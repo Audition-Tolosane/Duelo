@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(cd:*)",
+      "Bash(ipconfig:*)",
+      "Bash(pg_isready 2>/dev/null || echo \"PostgreSQL not found or not running\")",
+      "Bash(sleep:*)",
+      "Bash(curl:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(xargs -I {} basename {})",
+      "Bash(for model:*)"
+    ]
+  }
+}
