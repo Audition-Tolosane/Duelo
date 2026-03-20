@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Image,
   ActivityIndicator, KeyboardAvoidingView, Platform, Keyboard, RefreshControl,
-  Modal, FlatList, Dimensions
+  Modal, Dimensions
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -42,10 +42,6 @@ type CommentData = {
   content: string; created_at: string;
 };
 
-type LeaderEntry = {
-  id: string; rank: number; pseudo: string; avatar_seed: string;
-  level: number; title: string; xp: number;
-};
 
 export default function CategoryDetailScreen() {
   const router = useRouter();
@@ -73,9 +69,7 @@ export default function CategoryDetailScreen() {
   const [commentText, setCommentText] = useState('');
   const [commentingPost, setCommentingPost] = useState<string | null>(null);
 
-  // Leaderboard modal
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [leaderboard, setLeaderboard] = useState<LeaderEntry[]>([]);
+  // Leaderboard (navigates to separate screen)
 
   useEffect(() => {
     init();
@@ -141,14 +135,9 @@ export default function CategoryDetailScreen() {
     router.push(`/matchmaking?category=${id}&themeName=${encodeURIComponent(detail?.name || '')}`);
   };
 
-  const handleLeaderboard = async () => {
+  const handleLeaderboard = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setShowLeaderboard(true);
-    try {
-      const res = await fetch(`${API_URL}/api/theme/${id}/leaderboard`);
-      const data = await res.json();
-      setLeaderboard(data);
-    } catch {}
+    router.push(`/leaderboard?themeId=${id}&themeName=${encodeURIComponent(detail?.name || '')}`);
   };
 
   const pickImage = async () => {
@@ -483,56 +472,6 @@ export default function CategoryDetailScreen() {
         </KeyboardAvoidingView>
       </Modal>
 
-      {/* Leaderboard Modal */}
-      <Modal visible={showLeaderboard} transparent animationType="slide" onRequestClose={() => setShowLeaderboard(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.leaderModalContent}>
-            <View style={styles.leaderModalHeader}>
-              <Text style={styles.leaderModalTitle}>🏆 Classement {detail.name}</Text>
-              <TouchableOpacity onPress={() => setShowLeaderboard(false)}>
-                <Text style={styles.leaderModalClose}>✕</Text>
-              </TouchableOpacity>
-            </View>
-            {leaderboard.length === 0 ? (
-              <View style={styles.emptyLeader}>
-                <Text style={styles.emptyLeaderText}>Aucun joueur classé pour le moment</Text>
-              </View>
-            ) : (
-              <FlatList
-                data={leaderboard}
-                keyExtractor={item => item.pseudo}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.leaderRow}
-                    onPress={() => {
-                      setShowLeaderboard(false);
-                      router.push(`/player-profile?id=${item.id}`);
-                    }}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={[styles.leaderRank,
-                      item.rank === 1 && { color: '#FFD700' },
-                      item.rank === 2 && { color: '#C0C0C0' },
-                      item.rank === 3 && { color: '#CD7F32' },
-                    ]}>#{item.rank}</Text>
-                    <View style={[styles.leaderAvatar, { backgroundColor: meta.color + '40' }]}>
-                      <Text style={styles.leaderAvatarText}>{item.pseudo[0]?.toUpperCase()}</Text>
-                    </View>
-                    <View style={styles.leaderInfo}>
-                      <Text style={styles.leaderPseudo}>{item.pseudo}</Text>
-                      <Text style={[styles.leaderTitle, { color: meta.color }]}>{item.title}</Text>
-                    </View>
-                    <View style={styles.leaderStats}>
-                      <Text style={styles.leaderLevel}>Niv. {item.level}</Text>
-                      <Text style={styles.leaderXp}>{item.xp.toLocaleString()} XP</Text>
-                    </View>
-                  </TouchableOpacity>
-                )}
-              />
-            )}
-          </View>
-        </View>
-      </Modal>
     </View>
     </SwipeBackPage>
   );
@@ -690,31 +629,4 @@ const styles = StyleSheet.create({
   mediaBtnText: { color: '#A3A3A3', fontSize: 14 },
   charCount: { color: '#525252', fontSize: 13, fontWeight: '500' },
 
-  // Leaderboard Modal
-  leaderModalContent: {
-    backgroundColor: GLASS.bgDark, borderTopLeftRadius: 24, borderTopRightRadius: 24,
-    paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40, maxHeight: '80%',
-  },
-  leaderModalHeader: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20,
-  },
-  leaderModalTitle: { color: '#FFF', fontSize: 20, fontWeight: '800' },
-  leaderModalClose: { color: '#A3A3A3', fontSize: 22, fontWeight: '600', padding: 4 },
-  emptyLeader: { alignItems: 'center', paddingVertical: 40 },
-  emptyLeaderText: { color: '#525252', fontSize: 15 },
-  leaderRow: {
-    flexDirection: 'row', alignItems: 'center', paddingVertical: 12,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)',
-  },
-  leaderRank: { color: '#FFF', fontSize: 16, fontWeight: '800', width: 36, textAlign: 'center' },
-  leaderAvatar: {
-    width: 40, height: 40, borderRadius: 14, justifyContent: 'center', alignItems: 'center', marginRight: 12,
-  },
-  leaderAvatarText: { color: '#FFF', fontSize: 18, fontWeight: '800' },
-  leaderInfo: { flex: 1 },
-  leaderPseudo: { color: '#FFF', fontSize: 15, fontWeight: '700' },
-  leaderTitle: { fontSize: 12, fontWeight: '600', marginTop: 2 },
-  leaderStats: { alignItems: 'flex-end' },
-  leaderLevel: { color: '#FFF', fontSize: 14, fontWeight: '700' },
-  leaderXp: { color: '#525252', fontSize: 12, marginTop: 2 },
 });

@@ -39,7 +39,7 @@ const AVATAR_COLORS = [
   ['#4ECDC4', '#44AF69'],
 ];
 
-function getAvatarColors(seed: string): string[] {
+function getAvatarColors(seed: string): [string, string] {
   let hash = 0;
   for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];

@@ -11,7 +11,7 @@ const SWIPEABLE_SCREENS = [
   'search', 'conversations', 'notifications',
   'chat', 'player-profile', 'category-detail',
   'results', 'matchmaking', 'game',
-  'super-category', 'notification-settings',
+  'super-category', 'notification-settings', 'leaderboard',
 ];
 
 // Platform-specific options for swipeable screens
