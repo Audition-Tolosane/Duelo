@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { GLASS } from '../theme/glassTheme';
 import SwipeBackPage from '../components/SwipeBackPage';
 import { useWS } from '../contexts/WebSocketContext';
@@ -18,14 +19,14 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 const CATEGORY_META: Record<string, { icon: string; color: string; name: string }> = {
-  series_tv: { icon: '📺', color: '#E040FB', name: 'Séries TV' },
-  geographie: { icon: '🌍', color: '#00FFFF', name: 'Géographie' },
-  histoire: { icon: '🏛️', color: '#FFD700', name: 'Histoire' },
-  cinema: { icon: '🎬', color: '#FF6B6B', name: 'Cinéma' },
-  sport: { icon: '⚽', color: '#00FF9D', name: 'Sport' },
-  musique: { icon: '🎵', color: '#FF8C00', name: 'Musique' },
-  sciences: { icon: '🔬', color: '#7B68EE', name: 'Sciences' },
-  gastronomie: { icon: '🍽️', color: '#FF69B4', name: 'Gastronomie' },
+  series_tv: { icon: 'television-classic', color: '#E040FB', name: 'Séries TV' },
+  geographie: { icon: 'earth', color: '#00FFFF', name: 'Géographie' },
+  histoire: { icon: 'bank', color: '#FFD700', name: 'Histoire' },
+  cinema: { icon: 'movie-open', color: '#FF6B6B', name: 'Cinéma' },
+  sport: { icon: 'soccer', color: '#00FF9D', name: 'Sport' },
+  musique: { icon: 'music-note', color: '#FF8C00', name: 'Musique' },
+  sciences: { icon: 'microscope', color: '#7B68EE', name: 'Sciences' },
+  gastronomie: { icon: 'silverware-fork-knife', color: '#FF69B4', name: 'Gastronomie' },
 };
 
 type Message = {
@@ -157,7 +158,7 @@ export default function ChatScreen() {
         wsSend({
           action: 'chat_send',
           receiver_id: partnerId,
-          content: '📷 Image',
+          content: 'Image',
           message_type: 'image',
           extra_data: { image_base64: result.assets[0].base64.substring(0, 50000) },
         });
@@ -189,7 +190,7 @@ export default function ChatScreen() {
 
   // ── Game Card Component ──
   const GameCard = ({ data, isMe }: { data: any; isMe: boolean }) => {
-    const cat = CATEGORY_META[data?.category] || { icon: '🎮', color: '#8A2BE2', name: 'Quiz' };
+    const cat = CATEGORY_META[data?.category] || { icon: 'controller-classic', color: '#8A2BE2', name: 'Quiz' };
     const won = data?.winner_id === myId;
     const myScore = isMe ? data?.sender_score : data?.receiver_score;
     const theirScore = isMe ? data?.receiver_score : data?.sender_score;
@@ -201,11 +202,21 @@ export default function ChatScreen() {
           colors={[cat.color + '30', 'transparent']}
           style={st.gameCardHeader}
         >
-          <Text style={st.gameCardCategory}>{cat.icon} {cat.name}</Text>
+          <View style={st.gameCardCategoryRow}>
+            <MaterialCommunityIcons name={cat.icon as any} size={16} color={cat.color} />
+            <Text style={st.gameCardCategory}> {cat.name}</Text>
+          </View>
           <View style={[st.gameCardResultBadge, { backgroundColor: won ? '#00FF9D20' : '#FF6B6B20' }]}>
-            <Text style={[st.gameCardResultText, { color: won ? '#00FF9D' : '#FF6B6B' }]}>
-              {won ? '🏆 VICTOIRE' : '💀 DÉFAITE'}
-            </Text>
+            <View style={st.gameCardResultRow}>
+              <MaterialCommunityIcons
+                name={won ? 'trophy' : 'skull'}
+                size={13}
+                color={won ? '#00FF9D' : '#FF6B6B'}
+              />
+              <Text style={[st.gameCardResultText, { color: won ? '#00FF9D' : '#FF6B6B' }]}>
+                {' '}{won ? 'VICTOIRE' : 'DÉFAITE'}
+              </Text>
+            </View>
           </View>
         </LinearGradient>
 
@@ -239,7 +250,10 @@ export default function ChatScreen() {
             end={{ x: 1, y: 0 }}
             style={st.revancheGradient}
           >
-            <Text style={st.revancheText}>⚔️ REVANCHE</Text>
+            <View style={st.revancheContent}>
+              <MaterialCommunityIcons name="sword-cross" size={16} color="#FFF" />
+              <Text style={st.revancheText}> REVANCHE</Text>
+            </View>
           </LinearGradient>
         </TouchableOpacity>
       </View>
@@ -329,7 +343,7 @@ export default function ChatScreen() {
                     <Text style={st.myMsgText}>{item.content}</Text>
                     <View style={st.msgFooter}>
                       <Text style={st.msgTimeInner}>{formatTime(item.created_at)}</Text>
-                      {item.read && <Text style={st.readIndicator}>✓✓</Text>}
+                      {item.read && <MaterialCommunityIcons name="check-all" size={12} color="#00BFFF" />}
                     </View>
                   </LinearGradient>
                 ) : (
@@ -360,7 +374,7 @@ export default function ChatScreen() {
       {/* Premium Header */}
       <View style={st.header}>
         <TouchableOpacity data-testid="chat-back-button" onPress={() => router.back()} style={st.headerBack}>
-          <Text style={st.headerBackText}>←</Text>
+          <MaterialCommunityIcons name="chevron-left" size={26} color="#FFF" />
         </TouchableOpacity>
         <TouchableOpacity
           style={st.headerCenter}
@@ -385,7 +399,7 @@ export default function ChatScreen() {
           style={st.headerAction}
           onPress={() => router.push(`/player-profile?id=${partnerId}`)}
         >
-          <Text style={st.headerActionText}>👤</Text>
+          <MaterialCommunityIcons name="account-outline" size={22} color="rgba(255,255,255,0.5)" />
         </TouchableOpacity>
       </View>
 
@@ -405,11 +419,14 @@ export default function ChatScreen() {
                 colors={['#8A2BE2', '#00BFFF']}
                 style={st.emptyChatCircle}
               >
-                <Text style={st.emptyChatIcon}>💬</Text>
+                <MaterialCommunityIcons name="chat-outline" size={36} color="#FFF" />
               </LinearGradient>
               <Text style={st.emptyChatText}>Commencez la conversation !</Text>
               <Text style={st.emptyChatSub}>Défiez-vous et partagez vos résultats</Text>
-              <Text style={st.emptyChatTtl}>📌 Les messages expirent après 7 jours</Text>
+              <View style={st.emptyChatTtlRow}>
+                <MaterialCommunityIcons name="pin" size={13} color="#525252" />
+                <Text style={st.emptyChatTtl}> Les messages expirent après 7 jours</Text>
+              </View>
             </View>
           }
         />
@@ -419,7 +436,7 @@ export default function ChatScreen() {
           <View style={st.inputRow}>
             {/* Image Picker Button */}
             <TouchableOpacity style={st.attachBtn} onPress={handleSendImage}>
-              <Text style={st.attachBtnText}>📷</Text>
+              <MaterialCommunityIcons name="camera-outline" size={22} color="rgba(255,255,255,0.5)" />
             </TouchableOpacity>
 
             {/* Text Input */}
@@ -451,12 +468,12 @@ export default function ChatScreen() {
                   {sending ? (
                     <ActivityIndicator size="small" color="#FFF" />
                   ) : (
-                    <Text style={st.sendBtnText}>↑</Text>
+                    <MaterialCommunityIcons name="arrow-up" size={20} color="#FFF" />
                   )}
                 </LinearGradient>
               ) : (
                 <View style={[st.sendBtn, st.sendBtnInactive]}>
-                  <Text style={st.sendBtnText}>↑</Text>
+                  <MaterialCommunityIcons name="arrow-up" size={20} color="#FFF" />
                 </View>
               )}
             </TouchableOpacity>
@@ -478,8 +495,11 @@ const st = StyleSheet.create({
     borderBottomWidth: 1, borderBottomColor: 'rgba(138,43,226,0.15)',
     backgroundColor: 'rgba(138,43,226,0.03)',
   },
-  headerBack: { padding: 8, marginRight: 4 },
-  headerBackText: { color: '#A3A3A3', fontSize: 22, fontWeight: '600' },
+  headerBack: {
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    justifyContent: 'center', alignItems: 'center', marginRight: 4,
+  },
   headerCenter: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
   headerAvatar: {
     width: 42, height: 42, borderRadius: 21,
@@ -491,8 +511,11 @@ const st = StyleSheet.create({
   headerOnlineRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 2 },
   onlineDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#00FF9D' },
   headerSub: { color: '#00FF9D', fontSize: 11, fontWeight: '600' },
-  headerAction: { padding: 8 },
-  headerActionText: { fontSize: 20 },
+  headerAction: {
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    justifyContent: 'center', alignItems: 'center',
+  },
 
   // Messages
   messagesList: { paddingHorizontal: 12, paddingTop: 12, paddingBottom: 8, flexGrow: 1, justifyContent: 'flex-end' },
@@ -540,7 +563,6 @@ const st = StyleSheet.create({
   msgFooter: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 4, marginTop: 4 },
   msgTimeInner: { fontSize: 10, color: 'rgba(255,255,255,0.5)', textAlign: 'right', marginTop: 3 },
   theirMsgTime: { fontSize: 10, color: '#525252', marginTop: 3 },
-  readIndicator: { color: '#00BFFF', fontSize: 10, fontWeight: '800' },
 
   // Image Message
   imageMessage: {
@@ -558,8 +580,10 @@ const st = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingHorizontal: 14, paddingVertical: 10,
   },
+  gameCardCategoryRow: { flexDirection: 'row', alignItems: 'center' },
   gameCardCategory: { color: '#FFF', fontSize: 14, fontWeight: '700' },
   gameCardResultBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
+  gameCardResultRow: { flexDirection: 'row', alignItems: 'center' },
   gameCardResultText: { fontSize: 11, fontWeight: '900', letterSpacing: 1 },
 
   gameCardScore: {
@@ -581,6 +605,7 @@ const st = StyleSheet.create({
     paddingVertical: 12, alignItems: 'center', justifyContent: 'center',
     borderRadius: 14,
   },
+  revancheContent: { flexDirection: 'row', alignItems: 'center' },
   revancheText: { color: '#FFF', fontSize: 14, fontWeight: '900', letterSpacing: 1 },
 
   // Empty Chat
@@ -589,13 +614,15 @@ const st = StyleSheet.create({
     width: 80, height: 80, borderRadius: 40,
     justifyContent: 'center', alignItems: 'center', marginBottom: 16,
   },
-  emptyChatIcon: { fontSize: 36 },
   emptyChatText: { color: '#FFF', fontSize: 20, fontWeight: '800', marginBottom: 6 },
   emptyChatSub: { color: '#A3A3A3', fontSize: 14, marginBottom: 20 },
-  emptyChatTtl: {
-    color: '#525252', fontSize: 12, fontWeight: '600',
+  emptyChatTtlRow: {
+    flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.04)', paddingHorizontal: 14, paddingVertical: 8,
     borderRadius: 10, overflow: 'hidden',
+  },
+  emptyChatTtl: {
+    color: '#525252', fontSize: 12, fontWeight: '600',
   },
 
   // Premium Input Bar
@@ -605,12 +632,12 @@ const st = StyleSheet.create({
   },
   inputRow: {
     flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: 10, paddingVertical: 10, gap: 8,
+    backgroundColor: 'rgba(255,255,255,0.03)',
   },
   attachBtn: {
     width: 42, height: 42, borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.06)',
     justifyContent: 'center', alignItems: 'center',
   },
-  attachBtnText: { fontSize: 20 },
   inputContainer: {
     flex: 1, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 22,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
@@ -623,5 +650,4 @@ const st = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center',
   },
   sendBtnInactive: { backgroundColor: '#1A1A2E' },
-  sendBtnText: { color: '#FFF', fontSize: 20, fontWeight: '800' },
 });

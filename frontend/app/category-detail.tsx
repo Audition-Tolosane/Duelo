@@ -4,13 +4,15 @@ import {
   ActivityIndicator, KeyboardAvoidingView, Platform, Keyboard, RefreshControl,
   Modal, FlatList, Dimensions
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import { GLASS } from '../theme/glassTheme';
 import SwipeBackPage from '../components/SwipeBackPage';
+import DueloHeader from '../components/DueloHeader';
+import CategoryIcon from '../components/CategoryIcon';
 
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
@@ -47,6 +49,7 @@ type LeaderEntry = {
 
 export default function CategoryDetailScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const oldMeta = { icon: '❓', color: '#8A2BE2', bgPattern: '' };
 
@@ -250,7 +253,10 @@ export default function CategoryDetailScreen() {
 
   return (
     <SwipeBackPage>
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <View style={{ paddingTop: insets.top, backgroundColor: GLASS.bgDark }}>
+        <DueloHeader />
+      </View>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -266,7 +272,7 @@ export default function CategoryDetailScreen() {
           <View style={[styles.headerCard, { borderColor: meta.color + '30' }]}>
             <View style={styles.headerTop}>
               <View style={[styles.catImageBox, { backgroundColor: meta.color + '20' }]}>
-                <Text style={styles.catEmoji}>{meta.icon}</Text>
+                <CategoryIcon themeId={id} emoji={meta.icon} size={32} color={meta.color} type="theme" />
               </View>
               <View style={styles.headerInfo}>
                 <Text style={styles.catName}>{detail.name}</Text>
@@ -527,7 +533,7 @@ export default function CategoryDetailScreen() {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
     </SwipeBackPage>
   );
 }
@@ -587,7 +593,7 @@ const styles = StyleSheet.create({
   progressPct: { color: '#FFF', fontSize: 12, fontWeight: '800', textAlign: 'center', zIndex: 1 },
 
   // Stats Row
-  statsRow: { flexDirection: 'row', alignItems: 'center' },
+  statsRow: { flexDirection: 'row', alignItems: 'flex-start' },
   statItem: { flex: 1, alignItems: 'center' },
   statLabel: { fontSize: 9, fontWeight: '800', color: '#525252', letterSpacing: 1, marginBottom: 6 },
   statValue: { fontSize: 28, fontWeight: '900', color: '#FFF' },

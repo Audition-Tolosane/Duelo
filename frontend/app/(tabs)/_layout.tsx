@@ -7,6 +7,7 @@ import Animated, {
   runOnJS, interpolate, Extrapolation,
 } from 'react-native-reanimated';
 import { useRouter, usePathname, Slot } from 'expo-router';
+import * as Haptics from 'expo-haptics';
 import { GLASS } from '../../theme/glassTheme';
 import DueloHeader from '../../components/DueloHeader';
 import { useSwipeBackProgress } from '../../components/SwipeBackContext';
@@ -109,9 +110,12 @@ export default function TabLayout() {
   }, [pathname, SCREEN_WIDTH]);
 
   const updateActiveIndex = useCallback((idx: number) => {
+    if (idx !== activeIndex) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     setActiveIndex(idx);
     lastSyncedPath.current = TAB_NAMES[idx];
-  }, []);
+  }, [activeIndex]);
 
   const panGesture = Gesture.Pan()
     .activeOffsetX([-30, 30])
@@ -157,11 +161,14 @@ export default function TabLayout() {
   }));
 
   const onTabPress = useCallback((index: number) => {
+    if (index !== activeIndex) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     currentIndex.value = index;
     translateX.value = withTiming(-index * SCREEN_WIDTH, { duration: 300 });
     setActiveIndex(index);
     lastSyncedPath.current = TAB_NAMES[index];
-  }, [SCREEN_WIDTH]);
+  }, [SCREEN_WIDTH, activeIndex]);
 
   // Parallax: shift the tab content slightly left when a stack page is on top
   // progress: 0 = normal (no page on top), 1 = page fully covering tabs

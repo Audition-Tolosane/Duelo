@@ -5,9 +5,12 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import SwipeBackPage from '../components/SwipeBackPage';
+import DueloHeader from '../components/DueloHeader';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -21,46 +24,59 @@ interface NotificationSettingsData {
   system: boolean;
 }
 
-const SETTINGS_CONFIG = [
+const SETTINGS_CONFIG: {
+  key: keyof NotificationSettingsData;
+  icon: string;
+  colors: [string, string];
+  title: string;
+  description: string;
+}[] = [
   {
-    key: 'challenges' as const,
-    icon: '⚔️',
+    key: 'challenges',
+    icon: 'sword-cross',
+    colors: ['#FF6B35', '#FF8F60'],
     title: 'Défis',
     description: 'Quand un joueur te défie en duel',
   },
   {
-    key: 'match_results' as const,
-    icon: '🏆',
+    key: 'match_results',
+    icon: 'trophy',
+    colors: ['#8A2BE2', '#A855F7'],
     title: 'Résultats de match',
     description: 'Résumé après chaque partie',
   },
   {
-    key: 'follows' as const,
-    icon: '👤',
+    key: 'follows',
+    icon: 'account-plus',
+    colors: ['#00D4FF', '#38BDF8'],
     title: 'Nouveaux followers',
     description: 'Quand quelqu\'un commence à te suivre',
   },
   {
-    key: 'messages' as const,
-    icon: '💬',
+    key: 'messages',
+    icon: 'chat',
+    colors: ['#4CAF50', '#66BB6A'],
     title: 'Messages',
     description: 'Nouveaux messages de chat',
   },
   {
-    key: 'likes' as const,
-    icon: '❤️',
+    key: 'likes',
+    icon: 'heart',
+    colors: ['#FF3B5C', '#FF6B81'],
     title: 'Likes',
     description: 'Quand quelqu\'un aime ta publication',
   },
   {
-    key: 'comments' as const,
-    icon: '💬',
+    key: 'comments',
+    icon: 'comment-text',
+    colors: ['#FFB800', '#FFC933'],
     title: 'Commentaires',
     description: 'Quand quelqu\'un commente ta publication',
   },
   {
-    key: 'system' as const,
-    icon: '🔔',
+    key: 'system',
+    icon: 'bell',
+    colors: ['#6B7280', '#9CA3AF'],
     title: 'Système',
     description: 'Mises à jour et annonces',
   },
@@ -79,7 +95,6 @@ export default function NotificationSettingsScreen() {
     system: true,
   });
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -117,7 +132,6 @@ export default function NotificationSettingsScreen() {
         body: JSON.stringify({ user_id: userId, [key]: value }),
       });
     } catch {
-      // Revert on error
       setSettings(prev => ({ ...prev, [key]: !value }));
     }
   };
@@ -148,11 +162,14 @@ export default function NotificationSettingsScreen() {
 
   const allEnabled = Object.values(settings).every(v => v);
   const allDisabled = Object.values(settings).every(v => !v);
+  const enabledCount = Object.values(settings).filter(v => v).length;
 
   return (
     <SwipeBackPage>
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* Header */}
+      <DueloHeader />
+
+      {/* Sub-header */}
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backBtn}
@@ -161,10 +178,13 @@ export default function NotificationSettingsScreen() {
             router.back();
           }}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <MaterialCommunityIcons name="chevron-left" size={22} color="#FFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Paramètres</Text>
-        <View style={{ width: 40 }} />
+        <View style={styles.headerCenter}>
+          <MaterialCommunityIcons name="bell-cog-outline" size={18} color="#8A2BE2" />
+          <Text style={styles.headerTitle}>Paramètres</Text>
+        </View>
+        <View style={{ width: 36 }} />
       </View>
 
       {loading ? (
@@ -177,56 +197,115 @@ export default function NotificationSettingsScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Master Toggle */}
+          {/* Master Toggle Card */}
           <View style={styles.masterCard}>
-            <View style={styles.masterLeft}>
-              <Text style={styles.masterIcon}>🔔</Text>
-              <View>
-                <Text style={styles.masterTitle}>Toutes les notifications</Text>
-                <Text style={styles.masterSubtitle}>
-                  {allEnabled ? 'Toutes activées' : allDisabled ? 'Toutes désactivées' : 'Personnalisé'}
-                </Text>
+            <LinearGradient
+              colors={['rgba(138,43,226,0.15)', 'rgba(138,43,226,0.05)']}
+              style={styles.masterGradient}
+            >
+              <View style={styles.masterTop}>
+                <LinearGradient colors={['#8A2BE2', '#A855F7']} style={styles.masterIconCircle}>
+                  <MaterialCommunityIcons name="bell-ring" size={24} color="#FFF" />
+                </LinearGradient>
+                <View style={styles.masterTextWrap}>
+                  <Text style={styles.masterTitle}>Toutes les notifications</Text>
+                  <Text style={styles.masterSubtitle}>
+                    {allEnabled
+                      ? 'Toutes activées'
+                      : allDisabled
+                      ? 'Toutes désactivées'
+                      : `${enabledCount}/${SETTINGS_CONFIG.length} activées`}
+                  </Text>
+                </View>
+                <Switch
+                  value={allEnabled}
+                  onValueChange={(val) => toggleAll(val)}
+                  trackColor={{ false: '#333', true: 'rgba(138, 43, 226, 0.5)' }}
+                  thumbColor={allEnabled ? '#A855F7' : '#666'}
+                  ios_backgroundColor="#333"
+                />
               </View>
-            </View>
-            <Switch
-              value={allEnabled}
-              onValueChange={(val) => toggleAll(val)}
-              trackColor={{ false: '#333', true: 'rgba(138, 43, 226, 0.4)' }}
-              thumbColor={allEnabled ? '#8A2BE2' : '#666'}
-              ios_backgroundColor="#333"
-            />
+
+              {/* Status bar */}
+              <View style={styles.statusBar}>
+                {SETTINGS_CONFIG.map((config) => (
+                  <View
+                    key={config.key}
+                    style={[
+                      styles.statusDot,
+                      { backgroundColor: settings[config.key] ? config.colors[0] : 'rgba(255,255,255,0.1)' },
+                    ]}
+                  />
+                ))}
+              </View>
+            </LinearGradient>
+          </View>
+
+          {/* Section header */}
+          <View style={styles.sectionHeaderRow}>
+            <MaterialCommunityIcons name="tune-variant" size={14} color="rgba(255,255,255,0.4)" />
+            <Text style={styles.sectionTitle}>Types de notifications</Text>
           </View>
 
           {/* Individual Settings */}
-          <Text style={styles.sectionTitle}>Types de notifications</Text>
+          {SETTINGS_CONFIG.map((config) => {
+            const enabled = settings[config.key];
 
-          {SETTINGS_CONFIG.map((config) => (
-            <View key={config.key} style={styles.settingRow}>
-              <View style={styles.settingLeft}>
-                <View style={styles.settingIconWrap}>
-                  <Text style={styles.settingIcon}>{config.icon}</Text>
-                </View>
+            return (
+              <View key={config.key} style={[styles.settingRow, enabled && styles.settingRowEnabled]}>
+                {/* Icon */}
+                <LinearGradient
+                  colors={enabled ? config.colors : ['rgba(255,255,255,0.06)', 'rgba(255,255,255,0.03)']}
+                  style={styles.settingIconWrap}
+                >
+                  <MaterialCommunityIcons
+                    name={config.icon as any}
+                    size={18}
+                    color={enabled ? '#FFF' : 'rgba(255,255,255,0.3)'}
+                  />
+                </LinearGradient>
+
+                {/* Text */}
                 <View style={styles.settingText}>
-                  <Text style={styles.settingTitle}>{config.title}</Text>
+                  <Text style={[styles.settingTitle, !enabled && styles.settingTitleDisabled]}>
+                    {config.title}
+                  </Text>
                   <Text style={styles.settingDesc}>{config.description}</Text>
                 </View>
+
+                {/* Switch */}
+                <Switch
+                  value={enabled}
+                  onValueChange={(val) => updateSetting(config.key, val)}
+                  trackColor={{ false: '#333', true: `${config.colors[0]}60` }}
+                  thumbColor={enabled ? config.colors[0] : '#666'}
+                  ios_backgroundColor="#333"
+                />
               </View>
-              <Switch
-                value={settings[config.key]}
-                onValueChange={(val) => updateSetting(config.key, val)}
-                trackColor={{ false: '#333', true: 'rgba(138, 43, 226, 0.4)' }}
-                thumbColor={settings[config.key] ? '#8A2BE2' : '#666'}
-                ios_backgroundColor="#333"
-              />
-            </View>
-          ))}
+            );
+          })}
 
           {/* Info card */}
           <View style={styles.infoCard}>
-            <Text style={styles.infoIcon}>💡</Text>
+            <LinearGradient colors={['#FFB800', '#FFC933']} style={styles.infoIconCircle}>
+              <MaterialCommunityIcons name="lightbulb-on" size={14} color="#FFF" />
+            </LinearGradient>
             <Text style={styles.infoText}>
               Les notifications de défis sont prioritaires et seront toujours affichées en premier dans ta liste.
             </Text>
+          </View>
+
+          {/* Quiet hours hint */}
+          <View style={styles.quietCard}>
+            <LinearGradient colors={['#6B7280', '#9CA3AF']} style={styles.infoIconCircle}>
+              <MaterialCommunityIcons name="moon-waning-crescent" size={14} color="#FFF" />
+            </LinearGradient>
+            <View style={styles.quietText}>
+              <Text style={styles.quietTitle}>Mode silencieux</Text>
+              <Text style={styles.quietDesc}>
+                Active le mode "Ne pas déranger" de ton téléphone pour mettre en pause toutes les notifications Duelo.
+              </Text>
+            </View>
           </View>
         </ScrollView>
       )}
@@ -238,7 +317,7 @@ export default function NotificationSettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#050510',
   },
   header: {
     flexDirection: 'row',
@@ -247,19 +326,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.06)',
+    borderBottomColor: 'rgba(138, 43, 226, 0.15)',
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: 'rgba(255,255,255,0.06)',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
-  backIcon: {
-    fontSize: 20,
-    color: '#FFF',
+  headerCenter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   headerTitle: {
     fontSize: 18,
@@ -280,23 +362,29 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   masterCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(138, 43, 226, 0.08)',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 18,
+    overflow: 'hidden',
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: 'rgba(138, 43, 226, 0.15)',
+    borderColor: 'rgba(138, 43, 226, 0.2)',
   },
-  masterLeft: {
+  masterGradient: {
+    padding: 18,
+  },
+  masterTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
   },
-  masterIcon: {
-    fontSize: 28,
+  masterIconCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+  masterTextWrap: {
+    flex: 1,
   },
   masterTitle: {
     fontSize: 16,
@@ -305,76 +393,121 @@ const styles = StyleSheet.create({
   },
   masterSubtitle: {
     fontSize: 12,
-    color: '#888',
+    color: 'rgba(255,255,255,0.5)',
     marginTop: 2,
+  },
+  statusBar: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 14,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.06)',
+  },
+  statusDot: {
+    flex: 1,
+    height: 4,
+    borderRadius: 2,
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 14,
   },
   sectionTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#666',
+    color: 'rgba(255,255,255,0.4)',
     textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 12,
+    letterSpacing: 0.8,
   },
   settingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: 'rgba(255,255,255,0.02)',
     borderRadius: 14,
     padding: 14,
     marginBottom: 8,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
-  settingLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    marginRight: 12,
+  settingRowEnabled: {
+    borderColor: 'rgba(255,255,255,0.04)',
   },
   settingIconWrap: {
-    width: 40,
-    height: 40,
+    width: 38,
+    height: 38,
     borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.06)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
-  settingIcon: {
-    fontSize: 18,
-  },
   settingText: {
     flex: 1,
+    marginRight: 12,
   },
   settingTitle: {
     fontSize: 15,
     fontWeight: '600',
     color: '#FFF',
   },
+  settingTitleDisabled: {
+    color: 'rgba(255,255,255,0.4)',
+  },
   settingDesc: {
     fontSize: 12,
-    color: '#777',
+    color: 'rgba(255,255,255,0.35)',
     marginTop: 2,
   },
   infoCard: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: 'rgba(255, 185, 0, 0.08)',
+    backgroundColor: 'rgba(255, 185, 0, 0.06)',
     borderRadius: 14,
     padding: 14,
-    marginTop: 16,
-    gap: 10,
+    marginTop: 20,
+    gap: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 185, 0, 0.15)',
+    borderColor: 'rgba(255, 185, 0, 0.12)',
   },
-  infoIcon: {
-    fontSize: 18,
-    marginTop: 2,
+  infoIconCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexShrink: 0,
   },
   infoText: {
     flex: 1,
     fontSize: 13,
-    color: '#BBB',
+    color: 'rgba(255,255,255,0.6)',
     lineHeight: 18,
+  },
+  quietCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    borderRadius: 14,
+    padding: 14,
+    marginTop: 10,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+  },
+  quietText: {
+    flex: 1,
+  },
+  quietTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.7)',
+    marginBottom: 4,
+  },
+  quietDesc: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.35)',
+    lineHeight: 17,
   },
 });

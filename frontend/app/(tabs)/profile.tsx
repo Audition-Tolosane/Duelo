@@ -7,6 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DueloHeader from '../../components/DueloHeader';
 import { GLASS } from '../../theme/glassTheme';
 import CosmicBackground from '../../components/CosmicBackground';
@@ -316,36 +318,39 @@ export default function ProfileScreen() {
         {/* ── Paramètres ── */}
         <Text style={s.sectionTitle}>PARAMÈTRES</Text>
         <View style={s.settingsWrap}>
-          <TouchableOpacity style={s.settingsRow} onPress={() => setShowTitleModal(true)}>
-            <Text style={s.settingsIcon}>🏷️</Text>
-            <Text style={s.settingsText}>Changer de titre</Text>
-            <Text style={s.settingsArrow}>›</Text>
-          </TouchableOpacity>
-          <View style={s.settingsDivider} />
-          <TouchableOpacity style={s.settingsRow}>
-            <Text style={s.settingsIcon}>🔔</Text>
-            <Text style={s.settingsText}>Notifications</Text>
-            <Text style={s.settingsArrow}>›</Text>
-          </TouchableOpacity>
-          <View style={s.settingsDivider} />
-          <TouchableOpacity style={s.settingsRow}>
-            <Text style={s.settingsIcon}>🌐</Text>
-            <Text style={s.settingsText}>Langue</Text>
-            <Text style={s.settingsArrow}>›</Text>
-          </TouchableOpacity>
-          <View style={s.settingsDivider} />
-          <TouchableOpacity style={s.settingsRow}>
-            <Text style={s.settingsIcon}>📜</Text>
-            <Text style={s.settingsText}>Conditions d'utilisation</Text>
-            <Text style={s.settingsArrow}>›</Text>
-          </TouchableOpacity>
-          <View style={s.settingsDivider} />
-          <TouchableOpacity style={[s.settingsRow]} onPress={handleLogout} activeOpacity={0.7}>
-            <Text style={s.settingsIcon}>🚪</Text>
-            <Text style={[s.settingsText, { color: '#FF3B30' }]}>Se déconnecter</Text>
-            <Text style={[s.settingsArrow, { color: '#FF3B30' }]}>›</Text>
-          </TouchableOpacity>
+          {[
+            { icon: 'tag-outline' as const, label: 'Changer de titre', color: '#8A2BE2', onPress: () => setShowTitleModal(true) },
+            { icon: 'bell-outline' as const, label: 'Notifications', color: '#FFD700' },
+            { icon: 'translate' as const, label: 'Langue', color: '#4ECDC4' },
+            { icon: 'file-document-outline' as const, label: 'Conditions d\'utilisation', color: '#A3A3A3' },
+          ].map((item, idx) => (
+            <React.Fragment key={item.label}>
+              <TouchableOpacity style={s.settingsRow} onPress={item.onPress} activeOpacity={0.7}>
+                <LinearGradient
+                  colors={[item.color + '20', item.color + '08']}
+                  style={s.settingsIconCircle}
+                >
+                  <MaterialCommunityIcons name={item.icon} size={20} color={item.color} />
+                </LinearGradient>
+                <Text style={s.settingsText}>{item.label}</Text>
+                <MaterialCommunityIcons name="chevron-right" size={20} color="rgba(255,255,255,0.2)" />
+              </TouchableOpacity>
+              {idx < 3 && <View style={s.settingsDivider} />}
+            </React.Fragment>
+          ))}
         </View>
+
+        {/* Déconnexion */}
+        <TouchableOpacity style={s.logoutRow} onPress={handleLogout} activeOpacity={0.7}>
+          <LinearGradient
+            colors={['rgba(255,59,48,0.15)', 'rgba(255,59,48,0.05)']}
+            style={s.settingsIconCircle}
+          >
+            <MaterialCommunityIcons name="logout" size={20} color="#FF3B30" />
+          </LinearGradient>
+          <Text style={[s.settingsText, { color: '#FF3B30' }]}>Se déconnecter</Text>
+          <MaterialCommunityIcons name="chevron-right" size={20} color="#FF3B3040" />
+        </TouchableOpacity>
       </ScrollView>
 
       {/* Title Selection Modal */}
@@ -505,15 +510,26 @@ const s = StyleSheet.create({
 
   /* Settings */
   settingsWrap: {
-    marginHorizontal: GRID_PAD, borderRadius: GLASS.radius, overflow: 'hidden',
-    backgroundColor: GLASS.bg,
-    borderWidth: 1, borderColor: GLASS.borderCyan, marginBottom: 24,
+    marginHorizontal: GRID_PAD, borderRadius: 20, overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', marginBottom: 12,
   },
-  settingsRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 16 },
-  settingsIcon: { fontSize: 18, marginRight: 12 },
+  settingsRow: {
+    flexDirection: 'row', alignItems: 'center',
+    paddingVertical: 12, paddingHorizontal: 14,
+  },
+  settingsIconCircle: {
+    width: 38, height: 38, borderRadius: 12,
+    justifyContent: 'center', alignItems: 'center', marginRight: 14,
+  },
   settingsText: { flex: 1, color: '#E0E0E0', fontSize: 15, fontWeight: '600' },
-  settingsArrow: { color: '#525252', fontSize: 22, fontWeight: '300' },
-  settingsDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.04)', marginHorizontal: 16 },
+  settingsDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.04)', marginLeft: 66 },
+  logoutRow: {
+    flexDirection: 'row', alignItems: 'center',
+    marginHorizontal: GRID_PAD, paddingVertical: 12, paddingHorizontal: 14,
+    borderRadius: 20, backgroundColor: 'rgba(255,59,48,0.06)',
+    borderWidth: 1, borderColor: 'rgba(255,59,48,0.12)', marginBottom: 24,
+  },
 
   /* Modal */
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', paddingHorizontal: 24 },

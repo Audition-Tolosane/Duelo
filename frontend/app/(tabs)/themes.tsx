@@ -1,29 +1,23 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
-  Dimensions, FlatList, Modal, Pressable, Platform, useWindowDimensions, Image,
+  Dimensions, Modal, Pressable,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, {
-  useSharedValue, useAnimatedStyle, withTiming, withSpring,
-  withDelay, withRepeat, withSequence, Easing, FadeIn, FadeInDown,
-  FadeInUp, interpolateColor, runOnJS,
+  useSharedValue, useAnimatedStyle, withTiming,
+  FadeIn, FadeInDown, FadeInUp,
 } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
-import { BlurView } from 'expo-blur';
-import DueloHeader from '../../components/DueloHeader';
-import { GlassIconFrame } from '../../components/GlassIconFrame';
-import { GLASS } from '../../theme/glassTheme';
 import CosmicBackground from '../../components/CosmicBackground';
+import CategoryIcon from '../../components/CategoryIcon';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
-const CARD_W = 130;
-const CARD_H = 170;
-const GRID_CARD_W = Math.floor((SCREEN_W - 48 - 16) / 3);
+const { width: SCREEN_W } = Dimensions.get('window');
 
 // ── Types ──
 type TopicData = {
@@ -43,219 +37,34 @@ type PillarData = {
   icon: string; themes: ThemeData[];
 };
 
-// ── Progress Ring Component ──
-const ProgressRing = ({ progress, color, size = 72, strokeWidth = 4 }: {
+// ── Progress Ring ──
+const ProgressRing = ({ progress, color, size = 56, strokeWidth = 3 }: {
   progress: number; color: string; size?: number; strokeWidth?: number;
 }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - Math.min(progress, 1));
-
   return (
     <Svg width={size} height={size} style={{ position: 'absolute' }}>
-      <Circle
-        cx={size / 2} cy={size / 2} r={radius}
-        stroke={color + '20'} strokeWidth={strokeWidth} fill="none"
-      />
-      <Circle
-        cx={size / 2} cy={size / 2} r={radius}
-        stroke={color} strokeWidth={strokeWidth} fill="none"
-        strokeDasharray={`${circumference}`}
-        strokeDashoffset={strokeDashoffset}
-        strokeLinecap="round"
-        rotation={-90} origin={`${size / 2}, ${size / 2}`}
-      />
+      <Circle cx={size/2} cy={size/2} r={radius} stroke={color+'20'} strokeWidth={strokeWidth} fill="none" />
+      <Circle cx={size/2} cy={size/2} r={radius} stroke={color} strokeWidth={strokeWidth} fill="none"
+        strokeDasharray={`${circumference}`} strokeDashoffset={strokeDashoffset}
+        strokeLinecap="round" rotation={-90} origin={`${size/2}, ${size/2}`} />
     </Svg>
-  );
-};
-
-// ── Animated Neon Border (for La Forge) ──
-const NeonBorderCard = ({ children }: { children: React.ReactNode }) => {
-  const glowOpacity = useSharedValue(0.4);
-
-  useEffect(() => {
-    glowOpacity.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0.4, { duration: 1500, easing: Easing.inOut(Easing.ease) })
-      ),
-      -1, true
-    );
-  }, []);
-
-  const borderStyle = useAnimatedStyle(() => ({
-    opacity: glowOpacity.value,
-  }));
-
-  return (
-    <View style={forgeStyles.outerWrap}>
-      <Animated.View style={[forgeStyles.neonBorder, borderStyle]} />
-      <View style={forgeStyles.innerCard}>
-        {children}
-      </View>
-    </View>
-  );
-};
-
-// ── Theme Card ──
-const ThemeCard = ({ theme, pillarColor, onPress, onLongPress }: {
-  theme: ThemeData; pillarColor: string;
-  onPress: () => void; onLongPress: () => void;
-}) => {
-  const isLocked = theme.level === 0 && !theme.playable;
-  const isNewTheme = theme.level === 0 && theme.playable;
-  const progress = theme.xp_progress?.progress || 0;
-
-  return (
-    <TouchableOpacity
-      style={styles.themeCard}
-      onPress={onPress}
-      onLongPress={onLongPress}
-      delayLongPress={500}
-      activeOpacity={0.7}
-    >
-      <View style={[
-        styles.themeCardInner,
-        { borderColor: isLocked ? '#222' : pillarColor + '30' },
-        isLocked && styles.themeCardLocked,
-      ]}>
-        {/* GlassIconFrame */}
-        <GlassIconFrame
-          emoji={theme.icon}
-          size={64}
-          pillarColor={pillarColor}
-          progress={progress}
-          showRing={!isLocked}
-          locked={isLocked}
-        />
-
-        {/* Name */}
-        <Text style={[
-          styles.themeName,
-          { color: isLocked ? '#444' : '#FFF' },
-        ]} numberOfLines={2}>
-          {theme.name}
-        </Text>
-
-        {/* Badge Level / Lock */}
-        {isLocked ? (
-          <View style={styles.lockBadge}>
-            <Text style={styles.lockText}>🔒 Bientôt</Text>
-          </View>
-        ) : isNewTheme ? (
-          <View style={[styles.levelBadge, { backgroundColor: pillarColor + '25', borderColor: pillarColor + '50' }]}>
-            <Text style={[styles.levelBadgeText, { color: pillarColor }]}>À découvrir</Text>
-          </View>
-        ) : (
-          <View style={[styles.levelBadge, { backgroundColor: pillarColor + '25', borderColor: pillarColor + '50' }]}>
-            <Text style={[styles.levelBadgeText, { color: pillarColor }]}>Niv. {theme.level}</Text>
-          </View>
-        )}
-
-        {/* Title */}
-        {theme.title ? (
-          <Text style={[styles.themeTitle, { color: pillarColor + 'CC' }]} numberOfLines={1}>
-            {theme.title}
-          </Text>
-        ) : null}
-      </View>
-    </TouchableOpacity>
-  );
-};
-
-// ── Topic Card (Individual themes like Breaking Bad) ──
-const TopicCardItem = ({ topic, pillarColor, onPress }: {
-  topic: TopicData; pillarColor: string; onPress: () => void;
-}) => {
-  return (
-    <TouchableOpacity
-      style={styles.topicCard}
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      <View style={[styles.topicCardInner, { borderColor: pillarColor + '25' }]}>
-        {/* Subtle glow */}
-        <View style={[styles.topicGlow, {
-          backgroundColor: pillarColor + '06',
-          shadowColor: pillarColor,
-        }]} />
-
-        <GlassIconFrame
-          iconUrl={topic.icon_url || undefined}
-          emoji={!topic.icon_url ? topic.icon : undefined}
-          size={68}
-          pillarColor={pillarColor}
-          progress={0}
-          showRing={true}
-        />
-
-        <Text style={styles.topicName} numberOfLines={2}>{topic.name}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-};
-
-// ── Grid Theme Card (for "Tout Voir") ──
-const GridThemeCard = ({ theme, pillarColor, onPress, index, cardWidth }: {
-  theme: ThemeData; pillarColor: string; onPress: () => void; index: number; cardWidth: number;
-}) => {
-  const isLocked = theme.level === 0 && !theme.playable;
-  const progress = theme.xp_progress?.progress || 0;
-
-  return (
-    <Animated.View entering={FadeInDown.delay(index * 80).springify()} style={{ width: cardWidth, marginBottom: 8 }}>
-      <TouchableOpacity
-        onPress={onPress}
-        activeOpacity={0.7}
-        style={{ width: '100%' }}
-      >
-        <View style={[
-          styles.gridCardInner,
-          { borderColor: isLocked ? '#222' : pillarColor + '30' },
-          isLocked && styles.themeCardLocked,
-        ]}>
-          <View style={styles.gridRingWrap}>
-            {!isLocked && (
-              <ProgressRing progress={progress} color={pillarColor} size={56} strokeWidth={3} />
-            )}
-            <View style={[styles.gridIconCircle, { backgroundColor: isLocked ? '#111' : pillarColor + '15' }]}>
-              <Text style={[styles.gridThemeIcon, isLocked && { opacity: 0.3 }]}>{theme.icon}</Text>
-            </View>
-          </View>
-          <Text style={[styles.gridThemeName, { color: isLocked ? '#444' : '#FFF' }]} numberOfLines={2}>
-            {theme.name}
-          </Text>
-          {!isLocked && theme.level > 0 && (
-            <Text style={[styles.gridLevel, { color: pillarColor }]}>Niv. {theme.level}</Text>
-          )}
-        </View>
-      </TouchableOpacity>
-    </Animated.View>
   );
 };
 
 // ── Main Component ──
 export default function ThemesScreen() {
   const router = useRouter();
-  const { width: windowWidth } = useWindowDimensions();
   const [pillars, setPillars] = useState<PillarData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activePillar, setActivePillar] = useState<string>('screen');
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [activePillar, setActivePillar] = useState<string>('');
   const [previewTheme, setPreviewTheme] = useState<ThemeData | null>(null);
-  const [previewPillarColor, setPreviewPillarColor] = useState('#8B5CF6');
+  const [previewColor, setPreviewColor] = useState('#8A2BE2');
   const scrollRef = useRef<ScrollView>(null);
 
-  // Compute responsive grid card width
-  const gridCardWidth = Math.floor((Math.min(windowWidth, 500) - 32 - 16) / 3);
-
-  // Background glow animation
-  const glowColor = useSharedValue(0);
-  const pillarColors = pillars.map(p => p.color);
-
-  useEffect(() => {
-    loadThemes();
-  }, []);
+  useEffect(() => { loadThemes(); }, []);
 
   const loadThemes = async () => {
     const userId = await AsyncStorage.getItem('duelo_user_id');
@@ -265,62 +74,32 @@ export default function ThemesScreen() {
         : `${API_URL}/api/themes/explore`;
       const res = await fetch(url);
       const data = await res.json();
-      setPillars(data.pillars || []);
-    } catch (e) {
-      console.log('Error loading themes:', e);
-    }
+      const p = data.pillars || [];
+      setPillars(p);
+      if (p.length > 0) setActivePillar(p[0].id);
+    } catch (e) { console.log('Error loading themes:', e); }
     setLoading(false);
   };
 
   const handlePillarSelect = (pillarId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setActivePillar(pillarId);
-    setExpandedSection(null);
-    const idx = pillars.findIndex(p => p.id === pillarId);
-    if (idx >= 0) {
-      glowColor.value = withTiming(idx, { duration: 600 });
-    }
   };
 
   const handleThemePress = (theme: ThemeData) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    // Clusters have topics → scroll down to show them, don't navigate
-    if (theme.topics && theme.topics.length > 0) {
-      // The topics are already displayed below - no need to navigate
-      return;
-    }
-    // Fallback for legacy themes without topics
-    if (theme.playable) {
-      router.push(`/category-detail?id=${theme.id}`);
-    }
-  };
-
-  const handleLongPress = (theme: ThemeData, pillarColor: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    setPreviewTheme(theme);
-    setPreviewPillarColor(pillarColor);
-  };
-
-  const handleToggleExpand = (sectionName: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setExpandedSection(expandedSection === sectionName ? null : sectionName);
+    if (theme.topics && theme.topics.length > 0) return;
+    if (theme.playable) router.push(`/category-detail?id=${theme.id}`);
   };
 
   const currentPillar = pillars.find(p => p.id === activePillar);
-  const currentColor = currentPillar?.color || '#8B5CF6';
-
-  // Dynamic background glow
-  const glowBgStyle = useAnimatedStyle(() => {
-    return {
-      backgroundColor: 'transparent',
-    };
-  });
+  const accent = currentPillar?.color || '#8A2BE2';
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <View style={styles.loadCenter}>
-          <ActivityIndicator size="large" color="#8B5CF6" />
+      <View style={s.container}>
+        <View style={s.loadCenter}>
+          <ActivityIndicator size="large" color="#8A2BE2" />
         </View>
       </View>
     );
@@ -328,315 +107,215 @@ export default function ThemesScreen() {
 
   return (
     <CosmicBackground>
-    <View style={styles.container}>
+    <View style={s.container}>
+      <ScrollView ref={scrollRef} contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false}>
 
-      {/* Dynamic Background Glow */}
-      <View style={[styles.bgGlow, { backgroundColor: currentColor + '08', pointerEvents: 'none' }]} />
-      <View style={[styles.bgGlowTop, { 
-        shadowColor: currentColor,
-        backgroundColor: currentColor + '06',
-        pointerEvents: 'none',
-      }]} />
+        {/* ── LA FORGE ── */}
+        <TouchableOpacity style={s.forgeCard} activeOpacity={0.8} onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        }}>
+          <LinearGradient colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.forgeBg} />
+          <View style={s.forgeIconWrap}>
+            <MaterialCommunityIcons name="hammer-wrench" size={26} color="#FFF" />
+          </View>
+          <View style={s.forgeText}>
+            <Text style={s.forgeTitle}>Créer mon Thème</Text>
+            <Text style={s.forgeSub}>Génère tes propres quiz avec l'IA</Text>
+          </View>
+          <View style={s.forgeArrow}>
+            <MaterialCommunityIcons name="chevron-right" size={22} color="rgba(255,255,255,0.5)" />
+          </View>
+        </TouchableOpacity>
 
-      <ScrollView
-        ref={scrollRef}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* ── LA FORGE / HERO SECTION ── */}
-        <Animated.View entering={FadeInDown.delay(100).springify()} style={forgeStyles.container}>
-          <NeonBorderCard>
-            <TouchableOpacity
-              style={forgeStyles.touchable}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-                // TODO: Open AI theme creation
-              }}
-              activeOpacity={0.8}
-            >
-              <View style={forgeStyles.content}>
-                <View style={forgeStyles.iconWrap}>
-                  <Text style={forgeStyles.icon}>⚒️</Text>
-                </View>
-                <View style={forgeStyles.textWrap}>
-                  <Text style={forgeStyles.title}>Créer mon Thème</Text>
-                  <Text style={forgeStyles.subtitle}>
-                    Génère tes propres quiz avec l'IA ✨
-                  </Text>
-                </View>
-                <View style={forgeStyles.arrow}>
-                  <Text style={forgeStyles.arrowText}>→</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </NeonBorderCard>
-        </Animated.View>
-
-        {/* ── 9 PILLARS NAVIGATION ── */}
-        <Animated.View entering={FadeInDown.delay(200).springify()}>
-          <Text style={styles.sectionLabel}>UNIVERS</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.pillarsScroll}
-          >
-            {pillars.map((pillar) => {
-              const isActive = pillar.id === activePillar;
-              return (
-                <TouchableOpacity
-                  key={pillar.id}
-                  style={[
-                    styles.pillarChip,
-                    isActive && { backgroundColor: pillar.color + '20', borderColor: pillar.color },
-                  ]}
-                  onPress={() => handlePillarSelect(pillar.id)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.pillarIcon}>{pillar.icon}</Text>
-                  <Text style={[
-                    styles.pillarName,
-                    { color: isActive ? pillar.color : '#888' },
-                  ]}>
-                    {pillar.name}
-                  </Text>
-                  {isActive && (
-                    <View style={[styles.pillarDot, { backgroundColor: pillar.color }]} />
-                  )}
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </Animated.View>
-
-        {/* ── PILLAR LABEL ── */}
-        {currentPillar && (
-          <Animated.View
-            key={currentPillar.id}
-            entering={FadeIn.duration(300)}
-            style={styles.pillarHeader}
-          >
-            <Text style={[styles.pillarHeaderIcon]}>{currentPillar.icon}</Text>
-            <View>
-              <Text style={[styles.pillarHeaderName, { color: currentColor }]}>
-                {currentPillar.name}
-              </Text>
-              <Text style={styles.pillarHeaderLabel}>{currentPillar.label}</Text>
-            </View>
-          </Animated.View>
-        )}
-
-        {/* ── THEMES CAROUSEL ── */}
-        {currentPillar && (
-          <Animated.View key={`carousel-${currentPillar.id}`} entering={FadeInDown.delay(100).springify()}>
-            {/* Section Header */}
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>
-                Thèmes disponibles
-              </Text>
+        {/* ── PILLAR CHIPS ── */}
+        <Text style={s.sectionLabel}>UNIVERS</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}
+          contentContainerStyle={s.pillarsScroll}>
+          {pillars.map((pillar) => {
+            const isActive = pillar.id === activePillar;
+            return (
               <TouchableOpacity
-                onPress={() => handleToggleExpand(currentPillar.id)}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                key={pillar.id}
+                style={[s.pillarChip, isActive && {
+                  backgroundColor: pillar.color + '18',
+                  borderColor: pillar.color + '50',
+                }]}
+                onPress={() => handlePillarSelect(pillar.id)}
+                activeOpacity={0.7}
               >
-                <Text style={[styles.seeAll, { color: currentColor }]}>
-                  {expandedSection === currentPillar.id ? 'Carrousel' : 'Tout Voir'}
+                <CategoryIcon emoji={pillar.icon} size={16} color={isActive ? pillar.color : '#666'} type="super" />
+                <Text style={[s.pillarChipText, { color: isActive ? pillar.color : '#666' }]}>
+                  {pillar.name}
                 </Text>
               </TouchableOpacity>
-            </View>
+            );
+          })}
+        </ScrollView>
 
-            {/* Carousel Mode */}
-            {expandedSection !== currentPillar.id ? (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.carouselScroll}
-              >
-                {currentPillar.themes.map((theme) => (
-                  <ThemeCard
-                    key={theme.id}
-                    theme={theme}
-                    pillarColor={currentColor}
-                    onPress={() => handleThemePress(theme)}
-                    onLongPress={() => handleLongPress(theme, currentColor)}
-                  />
-                ))}
-              </ScrollView>
-            ) : (
-              /* Grid Mode (Tout Voir) */
-              <View style={styles.gridContainer}>
-                {currentPillar.themes.map((theme, i) => (
-                  <GridThemeCard
-                    key={theme.id}
-                    theme={theme}
-                    pillarColor={currentColor}
-                    onPress={() => handleThemePress(theme)}
-                    index={i}
-                    cardWidth={gridCardWidth}
-                  />
-                ))}
-              </View>
-            )}
+        {/* ── CURRENT PILLAR HEADER ── */}
+        {currentPillar && (
+          <Animated.View key={currentPillar.id} entering={FadeIn.duration(300)} style={s.pillarHeader}>
+            <LinearGradient colors={[accent + '20', 'transparent']}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={s.pillarHeaderGradient} />
+            <View style={[s.pillarHeaderIcon, { backgroundColor: accent + '20' }]}>
+              <CategoryIcon emoji={currentPillar.icon} size={24} color={accent} type="super" />
+            </View>
+            <View style={s.pillarHeaderInfo}>
+              <Text style={[s.pillarHeaderName, { color: accent }]}>
+                {currentPillar.name}
+              </Text>
+              <Text style={s.pillarHeaderLabel}>{currentPillar.label}</Text>
+            </View>
           </Animated.View>
         )}
 
-        {/* ── TOPICS CAROUSEL (Individual themes with icon_url) ── */}
-        {currentPillar && currentPillar.themes.some(t => t.topics && t.topics.length > 0) && (
-          <Animated.View entering={FadeInDown.delay(200).springify()}>
-            {currentPillar.themes.filter(t => t.topics && t.topics.length > 0).map((theme) => (
-              <View key={`topics-${theme.id}`}>
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>
-                    {theme.icon} {theme.name}
+        {/* ── CLUSTERS WITH THEMES ── */}
+        {currentPillar && (
+          <Animated.View key={`clusters-${currentPillar.id}`} entering={FadeInDown.delay(100).springify()}>
+            {currentPillar.themes.map((theme) => (
+              <View key={theme.id} style={{ marginBottom: 18 }}>
+                {/* Cluster header */}
+                <View style={s.clusterHeader}>
+                  <LinearGradient colors={[accent + '20', 'transparent']}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={s.clusterGradient} />
+                  <View style={[s.clusterIconCircle, { backgroundColor: accent + '25' }]}>
+                    <CategoryIcon emoji={theme.icon} size={18} color={accent} type="cluster" />
+                  </View>
+                  <Text style={s.clusterName}>{theme.name}</Text>
+                  <Text style={[s.clusterCount, { color: accent + '80' }]}>
+                    {theme.topics?.length || 0} thèmes
                   </Text>
                 </View>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.carouselScroll}
-                >
-                  {theme.topics.map((topic: TopicData) => (
-                    <TopicCardItem
-                      key={topic.id}
-                      topic={topic}
-                      pillarColor={currentColor}
-                      onPress={() => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                        router.push(`/category-detail?id=${topic.id}`);
-                      }}
-                    />
-                  ))}
-                </ScrollView>
+
+                {/* Themes carousel */}
+                {theme.topics && theme.topics.length > 0 && (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={s.carousel}>
+                    {theme.topics.map((topic) => (
+                      <TouchableOpacity key={topic.id} style={s.topicCard}
+                        onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); router.push(`/category-detail?id=${topic.id}`); }}
+                        activeOpacity={0.8}>
+                        <LinearGradient colors={[accent+'18', 'transparent']} style={s.topicCardGlow} />
+                        <LinearGradient colors={[accent+'30', accent+'10']} style={s.topicIconCircle}>
+                          <CategoryIcon themeId={topic.id} emoji={topic.icon} size={24} color={accent} type="theme" />
+                        </LinearGradient>
+                        <Text style={s.topicName} numberOfLines={2}>{topic.name}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                )}
               </View>
             ))}
           </Animated.View>
         )}
 
-        {/* ── ALL PILLARS PREVIEW ── */}
-        <View style={styles.allPillarsSection}>
-          <Text style={styles.sectionLabel}>TOUS LES UNIVERS</Text>
-          {pillars.filter(p => p.id !== activePillar).map((pillar, pIdx) => (
-            <Animated.View
-              key={pillar.id}
-              entering={FadeInDown.delay(pIdx * 60).springify()}
-            >
-              <View style={styles.miniSectionHeader}>
-                <TouchableOpacity
-                  style={styles.miniSectionTouch}
-                  onPress={() => handlePillarSelect(pillar.id)}
-                >
-                  <Text style={styles.miniSectionIcon}>{pillar.icon}</Text>
-                  <Text style={[styles.miniSectionName, { color: pillar.color }]}>
-                    {pillar.name}
-                  </Text>
-                  <Text style={styles.miniSectionLabel}>{pillar.label}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handlePillarSelect(pillar.id)}>
-                  <Text style={[styles.seeAll, { color: pillar.color }]}>Explorer →</Text>
-                </TouchableOpacity>
+        {/* ── OTHER PILLARS ── */}
+        <Text style={[s.sectionLabel, { marginTop: 24 }]}>AUTRES UNIVERS</Text>
+        {pillars.filter(p => p.id !== activePillar).map((pillar) => (
+          <View key={pillar.id} style={{ marginBottom: 20 }}>
+            <TouchableOpacity style={s.miniPillarHeader} onPress={() => handlePillarSelect(pillar.id)} activeOpacity={0.7}>
+              <LinearGradient colors={[pillar.color+'15', 'transparent']}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={s.miniPillarGradient} />
+              <View style={[s.miniPillarIcon, { backgroundColor: pillar.color+'20' }]}>
+                <CategoryIcon emoji={pillar.icon} size={18} color={pillar.color} type="super" />
               </View>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.carouselScroll}
-              >
-                {pillar.themes.map((theme) => (
-                  <ThemeCard
-                    key={theme.id}
-                    theme={theme}
-                    pillarColor={pillar.color}
-                    onPress={() => handleThemePress(theme)}
-                    onLongPress={() => handleLongPress(theme, pillar.color)}
-                  />
-                ))}
-              </ScrollView>
-            </Animated.View>
-          ))}
-        </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[s.miniPillarName, { color: pillar.color }]}>{pillar.name}</Text>
+                <Text style={s.miniPillarLabel}>{pillar.label}</Text>
+              </View>
+              <MaterialCommunityIcons name="chevron-right" size={20} color={pillar.color+'60'} />
+            </TouchableOpacity>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}
+              contentContainerStyle={s.carousel}>
+              {pillar.themes.slice(0, 8).map((theme) => {
+                const isLocked = theme.level === 0 && !theme.playable;
+                return (
+                  <TouchableOpacity key={theme.id} style={s.miniThemeCard}
+                    onPress={() => { handlePillarSelect(pillar.id); }} activeOpacity={0.8}>
+                    <LinearGradient colors={[isLocked ? '#111' : pillar.color+'15', 'transparent']}
+                      style={s.miniThemeGlow} />
+                    <LinearGradient
+                      colors={isLocked ? ['#1a1a1a','#111'] : [pillar.color+'25', pillar.color+'08']}
+                      style={s.miniThemeIcon}>
+                      <CategoryIcon emoji={theme.icon} size={20}
+                        color={isLocked ? '#444' : pillar.color} type="cluster" />
+                    </LinearGradient>
+                    <Text style={[s.miniThemeName, isLocked && { color: '#444' }]} numberOfLines={2}>
+                      {theme.name}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+        ))}
 
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      {/* ── LONG-PRESS PREVIEW MODAL ── */}
-      <Modal
-        visible={!!previewTheme}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setPreviewTheme(null)}
-      >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setPreviewTheme(null)}
-        >
-          <Pressable style={styles.modalContent} onPress={(e) => e.stopPropagation()}>
+      {/* ── LONG-PRESS PREVIEW ── */}
+      <Modal visible={!!previewTheme} transparent animationType="fade"
+        onRequestClose={() => setPreviewTheme(null)}>
+        <Pressable style={s.modalOverlay} onPress={() => setPreviewTheme(null)}>
+          <Pressable onPress={e => e.stopPropagation()}>
             {previewTheme && (
-              <Animated.View entering={FadeInUp.springify()} style={styles.previewCard}>
-                {/* Glow */}
-                <View style={[styles.previewGlow, {
-                  shadowColor: previewPillarColor,
-                  backgroundColor: previewPillarColor + '10',
-                }]} />
+              <Animated.View entering={FadeInUp.springify()} style={s.previewCard}>
+                <LinearGradient colors={[previewColor+'20', 'transparent']}
+                  style={s.previewGlow} />
 
-                <View style={styles.previewRingWrap}>
-                  <ProgressRing
-                    progress={previewTheme.xp_progress?.progress || 0}
-                    color={previewPillarColor}
-                    size={96}
-                    strokeWidth={4}
-                  />
-                  <View style={[styles.previewIconCircle, { backgroundColor: previewPillarColor + '15' }]}>
-                    <Text style={styles.previewIcon}>{previewTheme.icon}</Text>
-                  </View>
+                <View style={s.previewRingWrap}>
+                  <ProgressRing progress={previewTheme.xp_progress?.progress || 0}
+                    color={previewColor} size={88} strokeWidth={4} />
+                  <LinearGradient colors={[previewColor+'30', previewColor+'10']}
+                    style={s.previewIconCircle}>
+                    <CategoryIcon emoji={previewTheme.icon} size={34} color={previewColor} type="cluster" />
+                  </LinearGradient>
                 </View>
 
-                <Text style={styles.previewName}>{previewTheme.name}</Text>
+                <Text style={s.previewName}>{previewTheme.name}</Text>
 
-                {previewTheme.level > 0 ? (
-                  <View style={[styles.previewLevelBadge, { backgroundColor: previewPillarColor + '25' }]}>
-                    <Text style={[styles.previewLevelText, { color: previewPillarColor }]}>
+                {previewTheme.level > 0 && (
+                  <View style={[s.previewBadge, { backgroundColor: previewColor+'25' }]}>
+                    <Text style={[s.previewBadgeText, { color: previewColor }]}>
                       Niveau {previewTheme.level}
                     </Text>
                   </View>
-                ) : null}
+                )}
 
                 {previewTheme.title ? (
-                  <Text style={[styles.previewTitle, { color: previewPillarColor }]}>
+                  <Text style={[s.previewTitle, { color: previewColor }]}>
                     « {previewTheme.title} »
                   </Text>
                 ) : null}
 
-                {/* Stats */}
-                <View style={styles.previewStats}>
-                  <View style={styles.previewStat}>
-                    <Text style={styles.previewStatValue}>{previewTheme.total_questions}</Text>
-                    <Text style={styles.previewStatLabel}>Questions</Text>
+                <View style={s.previewStats}>
+                  <View style={s.previewStat}>
+                    <Text style={s.previewStatVal}>{previewTheme.total_questions}</Text>
+                    <Text style={s.previewStatLbl}>Questions</Text>
                   </View>
-                  <View style={[styles.previewDivider, { backgroundColor: previewPillarColor + '30' }]} />
-                  <View style={styles.previewStat}>
-                    <Text style={styles.previewStatValue}>{previewTheme.xp}</Text>
-                    <Text style={styles.previewStatLabel}>XP</Text>
+                  <View style={[s.previewDivider, { backgroundColor: previewColor+'30' }]} />
+                  <View style={s.previewStat}>
+                    <Text style={s.previewStatVal}>{previewTheme.xp}</Text>
+                    <Text style={s.previewStatLbl}>XP</Text>
                   </View>
                 </View>
 
-                {/* Lvl 50 Target */}
                 {previewTheme.title_lvl50 ? (
-                  <View style={styles.previewGoal}>
-                    <Text style={styles.previewGoalLabel}>🏆 Titre Niveau 50</Text>
-                    <Text style={[styles.previewGoalTitle, { color: previewPillarColor }]}>
+                  <View style={s.previewGoal}>
+                    <Text style={s.previewGoalLabel}>Titre Niveau 50</Text>
+                    <Text style={[s.previewGoalTitle, { color: previewColor }]}>
                       {previewTheme.title_lvl50}
                     </Text>
                   </View>
                 ) : null}
 
-                {/* Play Button */}
                 {previewTheme.playable && (
                   <TouchableOpacity
-                    style={[styles.previewPlayBtn, { backgroundColor: previewPillarColor }]}
-                    onPress={() => {
-                      setPreviewTheme(null);
-                      handleThemePress(previewTheme);
-                    }}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.previewPlayText}>⚔️  JOUER</Text>
+                    style={[s.previewPlayBtn, { backgroundColor: previewColor }]}
+                    onPress={() => { setPreviewTheme(null); handleThemePress(previewTheme); }}
+                    activeOpacity={0.8}>
+                    <Text style={s.previewPlayText}>JOUER</Text>
                   </TouchableOpacity>
                 )}
               </Animated.View>
@@ -649,502 +328,171 @@ export default function ThemesScreen() {
   );
 }
 
-// ── La Forge Styles ──
-const forgeStyles = StyleSheet.create({
-  container: {
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 20,
+const s = StyleSheet.create({
+  container: { flex: 1, backgroundColor: 'transparent' },
+  loadCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  scrollContent: { paddingBottom: 40 },
+
+  // La Forge
+  forgeCard: {
+    flexDirection: 'row', alignItems: 'center',
+    marginHorizontal: 16, marginTop: 16, marginBottom: 20,
+    borderRadius: 18, padding: 16, overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
-  outerWrap: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  neonBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.6)',
-    shadowColor: '#FFF',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  innerCard: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-  },
-  touchable: {
-    padding: 18,
-  },
-  content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  iconWrap: {
-    width: 50,
-    height: 50,
-    borderRadius: 16,
+  forgeBg: { ...StyleSheet.absoluteFillObject, borderRadius: 18 },
+  forgeIconWrap: {
+    width: 48, height: 48, borderRadius: 24,
     backgroundColor: 'rgba(255,255,255,0.08)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 14,
+    justifyContent: 'center', alignItems: 'center',
   },
-  icon: { fontSize: 26 },
-  textWrap: { flex: 1 },
-  title: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#FFF',
-    marginBottom: 3,
-  },
-  subtitle: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
-    fontWeight: '500',
-  },
-  arrow: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  forgeText: { flex: 1, marginLeft: 14 },
+  forgeTitle: { fontSize: 16, fontWeight: '800', color: '#FFF', marginBottom: 2 },
+  forgeSub: { fontSize: 12, color: 'rgba(255,255,255,0.45)', fontWeight: '500' },
+  forgeArrow: {
+    width: 32, height: 32, borderRadius: 16,
     backgroundColor: 'rgba(255,255,255,0.06)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  arrowText: {
-    fontSize: 18,
-    color: '#FFF',
-    fontWeight: '600',
-  },
-});
-
-// ── Main Styles ──
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  loadCenter: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scrollContent: {
-    paddingBottom: 40,
+    justifyContent: 'center', alignItems: 'center',
   },
 
-  // Background glow
-  bgGlow: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 0,
-  },
-  bgGlowTop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 200,
-    shadowOffset: { width: 0, height: 80 },
-    shadowOpacity: 0.3,
-    shadowRadius: 60,
-    zIndex: 0,
-  },
-
-  // Section labels
+  // Section label
   sectionLabel: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#525252',
-    letterSpacing: 3,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    marginTop: 8,
+    fontSize: 11, fontWeight: '800', color: 'rgba(255,255,255,0.35)',
+    letterSpacing: 3, marginHorizontal: 16, marginBottom: 12, marginTop: 8,
   },
 
-  // Pillars
-  pillarsScroll: {
-    paddingHorizontal: 12,
-    paddingBottom: 16,
-    gap: 8,
-  },
+  // Pillar chips
+  pillarsScroll: { paddingHorizontal: 12, paddingBottom: 16, gap: 8 },
   pillarChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 20,
-    backgroundColor: GLASS.bg,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    gap: 6,
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 14, paddingVertical: 10, borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
   },
-  pillarIcon: { fontSize: 18 },
-  pillarName: {
-    fontSize: 12,
-    fontWeight: '800',
-    letterSpacing: 1,
-  },
-  pillarDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-  },
+  pillarChipText: { fontSize: 12, fontWeight: '800', letterSpacing: 0.5 },
 
-  // Pillar Header
+  // Pillar header
   pillarHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    marginBottom: 16,
-    gap: 12,
+    flexDirection: 'row', alignItems: 'center',
+    marginHorizontal: 16, marginBottom: 16, padding: 14,
+    borderRadius: 16, overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
   },
-  pillarHeaderIcon: { fontSize: 32 },
-  pillarHeaderName: {
-    fontSize: 20,
-    fontWeight: '900',
-    letterSpacing: 2,
+  pillarHeaderGradient: {
+    position: 'absolute', top: 0, left: 0, bottom: 0, width: '60%',
   },
-  pillarHeaderLabel: {
-    fontSize: 12,
-    color: '#888',
-    fontWeight: '600',
-    marginTop: 1,
+  pillarHeaderIcon: {
+    width: 44, height: 44, borderRadius: 22,
+    justifyContent: 'center', alignItems: 'center',
   },
+  pillarHeaderInfo: { flex: 1, marginLeft: 12 },
+  pillarHeaderName: { fontSize: 18, fontWeight: '900', letterSpacing: 1.5 },
+  pillarHeaderLabel: { fontSize: 11, color: 'rgba(255,255,255,0.4)', fontWeight: '600', marginTop: 2 },
 
-  // Section Header
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    marginBottom: 12,
+  // Cluster header
+  clusterHeader: {
+    flexDirection: 'row', alignItems: 'center',
+    marginHorizontal: 16, marginBottom: 10, padding: 12,
+    borderRadius: 14, overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
   },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#FFF',
+  clusterGradient: { position: 'absolute', top: 0, left: 0, bottom: 0, width: '50%' },
+  clusterIconCircle: {
+    width: 36, height: 36, borderRadius: 18,
+    justifyContent: 'center', alignItems: 'center',
   },
-  seeAll: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
+  clusterName: { color: '#FFF', fontSize: 14, fontWeight: '800', flex: 1, marginLeft: 10 },
+  clusterCount: { fontSize: 11, fontWeight: '600' },
 
   // Carousel
-  carouselScroll: {
-    paddingHorizontal: 12,
-    paddingBottom: 8,
-    gap: 10,
-  },
-
-  // Theme Card
-  themeCard: {
-    width: CARD_W,
-  },
-  themeCardInner: {
-    width: '100%',
-    height: CARD_H,
-    borderRadius: 18,
-    backgroundColor: GLASS.bg,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
-  },
-  themeCardLocked: {
-    backgroundColor: 'rgba(255,255,255,0.02)',
-  },
-  ringWrap: {
-    width: 72,
-    height: 72,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  iconCircle: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  themeIcon: { fontSize: 28 },
-  themeName: {
-    fontSize: 11,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginBottom: 4,
-    lineHeight: 14,
-  },
-  levelBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  levelBadgeText: {
-    fontSize: 9,
-    fontWeight: '800',
-  },
-  lockBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-    backgroundColor: GLASS.bg,
-  },
-  lockText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: '#444',
-  },
-  themeTitle: {
-    fontSize: 8,
-    fontWeight: '700',
-    marginTop: 3,
-    textAlign: 'center',
-  },
-
-  // Topic Card (individual themes with icon_url)
+  carousel: { paddingHorizontal: 12, paddingBottom: 8, gap: 10 },
   topicCard: {
-    width: CARD_W,
+    width: 125, borderRadius: 18, padding: 12,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
+    alignItems: 'center', overflow: 'hidden',
   },
-  topicCardInner: {
-    width: '100%',
-    borderRadius: 18,
-    backgroundColor: GLASS.bg,
-    borderWidth: 1,
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 8,
-    minHeight: CARD_H,
-    overflow: 'hidden',
-  },
-  topicGlow: {
-    position: 'absolute',
-    top: -20,
-    left: -20,
-    right: -20,
-    height: 80,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.2,
-    shadowRadius: 20,
+  topicCardGlow: { position: 'absolute', top: 0, left: 0, right: 0, height: 60, borderRadius: 18 },
+  topicIconCircle: {
+    width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center',
+    marginBottom: 10,
   },
   topicName: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#FFF',
-    textAlign: 'center',
-    marginTop: 8,
-    lineHeight: 15,
+    color: '#FFF', fontSize: 11, fontWeight: '700', textAlign: 'center', lineHeight: 14,
   },
 
-  // Grid
-  gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 16,
-    gap: 8,
+  // Mini pillar (other univers)
+  miniPillarHeader: {
+    flexDirection: 'row', alignItems: 'center',
+    marginHorizontal: 16, marginBottom: 10, padding: 12,
+    borderRadius: 14, overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)',
   },
-  gridCard: {
-    width: Math.floor((SCREEN_W - 32 - 16) / 3),
-    marginBottom: 4,
+  miniPillarGradient: { position: 'absolute', top: 0, left: 0, bottom: 0, width: '50%' },
+  miniPillarIcon: {
+    width: 34, height: 34, borderRadius: 17, justifyContent: 'center', alignItems: 'center', marginRight: 10,
   },
-  gridCardInner: {
-    width: '100%',
-    borderRadius: 16,
-    backgroundColor: GLASS.bg,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 6,
-    minHeight: 140,
+  miniPillarName: { fontSize: 14, fontWeight: '800', letterSpacing: 1 },
+  miniPillarLabel: { fontSize: 10, color: 'rgba(255,255,255,0.35)', fontWeight: '600', marginTop: 1 },
+
+  miniThemeCard: {
+    width: 100, borderRadius: 14, padding: 10,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)',
+    alignItems: 'center', overflow: 'hidden',
   },
-  gridRingWrap: {
-    width: 56,
-    height: 56,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 6,
+  miniThemeGlow: { position: 'absolute', top: 0, left: 0, right: 0, height: '100%', borderRadius: 14 },
+  miniThemeIcon: {
+    width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center', marginBottom: 6,
   },
-  gridIconCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  gridThemeIcon: { fontSize: 22 },
-  gridThemeName: {
-    fontSize: 11,
-    fontWeight: '700',
-    textAlign: 'center',
-    lineHeight: 14,
-    width: '100%',
-    paddingHorizontal: 2,
-  },
-  gridLevel: {
-    fontSize: 9,
-    fontWeight: '800',
-    marginTop: 4,
+  miniThemeName: {
+    color: 'rgba(255,255,255,0.7)', fontSize: 9, fontWeight: '700', textAlign: 'center', lineHeight: 12,
   },
 
-  // All Pillars Section
-  allPillarsSection: {
-    marginTop: 24,
-  },
-  miniSectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    marginBottom: 10,
-    marginTop: 16,
-  },
-  miniSectionTouch: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    gap: 8,
-  },
-  miniSectionIcon: { fontSize: 20 },
-  miniSectionName: {
-    fontSize: 14,
-    fontWeight: '800',
-    letterSpacing: 1,
-  },
-  miniSectionLabel: {
-    fontSize: 11,
-    color: '#666',
-    fontWeight: '600',
-  },
-
-  // Long-Press Preview Modal
+  // Preview modal
   modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.85)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    width: SCREEN_W * 0.82,
-    maxWidth: 340,
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.85)',
+    justifyContent: 'center', alignItems: 'center',
   },
   previewCard: {
-    borderRadius: 24,
-    backgroundColor: GLASS.bgDark,
-    borderWidth: 1,
-    borderColor: GLASS.borderCyan,
-    alignItems: 'center',
-    paddingVertical: 28,
-    paddingHorizontal: 20,
+    width: SCREEN_W * 0.82, maxWidth: 340,
+    borderRadius: 24, backgroundColor: '#0a0a1a',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    alignItems: 'center', paddingVertical: 28, paddingHorizontal: 20,
     overflow: 'hidden',
   },
   previewGlow: {
-    position: 'absolute',
-    top: -40,
-    left: -40,
-    right: -40,
-    height: 180,
-    borderRadius: 100,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 50,
+    position: 'absolute', top: 0, left: 0, right: 0, height: 120, borderRadius: 24,
   },
   previewRingWrap: {
-    width: 96,
-    height: 96,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
+    width: 88, height: 88, justifyContent: 'center', alignItems: 'center', marginBottom: 16,
   },
   previewIconCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: 64, height: 64, borderRadius: 32, justifyContent: 'center', alignItems: 'center',
   },
-  previewIcon: { fontSize: 38 },
   previewName: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: '#FFF',
-    marginBottom: 10,
-    textAlign: 'center',
+    fontSize: 20, fontWeight: '900', color: '#FFF', marginBottom: 10, textAlign: 'center',
   },
-  previewLevelBadge: {
-    paddingHorizontal: 14,
-    paddingVertical: 5,
-    borderRadius: 12,
-    marginBottom: 6,
-  },
-  previewLevelText: {
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  previewTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    fontStyle: 'italic',
-    marginBottom: 16,
-  },
-  previewStats: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  previewStat: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  previewStatValue: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: '#FFF',
-  },
-  previewStatLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#888',
-    marginTop: 2,
-  },
-  previewDivider: {
-    width: 1,
-    height: 30,
-  },
+  previewBadge: { paddingHorizontal: 14, paddingVertical: 5, borderRadius: 12, marginBottom: 6 },
+  previewBadgeText: { fontSize: 13, fontWeight: '800' },
+  previewTitle: { fontSize: 14, fontWeight: '700', fontStyle: 'italic', marginBottom: 16 },
+  previewStats: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+  previewStat: { alignItems: 'center', paddingHorizontal: 20 },
+  previewStatVal: { fontSize: 22, fontWeight: '900', color: '#FFF' },
+  previewStatLbl: { fontSize: 10, fontWeight: '600', color: '#888', marginTop: 2 },
+  previewDivider: { width: 1, height: 30 },
   previewGoal: {
-    backgroundColor: GLASS.bg,
-    borderRadius: 12,
-    padding: 12,
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 16,
+    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 12,
+    width: '100%', alignItems: 'center', marginBottom: 16,
   },
-  previewGoalLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#888',
-    marginBottom: 4,
-  },
-  previewGoalTitle: {
-    fontSize: 16,
-    fontWeight: '900',
-  },
+  previewGoalLabel: { fontSize: 11, fontWeight: '700', color: '#888', marginBottom: 4 },
+  previewGoalTitle: { fontSize: 16, fontWeight: '900' },
   previewPlayBtn: {
-    width: '100%',
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-    marginTop: 4,
+    width: '100%', paddingVertical: 14, borderRadius: 14, alignItems: 'center', marginTop: 4,
   },
-  previewPlayText: {
-    fontSize: 15,
-    fontWeight: '900',
-    color: '#FFF',
-    letterSpacing: 2,
-  },
+  previewPlayText: { fontSize: 15, fontWeight: '900', color: '#FFF', letterSpacing: 2 },
 });

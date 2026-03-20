@@ -4,33 +4,37 @@ import {
   ActivityIndicator, ScrollView, Animated, Keyboard, Platform,
   KeyboardAvoidingView, Dimensions
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { GLASS } from '../theme/glassTheme';
 import SwipeBackPage from '../components/SwipeBackPage';
+import DueloHeader from '../components/DueloHeader';
+import CategoryIcon from '../components/CategoryIcon';
 
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-const CATEGORY_META: Record<string, { icon: string; color: string; bg: string }> = {
-  series_tv: { icon: '📺', color: '#E040FB', bg: '#2D1B4E' },
-  geographie: { icon: '🌍', color: '#00FFFF', bg: '#0D2B2B' },
-  histoire: { icon: '🏛️', color: '#FFD700', bg: '#2B2510' },
-  cinema: { icon: '🎬', color: '#FF6B6B', bg: '#2B1515' },
-  sport: { icon: '⚽', color: '#00FF9D', bg: '#0D2B1A' },
-  musique: { icon: '🎵', color: '#FF8C00', bg: '#2B1E0D' },
-  sciences: { icon: '🔬', color: '#7B68EE', bg: '#1A1533' },
-  gastronomie: { icon: '🍽️', color: '#FF69B4', bg: '#2B152B' },
+const CATEGORY_META: Record<string, { color: string; bg: string }> = {
+  series_tv: { color: '#E040FB', bg: '#2D1B4E' },
+  geographie: { color: '#00FFFF', bg: '#0D2B2B' },
+  histoire: { color: '#FFD700', bg: '#2B2510' },
+  cinema: { color: '#FF6B6B', bg: '#2B1515' },
+  sport: { color: '#00FF9D', bg: '#0D2B1A' },
+  musique: { color: '#FF8C00', bg: '#2B1E0D' },
+  sciences: { color: '#7B68EE', bg: '#1A1533' },
+  gastronomie: { color: '#FF69B4', bg: '#152B2B' },
 };
 
-const DIFFICULTY_FILTERS = [
-  { key: 'all', label: 'Tous', icon: '🌟' },
-  { key: 'debutant', label: 'Débutant', icon: '🌱' },
-  { key: 'intermediaire', label: 'Intermédiaire', icon: '🔥' },
-  { key: 'avance', label: 'Avancé', icon: '⭐' },
-  { key: 'expert', label: 'Expert', icon: '👑' },
+const DIFFICULTY_FILTERS: { key: string; label: string; icon: React.ComponentProps<typeof MaterialCommunityIcons>['name'] }[] = [
+  { key: 'all', label: 'Tous', icon: 'star-outline' },
+  { key: 'debutant', label: 'Débutant', icon: 'sprout' },
+  { key: 'intermediaire', label: 'Intermédiaire', icon: 'fire' },
+  { key: 'avance', label: 'Avancé', icon: 'star' },
+  { key: 'expert', label: 'Expert', icon: 'crown' },
 ];
 
 type ThemeResult = {
@@ -66,10 +70,20 @@ type TrendingTag = { tag: string; icon: string; type: string };
 
 type Tab = 'themes' | 'joueurs' | 'contenu';
 
+const TAB_ICONS: Record<Tab, React.ComponentProps<typeof MaterialCommunityIcons>['name']> = {
+  themes: 'book-open-variant',
+  joueurs: 'account-group',
+  contenu: 'text-box-outline',
+};
+
 export default function SearchScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { tab: initialTab } = useLocalSearchParams<{ tab?: string }>();
   const [myId, setMyId] = useState('');
-  const [activeTab, setActiveTab] = useState<Tab>('themes');
+  const [activeTab, setActiveTab] = useState<Tab>(
+    (initialTab === 'joueurs' || initialTab === 'contenu') ? initialTab : 'themes'
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
 
@@ -205,7 +219,7 @@ export default function SearchScreen() {
   const timeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime();
     const mins = Math.floor(diff / 60000);
-    if (mins < 1) return "À l'instant";
+    if (mins < 1) return "A l'instant";
     if (mins < 60) return `${mins}min`;
     const hours = Math.floor(mins / 60);
     if (hours < 24) return `${hours}h`;
@@ -216,7 +230,7 @@ export default function SearchScreen() {
   // ── Renders ──
 
   const renderThemeItem = ({ item }: { item: ThemeResult }) => {
-    const meta = CATEGORY_META[item.id] || { icon: '❓', color: '#8A2BE2', bg: '#1A1A2E' };
+    const meta = CATEGORY_META[item.id] || { color: '#8A2BE2', bg: '#1A1A2E' };
     return (
       <TouchableOpacity
         style={st.themeCard}
@@ -229,7 +243,7 @@ export default function SearchScreen() {
         <View style={[st.themeCardInner, { borderLeftColor: meta.color, borderLeftWidth: 3 }]}>
           <View style={st.themeCardLeft}>
             <View style={[st.themeIconBox, { backgroundColor: meta.color + '20' }]}>
-              <Text style={st.themeIcon}>{meta.icon}</Text>
+              <MaterialCommunityIcons name="shape" size={24} color={meta.color} />
             </View>
           </View>
           <View style={st.themeCardCenter}>
@@ -240,7 +254,7 @@ export default function SearchScreen() {
               <Text style={st.themeMetaDot}>·</Text>
               <Text style={st.themeMeta}>{item.player_count} joueurs</Text>
               <Text style={st.themeMetaDot}>·</Text>
-              <Text style={st.themeMeta}>{item.followers_count} abonnés</Text>
+              <Text style={st.themeMeta}>{item.followers_count} abonnes</Text>
             </View>
           </View>
           <View style={st.themeCardRight}>
@@ -286,19 +300,19 @@ export default function SearchScreen() {
               <>
                 <Text style={st.playerStatDot}>·</Text>
                 <Text style={[st.playerStat, { color: CATEGORY_META[item.best_category]?.color || '#A3A3A3' }]}>
-                  {CATEGORY_META[item.best_category]?.icon} Niv.{item.best_level}
+                  Niv.{item.best_level}
                 </Text>
               </>
             )}
           </View>
         </View>
-        <Text style={st.playerArrow}>›</Text>
+        <MaterialCommunityIcons name="chevron-right" size={20} color="#525252" />
       </TouchableOpacity>
     );
   };
 
   const renderPostItem = ({ item }: { item: PostResult }) => {
-    const meta = CATEGORY_META[item.category_id] || { icon: '❓', color: '#8A2BE2', bg: '#1A1A2E' };
+    const meta = CATEGORY_META[item.category_id] || { color: '#8A2BE2', bg: '#1A1A2E' };
     return (
       <TouchableOpacity
         style={st.postCard}
@@ -315,23 +329,37 @@ export default function SearchScreen() {
           <View style={st.postHeaderInfo}>
             <Text style={st.postAuthor}>{item.user.pseudo}</Text>
             <View style={st.postCatRow}>
-              <Text style={[st.postCatBadge, { color: meta.color }]}>{meta.icon} {item.category_name}</Text>
+              <Text style={[st.postCatBadge, { color: meta.color }]}>{item.category_name}</Text>
               <Text style={st.postTime}>{timeAgo(item.created_at)}</Text>
             </View>
           </View>
         </View>
         <Text style={st.postContent} numberOfLines={3}>{item.content}</Text>
         <View style={st.postFooter}>
-          <Text style={st.postStat}>❤️ {item.likes_count}</Text>
-          <Text style={st.postStat}>💬 {item.comments_count}</Text>
-          {item.has_image && <Text style={st.postStat}>📷</Text>}
+          <View style={st.postStatRow}>
+            <MaterialCommunityIcons
+              name={item.is_liked ? 'heart' : 'heart-outline'}
+              size={15}
+              color={item.is_liked ? '#FF4D6A' : '#525252'}
+            />
+            <Text style={[st.postStat, item.is_liked && { color: '#FF4D6A' }]}>{item.likes_count}</Text>
+          </View>
+          <View style={st.postStatRow}>
+            <MaterialCommunityIcons name="comment-outline" size={15} color="#525252" />
+            <Text style={st.postStat}>{item.comments_count}</Text>
+          </View>
+          {item.has_image && (
+            <View style={st.postStatRow}>
+              <MaterialCommunityIcons name="camera" size={15} color="#525252" />
+            </View>
+          )}
         </View>
       </TouchableOpacity>
     );
   };
 
   const renderCommentItem = ({ item }: { item: CommentResult }) => {
-    const meta = CATEGORY_META[item.category_id] || { icon: '❓', color: '#8A2BE2', bg: '#1A1A2E' };
+    const meta = CATEGORY_META[item.category_id] || { color: '#8A2BE2', bg: '#1A1A2E' };
     return (
       <View style={st.commentCard}>
         <View style={st.commentHeader}>
@@ -339,7 +367,7 @@ export default function SearchScreen() {
             <Text style={st.commentAvatarText}>{item.user.pseudo[0]?.toUpperCase()}</Text>
           </View>
           <Text style={st.commentAuthor}>{item.user.pseudo}</Text>
-          <Text style={[st.commentCat, { color: meta.color }]}>{meta.icon} {item.category_name}</Text>
+          <Text style={[st.commentCat, { color: meta.color }]}>{item.category_name}</Text>
         </View>
         <Text style={st.commentContent} numberOfLines={2}>{item.content}</Text>
         <Text style={st.commentTime}>{timeAgo(item.created_at)}</Text>
@@ -347,17 +375,44 @@ export default function SearchScreen() {
     );
   };
 
+  // ── Difficulty filter row (shared) ──
+
+  const renderDifficultyFilters = () => (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.diffFiltersWrap}>
+      {DIFFICULTY_FILTERS.map((d) => (
+        <TouchableOpacity
+          key={d.key}
+          style={[st.diffChip, difficultyFilter === d.key && st.diffChipActive]}
+          onPress={() => handleDifficultyChange(d.key)}
+        >
+          <MaterialCommunityIcons
+            name={d.icon}
+            size={14}
+            color={difficultyFilter === d.key ? '#8A2BE2' : '#A3A3A3'}
+          />
+          <Text style={[st.diffChipText, difficultyFilter === d.key && st.diffChipTextActive]}>
+            {d.label}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  );
+
   // ── Main Render ──
 
   const showTrendingSection = !searchQuery.trim() && activeTab === 'themes';
 
   return (
     <SwipeBackPage>
-    <SafeAreaView style={st.container}>
-      {/* Header */}
+    <View style={st.container}>
+      <View style={{ paddingTop: insets.top, backgroundColor: GLASS.bgDark }}>
+        <DueloHeader />
+      </View>
+
+      {/* Sub-header */}
       <View style={st.header}>
-        <TouchableOpacity style={st.backBtn} onPress={() => router.back()}>
-          <Text style={st.backBtnText}>←</Text>
+        <TouchableOpacity onPress={() => router.back()} style={st.backBtnCircle} activeOpacity={0.6}>
+          <MaterialCommunityIcons name="chevron-left" size={26} color="#FFF" />
         </TouchableOpacity>
         <Text style={st.headerTitle}>Recherche</Text>
         <View style={{ width: 40 }} />
@@ -366,12 +421,12 @@ export default function SearchScreen() {
       {/* Search Bar */}
       <View style={st.searchBarWrap}>
         <View style={st.searchBar}>
-          <Text style={st.searchIcon}>🔍</Text>
+          <MaterialCommunityIcons name="magnify" size={18} color="rgba(255,255,255,0.3)" style={{ marginRight: 10 }} />
           <TextInput
             ref={searchInputRef}
             style={st.searchInput}
             placeholder={
-              activeTab === 'themes' ? 'Chercher un thème (ex: Espace, Star Wars...)' :
+              activeTab === 'themes' ? 'Chercher un theme (ex: Espace, Star Wars...)' :
               activeTab === 'joueurs' ? 'Chercher un joueur (@pseudo ou titre...)' :
               'Chercher dans les publications...'
             }
@@ -384,7 +439,7 @@ export default function SearchScreen() {
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => { setSearchQuery(''); performSearch(''); }} style={st.clearBtn}>
-              <Text style={st.clearBtnText}>✕</Text>
+              <MaterialCommunityIcons name="close-circle" size={18} color="#525252" />
             </TouchableOpacity>
           )}
         </View>
@@ -392,19 +447,26 @@ export default function SearchScreen() {
 
       {/* Tabs */}
       <View style={st.tabsRow}>
-        {[
-          { key: 'themes' as Tab, label: 'Thèmes', icon: '📚' },
-          { key: 'joueurs' as Tab, label: 'Joueurs', icon: '👥' },
-          { key: 'contenu' as Tab, label: 'Contenu', icon: '📝' },
-        ].map((tab) => (
+        {([
+          { key: 'themes' as Tab, label: 'Themes' },
+          { key: 'joueurs' as Tab, label: 'Joueurs' },
+          { key: 'contenu' as Tab, label: 'Contenu' },
+        ]).map((tab) => (
           <TouchableOpacity
             key={tab.key}
             style={[st.tabBtn, activeTab === tab.key && st.tabBtnActive]}
             onPress={() => handleTabChange(tab.key)}
           >
-            <Text style={[st.tabText, activeTab === tab.key && st.tabTextActive]}>
-              {tab.icon} {tab.label}
-            </Text>
+            <View style={st.tabInner}>
+              <MaterialCommunityIcons
+                name={TAB_ICONS[tab.key]}
+                size={16}
+                color={activeTab === tab.key ? '#8A2BE2' : '#A3A3A3'}
+              />
+              <Text style={[st.tabText, activeTab === tab.key && st.tabTextActive]}>
+                {tab.label}
+              </Text>
+            </View>
           </TouchableOpacity>
         ))}
       </View>
@@ -416,7 +478,10 @@ export default function SearchScreen() {
             {/* Trending Tags */}
             {trendingTags.length > 0 && (
               <View style={st.trendingSection}>
-                <Text style={st.sectionLabel}>🔥 TENDANCES DU MOMENT</Text>
+                <View style={st.sectionLabelRow}>
+                  <MaterialCommunityIcons name="fire" size={14} color="#525252" />
+                  <Text style={st.sectionLabel}>TENDANCES DU MOMENT</Text>
+                </View>
                 <View style={st.trendingTagsWrap}>
                   {trendingTags.map((tag, idx) => (
                     <TouchableOpacity
@@ -424,11 +489,19 @@ export default function SearchScreen() {
                       style={[st.trendingTag, tag.type === 'hot' && st.trendingTagHot]}
                       onPress={() => handleTrendingTag(tag.tag)}
                     >
-                      <Text style={st.trendingTagIcon}>{tag.icon}</Text>
+                      <MaterialCommunityIcons
+                        name={tag.type === 'hot' ? 'fire' : 'tag-outline'}
+                        size={16}
+                        color={tag.type === 'hot' ? '#FF5722' : 'rgba(255,255,255,0.5)'}
+                      />
                       <Text style={[st.trendingTagText, tag.type === 'hot' && st.trendingTagTextHot]}>
                         {tag.tag}
                       </Text>
-                      {tag.type === 'hot' && <Text style={st.hotBadge}>HOT</Text>}
+                      {tag.type === 'hot' && (
+                        <View style={st.hotBadge}>
+                          <MaterialCommunityIcons name="fire" size={10} color="#FF5722" />
+                        </View>
+                      )}
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -438,7 +511,10 @@ export default function SearchScreen() {
             {/* Top Players */}
             {topPlayers.length > 0 && (
               <View style={st.trendingSection}>
-                <Text style={st.sectionLabel}>🏆 TOP JOUEURS</Text>
+                <View style={st.sectionLabelRow}>
+                  <MaterialCommunityIcons name="trophy" size={14} color="#525252" />
+                  <Text style={st.sectionLabel}>TOP JOUEURS</Text>
+                </View>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.topPlayersScroll}>
                   {topPlayers.map((p: any) => (
                     <TouchableOpacity
@@ -449,9 +525,14 @@ export default function SearchScreen() {
                         router.push(`/player-profile?id=${p.id}`);
                       }}
                     >
-                      <View style={st.topPlayerAvatar}>
+                      <LinearGradient
+                        colors={['#8A2BE2', '#5B21B6']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={st.topPlayerAvatar}
+                      >
                         <Text style={st.topPlayerAvatarText}>{p.pseudo[0]?.toUpperCase()}</Text>
-                      </View>
+                      </LinearGradient>
                       <Text style={st.topPlayerName} numberOfLines={1}>{p.pseudo}</Text>
                       <Text style={st.topPlayerXp}>{p.total_xp.toLocaleString()} XP</Text>
                     </TouchableOpacity>
@@ -462,22 +543,12 @@ export default function SearchScreen() {
 
             {/* All Themes */}
             <View style={st.trendingSection}>
-              <Text style={st.sectionLabel}>📚 TOUS LES THÈMES</Text>
+              <View style={st.sectionLabelRow}>
+                <MaterialCommunityIcons name="book-open-variant" size={14} color="#525252" />
+                <Text style={st.sectionLabel}>TOUS LES THEMES</Text>
+              </View>
               {/* Difficulty filter */}
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.diffFiltersWrap}>
-                {DIFFICULTY_FILTERS.map((d) => (
-                  <TouchableOpacity
-                    key={d.key}
-                    style={[st.diffChip, difficultyFilter === d.key && st.diffChipActive]}
-                    onPress={() => handleDifficultyChange(d.key)}
-                  >
-                    <Text style={st.diffChipIcon}>{d.icon}</Text>
-                    <Text style={[st.diffChipText, difficultyFilter === d.key && st.diffChipTextActive]}>
-                      {d.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
+              {renderDifficultyFilters()}
               {themes.map((theme) => renderThemeItem({ item: theme }))}
             </View>
           </ScrollView>
@@ -487,20 +558,9 @@ export default function SearchScreen() {
         {activeTab === 'themes' && !showTrendingSection && (
           <View style={{ flex: 1 }}>
             {/* Difficulty filter */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={st.filterRow} contentContainerStyle={st.diffFiltersWrap}>
-              {DIFFICULTY_FILTERS.map((d) => (
-                <TouchableOpacity
-                  key={d.key}
-                  style={[st.diffChip, difficultyFilter === d.key && st.diffChipActive]}
-                  onPress={() => handleDifficultyChange(d.key)}
-                >
-                  <Text style={st.diffChipIcon}>{d.icon}</Text>
-                  <Text style={[st.diffChipText, difficultyFilter === d.key && st.diffChipTextActive]}>
-                    {d.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+            <View style={st.filterRow}>
+              {renderDifficultyFilters()}
+            </View>
             {isSearching ? (
               <ActivityIndicator size="large" color="#8A2BE2" style={{ marginTop: 40 }} />
             ) : (
@@ -511,9 +571,9 @@ export default function SearchScreen() {
                 contentContainerStyle={st.listContent}
                 ListEmptyComponent={
                   <View style={st.emptyState}>
-                    <Text style={st.emptyIcon}>🔍</Text>
-                    <Text style={st.emptyTitle}>Aucun thème trouvé</Text>
-                    <Text style={st.emptyDesc}>Essayez avec d'autres mots-clés</Text>
+                    <MaterialCommunityIcons name="magnify" size={48} color="#525252" style={{ marginBottom: 12 }} />
+                    <Text style={st.emptyTitle}>Aucun theme trouve</Text>
+                    <Text style={st.emptyDesc}>Essayez avec d'autres mots-cles</Text>
                   </View>
                 }
               />
@@ -532,8 +592,10 @@ export default function SearchScreen() {
                   style={[st.catChip, playerCatFilter === key && { backgroundColor: meta.color + '25', borderColor: meta.color + '50' }]}
                   onPress={() => handlePlayerCatFilter(key)}
                 >
-                  <Text style={st.catChipIcon}>{meta.icon}</Text>
-                  {playerCatFilter === key && <Text style={[st.catChipText, { color: meta.color }]}>✓</Text>}
+                  <View style={[st.catChipDot, { backgroundColor: meta.color }]} />
+                  {playerCatFilter === key && (
+                    <MaterialCommunityIcons name="check" size={14} color={meta.color} />
+                  )}
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -547,8 +609,8 @@ export default function SearchScreen() {
                 contentContainerStyle={st.listContent}
                 ListEmptyComponent={
                   <View style={st.emptyState}>
-                    <Text style={st.emptyIcon}>👥</Text>
-                    <Text style={st.emptyTitle}>Aucun joueur trouvé</Text>
+                    <MaterialCommunityIcons name="account-group" size={48} color="#525252" style={{ marginBottom: 12 }} />
+                    <Text style={st.emptyTitle}>Aucun joueur trouve</Text>
                     <Text style={st.emptyDesc}>Cherche par @pseudo ou par titre</Text>
                   </View>
                 }
@@ -564,21 +626,24 @@ export default function SearchScreen() {
               <ActivityIndicator size="large" color="#8A2BE2" style={{ marginTop: 40 }} />
             ) : !searchQuery.trim() ? (
               <View style={st.emptyState}>
-                <Text style={st.emptyIcon}>📝</Text>
+                <MaterialCommunityIcons name="text-box-outline" size={48} color="#525252" style={{ marginBottom: 12 }} />
                 <Text style={st.emptyTitle}>Rechercher du contenu</Text>
                 <Text style={st.emptyDesc}>Retrouvez des posts et discussions sur les murs sociaux</Text>
               </View>
             ) : posts.length === 0 && comments.length === 0 ? (
               <View style={st.emptyState}>
-                <Text style={st.emptyIcon}>🔍</Text>
-                <Text style={st.emptyTitle}>Aucun résultat</Text>
+                <MaterialCommunityIcons name="magnify" size={48} color="#525252" style={{ marginBottom: 12 }} />
+                <Text style={st.emptyTitle}>Aucun resultat</Text>
                 <Text style={st.emptyDesc}>Essayez avec d'autres termes de recherche</Text>
               </View>
             ) : (
               <>
                 {posts.length > 0 && (
                   <>
-                    <Text style={st.contentSectionLabel}>📋 PUBLICATIONS ({posts.length})</Text>
+                    <View style={st.contentSectionLabelRow}>
+                      <MaterialCommunityIcons name="clipboard-text-outline" size={13} color="#525252" />
+                      <Text style={st.contentSectionLabel}>PUBLICATIONS ({posts.length})</Text>
+                    </View>
                     {posts.map((post) => (
                       <View key={post.id}>{renderPostItem({ item: post })}</View>
                     ))}
@@ -586,7 +651,10 @@ export default function SearchScreen() {
                 )}
                 {comments.length > 0 && (
                   <>
-                    <Text style={[st.contentSectionLabel, { marginTop: 20 }]}>💬 COMMENTAIRES ({comments.length})</Text>
+                    <View style={[st.contentSectionLabelRow, { marginTop: 20 }]}>
+                      <MaterialCommunityIcons name="comment-outline" size={13} color="#525252" />
+                      <Text style={st.contentSectionLabel}>COMMENTAIRES ({comments.length})</Text>
+                    </View>
                     {comments.map((comment) => (
                       <View key={comment.id}>{renderCommentItem({ item: comment })}</View>
                     ))}
@@ -597,22 +665,24 @@ export default function SearchScreen() {
           </ScrollView>
         )}
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
     </SwipeBackPage>
   );
 }
 
 const st = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'transparent' },
+  container: { flex: 1, backgroundColor: '#050510' },
 
   // Header
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 10,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)',
+    paddingHorizontal: 12, paddingVertical: 10,
   },
-  backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
-  backBtnText: { color: '#A3A3A3', fontSize: 24, fontWeight: '600' },
+  backBtnCircle: {
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    justifyContent: 'center', alignItems: 'center',
+  },
   headerTitle: { fontSize: 18, fontWeight: '800', color: '#FFF' },
 
   // Search Bar
@@ -622,12 +692,10 @@ const st = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 16,
     paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
   },
-  searchIcon: { fontSize: 16, marginRight: 10 },
   searchInput: {
     flex: 1, color: '#FFF', fontSize: 15, paddingVertical: 14,
   },
   clearBtn: { padding: 8 },
-  clearBtnText: { color: '#525252', fontSize: 16 },
 
   // Tabs
   tabsRow: {
@@ -638,6 +706,7 @@ const st = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
   tabBtnActive: { backgroundColor: 'rgba(138,43,226,0.15)', borderColor: 'rgba(138,43,226,0.4)' },
+  tabInner: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   tabText: { color: '#A3A3A3', fontSize: 13, fontWeight: '600' },
   tabTextActive: { color: '#8A2BE2' },
 
@@ -650,7 +719,6 @@ const st = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
   diffChipActive: { backgroundColor: 'rgba(138,43,226,0.2)', borderColor: 'rgba(138,43,226,0.5)' },
-  diffChipIcon: { fontSize: 14 },
   diffChipText: { color: '#A3A3A3', fontSize: 12, fontWeight: '600' },
   diffChipTextActive: { color: '#8A2BE2' },
 
@@ -660,22 +728,23 @@ const st = StyleSheet.create({
     paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
     backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
-  catChipIcon: { fontSize: 18 },
-  catChipText: { fontSize: 14, fontWeight: '700' },
+  catChipDot: {
+    width: 10, height: 10, borderRadius: 5,
+  },
 
   // List
   listContent: { paddingHorizontal: 16, paddingBottom: 30 },
 
   // Empty state
   emptyState: { alignItems: 'center', paddingVertical: 60 },
-  emptyIcon: { fontSize: 48, marginBottom: 12 },
   emptyTitle: { color: '#FFF', fontSize: 18, fontWeight: '700', marginBottom: 4 },
   emptyDesc: { color: '#525252', fontSize: 13, textAlign: 'center' },
 
   // Trending
   trendingSection: { paddingHorizontal: 16, marginTop: 16 },
+  sectionLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
   sectionLabel: {
-    fontSize: 12, fontWeight: '800', color: '#525252', letterSpacing: 2, marginBottom: 12,
+    fontSize: 12, fontWeight: '800', color: '#525252', letterSpacing: 2,
   },
   trendingTagsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
   trendingTag: {
@@ -684,12 +753,11 @@ const st = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
   trendingTagHot: { borderColor: 'rgba(255,87,34,0.4)', backgroundColor: 'rgba(255,87,34,0.1)' },
-  trendingTagIcon: { fontSize: 16 },
   trendingTagText: { color: '#E0E0E0', fontSize: 14, fontWeight: '600' },
   trendingTagTextHot: { color: '#FF5722' },
   hotBadge: {
-    fontSize: 9, fontWeight: '900', color: '#FF5722', backgroundColor: 'rgba(255,87,34,0.2)',
-    paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, overflow: 'hidden', letterSpacing: 1,
+    backgroundColor: 'rgba(255,87,34,0.2)',
+    paddingHorizontal: 4, paddingVertical: 2, borderRadius: 6, overflow: 'hidden',
   },
 
   // Top Players (horizontal scroll)
@@ -699,7 +767,7 @@ const st = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
   topPlayerAvatar: {
-    width: 44, height: 44, borderRadius: 22, backgroundColor: '#8A2BE2',
+    width: 44, height: 44, borderRadius: 22,
     justifyContent: 'center', alignItems: 'center', marginBottom: 6,
   },
   topPlayerAvatarText: { color: '#FFF', fontSize: 18, fontWeight: '800' },
@@ -717,7 +785,6 @@ const st = StyleSheet.create({
     width: 48, height: 48, borderRadius: 14,
     justifyContent: 'center', alignItems: 'center',
   },
-  themeIcon: { fontSize: 24 },
   themeCardCenter: { flex: 1 },
   themeName: { fontSize: 16, fontWeight: '800', marginBottom: 2 },
   themeDesc: { color: '#A3A3A3', fontSize: 12, marginBottom: 4 },
@@ -751,7 +818,6 @@ const st = StyleSheet.create({
   playerStatsRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   playerStat: { color: '#525252', fontSize: 12, fontWeight: '600' },
   playerStatDot: { color: '#333', fontSize: 12 },
-  playerArrow: { color: '#525252', fontSize: 24, fontWeight: '300' },
 
   // Post Card
   postCard: {
@@ -771,6 +837,7 @@ const st = StyleSheet.create({
   postTime: { color: '#525252', fontSize: 11 },
   postContent: { color: '#E0E0E0', fontSize: 14, lineHeight: 20, marginBottom: 10 },
   postFooter: { flexDirection: 'row', gap: 16 },
+  postStatRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   postStat: { color: '#525252', fontSize: 13 },
 
   // Comment Card
@@ -790,7 +857,10 @@ const st = StyleSheet.create({
   commentTime: { color: '#333', fontSize: 10, marginTop: 4 },
 
   // Content section label
+  contentSectionLabelRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12, marginTop: 8,
+  },
   contentSectionLabel: {
-    fontSize: 12, fontWeight: '800', color: '#525252', letterSpacing: 2, marginBottom: 12, marginTop: 8,
+    fontSize: 12, fontWeight: '800', color: '#525252', letterSpacing: 2,
   },
 });

@@ -14,7 +14,10 @@ import Animated, {
   FadeInUp, FadeInLeft, FadeInRight, SlideInRight,
 } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DueloHeader from '../../components/DueloHeader';
+import CategoryIcon from '../../components/CategoryIcon';
 import { GLASS } from '../../theme/glassTheme';
 import CosmicBackground from '../../components/CosmicBackground';
 
@@ -158,7 +161,11 @@ const ExploitCard = ({ item, onChallenge, onProfile }: {
           />
           <View style={exploitStyles.content}>
             <View style={exploitStyles.titleRow}>
-              <Text style={exploitStyles.icon}>{item.icon}</Text>
+              <MaterialCommunityIcons
+                name={isPerfect ? 'star-circle' : isStreak ? 'fire' : 'sword-cross'}
+                size={16}
+                color={isPerfect ? '#FFD700' : isStreak ? '#FF6B35' : color}
+              />
               <Text style={[exploitStyles.title, isPerfect && { color: '#FFD700' }]} numberOfLines={1}>
                 {item.title}
               </Text>
@@ -213,7 +220,6 @@ const exploitStyles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   content: { flex: 1 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 },
-  icon: { fontSize: 16 },
   title: { color: '#FFF', fontSize: 14, fontWeight: '700', flex: 1 },
   pseudo: { color: '#888', fontSize: 12, fontWeight: '600', marginBottom: 4 },
   vs: { color: '#555' },
@@ -229,8 +235,8 @@ const exploitStyles = StyleSheet.create({
 });
 
 // ── Tribe Card ──
-const TribeCard = ({ tribe, onPress }: { tribe: Tribe; onPress: () => void }) => {
-  const color = tribe.pillar_color;
+const TribeCard = ({ tribe, onPress, accentColor }: { tribe: Tribe; onPress: () => void; accentColor?: string }) => {
+  const color = accentColor || tribe.pillar_color;
   const hasThrone = !!tribe.throne;
 
   return (
@@ -239,16 +245,21 @@ const TribeCard = ({ tribe, onPress }: { tribe: Tribe; onPress: () => void }) =>
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <View style={[tribeStyles.pillarBar, { backgroundColor: color }]} />
+      <LinearGradient colors={[color + '30', color + '08']} style={tribeStyles.pillarBar} />
       <View style={tribeStyles.content}>
-        <Text style={tribeStyles.icon}>{tribe.icon}</Text>
+        <LinearGradient colors={[color + '25', color + '08']} style={tribeStyles.iconCircle}>
+          <CategoryIcon themeId={tribe.id} emoji={tribe.icon} size={22} color={color} type="theme" />
+        </LinearGradient>
         <Text style={[tribeStyles.name, { color: '#FFF' }]} numberOfLines={1}>{tribe.name}</Text>
         <Text style={[tribeStyles.pillarLabel, { color: color + 'AA' }]}>{tribe.pillar_name}</Text>
 
         {/* Throne */}
         {hasThrone ? (
           <View style={tribeStyles.throneWrap}>
-            <Text style={tribeStyles.throneLabel}>👑 Trône</Text>
+            <View style={tribeStyles.throneLabelRow}>
+              <MaterialCommunityIcons name="crown" size={14} color="#FFD700" />
+              <Text style={tribeStyles.throneLabel}>Trône</Text>
+            </View>
             <AuraAvatar
               letter={tribe.throne!.pseudo[0]?.toUpperCase() || '?'}
               level={tribe.throne!.level}
@@ -264,7 +275,7 @@ const TribeCard = ({ tribe, onPress }: { tribe: Tribe; onPress: () => void }) =>
           </View>
         ) : (
           <View style={tribeStyles.throneEmpty}>
-            <Text style={tribeStyles.throneEmptyText}>👑</Text>
+            <MaterialCommunityIcons name="crown-outline" size={24} color="#444" />
             <Text style={tribeStyles.throneEmptyLabel}>Trône vacant</Text>
           </View>
         )}
@@ -287,15 +298,18 @@ const tribeStyles = StyleSheet.create({
   },
   pillarBar: { height: 3, width: '100%' },
   content: { padding: 12, alignItems: 'center' },
-  icon: { fontSize: 28, marginBottom: 6 },
+  iconCircle: {
+    width: 44, height: 44, borderRadius: 22,
+    justifyContent: 'center', alignItems: 'center', marginBottom: 6,
+  },
   name: { fontSize: 12, fontWeight: '700', textAlign: 'center', marginBottom: 2 },
   pillarLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 1, marginBottom: 10 },
   throneWrap: { alignItems: 'center', marginBottom: 8 },
-  throneLabel: { fontSize: 10, fontWeight: '700', color: '#FFD700', marginBottom: 6 },
+  throneLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6 },
+  throneLabel: { fontSize: 10, fontWeight: '700', color: '#FFD700' },
   thronePseudo: { color: '#CCC', fontSize: 11, fontWeight: '600', marginTop: 4 },
   throneLevel: { fontSize: 10, fontWeight: '800', marginTop: 2 },
-  throneEmpty: { alignItems: 'center', marginBottom: 8, paddingVertical: 8 },
-  throneEmptyText: { fontSize: 24, marginBottom: 4 },
+  throneEmpty: { alignItems: 'center', marginBottom: 8, paddingVertical: 8, gap: 4 },
   throneEmptyLabel: { fontSize: 10, color: '#444', fontWeight: '600' },
   memberRow: { alignItems: 'center' },
   memberCount: { fontSize: 10, color: '#555', fontWeight: '600' },
@@ -317,9 +331,9 @@ const CoachWidget = ({ suggestions, onAction }: {
         onPress={() => onAction(s)}
         activeOpacity={0.8}
       >
-        <View style={[coachStyles.iconWrap, { backgroundColor: color + '20' }]}>
-          <Text style={coachStyles.icon}>{s.icon || '🤖'}</Text>
-        </View>
+        <LinearGradient colors={[color + '25', color + '08']} style={coachStyles.iconWrap}>
+          <MaterialCommunityIcons name="robot-outline" size={22} color={color} />
+        </LinearGradient>
         <View style={coachStyles.textWrap}>
           <Text style={coachStyles.label}>COACH DUELO</Text>
           <Text style={coachStyles.message} numberOfLines={2}>{s.message}</Text>
@@ -341,7 +355,6 @@ const coachStyles = StyleSheet.create({
   iconWrap: {
     width: 42, height: 42, borderRadius: 14, justifyContent: 'center', alignItems: 'center',
   },
-  icon: { fontSize: 22 },
   textWrap: { flex: 1 },
   label: { fontSize: 9, fontWeight: '900', color: '#FFD700', letterSpacing: 2, marginBottom: 3 },
   message: { color: '#CCC', fontSize: 12, fontWeight: '600', lineHeight: 16 },
@@ -373,20 +386,18 @@ export default function PlayersScreen() {
   // Forge
   const [forgeThemeName, setForgeThemeName] = useState('');
 
-  // Messages (keep accessible)
-  const [totalUnread, setTotalUnread] = useState(0);
 
   const pillarFilters = [
     { id: 'all', name: 'TOUS', icon: '🌐', color: '#8A2BE2' },
-    { id: 'screen', name: 'SCREEN', icon: '🎬', color: '#8B5CF6' },
-    { id: 'sound', name: 'SOUND', icon: '🎵', color: '#6366F1' },
-    { id: 'lab', name: 'LAB', icon: '🔬', color: '#06B6D4' },
-    { id: 'arena', name: 'ARENA', icon: '⚽', color: '#84CC16' },
-    { id: 'legends', name: 'LEGENDS', icon: '🏛️', color: '#F59E0B' },
-    { id: 'globe', name: 'GLOBE', icon: '🌍', color: '#F97316' },
-    { id: 'art', name: 'ART', icon: '🎨', color: '#D946EF' },
-    { id: 'mind', name: 'MIND', icon: '📖', color: '#3B82F6' },
-    { id: 'life', name: 'LIFE', icon: '🌿', color: '#10B981' },
+    { id: 'screen', name: 'SCREEN', icon: '🎬', color: '#8A2BE2' },
+    { id: 'sound', name: 'SOUND', icon: '🎵', color: '#FF6B35' },
+    { id: 'arena', name: 'ARENA', icon: '⚽', color: '#00FF9D' },
+    { id: 'legends', name: 'LEGENDS', icon: '🏛️', color: '#FFD700' },
+    { id: 'lab', name: 'LAB', icon: '🔬', color: '#1565C0' },
+    { id: 'globe', name: 'GLOBE', icon: '🌍', color: '#4ECDC4' },
+    { id: 'art', name: 'ART', icon: '🎨', color: '#E53935' },
+    { id: 'life', name: 'LIFE', icon: '🌱', color: '#2E7D32' },
+    { id: 'mind', name: 'MIND', icon: '🧠', color: '#FFAB40' },
   ];
 
   useEffect(() => {
@@ -401,7 +412,6 @@ export default function PlayersScreen() {
       setMyId(uid);
       loadPulse(uid);
       loadCoach(uid);
-      fetchUnreadCount(uid);
     } else {
       setLoadingFeed(false);
     }
@@ -435,13 +445,6 @@ export default function PlayersScreen() {
     } catch (e) { console.log('Coach error:', e); }
   };
 
-  const fetchUnreadCount = async (uid: string) => {
-    try {
-      const res = await fetch(`${API_URL}/api/chat/unread-count/${uid}`);
-      const data = await res.json();
-      setTotalUnread(data.unread_count || 0);
-    } catch {}
-  };
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -477,7 +480,7 @@ export default function PlayersScreen() {
 
   const filteredTribes = selectedPillar === 'all'
     ? tribes
-    : tribes.filter(t => t.pillar_id === selectedPillar);
+    : tribes.filter(t => t.pillar_id.toLowerCase() === selectedPillar);
 
   const sectionColor = activeSection === 'pulse' ? '#8A2BE2' : activeSection === 'tribus' ? '#FFD700' : '#10B981';
 
@@ -490,9 +493,9 @@ export default function PlayersScreen() {
         {(['pulse', 'tribus', 'forge'] as SectionTab[]).map((section) => {
           const isActive = activeSection === section;
           const meta = {
-            pulse: { label: 'PULSE', icon: '⚡', color: '#8A2BE2' },
-            tribus: { label: 'TRIBUS', icon: '👑', color: '#FFD700' },
-            forge: { label: 'FORGE', icon: '⚒️', color: '#10B981' },
+            pulse: { label: 'PULSE', icon: 'lightning-bolt' as const, color: '#8A2BE2' },
+            tribus: { label: 'TRIBUS', icon: 'crown' as const, color: '#FFD700' },
+            forge: { label: 'FORGE', icon: 'hammer-wrench' as const, color: '#10B981' },
           }[section];
           return (
             <TouchableOpacity
@@ -504,26 +507,13 @@ export default function PlayersScreen() {
               }}
               activeOpacity={0.7}
             >
-              <Text style={s.sectionTabIcon}>{meta.icon}</Text>
+              <MaterialCommunityIcons name={meta.icon} size={16} color={isActive ? meta.color : '#555'} />
               <Text style={[s.sectionTabLabel, isActive && { color: meta.color }]}>{meta.label}</Text>
               {isActive && <View style={[s.sectionDot, { backgroundColor: meta.color }]} />}
             </TouchableOpacity>
           );
         })}
 
-        {/* Messages shortcut */}
-        <TouchableOpacity
-          style={s.msgShortcut}
-          onPress={() => router.push('/search')}
-          activeOpacity={0.7}
-        >
-          <Text style={s.msgIcon}>💬</Text>
-          {totalUnread > 0 && (
-            <View style={s.msgBadge}>
-              <Text style={s.msgBadgeText}>{totalUnread}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
       </View>
 
       {/* ─── PULSE SECTION ─── */}
@@ -541,7 +531,7 @@ export default function PlayersScreen() {
             <ActivityIndicator size="large" color="#8A2BE2" style={{ marginTop: 40 }} />
           ) : feed.length === 0 ? (
             <View style={s.emptyState}>
-              <Text style={s.emptyIcon}>⚡</Text>
+              <MaterialCommunityIcons name="lightning-bolt" size={48} color="#8A2BE230" />
               <Text style={s.emptyTitle}>Le Pulse est calme</Text>
               <Text style={s.emptySub}>Lance un match pour animer le feed !</Text>
             </View>
@@ -582,7 +572,7 @@ export default function PlayersScreen() {
                     setSelectedPillar(pf.id);
                   }}
                 >
-                  <Text style={s.pillarFilterIcon}>{pf.icon}</Text>
+                  <CategoryIcon emoji={pf.icon} size={14} color={isActive ? pf.color : '#666'} type="super" />
                   <Text style={[s.pillarFilterName, { color: isActive ? pf.color : '#666' }]}>{pf.name}</Text>
                 </TouchableOpacity>
               );
@@ -600,11 +590,11 @@ export default function PlayersScreen() {
                 grouped[t.pillar_id].push(t);
               });
               return Object.entries(grouped).map(([pillarId, pillarTribes]) => {
-                const pf = pillarFilters.find(p => p.id === pillarId);
+                const pf = pillarFilters.find(p => p.id === pillarId.toLowerCase());
                 return (
                   <Animated.View key={pillarId} entering={FadeInDown.springify()}>
                     <View style={s.tribeGroupHeader}>
-                      <Text style={s.tribeGroupIcon}>{pf?.icon || '🌐'}</Text>
+                      <CategoryIcon emoji={pf?.icon || '🌐'} size={18} color={pf?.color || '#FFF'} type="super" />
                       <Text style={[s.tribeGroupName, { color: pf?.color || '#FFF' }]}>{pf?.name || pillarId}</Text>
                       <View style={[s.tribeGroupLine, { backgroundColor: (pf?.color || '#333') + '30' }]} />
                     </View>
@@ -613,7 +603,7 @@ export default function PlayersScreen() {
                       contentContainerStyle={s.tribeCarousel}
                     >
                       {pillarTribes.map((tribe) => (
-                        <TribeCard key={tribe.id} tribe={tribe} onPress={() => handleTribePress(tribe)} />
+                        <TribeCard key={tribe.id} tribe={tribe} accentColor={pf?.color} onPress={() => handleTribePress(tribe)} />
                       ))}
                     </ScrollView>
                   </Animated.View>
@@ -635,9 +625,9 @@ export default function PlayersScreen() {
           <Animated.View entering={FadeInDown.delay(100).springify()}>
             <ForgeHeroCard>
               <View style={forgeStyles.hero}>
-                <View style={forgeStyles.heroIconWrap}>
-                  <Text style={forgeStyles.heroIcon}>⚒️</Text>
-                </View>
+                <LinearGradient colors={['rgba(138,43,226,0.25)', 'rgba(138,43,226,0.08)']} style={forgeStyles.heroIconWrap}>
+                  <MaterialCommunityIcons name="hammer-wrench" size={32} color="#8A2BE2" />
+                </LinearGradient>
                 <Text style={forgeStyles.heroTitle}>La Forge</Text>
                 <Text style={forgeStyles.heroSub}>
                   Crée ton propre thème de quiz{'\n'}
@@ -670,7 +660,7 @@ export default function PlayersScreen() {
                 disabled={!forgeThemeName.trim()}
                 activeOpacity={0.7}
               >
-                <Text style={forgeStyles.generateBtnIcon}>✨</Text>
+                <MaterialCommunityIcons name="creation" size={18} color="#FFF" />
                 <Text style={forgeStyles.generateBtnText}>Générer avec l'IA</Text>
               </TouchableOpacity>
               <Text style={forgeStyles.generateHint}>
@@ -689,22 +679,22 @@ export default function PlayersScreen() {
 
               {/* Placeholder community themes */}
               {[
-                { name: 'One Piece', author: 'Luffy_Fan', votes: 42, icon: '🏴‍☠️', color: '#F97316' },
-                { name: 'Formule 1', author: 'SpeedKing', votes: 38, icon: '🏎️', color: '#EF4444' },
-                { name: 'K-Pop', author: 'BTS_Army', votes: 31, icon: '🎤', color: '#EC4899' },
+                { name: 'One Piece', author: 'Luffy_Fan', votes: 42, mci: 'pirate' as const, color: '#F97316' },
+                { name: 'Formule 1', author: 'SpeedKing', votes: 38, mci: 'car-sports' as const, color: '#EF4444' },
+                { name: 'K-Pop', author: 'BTS_Army', votes: 31, mci: 'microphone-variant' as const, color: '#EC4899' },
               ].map((theme, i) => (
                 <Animated.View key={i} entering={FadeInDown.delay(400 + i * 80).springify()}>
                   <View style={[forgeStyles.communityCard, { borderColor: theme.color + '20' }]}>
-                    <View style={[forgeStyles.communityIconWrap, { backgroundColor: theme.color + '15' }]}>
-                      <Text style={forgeStyles.communityIcon}>{theme.icon}</Text>
-                    </View>
+                    <LinearGradient colors={[theme.color + '25', theme.color + '08']} style={forgeStyles.communityIconWrap}>
+                      <MaterialCommunityIcons name={theme.mci} size={22} color={theme.color} />
+                    </LinearGradient>
                     <View style={forgeStyles.communityInfo}>
                       <Text style={forgeStyles.communityName}>{theme.name}</Text>
                       <Text style={forgeStyles.communityAuthor}>Créé par @{theme.author}</Text>
                     </View>
                     <View style={forgeStyles.voteSection}>
                       <TouchableOpacity style={[forgeStyles.voteBtn, { borderColor: theme.color + '40' }]}>
-                        <Text style={[forgeStyles.voteIcon, { color: theme.color }]}>▲</Text>
+                        <MaterialCommunityIcons name="arrow-up-bold" size={16} color={theme.color} />
                       </TouchableOpacity>
                       <Text style={[forgeStyles.voteCount, { color: theme.color }]}>{theme.votes}</Text>
                     </View>
@@ -729,7 +719,6 @@ const forgeStyles = StyleSheet.create({
     width: 64, height: 64, borderRadius: 22, backgroundColor: 'rgba(138,43,226,0.15)',
     justifyContent: 'center', alignItems: 'center', marginBottom: 12,
   },
-  heroIcon: { fontSize: 32 },
   heroTitle: { fontSize: 22, fontWeight: '900', color: '#FFF', letterSpacing: 2, marginBottom: 8 },
   heroSub: { fontSize: 13, color: '#888', fontWeight: '600', textAlign: 'center', lineHeight: 20 },
 
@@ -745,7 +734,6 @@ const forgeStyles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     backgroundColor: '#10B981', paddingVertical: 14, borderRadius: 14, gap: 8, marginBottom: 8,
   },
-  generateBtnIcon: { fontSize: 18 },
   generateBtnText: { color: '#FFF', fontSize: 15, fontWeight: '800' },
   generateHint: { fontSize: 11, color: '#555', textAlign: 'center', fontWeight: '500' },
 
@@ -759,7 +747,6 @@ const forgeStyles = StyleSheet.create({
   communityIconWrap: {
     width: 44, height: 44, borderRadius: 14, justifyContent: 'center', alignItems: 'center',
   },
-  communityIcon: { fontSize: 22 },
   communityInfo: { flex: 1 },
   communityName: { color: '#FFF', fontSize: 15, fontWeight: '700', marginBottom: 2 },
   communityAuthor: { color: '#666', fontSize: 11, fontWeight: '600' },
@@ -768,7 +755,6 @@ const forgeStyles = StyleSheet.create({
     width: 34, height: 28, borderRadius: 8, borderWidth: 1,
     backgroundColor: 'rgba(255,255,255,0.04)', justifyContent: 'center', alignItems: 'center',
   },
-  voteIcon: { fontSize: 14, fontWeight: '800' },
   voteCount: { fontSize: 13, fontWeight: '800' },
 });
 
@@ -786,24 +772,12 @@ const s = StyleSheet.create({
     paddingVertical: 10, borderRadius: 14, gap: 6,
     backgroundColor: GLASS.bg, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
   },
-  sectionTabIcon: { fontSize: 16 },
   sectionTabLabel: { fontSize: 11, fontWeight: '900', color: '#555', letterSpacing: 1 },
   sectionDot: { width: 4, height: 4, borderRadius: 2 },
-  msgShortcut: {
-    width: 44, height: 44, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.04)',
-    justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
-  },
-  msgIcon: { fontSize: 18 },
-  msgBadge: {
-    position: 'absolute', top: 4, right: 4, width: 16, height: 16, borderRadius: 8,
-    backgroundColor: '#EF4444', justifyContent: 'center', alignItems: 'center',
-  },
-  msgBadgeText: { color: '#FFF', fontSize: 9, fontWeight: '800' },
 
   // Empty state
   emptyState: { alignItems: 'center', paddingVertical: 60 },
-  emptyIcon: { fontSize: 48, marginBottom: 12 },
-  emptyTitle: { color: '#FFF', fontSize: 18, fontWeight: '700', marginBottom: 4 },
+  emptyTitle: { color: '#FFF', fontSize: 18, fontWeight: '700', marginBottom: 4, marginTop: 12 },
   emptySub: { color: '#525252', fontSize: 13, fontWeight: '500' },
 
   // Pillar filter
@@ -813,14 +787,12 @@ const s = StyleSheet.create({
     borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1,
     borderColor: GLASS.borderSubtle, gap: 4,
   },
-  pillarFilterIcon: { fontSize: 14 },
   pillarFilterName: { fontSize: 10, fontWeight: '800', letterSpacing: 1 },
 
   // Tribe groups
   tribeGroupHeader: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginBottom: 10, gap: 8,
   },
-  tribeGroupIcon: { fontSize: 18 },
   tribeGroupName: { fontSize: 14, fontWeight: '800', letterSpacing: 1 },
   tribeGroupLine: { flex: 1, height: 1, marginLeft: 8 },
   tribeCarousel: { paddingHorizontal: 12, paddingBottom: 12 },

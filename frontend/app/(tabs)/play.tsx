@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
-import { GLASS } from '../../theme/glassTheme';
-import DueloHeader from '../../components/DueloHeader';
+import { LinearGradient } from 'expo-linear-gradient';
 import CosmicBackground from '../../components/CosmicBackground';
+import CategoryIcon from '../../components/CategoryIcon';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -21,12 +20,11 @@ type SuperCategory = {
   total_themes: number;
 };
 
-// Placeholder items for upcoming super categories
 const UPCOMING_CATS = [
   { id: 'SOUND', label: 'Sound', icon: '🎵', color: '#FF6B35' },
   { id: 'ARENA', label: 'Arena', icon: '⚽', color: '#00FF9D' },
   { id: 'LEGENDS', label: 'Legends', icon: '🏛️', color: '#FFD700' },
-  { id: 'LAB', label: 'Lab', icon: '🔬', color: '#00FFFF' },
+  { id: 'LAB', label: 'Lab', icon: '🔬', color: '#1565C0' },
   { id: 'TASTE', label: 'Taste', icon: '🍽️', color: '#FF69B4' },
   { id: 'GLOBE', label: 'Globe', icon: '🌍', color: '#4ECDC4' },
   { id: 'PIXEL', label: 'Pixel', icon: '🎮', color: '#FF3B5C' },
@@ -70,79 +68,78 @@ export default function PlayScreen() {
     );
   }
 
-  // Merge loaded + upcoming (show upcoming as locked)
   const loadedIds = new Set(superCategories.map(sc => sc.id));
   const upcomingFiltered = UPCOMING_CATS.filter(c => !loadedIds.has(c.id));
 
   return (
     <CosmicBackground>
       <View style={styles.container}>
-
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.greeting}>Salut, {pseudo || 'Joueur'} 👋</Text>
-        <Text style={styles.sectionTitle}>SUPER CATÉGORIES</Text>
+          <Text style={styles.greeting}>Salut, {pseudo || 'Joueur'} 👋</Text>
+          <Text style={styles.sectionTitle}>SUPER CATÉGORIES</Text>
 
-        {/* Active Super Categories */}
-        {superCategories.map((cat) => (
-          <TouchableOpacity
-            key={cat.id}
-            style={styles.superCard}
-            onPress={() => handlePress(cat)}
-            activeOpacity={0.7}
-          >
-            <View style={[styles.superCardInner]}>
-              <View style={[styles.superCardGlow, { backgroundColor: cat.color + '15' }]} />
-              <View style={styles.superCardTop}>
-                <View style={[styles.superIconBox, { backgroundColor: cat.color + '20' }]}>
-                  <Text style={styles.superIcon}>{cat.icon}</Text>
-                </View>
-                <View style={styles.superCardInfo}>
-                  <Text style={[styles.superLabel, { color: cat.color }]}>{cat.label.toUpperCase()}</Text>
-                  <Text style={styles.superMeta}>{cat.total_themes} thèmes</Text>
-                </View>
-                <Text style={styles.superChevron}>›</Text>
-              </View>
+          {superCategories.map((cat) => (
+            <TouchableOpacity
+              key={cat.id}
+              style={styles.superCard}
+              onPress={() => handlePress(cat)}
+              activeOpacity={0.8}
+            >
+              {/* Colored top gradient accent */}
+              <LinearGradient
+                colors={[cat.color + '30', 'transparent']}
+                style={styles.cardTopGlow}
+              />
 
-              {/* Clusters preview */}
-              <View style={styles.clustersPreview}>
-                {cat.clusters.map((cluster) => (
-                  <View key={cluster.name} style={styles.clusterPill}>
-                    <Text style={styles.clusterPillIcon}>{cluster.icon}</Text>
-                    <Text style={styles.clusterPillText}>{cluster.name}</Text>
-                    <Text style={styles.clusterPillCount}>{cluster.theme_count}</Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))}
+              {/* Left color bar */}
+              <LinearGradient
+                colors={[cat.color, cat.color + '40']}
+                style={styles.cardAccent}
+              />
 
-        {/* Upcoming categories */}
-        {upcomingFiltered.length > 0 && (
-          <>
-            <Text style={[styles.sectionTitle, { marginTop: 24 }]}>BIENTÔT DISPONIBLE</Text>
-            <View style={styles.upcomingGrid}>
-              {upcomingFiltered.map((cat) => (
-                <View key={cat.id} style={styles.upcomingCard}>
-                  <View style={[styles.upcomingInner, { borderColor: cat.color + '15' }]}>
-                    <View style={[styles.upcomingIconBox, { backgroundColor: cat.color + '10' }]}>
-                      <Text style={styles.upcomingIcon}>{cat.icon}</Text>
-                    </View>
-                    <Text style={[styles.upcomingLabel, { color: cat.color + '60' }]}>
-                      {cat.label}
+              <View style={styles.superCardContent}>
+                <View style={styles.superCardTop}>
+                  <LinearGradient
+                    colors={[cat.color + '35', cat.color + '15']}
+                    style={styles.superIconCircle}
+                  >
+                    <CategoryIcon emoji={cat.icon} size={28} color={cat.color} type="super" />
+                  </LinearGradient>
+                  <View style={styles.superCardInfo}>
+                    <Text style={[styles.superLabel, { color: cat.color }]}>
+                      {cat.label.toUpperCase()}
                     </Text>
-                    <View style={styles.lockBadge}>
-                      <Text style={styles.lockText}>🔒</Text>
-                    </View>
+                    <Text style={styles.superMeta}>{cat.total_themes} thèmes</Text>
+                  </View>
+                  <View style={[styles.arrowCircle, { backgroundColor: cat.color + '18' }]}>
+                    <Text style={[styles.arrowText, { color: cat.color }]}>›</Text>
                   </View>
                 </View>
-              ))}
-            </View>
-          </>
-        )}
 
-        <View style={{ height: 30 }} />
-      </ScrollView>
+                {/* Clusters preview */}
+                <View style={styles.clustersPreview}>
+                  {cat.clusters.map((cluster) => (
+                    <View
+                      key={cluster.name}
+                      style={[styles.clusterPill, { borderColor: cat.color + '20' }]}
+                    >
+                      <CategoryIcon emoji={cluster.icon} size={13} color="rgba(255,255,255,0.7)" type="cluster" />
+                      <Text style={styles.clusterPillText}>{cluster.name}</Text>
+                      <View style={[styles.clusterCountBadge, { backgroundColor: cat.color + '25' }]}>
+                        <Text style={[styles.clusterPillCount, { color: cat.color }]}>
+                          {cluster.theme_count}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+
+
+          <View style={{ height: 30 }} />
+        </ScrollView>
       </View>
     </CosmicBackground>
   );
@@ -154,37 +151,48 @@ const styles = StyleSheet.create({
   scroll: { paddingBottom: 30 },
 
   greeting: {
-    fontSize: 22, fontWeight: '800', color: '#FFF',
-    marginTop: 20, marginBottom: 24, paddingHorizontal: 16,
+    fontSize: 24, fontWeight: '800', color: '#FFF',
+    marginTop: 20, marginBottom: 28, paddingHorizontal: 20,
   },
   sectionTitle: {
-    fontSize: 12, fontWeight: '800', color: 'rgba(255,255,255,0.7)', letterSpacing: 3,
-    marginBottom: 16, paddingHorizontal: 16,
+    fontSize: 11, fontWeight: '800', color: 'rgba(255,255,255,0.5)', letterSpacing: 3,
+    marginBottom: 16, paddingHorizontal: 20,
   },
 
   // Super Category Card
-  superCard: { marginHorizontal: 16, marginBottom: 16 },
-  superCardInner: {
-    borderRadius: GLASS.radius, padding: 16,
-    backgroundColor: GLASS.bg,
-    borderWidth: 1.5, overflow: 'hidden',
-    borderColor: GLASS.borderBright,
+  superCard: {
+    marginHorizontal: 16, marginBottom: 14,
+    borderRadius: 20, overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
-  superCardGlow: {
-    position: 'absolute', top: 0, left: 0, right: 0, height: 60,
+  cardTopGlow: {
+    position: 'absolute', top: 0, left: 0, right: 0, height: 80,
+  },
+  cardAccent: {
+    position: 'absolute', top: 12, bottom: 12, left: 0, width: 3,
+    borderTopRightRadius: 3, borderBottomRightRadius: 3,
+  },
+  superCardContent: {
+    padding: 16, paddingLeft: 18,
   },
   superCardTop: {
     flexDirection: 'row', alignItems: 'center',
   },
-  superIconBox: {
-    width: 56, height: 56, borderRadius: 16,
+  superIconCircle: {
+    width: 54, height: 54, borderRadius: 27,
     justifyContent: 'center', alignItems: 'center',
   },
-  superIcon: { fontSize: 30 },
+  superIcon: { fontSize: 28 },
   superCardInfo: { flex: 1, marginLeft: 14 },
-  superLabel: { fontSize: 20, fontWeight: '900', letterSpacing: 2 },
-  superMeta: { color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: '600', marginTop: 2 },
-  superChevron: { color: 'rgba(255,255,255,0.5)', fontSize: 28, fontWeight: '300' },
+  superLabel: { fontSize: 18, fontWeight: '900', letterSpacing: 1.5 },
+  superMeta: { color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: '600', marginTop: 3 },
+  arrowCircle: {
+    width: 36, height: 36, borderRadius: 18,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  arrowText: { fontSize: 22, fontWeight: '600', marginTop: -2 },
 
   // Clusters preview
   clustersPreview: {
@@ -192,33 +200,39 @@ const styles = StyleSheet.create({
   },
   clusterPill: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: GLASS.bgLight,
-    borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6,
-    gap: 6,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5,
+    gap: 5,
     borderWidth: 1,
-    borderColor: GLASS.borderSubtle,
   },
-  clusterPillIcon: { fontSize: 14 },
-  clusterPillText: { color: '#FFF', fontSize: 12, fontWeight: '600' },
-  clusterPillCount: { color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: '700' },
+  clusterPillIcon: { fontSize: 13 },
+  clusterPillText: { color: 'rgba(255,255,255,0.8)', fontSize: 11, fontWeight: '600' },
+  clusterCountBadge: {
+    borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1, minWidth: 18, alignItems: 'center',
+  },
+  clusterPillCount: { fontSize: 10, fontWeight: '800' },
 
   // Upcoming
   upcomingGrid: {
-    flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 16,
+    flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 14,
   },
   upcomingCard: { width: '25%', padding: 4 },
   upcomingInner: {
-    borderRadius: GLASS.radiusSm, padding: 10, borderWidth: 1,
-    backgroundColor: GLASS.bgLight,
-    borderColor: GLASS.borderSubtle,
+    borderRadius: 16, paddingVertical: 14, paddingHorizontal: 6,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
     alignItems: 'center',
+    overflow: 'hidden',
   },
-  upcomingIconBox: {
-    width: 40, height: 40, borderRadius: 12,
-    justifyContent: 'center', alignItems: 'center', marginBottom: 6,
+  upcomingGlow: {
+    position: 'absolute', top: 0, left: 0, right: 0, height: 40,
   },
-  upcomingIcon: { fontSize: 20 },
-  upcomingLabel: { fontSize: 10, fontWeight: '700', textAlign: 'center' },
-  lockBadge: { marginTop: 4 },
-  lockText: { fontSize: 10 },
+  upcomingIconCircle: {
+    width: 40, height: 40, borderRadius: 20,
+    justifyContent: 'center', alignItems: 'center', marginBottom: 8,
+  },
+  upcomingIcon: { fontSize: 18 },
+  upcomingLabel: { fontSize: 10, fontWeight: '700', textAlign: 'center', marginBottom: 4 },
+  lockText: { fontSize: 9, opacity: 0.6 },
 });

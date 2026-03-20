@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, FlatList, TextInput,
-  ActivityIndicator, RefreshControl, Platform, Dimensions, Animated,
+  ActivityIndicator, RefreshControl, Platform, Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import CosmicBackground from '../components/CosmicBackground';
 import { GLASS } from '../theme/glassTheme';
 import SwipeBackPage from '../components/SwipeBackPage';
+import DueloHeader from '../components/DueloHeader';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -43,11 +45,8 @@ function getAvatarColors(seed: string): string[] {
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
-function getAvatarEmoji(seed: string): string {
-  const emojis = ['🐯','🦊','🐸','🦄','🐺','🦅','🐲','🐼','🦁','🐙','🐬','🦋'];
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
-  return emojis[Math.abs(hash) % emojis.length];
+function getInitial(pseudo: string): string {
+  return pseudo && pseudo.length > 0 ? pseudo[0].toUpperCase() : '?';
 }
 
 function timeAgo(dateStr: string): string {
@@ -63,15 +62,16 @@ function timeAgo(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
 }
 
-function getMessagePreview(conv: Conversation): string {
+function getMessagePreview(conv: Conversation): { text: string; icon?: React.ComponentProps<typeof MaterialCommunityIcons>['name'] } {
   const prefix = conv.is_sender ? 'Vous : ' : '';
-  if (conv.last_message_type === 'image') return `${prefix}📷 Photo`;
-  if (conv.last_message_type === 'game_card') return `${prefix}🎮 Résultat de match`;
-  return `${prefix}${conv.last_message}`;
+  if (conv.last_message_type === 'image') return { text: `${prefix}Photo`, icon: 'camera' };
+  if (conv.last_message_type === 'game_card') return { text: `${prefix}Résultat de match`, icon: 'gamepad-variant' };
+  return { text: `${prefix}${conv.last_message}` };
 }
 
 export default function ConversationsScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [filtered, setFiltered] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,7 +82,6 @@ export default function ConversationsScreen() {
 
   useEffect(() => {
     loadConversations();
-    // Poll every 5s for new messages
     pollRef.current = setInterval(loadConversations, 5000);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, []);
@@ -125,15 +124,17 @@ export default function ConversationsScreen() {
     router.push(`/chat?partnerId=${conv.partner_id}&partnerPseudo=${encodeURIComponent(conv.partner_pseudo)}`);
   };
 
-  const renderConversation = ({ item, index }: { item: Conversation; index: number }) => {
+  const totalUnread = conversations.reduce((sum, c) => sum + c.unread_count, 0);
+
+  const renderConversation = ({ item }: { item: Conversation; index: number }) => {
     const colors = getAvatarColors(item.partner_avatar_seed || item.partner_id);
-    const emoji = getAvatarEmoji(item.partner_avatar_seed || item.partner_id);
     const hasUnread = item.unread_count > 0;
+    const preview = getMessagePreview(item);
 
     return (
       <TouchableOpacity
         data-testid={`conversation-${item.partner_id}`}
-        style={styles.convRow}
+        style={[styles.convRow, hasUnread && styles.convRowUnread]}
         onPress={() => openChat(item)}
         activeOpacity={0.6}
       >
@@ -145,9 +146,8 @@ export default function ConversationsScreen() {
             </View>
           )}
           <LinearGradient colors={colors} style={styles.avatar}>
-            <Text style={styles.avatarEmoji}>{emoji}</Text>
+            <Text style={styles.avatarLetter}>{getInitial(item.partner_pseudo)}</Text>
           </LinearGradient>
-          {/* Online indicator - random for now */}
           <View style={styles.onlineDot} />
         </View>
 
@@ -162,9 +162,27 @@ export default function ConversationsScreen() {
             </Text>
           </View>
           <View style={styles.convBottomRow}>
-            <Text style={[styles.convPreview, hasUnread && styles.convPreviewUnread]} numberOfLines={1}>
-              {getMessagePreview(item)}
-            </Text>
+            <View style={styles.previewRow}>
+              {preview.icon && (
+                <MaterialCommunityIcons
+                  name={preview.icon}
+                  size={13}
+                  color={hasUnread ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.35)'}
+                  style={{ marginRight: 4 }}
+                />
+              )}
+              {item.is_sender && !hasUnread && (
+                <MaterialCommunityIcons
+                  name="check-all"
+                  size={13}
+                  color="rgba(255,255,255,0.3)"
+                  style={{ marginRight: 4 }}
+                />
+              )}
+              <Text style={[styles.convPreview, hasUnread && styles.convPreviewUnread]} numberOfLines={1}>
+                {preview.text}
+              </Text>
+            </View>
             {hasUnread && (
               <View style={styles.unreadBadge}>
                 <Text style={styles.unreadText}>
@@ -174,6 +192,9 @@ export default function ConversationsScreen() {
             )}
           </View>
         </View>
+
+        {/* Chevron */}
+        <MaterialCommunityIcons name="chevron-right" size={16} color="rgba(255,255,255,0.15)" />
       </TouchableOpacity>
     );
   };
@@ -181,40 +202,45 @@ export default function ConversationsScreen() {
   return (
     <SwipeBackPage>
     <CosmicBackground>
-      <SafeAreaView style={styles.container}>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <DueloHeader />
+
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity data-testid="conversations-back-btn" onPress={() => router.back()} style={styles.backBtn}>
-            <Text style={styles.backIcon}>‹</Text>
+          <TouchableOpacity data-testid="conversations-back-btn" onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.back();
+          }} style={styles.backBtn}>
+            <MaterialCommunityIcons name="chevron-left" size={22} color="#FFF" />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>{myPseudo || 'Messages'}</Text>
-            <Text style={styles.headerChevron}>▾</Text>
+            <MaterialCommunityIcons name="chat" size={16} color="#8A2BE2" />
+            <Text style={styles.headerTitle}>Messages</Text>
+            {totalUnread > 0 && (
+              <View style={styles.headerBadge}>
+                <Text style={styles.headerBadgeText}>{totalUnread > 99 ? '99+' : totalUnread}</Text>
+              </View>
+            )}
           </View>
-          <TouchableOpacity data-testid="new-message-btn" style={styles.newMsgBtn} onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.push('/search');
-          }}>
-            <Text style={styles.newMsgIcon}>✏️</Text>
-          </TouchableOpacity>
+          <View style={{ width: 36 }} />
         </View>
 
         {/* Search bar */}
         <View style={styles.searchWrap}>
           <View style={styles.searchBar}>
-            <Text style={styles.searchIcon}>🔍</Text>
+            <MaterialCommunityIcons name="magnify" size={18} color="rgba(255,255,255,0.3)" />
             <TextInput
               data-testid="conversations-search"
               style={styles.searchInput}
-              placeholder="Rechercher..."
-              placeholderTextColor="rgba(255,255,255,0.3)"
+              placeholder="Rechercher une conversation..."
+              placeholderTextColor="rgba(255,255,255,0.25)"
               value={search}
               onChangeText={setSearch}
               autoCorrect={false}
             />
             {search.length > 0 && (
-              <TouchableOpacity onPress={() => setSearch('')}>
-                <Text style={styles.searchClear}>✕</Text>
+              <TouchableOpacity onPress={() => setSearch('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <MaterialCommunityIcons name="close-circle" size={16} color="rgba(255,255,255,0.3)" />
               </TouchableOpacity>
             )}
           </View>
@@ -227,7 +253,7 @@ export default function ConversationsScreen() {
         ) : filtered.length === 0 && !search ? (
           <View style={styles.emptyWrap}>
             <LinearGradient colors={['#8A2BE2', '#00BFFF']} style={styles.emptyCircle}>
-              <Text style={styles.emptyCircleIcon}>💬</Text>
+              <MaterialCommunityIcons name="chat-outline" size={36} color="#FFF" />
             </LinearGradient>
             <Text style={styles.emptyTitle}>Vos messages</Text>
             <Text style={styles.emptyText}>
@@ -238,17 +264,19 @@ export default function ConversationsScreen() {
               style={styles.emptyBtn}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                router.push('/search');
+                router.push('/search?tab=joueurs');
               }}
               activeOpacity={0.8}
             >
               <LinearGradient colors={['#8A2BE2', '#00BFFF']} start={{x:0,y:0}} end={{x:1,y:0}} style={styles.emptyBtnGradient}>
-                <Text style={styles.emptyBtnText}>Envoyer un message</Text>
+                <MaterialCommunityIcons name="magnify" size={16} color="#FFF" style={{ marginRight: 6 }} />
+                <Text style={styles.emptyBtnText}>Trouver un joueur</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
         ) : filtered.length === 0 && search ? (
           <View style={styles.emptyWrap}>
+            <MaterialCommunityIcons name="magnify" size={48} color="#525252" style={{ marginBottom: 12 }} />
             <Text style={styles.emptyTitle}>Aucun résultat</Text>
             <Text style={styles.emptyText}>Aucune conversation ne correspond à "{search}"</Text>
           </View>
@@ -264,7 +292,7 @@ export default function ConversationsScreen() {
             }
           />
         )}
-      </SafeAreaView>
+      </View>
     </CosmicBackground>
     </SwipeBackPage>
   );
@@ -275,34 +303,32 @@ const styles = StyleSheet.create({
   loadingWrap: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   list: { paddingBottom: 20 },
 
-  // Header - Instagram style
+  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: GLASS.bgDark,
     borderBottomWidth: 1,
-    borderBottomColor: GLASS.borderCyan,
-    ...Platform.select({
-      web: { backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' } as any,
-      default: {},
-    }),
+    borderBottomColor: 'rgba(138, 43, 226, 0.15)',
   },
   backBtn: {
     width: 36,
     height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.06)',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
-  backIcon: { fontSize: 30, color: '#FFF', fontWeight: '300', marginTop: -2 },
   headerCenter: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
+    gap: 6,
   },
   headerTitle: {
     fontSize: 18,
@@ -310,45 +336,52 @@ const styles = StyleSheet.create({
     color: '#FFF',
     letterSpacing: 0.3,
   },
-  headerChevron: {
-    fontSize: 12,
-    color: '#FFF',
-    marginTop: 2,
-  },
-  newMsgBtn: {
-    width: 36,
-    height: 36,
+  headerBadge: {
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#FF3B30',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 6,
   },
-  newMsgIcon: { fontSize: 20 },
+  headerBadgeText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  searchBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
 
   // Search
   searchWrap: {
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: 'rgba(0,0,0,0.2)',
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(255,255,255,0.06)',
     borderRadius: 12,
     paddingHorizontal: 12,
-    height: 38,
+    height: 40,
     gap: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
   },
-  searchIcon: { fontSize: 14 },
   searchInput: {
     flex: 1,
     color: '#FFF',
     fontSize: 15,
     paddingVertical: 0,
-  },
-  searchClear: {
-    color: 'rgba(255,255,255,0.4)',
-    fontSize: 14,
-    padding: 4,
   },
 
   // Conversation row
@@ -357,12 +390,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
+    marginHorizontal: 8,
+    marginVertical: 2,
+    borderRadius: 14,
+  },
+  convRowUnread: {
+    backgroundColor: 'rgba(138, 43, 226, 0.05)',
   },
 
   // Avatar
   avatarWrap: {
-    width: 56,
-    height: 56,
+    width: 52,
+    height: 52,
     position: 'relative',
   },
   avatarRing: {
@@ -371,33 +410,37 @@ const styles = StyleSheet.create({
     left: -2,
     right: -2,
     bottom: -2,
-    borderRadius: 30,
+    borderRadius: 28,
     overflow: 'hidden',
   },
   avatarRingGradient: {
     width: '100%' as any,
     height: '100%' as any,
-    borderRadius: 30,
+    borderRadius: 28,
   },
   avatar: {
     position: 'absolute',
     top: 1,
     left: 1,
-    width: 54,
-    height: 54,
-    borderRadius: 27,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2.5,
     borderColor: '#050510',
   },
-  avatarEmoji: { fontSize: 24 },
+  avatarLetter: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#FFF',
+  },
   onlineDot: {
     position: 'absolute',
     bottom: 1,
     right: 1,
-    width: 14,
-    height: 14,
+    width: 13,
+    height: 13,
     borderRadius: 7,
     backgroundColor: '#00FF9D',
     borderWidth: 2.5,
@@ -408,6 +451,7 @@ const styles = StyleSheet.create({
   convInfo: {
     flex: 1,
     marginLeft: 14,
+    marginRight: 8,
   },
   convTopRow: {
     flexDirection: 'row',
@@ -438,11 +482,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  previewRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 8,
+  },
   convPreview: {
     fontSize: 13,
     color: 'rgba(255,255,255,0.4)',
     flex: 1,
-    marginRight: 8,
   },
   convPreviewUnread: {
     color: 'rgba(255,255,255,0.7)',
@@ -478,7 +527,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  emptyCircleIcon: { fontSize: 36 },
   emptyTitle: {
     fontSize: 22,
     fontWeight: '800',
@@ -497,6 +545,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   emptyBtnGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 22,

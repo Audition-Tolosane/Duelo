@@ -5,9 +5,12 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import SwipeBackPage from '../components/SwipeBackPage';
+import DueloHeader from '../components/DueloHeader';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -25,14 +28,33 @@ interface NotificationItem {
   created_at: string;
 }
 
-function getAvatar(seed: string | null) {
-  if (!seed) return '👤';
-  const emojis = ['🐯', '🦊', '🐸', '🦄', '🐺', '🦅', '🐲', '🐼', '🦁', '🐙', '🐬', '🦋'];
+// MCI icon + gradient for each notification type
+const TYPE_META: Record<string, { icon: string; colors: [string, string]; color: string }> = {
+  challenge:    { icon: 'sword-cross',    colors: ['#FF6B35', '#FF8F60'], color: '#FF6B35' },
+  match_result: { icon: 'trophy',         colors: ['#8A2BE2', '#A855F7'], color: '#8A2BE2' },
+  follow:       { icon: 'account-plus',   colors: ['#00D4FF', '#38BDF8'], color: '#00D4FF' },
+  message:      { icon: 'chat',           colors: ['#4CAF50', '#66BB6A'], color: '#4CAF50' },
+  like:         { icon: 'heart',          colors: ['#FF3B5C', '#FF6B81'], color: '#FF3B5C' },
+  comment:      { icon: 'comment-text',   colors: ['#FFB800', '#FFC933'], color: '#FFB800' },
+  system:       { icon: 'bell',           colors: ['#6B7280', '#9CA3AF'], color: '#888' },
+};
+
+const DEFAULT_META = { icon: 'bell-outline', colors: ['#6B7280', '#9CA3AF'] as [string, string], color: '#888' };
+
+function getInitial(pseudo: string | null, seed: string | null): string {
+  if (pseudo && pseudo.length > 0) return pseudo[0].toUpperCase();
+  if (seed && seed.length > 0) return seed[0].toUpperCase();
+  return '?';
+}
+
+function getAvatarColor(seed: string | null): string {
+  if (!seed) return '#8A2BE2';
+  const palette = ['#FF6B35', '#8A2BE2', '#00D4FF', '#4CAF50', '#FF3B5C', '#FFB800', '#00FF9D', '#E53935'];
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
     hash = seed.charCodeAt(i) + ((hash << 5) - hash);
   }
-  return emojis[Math.abs(hash) % emojis.length];
+  return palette[Math.abs(hash) % palette.length];
 }
 
 function getTimeAgo(dateStr: string): string {
@@ -60,16 +82,6 @@ function getDateGroup(dateStr: string): string {
   if (diffDays < 7) return 'Cette semaine';
   return 'Plus ancien';
 }
-
-const TYPE_COLORS: Record<string, string> = {
-  challenge: '#FF6B35',
-  match_result: '#8A2BE2',
-  follow: '#00D4FF',
-  message: '#4CAF50',
-  like: '#FF3B5C',
-  comment: '#FFB800',
-  system: '#888',
-};
 
 export default function NotificationsScreen() {
   const router = useRouter();
@@ -140,7 +152,6 @@ export default function NotificationsScreen() {
       markAsRead(notif.id);
     }
 
-    // Deep linking
     if (notif.data?.screen) {
       const screen = notif.data.screen;
       const params = notif.data.params || {};
@@ -158,22 +169,34 @@ export default function NotificationsScreen() {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   // Group notifications by date
-  const groupedNotifications = notifications.reduce<{ title: string; data: NotificationItem[] }[]>(
-    (acc, notif) => {
-      const group = getDateGroup(notif.created_at);
-      const existing = acc.find(g => g.title === group);
-      if (existing) {
-        existing.data.push(notif);
-      } else {
-        acc.push({ title: group, data: [notif] });
-      }
-      return acc;
-    },
-    []
-  );
+  const sections: { title: string; data: NotificationItem[] }[] = [];
+  notifications.forEach(notif => {
+    const group = getDateGroup(notif.created_at);
+    const existing = sections.find(g => g.title === group);
+    if (existing) {
+      existing.data.push(notif);
+    } else {
+      sections.push({ title: group, data: [notif] });
+    }
+  });
 
-  const renderNotification = ({ item }: { item: NotificationItem }) => {
-    const typeColor = TYPE_COLORS[item.type] || '#888';
+  // Flatten sections with headers into a single list
+  const flatData: (NotificationItem | { _sectionHeader: string })[] = [];
+  sections.forEach(section => {
+    flatData.push({ _sectionHeader: section.title });
+    section.data.forEach(item => flatData.push(item));
+  });
+
+  const renderItem = ({ item }: { item: NotificationItem | { _sectionHeader: string } }) => {
+    if ('_sectionHeader' in item) {
+      return (
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{item._sectionHeader}</Text>
+        </View>
+      );
+    }
+
+    const meta = TYPE_META[item.type] || DEFAULT_META;
 
     return (
       <TouchableOpacity
@@ -181,16 +204,26 @@ export default function NotificationsScreen() {
         onPress={() => handleNotificationPress(item)}
         activeOpacity={0.7}
       >
-        {/* Unread dot */}
-        {!item.read && <View style={[styles.unreadDot, { backgroundColor: typeColor }]} />}
+        {/* Unread indicator line */}
+        {!item.read && <View style={[styles.unreadLine, { backgroundColor: meta.color }]} />}
 
-        {/* Avatar / Icon */}
-        <View style={[styles.notifIconWrap, { backgroundColor: `${typeColor}20` }]}>
-          {item.actor_avatar_seed ? (
-            <Text style={styles.notifAvatar}>{getAvatar(item.actor_avatar_seed)}</Text>
+        {/* Avatar or type icon */}
+        <View style={styles.avatarWrap}>
+          {item.actor_pseudo || item.actor_avatar_seed ? (
+            <View style={[styles.avatarCircle, { backgroundColor: getAvatarColor(item.actor_avatar_seed) }]}>
+              <Text style={styles.avatarLetter}>
+                {getInitial(item.actor_pseudo, item.actor_avatar_seed)}
+              </Text>
+            </View>
           ) : (
-            <Text style={styles.notifIcon}>{item.icon}</Text>
+            <LinearGradient colors={meta.colors} style={styles.avatarCircle}>
+              <MaterialCommunityIcons name={meta.icon as any} size={22} color="#FFF" />
+            </LinearGradient>
           )}
+          {/* Small type badge on avatar */}
+          <LinearGradient colors={meta.colors} style={styles.typeBadge}>
+            <MaterialCommunityIcons name={meta.icon as any} size={10} color="#FFF" />
+          </LinearGradient>
         </View>
 
         {/* Content */}
@@ -198,13 +231,14 @@ export default function NotificationsScreen() {
           <Text style={[styles.notifBody, !item.read && styles.notifBodyUnread]} numberOfLines={2}>
             {item.body}
           </Text>
-          <Text style={styles.notifTime}>{getTimeAgo(item.created_at)}</Text>
+          <View style={styles.notifMeta}>
+            <MaterialCommunityIcons name="clock-outline" size={11} color="#555" />
+            <Text style={styles.notifTime}>{getTimeAgo(item.created_at)}</Text>
+          </View>
         </View>
 
-        {/* Type indicator */}
-        <View style={[styles.typeIndicator, { backgroundColor: typeColor }]}>
-          <Text style={styles.typeIcon}>{item.icon}</Text>
-        </View>
+        {/* Chevron */}
+        <MaterialCommunityIcons name="chevron-right" size={18} color="rgba(255,255,255,0.2)" />
       </TouchableOpacity>
     );
   };
@@ -212,7 +246,9 @@ export default function NotificationsScreen() {
   return (
     <SwipeBackPage>
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* Header */}
+      <DueloHeader />
+
+      {/* Sub-header */}
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backBtn}
@@ -221,9 +257,11 @@ export default function NotificationsScreen() {
             router.back();
           }}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <MaterialCommunityIcons name="chevron-left" size={22} color="#FFF" />
         </TouchableOpacity>
+
         <View style={styles.headerCenter}>
+          <MaterialCommunityIcons name="bell" size={18} color="#8A2BE2" />
           <Text style={styles.headerTitle}>Notifications</Text>
           {unreadCount > 0 && (
             <View style={styles.headerBadge}>
@@ -231,9 +269,11 @@ export default function NotificationsScreen() {
             </View>
           )}
         </View>
+
         <View style={styles.headerRight}>
           {unreadCount > 0 && (
             <TouchableOpacity style={styles.readAllBtn} onPress={markAllAsRead}>
+              <MaterialCommunityIcons name="check-all" size={14} color="#8A2BE2" />
               <Text style={styles.readAllText}>Tout lire</Text>
             </TouchableOpacity>
           )}
@@ -244,7 +284,7 @@ export default function NotificationsScreen() {
               router.push('/notification-settings');
             }}
           >
-            <Text style={styles.settingsIcon}>⚙️</Text>
+            <MaterialCommunityIcons name="cog-outline" size={18} color="rgba(255,255,255,0.6)" />
           </TouchableOpacity>
         </View>
       </View>
@@ -256,7 +296,9 @@ export default function NotificationsScreen() {
         </View>
       ) : notifications.length === 0 ? (
         <View style={styles.emptyWrap}>
-          <Text style={styles.emptyIcon}>🔔</Text>
+          <LinearGradient colors={['#8A2BE2', '#A855F7']} style={styles.emptyIconCircle}>
+            <MaterialCommunityIcons name="bell-outline" size={40} color="#FFF" />
+          </LinearGradient>
           <Text style={styles.emptyTitle}>Aucune notification</Text>
           <Text style={styles.emptyText}>
             Tu recevras des notifications pour les défis, messages, follows et interactions.
@@ -264,9 +306,9 @@ export default function NotificationsScreen() {
         </View>
       ) : (
         <FlatList
-          data={notifications}
-          keyExtractor={(item) => item.id}
-          renderItem={renderNotification}
+          data={flatData}
+          keyExtractor={(item, idx) => '_sectionHeader' in item ? `section-${item._sectionHeader}` : item.id}
+          renderItem={renderItem}
           contentContainerStyle={styles.listContent}
           refreshControl={
             <RefreshControl
@@ -276,7 +318,6 @@ export default function NotificationsScreen() {
               colors={['#8A2BE2']}
             />
           }
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
           showsVerticalScrollIndicator={false}
         />
       )}
@@ -288,7 +329,7 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#050510',
   },
   header: {
     flexDirection: 'row',
@@ -297,19 +338,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.06)',
+    borderBottomColor: 'rgba(138, 43, 226, 0.15)',
   },
   backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: 'rgba(255,255,255,0.06)',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  backIcon: {
-    fontSize: 20,
-    color: '#FFF',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   headerCenter: {
     flexDirection: 'row',
@@ -323,9 +362,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   headerBadge: {
-    minWidth: 22,
-    height: 22,
-    borderRadius: 11,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
     backgroundColor: '#FF3B30',
     justifyContent: 'center',
     alignItems: 'center',
@@ -333,7 +372,7 @@ const styles = StyleSheet.create({
   },
   headerBadgeText: {
     color: '#FFF',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '800',
   },
   headerRight: {
@@ -342,13 +381,18 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   readAllBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
-    backgroundColor: 'rgba(138, 43, 226, 0.15)',
+    backgroundColor: 'rgba(138, 43, 226, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(138, 43, 226, 0.25)',
   },
   readAllText: {
-    color: '#8A2BE2',
+    color: '#A855F7',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -359,9 +403,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  settingsIcon: {
-    fontSize: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   loadingWrap: {
     flex: 1,
@@ -374,9 +417,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 40,
   },
-  emptyIcon: {
-    fontSize: 48,
-    marginBottom: 16,
+  emptyIconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   emptyTitle: {
     fontSize: 20,
@@ -390,72 +437,95 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-  listContent: {
-    paddingVertical: 8,
+  sectionHeader: {
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 8,
   },
-  separator: {
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    marginLeft: 72,
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.4)',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  listContent: {
+    paddingBottom: 24,
   },
   notifCard: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 14,
+    marginHorizontal: 12,
+    marginVertical: 3,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.02)',
     position: 'relative',
+    overflow: 'hidden',
   },
   notifCardUnread: {
-    backgroundColor: 'rgba(138, 43, 226, 0.04)',
+    backgroundColor: 'rgba(138, 43, 226, 0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(138, 43, 226, 0.12)',
   },
-  unreadDot: {
+  unreadLine: {
     position: 'absolute',
-    left: 6,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    left: 0,
+    top: 8,
+    bottom: 8,
+    width: 3,
+    borderRadius: 2,
   },
-  notifIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
+  avatarWrap: {
+    position: 'relative',
     marginRight: 12,
   },
-  notifAvatar: {
-    fontSize: 24,
+  avatarCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  notifIcon: {
-    fontSize: 22,
+  avatarLetter: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#FFF',
+  },
+  typeBadge: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#050510',
   },
   notifContent: {
     flex: 1,
-    marginRight: 12,
+    marginRight: 8,
   },
   notifBody: {
     fontSize: 14,
-    color: '#AAA',
+    color: 'rgba(255,255,255,0.5)',
     lineHeight: 20,
   },
   notifBodyUnread: {
     color: '#FFF',
     fontWeight: '600',
   },
+  notifMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 4,
+  },
   notifTime: {
     fontSize: 12,
     color: '#555',
-    marginTop: 4,
-  },
-  typeIndicator: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    opacity: 0.8,
-  },
-  typeIcon: {
-    fontSize: 12,
   },
 });

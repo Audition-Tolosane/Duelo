@@ -44,28 +44,52 @@ SUPER_CATEGORY_META = {
     "SOUND": {"icon": "🎵", "color": "#FF6B35", "label": "Sound"},
     "ARENA": {"icon": "⚽", "color": "#00FF9D", "label": "Arena"},
     "LEGENDS": {"icon": "🏛️", "color": "#FFD700", "label": "Legends"},
-    "LAB": {"icon": "🔬", "color": "#00FFFF", "label": "Lab"},
+    "LAB": {"icon": "🔬", "color": "#1565C0", "label": "Lab"},
     "TASTE": {"icon": "🍽️", "color": "#FF69B4", "label": "Taste"},
     "GLOBE": {"icon": "🌍", "color": "#4ECDC4", "label": "Globe"},
     "PIXEL": {"icon": "🎮", "color": "#FF3B5C", "label": "Pixel"},
     "STYLE": {"icon": "✨", "color": "#E040FB", "label": "Style"},
+    "ART": {"icon": "🎨", "color": "#E53935", "label": "Art"},
+    "LIFE": {"icon": "🌱", "color": "#2E7D32", "label": "Life"},
+    "MIND": {"icon": "🧠", "color": "#FFAB40", "label": "Mind"},
 }
 
 CLUSTER_ICONS = {
+    # SCREEN
     "Séries TV": "📺",
     "Cinéma": "🎬",
     "Animation & Anime": "🎌",
-    "Rock & Pop": "🎸",
-    "Rap & Hip-Hop": "🎤",
-    "Classique & Jazz": "🎻",
-    "Football": "⚽",
-    "Sports US": "🏈",
-    "Sports Individuels": "🎾",
-    "Histoire": "🏛️",
-    "Mythologie": "⚡",
-    "Personnalités": "👑",
-    "Sciences": "🔬",
-    "Technologie": "💻",
-    "Nature": "🌿",
+    # SOUND
+    "Hits & Pop Culture": "🎤",
+    "Musiques de Films & Jeux": "🎼",
+    "Rock & Classiques": "🎸",
+    # ARENA
+    "Combat & Athlé": "🥊",
+    "E-sport & Gaming": "🎮",
+    "Sports de Balle": "🏀",
+    # LEGENDS
+    "Antiq. & M-Â": "🏛️",
+    "Hist. Moderne": "📜",
+    "Mythologies": "⚡",
+    # LAB
+    "Espace & Univers": "🚀",
+    "Physique & Chimie": "⚗️",
+    "Tech & IA": "🤖",
+    # GLOBE
+    "Gastronomie": "🍷",
+    "Langues & Cultures": "🗣️",
+    "Voyage & Géo": "✈️",
+    # ART
+    "Architecture": "🏗️",
+    "Mode & Design": "👗",
+    "Peinture & Sculpture": "🖌️",
+    # LIFE
+    "Corps Humain": "🫀",
+    "Monde Animal": "🐾",
+    "Nature & Écologie": "🌿",
+    # MIND
+    "Littérature": "📖",
+    "Maths & Logique": "🔢",
+    "Philo & Psycho": "💭",
 }
 
