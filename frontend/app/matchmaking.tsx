@@ -1,28 +1,76 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
-  View, Text, StyleSheet, Animated, Dimensions, Easing
+  View, Text, StyleSheet, Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
-import { GLASS } from '../theme/glassTheme';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, {
+  useSharedValue, useAnimatedStyle, withRepeat, withTiming,
+  withSequence, withSpring, Easing,
+} from 'react-native-reanimated';
+import Svg, { Path } from 'react-native-svg';
 import SwipeBackPage from '../components/SwipeBackPage';
+import DueloHeader from '../components/DueloHeader';
 import { useWS } from '../contexts/WebSocketContext';
+import { authFetch } from '../utils/api';
+import { t } from '../utils/i18n';
 
-const { width } = Dimensions.get('window');
+// Real world map paths from Natural Earth data (Mercator projection, 1000×500 viewBox)
+import MAP_PATHS from '../assets/map-paths.json';
+
+const { width: SW, height: SH } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-const BADGE_MAP: Record<string, string> = { fire: '🔥', bolt: '⚡', glow: '✨' };
+const BADGE_ICON_MAP: Record<string, string> = { fire: 'fire', bolt: 'lightning-bolt', glow: 'shimmer' };
 
-const SEARCH_MESSAGES = [
-  'Recherche d\'un adversaire...',
-  'Scan du réseau...',
-  'Analyse des joueurs en ligne...',
-  'Connexion au serveur de combat...',
+// Pin positions for fake players (in SVG 1000×500 viewBox coords)
+const PIN_POSITIONS = [
+  { x: 180, y: 140 },  // USA
+  { x: 280, y: 310 },  // Brazil
+  { x: 470, y: 135 },  // France
+  { x: 490, y: 250 },  // Nigeria
+  { x: 630, y: 95 },   // Russia
+  { x: 610, y: 210 },  // India
+  { x: 720, y: 155 },  // China
+  { x: 775, y: 130 },  // Japan
+  { x: 790, y: 360 },  // Australia
+  { x: 485, y: 75 },   // Scandinavia
+  { x: 155, y: 190 },  // Mexico
+  { x: 545, y: 200 },  // Saudi Arabia
+  { x: 710, y: 215 },  // Thailand
+  { x: 745, y: 252 },  // Indonesia
+  { x: 210, y: 100 },  // Canada
+  { x: 505, y: 290 },  // Congo
 ];
 
+const PLAYER_NAMES = [
+  'Alex', 'Mia', 'Lucas', 'Emma', 'Noah', 'Léa', 'Hugo', 'Chloé',
+  'Tom', 'Jade', 'Liam', 'Sarah', 'Enzo', 'Luna', 'Adam', 'Zoé',
+];
+
+const PIN_COLORS = [
+  '#FF6B35', '#00D4FF', '#4CAF50', '#FF3B5C', '#FFB800',
+  '#00FF9D', '#E53935', '#8A2BE2', '#FF69B4', '#1565C0',
+  '#FF9800', '#00BCD4', '#9C27B0', '#CDDC39', '#FF5722', '#3F51B5',
+];
+
+// Map sizing
+const SVG_W = 1000;
+const SVG_H = 500;
+const SCALE = Math.max(SW / SVG_W, SH / SVG_H) * 1.9;
+const REAL_W = SVG_W * SCALE;
+const REAL_H = SVG_H * SCALE;
+
+// Start centered on Atlantic
+const INIT_X = -(REAL_W * 0.38 - SW / 2);
+const INIT_Y = -(REAL_H * 0.3 - SH / 2);
+
 type OpponentData = {
+  id: string;
   pseudo: string;
   avatar_seed: string;
   is_bot: boolean;
@@ -32,54 +80,128 @@ type OpponentData = {
   streak_badge: string;
 };
 
-type PlayerData = {
-  level: number;
-  title: string;
-};
+type PlayerData = { level: number; title: string };
 
+// ── Player Pin Component ──
+function PlayerPin({ x, y, name, color, isTarget }: {
+  x: number; y: number; name: string; color: string; isTarget?: boolean;
+}) {
+  const pulse = useSharedValue(0.5);
+
+  useEffect(() => {
+    pulse.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 1200 + Math.random() * 800 }),
+        withTiming(0.5, { duration: 1200 + Math.random() * 800 }),
+      ),
+      -1, true,
+    );
+  }, []);
+
+  const pulseStyle = useAnimatedStyle(() => ({
+    opacity: pulse.value,
+  }));
+
+  const size = isTarget ? 38 : 24;
+  const fontSize = isTarget ? 14 : 9;
+
+  return (
+    <Animated.View
+      style={[
+        {
+          position: 'absolute',
+          left: x * SCALE - size / 2,
+          top: y * SCALE - size / 2,
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          backgroundColor: color,
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderWidth: isTarget ? 3 : 1,
+          borderColor: isTarget ? '#FFF' : 'rgba(255,255,255,0.35)',
+          zIndex: isTarget ? 100 : 10,
+        },
+        !isTarget && pulseStyle,
+        isTarget && {
+          shadowColor: color,
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.9,
+          shadowRadius: 25,
+          elevation: 12,
+        },
+      ]}
+    >
+      <Text style={{ color: '#FFF', fontSize, fontWeight: '900' }}>
+        {name[0]?.toUpperCase()}
+      </Text>
+    </Animated.View>
+  );
+}
+
+// ── Main Screen ──
 export default function MatchmakingScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { category, themeName } = useLocalSearchParams<{ category: string; themeName: string }>();
+  const { category, themeName, rematch } = useLocalSearchParams<{ category: string; themeName: string; rematch: string }>();
+  const isRematch = rematch === 'true';
   const { send: wsSend, on: wsOn } = useWS();
-  const [message, setMessage] = useState(SEARCH_MESSAGES[0]);
   const [dots, setDots] = useState('');
-  const [phase, setPhase] = useState<'searching' | 'versus'>('searching');
+  const [message, setMessage] = useState(t('matchmaking.searching_opponent'));
+  const [phase, setPhase] = useState<'searching' | 'found' | 'versus'>('searching');
   const [opponent, setOpponent] = useState<OpponentData | null>(null);
   const [playerInfo, setPlayerInfo] = useState<PlayerData | null>(null);
-  const [pseudo, setPseudo] = useState('Joueur');
+  const [pseudo, setPseudo] = useState(t('matchmaking.player'));
   const [roomId, setRoomId] = useState<string | null>(null);
 
-  const radarAnim = useRef(new Animated.Value(0)).current;
-  const pulseAnim = useRef(new Animated.Value(0.3)).current;
-  const ringAnim1 = useRef(new Animated.Value(0)).current;
-  const ringAnim2 = useRef(new Animated.Value(0)).current;
+  const mapX = useSharedValue(INIT_X);
+  const mapY = useSharedValue(INIT_Y);
+  const mapScaleAnim = useSharedValue(1);
+  const overlayOpacity = useSharedValue(0);
 
-  // Versus screen anims
-  const playerSlide = useRef(new Animated.Value(-width)).current;
-  const opponentSlide = useRef(new Animated.Value(width)).current;
-  const vsFade = useRef(new Animated.Value(0)).current;
-  const vsScale = useRef(new Animated.Value(0.3)).current;
-  const vsGlow = useRef(new Animated.Value(0)).current;
+  const vsOpacity = useSharedValue(0);
+  const vsScale = useSharedValue(0.5);
+  const playerSlideX = useSharedValue(-SW);
+  const opponentSlideX = useSharedValue(SW);
+
+  const [targetPin, setTargetPin] = useState<{ x: number; y: number } | null>(null);
+
+  const playerPins = useMemo(() => {
+    return PIN_POSITIONS.map((pos, i) => ({
+      x: pos.x + (Math.random() - 0.5) * 15,
+      y: pos.y + (Math.random() - 0.5) * 15,
+      name: PLAYER_NAMES[i % PLAYER_NAMES.length],
+      color: PIN_COLORS[i % PIN_COLORS.length],
+    }));
+  }, []);
+
+  const SEARCH_MESSAGES = [
+    t('matchmaking.searching_opponent'),
+    t('matchmaking.scanning_players'),
+    t('matchmaking.exploring_globe'),
+    t('matchmaking.connecting_network'),
+  ];
 
   useEffect(() => {
     loadPseudo();
-    // Join matchmaking queue via WebSocket
-    wsSend({ action: 'matchmaking_join', theme_id: category });
-
-    return () => {
-      // Leave queue on unmount
-      wsSend({ action: 'matchmaking_leave' });
-    };
+    if (isRematch) {
+      // Rematch accepted → skip search, go straight to VS
+      fetchBotOpponent();
+    } else {
+      wsSend({ action: 'matchmaking_join', theme_id: category });
+    }
+    return () => { if (!isRematch) wsSend({ action: 'matchmaking_leave' }); };
   }, []);
 
-  // Listen for match_found or matchmaking_timeout via WebSocket
   useEffect(() => {
     const unsubs = [
       wsOn('match_found', (msg) => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         const opp = msg.data?.opponent;
-        setRoomId(msg.data?.room_id);
-        setOpponent({
+        const rid = msg.data?.room_id;
+        setRoomId(rid);
+        const oppData: OpponentData = {
+          id: opp.id || '',
           pseudo: opp.pseudo,
           avatar_seed: opp.avatar_seed,
           is_bot: false,
@@ -87,20 +209,11 @@ export default function MatchmakingScreen() {
           title: opp.selected_title || '',
           streak: opp.streak || 0,
           streak_badge: opp.streak_badge || '',
-        });
-        setPlayerInfo({ level: 1, title: '' }); // Will be updated from game_start
-        setPhase('versus');
-        showVersusScreen({
-          pseudo: opp.pseudo,
-          avatar_seed: opp.avatar_seed,
-          is_bot: false,
-          level: opp.level || 1,
-          title: opp.selected_title || '',
-          streak: opp.streak || 0,
-          streak_badge: opp.streak_badge || '',
-        }, msg.data?.room_id);
+        };
+        setOpponent(oppData);
+        setPlayerInfo({ level: 1, title: '' });
+        handleMatchFound(oppData, rid);
       }),
-      // Timeout: no real player found, fall back to bot
       wsOn('matchmaking_timeout', () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         fetchBotOpponent();
@@ -117,60 +230,44 @@ export default function MatchmakingScreen() {
   useEffect(() => {
     if (phase !== 'searching') return;
 
-    // Radar rotation
-    const radar = Animated.loop(
-      Animated.timing(radarAnim, {
-        toValue: 1, duration: 2000, easing: Easing.linear, useNativeDriver: true,
-      })
-    );
-    radar.start();
+    const targets = [
+      { x: -(REAL_W * 0.38 - SW / 2), y: -(REAL_H * 0.25 - SH / 2) },
+      { x: -(REAL_W * 0.55 - SW / 2), y: -(REAL_H * 0.28 - SH / 2) },
+      { x: -(REAL_W * 0.15 - SW / 2), y: -(REAL_H * 0.22 - SH / 2) },
+      { x: -(REAL_W * 0.45 - SW / 2), y: -(REAL_H * 0.45 - SH / 2) },
+      { x: -(REAL_W * 0.62 - SW / 2), y: -(REAL_H * 0.32 - SH / 2) },
+    ];
+    let i = 0;
+    const next = () => {
+      const t = targets[i % targets.length];
+      mapX.value = withTiming(t.x, { duration: 5000, easing: Easing.inOut(Easing.ease) });
+      mapY.value = withTiming(t.y, { duration: 5000, easing: Easing.inOut(Easing.ease) });
+      i++;
+    };
+    next();
+    const panInterval = setInterval(next, 5500);
 
-    // Pulse
-    const pulse = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
-        Animated.timing(pulseAnim, { toValue: 0.3, duration: 1000, useNativeDriver: true }),
-      ])
-    );
-    pulse.start();
-
-    // Rings
-    const ring1 = Animated.loop(
-      Animated.timing(ringAnim1, { toValue: 1, duration: 2500, useNativeDriver: true })
-    );
-    const ring2 = Animated.loop(
-      Animated.timing(ringAnim2, { toValue: 1, duration: 3000, useNativeDriver: true })
-    );
-    ring1.start();
-    ring2.start();
-
-    // Dots animation
     const dotsInterval = setInterval(() => {
       setDots(prev => prev.length >= 3 ? '' : prev + '.');
     }, 500);
 
-    // Message rotation
-    let msgIndex = 0;
+    let msgIdx = 0;
     const msgInterval = setInterval(() => {
-      msgIndex = (msgIndex + 1) % SEARCH_MESSAGES.length;
-      setMessage(SEARCH_MESSAGES[msgIndex]);
-    }, 2000);
+      msgIdx = (msgIdx + 1) % SEARCH_MESSAGES.length;
+      setMessage(SEARCH_MESSAGES[msgIdx]);
+    }, 3000);
 
     return () => {
-      radar.stop();
-      pulse.stop();
-      ring1.stop();
-      ring2.stop();
+      clearInterval(panInterval);
       clearInterval(dotsInterval);
       clearInterval(msgInterval);
     };
   }, [phase]);
 
-  /** Fallback: fetch a bot opponent via HTTP when no real player is found */
   const fetchBotOpponent = async () => {
     try {
       const userId = await AsyncStorage.getItem('duelo_user_id');
-      const res = await fetch(`${API_URL}/api/game/matchmaking-v2`, {
+      const res = await authFetch(`${API_URL}/api/game/matchmaking-v2`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ theme_id: category, player_id: userId }),
@@ -178,185 +275,312 @@ export default function MatchmakingScreen() {
       const data = await res.json();
       setOpponent(data.opponent);
       setPlayerInfo(data.player);
-      setPhase('versus');
-      showVersusScreen(data.opponent);
+      handleMatchFound(data.opponent);
     } catch {
       router.back();
     }
   };
 
-  const showVersusScreen = (opp: OpponentData, matchRoomId?: string) => {
+  const handleMatchFound = (opp: OpponentData, matchRoomId?: string) => {
+    const pin = PIN_POSITIONS[Math.floor(Math.random() * PIN_POSITIONS.length)];
+    setTargetPin(pin);
+
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 
-    // Players slide in from sides
-    Animated.parallel([
-      Animated.spring(playerSlide, { toValue: 0, tension: 50, friction: 9, useNativeDriver: true }),
-      Animated.spring(opponentSlide, { toValue: 0, tension: 50, friction: 9, useNativeDriver: true }),
-    ]).start();
+    const isBotMatch = !matchRoomId;
+    // Rematch: skip map zoom, go straight to VS
+    const zoomDuration = isRematch ? 400 : 1500;
+    const vsDelay = isRematch ? 500 : 1800;
+    const navDelay = isRematch ? 2800 : 4500;
 
-    // VS badge appears
+    setPhase(isRematch ? 'found' : 'found');
+
+    const targetX = -(pin.x * SCALE - SW / 2);
+    const targetY = -(pin.y * SCALE - SH / 2);
+
+    mapX.value = withTiming(targetX, { duration: zoomDuration, easing: Easing.inOut(Easing.cubic) });
+    mapY.value = withTiming(targetY, { duration: zoomDuration, easing: Easing.inOut(Easing.cubic) });
+    mapScaleAnim.value = withTiming(2, { duration: zoomDuration, easing: Easing.inOut(Easing.cubic) });
+
     setTimeout(() => {
-      Animated.parallel([
-        Animated.spring(vsScale, { toValue: 1, tension: 80, friction: 6, useNativeDriver: true }),
-        Animated.timing(vsFade, { toValue: 1, duration: 300, useNativeDriver: true }),
-      ]).start();
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      setPhase('versus');
+      overlayOpacity.value = withTiming(1, { duration: 400 });
+      vsOpacity.value = withTiming(1, { duration: 500 });
+      vsScale.value = withSpring(1, { damping: 12, stiffness: 100 });
+      playerSlideX.value = withSpring(0, { damping: 14, stiffness: 80 });
+      opponentSlideX.value = withSpring(0, { damping: 14, stiffness: 80 });
+    }, vsDelay);
 
-      // Glow pulse
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(vsGlow, { toValue: 1, duration: 800, useNativeDriver: true }),
-          Animated.timing(vsGlow, { toValue: 0.4, duration: 800, useNativeDriver: true }),
-        ])
-      ).start();
-    }, 400);
-
-    // Navigate to game after 3 seconds
-    const isBot = !matchRoomId;
     setTimeout(() => {
       router.replace(
-        `/game?category=${category}&opponentPseudo=${opp.pseudo}&opponentSeed=${opp.avatar_seed}&isBot=${isBot}&opponentLevel=${opp.level}&opponentStreak=${opp.streak}${matchRoomId ? `&roomId=${matchRoomId}` : ''}`
+        `/game?category=${category}&opponentPseudo=${opp.pseudo}&opponentSeed=${opp.avatar_seed}&isBot=${isBotMatch}&opponentLevel=${opp.level}&opponentStreak=${opp.streak}&opponentId=${opp.id || ''}${matchRoomId ? `&roomId=${matchRoomId}` : ''}`
       );
-    }, 3000);
+    }, navDelay);
   };
 
-  const spin = radarAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  const mapStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: mapX.value },
+      { translateY: mapY.value },
+      { scale: mapScaleAnim.value },
+    ],
+  }));
+
+  const overlayStyle = useAnimatedStyle(() => ({
+    opacity: overlayOpacity.value,
+  }));
+
+  const vsAnimStyle = useAnimatedStyle(() => ({
+    opacity: vsOpacity.value,
+    transform: [{ scale: vsScale.value }],
+  }));
+
+  const playerStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: playerSlideX.value }],
+  }));
+
+  const opponentStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: opponentSlideX.value }],
+  }));
 
   const getCategoryLabel = () => {
     const name = themeName ? decodeURIComponent(themeName) : category;
     return name || 'Quiz';
   };
 
-  // ── VERSUS SCREEN ──
-  if (phase === 'versus' && opponent) {
-    const oppBadge = BADGE_MAP[opponent.streak_badge] || '';
-    const oppIsGlow = opponent.streak_badge === 'glow';
-    const pLevel = playerInfo?.level || 1;
-    const pTitle = playerInfo?.title || '';
+  const oppBadgeIcon = opponent ? (BADGE_ICON_MAP[opponent.streak_badge] || '') : '';
+  const oppIsGlow = opponent?.streak_badge === 'glow';
 
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.versusContent}>
-          <Text style={styles.versusCategory}>{getCategoryLabel()}</Text>
-
-          <View style={styles.versusPlayers}>
-            {/* Player */}
-            <Animated.View style={[styles.versusPlayer, { transform: [{ translateX: playerSlide }] }]}>
-              <View style={styles.versusAvatar}>
-                <Text style={styles.versusAvatarText}>{pseudo[0]?.toUpperCase()}</Text>
-              </View>
-              <Text style={styles.versusPseudo} numberOfLines={1}>{pseudo}</Text>
-              <Text style={styles.versusLevel}>Niv. {pLevel}</Text>
-              {pTitle ? <Text style={styles.versusTitle}>{pTitle}</Text> : null}
-            </Animated.View>
-
-            {/* VS Badge */}
-            <Animated.View style={[styles.vsBadge, {
-              opacity: vsFade,
-              transform: [{ scale: vsScale }],
-            }]}>
-              <Animated.Text style={[styles.vsBadgeText, { opacity: vsGlow }]}>VS</Animated.Text>
-            </Animated.View>
-
-            {/* Opponent */}
-            <Animated.View style={[styles.versusPlayer, { transform: [{ translateX: opponentSlide }] }]}>
-              <View style={[styles.versusAvatar, styles.versusAvatarOpp, oppIsGlow && styles.versusAvatarGlow]}>
-                <Text style={styles.versusAvatarText}>{opponent.pseudo[0]?.toUpperCase()}</Text>
-              </View>
-              <View style={styles.versusPseudoRow}>
-                <Text style={[styles.versusPseudo, oppIsGlow && styles.versusGlowPseudo]} numberOfLines={1}>
-                  {opponent.pseudo}
-                </Text>
-                {oppBadge ? <Text style={styles.versusBadgeEmoji}>{oppBadge}</Text> : null}
-              </View>
-              <Text style={styles.versusLevel}>Niv. {opponent.level}</Text>
-              <Text style={styles.versusTitle}>{opponent.title}</Text>
-              {opponent.streak >= 3 && (
-                <View style={[styles.versusStreakTag, oppIsGlow && styles.versusStreakGlow]}>
-                  <Text style={styles.versusStreakText}>
-                    {oppBadge} {opponent.streak} victoires
-                  </Text>
-                </View>
-              )}
-            </Animated.View>
-          </View>
-
-          <Text style={styles.versusHint}>Le duel commence...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  // ── SEARCHING SCREEN ──
   return (
     <SwipeBackPage>
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>RECHERCHE</Text>
-        <Text style={styles.categoryLabel}>{getCategoryLabel()}</Text>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <DueloHeader />
 
-        <View style={styles.radarContainer}>
-          <Animated.View style={[styles.ring, {
-            opacity: ringAnim1.interpolate({ inputRange: [0, 1], outputRange: [0.6, 0] }),
-            transform: [{ scale: ringAnim1.interpolate({ inputRange: [0, 1], outputRange: [0.5, 2] }) }],
-          }]} />
-          <Animated.View style={[styles.ring, {
-            opacity: ringAnim2.interpolate({ inputRange: [0, 1], outputRange: [0.4, 0] }),
-            transform: [{ scale: ringAnim2.interpolate({ inputRange: [0, 1], outputRange: [0.5, 2.5] }) }],
-          }]} />
+        {/* ── World Map Layer ── */}
+        <View style={styles.mapViewport}>
+          <Animated.View style={[styles.mapContainer, mapStyle]}>
+            <Svg
+              width={REAL_W}
+              height={REAL_H}
+              viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+              style={{ position: 'absolute', top: 0, left: 0 }}
+            >
+              {/* Subtle grid */}
+              {Array.from({ length: 9 }).map((_, i) => (
+                <Path key={`h-${i}`} d={`M0,${(i+1)*50} L1000,${(i+1)*50}`}
+                  stroke="rgba(138,43,226,0.05)" strokeWidth={0.4} />
+              ))}
+              {Array.from({ length: 19 }).map((_, i) => (
+                <Path key={`v-${i}`} d={`M${(i+1)*50},0 L${(i+1)*50},500`}
+                  stroke="rgba(138,43,226,0.05)" strokeWidth={0.4} />
+              ))}
+              {/* Equator */}
+              <Path d="M0,250 L1000,250" stroke="rgba(138,43,226,0.1)"
+                strokeWidth={0.5} strokeDasharray="6,4" />
 
-          <Animated.View style={[styles.radarSweep, { transform: [{ rotate: spin }] }]}>
-            <View style={styles.sweepLine} />
+              {/* Real continent shapes - outer glow */}
+              {(MAP_PATHS as string[]).map((d, i) => (
+                <Path key={`g-${i}`} d={d}
+                  fill="none"
+                  stroke="rgba(0,255,255,0.12)"
+                  strokeWidth={4}
+                  strokeLinejoin="round" />
+              ))}
+              {/* Real continent shapes - fill + border */}
+              {(MAP_PATHS as string[]).map((d, i) => (
+                <Path key={`f-${i}`} d={d}
+                  fill="rgba(0,255,255,0.06)"
+                  stroke="rgba(0,255,255,0.5)"
+                  strokeWidth={0.8}
+                  strokeLinejoin="round" />
+              ))}
+            </Svg>
+
+            {/* Player pins */}
+            {playerPins.map((pin, i) => (
+              <PlayerPin key={`pin-${i}`} x={pin.x} y={pin.y}
+                name={pin.name} color={pin.color} />
+            ))}
+
+            {/* Target opponent pin */}
+            {targetPin && opponent && (
+              <PlayerPin x={targetPin.x} y={targetPin.y}
+                name={opponent.pseudo}
+                color={oppIsGlow ? '#00FFFF' : '#FF3B5C'}
+                isTarget />
+            )}
           </Animated.View>
 
-          <Animated.View style={[styles.radarCenter, { opacity: pulseAnim }]}>
-            <Text style={styles.radarIcon}>⚡</Text>
-          </Animated.View>
+          {/* Vignette edges */}
+          <LinearGradient
+            colors={['#050510', 'transparent', 'transparent', '#050510']}
+            locations={[0, 0.12, 0.88, 1]}
+            style={styles.vignetteV} />
+          <LinearGradient
+            colors={['#050510', 'transparent', 'transparent', '#050510']}
+            locations={[0, 0.12, 0.88, 1]}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+            style={styles.vignetteH} />
         </View>
 
-        <Text style={styles.searchMessage}>{message}{dots}</Text>
-        <Text style={styles.hint}>Un adversaire sera trouvé sous peu...</Text>
+        {/* ── Search UI overlay ── */}
+        {phase === 'searching' && (
+          <View style={styles.searchOverlay}>
+            <View style={styles.searchCard}>
+              <LinearGradient
+                colors={['rgba(138,43,226,0.12)', 'rgba(5,5,16,0.95)']}
+                style={styles.searchCardGradient}>
+                <View style={styles.categoryChip}>
+                  <MaterialCommunityIcons name="sword-cross" size={14} color="#8A2BE2" />
+                  <Text style={styles.categoryLabel}>{getCategoryLabel()}</Text>
+                </View>
+                <View style={styles.scannerRow}>
+                  <View style={styles.scannerDot} />
+                  <Text style={styles.searchMessage}>{message}{dots}</Text>
+                </View>
+                <View style={styles.hintRow}>
+                  <MaterialCommunityIcons name="earth" size={14} color="#525252" />
+                  <Text style={styles.hint}>{t('matchmaking.scanning_active')}</Text>
+                </View>
+              </LinearGradient>
+            </View>
+          </View>
+        )}
+
+        {/* ── "Found" indicator ── */}
+        {phase === 'found' && opponent && (
+          <View style={styles.foundOverlay}>
+            <View style={styles.foundCard}>
+              <LinearGradient
+                colors={['rgba(0,255,157,0.15)', 'rgba(5,5,16,0.9)']}
+                style={styles.foundCardGradient}>
+                <MaterialCommunityIcons name="target-account" size={24} color="#00FF9D" />
+                <Text style={styles.foundText}>{t('matchmaking.opponent_located')}</Text>
+                <Text style={styles.foundName}>{opponent.pseudo}</Text>
+              </LinearGradient>
+            </View>
+          </View>
+        )}
+
+        {/* ── Versus overlay ── */}
+        {phase === 'versus' && opponent && (
+          <>
+            <Animated.View style={[styles.versusBackdrop, overlayStyle]} />
+            <View style={styles.versusOverlay}>
+              <View style={styles.versusContent}>
+                <View style={styles.versusCategoryRow}>
+                  <MaterialCommunityIcons name="sword-cross" size={16} color="#8A2BE2" />
+                  <Text style={styles.versusCategory}>{getCategoryLabel()}</Text>
+                </View>
+                <View style={styles.versusPlayers}>
+                  <Animated.View style={[styles.versusPlayer, playerStyle]}>
+                    <LinearGradient colors={['#8A2BE2', '#6A1FCE']} style={styles.versusAvatar}>
+                      <Text style={styles.versusAvatarText}>{pseudo[0]?.toUpperCase()}</Text>
+                    </LinearGradient>
+                    <Text style={styles.versusPseudo} numberOfLines={1}>{pseudo}</Text>
+                    <View style={styles.versusLevelRow}>
+                      <MaterialCommunityIcons name="star-outline" size={12} color="#525252" />
+                      <Text style={styles.versusLevel}>{t('matchmaking.level_short')} {playerInfo?.level || 1}</Text>
+                    </View>
+                  </Animated.View>
+
+                  <Animated.View style={[styles.vsBadge, vsAnimStyle]}>
+                    <LinearGradient colors={['#8A2BE2', '#B24BF3']} style={styles.vsBadgeInner}>
+                      <Text style={styles.vsBadgeText}>VS</Text>
+                    </LinearGradient>
+                  </Animated.View>
+
+                  <Animated.View style={[styles.versusPlayer, opponentStyle]}>
+                    <LinearGradient
+                      colors={oppIsGlow ? ['#00CCCC', '#00FFFF'] : ['#FF3B30', '#CC2200']}
+                      style={[styles.versusAvatar, oppIsGlow && styles.versusAvatarGlow]}>
+                      <Text style={styles.versusAvatarText}>{opponent.pseudo[0]?.toUpperCase()}</Text>
+                    </LinearGradient>
+                    <View style={styles.versusPseudoRow}>
+                      <Text style={[styles.versusPseudo, oppIsGlow && styles.glowPseudo]} numberOfLines={1}>
+                        {opponent.pseudo}
+                      </Text>
+                      {oppBadgeIcon ? (
+                        <MaterialCommunityIcons name={oppBadgeIcon as any} size={14}
+                          color={oppIsGlow ? '#00FFFF' : '#FFA500'} />
+                      ) : null}
+                    </View>
+                    <View style={styles.versusLevelRow}>
+                      <MaterialCommunityIcons name="star-outline" size={12} color="#525252" />
+                      <Text style={styles.versusLevel}>{t('matchmaking.level_short')} {opponent.level}</Text>
+                    </View>
+                    {opponent.title ? <Text style={styles.versusTitle}>{opponent.title}</Text> : null}
+                    {opponent.streak >= 3 && (
+                      <View style={[styles.streakTag, oppIsGlow && styles.streakTagGlow]}>
+                        <MaterialCommunityIcons name={(oppBadgeIcon || 'fire') as any} size={12}
+                          color={oppIsGlow ? '#00FFFF' : '#FFA500'} />
+                        <Text style={[styles.streakText, oppIsGlow && { color: '#00FFFF' }]}>
+                          {opponent.streak} {t('matchmaking.wins')}
+                        </Text>
+                      </View>
+                    )}
+                  </Animated.View>
+                </View>
+                <View style={styles.versusHintRow}>
+                  <MaterialCommunityIcons name="gamepad-variant" size={16} color="#525252" />
+                  <Text style={styles.versusHint}>{t('matchmaking.duel_starting')}</Text>
+                </View>
+              </View>
+            </View>
+          </>
+        )}
       </View>
-    </SafeAreaView>
     </SwipeBackPage>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#050510' },
-  content: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 },
-  title: { fontSize: 14, fontWeight: '800', color: '#525252', letterSpacing: 4, marginBottom: 8 },
-  categoryLabel: { fontSize: 18, fontWeight: '700', color: '#FFF', marginBottom: 48 },
-  radarContainer: { width: 200, height: 200, justifyContent: 'center', alignItems: 'center', marginBottom: 48 },
-  ring: {
-    position: 'absolute', width: 200, height: 200, borderRadius: 100,
-    borderWidth: 1, borderColor: '#8A2BE2',
-  },
-  radarSweep: { position: 'absolute', width: 200, height: 200, justifyContent: 'center', alignItems: 'flex-start' },
-  sweepLine: {
-    width: 100, height: 2, backgroundColor: '#00FFFF',
-    marginLeft: 100, shadowColor: '#00FFFF', shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8, shadowRadius: 8,
-  },
-  radarCenter: {
-    width: 60, height: 60, borderRadius: 30, backgroundColor: '#8A2BE2',
-    justifyContent: 'center', alignItems: 'center',
-    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.6, shadowRadius: 16,
-  },
-  radarIcon: { fontSize: 28 },
-  searchMessage: { fontSize: 16, fontWeight: '600', color: '#FFF', marginBottom: 8 },
-  hint: { fontSize: 13, color: '#525252' },
+  mapViewport: { ...StyleSheet.absoluteFillObject, overflow: 'hidden' },
+  mapContainer: { width: REAL_W, height: REAL_H, position: 'absolute' },
+  vignetteV: { ...StyleSheet.absoluteFillObject },
+  vignetteH: { ...StyleSheet.absoluteFillObject },
 
-  // ── Versus Screen ──
-  versusContent: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 },
-  versusCategory: { fontSize: 16, fontWeight: '700', color: '#A3A3A3', marginBottom: 48 },
+  searchOverlay: { position: 'absolute', bottom: 60, left: 0, right: 0, alignItems: 'center' },
+  searchCard: { borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(138,43,226,0.2)' },
+  searchCardGradient: { paddingHorizontal: 24, paddingVertical: 20, alignItems: 'center', minWidth: SW * 0.8 },
+  categoryChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: 'rgba(138,43,226,0.15)', paddingHorizontal: 14,
+    paddingVertical: 6, borderRadius: 16, marginBottom: 16,
+    borderWidth: 1, borderColor: 'rgba(138,43,226,0.25)',
+  },
+  categoryLabel: { fontSize: 14, fontWeight: '700', color: '#FFF' },
+  scannerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
+  scannerDot: {
+    width: 8, height: 8, borderRadius: 4, backgroundColor: '#00FF9D',
+    shadowColor: '#00FF9D', shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8, shadowRadius: 6,
+  },
+  searchMessage: { fontSize: 15, fontWeight: '600', color: '#FFF' },
+  hintRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  hint: { fontSize: 12, color: '#525252' },
+
+  foundOverlay: { position: 'absolute', bottom: 60, left: 0, right: 0, alignItems: 'center' },
+  foundCard: { borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(0,255,157,0.3)' },
+  foundCardGradient: { paddingHorizontal: 24, paddingVertical: 20, alignItems: 'center', minWidth: SW * 0.7, gap: 6 },
+  foundText: { fontSize: 16, fontWeight: '800', color: '#00FF9D' },
+  foundName: { fontSize: 20, fontWeight: '900', color: '#FFF' },
+
+  versusBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(5,5,16,0.85)' },
+  versusOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center' },
+  versusContent: { alignItems: 'center', paddingHorizontal: 24 },
+  versusCategoryRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 48 },
+  versusCategory: { fontSize: 16, fontWeight: '700', color: '#A3A3A3' },
   versusPlayers: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', width: '100%' },
   versusPlayer: { alignItems: 'center', flex: 1 },
   versusAvatar: {
-    width: 72, height: 72, borderRadius: 24, backgroundColor: '#8A2BE2',
+    width: 72, height: 72, borderRadius: 24,
     justifyContent: 'center', alignItems: 'center', marginBottom: 10,
-    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 12,
+    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5, shadowRadius: 12,
   },
-  versusAvatarOpp: { backgroundColor: '#FF3B30', shadowColor: '#FF3B30' },
   versusAvatarGlow: {
     shadowColor: '#00FFFF', shadowOpacity: 0.8, shadowRadius: 20,
     borderWidth: 2, borderColor: 'rgba(0,255,255,0.5)',
@@ -364,30 +588,30 @@ const styles = StyleSheet.create({
   versusAvatarText: { color: '#FFF', fontSize: 32, fontWeight: '900' },
   versusPseudoRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   versusPseudo: { color: '#FFF', fontSize: 16, fontWeight: '800', maxWidth: 120 },
-  versusGlowPseudo: {
+  glowPseudo: {
     color: '#00FFFF', textShadowColor: '#00FFFF',
     textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 10,
   },
-  versusBadgeEmoji: { fontSize: 16 },
-  versusLevel: { color: '#525252', fontSize: 12, fontWeight: '600', marginTop: 2 },
+  versusLevelRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 },
+  versusLevel: { color: '#525252', fontSize: 12, fontWeight: '600' },
   versusTitle: { color: '#8A2BE2', fontSize: 11, fontWeight: '700', marginTop: 3 },
-  versusStreakTag: {
+  streakTag: {
     marginTop: 8, backgroundColor: 'rgba(255,100,0,0.12)', borderRadius: 10,
-    paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(255,100,0,0.25)',
+    paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1,
+    borderColor: 'rgba(255,100,0,0.25)', flexDirection: 'row', alignItems: 'center', gap: 4,
   },
-  versusStreakGlow: {
-    backgroundColor: 'rgba(0,255,255,0.1)', borderColor: 'rgba(0,255,255,0.3)',
-  },
-  versusStreakText: { color: '#FFA500', fontSize: 11, fontWeight: '700' },
+  streakTagGlow: { backgroundColor: 'rgba(0,255,255,0.1)', borderColor: 'rgba(0,255,255,0.3)' },
+  streakText: { color: '#FFA500', fontSize: 11, fontWeight: '700' },
 
-  // VS Badge
   vsBadge: {
-    width: 56, height: 56, borderRadius: 28, backgroundColor: '#8A2BE2',
-    justifyContent: 'center', alignItems: 'center', marginHorizontal: 12,
-    marginTop: 8,
-    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.8, shadowRadius: 20,
+    width: 56, height: 56, borderRadius: 28, overflow: 'hidden',
+    marginHorizontal: 12, marginTop: 8,
+    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8, shadowRadius: 20,
     borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)',
   },
+  vsBadgeInner: { width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', borderRadius: 28 },
   vsBadgeText: { color: '#FFF', fontSize: 20, fontWeight: '900', letterSpacing: 2 },
-  versusHint: { color: '#525252', fontSize: 14, fontWeight: '600', marginTop: 48 },
+  versusHintRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 48 },
+  versusHint: { color: '#525252', fontSize: 14, fontWeight: '600' },
 });

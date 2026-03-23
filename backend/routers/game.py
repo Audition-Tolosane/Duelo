@@ -1,7 +1,9 @@
 import random
 import secrets
+import logging
+from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy import select, func, text
+from sqlalchemy import select, func, or_, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import User, Question, Match, Theme, UserThemeXP
@@ -12,30 +14,70 @@ from services.xp import (
     get_theme_title, check_new_title_theme, MAX_LEVEL, TITLE_THRESHOLDS,
 )
 from services.notifications import create_notification
+from auth_middleware import get_current_user_id
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/game", tags=["game"])
+
+
+async def _resolve_theme_category(theme: str, db: AsyncSession) -> str:
+    """Resolve a theme parameter to the actual Question.category value.
+    The frontend sends theme_id (e.g. 'STV_BBAD'), but Question.category
+    might store either the theme_id or the theme name (e.g. 'Breaking Bad').
+    Try both and return whichever matches questions in the DB."""
+    # First: check if questions exist with this exact value
+    count_res = await db.execute(
+        select(func.count()).select_from(Question).where(Question.category == theme)
+    )
+    if (count_res.scalar() or 0) > 0:
+        return theme
+
+    # Second: look up Theme by id and try with theme.name
+    theme_res = await db.execute(select(Theme).where(Theme.id == theme))
+    theme_obj = theme_res.scalar_one_or_none()
+    if theme_obj:
+        count_res2 = await db.execute(
+            select(func.count()).select_from(Question).where(Question.category == theme_obj.name)
+        )
+        if (count_res2.scalar() or 0) > 0:
+            logger.info(f"[questions] Resolved theme_id '{theme}' -> name '{theme_obj.name}'")
+            return theme_obj.name
+
+    # Third: try matching by Theme.name directly (if frontend sent a name)
+    theme_by_name = await db.execute(select(Theme).where(Theme.name == theme))
+    t = theme_by_name.scalar_one_or_none()
+    if t:
+        count_res3 = await db.execute(
+            select(func.count()).select_from(Question).where(Question.category == t.id)
+        )
+        if (count_res3.scalar() or 0) > 0:
+            logger.info(f"[questions] Resolved theme name '{theme}' -> id '{t.id}'")
+            return t.id
+
+    logger.warning(f"[questions] No questions found for theme='{theme}'")
+    return theme
 
 
 @router.get("/questions")
 async def get_game_questions(theme: str, db: AsyncSession = Depends(get_db)):
     """Get 7 questions: 2 Facile + 3 Moyen + 2 Difficile, all from different angles."""
+    # Resolve theme to the correct Question.category value
+    category = await _resolve_theme_category(theme, db)
+    logger.info(f"[questions] theme='{theme}' -> category='{category}'")
+
     selected = []
     used_angles = set()
 
     for difficulty, count in [("Facile", 2), ("Moyen", 3), ("Difficile", 2)]:
         result = await db.execute(
-            select(Question).where(Question.category == theme, Question.difficulty == difficulty)
+            select(Question).where(Question.category == category, Question.difficulty == difficulty)
             .order_by(func.random())
         )
         candidates = result.scalars().all()
 
         added = 0
         for q in candidates:
-            angle_res = await db.execute(
-                text("SELECT angle_num FROM questions WHERE id = :qid"), {"qid": q.id}
-            )
-            angle_row = angle_res.first()
-            q_angle = angle_row[0] if angle_row and angle_row[0] else 0
+            q_angle = getattr(q, 'angle_num', None) or 0
 
             if q_angle not in used_angles or q_angle == 0:
                 selected.append(q)
@@ -55,13 +97,14 @@ async def get_game_questions(theme: str, db: AsyncSession = Depends(get_db)):
 
     if len(selected) < 7:
         result = await db.execute(
-            select(Question).where(Question.category == theme).order_by(func.random()).limit(7)
+            select(Question).where(Question.category == category).order_by(func.random()).limit(7)
         )
         fallback = result.scalars().all()
         for q in fallback:
             if q not in selected and len(selected) < 7:
                 selected.append(q)
 
+    logger.info(f"[questions] Found {len(selected)} questions for category='{category}'")
     random.shuffle(selected)
 
     result_list = []
@@ -81,23 +124,30 @@ async def get_game_questions_v2(theme: str, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/matchmaking")
-async def start_matchmaking(request: Request, db: AsyncSession = Depends(get_db)):
+async def start_matchmaking(request: Request, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     """Matchmaking using theme_id."""
     body = await request.json()
     theme_id = body.get("theme_id", "")
     player_id = body.get("player_id")
 
+    logger.info(f"[matchmaking] theme_id='{theme_id}', player_id='{player_id}'")
+
     theme_res = await db.execute(select(Theme).where(Theme.id == theme_id))
     theme = theme_res.scalar_one_or_none()
     if not theme:
-        raise HTTPException(status_code=404, detail="Thème introuvable")
+        # Try by name as fallback
+        theme_res2 = await db.execute(select(Theme).where(Theme.name == theme_id))
+        theme = theme_res2.scalar_one_or_none()
+    if not theme:
+        logger.error(f"[matchmaking] Theme not found: '{theme_id}'")
+        raise HTTPException(status_code=404, detail=f"Thème introuvable: {theme_id}")
 
     player_level = 0
     player_title = ""
 
     if player_id:
         xp_res = await db.execute(
-            select(UserThemeXP).where(UserThemeXP.user_id == player_id, UserThemeXP.theme_id == theme_id)
+            select(UserThemeXP).where(UserThemeXP.user_id == player_id, UserThemeXP.theme_id == theme.id)
         )
         uxp = xp_res.scalar_one_or_none()
         if uxp:
@@ -126,12 +176,12 @@ async def start_matchmaking(request: Request, db: AsyncSession = Depends(get_db)
 
 # Keep /matchmaking-v2 as alias for frontend compatibility
 @router.post("/matchmaking-v2")
-async def start_matchmaking_v2(request: Request, db: AsyncSession = Depends(get_db)):
-    return await start_matchmaking(request, db)
+async def start_matchmaking_v2(request: Request, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    return await start_matchmaking(request, current_user, db)
 
 
 @router.post("/submit")
-async def submit_match(request: Request, db: AsyncSession = Depends(get_db)):
+async def submit_match(request: Request, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     """Submit match result using theme_id. XP tracked in UserThemeXP."""
     body = await request.json()
     player_id = body.get("player_id")
@@ -144,28 +194,57 @@ async def submit_match(request: Request, db: AsyncSession = Depends(get_db)):
     opponent_level = body.get("opponent_level", 1)
     questions_data = body.get("questions_data")
 
+    # Validate scores
+    MAX_SCORE = 140  # 20 pts max × 7 questions
+    player_score = max(0, min(int(player_score), MAX_SCORE))
+    opponent_score = max(0, min(int(opponent_score), MAX_SCORE))
+    correct_count = max(0, min(int(correct_count), 7))
+
+    logger.info(f"[submit] theme_id='{theme_id}', player_id='{player_id}', score={player_score}-{opponent_score}")
+
     if not player_id or not theme_id:
         raise HTTPException(status_code=400, detail="player_id and theme_id required")
+    if player_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+
+    # ── Duplicate submission guard ──
+    recent_cutoff = datetime.now(timezone.utc) - timedelta(seconds=60)
+    existing = await db.execute(
+        select(Match).where(
+            Match.created_at >= recent_cutoff,
+            Match.player1_id == player_id,
+            Match.category == theme_id,
+        )
+    )
+    if existing.scalar_one_or_none():
+        logger.info(f"[submit] Duplicate blocked for player={player_id}, theme={theme_id}")
+        return {"status": "already_submitted", "message": "Match déjà enregistré"}
 
     theme_res = await db.execute(select(Theme).where(Theme.id == theme_id))
     theme = theme_res.scalar_one_or_none()
     if not theme:
-        raise HTTPException(status_code=404, detail="Thème introuvable")
+        # Try by name as fallback
+        theme_res2 = await db.execute(select(Theme).where(Theme.name == theme_id))
+        theme = theme_res2.scalar_one_or_none()
+    if not theme:
+        logger.error(f"[submit] Theme not found: '{theme_id}'")
+        raise HTTPException(status_code=404, detail=f"Thème introuvable: {theme_id}")
 
     result = await db.execute(select(User).where(User.id == player_id))
     user = result.scalar_one_or_none()
     if not user:
+        logger.error(f"[submit] User not found: '{player_id}'")
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
 
     won = player_score > opponent_score
     perfect = correct_count == TOTAL_QUESTIONS
 
     xp_res = await db.execute(
-        select(UserThemeXP).where(UserThemeXP.user_id == player_id, UserThemeXP.theme_id == theme_id)
+        select(UserThemeXP).where(UserThemeXP.user_id == player_id, UserThemeXP.theme_id == theme.id)
     )
     uxp = xp_res.scalar_one_or_none()
     if not uxp:
-        uxp = UserThemeXP(user_id=player_id, theme_id=theme_id, xp=0)
+        uxp = UserThemeXP(user_id=player_id, theme_id=theme.id, xp=0)
         db.add(uxp)
         await db.flush()
 
@@ -186,7 +265,7 @@ async def submit_match(request: Request, db: AsyncSession = Depends(get_db)):
 
     match = Match(
         player1_id=player_id, player2_pseudo=opponent_pseudo,
-        player2_is_bot=opponent_is_bot, category=theme_id,
+        player2_is_bot=opponent_is_bot, category=theme.id,
         player1_score=player_score, player2_score=opponent_score,
         player1_correct=correct_count,
         winner_id=player_id if won else None,
@@ -220,11 +299,16 @@ async def submit_match(request: Request, db: AsyncSession = Depends(get_db)):
     else:
         notif_body = f"Défaite en {theme.name}. +{total_xp} XP"
     await create_notification(
-        db, player_id, "match_result", "Résultat du match", notif_body,
+        db, player_id, "match_result", "notif.match_result", notif_body,
         data={"screen": "results", "params": {"matchId": match.id}},
     )
 
-    await db.commit()
+    try:
+        await db.commit()
+    except Exception:
+        await db.rollback()
+        raise HTTPException(status_code=500, detail="Erreur lors de l'enregistrement du match")
+
     await db.refresh(match)
 
     return {
@@ -241,5 +325,5 @@ async def submit_match(request: Request, db: AsyncSession = Depends(get_db)):
 
 # Keep /submit-v2 as alias for frontend compatibility
 @router.post("/submit-v2")
-async def submit_match_v2(request: Request, db: AsyncSession = Depends(get_db)):
-    return await submit_match(request, db)
+async def submit_match_v2(request: Request, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    return await submit_match(request, current_user, db)

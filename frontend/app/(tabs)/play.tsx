@@ -8,6 +8,7 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import CosmicBackground from '../../components/CosmicBackground';
 import CategoryIcon from '../../components/CategoryIcon';
+import { t } from '../../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -35,6 +36,7 @@ export default function PlayScreen() {
   const router = useRouter();
   const [superCategories, setSuperCategories] = useState<SuperCategory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [pseudo, setPseudo] = useState('');
 
   useEffect(() => {
@@ -46,10 +48,13 @@ export default function PlayScreen() {
     if (storedPseudo) setPseudo(storedPseudo);
 
     try {
+      setLoadError(false);
       const res = await fetch(`${API_URL}/api/explore/super-categories`);
       const data = await res.json();
       setSuperCategories(data);
-    } catch {}
+    } catch {
+      setLoadError(true);
+    }
     setLoading(false);
   };
 
@@ -68,6 +73,18 @@ export default function PlayScreen() {
     );
   }
 
+  if (loadError) {
+    return (
+      <CosmicBackground>
+        <View style={styles.loadingContainer}>
+          <TouchableOpacity onPress={() => { setLoadError(false); setLoading(true); loadData(); }} style={{ padding: 20, alignItems: 'center' }}>
+            <Text style={{ color: '#aaa', fontSize: 14 }}>{t('play.load_error')}</Text>
+          </TouchableOpacity>
+        </View>
+      </CosmicBackground>
+    );
+  }
+
   const loadedIds = new Set(superCategories.map(sc => sc.id));
   const upcomingFiltered = UPCOMING_CATS.filter(c => !loadedIds.has(c.id));
 
@@ -75,8 +92,8 @@ export default function PlayScreen() {
     <CosmicBackground>
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <Text style={styles.greeting}>Salut, {pseudo || 'Joueur'} 👋</Text>
-          <Text style={styles.sectionTitle}>SUPER CATÉGORIES</Text>
+          <Text style={styles.greeting}>{t('play.greeting')} {pseudo || t('play.default_player')} 👋</Text>
+          <Text style={styles.sectionTitle}>{t('play.super_categories')}</Text>
 
           {superCategories.map((cat) => (
             <TouchableOpacity
@@ -109,7 +126,7 @@ export default function PlayScreen() {
                     <Text style={[styles.superLabel, { color: cat.color }]}>
                       {cat.label.toUpperCase()}
                     </Text>
-                    <Text style={styles.superMeta}>{cat.total_themes} thèmes</Text>
+                    <Text style={styles.superMeta}>{cat.total_themes} {t('play.themes_count')}</Text>
                   </View>
                   <View style={[styles.arrowCircle, { backgroundColor: cat.color + '18' }]}>
                     <Text style={[styles.arrowText, { color: cat.color }]}>›</Text>

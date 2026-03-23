@@ -4,7 +4,9 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SwipeBackProvider } from '../components/SwipeBackContext';
+import ErrorBoundary from '../components/ErrorBoundary';
 import { WebSocketProvider } from '../contexts/WebSocketContext';
+import RematchModal from '../components/RematchModal';
 
 // All stack pages that support swipe-back with transparent overlay
 const SWIPEABLE_SCREENS = [
@@ -12,6 +14,7 @@ const SWIPEABLE_SCREENS = [
   'chat', 'player-profile', 'category-detail',
   'results', 'matchmaking', 'game',
   'super-category', 'notification-settings', 'leaderboard',
+  'language-settings', 'terms', 'support',
 ];
 
 // Platform-specific options for swipeable screens
@@ -28,6 +31,8 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <WebSocketProvider>
+      <ErrorBoundary>
+      <RematchModal />
       <SwipeBackProvider>
         <StatusBar style="light" />
         <Stack
@@ -41,11 +46,13 @@ export default function RootLayout() {
           <Stack.Screen name="index" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="admin" options={{ headerShown: false, animation: 'slide_from_bottom', contentStyle: { backgroundColor: '#000000' } }} />
+          <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'fade', gestureEnabled: false }} />
           {SWIPEABLE_SCREENS.map((name) => (
             <Stack.Screen key={name} name={name} options={swipeableScreenOptions} />
           ))}
         </Stack>
       </SwipeBackProvider>
+      </ErrorBoundary>
       </WebSocketProvider>
     </GestureHandlerRootView>
   );

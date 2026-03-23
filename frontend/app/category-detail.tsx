@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Image,
   ActivityIndicator, KeyboardAvoidingView, Platform, Keyboard, RefreshControl,
-  Modal, Dimensions
+  Modal, Dimensions, Alert
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -10,9 +10,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import { GLASS } from '../theme/glassTheme';
+import { authFetch } from '../utils/api';
+import { t } from '../utils/i18n';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
 import CategoryIcon from '../components/CategoryIcon';
+import UserAvatar from '../components/UserAvatar';
 
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
@@ -30,7 +33,7 @@ type CategoryDetail = {
 
 type WallPostData = {
   id: string;
-  user: { id: string; pseudo: string; avatar_seed: string };
+  user: { id: string; pseudo: string; avatar_seed: string; avatar_url?: string };
   content: string; image_base64: string | null;
   likes_count: number; comments_count: number;
   is_liked: boolean; created_at: string;
@@ -38,7 +41,7 @@ type WallPostData = {
 
 type CommentData = {
   id: string;
-  user: { id: string; pseudo: string; avatar_seed: string };
+  user: { id: string; pseudo: string; avatar_seed: string; avatar_url?: string };
   content: string; created_at: string;
 };
 
@@ -47,6 +50,13 @@ export default function CategoryDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
+
+  if (!id) {
+    Alert.alert(t('common.error'), t('category.error_not_found'));
+    router.back();
+    return null;
+  }
+
   const oldMeta = { icon: '❓', color: '#8A2BE2', bgPattern: '' };
 
   const [userId, setUserId] = useState('');
@@ -159,7 +169,7 @@ export default function CategoryDetailScreen() {
     setPosting(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
-      const res = await fetch(`${API_URL}/api/category/${id}/wall`, {
+      const res = await authFetch(`${API_URL}/api/category/${id}/wall`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: userId,
@@ -180,7 +190,7 @@ export default function CategoryDetailScreen() {
     if (!userId) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
-      const res = await fetch(`${API_URL}/api/wall/${postId}/like`, {
+      const res = await authFetch(`${API_URL}/api/wall/${postId}/like`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId }),
       });
@@ -210,7 +220,7 @@ export default function CategoryDetailScreen() {
     if (!commentText.trim() || !userId) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
-      const res = await fetch(`${API_URL}/api/wall/${postId}/comment`, {
+      const res = await authFetch(`${API_URL}/api/wall/${postId}/comment`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId, content: commentText.trim() }),
       });
@@ -226,7 +236,7 @@ export default function CategoryDetailScreen() {
   const timeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime();
     const mins = Math.floor(diff / 60000);
-    if (mins < 1) return "À l'instant";
+    if (mins < 1) return t('category.just_now');
     if (mins < 60) return `${mins}min`;
     const hours = Math.floor(mins / 60);
     if (hours < 24) return `${hours}h`;
@@ -254,7 +264,7 @@ export default function CategoryDetailScreen() {
         >
           {/* Back button */}
           <TouchableOpacity data-testid="back-button" style={styles.backBtn} onPress={() => router.back()}>
-            <Text style={styles.backBtnText}>← Retour</Text>
+            <Text style={styles.backBtnText}>{t('category.back')}</Text>
           </TouchableOpacity>
 
           {/* Category Header */}
@@ -273,7 +283,7 @@ export default function CategoryDetailScreen() {
             <View style={styles.actionsRow}>
               <TouchableOpacity data-testid="play-button" style={[styles.actionBtn, styles.playBtn]} onPress={handlePlay} activeOpacity={0.8}>
                 <Text style={styles.playBtnIcon}>⚡</Text>
-                <Text style={styles.playBtnText}>Jouer</Text>
+                <Text style={styles.playBtnText}>{t('category.play')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 data-testid="follow-button"
@@ -282,18 +292,18 @@ export default function CategoryDetailScreen() {
               >
                 <Text style={styles.followIcon}>{detail.is_following ? '✓' : '+'}</Text>
                 <Text style={[styles.followText, detail.is_following && { color: '#00FF9D' }]}>
-                  {detail.is_following ? 'Suivi' : 'Suivre'}
+                  {detail.is_following ? t('category.following') : t('category.follow')}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity data-testid="leaderboard-button" style={[styles.actionBtn, styles.leaderBtn]} onPress={handleLeaderboard} activeOpacity={0.8}>
                 <Text style={styles.leaderIcon}>🏆</Text>
-                <Text style={styles.leaderText}>Classement</Text>
+                <Text style={styles.leaderText}>{t('category.leaderboard')}</Text>
               </TouchableOpacity>
             </View>
 
             {/* Progress Bar */}
             <View style={styles.progressSection}>
-              <Text style={styles.progressLabel}>QUESTIONS COMPLÉTÉES</Text>
+              <Text style={styles.progressLabel}>{t('category.questions_completed')}</Text>
               <View style={styles.progressBar}>
                 <View style={[styles.progressFill, { width: `${detail.completion_pct}%`, backgroundColor: meta.color }]} />
                 <Text style={styles.progressPct}>{detail.completion_pct}%</Text>
@@ -303,18 +313,18 @@ export default function CategoryDetailScreen() {
             {/* Stats Row */}
             <View style={styles.statsRow}>
               <View style={styles.statItem}>
-                <Text style={styles.statLabel}>VOTRE NIVEAU</Text>
+                <Text style={styles.statLabel}>{t('category.your_level')}</Text>
                 <Text style={[styles.statValue, { color: meta.color }]}>{detail.user_level}</Text>
                 <Text style={styles.statSub}>{detail.user_title}</Text>
               </View>
               <View style={[styles.statDivider, { backgroundColor: meta.color + '30' }]} />
               <View style={styles.statItem}>
-                <Text style={styles.statLabel}>FOLLOWERS</Text>
+                <Text style={styles.statLabel}>{t('category.followers')}</Text>
                 <Text style={styles.statValue}>{detail.followers_count.toLocaleString()}</Text>
               </View>
               <View style={[styles.statDivider, { backgroundColor: meta.color + '30' }]} />
               <View style={styles.statItem}>
-                <Text style={styles.statLabel}>QUESTIONS</Text>
+                <Text style={styles.statLabel}>{t('category.questions')}</Text>
                 <Text style={styles.statValue}>{detail.total_questions}</Text>
               </View>
             </View>
@@ -322,13 +332,13 @@ export default function CategoryDetailScreen() {
 
           {/* Wall Header + Create Post */}
           <View style={styles.wallHeader}>
-            <Text style={styles.wallTitle}>MUR DE LA COMMUNAUTÉ</Text>
+            <Text style={styles.wallTitle}>{t('category.community_wall')}</Text>
             <TouchableOpacity
               data-testid="create-post-button"
               style={[styles.createPostBtn, { backgroundColor: meta.color + '20', borderColor: meta.color + '40' }]}
               onPress={() => setShowCreatePost(true)}
             >
-              <Text style={[styles.createPostText, { color: meta.color }]}>+ Publier</Text>
+              <Text style={[styles.createPostText, { color: meta.color }]}>{t('category.publish')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -336,8 +346,8 @@ export default function CategoryDetailScreen() {
           {posts.length === 0 ? (
             <View style={styles.emptyWall}>
               <Text style={styles.emptyIcon}>💬</Text>
-              <Text style={styles.emptyText}>Sois le premier à publier !</Text>
-              <Text style={styles.emptySub}>Partage tes opinions, records et trouvailles</Text>
+              <Text style={styles.emptyText}>{t('category.be_first_to_post')}</Text>
+              <Text style={styles.emptySub}>{t('category.share_opinions')}</Text>
             </View>
           ) : (
             posts.map(post => (
@@ -349,7 +359,7 @@ export default function CategoryDetailScreen() {
                   activeOpacity={0.7}
                 >
                   <View style={styles.postAvatar}>
-                    <Text style={styles.postAvatarText}>{post.user.pseudo[0]?.toUpperCase()}</Text>
+                    <UserAvatar avatarUrl={post.user.avatar_url} avatarSeed={post.user.avatar_seed} pseudo={post.user.pseudo} size={40} />
                   </View>
                   <View style={styles.postUserInfo}>
                     <Text style={styles.postUsername}>{post.user.pseudo}</Text>
@@ -387,7 +397,7 @@ export default function CategoryDetailScreen() {
                     {(comments[post.id] || []).map(c => (
                       <View key={c.id} style={styles.commentRow}>
                         <View style={styles.commentAvatar}>
-                          <Text style={styles.commentAvatarText}>{c.user.pseudo[0]?.toUpperCase()}</Text>
+                          <UserAvatar avatarUrl={c.user.avatar_url} avatarSeed={c.user.avatar_seed} pseudo={c.user.pseudo} size={28} />
                         </View>
                         <View style={styles.commentContent}>
                           <Text style={styles.commentUser}>{c.user.pseudo}</Text>
@@ -400,7 +410,7 @@ export default function CategoryDetailScreen() {
                     <View style={styles.commentInputRow}>
                       <TextInput
                         style={styles.commentInput}
-                        placeholder="Ajouter un commentaire..."
+                        placeholder={t('category.add_comment')}
                         placeholderTextColor="#525252"
                         value={commentingPost === post.id ? commentText : ''}
                         onFocus={() => setCommentingPost(post.id)}
@@ -429,21 +439,21 @@ export default function CategoryDetailScreen() {
             <View style={styles.createModalContent}>
               <View style={styles.createModalHeader}>
                 <TouchableOpacity onPress={() => { setShowCreatePost(false); setNewPostImage(null); setNewPostText(''); }}>
-                  <Text style={styles.createModalCancel}>Annuler</Text>
+                  <Text style={styles.createModalCancel}>{t('category.cancel')}</Text>
                 </TouchableOpacity>
-                <Text style={styles.createModalTitle}>Nouveau post</Text>
+                <Text style={styles.createModalTitle}>{t('category.new_post')}</Text>
                 <TouchableOpacity
                   style={[styles.publishBtn, { backgroundColor: newPostText.trim() ? meta.color : '#333' }]}
                   onPress={handleCreatePost}
                   disabled={!newPostText.trim() || posting}
                 >
-                  {posting ? <ActivityIndicator size="small" color="#FFF" /> : <Text style={styles.publishText}>Publier</Text>}
+                  {posting ? <ActivityIndicator size="small" color="#FFF" /> : <Text style={styles.publishText}>{t('category.publish_btn')}</Text>}
                 </TouchableOpacity>
               </View>
 
               <TextInput
                 style={styles.postInput}
-                placeholder="Partage quelque chose avec la communauté..."
+                placeholder={t('category.share_with_community')}
                 placeholderTextColor="#525252"
                 value={newPostText}
                 onChangeText={setNewPostText}
@@ -463,7 +473,7 @@ export default function CategoryDetailScreen() {
 
               <View style={styles.createModalActions}>
                 <TouchableOpacity style={styles.mediaBtn} onPress={pickImage}>
-                  <Text style={styles.mediaBtnText}>📷 Photo</Text>
+                  <Text style={styles.mediaBtnText}>📷 {t('category.photo')}</Text>
                 </TouchableOpacity>
                 <Text style={styles.charCount}>{newPostText.length}/500</Text>
               </View>

@@ -3,29 +3,35 @@ import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, Image,
   ActivityIndicator, RefreshControl, Dimensions
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { GLASS } from '../theme/glassTheme';
+import { authFetch } from '../utils/api';
+import { t } from '../utils/i18n';
+import DueloHeader from '../components/DueloHeader';
 import SwipeBackPage from '../components/SwipeBackPage';
+import UserAvatar from '../components/UserAvatar';
 
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 const CATEGORY_META: Record<string, { icon: string; color: string; name: string; bg: string }> = {
-  series_tv: { icon: '📺', color: '#E040FB', name: 'Séries TV', bg: '#2D1B4E' },
-  geographie: { icon: '🌍', color: '#00FFFF', name: 'Géographie', bg: '#0D2B2B' },
-  histoire: { icon: '🏛️', color: '#FFD700', name: 'Histoire', bg: '#2B2510' },
-  cinema: { icon: '🎬', color: '#FF6B6B', name: 'Cinéma', bg: '#2B1515' },
-  sport: { icon: '⚽', color: '#00FF9D', name: 'Sport', bg: '#0D2B1A' },
-  musique: { icon: '🎵', color: '#FF8C00', name: 'Musique', bg: '#2B1E0D' },
-  sciences: { icon: '🔬', color: '#7B68EE', name: 'Sciences', bg: '#1A1533' },
-  gastronomie: { icon: '🍽️', color: '#FF69B4', name: 'Gastronomie', bg: '#2B152B' },
+  series_tv: { icon: 'television-classic', color: '#E040FB', name: 'Series TV', bg: '#2D1B4E' },
+  geographie: { icon: 'earth', color: '#00FFFF', name: 'Geographie', bg: '#0D2B2B' },
+  histoire: { icon: 'bank', color: '#FFD700', name: 'Histoire', bg: '#2B2510' },
+  cinema: { icon: 'movie-open', color: '#FF6B6B', name: 'Cinema', bg: '#2B1515' },
+  sport: { icon: 'soccer', color: '#00FF9D', name: 'Sport', bg: '#0D2B1A' },
+  musique: { icon: 'music-note', color: '#FF8C00', name: 'Musique', bg: '#2B1E0D' },
+  sciences: { icon: 'microscope', color: '#7B68EE', name: 'Sciences', bg: '#1A1533' },
+  gastronomie: { icon: 'silverware-fork-knife', color: '#FF69B4', name: 'Gastronomie', bg: '#2B152B' },
 };
 
 type PlayerProfile = {
-  id: string; pseudo: string; avatar_seed: string;
+  id: string; pseudo: string; avatar_seed: string; avatar_url?: string;
   selected_title: string; country: string | null; country_flag: string;
   matches_played: number; matches_won: number; win_rate: number;
   current_streak: number; best_streak: number; total_xp: number;
@@ -39,9 +45,23 @@ type PlayerProfile = {
   }[];
 };
 
+// Deterministic color from a letter for avatar backgrounds
+const AVATAR_COLORS = ['#8A2BE2', '#E040FB', '#00FFFF', '#FFD700', '#FF6B6B', '#00FF9D', '#FF8C00', '#7B68EE', '#FF69B4', '#00BFFF'];
+const getAvatarColor = (letter: string) => {
+  const code = letter.toUpperCase().charCodeAt(0) - 65;
+  return AVATAR_COLORS[Math.abs(code) % AVATAR_COLORS.length];
+};
+
 export default function PlayerProfileScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
+
+  if (!id) {
+    router.back();
+    return null;
+  }
+
   const [myId, setMyId] = useState('');
   const [profile, setProfile] = useState<PlayerProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -76,7 +96,7 @@ export default function PlayerProfileScreen() {
     setFollowLoading(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
-      const res = await fetch(`${API_URL}/api/player/${id}/follow`, {
+      const res = await authFetch(`${API_URL}/api/player/${id}/follow`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ follower_id: myId }),
       });
@@ -107,7 +127,7 @@ export default function PlayerProfileScreen() {
   const timeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime();
     const mins = Math.floor(diff / 60000);
-    if (mins < 1) return "À l'instant";
+    if (mins < 1) return t('player.just_now');
     if (mins < 60) return `${mins}min`;
     const hours = Math.floor(mins / 60);
     if (hours < 24) return `${hours}h`;
@@ -116,7 +136,7 @@ export default function PlayerProfileScreen() {
   };
 
   if (loading) {
-    return <View style={s.loadingContainer}><ActivityIndicator size="large" color="#8A2BE2" /></View>;
+    return <View style={[s.loadingContainer, { backgroundColor: '#050510' }]}><ActivityIndicator size="large" color="#8A2BE2" /></View>;
   }
   if (!profile) return null;
 
@@ -128,7 +148,8 @@ export default function PlayerProfileScreen() {
 
   return (
     <SwipeBackPage>
-    <SafeAreaView style={s.container}>
+    <View style={[s.container, { paddingTop: insets.top }]}>
+      <DueloHeader />
       <ScrollView
         contentContainerStyle={s.scroll}
         showsVerticalScrollIndicator={false}
@@ -136,18 +157,25 @@ export default function PlayerProfileScreen() {
       >
         {/* Back */}
         <TouchableOpacity data-testid="back-button" style={s.backBtn} onPress={() => router.back()}>
-          <Text style={s.backText}>{'← Retour'}</Text>
+          <LinearGradient
+            colors={['rgba(255,255,255,0.10)', 'rgba(255,255,255,0.04)']}
+            style={s.backCircle}
+          >
+            <MaterialCommunityIcons name="chevron-left" size={22} color="#A3A3A3" />
+          </LinearGradient>
+          <Text style={s.backText}>{t('player.back')}</Text>
         </TouchableOpacity>
 
         {/* ── Hero Header ── */}
         <View style={s.heroCard}>
-          <View style={s.heroBg} />
+          <LinearGradient
+            colors={['#1A0A2E', '#0D0D1A']}
+            style={s.heroBg}
+          />
 
           {/* Avatar */}
           <View style={s.avatarRing}>
-            <View style={s.avatar}>
-              <Text style={s.avatarText}>{profile.pseudo[0]?.toUpperCase()}</Text>
-            </View>
+            <UserAvatar avatarUrl={profile.avatar_url} avatarSeed={profile.avatar_seed} pseudo={profile.pseudo} size={94} />
           </View>
 
           {/* Name & Title */}
@@ -157,7 +185,7 @@ export default function PlayerProfileScreen() {
           {/* Location */}
           <View style={s.locationRow}>
             <Text style={s.locationFlag}>{profile.country_flag}</Text>
-            <Text style={s.locationText}>{profile.country || 'Monde'}</Text>
+            <Text style={s.locationText}>{profile.country || t('player.world')}</Text>
           </View>
 
           {/* Champion Titles */}
@@ -165,9 +193,14 @@ export default function PlayerProfileScreen() {
             <View style={s.championSection}>
               {profile.champion_titles.map((ct, i) => (
                 <View key={i} style={s.championBanner}>
-                  <Text style={s.championIcon}>{'🏆'}</Text>
+                  <LinearGradient
+                    colors={['rgba(255,215,0,0.20)', 'rgba(255,215,0,0.06)']}
+                    style={s.championIconCircle}
+                  >
+                    <MaterialCommunityIcons name="trophy" size={18} color="#FFD700" />
+                  </LinearGradient>
                   <View>
-                    <Text style={s.championText}>#1 en {ct.category_name}</Text>
+                    <Text style={s.championText}>{t('player.number_one_in')} {ct.category_name}</Text>
                     <Text style={s.championSub}>{ct.scope} - {ct.date}</Text>
                   </View>
                 </View>
@@ -179,22 +212,26 @@ export default function PlayerProfileScreen() {
           {!isOwnProfile && (
             <View style={s.actionsRow}>
               <TouchableOpacity data-testid="play-button" style={s.actionBtn} onPress={handlePlay}>
-                <Text style={s.actionIcon}>{'⚡'}</Text>
-                <Text style={s.actionText}>Jouer</Text>
+                <MaterialCommunityIcons name="lightning-bolt" size={16} color="#FFF" />
+                <Text style={s.actionText}>{t('player.play')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 data-testid="follow-button"
                 style={[s.actionBtn, profile.is_following ? s.followingBtn : s.followBtn]}
                 onPress={handleFollow} disabled={followLoading}
               >
-                <Text style={s.actionIcon}>{profile.is_following ? '✓' : '+'}</Text>
+                <MaterialCommunityIcons
+                  name={profile.is_following ? 'check' : 'plus'}
+                  size={16}
+                  color={profile.is_following ? '#00FF9D' : '#FFF'}
+                />
                 <Text style={[s.actionText, profile.is_following && { color: '#00FF9D' }]}>
-                  {profile.is_following ? 'Suivi' : 'Suivre'}
+                  {profile.is_following ? t('player.following') : t('player.follow')}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity data-testid="chat-button" style={[s.actionBtn, s.chatBtn]} onPress={handleChat}>
-                <Text style={s.actionIcon}>{'💬'}</Text>
-                <Text style={[s.actionText, { color: '#00BFFF' }]}>Message</Text>
+                <MaterialCommunityIcons name="comment-outline" size={16} color="#00BFFF" />
+                <Text style={[s.actionText, { color: '#00BFFF' }]}>{t('player.message')}</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -202,81 +239,136 @@ export default function PlayerProfileScreen() {
           {/* ── Stats Row ── */}
           <View style={s.statsRow}>
             <View style={s.statItem}>
+              <LinearGradient
+                colors={['rgba(138,43,226,0.20)', 'rgba(138,43,226,0.06)']}
+                style={s.statIconCircle}
+              >
+                <MaterialCommunityIcons name="sword-cross" size={16} color="#8A2BE2" />
+              </LinearGradient>
               <Text style={s.statValue} data-testid="stat-games">{profile.matches_played}</Text>
-              <Text style={s.statLabel}>PARTIES</Text>
+              <Text style={s.statLabel}>{t('player.games')}</Text>
             </View>
             <View style={s.statDivider} />
             <View style={s.statItem}>
+              <LinearGradient
+                colors={['rgba(0,255,255,0.20)', 'rgba(0,255,255,0.06)']}
+                style={s.statIconCircle}
+              >
+                <MaterialCommunityIcons name="account" size={16} color="#00FFFF" />
+              </LinearGradient>
               <Text style={s.statValue} data-testid="stat-followers">{profile.followers_count}</Text>
-              <Text style={s.statLabel}>ABONNÉS</Text>
+              <Text style={s.statLabel}>{t('player.followers')}</Text>
             </View>
             <View style={s.statDivider} />
             <View style={s.statItem}>
+              <LinearGradient
+                colors={['rgba(0,255,157,0.20)', 'rgba(0,255,157,0.06)']}
+                style={s.statIconCircle}
+              >
+                <MaterialCommunityIcons name="heart" size={16} color="#00FF9D" />
+              </LinearGradient>
               <Text style={s.statValue} data-testid="stat-following">{profile.following_count}</Text>
-              <Text style={s.statLabel}>ABONNEMENTS</Text>
+              <Text style={s.statLabel}>{t('player.following_label')}</Text>
             </View>
           </View>
         </View>
 
+        {/* ── Quick Performance Stats ── */}
+        <Text style={s.sectionTitle}>{t('player.performances')}</Text>
+        <View style={s.perfRow}>
+          {[
+            { icon: 'trophy' as const, label: t('player.victories'), value: profile.matches_won, color: '#FFD700' },
+            { icon: 'chart-line' as const, label: t('player.win_rate'), value: `${profile.win_rate}%`, color: '#00FFFF' },
+            { icon: 'fire' as const, label: t('player.streak'), value: profile.current_streak, color: '#FF6B35' },
+            { icon: 'star' as const, label: t('player.best'), value: profile.best_streak, color: '#E040FB' },
+          ].map((stat, i) => (
+            <View key={i} style={s.perfCard}>
+              <LinearGradient
+                colors={[stat.color + '22', stat.color + '08']}
+                style={s.perfIconCircle}
+              >
+                <MaterialCommunityIcons name={stat.icon} size={18} color={stat.color} />
+              </LinearGradient>
+              <Text style={[s.perfValue, { color: stat.color }]}>{stat.value}</Text>
+              <Text style={s.perfLabel}>{stat.label}</Text>
+            </View>
+          ))}
+        </View>
+
         {/* ── Topics Grid ── */}
-        <Text style={s.sectionTitle}>SES THÈMES</Text>
+        <Text style={s.sectionTitle}>{t('player.their_themes')}</Text>
         <View style={s.topicsGrid}>
           {sortedCategories.map(([catKey, catData]) => {
-            const meta = CATEGORY_META[catKey] || { icon: '?', name: catKey, color: '#8A2BE2', bg: '#1A1A2E' };
+            const meta = CATEGORY_META[catKey] || { icon: 'help-circle', name: catKey, color: '#8A2BE2', bg: '#1A1A2E' };
             return (
               <View
                 key={catKey}
                 data-testid={`topic-${catKey}`}
                 style={[s.topicCard, { backgroundColor: meta.bg }]}
               >
-                <View style={[s.topicIconBox, { backgroundColor: meta.color + '25' }]}>
-                  <Text style={s.topicIcon}>{meta.icon}</Text>
-                </View>
+                <LinearGradient
+                  colors={[meta.color + '30', meta.color + '10']}
+                  style={s.topicIconBox}
+                >
+                  <MaterialCommunityIcons name={meta.icon as any} size={22} color={meta.color} />
+                </LinearGradient>
                 <Text style={[s.topicName, { color: meta.color }]}>{meta.name}</Text>
-                <Text style={s.topicLevel}>NiV. {catData.level}</Text>
+                <Text style={s.topicLevel}>{t('player.level_short')} {catData.level}</Text>
               </View>
             );
           })}
         </View>
 
         {/* ── Posts Wall ── */}
-        <Text style={s.sectionTitle}>PUBLICATIONS</Text>
+        <Text style={s.sectionTitle}>{t('player.publications')}</Text>
 
         {profile.posts.length === 0 ? (
           <View style={s.emptyWall}>
-            <Text style={s.emptyText}>Aucune publication</Text>
+            <MaterialCommunityIcons name="post-outline" size={32} color="#525252" />
+            <Text style={s.emptyText}>{t('player.no_posts')}</Text>
           </View>
         ) : (
-          profile.posts.map(post => (
-            <View key={post.id} style={s.postCard}>
-              <View style={s.postHeader}>
-                <View style={[s.postCatBadge, { backgroundColor: (CATEGORY_META[post.category_id]?.color || '#8A2BE2') + '20' }]}>
-                  <Text style={s.postCatIcon}>{CATEGORY_META[post.category_id]?.icon || '?'}</Text>
-                  <Text style={[s.postCatName, { color: CATEGORY_META[post.category_id]?.color || '#8A2BE2' }]}>
-                    {post.category_name}
-                  </Text>
+          profile.posts.map(post => {
+            const postMeta = CATEGORY_META[post.category_id];
+            return (
+              <View key={post.id} style={s.postCard}>
+                <View style={s.postHeader}>
+                  <View style={[s.postCatBadge, { backgroundColor: (postMeta?.color || '#8A2BE2') + '20' }]}>
+                    <MaterialCommunityIcons
+                      name={(postMeta?.icon || 'help-circle') as any}
+                      size={14}
+                      color={postMeta?.color || '#8A2BE2'}
+                    />
+                    <Text style={[s.postCatName, { color: postMeta?.color || '#8A2BE2' }]}>
+                      {post.category_name}
+                    </Text>
+                  </View>
+                  <Text style={s.postTime}>{timeAgo(post.created_at)}</Text>
                 </View>
-                <Text style={s.postTime}>{timeAgo(post.created_at)}</Text>
+                <Text style={s.postContent}>{post.content}</Text>
+                {post.image_base64 && (
+                  <Image source={{ uri: post.image_base64 }} style={s.postImage} resizeMode="cover" />
+                )}
+                <View style={s.postActions}>
+                  <View style={s.postActionItem}>
+                    <MaterialCommunityIcons
+                      name={post.is_liked ? 'heart' : 'heart-outline'}
+                      size={18}
+                      color={post.is_liked ? '#FF3B30' : '#A3A3A3'}
+                    />
+                    <Text style={s.postActionCount}>{post.likes_count}</Text>
+                  </View>
+                  <View style={s.postActionItem}>
+                    <MaterialCommunityIcons name="comment-outline" size={18} color="#A3A3A3" />
+                    <Text style={s.postActionCount}>{post.comments_count}</Text>
+                  </View>
+                </View>
               </View>
-              <Text style={s.postContent}>{post.content}</Text>
-              {post.image_base64 && (
-                <Image source={{ uri: post.image_base64 }} style={s.postImage} resizeMode="cover" />
-              )}
-              <View style={s.postActions}>
-                <View style={s.postActionItem}>
-                  <Text style={s.postActionIcon}>{post.is_liked ? '❤️' : '🤍'}</Text>
-                  <Text style={s.postActionCount}>{post.likes_count}</Text>
-                </View>
-                <View style={s.postActionItem}>
-                  <Text style={s.postActionIcon}>{'💬'}</Text>
-                  <Text style={s.postActionCount}>{post.comments_count}</Text>
-                </View>
-              </View>
-            </View>
-          ))
+            );
+          })
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
     </SwipeBackPage>
   );
 }
@@ -284,34 +376,40 @@ export default function PlayerProfileScreen() {
 const CARD_SIZE = (width - 72) / 4;
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'transparent' },
-  loadingContainer: { flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' },
+  container: { flex: 1, backgroundColor: '#050510' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   scroll: { paddingBottom: 40 },
 
-  backBtn: { paddingHorizontal: 20, paddingVertical: 12 },
+  backBtn: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, gap: 10 },
+  backCircle: {
+    width: 36, height: 36, borderRadius: 18,
+    justifyContent: 'center', alignItems: 'center',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+  },
   backText: { color: '#A3A3A3', fontSize: 15, fontWeight: '600' },
 
   /* ── Hero Header ── */
   heroCard: {
     marginHorizontal: 16, borderRadius: 24, overflow: 'hidden',
-    backgroundColor: '#0D0D1A', borderWidth: 1, borderColor: 'rgba(138,43,226,0.2)',
+    backgroundColor: '#0D0D1A', borderWidth: 1, borderColor: GLASS.borderCyan,
     paddingBottom: 24, alignItems: 'center',
   },
   heroBg: {
     position: 'absolute', top: 0, left: 0, right: 0, height: 120,
-    backgroundColor: '#1A0A2E',
   },
   avatarRing: {
-    marginTop: 60, width: 100, height: 100, borderRadius: 50,
-    borderWidth: 3, borderColor: '#00FFFF',
+    marginTop: 60,
+  },
+  avatarGradient: {
+    width: 100, height: 100, borderRadius: 50,
     justifyContent: 'center', alignItems: 'center',
-    backgroundColor: 'rgba(8, 8, 24, 0.65)',
+    padding: 3,
   },
   avatar: {
-    width: 90, height: 90, borderRadius: 45, backgroundColor: '#1A1A2E',
+    width: 94, height: 94, borderRadius: 47, backgroundColor: '#0D0D1A',
     justifyContent: 'center', alignItems: 'center',
   },
-  avatarText: { fontSize: 40, fontWeight: '900', color: '#8A2BE2' },
+  avatarText: { fontSize: 40, fontWeight: '900' },
 
   pseudo: { fontSize: 26, fontWeight: '900', color: '#FFF', marginTop: 12 },
   title: { fontSize: 14, color: '#B57EDC', fontWeight: '600', marginTop: 4 },
@@ -327,7 +425,10 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(255,215,0,0.08)', borderRadius: 12, paddingVertical: 8, paddingHorizontal: 14,
     borderWidth: 1, borderColor: 'rgba(255,215,0,0.2)',
   },
-  championIcon: { fontSize: 22 },
+  championIconCircle: {
+    width: 36, height: 36, borderRadius: 12,
+    justifyContent: 'center', alignItems: 'center',
+  },
   championText: { color: '#FFD700', fontSize: 13, fontWeight: '800' },
   championSub: { color: '#A3A3A3', fontSize: 11, marginTop: 1 },
 
@@ -340,7 +441,6 @@ const s = StyleSheet.create({
   followBtn: { backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   followingBtn: { backgroundColor: 'rgba(0,255,157,0.1)', borderWidth: 1, borderColor: 'rgba(0,255,157,0.3)' },
   chatBtn: { backgroundColor: 'rgba(0,191,255,0.1)', borderWidth: 1, borderColor: 'rgba(0,191,255,0.3)' },
-  actionIcon: { fontSize: 16 },
   actionText: { color: '#FFF', fontSize: 13, fontWeight: '700' },
 
   /* Stats Row */
@@ -350,9 +450,28 @@ const s = StyleSheet.create({
     borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)',
   },
   statItem: { flex: 1, alignItems: 'center' },
-  statValue: { fontSize: 26, fontWeight: '900', color: '#FFF' },
+  statIconCircle: {
+    width: 32, height: 32, borderRadius: 10,
+    justifyContent: 'center', alignItems: 'center', marginBottom: 6,
+  },
+  statValue: { fontSize: 22, fontWeight: '900', color: '#FFF' },
   statLabel: { fontSize: 9, fontWeight: '800', color: '#525252', letterSpacing: 1.5, marginTop: 4 },
-  statDivider: { width: 1, height: 40, backgroundColor: 'rgba(255,255,255,0.08)' },
+  statDivider: { width: 1, height: 50, backgroundColor: 'rgba(255,255,255,0.08)' },
+
+  /* Performance Row */
+  perfRow: {
+    flexDirection: 'row', gap: 8, paddingHorizontal: 16,
+  },
+  perfCard: {
+    flex: 1, backgroundColor: GLASS.bg, borderRadius: GLASS.radius,
+    padding: 12, alignItems: 'center', borderWidth: 1, borderColor: GLASS.borderCyan,
+  },
+  perfIconCircle: {
+    width: 36, height: 36, borderRadius: 12,
+    justifyContent: 'center', alignItems: 'center', marginBottom: 6,
+  },
+  perfValue: { fontSize: 18, fontWeight: '800' },
+  perfLabel: { fontSize: 9, color: 'rgba(255,255,255,0.45)', marginTop: 2, fontWeight: '700', textTransform: 'uppercase' as const },
 
   /* Section Title */
   sectionTitle: {
@@ -374,29 +493,26 @@ const s = StyleSheet.create({
     width: 44, height: 44, borderRadius: 14,
     justifyContent: 'center', alignItems: 'center', marginBottom: 6,
   },
-  topicIcon: { fontSize: 22 },
   topicName: { fontSize: 10, fontWeight: '800', marginBottom: 2, textAlign: 'center' },
   topicLevel: { fontSize: 9, fontWeight: '700', color: '#A3A3A3', letterSpacing: 0.5 },
 
   /* Empty Wall */
-  emptyWall: { alignItems: 'center', paddingVertical: 30 },
+  emptyWall: { alignItems: 'center', paddingVertical: 30, gap: 8 },
   emptyText: { color: '#525252', fontSize: 15 },
 
   /* Post */
   postCard: {
-    marginHorizontal: 16, backgroundColor: 'rgba(255,255,255,0.04)',
+    marginHorizontal: 16, backgroundColor: GLASS.bg,
     borderRadius: 16, padding: 16, marginBottom: 12,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1, borderColor: GLASS.borderCyan,
   },
   postHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   postCatBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 },
-  postCatIcon: { fontSize: 14 },
   postCatName: { fontSize: 12, fontWeight: '700' },
   postTime: { color: '#525252', fontSize: 12 },
   postContent: { color: '#E0E0E0', fontSize: 15, lineHeight: 22, marginBottom: 10 },
   postImage: { width: '100%', height: 200, borderRadius: 12, marginBottom: 10 },
   postActions: { flexDirection: 'row', gap: 20 },
   postActionItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  postActionIcon: { fontSize: 18 },
   postActionCount: { color: '#A3A3A3', fontSize: 14, fontWeight: '600' },
 });

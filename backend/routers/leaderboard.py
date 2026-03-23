@@ -29,6 +29,7 @@ async def get_leaderboard(
         entries.append({
             "pseudo": u.pseudo,
             "avatar_seed": u.avatar_seed,
+            "avatar_url": getattr(u, 'avatar_url', None),
             "total_xp": xp,
             "matches_won": u.matches_won,
             "current_streak": u.current_streak,

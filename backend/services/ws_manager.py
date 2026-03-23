@@ -24,6 +24,12 @@ class ConnectionManager:
         self.game_rooms: dict[str, "GameRoom"] = {}
         # Matchmaking timeout tasks: user_id → asyncio.Task
         self._matchmaking_timers: dict[str, asyncio.Task] = {}
+        # Pending rematch proposals: rematch_id → {proposer_id, opponent_id, theme_id, proposer_data, timer}
+        self.pending_rematches: dict[str, dict] = {}
+        # Quick lookup: opponent_id → rematch_id (so opponent can find their pending rematch)
+        self._rematch_by_opponent: dict[str, str] = {}
+        # Quick lookup: proposer_id → rematch_id
+        self._rematch_by_proposer: dict[str, str] = {}
 
     async def connect(self, user_id: str, ws: WebSocket):
         await ws.accept()
@@ -45,11 +51,71 @@ class ConnectionManager:
             timer.cancel()
         # Remove from matchmaking queue
         self.matchmaking_queue = [e for e in self.matchmaking_queue if e["user_id"] != user_id]
-        # Handle game room disconnect
+        # Handle game room disconnect — schedule async cleanup
         for room_id, room in list(self.game_rooms.items()):
             if user_id in (room.player1_id, room.player2_id):
                 room.handle_disconnect(user_id)
+                # Schedule async notification to opponent
+                asyncio.create_task(self._handle_game_disconnect(room, user_id))
         logger.info(f"WS disconnected: {user_id} (total: {len(self.active_connections)})")
+
+    async def _handle_game_disconnect(self, room: "GameRoom", disconnected_id: str):
+        """Handle a player disconnecting mid-game. Give opponent auto-win with score compensation."""
+        opponent_id = room.get_opponent_id(disconnected_id)
+
+        # Calculate score compensation for remaining questions
+        opponent_score = room.get_score(opponent_id)
+        opponent_correct = room.get_correct_count(opponent_id)
+        answered_count = len(room.answers.get(opponent_id, {}))
+        remaining = room.total_questions - answered_count
+
+        # Average points per question for the opponent (if they answered at least 1)
+        if answered_count > 0:
+            avg_pts = opponent_score / answered_count
+        else:
+            avg_pts = 10  # Default: base points for a correct answer
+
+        # Add compensation: average * remaining questions
+        compensation = round(avg_pts * remaining)
+        room.scores[opponent_id] += compensation
+        room.correct_counts[opponent_id] += min(remaining, remaining)  # assume correct for remaining
+
+        # Mark all remaining questions as answered by disconnected player (score 0)
+        for i in range(room.total_questions):
+            if i not in room.answers.get(disconnected_id, {}):
+                if disconnected_id not in room.answers:
+                    room.answers[disconnected_id] = {}
+                room.answers[disconnected_id][i] = {
+                    "answer": -1,
+                    "is_correct": False,
+                    "points": 0,
+                    "time_ms": 0,
+                }
+            if i not in room.answers.get(opponent_id, {}):
+                if opponent_id not in room.answers:
+                    room.answers[opponent_id] = {}
+                room.answers[opponent_id][i] = {
+                    "answer": -1,
+                    "is_correct": True,
+                    "points": round(avg_pts),
+                    "time_ms": 5000,
+                }
+
+        # Notify opponent of disconnect + auto victory
+        await self.send_to_user(opponent_id, {
+            "type": "opponent_disconnected",
+            "data": {
+                "message": "Votre adversaire s'est déconnecté",
+                "auto_victory": True,
+                "compensation_points": compensation,
+                "your_score": room.get_score(opponent_id),
+                "opponent_score": room.get_score(disconnected_id),
+                "your_correct": room.get_correct_count(opponent_id),
+            },
+        })
+
+        # Finish the game properly (save results)
+        await self._finish_game(room)
 
     def is_online(self, user_id: str) -> bool:
         return user_id in self.active_connections
@@ -196,6 +262,142 @@ class ConnectionManager:
             })
 
         logger.info(f"Game room created: {room_id} ({player1['user_id']} vs {player2['user_id']})")
+
+    # ── Rematch ──
+
+    REMATCH_TIMEOUT = 15  # seconds to wait for opponent response
+
+    async def propose_rematch(self, proposer_id: str, opponent_id: str, theme_id: str, proposer_data: dict):
+        """Send a rematch proposal to the opponent."""
+        # Cancel any existing rematch from this proposer
+        old_rid = self._rematch_by_proposer.get(proposer_id)
+        if old_rid:
+            self._cleanup_rematch(old_rid)
+
+        # If opponent is offline, immediately decline
+        if not self.is_online(opponent_id):
+            await self.send_to_user(proposer_id, {
+                "type": "rematch_declined",
+                "data": {"reason": "opponent_offline"},
+            })
+            return
+
+        rematch_id = secrets.token_hex(8)
+        self.pending_rematches[rematch_id] = {
+            "proposer_id": proposer_id,
+            "opponent_id": opponent_id,
+            "theme_id": theme_id,
+            "proposer_data": proposer_data,
+        }
+        self._rematch_by_opponent[opponent_id] = rematch_id
+        self._rematch_by_proposer[proposer_id] = rematch_id
+
+        # Notify opponent
+        await self.send_to_user(opponent_id, {
+            "type": "rematch_proposal",
+            "data": {
+                "rematch_id": rematch_id,
+                "proposer_id": proposer_id,
+                "proposer_pseudo": proposer_data.get("pseudo", "Joueur"),
+                "theme_id": theme_id,
+            },
+        })
+
+        # Confirm to proposer that proposal was sent
+        await self.send_to_user(proposer_id, {
+            "type": "rematch_sent",
+            "data": {"rematch_id": rematch_id},
+        })
+
+        # Start timeout
+        self.pending_rematches[rematch_id]["timer"] = asyncio.create_task(
+            self._rematch_timeout(rematch_id)
+        )
+        logger.info(f"Rematch proposed: {proposer_id} → {opponent_id} (theme={theme_id})")
+
+    async def _rematch_timeout(self, rematch_id: str):
+        """Auto-decline rematch after timeout."""
+        try:
+            await asyncio.sleep(self.REMATCH_TIMEOUT)
+        except asyncio.CancelledError:
+            return
+
+        rematch = self.pending_rematches.get(rematch_id)
+        if not rematch:
+            return
+
+        proposer_id = rematch["proposer_id"]
+        opponent_id = rematch["opponent_id"]
+        self._cleanup_rematch(rematch_id)
+
+        # Notify proposer that opponent didn't respond
+        await self.send_to_user(proposer_id, {
+            "type": "rematch_expired",
+            "data": {"reason": "timeout"},
+        })
+        # Notify opponent too (dismiss modal if still showing)
+        await self.send_to_user(opponent_id, {
+            "type": "rematch_expired",
+            "data": {"reason": "timeout"},
+        })
+        logger.info(f"Rematch expired: {rematch_id}")
+
+    async def accept_rematch(self, opponent_id: str):
+        """Opponent accepts the rematch. Create a game room directly."""
+        rematch_id = self._rematch_by_opponent.get(opponent_id)
+        if not rematch_id:
+            return None
+
+        rematch = self.pending_rematches.get(rematch_id)
+        if not rematch:
+            return None
+
+        proposer_id = rematch["proposer_id"]
+        theme_id = rematch["theme_id"]
+        self._cleanup_rematch(rematch_id)
+
+        # Notify both players
+        await self.send_to_user(proposer_id, {
+            "type": "rematch_accepted",
+            "data": {"theme_id": theme_id},
+        })
+        await self.send_to_user(opponent_id, {
+            "type": "rematch_accepted",
+            "data": {"theme_id": theme_id},
+        })
+        logger.info(f"Rematch accepted: {proposer_id} vs {opponent_id}")
+        return {"proposer_id": proposer_id, "opponent_id": opponent_id, "theme_id": theme_id}
+
+    async def decline_rematch(self, opponent_id: str):
+        """Opponent declines the rematch."""
+        rematch_id = self._rematch_by_opponent.get(opponent_id)
+        if not rematch_id:
+            return
+
+        rematch = self.pending_rematches.get(rematch_id)
+        if not rematch:
+            return
+
+        proposer_id = rematch["proposer_id"]
+        self._cleanup_rematch(rematch_id)
+
+        # Notify proposer
+        await self.send_to_user(proposer_id, {
+            "type": "rematch_declined",
+            "data": {"reason": "declined"},
+        })
+        logger.info(f"Rematch declined by {opponent_id}")
+
+    def _cleanup_rematch(self, rematch_id: str):
+        """Remove a rematch proposal and cancel its timer."""
+        rematch = self.pending_rematches.pop(rematch_id, None)
+        if not rematch:
+            return
+        timer = rematch.get("timer")
+        if timer and not timer.done():
+            timer.cancel()
+        self._rematch_by_opponent.pop(rematch.get("opponent_id", ""), None)
+        self._rematch_by_proposer.pop(rematch.get("proposer_id", ""), None)
 
     # ── Game Actions ──
 

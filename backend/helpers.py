@@ -1,8 +1,46 @@
+import base64
 import bcrypt
 import random
 import httpx
 from typing import Optional
 from fastapi import Request
+
+
+ALLOWED_IMAGE_SIGNATURES = {
+    b'\x89PNG\r\n\x1a\n': 'image/png',
+    b'\xff\xd8\xff': 'image/jpeg',
+    b'RIFF': 'image/webp',  # WebP starts with RIFF....WEBP
+    b'GIF87a': 'image/gif',
+    b'GIF89a': 'image/gif',
+}
+
+
+def validate_image_base64(data_uri: str) -> bytes:
+    """Validate that a base64 data URI contains a real image. Returns decoded bytes."""
+    # Strip data URI prefix if present
+    if ',' in data_uri:
+        data_uri = data_uri.split(',', 1)[1]
+
+    try:
+        raw = base64.b64decode(data_uri)
+    except Exception:
+        raise ValueError("Données base64 invalides")
+
+    # Check magic bytes
+    is_valid = False
+    for signature in ALLOWED_IMAGE_SIGNATURES:
+        if raw[:len(signature)] == signature:
+            is_valid = True
+            break
+
+    # Special check for WebP (RIFF....WEBP)
+    if raw[:4] == b'RIFF' and len(raw) > 11 and raw[8:12] != b'WEBP':
+        is_valid = False
+
+    if not is_valid:
+        raise ValueError("Le fichier n'est pas une image valide (PNG, JPG, WebP ou GIF)")
+
+    return raw
 
 
 def hash_password(password: str) -> str:

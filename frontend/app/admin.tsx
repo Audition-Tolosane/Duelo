@@ -2,12 +2,17 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, Pressable, StyleSheet, ScrollView, TextInput,
   Alert, ActivityIndicator, Platform, KeyboardAvoidingView, RefreshControl,
+  Image,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
+import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Papa from 'papaparse';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -95,7 +100,15 @@ type ReportCounts = {
   total: number;
 };
 
-const TABS = ['Questions', 'Themes', 'Stats', 'Signalements'];
+const TABS = ['Questions', 'Themes', 'Stats', 'Signalements', 'Avatars'];
+
+const TAB_ICONS: Record<string, string> = {
+  Questions: 'file-document-outline',
+  Themes: 'palette-outline',
+  Stats: 'chart-bar',
+  Signalements: 'alert-circle-outline',
+  Avatars: 'account-circle-outline',
+};
 
 const showAlert = (title: string, msg: string) => {
   if (Platform.OS === 'web') { window.alert(`${title}: ${msg}`); }
@@ -118,6 +131,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function AdminScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   // Auth
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -162,6 +176,13 @@ export default function AdminScreen() {
   const [reportCounts, setReportCounts] = useState<ReportCounts>({ pending: 0, reviewed: 0, resolved: 0, total: 0 });
   const [loadingReports, setLoadingReports] = useState(false);
   const [reportFilter, setReportFilter] = useState<string>('');
+
+  // Avatar states
+  const [avatars, setAvatars] = useState<{id: string; name: string; image_url: string; category: string}[]>([]);
+  const [avatarCategory, setAvatarCategory] = useState('default');
+  const [avatarImage, setAvatarImage] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [loadingAvatars, setLoadingAvatars] = useState(false);
 
   // Refresh
   const [refreshing, setRefreshing] = useState(false);
@@ -226,6 +247,7 @@ export default function AdminScreen() {
     else if (activeTab === 1) await loadThemesOverview();
     else if (activeTab === 2) await loadMatchStats();
     else if (activeTab === 3) await loadReports();
+    else if (activeTab === 4) await fetchAvatars();
     setRefreshing(false);
   }, [activeTab, reportFilter]);
 
@@ -588,41 +610,154 @@ export default function AdminScreen() {
     }
   };
 
+  // ── Avatars ──
+
+  const fetchAvatars = async () => {
+    setLoadingAvatars(true);
+    try {
+      const res = await fetch(`${API_URL}/api/admin/avatars`);
+      const data = await res.json();
+      setAvatars(data.avatars || []);
+    } catch {}
+    setLoadingAvatars(false);
+  };
+
+  const pickAvatarImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      base64: true,
+      quality: 0.8,
+      allowsEditing: true,
+      aspect: [1, 1],
+    });
+    if (!result.canceled && result.assets[0]?.base64) {
+      setAvatarImage(result.assets[0].base64);
+    }
+  };
+
+  const uploadAvatar = async () => {
+    if (!avatarImage) {
+      showAlert('Erreur', 'Image requise');
+      return;
+    }
+    setUploadingAvatar(true);
+    try {
+      const pwd = password;
+      const res = await fetch(`${API_URL}/api/admin/avatars/upload`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          password: pwd,
+          category: avatarCategory.trim() || 'default',
+          image_base64: avatarImage,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showAlert('Succes', 'Avatar uploade');
+        setAvatarCategory('default');
+        setAvatarImage(null);
+        fetchAvatars();
+      } else {
+        showAlert('Erreur', data.detail || 'Echec upload');
+      }
+    } catch (e: any) {
+      showAlert('Erreur', e.message);
+    }
+    setUploadingAvatar(false);
+  };
+
+  const deleteAvatar = async (avatarId: string) => {
+    try {
+      const pwd = password;
+      const res = await fetch(`${API_URL}/api/admin/avatars/${avatarId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pwd }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchAvatars();
+      }
+    } catch {}
+  };
+
+  useEffect(() => {
+    if (activeTab === 4) fetchAvatars();
+  }, [activeTab]);
+
+  // ── Section Header with gradient ──
+  const SectionHeader = ({ icon, title, subtitle }: { icon: string; title: string; subtitle?: string }) => (
+    <View style={styles.sectionHeaderWrap}>
+      <LinearGradient
+        colors={['rgba(138,43,226,0.25)', 'rgba(138,43,226,0.0)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.sectionHeaderGradient}
+      >
+        <MaterialCommunityIcons name={icon as any} size={20} color="#A855F7" style={{ marginRight: 10 }} />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.cardTitle}>{title}</Text>
+          {subtitle ? <Text style={styles.cardDescSub}>{subtitle}</Text> : null}
+        </View>
+      </LinearGradient>
+    </View>
+  );
+
   // ── Auth Screen ──
   if (!isAuthenticated) {
     return (
       <View style={styles.opaqueWrapper} testID="admin-bg" nativeID="admin-bg">
-      <SafeAreaView style={styles.container}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.flex1}>
-          <View style={styles.authContainer}>
-            <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-              <Text style={styles.backBtnText}>Retour</Text>
-            </TouchableOpacity>
-            <View style={styles.authCard}>
-              <Text style={styles.lockIcon}>{'🔒'}</Text>
-              <Text style={styles.authTitle}>Administration</Text>
-              <Text style={styles.authSubtitle}>Panel d'administration Duelo</Text>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder="Mot de passe admin"
-                placeholderTextColor="#555"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-                onSubmitEditing={handleLogin}
-                autoCapitalize="none"
-              />
-              <TouchableOpacity
-                style={[styles.loginBtn, !password.trim() && styles.loginBtnDisabled]}
-                onPress={handleLogin}
-                disabled={!password.trim() || authLoading}
-              >
-                {authLoading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.loginBtnText}>Se connecter</Text>}
+        <View style={[styles.container, { paddingTop: insets.top }]}>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.flex1}>
+            <View style={styles.authContainer}>
+              <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+                <MaterialCommunityIcons name="arrow-left" size={16} color="#A855F7" style={{ marginRight: 6 }} />
+                <Text style={styles.backBtnText}>Retour</Text>
               </TouchableOpacity>
+              <View style={styles.authCard}>
+                <LinearGradient
+                  colors={['rgba(138,43,226,0.2)', 'rgba(138,43,226,0.05)']}
+                  style={styles.authIconWrap}
+                >
+                  <MaterialCommunityIcons name="lock-outline" size={36} color="#A855F7" />
+                </LinearGradient>
+                <Text style={styles.authTitle}>Administration</Text>
+                <Text style={styles.authSubtitle}>Panel d'administration Duelo</Text>
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Mot de passe admin"
+                  placeholderTextColor="#555"
+                  secureTextEntry
+                  value={password}
+                  onChangeText={setPassword}
+                  onSubmitEditing={handleLogin}
+                  autoCapitalize="none"
+                />
+                <TouchableOpacity
+                  style={[styles.loginBtnWrap, !password.trim() && styles.loginBtnDisabled]}
+                  onPress={handleLogin}
+                  disabled={!password.trim() || authLoading}
+                  activeOpacity={0.8}
+                >
+                  <LinearGradient
+                    colors={['#8A2BE2', '#6A1FB0']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.loginBtnGradient}
+                  >
+                    {authLoading ? <ActivityIndicator color="#FFF" /> : (
+                      <>
+                        <MaterialCommunityIcons name="login" size={18} color="#FFF" style={{ marginRight: 8 }} />
+                        <Text style={styles.loginBtnText}>Se connecter</Text>
+                      </>
+                    )}
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
+          </KeyboardAvoidingView>
+        </View>
       </View>
     );
   }
@@ -633,19 +768,19 @@ export default function AdminScreen() {
     <View>
       {/* Upload Section */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Importer des questions CSV</Text>
+        <SectionHeader icon="folder-upload" title="Importer des questions CSV" />
         <Text style={styles.cardDesc}>
           Format (separateur ;) : ID;Categorie;Question;Rep A;Rep B;Rep C;Rep D;Bonne rep;Difficulte;Angle;Angle Num
         </Text>
         {!fileName ? (
-          <TouchableOpacity style={styles.uploadBtn} onPress={pickCSVFile}>
-            <Text style={styles.uploadBtnIcon}>{'📁'}</Text>
+          <TouchableOpacity style={styles.uploadBtn} onPress={pickCSVFile} activeOpacity={0.7}>
+            <MaterialCommunityIcons name="folder-upload-outline" size={32} color="#8A2BE2" style={{ marginBottom: 8 }} />
             <Text style={styles.uploadBtnText}>Choisir un fichier CSV</Text>
           </TouchableOpacity>
         ) : (
           <View>
             <View style={styles.fileInfo}>
-              <Text style={styles.fileIcon}>{'📄'}</Text>
+              <MaterialCommunityIcons name="file-document-outline" size={24} color="#A855F7" style={{ marginRight: 12 }} />
               <View style={styles.fileDetails}>
                 <Text style={styles.fileNameText} numberOfLines={1}>{fileName}</Text>
                 <Text style={styles.fileMetaText}>
@@ -654,7 +789,7 @@ export default function AdminScreen() {
                 </Text>
               </View>
               <TouchableOpacity style={styles.resetBtn} onPress={resetCSV}>
-                <Text style={styles.resetBtnText}>X</Text>
+                <MaterialCommunityIcons name="close" size={16} color="#FF3B30" />
               </TouchableOpacity>
             </View>
             {csvColumns.length > 0 && (
@@ -676,30 +811,44 @@ export default function AdminScreen() {
             )}
             {parseErrors.length > 0 && (
               <View style={styles.errorsSection}>
-                <Text style={styles.errorsTitle}>Avertissements ({parseErrors.length}) :</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+                  <MaterialCommunityIcons name="alert" size={16} color="#FF8A80" style={{ marginRight: 6 }} />
+                  <Text style={styles.errorsTitle}>Avertissements ({parseErrors.length}) :</Text>
+                </View>
                 {parseErrors.slice(0, 10).map((err, i) => (
                   <Text key={i} style={styles.errorText}>{err}</Text>
                 ))}
               </View>
             )}
             <TouchableOpacity
-              style={[styles.importBtn, (parsedRows.length === 0 || importing) && styles.importBtnDisabled]}
+              style={[styles.importBtnWrap, (parsedRows.length === 0 || importing) && styles.importBtnDisabled]}
               onPress={handleImport}
               disabled={parsedRows.length === 0 || importing}
+              activeOpacity={0.8}
             >
-              {importing ? (
-                <View style={{ width: '100%' }}>
-                  <View style={styles.importingRow}>
-                    <ActivityIndicator color="#FFF" />
-                    <Text style={styles.importBtnText}> {importProgress}% — Lot {Math.ceil((importProgress / 100) * Math.ceil(parsedRows.length / 2000))}/{Math.ceil(parsedRows.length / 2000)}</Text>
+              <LinearGradient
+                colors={importing ? ['#388E3C', '#2E7D32'] : ['#00C853', '#00A844']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.importBtnGradient}
+              >
+                {importing ? (
+                  <View style={{ width: '100%' }}>
+                    <View style={styles.importingRow}>
+                      <ActivityIndicator color="#FFF" />
+                      <Text style={styles.importBtnText}> {importProgress}% — Lot {Math.ceil((importProgress / 100) * Math.ceil(parsedRows.length / 2000))}/{Math.ceil(parsedRows.length / 2000)}</Text>
+                    </View>
+                    <View style={{ height: 4, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 2, marginTop: 8 }}>
+                      <View style={{ height: 4, backgroundColor: '#B9F6CA', borderRadius: 2, width: `${importProgress}%` }} />
+                    </View>
                   </View>
-                  <View style={{ height: 4, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 2, marginTop: 8 }}>
-                    <View style={{ height: 4, backgroundColor: '#00FF9D', borderRadius: 2, width: `${importProgress}%` }} />
+                ) : (
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <MaterialCommunityIcons name="upload" size={18} color="#FFF" style={{ marginRight: 8 }} />
+                    <Text style={styles.importBtnText}>Importer {parsedRows.length} question{parsedRows.length > 1 ? 's' : ''}</Text>
                   </View>
-                </View>
-              ) : (
-                <Text style={styles.importBtnText}>Importer {parsedRows.length} question{parsedRows.length > 1 ? 's' : ''}</Text>
-              )}
+                )}
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         )}
@@ -707,21 +856,47 @@ export default function AdminScreen() {
 
       {importResult && (
         <View style={[styles.card, styles.resultCard]}>
-          <Text style={styles.resultTitle}>
-            {importResult.success ? 'Importation terminee' : 'Erreur'}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+            <MaterialCommunityIcons
+              name={importResult.success ? 'check-circle' : 'alert-circle'}
+              size={22}
+              color={importResult.success ? '#00C853' : '#FF3B30'}
+              style={{ marginRight: 8 }}
+            />
+            <Text style={styles.resultTitle}>
+              {importResult.success ? 'Importation terminee' : 'Erreur'}
+            </Text>
+          </View>
           <View style={styles.resultStats}>
-            <View style={styles.resultStatItem}>
-              <Text style={styles.resultStatNum}>{importResult.imported}</Text>
-              <Text style={styles.resultStatLabel}>importees</Text>
+            <View style={styles.resultStatCard}>
+              <LinearGradient
+                colors={['rgba(0,200,83,0.15)', 'rgba(0,200,83,0.03)']}
+                style={styles.resultStatGradient}
+              >
+                <MaterialCommunityIcons name="check" size={18} color="#00C853" />
+                <Text style={styles.resultStatNum}>{importResult.imported}</Text>
+                <Text style={styles.resultStatLabel}>importees</Text>
+              </LinearGradient>
             </View>
-            <View style={styles.resultStatItem}>
-              <Text style={[styles.resultStatNum, { color: '#FFA000' }]}>{importResult.duplicates}</Text>
-              <Text style={styles.resultStatLabel}>doublons</Text>
+            <View style={styles.resultStatCard}>
+              <LinearGradient
+                colors={['rgba(255,160,0,0.15)', 'rgba(255,160,0,0.03)']}
+                style={styles.resultStatGradient}
+              >
+                <MaterialCommunityIcons name="content-copy" size={18} color="#FFA000" />
+                <Text style={[styles.resultStatNum, { color: '#FFA000' }]}>{importResult.duplicates}</Text>
+                <Text style={styles.resultStatLabel}>doublons</Text>
+              </LinearGradient>
             </View>
-            <View style={styles.resultStatItem}>
-              <Text style={[styles.resultStatNum, { color: '#FF3B30' }]}>{importResult.errors.length}</Text>
-              <Text style={styles.resultStatLabel}>erreurs</Text>
+            <View style={styles.resultStatCard}>
+              <LinearGradient
+                colors={['rgba(255,59,48,0.15)', 'rgba(255,59,48,0.03)']}
+                style={styles.resultStatGradient}
+              >
+                <MaterialCommunityIcons name="close" size={18} color="#FF3B30" />
+                <Text style={[styles.resultStatNum, { color: '#FF3B30' }]}>{importResult.errors.length}</Text>
+                <Text style={styles.resultStatLabel}>erreurs</Text>
+              </LinearGradient>
             </View>
           </View>
           {importResult.errors && importResult.errors.length > 0 && (
@@ -744,48 +919,59 @@ export default function AdminScreen() {
     <View>
       {/* Upload Themes CSV */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Upload CSV Themes</Text>
-        <Text style={styles.cardDescSub}>
-          Le CSV ecrase tous les themes existants. Colonnes attendues : ID_Theme;Super_Categorie;Cluster;Nom_Public;...
-        </Text>
+        <SectionHeader icon="file-replace-outline" title="Upload CSV Themes" subtitle="Le CSV ecrase tous les themes existants. Colonnes attendues : ID_Theme;Super_Categorie;Cluster;Nom_Public;..." />
         {!themesFileName ? (
-          <TouchableOpacity style={styles.uploadBtn} onPress={pickThemesCSV}>
-            <Text style={styles.uploadBtnIcon}>{'📋'}</Text>
+          <TouchableOpacity style={styles.uploadBtn} onPress={pickThemesCSV} activeOpacity={0.7}>
+            <MaterialCommunityIcons name="clipboard-file-outline" size={32} color="#8A2BE2" style={{ marginBottom: 8 }} />
             <Text style={styles.uploadBtnText}>Choisir le CSV Themes</Text>
           </TouchableOpacity>
         ) : (
           <View>
             <View style={styles.fileInfo}>
-              <Text style={styles.fileIcon}>{'📋'}</Text>
+              <MaterialCommunityIcons name="clipboard-file-outline" size={24} color="#A855F7" style={{ marginRight: 12 }} />
               <View style={styles.fileDetails}>
                 <Text style={styles.fileNameText} numberOfLines={1}>{themesFileName}</Text>
                 <Text style={styles.fileMetaText}>{themesPreviewCount} themes detectes</Text>
               </View>
               <TouchableOpacity style={styles.resetBtn} onPress={resetThemesCSV}>
-                <Text style={styles.resetBtnText}>X</Text>
+                <MaterialCommunityIcons name="close" size={16} color="#FF3B30" />
               </TouchableOpacity>
             </View>
             <TouchableOpacity
-              style={[styles.importBtnDanger, uploadingThemes && styles.importBtnDisabled]}
+              style={[styles.dangerBtnWrap, uploadingThemes && styles.importBtnDisabled]}
               onPress={uploadThemesCSV}
               disabled={uploadingThemes}
+              activeOpacity={0.8}
             >
-              {uploadingThemes ? (
-                <View style={styles.importingRow}>
-                  <ActivityIndicator color="#FFF" />
-                  <Text style={styles.importBtnText}> Upload en cours...</Text>
-                </View>
-              ) : (
-                <Text style={styles.importBtnText}>Remplacer tous les themes ({themesPreviewCount})</Text>
-              )}
+              <LinearGradient
+                colors={['#FF6B35', '#E55A2B']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.importBtnGradient}
+              >
+                {uploadingThemes ? (
+                  <View style={styles.importingRow}>
+                    <ActivityIndicator color="#FFF" />
+                    <Text style={styles.importBtnText}> Upload en cours...</Text>
+                  </View>
+                ) : (
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <MaterialCommunityIcons name="refresh" size={18} color="#FFF" style={{ marginRight: 8 }} />
+                    <Text style={styles.importBtnText}>Remplacer tous les themes ({themesPreviewCount})</Text>
+                  </View>
+                )}
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         )}
         {themesUploadResult && (
           <View style={[styles.resultBanner, { marginTop: 12 }]}>
-            <Text style={styles.resultBannerText}>
-              {themesUploadResult.themes_imported} themes importes
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+              <MaterialCommunityIcons name="check-circle" size={16} color="#00C853" style={{ marginRight: 6 }} />
+              <Text style={styles.resultBannerText}>
+                {themesUploadResult.themes_imported} themes importes
+              </Text>
+            </View>
             {themesUploadResult.errors && themesUploadResult.errors.length > 0 && (
               <Text style={{ color: '#FF8A80', fontSize: 12, marginTop: 6 }}>
                 Erreurs ({themesUploadResult.errors.length}): {themesUploadResult.errors.slice(0, 5).join(' | ')}
@@ -798,7 +984,7 @@ export default function AdminScreen() {
       {/* Themes Overview */}
       <View style={styles.card}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <Text style={styles.cardTitle}>Vue d'ensemble des themes</Text>
+          <SectionHeader icon="palette-swatch-variant" title="Vue d'ensemble des themes" />
           {selectedThemes.size > 0 && (
             <TouchableOpacity onPress={() => setSelectedThemes(new Set())} data-testid="clear-selection-btn">
               <Text style={{ color: '#888', fontSize: 12 }}>Deselectionner</Text>
@@ -811,22 +997,23 @@ export default function AdminScreen() {
           <View>
             {/* Totals */}
             <View style={styles.totalsRow}>
-              <View style={styles.totalItem}>
-                <Text style={styles.totalNum}>{themesOverview.totals.super_categories}</Text>
-                <Text style={styles.totalLabel}>Super Cat.</Text>
-              </View>
-              <View style={styles.totalItem}>
-                <Text style={styles.totalNum}>{themesOverview.totals.clusters}</Text>
-                <Text style={styles.totalLabel}>Clusters</Text>
-              </View>
-              <View style={styles.totalItem}>
-                <Text style={styles.totalNum}>{themesOverview.totals.themes}</Text>
-                <Text style={styles.totalLabel}>Themes</Text>
-              </View>
-              <View style={styles.totalItem}>
-                <Text style={styles.totalNum}>{themesOverview.totals.questions}</Text>
-                <Text style={styles.totalLabel}>Questions</Text>
-              </View>
+              {[
+                { num: themesOverview.totals.super_categories, label: 'Super Cat.', icon: 'shape-outline', color: '#A855F7' },
+                { num: themesOverview.totals.clusters, label: 'Clusters', icon: 'group', color: '#00BFFF' },
+                { num: themesOverview.totals.themes, label: 'Themes', icon: 'palette-outline', color: '#FFD700' },
+                { num: themesOverview.totals.questions, label: 'Questions', icon: 'help-circle-outline', color: '#00C853' },
+              ].map((item, idx) => (
+                <View key={idx} style={styles.totalItemCard}>
+                  <LinearGradient
+                    colors={[item.color + '20', item.color + '05']}
+                    style={styles.totalItemGradient}
+                  >
+                    <MaterialCommunityIcons name={item.icon as any} size={16} color={item.color} style={{ marginBottom: 4 }} />
+                    <Text style={[styles.totalNum, { color: item.color }]}>{item.num}</Text>
+                    <Text style={styles.totalLabel}>{item.label}</Text>
+                  </LinearGradient>
+                </View>
+              ))}
             </View>
 
             {/* Super Categories List */}
@@ -842,7 +1029,11 @@ export default function AdminScreen() {
                     <Text style={styles.scName}>{sc.label}</Text>
                     <Text style={styles.scMeta}>{sc.total_themes} themes | {sc.total_questions} questions</Text>
                   </View>
-                  <Text style={styles.scArrow}>{expandedSC === sc.id ? 'v' : '>'}</Text>
+                  <MaterialCommunityIcons
+                    name={expandedSC === sc.id ? 'chevron-down' : 'chevron-right'}
+                    size={20}
+                    color="#666"
+                  />
                 </TouchableOpacity>
 
                 {expandedSC === sc.id && sc.clusters.map((cl) => {
@@ -861,7 +1052,11 @@ export default function AdminScreen() {
                         <Text style={styles.clName}>{cl.name}</Text>
                         <Text style={styles.clMeta}>{cl.themes.length} themes | {cl.total_questions} Q</Text>
                       </View>
-                      <Text style={styles.clArrow}>{expandedCluster === clKey ? 'v' : '>'}</Text>
+                      <MaterialCommunityIcons
+                        name={expandedCluster === clKey ? 'chevron-down' : 'chevron-right'}
+                        size={18}
+                        color="#555"
+                      />
                     </TouchableOpacity>
 
                     {expandedCluster === clKey && (
@@ -873,8 +1068,8 @@ export default function AdminScreen() {
                             onPress={() => toggleClusterSelection(cl.themes)}
                           >
                             <View style={[styles.checkbox, allClusterSelected && styles.checkboxChecked, !allClusterSelected && someClusterSelected && styles.checkboxPartial]}>
-                              {allClusterSelected && <Text style={styles.checkMark}>✓</Text>}
-                              {!allClusterSelected && someClusterSelected && <Text style={styles.checkMark}>-</Text>}
+                              {allClusterSelected && <MaterialCommunityIcons name="check" size={12} color="#FFF" />}
+                              {!allClusterSelected && someClusterSelected && <MaterialCommunityIcons name="minus" size={12} color="#FFF" />}
                             </View>
                             <Text style={styles.selectAllText}>
                               {allClusterSelected ? 'Tout deselectionner' : 'Tout selectionner'} ({cl.themes.length})
@@ -886,9 +1081,12 @@ export default function AdminScreen() {
                               onPress={handleDeleteThemes}
                               activeOpacity={0.7}
                             >
-                              <Text style={styles.inlineDeleteBtnText}>
-                                Supprimer ({selectedThemes.size})
-                              </Text>
+                              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <MaterialCommunityIcons name="delete" size={12} color="#FFF" style={{ marginRight: 4 }} />
+                                <Text style={styles.inlineDeleteBtnText}>
+                                  Supprimer ({selectedThemes.size})
+                                </Text>
+                              </View>
                             </TouchableOpacity>
                           )}
                           {selectedThemes.size > 0 && confirmDelete && (
@@ -922,7 +1120,7 @@ export default function AdminScreen() {
                           data-testid={`theme-row-${theme.id}`}
                         >
                           <View style={[styles.checkbox, selectedThemes.has(theme.id) && styles.checkboxChecked]}>
-                            {selectedThemes.has(theme.id) && <Text style={styles.checkMark}>✓</Text>}
+                            {selectedThemes.has(theme.id) && <MaterialCommunityIcons name="check" size={12} color="#FFF" />}
                           </View>
                           <View style={[styles.themeIdBadge, { backgroundColor: theme.color_hex ? theme.color_hex + '30' : 'rgba(138,43,226,0.15)' }]}>
                             <Text style={[styles.themeIdText, { color: theme.color_hex || '#8A2BE2' }]}>{theme.id}</Text>
@@ -949,30 +1147,45 @@ export default function AdminScreen() {
   const renderStatsTab = () => (
     <View>
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Parties par theme</Text>
-        <Text style={styles.cardDescSub}>Themes classes par popularite (nombre de parties jouees)</Text>
+        <SectionHeader icon="chart-bar" title="Parties par theme" subtitle="Themes classes par popularite (nombre de parties jouees)" />
         {loadingMatchStats ? (
           <ActivityIndicator color="#8A2BE2" style={{ marginVertical: 12 }} />
         ) : matchStats.length > 0 ? (
           <View>
-            <View style={[styles.statRow, { borderBottomWidth: 2, borderBottomColor: 'rgba(138,43,226,0.3)' }]}>
-              <Text style={[styles.statLabel, { fontWeight: '700', color: '#FFF' }]}>Total parties</Text>
-              <Text style={styles.statValue}>{totalMatches}</Text>
+            <View style={styles.totalMatchCard}>
+              <LinearGradient
+                colors={['rgba(138,43,226,0.2)', 'rgba(138,43,226,0.05)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.totalMatchGradient}
+              >
+                <MaterialCommunityIcons name="gamepad-variant-outline" size={20} color="#A855F7" style={{ marginRight: 10 }} />
+                <Text style={[styles.statLabel, { fontWeight: '700', color: '#FFF' }]}>Total parties</Text>
+                <Text style={styles.statValue}>{totalMatches}</Text>
+              </LinearGradient>
             </View>
             {matchStats.map((stat, i) => {
               const pct = totalMatches > 0 ? (stat.match_count / totalMatches * 100) : 0;
               return (
                 <View key={i} style={styles.matchStatRow}>
-                  <View style={styles.matchStatRank}>
+                  <LinearGradient
+                    colors={i < 3 ? ['rgba(138,43,226,0.25)', 'rgba(138,43,226,0.08)'] : ['rgba(138,43,226,0.15)', 'rgba(138,43,226,0.03)']}
+                    style={styles.matchStatRank}
+                  >
                     <Text style={styles.matchStatRankText}>{i + 1}</Text>
-                  </View>
+                  </LinearGradient>
                   <View style={styles.matchStatInfo}>
                     <View style={styles.matchStatHeader}>
                       <Text style={styles.matchStatName} numberOfLines={1}>{stat.theme_name}</Text>
                       <Text style={styles.matchStatCount}>{stat.match_count}</Text>
                     </View>
                     <View style={styles.matchStatBarBg}>
-                      <View style={[styles.matchStatBar, { width: `${Math.max(pct, 2)}%` }]} />
+                      <LinearGradient
+                        colors={['#8A2BE2', '#A855F7']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={[styles.matchStatBar, { width: `${Math.max(pct, 2)}%` }]}
+                      />
                     </View>
                     <Text style={styles.matchStatId}>{stat.theme_id} | {pct.toFixed(1)}%</Text>
                   </View>
@@ -989,7 +1202,7 @@ export default function AdminScreen() {
     <View>
       {/* Filter */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Signalements de questions</Text>
+        <SectionHeader icon="alert-circle-outline" title="Signalements de questions" />
         <View style={styles.reportFilterRow}>
           {['', 'pending', 'reviewed', 'resolved'].map((f) => (
             <TouchableOpacity
@@ -1004,17 +1217,35 @@ export default function AdminScreen() {
           ))}
         </View>
         <View style={styles.reportCountsRow}>
-          <View style={[styles.reportCountBadge, { backgroundColor: 'rgba(255,165,0,0.15)' }]}>
-            <Text style={[styles.reportCountNum, { color: '#FFA500' }]}>{reportCounts.pending}</Text>
-            <Text style={styles.reportCountLabel}>En attente</Text>
+          <View style={styles.reportCountCard}>
+            <LinearGradient
+              colors={['rgba(255,165,0,0.18)', 'rgba(255,165,0,0.04)']}
+              style={styles.reportCountGradient}
+            >
+              <MaterialCommunityIcons name="clock-outline" size={16} color="#FFA500" style={{ marginBottom: 2 }} />
+              <Text style={[styles.reportCountNum, { color: '#FFA500' }]}>{reportCounts.pending}</Text>
+              <Text style={styles.reportCountLabel}>En attente</Text>
+            </LinearGradient>
           </View>
-          <View style={[styles.reportCountBadge, { backgroundColor: 'rgba(0,191,255,0.15)' }]}>
-            <Text style={[styles.reportCountNum, { color: '#00BFFF' }]}>{reportCounts.reviewed}</Text>
-            <Text style={styles.reportCountLabel}>Examines</Text>
+          <View style={styles.reportCountCard}>
+            <LinearGradient
+              colors={['rgba(0,191,255,0.18)', 'rgba(0,191,255,0.04)']}
+              style={styles.reportCountGradient}
+            >
+              <MaterialCommunityIcons name="eye-outline" size={16} color="#00BFFF" style={{ marginBottom: 2 }} />
+              <Text style={[styles.reportCountNum, { color: '#00BFFF' }]}>{reportCounts.reviewed}</Text>
+              <Text style={styles.reportCountLabel}>Examines</Text>
+            </LinearGradient>
           </View>
-          <View style={[styles.reportCountBadge, { backgroundColor: 'rgba(0,200,83,0.15)' }]}>
-            <Text style={[styles.reportCountNum, { color: '#00C853' }]}>{reportCounts.resolved}</Text>
-            <Text style={styles.reportCountLabel}>Resolus</Text>
+          <View style={styles.reportCountCard}>
+            <LinearGradient
+              colors={['rgba(0,200,83,0.18)', 'rgba(0,200,83,0.04)']}
+              style={styles.reportCountGradient}
+            >
+              <MaterialCommunityIcons name="check-circle-outline" size={16} color="#00C853" style={{ marginBottom: 2 }} />
+              <Text style={[styles.reportCountNum, { color: '#00C853' }]}>{reportCounts.resolved}</Text>
+              <Text style={styles.reportCountLabel}>Resolus</Text>
+            </LinearGradient>
           </View>
         </View>
       </View>
@@ -1035,14 +1266,17 @@ export default function AdminScreen() {
             </View>
             <Text style={styles.reportQuestionText} numberOfLines={3}>{r.question_text}</Text>
             <View style={styles.reportMetaRow}>
+              <MaterialCommunityIcons name="account-outline" size={14} color="#777" style={{ marginRight: 4 }} />
               <Text style={styles.reportMetaLabel}>Joueur:</Text>
               <Text style={styles.reportMetaValue}>{r.user_pseudo}</Text>
             </View>
             <View style={styles.reportMetaRow}>
+              <MaterialCommunityIcons name="tag-outline" size={14} color="#777" style={{ marginRight: 4 }} />
               <Text style={styles.reportMetaLabel}>Categorie:</Text>
               <Text style={styles.reportMetaValue}>{r.category}</Text>
             </View>
             <View style={styles.reportMetaRow}>
+              <MaterialCommunityIcons name="flag-outline" size={14} color="#777" style={{ marginRight: 4 }} />
               <Text style={styles.reportMetaLabel}>Raison:</Text>
               <Text style={styles.reportMetaValue}>{REASON_LABELS[r.reason_type] || r.reason_type}</Text>
             </View>
@@ -1056,16 +1290,24 @@ export default function AdminScreen() {
                 <TouchableOpacity
                   style={[styles.reportActionBtn, { backgroundColor: 'rgba(0,191,255,0.15)' }]}
                   onPress={() => updateReportStatus(r.id, 'reviewed')}
+                  activeOpacity={0.7}
                 >
-                  <Text style={[styles.reportActionText, { color: '#00BFFF' }]}>Marquer examine</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <MaterialCommunityIcons name="eye-check-outline" size={14} color="#00BFFF" style={{ marginRight: 4 }} />
+                    <Text style={[styles.reportActionText, { color: '#00BFFF' }]}>Marquer examine</Text>
+                  </View>
                 </TouchableOpacity>
               )}
               {r.status !== 'resolved' && (
                 <TouchableOpacity
                   style={[styles.reportActionBtn, { backgroundColor: 'rgba(0,200,83,0.15)' }]}
                   onPress={() => updateReportStatus(r.id, 'resolved')}
+                  activeOpacity={0.7}
                 >
-                  <Text style={[styles.reportActionText, { color: '#00C853' }]}>Marquer resolu</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <MaterialCommunityIcons name="check-circle-outline" size={14} color="#00C853" style={{ marginRight: 4 }} />
+                    <Text style={[styles.reportActionText, { color: '#00C853' }]}>Marquer resolu</Text>
+                  </View>
                 </TouchableOpacity>
               )}
             </View>
@@ -1073,8 +1315,86 @@ export default function AdminScreen() {
         ))
       ) : (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyIcon}>{'📭'}</Text>
+          <MaterialCommunityIcons name="inbox-outline" size={48} color="#555" style={{ marginBottom: 12 }} />
           <Text style={styles.emptyText}>Aucun signalement{reportFilter ? ` (${reportFilter})` : ''}</Text>
+        </View>
+      )}
+    </View>
+  );
+
+  const renderAvatarsTab = () => (
+    <View style={{ flex: 1, padding: 16 }}>
+      {/* Upload form */}
+      <View style={{ backgroundColor: 'rgba(138,43,226,0.08)', borderRadius: 16, padding: 16, marginBottom: 20, borderWidth: 1, borderColor: 'rgba(138,43,226,0.2)' }}>
+        <Text style={{ color: '#FFF', fontSize: 16, fontWeight: '800', marginBottom: 12 }}>Uploader un avatar</Text>
+
+        <TouchableOpacity
+          onPress={pickAvatarImage}
+          style={{ backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 12, padding: 16, alignItems: 'center', marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', borderStyle: 'dashed' }}
+        >
+          {avatarImage ? (
+            <Image source={{ uri: `data:image/webp;base64,${avatarImage}` }} style={{ width: 80, height: 80, borderRadius: 40 }} />
+          ) : (
+            <>
+              <MaterialCommunityIcons name="image-plus" size={32} color="#8A2BE2" />
+              <Text style={{ color: '#A3A3A3', fontSize: 13, marginTop: 6 }}>Choisir une image</Text>
+            </>
+          )}
+        </TouchableOpacity>
+
+        <TextInput
+          style={{ backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 10, padding: 12, color: '#FFF', fontSize: 14, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' }}
+          placeholder="Categorie (ex: animaux, heros...)"
+          placeholderTextColor="#525252"
+          value={avatarCategory}
+          onChangeText={setAvatarCategory}
+        />
+
+        <TouchableOpacity
+          onPress={uploadAvatar}
+          disabled={uploadingAvatar || !avatarImage}
+          style={{ opacity: (!avatarImage || uploadingAvatar) ? 0.5 : 1 }}
+        >
+          <LinearGradient
+            colors={['#8A2BE2', '#6A1FB0']}
+            style={{ borderRadius: 12, padding: 14, alignItems: 'center' }}
+          >
+            {uploadingAvatar ? (
+              <ActivityIndicator color="#FFF" />
+            ) : (
+              <Text style={{ color: '#FFF', fontSize: 14, fontWeight: '800' }}>UPLOADER</Text>
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+
+      {/* Existing avatars grid */}
+      <Text style={{ color: '#A3A3A3', fontSize: 12, fontWeight: '700', letterSpacing: 2, marginBottom: 12 }}>
+        AVATARS ({avatars.length})
+      </Text>
+
+      {loadingAvatars ? (
+        <ActivityIndicator color="#8A2BE2" style={{ marginTop: 20 }} />
+      ) : avatars.length === 0 ? (
+        <Text style={{ color: '#525252', textAlign: 'center', marginTop: 20 }}>Aucun avatar uploade</Text>
+      ) : (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+          {avatars.map((a) => (
+            <View key={a.id} style={{ alignItems: 'center', width: 80 }}>
+              <Image
+                source={{ uri: `${API_URL}/static/${a.image_url}` }}
+                style={{ width: 64, height: 64, borderRadius: 32, borderWidth: 2, borderColor: 'rgba(138,43,226,0.3)', marginBottom: 4 }}
+              />
+              <Text style={{ color: '#E5E5E5', fontSize: 11, fontWeight: '600', textAlign: 'center' }} numberOfLines={1}>{a.name}</Text>
+              <Text style={{ color: '#525252', fontSize: 9 }}>{a.category}</Text>
+              <TouchableOpacity
+                onPress={() => deleteAvatar(a.id)}
+                style={{ marginTop: 4, padding: 4 }}
+              >
+                <MaterialCommunityIcons name="delete-outline" size={16} color="#FF3B30" />
+              </TouchableOpacity>
+            </View>
+          ))}
         </View>
       )}
     </View>
@@ -1083,61 +1403,87 @@ export default function AdminScreen() {
   // ── Main Admin Screen ──
   return (
     <View style={styles.opaqueWrapper} testID="admin-bg" nativeID="admin-bg">
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Text style={styles.backBtnText}>Retour</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Admin Duelo</Text>
-      </View>
-
-      {/* Tabs */}
-      <View style={styles.tabBar}>
-        {TABS.map((tab, i) => (
-          <TouchableOpacity
-            key={tab}
-            style={[styles.tabItem, activeTab === i && styles.tabItemActive]}
-            onPress={() => setActiveTab(i)}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.tabText, activeTab === i && styles.tabTextActive]}>{tab}</Text>
-            {i === 3 && reportCounts.pending > 0 && (
-              <View style={styles.tabBadge}>
-                <Text style={styles.tabBadgeText}>{reportCounts.pending}</Text>
-              </View>
-            )}
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        {/* Header */}
+        <LinearGradient
+          colors={['rgba(138,43,226,0.12)', 'transparent']}
+          style={styles.header}
+        >
+          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+            <MaterialCommunityIcons name="arrow-left" size={16} color="#A855F7" style={{ marginRight: 6 }} />
+            <Text style={styles.backBtnText}>Retour</Text>
           </TouchableOpacity>
-        ))}
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 16 }}>
+            <MaterialCommunityIcons name="cog" size={22} color="#A855F7" style={{ marginRight: 8 }} />
+            <Text style={styles.headerTitle}>Admin Duelo</Text>
+          </View>
+        </LinearGradient>
+
+        {/* Tabs */}
+        <View style={styles.tabBar}>
+          {TABS.map((tab, i) => (
+            <TouchableOpacity
+              key={tab}
+              style={[styles.tabItem, activeTab === i && styles.tabItemActive]}
+              onPress={() => setActiveTab(i)}
+              activeOpacity={0.7}
+            >
+              {activeTab === i ? (
+                <LinearGradient
+                  colors={['rgba(138,43,226,0.2)', 'rgba(138,43,226,0.08)']}
+                  style={styles.tabItemGradient}
+                >
+                  <MaterialCommunityIcons name={TAB_ICONS[tab] as any} size={16} color="#A855F7" style={{ marginRight: 4 }} />
+                  <Text style={styles.tabTextActive}>{tab}</Text>
+                  {i === 3 && reportCounts.pending > 0 && (
+                    <View style={styles.tabBadge}>
+                      <Text style={styles.tabBadgeText}>{reportCounts.pending}</Text>
+                    </View>
+                  )}
+                </LinearGradient>
+              ) : (
+                <View style={styles.tabItemInner}>
+                  <MaterialCommunityIcons name={TAB_ICONS[tab] as any} size={16} color="#666" style={{ marginRight: 4 }} />
+                  <Text style={styles.tabText}>{tab}</Text>
+                  {i === 3 && reportCounts.pending > 0 && (
+                    <View style={styles.tabBadge}>
+                      <Text style={styles.tabBadgeText}>{reportCounts.pending}</Text>
+                    </View>
+                  )}
+                </View>
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Content */}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#8A2BE2" />}
+        >
+          {activeTab === 0 && renderQuestionsTab()}
+          {activeTab === 1 && renderThemesTab()}
+          {activeTab === 2 && renderStatsTab()}
+          {activeTab === 3 && renderReportsTab()}
+          {activeTab === 4 && renderAvatarsTab()}
+          <View style={{ height: 40 }} />
+        </ScrollView>
+
+        {/* Delete bar - OUTSIDE ScrollView - uses web-compatible approach */}
+        {activeTab === 1 && selectedThemes.size > 0 && (
+          <View style={{height: 0}} />
+        )}
       </View>
-
-      {/* Content */}
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#8A2BE2" />}
-      >
-        {activeTab === 0 && renderQuestionsTab()}
-        {activeTab === 1 && renderThemesTab()}
-        {activeTab === 2 && renderStatsTab()}
-        {activeTab === 3 && renderReportsTab()}
-        <View style={{ height: 40 }} />
-      </ScrollView>
-
-      {/* Delete bar - OUTSIDE ScrollView - uses web-compatible approach */}
-      {activeTab === 1 && selectedThemes.size > 0 && (
-        <View style={{height: 0}} />
-      )}
-    </SafeAreaView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000000' },
-  opaqueWrapper: { 
-    flex: 1, 
-    backgroundColor: '#000000',
+  container: { flex: 1, backgroundColor: '#050510' },
+  opaqueWrapper: {
+    flex: 1,
+    backgroundColor: '#050510',
     ...(Platform.OS === 'web' ? { position: 'fixed' as any, top: 0, left: 0, right: 0, bottom: 0, zIndex: 100 } : {}),
   },
   flex1: { flex: 1 },
@@ -1148,9 +1494,12 @@ const styles = StyleSheet.create({
   authCard: {
     backgroundColor: 'rgba(255,255,255,0.04)',
     borderRadius: 20, padding: 32,
-    alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    alignItems: 'center', borderWidth: 1, borderColor: 'rgba(138,43,226,0.15)',
   },
-  lockIcon: { fontSize: 48, marginBottom: 16 },
+  authIconWrap: {
+    width: 72, height: 72, borderRadius: 36,
+    justifyContent: 'center', alignItems: 'center', marginBottom: 20,
+  },
   authTitle: { color: '#FFF', fontSize: 24, fontWeight: '800', marginBottom: 4 },
   authSubtitle: { color: '#666', fontSize: 14, marginBottom: 24 },
   passwordInput: {
@@ -1159,9 +1508,10 @@ const styles = StyleSheet.create({
     color: '#FFF', fontSize: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
     marginBottom: 16,
   },
-  loginBtn: {
-    width: '100%', backgroundColor: '#8A2BE2',
-    borderRadius: 12, paddingVertical: 14, alignItems: 'center',
+  loginBtnWrap: { width: '100%', borderRadius: 12, overflow: 'hidden' },
+  loginBtnGradient: {
+    paddingVertical: 14, alignItems: 'center', justifyContent: 'center',
+    flexDirection: 'row',
   },
   loginBtnDisabled: { opacity: 0.5 },
   loginBtnText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
@@ -1169,32 +1519,48 @@ const styles = StyleSheet.create({
   // Header
   header: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 16,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)',
+    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)',
   },
   backBtn: {
     paddingHorizontal: 12, paddingVertical: 8,
-    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 8,
+    backgroundColor: 'rgba(138,43,226,0.1)', borderRadius: 8,
+    flexDirection: 'row', alignItems: 'center',
   },
-  backBtnText: { color: '#8A2BE2', fontSize: 14, fontWeight: '600' },
-  headerTitle: { color: '#FFF', fontSize: 20, fontWeight: '800', marginLeft: 16 },
+  backBtnText: { color: '#A855F7', fontSize: 14, fontWeight: '600' },
+  headerTitle: { color: '#FFF', fontSize: 20, fontWeight: '800' },
 
   // Tabs
   tabBar: {
-    flexDirection: 'row', paddingHorizontal: 12, paddingVertical: 8,
+    flexDirection: 'row', paddingHorizontal: 8, paddingVertical: 8,
     borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)',
+    gap: 4,
   },
   tabItem: {
-    flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 8,
-    flexDirection: 'row', justifyContent: 'center',
+    flex: 1, borderRadius: 10, overflow: 'hidden',
   },
-  tabItemActive: { backgroundColor: 'rgba(138,43,226,0.15)' },
-  tabText: { color: '#666', fontSize: 12, fontWeight: '600' },
-  tabTextActive: { color: '#8A2BE2', fontWeight: '800' },
+  tabItemActive: {},
+  tabItemGradient: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    paddingVertical: 10, borderRadius: 10,
+  },
+  tabItemInner: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    paddingVertical: 10,
+  },
+  tabText: { color: '#666', fontSize: 11, fontWeight: '600' },
+  tabTextActive: { color: '#A855F7', fontSize: 11, fontWeight: '800' },
   tabBadge: {
     backgroundColor: '#FF3B30', borderRadius: 8, minWidth: 16, height: 16,
     justifyContent: 'center', alignItems: 'center', marginLeft: 4, paddingHorizontal: 4,
   },
   tabBadgeText: { color: '#FFF', fontSize: 9, fontWeight: '800' },
+
+  // Section header
+  sectionHeaderWrap: { marginBottom: 12, borderRadius: 10, overflow: 'hidden' },
+  sectionHeaderGradient: {
+    flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 12,
+    borderRadius: 10,
+  },
 
   // Card
   card: {
@@ -1202,15 +1568,11 @@ const styles = StyleSheet.create({
     borderRadius: 16, padding: 20, marginBottom: 16,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
   },
-  cardTitle: { color: '#FFF', fontSize: 18, fontWeight: '700', marginBottom: 12 },
+  cardTitle: { color: '#FFF', fontSize: 17, fontWeight: '700' },
   cardDesc: { color: '#999', fontSize: 11, lineHeight: 17, marginBottom: 8, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
-  cardDescSub: { color: '#666', fontSize: 11, lineHeight: 16, marginBottom: 16 },
+  cardDescSub: { color: '#666', fontSize: 11, lineHeight: 16, marginTop: 2 },
 
   // Stats
-  statRow: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)',
-  },
   statLabel: { color: '#BBB', fontSize: 13, flex: 1 },
   statValue: { color: '#8A2BE2', fontSize: 20, fontWeight: '900' },
   statValueSmall: { color: '#8A2BE2', fontSize: 15, fontWeight: '700' },
@@ -1218,11 +1580,10 @@ const styles = StyleSheet.create({
 
   // Upload
   uploadBtn: {
-    backgroundColor: 'rgba(138,43,226,0.1)',
+    backgroundColor: 'rgba(138,43,226,0.08)',
     borderRadius: 12, paddingVertical: 28, alignItems: 'center',
-    borderWidth: 2, borderColor: '#8A2BE2', borderStyle: 'dashed',
+    borderWidth: 2, borderColor: 'rgba(138,43,226,0.3)', borderStyle: 'dashed',
   },
-  uploadBtnIcon: { fontSize: 32, marginBottom: 8 },
   uploadBtnText: { color: '#8A2BE2', fontSize: 16, fontWeight: '700' },
 
   // File info
@@ -1231,7 +1592,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(138,43,226,0.08)', borderRadius: 12, padding: 12,
     marginBottom: 12,
   },
-  fileIcon: { fontSize: 24, marginRight: 12 },
   fileDetails: { flex: 1 },
   fileNameText: { color: '#FFF', fontSize: 14, fontWeight: '600' },
   fileMetaText: { color: '#999', fontSize: 12, marginTop: 2 },
@@ -1239,7 +1599,6 @@ const styles = StyleSheet.create({
     width: 32, height: 32, borderRadius: 16,
     backgroundColor: 'rgba(255,59,48,0.12)', justifyContent: 'center', alignItems: 'center',
   },
-  resetBtnText: { color: '#FF3B30', fontSize: 14, fontWeight: '700' },
 
   // Columns
   columnsInfo: {
@@ -1267,29 +1626,30 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,59,48,0.06)', borderRadius: 10, padding: 12,
     marginBottom: 12,
   },
-  errorsTitle: { color: '#FF8A80', fontSize: 13, fontWeight: '700', marginBottom: 6 },
+  errorsTitle: { color: '#FF8A80', fontSize: 13, fontWeight: '700' },
   errorText: { color: '#FF8A80', fontSize: 11, lineHeight: 18 },
 
   // Import button
-  importBtn: {
-    backgroundColor: '#00C853', borderRadius: 12, paddingVertical: 16,
-    alignItems: 'center',
+  importBtnWrap: { borderRadius: 12, overflow: 'hidden' },
+  importBtnGradient: {
+    paddingVertical: 16, paddingHorizontal: 20,
+    alignItems: 'center', justifyContent: 'center',
   },
-  importBtnDanger: {
-    backgroundColor: '#FF6B35', borderRadius: 12, paddingVertical: 16,
-    alignItems: 'center',
-  },
+  dangerBtnWrap: { borderRadius: 12, overflow: 'hidden' },
   importBtnDisabled: { opacity: 0.4 },
   importBtnText: { color: '#FFF', fontSize: 16, fontWeight: '800' },
   importingRow: { flexDirection: 'row', alignItems: 'center' },
 
   // Results
   resultCard: { borderColor: 'rgba(0,200,83,0.2)' },
-  resultTitle: { color: '#FFF', fontSize: 18, fontWeight: '800', textAlign: 'center', marginBottom: 16 },
-  resultStats: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 16 },
-  resultStatItem: { alignItems: 'center' },
-  resultStatNum: { color: '#00C853', fontSize: 28, fontWeight: '900' },
-  resultStatLabel: { color: '#777', fontSize: 12, marginTop: 2 },
+  resultTitle: { color: '#FFF', fontSize: 18, fontWeight: '800', textAlign: 'center' },
+  resultStats: { flexDirection: 'row', justifyContent: 'space-around', gap: 10 },
+  resultStatCard: { flex: 1, borderRadius: 12, overflow: 'hidden' },
+  resultStatGradient: {
+    alignItems: 'center', paddingVertical: 16, paddingHorizontal: 8, borderRadius: 12,
+  },
+  resultStatNum: { color: '#00C853', fontSize: 26, fontWeight: '900', marginTop: 6 },
+  resultStatLabel: { color: '#777', fontSize: 11, marginTop: 2, fontWeight: '600' },
 
   // Result banner
   resultBanner: {
@@ -1300,12 +1660,21 @@ const styles = StyleSheet.create({
 
   // Totals row
   totalsRow: {
-    flexDirection: 'row', justifyContent: 'space-around', marginBottom: 20,
-    paddingVertical: 12, backgroundColor: 'rgba(138,43,226,0.06)', borderRadius: 12,
+    flexDirection: 'row', justifyContent: 'space-around', marginBottom: 20, gap: 8,
   },
-  totalItem: { alignItems: 'center' },
-  totalNum: { color: '#8A2BE2', fontSize: 24, fontWeight: '900' },
-  totalLabel: { color: '#888', fontSize: 10, fontWeight: '600', marginTop: 2 },
+  totalItemCard: { flex: 1, borderRadius: 12, overflow: 'hidden' },
+  totalItemGradient: {
+    alignItems: 'center', paddingVertical: 14, paddingHorizontal: 6, borderRadius: 12,
+  },
+  totalNum: { color: '#8A2BE2', fontSize: 22, fontWeight: '900' },
+  totalLabel: { color: '#888', fontSize: 9, fontWeight: '600', marginTop: 2 },
+
+  // Total match card (stats tab)
+  totalMatchCard: { marginBottom: 16, borderRadius: 12, overflow: 'hidden' },
+  totalMatchGradient: {
+    flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 16,
+    borderRadius: 12,
+  },
 
   // Super Category
   scContainer: { marginBottom: 4 },
@@ -1318,7 +1687,6 @@ const styles = StyleSheet.create({
   scHeaderInfo: { flex: 1 },
   scName: { color: '#FFF', fontSize: 16, fontWeight: '700' },
   scMeta: { color: '#888', fontSize: 11, marginTop: 2 },
-  scArrow: { color: '#666', fontSize: 16, fontWeight: '700' },
 
   // Cluster
   clContainer: { marginLeft: 16, marginBottom: 4 },
@@ -1331,7 +1699,6 @@ const styles = StyleSheet.create({
   clHeaderInfo: { flex: 1 },
   clName: { color: '#DDD', fontSize: 14, fontWeight: '600' },
   clMeta: { color: '#777', fontSize: 10, marginTop: 1 },
-  clArrow: { color: '#555', fontSize: 14, fontWeight: '700' },
 
   // Theme row
   themeRow: {
@@ -1356,10 +1723,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)',
   },
   matchStatRank: {
-    width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(138,43,226,0.15)',
+    width: 30, height: 30, borderRadius: 15,
     justifyContent: 'center', alignItems: 'center', marginRight: 12,
   },
-  matchStatRankText: { color: '#8A2BE2', fontSize: 12, fontWeight: '800' },
+  matchStatRankText: { color: '#A855F7', fontSize: 12, fontWeight: '800' },
   matchStatInfo: { flex: 1 },
   matchStatHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
   matchStatName: { color: '#DDD', fontSize: 14, fontWeight: '600', flex: 1, marginRight: 8 },
@@ -1368,7 +1735,7 @@ const styles = StyleSheet.create({
     height: 6, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 3,
     overflow: 'hidden', marginBottom: 4,
   },
-  matchStatBar: { height: 6, backgroundColor: '#8A2BE2', borderRadius: 3 },
+  matchStatBar: { height: 6, borderRadius: 3 },
   matchStatId: { color: '#555', fontSize: 10, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
 
   // Reports
@@ -1379,10 +1746,11 @@ const styles = StyleSheet.create({
   },
   reportFilterBtnActive: { backgroundColor: 'rgba(138,43,226,0.15)', borderColor: '#8A2BE2' },
   reportFilterText: { color: '#777', fontSize: 11, fontWeight: '600' },
-  reportFilterTextActive: { color: '#8A2BE2' },
+  reportFilterTextActive: { color: '#A855F7' },
 
   reportCountsRow: { flexDirection: 'row', gap: 8 },
-  reportCountBadge: { flex: 1, borderRadius: 10, padding: 10, alignItems: 'center' },
+  reportCountCard: { flex: 1, borderRadius: 10, overflow: 'hidden' },
+  reportCountGradient: { alignItems: 'center', paddingVertical: 12, paddingHorizontal: 6, borderRadius: 10 },
   reportCountNum: { fontSize: 20, fontWeight: '900' },
   reportCountLabel: { color: '#888', fontSize: 9, fontWeight: '600', marginTop: 2 },
 
@@ -1396,8 +1764,8 @@ const styles = StyleSheet.create({
   reportStatusText: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase' },
   reportDate: { color: '#666', fontSize: 10 },
   reportQuestionText: { color: '#EEE', fontSize: 14, fontWeight: '600', lineHeight: 20, marginBottom: 10 },
-  reportMetaRow: { flexDirection: 'row', paddingVertical: 2 },
-  reportMetaLabel: { color: '#777', fontSize: 12, width: 80 },
+  reportMetaRow: { flexDirection: 'row', paddingVertical: 2, alignItems: 'center' },
+  reportMetaLabel: { color: '#777', fontSize: 12, width: 76 },
   reportMetaValue: { color: '#BBB', fontSize: 12, fontWeight: '500', flex: 1 },
   reportDescBox: {
     backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: 10, marginTop: 8,
@@ -1410,7 +1778,6 @@ const styles = StyleSheet.create({
 
   // Empty state
   emptyState: { alignItems: 'center', paddingVertical: 40 },
-  emptyIcon: { fontSize: 48, marginBottom: 12 },
   emptyText: { color: '#666', fontSize: 14, fontWeight: '500' },
 
   // Checkbox
@@ -1425,7 +1792,6 @@ const styles = StyleSheet.create({
   checkboxPartial: {
     borderColor: '#FF3B30',
   },
-  checkMark: { color: '#FFF', fontSize: 12, fontWeight: '900', lineHeight: 14 },
 
   // Select all row
   selectAllRow: {

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView,
+  View, Text, TouchableOpacity, StyleSheet, ScrollView, FlatList,
   ActivityIndicator, RefreshControl, Dimensions, Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -13,9 +13,13 @@ import Animated, {
   withSequence, FadeInDown, FadeInRight,
   Easing, interpolate,
 } from 'react-native-reanimated';
+import * as Notifications from 'expo-notifications';
 import CosmicBackground from '../../components/CosmicBackground';
 import CategoryIcon from '../../components/CategoryIcon';
+import UserAvatar from '../../components/UserAvatar';
 import { GLASS } from '../../theme/glassTheme';
+import { authFetch } from '../../utils/api';
+import { t } from '../../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -31,6 +35,8 @@ interface DuelItem {
   id: string;
   opponent_pseudo: string;
   opponent_avatar_seed: string;
+  opponent_avatar_url?: string;
+  user_avatar_url?: string;
   category: string;
   category_name: string;
   category_color: string;
@@ -43,11 +49,13 @@ interface DuelItem {
 interface FeedItem {
   type: 'record' | 'community' | 'event';
   id: string;
+  theme_id?: string;
   category: string;
   category_name: string;
   category_color: string;
   user_pseudo?: string;
   user_avatar_seed?: string;
+  user_avatar_url?: string;
   title?: string;
   body?: string;
   score?: string;
@@ -73,6 +81,8 @@ interface UserData {
   matches_won: number;
   country_flag: string;
   selected_title: string;
+  last_played_at: string | null;
+  best_streak: number;
 }
 
 // Type icon mapping
@@ -107,12 +117,12 @@ function getAvatarColor(seed: string): string {
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const m = Math.floor(diff / 60000);
-  if (m < 1) return "À l'instant";
+  if (m < 1) return t('home.just_now');
   if (m < 60) return `${m}m`;
   const h = Math.floor(diff / 3600000);
   if (h < 24) return `${h}h`;
   const d = Math.floor(diff / 86400000);
-  return `${d}j`;
+  return `${d}${t('home.days_short')}`;
 }
 
 // ── Shimmer Border Animation ──
@@ -146,9 +156,7 @@ function ShimmerBorder({ color, children }: { color: string; children: React.Rea
 }
 
 // ── Duel Card ──
-function DuelCard({ duel, index, onRematch }: { duel: DuelItem; index: number; onRematch: () => void }) {
-  const opponentColor = getAvatarColor(duel.opponent_avatar_seed);
-
+const DuelCard = React.memo(function DuelCard({ duel, index, onRematch }: { duel: DuelItem; index: number; onRematch: () => void }) {
   return (
     <Animated.View entering={FadeInRight.delay(index * 100).duration(500)}>
       <ShimmerBorder color={duel.category_color}>
@@ -167,10 +175,10 @@ function DuelCard({ duel, index, onRematch }: { duel: DuelItem; index: number; o
           <View style={styles.duelVsSection}>
             {/* Player */}
             <View style={styles.duelPlayer}>
-              <LinearGradient colors={['#8A2BE2', '#A855F7']} style={styles.duelAvatarWrap}>
-                <MaterialCommunityIcons name="account" size={20} color="#FFF" />
-              </LinearGradient>
-              <Text style={styles.duelPlayerLabel}>Toi</Text>
+              <View style={styles.duelAvatarWrap}>
+                <UserAvatar avatarUrl={duel.user_avatar_url} avatarSeed="me" pseudo={t('home.you')} size={44} />
+              </View>
+              <Text style={styles.duelPlayerLabel}>{t('home.you')}</Text>
             </View>
 
             {/* Score */}
@@ -179,7 +187,7 @@ function DuelCard({ duel, index, onRematch }: { duel: DuelItem; index: number; o
                 {duel.player_score}
               </Text>
               <View style={styles.vsCircle}>
-                <Text style={styles.duelVsText}>VS</Text>
+                <Text style={styles.duelVsText}>{t('home.vs')}</Text>
               </View>
               <Text style={[styles.duelScoreNum, !duel.won && { color: '#FF3B5C' }]}>
                 {duel.opponent_score}
@@ -188,8 +196,8 @@ function DuelCard({ duel, index, onRematch }: { duel: DuelItem; index: number; o
 
             {/* Opponent */}
             <View style={styles.duelPlayer}>
-              <View style={[styles.duelAvatarWrap, { backgroundColor: opponentColor }]}>
-                <Text style={styles.duelAvatarLetter}>{getInitial(duel.opponent_pseudo)}</Text>
+              <View style={styles.duelAvatarWrap}>
+                <UserAvatar avatarUrl={duel.opponent_avatar_url} avatarSeed={duel.opponent_avatar_seed} pseudo={duel.opponent_pseudo} size={44} />
               </View>
               <Text style={styles.duelPlayerLabel} numberOfLines={1}>{duel.opponent_pseudo}</Text>
             </View>
@@ -203,7 +211,7 @@ function DuelCard({ duel, index, onRematch }: { duel: DuelItem; index: number; o
               color={duel.won ? '#00FF9D' : '#FF3B5C'}
             />
             <Text style={[styles.duelResultText, { color: duel.won ? '#00FF9D' : '#FF3B5C' }]}>
-              {duel.won ? 'VICTOIRE' : 'DÉFAITE'}
+              {duel.won ? t('home.victory_label') : t('home.defeat_label')}
             </Text>
           </View>
 
@@ -216,7 +224,7 @@ function DuelCard({ duel, index, onRematch }: { duel: DuelItem; index: number; o
               style={styles.rematchGradient}
             >
               <MaterialCommunityIcons name="sword-cross" size={14} color="#FFF" />
-              <Text style={styles.rematchText}>REVANCHE</Text>
+              <Text style={styles.rematchText}>{t('home.rematch_label')}</Text>
             </LinearGradient>
           </TouchableOpacity>
 
@@ -229,10 +237,10 @@ function DuelCard({ duel, index, onRematch }: { duel: DuelItem; index: number; o
       </ShimmerBorder>
     </Animated.View>
   );
-}
+});
 
 // ── Record Card ──
-function RecordCard({ item, index }: { item: FeedItem; index: number }) {
+const RecordCard = React.memo(function RecordCard({ item, index }: { item: FeedItem; index: number }) {
   const mciName = FEED_ICON_MAP[item.icon || ''] || 'trophy';
 
   return (
@@ -243,14 +251,14 @@ function RecordCard({ item, index }: { item: FeedItem; index: number }) {
             <MaterialCommunityIcons name={mciName} size={16} color="#FFF" />
           </LinearGradient>
           <View style={styles.feedHeaderText}>
-            <Text style={styles.feedCardTitle}>{item.title}</Text>
+            <Text style={styles.feedCardTitle}>{t('home.perfect_score')}</Text>
             <View style={styles.feedTimeRow}>
               <MaterialCommunityIcons name="clock-outline" size={10} color="#555" />
               <Text style={styles.feedCardTime}>{timeAgo(item.created_at)}</Text>
             </View>
           </View>
         </View>
-        <Text style={styles.feedCardBody}>{item.body}</Text>
+        <Text style={styles.feedCardBody}>{`@${item.user_pseudo} ${t('home.perfect_score_body')} ${item.category_name} !`}</Text>
         {item.xp_earned ? (
           <View style={styles.xpBadge}>
             <MaterialCommunityIcons name="lightning-bolt" size={12} color="#8A2BE2" />
@@ -260,23 +268,19 @@ function RecordCard({ item, index }: { item: FeedItem; index: number }) {
       </View>
     </Animated.View>
   );
-}
+});
 
 // ── Community Card ──
-function CommunityCard({ item, index, userId, onLike }: {
-  item: FeedItem; index: number; userId: string; onLike: (postId: string) => void
+const CommunityCard = React.memo(function CommunityCard({ item, index, userId, onLike, onComment }: {
+  item: FeedItem; index: number; userId: string; onLike: (postId: string) => void; onComment: (item: FeedItem) => void;
 }) {
-  const avatarColor = getAvatarColor(item.user_avatar_seed || '');
-
   return (
     <Animated.View entering={FadeInDown.delay(index * 80).duration(400)}>
       <View style={styles.feedCard}>
         {/* Header */}
         <View style={styles.communityHeader}>
           <View style={styles.communityUser}>
-            <View style={[styles.communityAvatar, { backgroundColor: avatarColor }]}>
-              <Text style={styles.communityAvatarLetter}>{getInitial(item.user_pseudo || '')}</Text>
-            </View>
+            <UserAvatar avatarUrl={item.user_avatar_url} avatarSeed={item.user_avatar_seed || ''} pseudo={item.user_pseudo || ''} size={38} />
             <View>
               <Text style={styles.communityPseudo}>{item.user_pseudo}</Text>
               <View style={styles.communityMeta}>
@@ -311,21 +315,36 @@ function CommunityCard({ item, index, userId, onLike }: {
               {item.likes_count || 0}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.communityActionBtn}>
+          <TouchableOpacity
+            style={styles.communityActionBtn}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              onComment(item);
+            }}
+          >
             <MaterialCommunityIcons name="comment-outline" size={15} color="#666" />
             <Text style={styles.communityActionCount}>{item.comments_count || 0}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.communityActionBtn}>
+          <TouchableOpacity
+            style={styles.communityActionBtn}
+            onPress={async () => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              const { Share } = require('react-native');
+              try {
+                await Share.share({ message: `${item.user_pseudo} ${t('home.share_on_duelo')} "${item.content?.slice(0, 100)}"` });
+              } catch {}
+            }}
+          >
             <MaterialCommunityIcons name="share-outline" size={15} color="#666" />
           </TouchableOpacity>
         </View>
       </View>
     </Animated.View>
   );
-}
+});
 
 // ── Event Card ──
-function EventCard({ item, index }: { item: FeedItem; index: number }) {
+const EventCard = React.memo(function EventCard({ item, index }: { item: FeedItem; index: number }) {
   const pulse = useSharedValue(0);
   useEffect(() => {
     pulse.value = withRepeat(
@@ -355,18 +374,18 @@ function EventCard({ item, index }: { item: FeedItem; index: number }) {
             <MaterialCommunityIcons name={mciName} size={20} color="#FFF" />
           </LinearGradient>
           <View style={styles.eventContent}>
-            <Text style={[styles.eventTitle, { color: item.category_color }]}>{item.title}</Text>
-            <Text style={styles.eventBody}>{item.body}</Text>
+            <Text style={[styles.eventTitle, { color: item.category_color }]}>{`${t('home.xp_double_title')} ${item.category_name}`}</Text>
+            <Text style={styles.eventBody}>{`${t('home.xp_double_body')} ${item.category_name} ${t('home.xp_double_duration')}`}</Text>
           </View>
           <View style={[styles.eventLiveBadge, { backgroundColor: item.category_color }]}>
             <View style={styles.liveDot} />
-            <Text style={styles.eventLiveText}>LIVE</Text>
+            <Text style={styles.eventLiveText}>{t('home.live')}</Text>
           </View>
         </LinearGradient>
       </Animated.View>
     </Animated.View>
   );
-}
+});
 
 
 // ── Main Screen ──
@@ -378,13 +397,54 @@ export default function AccueilScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [feedError, setFeedError] = useState(false);
 
   useEffect(() => {
     loadFeed();
   }, []);
 
+  // Schedule daily streak reminder notification
+  useEffect(() => {
+    let cancelled = false;
+
+    const scheduleStreakReminder = async () => {
+      try {
+        const { status } = await Notifications.requestPermissionsAsync();
+        if (status !== 'granted' || cancelled) return;
+
+        // Cancel ALL previously scheduled notifications to prevent accumulation
+        await Notifications.cancelAllScheduledNotificationsAsync();
+
+        if (cancelled) return;
+
+        // Schedule daily at 19:00
+        await Notifications.scheduleNotificationAsync({
+          content: {
+            title: t('home.streak_danger_title'),
+            body: `${t('home.streak_danger_body')} ${userData?.current_streak || 0} ${t('home.streak_danger_days')}`,
+            data: { type: 'streak_reminder' },
+          },
+          trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.DAILY,
+            hour: 19,
+            minute: 0,
+          },
+        });
+      } catch {}
+    };
+
+    if (userData && !hasPlayedToday && (userData.current_streak || 0) > 0) {
+      scheduleStreakReminder();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userData, hasPlayedToday]);
+
   const loadFeed = async () => {
     try {
+      setFeedError(false);
       const uid = await AsyncStorage.getItem('duelo_user_id');
       if (!uid) { setLoading(false); return; }
       setUserId(uid);
@@ -396,8 +456,8 @@ export default function AccueilScreen() {
         setPendingDuels(data.pending_duels || []);
         setSocialFeed(data.social_feed || []);
       }
-    } catch (err) {
-      console.error('Feed load error:', err);
+    } catch {
+      setFeedError(true);
     } finally {
       setLoading(false);
     }
@@ -409,36 +469,58 @@ export default function AccueilScreen() {
     setRefreshing(false);
   }, []);
 
-  const handleRematch = (duel: DuelItem) => {
+  const handleRematch = useCallback((duel: DuelItem) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     router.push(`/matchmaking?category=${duel.category}`);
-  };
+  }, [router]);
 
-  const handleLike = async (postId: string) => {
+  const handleLike = useCallback(async (postId: string) => {
     if (!userId) return;
+    // Save previous feed state for rollback
+    const previousFeed = [...socialFeed];
+    // Optimistic update
+    setSocialFeed(prev =>
+      prev.map(item =>
+        item.post_id === postId
+          ? {
+              ...item,
+              is_liked: !item.is_liked,
+              likes_count: (item.likes_count || 0) + (item.is_liked ? -1 : 1),
+            }
+          : item
+      )
+    );
     try {
-      await fetch(`${API_URL}/api/wall/${postId}/like`, {
+      const res = await authFetch(`${API_URL}/api/wall/${postId}/like`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId }),
       });
-      setSocialFeed(prev =>
-        prev.map(item =>
-          item.post_id === postId
-            ? {
-                ...item,
-                is_liked: !item.is_liked,
-                likes_count: (item.likes_count || 0) + (item.is_liked ? -1 : 1),
-              }
-            : item
-        )
-      );
-    } catch {}
-  };
+      if (!res.ok) {
+        setSocialFeed(previousFeed); // rollback
+      }
+    } catch {
+      setSocialFeed(previousFeed); // rollback
+    }
+  }, [userId, socialFeed]);
+
+  const handleComment = useCallback((feedItem: FeedItem) => {
+    const themeId = feedItem.theme_id || feedItem.category;
+    if (themeId) {
+      router.push(`/category-detail?id=${themeId}`);
+    }
+  }, [router]);
 
   const winRate = userData && userData.matches_played > 0
     ? Math.round((userData.matches_won / userData.matches_played) * 100)
     : 0;
+
+  const hasPlayedToday = (() => {
+    if (!userData?.last_played_at) return false;
+    const last = new Date(userData.last_played_at);
+    const now = new Date();
+    return last.toDateString() === now.toDateString();
+  })();
 
   if (loading) {
     return (
@@ -474,26 +556,17 @@ export default function AccueilScreen() {
           <View style={styles.greetingRow}>
             <View style={styles.greetingLeft}>
               <Text style={styles.greetingHi}>
-                Salut, {userData?.pseudo || 'Joueur'} {userData?.country_flag || ''}
+                {t('home.greeting')} {userData?.pseudo || t('home.player')} {userData?.country_flag || ''}
               </Text>
               <View style={styles.titleRow}>
                 <MaterialCommunityIcons name="shield-star" size={13} color="#8A2BE2" />
-                <Text style={styles.greetingTitle}>{userData?.selected_title || 'Novice'}</Text>
+                <Text style={styles.greetingTitle}>{userData?.selected_title || t('home.novice')}</Text>
               </View>
             </View>
           </View>
 
           {/* Stats pills */}
           <View style={styles.statsRow}>
-            {(userData?.current_streak || 0) > 0 && (
-              <View style={styles.statPill}>
-                <LinearGradient colors={['#FF6B35', '#FF8F60']} style={styles.statPillIcon}>
-                  <MaterialCommunityIcons name="fire" size={12} color="#FFF" />
-                </LinearGradient>
-                <Text style={styles.statPillNum}>{userData?.current_streak}</Text>
-                <Text style={styles.statPillLabel}>série</Text>
-              </View>
-            )}
             <View style={styles.statPill}>
               <LinearGradient colors={['#8A2BE2', '#A855F7']} style={styles.statPillIcon}>
                 <MaterialCommunityIcons name="lightning-bolt" size={12} color="#FFF" />
@@ -506,16 +579,68 @@ export default function AccueilScreen() {
                 <MaterialCommunityIcons name="trophy" size={11} color="#FFF" />
               </LinearGradient>
               <Text style={styles.statPillNum}>{winRate}%</Text>
-              <Text style={styles.statPillLabel}>wins</Text>
+              <Text style={styles.statPillLabel}>{t('home.wins_label')}</Text>
             </View>
             <View style={styles.statPill}>
               <LinearGradient colors={['#00D4FF', '#38BDF8']} style={styles.statPillIcon}>
                 <MaterialCommunityIcons name="sword-cross" size={11} color="#FFF" />
               </LinearGradient>
               <Text style={styles.statPillNum}>{userData?.matches_played || 0}</Text>
-              <Text style={styles.statPillLabel}>duels</Text>
+              <Text style={styles.statPillLabel}>{t('home.duels_label')}</Text>
             </View>
           </View>
+
+          {/* Streak Widget */}
+          <TouchableOpacity
+            style={styles.streakCard}
+            activeOpacity={0.85}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              if (!hasPlayedToday) router.push('/(tabs)/play');
+            }}
+          >
+            <LinearGradient
+              colors={hasPlayedToday ? ['rgba(0,255,157,0.08)', 'rgba(0,191,255,0.04)'] : ['rgba(255,107,53,0.12)', 'rgba(255,59,48,0.06)']}
+              style={styles.streakCardGradient}
+            >
+              <View style={styles.streakCardLeft}>
+                <View style={[styles.streakFireCircle, { backgroundColor: hasPlayedToday ? 'rgba(0,255,157,0.15)' : 'rgba(255,107,53,0.2)' }]}>
+                  <MaterialCommunityIcons
+                    name={hasPlayedToday ? 'check-circle' : 'fire'}
+                    size={24}
+                    color={hasPlayedToday ? '#00FF9D' : '#FF6B35'}
+                  />
+                </View>
+                <View style={styles.streakCardInfo}>
+                  <Text style={styles.streakCardTitle}>
+                    {(userData?.current_streak || 0) > 0
+                      ? `${userData?.current_streak} ${t('home.streak_days')}`
+                      : t('home.no_streak')}
+                  </Text>
+                  <Text style={styles.streakCardSub}>
+                    {hasPlayedToday
+                      ? t('home.streak_maintained')
+                      : (userData?.current_streak || 0) > 0
+                        ? t('home.play_to_keep_streak')
+                        : t('home.play_to_start_streak')}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.streakCardRight}>
+                <Text style={[styles.streakNum, { color: hasPlayedToday ? '#00FF9D' : '#FF6B35' }]}>
+                  {userData?.current_streak || 0}
+                </Text>
+                <Text style={styles.streakFire}>🔥</Text>
+              </View>
+            </LinearGradient>
+            {/* Best streak badge */}
+            {(userData?.best_streak || 0) > 0 && (
+              <View style={styles.bestStreakBadge}>
+                <MaterialCommunityIcons name="trophy" size={10} color="#FFD700" />
+                <Text style={styles.bestStreakText}>{t('home.best_streak_record')} {userData?.best_streak}{t('home.days_short')}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
         </Animated.View>
 
         {/* ── Quick Play Button ── */}
@@ -535,7 +660,7 @@ export default function AccueilScreen() {
               style={styles.quickPlayGradient}
             >
               <MaterialCommunityIcons name="lightning-bolt" size={20} color="#FFF" />
-              <Text style={styles.quickPlayText}>LANCER UN DUEL</Text>
+              <Text style={styles.quickPlayText}>{t('home.start_duel')}</Text>
             </LinearGradient>
           </TouchableOpacity>
         </Animated.View>
@@ -547,7 +672,7 @@ export default function AccueilScreen() {
               <LinearGradient colors={['#FF6B35', '#FF8F60']} style={styles.sectionIconCircle}>
                 <MaterialCommunityIcons name="sword-cross" size={12} color="#FFF" />
               </LinearGradient>
-              <Text style={styles.sectionTitle}>DUELS EN ATTENTE</Text>
+              <Text style={styles.sectionTitle}>{t('home.pending_duels')}</Text>
               <View style={styles.sectionBadge}>
                 <Text style={styles.sectionBadgeText}>{pendingDuels.length}</Text>
               </View>
@@ -578,41 +703,53 @@ export default function AccueilScreen() {
             <LinearGradient colors={['#00D4FF', '#38BDF8']} style={styles.sectionIconCircle}>
               <MaterialCommunityIcons name="earth" size={12} color="#FFF" />
             </LinearGradient>
-            <Text style={styles.sectionTitle}>ACTIVITÉ</Text>
+            <Text style={styles.sectionTitle}>{t('home.activity')}</Text>
           </View>
         </Animated.View>
 
-        {socialFeed.length === 0 ? (
+        {feedError ? (
+          <TouchableOpacity onPress={() => { setFeedError(false); loadFeed(); }} style={{ padding: 20, alignItems: 'center' }}>
+            <Text style={{ color: '#aaa', fontSize: 14 }}>{t('home.load_error')}</Text>
+          </TouchableOpacity>
+        ) : socialFeed.length === 0 ? (
           <Animated.View entering={FadeInDown.delay(500).duration(400)} style={styles.emptyFeed}>
             <LinearGradient colors={['#8A2BE2', '#A855F7']} style={styles.emptyFeedCircle}>
               <MaterialCommunityIcons name="weather-night" size={28} color="#FFF" />
             </LinearGradient>
-            <Text style={styles.emptyFeedTitle}>C'est calme ici...</Text>
+            <Text style={styles.emptyFeedTitle}>{t('home.empty_title')}</Text>
             <Text style={styles.emptyFeedText}>
-              Lance un duel ou publie sur le mur social d'une catégorie pour voir l'activité !
+              {t('home.empty_text')}
             </Text>
           </Animated.View>
         ) : (
-          socialFeed.map((item, idx) => {
-            if (item.type === 'event') {
-              return <EventCard key={item.id} item={item} index={idx} />;
-            }
-            if (item.type === 'record') {
-              return <RecordCard key={item.id} item={item} index={idx} />;
-            }
-            if (item.type === 'community') {
-              return (
-                <CommunityCard
-                  key={item.id}
-                  item={item}
-                  index={idx}
-                  userId={userId || ''}
-                  onLike={handleLike}
-                />
-              );
-            }
-            return null;
-          })
+          <FlatList
+            data={socialFeed}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+            renderItem={({ item, index: idx }) => {
+              if (item.type === 'event') {
+                return <EventCard item={item} index={idx} />;
+              }
+              if (item.type === 'record') {
+                return <RecordCard item={item} index={idx} />;
+              }
+              if (item.type === 'community') {
+                return (
+                  <CommunityCard
+                    item={item}
+                    index={idx}
+                    userId={userId || ''}
+                    onLike={handleLike}
+                    onComment={handleComment}
+                  />
+                );
+              }
+              return null;
+            }}
+            initialNumToRender={5}
+            maxToRenderPerBatch={5}
+            windowSize={3}
+          />
         )}
 
         <View style={{ height: 32 }} />
@@ -1015,4 +1152,73 @@ const styles = StyleSheet.create({
   },
   emptyFeedTitle: { fontSize: 18, fontWeight: '700', color: '#FFF', marginBottom: 6 },
   emptyFeedText: { fontSize: 13, color: '#666', textAlign: 'center', lineHeight: 18 },
+
+  // ── Streak Widget ──
+  streakCard: {
+    marginTop: 14,
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+  },
+  streakCardGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 14,
+  },
+  streakCardLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 12,
+  },
+  streakFireCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  streakCardInfo: {
+    flex: 1,
+  },
+  streakCardTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#FFF',
+    marginBottom: 2,
+  },
+  streakCardSub: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.5)',
+  },
+  streakCardRight: {
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  streakNum: {
+    fontSize: 28,
+    fontWeight: '900',
+  },
+  streakFire: {
+    fontSize: 16,
+    marginTop: -2,
+  },
+  bestStreakBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255,215,0,0.08)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+  },
+  bestStreakText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#FFD700',
+  },
 });

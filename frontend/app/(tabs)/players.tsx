@@ -20,6 +20,8 @@ import DueloHeader from '../../components/DueloHeader';
 import CategoryIcon from '../../components/CategoryIcon';
 import { GLASS } from '../../theme/glassTheme';
 import CosmicBackground from '../../components/CosmicBackground';
+import UserAvatar from '../../components/UserAvatar';
+import { t } from '../../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -27,13 +29,13 @@ const { width: SCREEN_W } = Dimensions.get('window');
 // ── Types ──
 type FeedItem = {
   type: string; id: string; user_id?: string;
-  user_pseudo?: string; user_avatar_seed?: string; user_level?: number;
+  user_pseudo?: string; user_avatar_seed?: string; user_avatar_url?: string; user_level?: number;
   category?: string; category_name?: string; category_color?: string;
   pillar_color?: string; score?: string; correct?: number;
   opponent_pseudo?: string; xp_earned?: number; is_self?: boolean;
   can_challenge?: boolean; icon?: string; title?: string;
   created_at?: string; rival_id?: string; rival_pseudo?: string;
-  rival_avatar_seed?: string; rival_level?: number; my_level?: number;
+  rival_avatar_seed?: string; rival_avatar_url?: string; rival_level?: number; my_level?: number;
   message?: string;
 };
 
@@ -42,7 +44,7 @@ type Tribe = {
   pillar_id: string; pillar_name: string; pillar_color: string;
   playable: boolean;
   throne: {
-    id: string; pseudo: string; avatar_seed: string;
+    id: string; pseudo: string; avatar_seed: string; avatar_url?: string;
     level: number; title: string; xp: number;
   } | null;
   member_count: number;
@@ -58,8 +60,9 @@ type CoachSuggestion = {
 type SectionTab = 'pulse' | 'tribus' | 'forge';
 
 // ── Aura Ring (prestige level) ──
-const AuraAvatar = ({ letter, level, color, size = 44 }: {
+const AuraAvatar = ({ letter, level, color, size = 44, avatarUrl, avatarSeed, pseudo }: {
   letter: string; level: number; color: string; size?: number;
+  avatarUrl?: string; avatarSeed?: string; pseudo?: string;
 }) => {
   const intensity = Math.min(level / 15, 1);
   const auraOpacity = 0.2 + intensity * 0.6;
@@ -74,13 +77,14 @@ const AuraAvatar = ({ letter, level, color, size = 44 }: {
           shadowRadius: 8 + intensity * 8,
         }]} />
       )}
-      <View style={[auraStyles.avatar, {
-        width: size, height: size, borderRadius: size / 2,
-        borderColor: level > 0 ? color : '#333',
-        borderWidth: level > 3 ? 2 : 1,
-      }]}>
-        <Text style={[auraStyles.letter, { fontSize: size * 0.45 }]}>{letter}</Text>
-      </View>
+      <UserAvatar
+        avatarUrl={avatarUrl}
+        avatarSeed={avatarSeed || pseudo || letter}
+        pseudo={pseudo || letter}
+        size={size}
+        borderColor={level > 0 ? color : '#333'}
+        borderWidth={level > 3 ? 2 : 1}
+      />
     </View>
   );
 };
@@ -158,6 +162,9 @@ const ExploitCard = ({ item, onChallenge, onProfile }: {
             level={item.user_level || 0}
             color={color}
             size={40}
+            avatarUrl={item.user_avatar_url}
+            avatarSeed={item.user_avatar_seed}
+            pseudo={item.user_pseudo}
           />
           <View style={exploitStyles.content}>
             <View style={exploitStyles.titleRow}>
@@ -173,7 +180,7 @@ const ExploitCard = ({ item, onChallenge, onProfile }: {
             <Text style={exploitStyles.pseudo}>
               @{item.user_pseudo}
               {item.opponent_pseudo && !isStreak ? (
-                <Text style={exploitStyles.vs}> vs {item.opponent_pseudo}</Text>
+                <Text style={exploitStyles.vs}> {t('players.vs')} {item.opponent_pseudo}</Text>
               ) : null}
             </Text>
             {item.score && (
@@ -198,7 +205,7 @@ const ExploitCard = ({ item, onChallenge, onProfile }: {
               onPress={() => item.user_id && item.category && onChallenge(item.user_id, item.category)}
               activeOpacity={0.7}
             >
-              <Text style={[exploitStyles.challengeText, { color }]}>DÉFIER</Text>
+              <Text style={[exploitStyles.challengeText, { color }]}>{t('players.challenge')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -258,31 +265,34 @@ const TribeCard = ({ tribe, onPress, accentColor }: { tribe: Tribe; onPress: () 
           <View style={tribeStyles.throneWrap}>
             <View style={tribeStyles.throneLabelRow}>
               <MaterialCommunityIcons name="crown" size={14} color="#FFD700" />
-              <Text style={tribeStyles.throneLabel}>Trône</Text>
+              <Text style={tribeStyles.throneLabel}>{t('players.throne')}</Text>
             </View>
             <AuraAvatar
               letter={tribe.throne!.pseudo[0]?.toUpperCase() || '?'}
               level={tribe.throne!.level}
               color={color}
               size={32}
+              avatarUrl={tribe.throne!.avatar_url}
+              avatarSeed={tribe.throne!.avatar_seed}
+              pseudo={tribe.throne!.pseudo}
             />
             <Text style={tribeStyles.thronePseudo} numberOfLines={1}>
               {tribe.throne!.pseudo}
             </Text>
             <Text style={[tribeStyles.throneLevel, { color }]}>
-              Niv. {tribe.throne!.level}
+              {t('players.level_short')} {tribe.throne!.level}
             </Text>
           </View>
         ) : (
           <View style={tribeStyles.throneEmpty}>
             <MaterialCommunityIcons name="crown-outline" size={24} color="#444" />
-            <Text style={tribeStyles.throneEmptyLabel}>Trône vacant</Text>
+            <Text style={tribeStyles.throneEmptyLabel}>{t('players.throne_vacant')}</Text>
           </View>
         )}
 
         <View style={tribeStyles.memberRow}>
           <Text style={tribeStyles.memberCount}>
-            {tribe.member_count} membre{tribe.member_count !== 1 ? 's' : ''}
+            {tribe.member_count} {tribe.member_count !== 1 ? t('players.members_plural') : t('players.members')}
           </Text>
         </View>
       </View>
@@ -335,11 +345,11 @@ const CoachWidget = ({ suggestions, onAction }: {
           <MaterialCommunityIcons name="robot-outline" size={22} color={color} />
         </LinearGradient>
         <View style={coachStyles.textWrap}>
-          <Text style={coachStyles.label}>COACH DUELO</Text>
+          <Text style={coachStyles.label}>{t('players.coach_label')}</Text>
           <Text style={coachStyles.message} numberOfLines={2}>{s.message}</Text>
         </View>
         <View style={[coachStyles.goBtn, { backgroundColor: color }]}>
-          <Text style={coachStyles.goBtnText}>GO</Text>
+          <Text style={coachStyles.goBtnText}>{t('players.coach_go')}</Text>
         </View>
       </TouchableOpacity>
     </Animated.View>
@@ -374,21 +384,24 @@ export default function PlayersScreen() {
   // Pulse
   const [feed, setFeed] = useState<FeedItem[]>([]);
   const [loadingFeed, setLoadingFeed] = useState(true);
+  const [pulseError, setPulseError] = useState(false);
 
   // Tribes
   const [tribes, setTribes] = useState<Tribe[]>([]);
   const [loadingTribes, setLoadingTribes] = useState(true);
+  const [tribesError, setTribesError] = useState(false);
   const [selectedPillar, setSelectedPillar] = useState<string>('all');
 
   // Coach
   const [coachSuggestions, setCoachSuggestions] = useState<CoachSuggestion[]>([]);
+  const [coachError, setCoachError] = useState(false);
 
   // Forge
   const [forgeThemeName, setForgeThemeName] = useState('');
 
 
   const pillarFilters = [
-    { id: 'all', name: 'TOUS', icon: '🌐', color: '#8A2BE2' },
+    { id: 'all', name: t('players.all_filter'), icon: '🌐', color: '#8A2BE2' },
     { id: 'screen', name: 'SCREEN', icon: '🎬', color: '#8A2BE2' },
     { id: 'sound', name: 'SOUND', icon: '🎵', color: '#FF6B35' },
     { id: 'arena', name: 'ARENA', icon: '⚽', color: '#00FF9D' },
@@ -419,68 +432,77 @@ export default function PlayersScreen() {
 
   const loadPulse = async (uid: string) => {
     setLoadingFeed(true);
+    setPulseError(false);
     try {
       const res = await fetch(`${API_URL}/api/social/pulse/${uid}`);
       const data = await res.json();
       setFeed(data.feed || []);
-    } catch (e) { console.log('Pulse error:', e); }
+    } catch {
+      setPulseError(true);
+    }
     setLoadingFeed(false);
   };
 
   const loadTribes = async () => {
     setLoadingTribes(true);
+    setTribesError(false);
     try {
       const res = await fetch(`${API_URL}/api/social/tribes`);
       const data = await res.json();
       setTribes(data.tribes || []);
-    } catch (e) { console.log('Tribes error:', e); }
+    } catch {
+      setTribesError(true);
+    }
     setLoadingTribes(false);
   };
 
   const loadCoach = async (uid: string) => {
+    setCoachError(false);
     try {
       const res = await fetch(`${API_URL}/api/social/coach/${uid}`);
       const data = await res.json();
       setCoachSuggestions(data.suggestions || []);
-    } catch (e) { console.log('Coach error:', e); }
+    } catch {
+      setCoachError(true);
+    }
   };
 
 
-  const onRefresh = async () => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
     if (myId) {
       await Promise.all([loadPulse(myId), loadTribes(), loadCoach(myId)]);
     }
     setRefreshing(false);
-  };
+  }, [myId]);
 
-  const handleChallenge = (userId: string, category: string) => {
+  const handleChallenge = useCallback((userId: string, category: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     router.push(`/matchmaking?category=${category}`);
-  };
+  }, [router]);
 
-  const handleProfile = (userId: string) => {
+  const handleProfile = useCallback((userId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push(`/player-profile?id=${userId}`);
-  };
+  }, [router]);
 
-  const handleCoachAction = (s: CoachSuggestion) => {
+  const handleCoachAction = useCallback((s: CoachSuggestion) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     if (s.category) {
       router.push(`/matchmaking?category=${s.category}`);
     }
-  };
+  }, [router]);
 
-  const handleTribePress = (tribe: Tribe) => {
+  const handleTribePress = useCallback((tribe: Tribe) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (tribe.playable) {
       router.push(`/category-detail?id=${tribe.id}`);
     }
-  };
+  }, [router]);
 
   const filteredTribes = selectedPillar === 'all'
     ? tribes
-    : tribes.filter(t => t.pillar_id.toLowerCase() === selectedPillar);
+    : tribes.filter(tr => tr.pillar_id.toLowerCase() === selectedPillar);
 
   const sectionColor = activeSection === 'pulse' ? '#8A2BE2' : activeSection === 'tribus' ? '#FFD700' : '#10B981';
 
@@ -493,9 +515,9 @@ export default function PlayersScreen() {
         {(['pulse', 'tribus', 'forge'] as SectionTab[]).map((section) => {
           const isActive = activeSection === section;
           const meta = {
-            pulse: { label: 'PULSE', icon: 'lightning-bolt' as const, color: '#8A2BE2' },
-            tribus: { label: 'TRIBUS', icon: 'crown' as const, color: '#FFD700' },
-            forge: { label: 'FORGE', icon: 'hammer-wrench' as const, color: '#10B981' },
+            pulse: { label: t('players.pulse_label'), icon: 'lightning-bolt' as const, color: '#8A2BE2' },
+            tribus: { label: t('players.tribus_label'), icon: 'crown' as const, color: '#FFD700' },
+            forge: { label: t('players.forge_label'), icon: 'hammer-wrench' as const, color: '#10B981' },
           }[section];
           return (
             <TouchableOpacity
@@ -527,13 +549,17 @@ export default function PlayersScreen() {
           <CoachWidget suggestions={coachSuggestions} onAction={handleCoachAction} />
 
           {/* Feed */}
-          {loadingFeed ? (
+          {pulseError ? (
+            <TouchableOpacity onPress={() => { setPulseError(false); if (myId) loadPulse(myId); }} style={{ padding: 20, alignItems: 'center' }}>
+              <Text style={{ color: '#aaa', fontSize: 14 }}>{t('players.load_error')}</Text>
+            </TouchableOpacity>
+          ) : loadingFeed ? (
             <ActivityIndicator size="large" color="#8A2BE2" style={{ marginTop: 40 }} />
           ) : feed.length === 0 ? (
             <View style={s.emptyState}>
               <MaterialCommunityIcons name="lightning-bolt" size={48} color="#8A2BE230" />
-              <Text style={s.emptyTitle}>Le Pulse est calme</Text>
-              <Text style={s.emptySub}>Lance un match pour animer le feed !</Text>
+              <Text style={s.emptyTitle}>{t('players.pulse_quiet')}</Text>
+              <Text style={s.emptySub}>{t('players.pulse_quiet_sub')}</Text>
             </View>
           ) : (
             feed.map((item) => (
@@ -580,14 +606,18 @@ export default function PlayersScreen() {
           </ScrollView>
 
           {/* Group by pillar */}
-          {loadingTribes ? (
+          {tribesError ? (
+            <TouchableOpacity onPress={() => { setTribesError(false); loadTribes(); }} style={{ padding: 20, alignItems: 'center' }}>
+              <Text style={{ color: '#aaa', fontSize: 14 }}>{t('players.load_error')}</Text>
+            </TouchableOpacity>
+          ) : loadingTribes ? (
             <ActivityIndicator size="large" color="#FFD700" style={{ marginTop: 40 }} />
           ) : (
             (() => {
               const grouped: { [key: string]: Tribe[] } = {};
-              filteredTribes.forEach(t => {
-                if (!grouped[t.pillar_id]) grouped[t.pillar_id] = [];
-                grouped[t.pillar_id].push(t);
+              filteredTribes.forEach(tr => {
+                if (!grouped[tr.pillar_id]) grouped[tr.pillar_id] = [];
+                grouped[tr.pillar_id].push(tr);
               });
               return Object.entries(grouped).map(([pillarId, pillarTribes]) => {
                 const pf = pillarFilters.find(p => p.id === pillarId.toLowerCase());
@@ -628,10 +658,9 @@ export default function PlayersScreen() {
                 <LinearGradient colors={['rgba(138,43,226,0.25)', 'rgba(138,43,226,0.08)']} style={forgeStyles.heroIconWrap}>
                   <MaterialCommunityIcons name="hammer-wrench" size={32} color="#8A2BE2" />
                 </LinearGradient>
-                <Text style={forgeStyles.heroTitle}>La Forge</Text>
+                <Text style={forgeStyles.heroTitle}>{t('players.forge_title')}</Text>
                 <Text style={forgeStyles.heroSub}>
-                  Crée ton propre thème de quiz{'\n'}
-                  et défie la communauté
+                  {t('players.forge_subtitle')}
                 </Text>
               </View>
             </ForgeHeroCard>
@@ -640,11 +669,11 @@ export default function PlayersScreen() {
           {/* Create Theme */}
           <Animated.View entering={FadeInDown.delay(200).springify()}>
             <View style={forgeStyles.createSection}>
-              <Text style={forgeStyles.createLabel}>CRÉER UN THÈME</Text>
+              <Text style={forgeStyles.createLabel}>{t('players.create_theme')}</Text>
               <View style={forgeStyles.inputRow}>
                 <TextInput
                   style={forgeStyles.input}
-                  placeholder="Nom du thème (ex: Dragon Ball, NBA, Harry Potter...)"
+                  placeholder={t('players.theme_placeholder')}
                   placeholderTextColor="#444"
                   value={forgeThemeName}
                   onChangeText={setForgeThemeName}
@@ -661,46 +690,11 @@ export default function PlayersScreen() {
                 activeOpacity={0.7}
               >
                 <MaterialCommunityIcons name="creation" size={18} color="#FFF" />
-                <Text style={forgeStyles.generateBtnText}>Générer avec l'IA</Text>
+                <Text style={forgeStyles.generateBtnText}>{t('players.generate_ai')}</Text>
               </TouchableOpacity>
               <Text style={forgeStyles.generateHint}>
-                L'IA génère 5 questions + un logo pour validation
+                {t('players.generate_hint')}
               </Text>
-            </View>
-          </Animated.View>
-
-          {/* Community Themes */}
-          <Animated.View entering={FadeInDown.delay(300).springify()}>
-            <View style={forgeStyles.communitySection}>
-              <Text style={forgeStyles.communityLabel}>THÈMES COMMUNAUTAIRES</Text>
-              <Text style={forgeStyles.communityHint}>
-                Les thèmes les plus joués et les mieux notés seront promus "Thèmes Officiels"
-              </Text>
-
-              {/* Placeholder community themes */}
-              {[
-                { name: 'One Piece', author: 'Luffy_Fan', votes: 42, mci: 'pirate' as const, color: '#F97316' },
-                { name: 'Formule 1', author: 'SpeedKing', votes: 38, mci: 'car-sports' as const, color: '#EF4444' },
-                { name: 'K-Pop', author: 'BTS_Army', votes: 31, mci: 'microphone-variant' as const, color: '#EC4899' },
-              ].map((theme, i) => (
-                <Animated.View key={i} entering={FadeInDown.delay(400 + i * 80).springify()}>
-                  <View style={[forgeStyles.communityCard, { borderColor: theme.color + '20' }]}>
-                    <LinearGradient colors={[theme.color + '25', theme.color + '08']} style={forgeStyles.communityIconWrap}>
-                      <MaterialCommunityIcons name={theme.mci} size={22} color={theme.color} />
-                    </LinearGradient>
-                    <View style={forgeStyles.communityInfo}>
-                      <Text style={forgeStyles.communityName}>{theme.name}</Text>
-                      <Text style={forgeStyles.communityAuthor}>Créé par @{theme.author}</Text>
-                    </View>
-                    <View style={forgeStyles.voteSection}>
-                      <TouchableOpacity style={[forgeStyles.voteBtn, { borderColor: theme.color + '40' }]}>
-                        <MaterialCommunityIcons name="arrow-up-bold" size={16} color={theme.color} />
-                      </TouchableOpacity>
-                      <Text style={[forgeStyles.voteCount, { color: theme.color }]}>{theme.votes}</Text>
-                    </View>
-                  </View>
-                </Animated.View>
-              ))}
             </View>
           </Animated.View>
 
@@ -737,25 +731,6 @@ const forgeStyles = StyleSheet.create({
   generateBtnText: { color: '#FFF', fontSize: 15, fontWeight: '800' },
   generateHint: { fontSize: 11, color: '#555', textAlign: 'center', fontWeight: '500' },
 
-  communitySection: { marginHorizontal: 16 },
-  communityLabel: { fontSize: 11, fontWeight: '900', color: '#525252', letterSpacing: 3, marginBottom: 8 },
-  communityHint: { fontSize: 12, color: '#555', fontWeight: '500', marginBottom: 16, lineHeight: 17 },
-  communityCard: {
-    flexDirection: 'row', alignItems: 'center', padding: 14, borderRadius: 16,
-    backgroundColor: GLASS.bg, borderWidth: 1, marginBottom: 10, gap: 12,
-  },
-  communityIconWrap: {
-    width: 44, height: 44, borderRadius: 14, justifyContent: 'center', alignItems: 'center',
-  },
-  communityInfo: { flex: 1 },
-  communityName: { color: '#FFF', fontSize: 15, fontWeight: '700', marginBottom: 2 },
-  communityAuthor: { color: '#666', fontSize: 11, fontWeight: '600' },
-  voteSection: { alignItems: 'center', gap: 4 },
-  voteBtn: {
-    width: 34, height: 28, borderRadius: 8, borderWidth: 1,
-    backgroundColor: 'rgba(255,255,255,0.04)', justifyContent: 'center', alignItems: 'center',
-  },
-  voteCount: { fontSize: 13, fontWeight: '800' },
 });
 
 // ── Main Styles ──

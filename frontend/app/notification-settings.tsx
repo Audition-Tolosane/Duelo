@@ -11,6 +11,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
+import { authFetch } from '../utils/api';
+import { t } from '../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -28,57 +30,57 @@ const SETTINGS_CONFIG: {
   key: keyof NotificationSettingsData;
   icon: string;
   colors: [string, string];
-  title: string;
-  description: string;
+  titleKey: string;
+  descKey: string;
 }[] = [
   {
     key: 'challenges',
     icon: 'sword-cross',
     colors: ['#FF6B35', '#FF8F60'],
-    title: 'Défis',
-    description: 'Quand un joueur te défie en duel',
+    titleKey: 'notif_settings.challenges_title',
+    descKey: 'notif_settings.challenges_desc',
   },
   {
     key: 'match_results',
     icon: 'trophy',
     colors: ['#8A2BE2', '#A855F7'],
-    title: 'Résultats de match',
-    description: 'Résumé après chaque partie',
+    titleKey: 'notif_settings.match_results_title',
+    descKey: 'notif_settings.match_results_desc',
   },
   {
     key: 'follows',
     icon: 'account-plus',
     colors: ['#00D4FF', '#38BDF8'],
-    title: 'Nouveaux followers',
-    description: 'Quand quelqu\'un commence à te suivre',
+    titleKey: 'notif_settings.follows_title',
+    descKey: 'notif_settings.follows_desc',
   },
   {
     key: 'messages',
     icon: 'chat',
     colors: ['#4CAF50', '#66BB6A'],
-    title: 'Messages',
-    description: 'Nouveaux messages de chat',
+    titleKey: 'notif_settings.messages_title',
+    descKey: 'notif_settings.messages_desc',
   },
   {
     key: 'likes',
     icon: 'heart',
     colors: ['#FF3B5C', '#FF6B81'],
-    title: 'Likes',
-    description: 'Quand quelqu\'un aime ta publication',
+    titleKey: 'notif_settings.likes_title',
+    descKey: 'notif_settings.likes_desc',
   },
   {
     key: 'comments',
     icon: 'comment-text',
     colors: ['#FFB800', '#FFC933'],
-    title: 'Commentaires',
-    description: 'Quand quelqu\'un commente ta publication',
+    titleKey: 'notif_settings.comments_title',
+    descKey: 'notif_settings.comments_desc',
   },
   {
     key: 'system',
     icon: 'bell',
     colors: ['#6B7280', '#9CA3AF'],
-    title: 'Système',
-    description: 'Mises à jour et annonces',
+    titleKey: 'notif_settings.system_title',
+    descKey: 'notif_settings.system_desc',
   },
 ];
 
@@ -126,7 +128,7 @@ export default function NotificationSettingsScreen() {
     setSettings(prev => ({ ...prev, [key]: value }));
 
     try {
-      await fetch(`${API_URL}/api/notifications/${userId}/settings`, {
+      await authFetch(`${API_URL}/api/notifications/${userId}/settings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId, [key]: value }),
@@ -152,7 +154,7 @@ export default function NotificationSettingsScreen() {
     setSettings(newSettings);
 
     try {
-      await fetch(`${API_URL}/api/notifications/${userId}/settings`, {
+      await authFetch(`${API_URL}/api/notifications/${userId}/settings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId, ...newSettings }),
@@ -182,7 +184,7 @@ export default function NotificationSettingsScreen() {
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           <MaterialCommunityIcons name="bell-cog-outline" size={18} color="#8A2BE2" />
-          <Text style={styles.headerTitle}>Paramètres</Text>
+          <Text style={styles.headerTitle}>{t('notif_settings.header')}</Text>
         </View>
         <View style={{ width: 36 }} />
       </View>
@@ -208,13 +210,13 @@ export default function NotificationSettingsScreen() {
                   <MaterialCommunityIcons name="bell-ring" size={24} color="#FFF" />
                 </LinearGradient>
                 <View style={styles.masterTextWrap}>
-                  <Text style={styles.masterTitle}>Toutes les notifications</Text>
+                  <Text style={styles.masterTitle}>{t('notif_settings.all_notifications')}</Text>
                   <Text style={styles.masterSubtitle}>
                     {allEnabled
-                      ? 'Toutes activées'
+                      ? t('notif_settings.all_enabled')
                       : allDisabled
-                      ? 'Toutes désactivées'
-                      : `${enabledCount}/${SETTINGS_CONFIG.length} activées`}
+                      ? t('notif_settings.all_disabled')
+                      : `${enabledCount}/${SETTINGS_CONFIG.length} ${t('notif_settings.enabled_count')}`}
                   </Text>
                 </View>
                 <Switch
@@ -244,7 +246,7 @@ export default function NotificationSettingsScreen() {
           {/* Section header */}
           <View style={styles.sectionHeaderRow}>
             <MaterialCommunityIcons name="tune-variant" size={14} color="rgba(255,255,255,0.4)" />
-            <Text style={styles.sectionTitle}>Types de notifications</Text>
+            <Text style={styles.sectionTitle}>{t('notif_settings.section_types')}</Text>
           </View>
 
           {/* Individual Settings */}
@@ -268,9 +270,9 @@ export default function NotificationSettingsScreen() {
                 {/* Text */}
                 <View style={styles.settingText}>
                   <Text style={[styles.settingTitle, !enabled && styles.settingTitleDisabled]}>
-                    {config.title}
+                    {t(config.titleKey)}
                   </Text>
-                  <Text style={styles.settingDesc}>{config.description}</Text>
+                  <Text style={styles.settingDesc}>{t(config.descKey)}</Text>
                 </View>
 
                 {/* Switch */}
@@ -291,7 +293,7 @@ export default function NotificationSettingsScreen() {
               <MaterialCommunityIcons name="lightbulb-on" size={14} color="#FFF" />
             </LinearGradient>
             <Text style={styles.infoText}>
-              Les notifications de défis sont prioritaires et seront toujours affichées en premier dans ta liste.
+              {t('notif_settings.info_challenges_priority')}
             </Text>
           </View>
 
@@ -301,9 +303,9 @@ export default function NotificationSettingsScreen() {
               <MaterialCommunityIcons name="moon-waning-crescent" size={14} color="#FFF" />
             </LinearGradient>
             <View style={styles.quietText}>
-              <Text style={styles.quietTitle}>Mode silencieux</Text>
+              <Text style={styles.quietTitle}>{t('notif_settings.quiet_mode_title')}</Text>
               <Text style={styles.quietDesc}>
-                Active le mode "Ne pas déranger" de ton téléphone pour mettre en pause toutes les notifications Duelo.
+                {t('notif_settings.quiet_mode_desc')}
               </Text>
             </View>
           </View>

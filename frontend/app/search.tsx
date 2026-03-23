@@ -14,6 +14,8 @@ import { GLASS } from '../theme/glassTheme';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
 import CategoryIcon from '../components/CategoryIcon';
+import UserAvatar from '../components/UserAvatar';
+import { t } from '../utils/i18n';
 
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
@@ -29,12 +31,12 @@ const CATEGORY_META: Record<string, { color: string; bg: string }> = {
   gastronomie: { color: '#FF69B4', bg: '#152B2B' },
 };
 
-const DIFFICULTY_FILTERS: { key: string; label: string; icon: React.ComponentProps<typeof MaterialCommunityIcons>['name'] }[] = [
-  { key: 'all', label: 'Tous', icon: 'star-outline' },
-  { key: 'debutant', label: 'Débutant', icon: 'sprout' },
-  { key: 'intermediaire', label: 'Intermédiaire', icon: 'fire' },
-  { key: 'avance', label: 'Avancé', icon: 'star' },
-  { key: 'expert', label: 'Expert', icon: 'crown' },
+const DIFFICULTY_FILTER_KEYS: { key: string; labelKey: string; icon: React.ComponentProps<typeof MaterialCommunityIcons>['name'] }[] = [
+  { key: 'all', labelKey: 'search.difficulty_all', icon: 'star-outline' },
+  { key: 'debutant', labelKey: 'search.difficulty_beginner', icon: 'sprout' },
+  { key: 'intermediaire', labelKey: 'search.difficulty_intermediate', icon: 'fire' },
+  { key: 'avance', labelKey: 'search.difficulty_advanced', icon: 'star' },
+  { key: 'expert', labelKey: 'search.difficulty_expert', icon: 'crown' },
 ];
 
 type ThemeResult = {
@@ -45,7 +47,7 @@ type ThemeResult = {
 };
 
 type PlayerResult = {
-  id: string; pseudo: string; avatar_seed: string;
+  id: string; pseudo: string; avatar_seed: string; avatar_url?: string;
   country: string | null; country_flag: string;
   total_xp: number; matches_played: number;
   selected_title: string; best_category: string | null; best_level: number;
@@ -54,7 +56,7 @@ type PlayerResult = {
 
 type PostResult = {
   id: string; category_id: string; category_name: string;
-  user: { id: string; pseudo: string; avatar_seed: string };
+  user: { id: string; pseudo: string; avatar_seed: string; avatar_url?: string };
   content: string; has_image: boolean;
   likes_count: number; comments_count: number;
   is_liked: boolean; created_at: string;
@@ -62,7 +64,7 @@ type PostResult = {
 
 type CommentResult = {
   id: string; post_id: string; category_id: string; category_name: string;
-  user: { id: string; pseudo: string; avatar_seed: string };
+  user: { id: string; pseudo: string; avatar_seed: string; avatar_url?: string };
   content: string; created_at: string;
 };
 
@@ -219,7 +221,7 @@ export default function SearchScreen() {
   const timeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime();
     const mins = Math.floor(diff / 60000);
-    if (mins < 1) return "A l'instant";
+    if (mins < 1) return t('search.just_now');
     if (mins < 60) return `${mins}min`;
     const hours = Math.floor(mins / 60);
     if (hours < 24) return `${hours}h`;
@@ -250,21 +252,21 @@ export default function SearchScreen() {
             <Text style={[st.themeName, { color: meta.color }]}>{item.name}</Text>
             <Text style={st.themeDesc} numberOfLines={1}>{item.description}</Text>
             <View style={st.themeMetaRow}>
-              <Text style={st.themeMeta}>{item.total_questions} questions</Text>
+              <Text style={st.themeMeta}>{item.total_questions} {t('search.questions')}</Text>
               <Text style={st.themeMetaDot}>·</Text>
-              <Text style={st.themeMeta}>{item.player_count} joueurs</Text>
+              <Text style={st.themeMeta}>{item.player_count} {t('search.players_count')}</Text>
               <Text style={st.themeMetaDot}>·</Text>
-              <Text style={st.themeMeta}>{item.followers_count} abonnes</Text>
+              <Text style={st.themeMeta}>{item.followers_count} {t('search.followers')}</Text>
             </View>
           </View>
           <View style={st.themeCardRight}>
             {item.user_level > 0 ? (
               <View style={[st.themeLevelBadge, { backgroundColor: meta.color + '20' }]}>
-                <Text style={[st.themeLevelText, { color: meta.color }]}>Niv. {item.user_level}</Text>
+                <Text style={[st.themeLevelText, { color: meta.color }]}>{t('search.level_short')} {item.user_level}</Text>
               </View>
             ) : (
               <View style={st.themeNewBadge}>
-                <Text style={st.themeNewText}>Nouveau</Text>
+                <Text style={st.themeNewText}>{t('search.new_badge')}</Text>
               </View>
             )}
           </View>
@@ -284,7 +286,7 @@ export default function SearchScreen() {
         activeOpacity={0.7}
       >
         <View style={st.playerAvatar}>
-          <Text style={st.playerAvatarText}>{item.pseudo[0]?.toUpperCase()}</Text>
+          <UserAvatar avatarUrl={item.avatar_url} avatarSeed={item.avatar_seed} pseudo={item.pseudo} size={48} />
         </View>
         <View style={st.playerInfo}>
           <View style={st.playerNameRow}>
@@ -295,12 +297,12 @@ export default function SearchScreen() {
           <View style={st.playerStatsRow}>
             <Text style={st.playerStat}>{item.total_xp.toLocaleString()} XP</Text>
             <Text style={st.playerStatDot}>·</Text>
-            <Text style={st.playerStat}>{item.matches_played} parties</Text>
+            <Text style={st.playerStat}>{item.matches_played} {t('search.matches')}</Text>
             {item.best_category && (
               <>
                 <Text style={st.playerStatDot}>·</Text>
                 <Text style={[st.playerStat, { color: CATEGORY_META[item.best_category]?.color || '#A3A3A3' }]}>
-                  Niv.{item.best_level}
+                  {t('search.level_short')}{item.best_level}
                 </Text>
               </>
             )}
@@ -324,7 +326,7 @@ export default function SearchScreen() {
       >
         <View style={st.postHeader}>
           <View style={st.postAvatarSmall}>
-            <Text style={st.postAvatarText}>{item.user.pseudo[0]?.toUpperCase()}</Text>
+            <UserAvatar avatarUrl={item.user.avatar_url} avatarSeed={item.user.avatar_seed} pseudo={item.user.pseudo} size={36} />
           </View>
           <View style={st.postHeaderInfo}>
             <Text style={st.postAuthor}>{item.user.pseudo}</Text>
@@ -364,7 +366,7 @@ export default function SearchScreen() {
       <View style={st.commentCard}>
         <View style={st.commentHeader}>
           <View style={st.commentAvatarSmall}>
-            <Text style={st.commentAvatarText}>{item.user.pseudo[0]?.toUpperCase()}</Text>
+            <UserAvatar avatarUrl={item.user.avatar_url} avatarSeed={item.user.avatar_seed} pseudo={item.user.pseudo} size={28} />
           </View>
           <Text style={st.commentAuthor}>{item.user.pseudo}</Text>
           <Text style={[st.commentCat, { color: meta.color }]}>{item.category_name}</Text>
@@ -379,7 +381,7 @@ export default function SearchScreen() {
 
   const renderDifficultyFilters = () => (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.diffFiltersWrap}>
-      {DIFFICULTY_FILTERS.map((d) => (
+      {DIFFICULTY_FILTER_KEYS.map((d) => (
         <TouchableOpacity
           key={d.key}
           style={[st.diffChip, difficultyFilter === d.key && st.diffChipActive]}
@@ -391,7 +393,7 @@ export default function SearchScreen() {
             color={difficultyFilter === d.key ? '#8A2BE2' : '#A3A3A3'}
           />
           <Text style={[st.diffChipText, difficultyFilter === d.key && st.diffChipTextActive]}>
-            {d.label}
+            {t(d.labelKey)}
           </Text>
         </TouchableOpacity>
       ))}
@@ -414,7 +416,7 @@ export default function SearchScreen() {
         <TouchableOpacity onPress={() => router.back()} style={st.backBtnCircle} activeOpacity={0.6}>
           <MaterialCommunityIcons name="chevron-left" size={26} color="#FFF" />
         </TouchableOpacity>
-        <Text style={st.headerTitle}>Recherche</Text>
+        <Text style={st.headerTitle}>{t('search.title')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -426,9 +428,9 @@ export default function SearchScreen() {
             ref={searchInputRef}
             style={st.searchInput}
             placeholder={
-              activeTab === 'themes' ? 'Chercher un theme (ex: Espace, Star Wars...)' :
-              activeTab === 'joueurs' ? 'Chercher un joueur (@pseudo ou titre...)' :
-              'Chercher dans les publications...'
+              activeTab === 'themes' ? t('search.placeholder_themes') :
+              activeTab === 'joueurs' ? t('search.placeholder_players') :
+              t('search.placeholder_content')
             }
             placeholderTextColor="#525252"
             value={searchQuery}
@@ -448,9 +450,9 @@ export default function SearchScreen() {
       {/* Tabs */}
       <View style={st.tabsRow}>
         {([
-          { key: 'themes' as Tab, label: 'Themes' },
-          { key: 'joueurs' as Tab, label: 'Joueurs' },
-          { key: 'contenu' as Tab, label: 'Contenu' },
+          { key: 'themes' as Tab, label: t('search.tab_themes') },
+          { key: 'joueurs' as Tab, label: t('search.tab_players') },
+          { key: 'contenu' as Tab, label: t('search.tab_content') },
         ]).map((tab) => (
           <TouchableOpacity
             key={tab.key}
@@ -480,7 +482,7 @@ export default function SearchScreen() {
               <View style={st.trendingSection}>
                 <View style={st.sectionLabelRow}>
                   <MaterialCommunityIcons name="fire" size={14} color="#525252" />
-                  <Text style={st.sectionLabel}>TENDANCES DU MOMENT</Text>
+                  <Text style={st.sectionLabel}>{t('search.trending')}</Text>
                 </View>
                 <View style={st.trendingTagsWrap}>
                   {trendingTags.map((tag, idx) => (
@@ -513,7 +515,7 @@ export default function SearchScreen() {
               <View style={st.trendingSection}>
                 <View style={st.sectionLabelRow}>
                   <MaterialCommunityIcons name="trophy" size={14} color="#525252" />
-                  <Text style={st.sectionLabel}>TOP JOUEURS</Text>
+                  <Text style={st.sectionLabel}>{t('search.top_players')}</Text>
                 </View>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.topPlayersScroll}>
                   {topPlayers.map((p: any) => (
@@ -525,14 +527,9 @@ export default function SearchScreen() {
                         router.push(`/player-profile?id=${p.id}`);
                       }}
                     >
-                      <LinearGradient
-                        colors={['#8A2BE2', '#5B21B6']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={st.topPlayerAvatar}
-                      >
-                        <Text style={st.topPlayerAvatarText}>{p.pseudo[0]?.toUpperCase()}</Text>
-                      </LinearGradient>
+                      <View style={st.topPlayerAvatar}>
+                        <UserAvatar avatarUrl={p.avatar_url} avatarSeed={p.avatar_seed || p.id} pseudo={p.pseudo} size={44} />
+                      </View>
                       <Text style={st.topPlayerName} numberOfLines={1}>{p.pseudo}</Text>
                       <Text style={st.topPlayerXp}>{p.total_xp.toLocaleString()} XP</Text>
                     </TouchableOpacity>
@@ -545,7 +542,7 @@ export default function SearchScreen() {
             <View style={st.trendingSection}>
               <View style={st.sectionLabelRow}>
                 <MaterialCommunityIcons name="book-open-variant" size={14} color="#525252" />
-                <Text style={st.sectionLabel}>TOUS LES THEMES</Text>
+                <Text style={st.sectionLabel}>{t('search.all_themes')}</Text>
               </View>
               {/* Difficulty filter */}
               {renderDifficultyFilters()}
@@ -572,8 +569,8 @@ export default function SearchScreen() {
                 ListEmptyComponent={
                   <View style={st.emptyState}>
                     <MaterialCommunityIcons name="magnify" size={48} color="#525252" style={{ marginBottom: 12 }} />
-                    <Text style={st.emptyTitle}>Aucun theme trouve</Text>
-                    <Text style={st.emptyDesc}>Essayez avec d'autres mots-cles</Text>
+                    <Text style={st.emptyTitle}>{t('search.no_theme_found')}</Text>
+                    <Text style={st.emptyDesc}>{t('search.try_other_keywords')}</Text>
                   </View>
                 }
               />
@@ -610,8 +607,8 @@ export default function SearchScreen() {
                 ListEmptyComponent={
                   <View style={st.emptyState}>
                     <MaterialCommunityIcons name="account-group" size={48} color="#525252" style={{ marginBottom: 12 }} />
-                    <Text style={st.emptyTitle}>Aucun joueur trouve</Text>
-                    <Text style={st.emptyDesc}>Cherche par @pseudo ou par titre</Text>
+                    <Text style={st.emptyTitle}>{t('search.no_player_found')}</Text>
+                    <Text style={st.emptyDesc}>{t('search.search_by_pseudo')}</Text>
                   </View>
                 }
               />
@@ -627,14 +624,14 @@ export default function SearchScreen() {
             ) : !searchQuery.trim() ? (
               <View style={st.emptyState}>
                 <MaterialCommunityIcons name="text-box-outline" size={48} color="#525252" style={{ marginBottom: 12 }} />
-                <Text style={st.emptyTitle}>Rechercher du contenu</Text>
-                <Text style={st.emptyDesc}>Retrouvez des posts et discussions sur les murs sociaux</Text>
+                <Text style={st.emptyTitle}>{t('search.search_content')}</Text>
+                <Text style={st.emptyDesc}>{t('search.search_content_desc')}</Text>
               </View>
             ) : posts.length === 0 && comments.length === 0 ? (
               <View style={st.emptyState}>
                 <MaterialCommunityIcons name="magnify" size={48} color="#525252" style={{ marginBottom: 12 }} />
-                <Text style={st.emptyTitle}>Aucun resultat</Text>
-                <Text style={st.emptyDesc}>Essayez avec d'autres termes de recherche</Text>
+                <Text style={st.emptyTitle}>{t('search.no_results')}</Text>
+                <Text style={st.emptyDesc}>{t('search.try_other_terms')}</Text>
               </View>
             ) : (
               <>
@@ -642,7 +639,7 @@ export default function SearchScreen() {
                   <>
                     <View style={st.contentSectionLabelRow}>
                       <MaterialCommunityIcons name="clipboard-text-outline" size={13} color="#525252" />
-                      <Text style={st.contentSectionLabel}>PUBLICATIONS ({posts.length})</Text>
+                      <Text style={st.contentSectionLabel}>{t('search.publications')} ({posts.length})</Text>
                     </View>
                     {posts.map((post) => (
                       <View key={post.id}>{renderPostItem({ item: post })}</View>
@@ -653,7 +650,7 @@ export default function SearchScreen() {
                   <>
                     <View style={[st.contentSectionLabelRow, { marginTop: 20 }]}>
                       <MaterialCommunityIcons name="comment-outline" size={13} color="#525252" />
-                      <Text style={st.contentSectionLabel}>COMMENTAIRES ({comments.length})</Text>
+                      <Text style={st.contentSectionLabel}>{t('search.comments')} ({comments.length})</Text>
                     </View>
                     {comments.map((comment) => (
                       <View key={comment.id}>{renderCommentItem({ item: comment })}</View>

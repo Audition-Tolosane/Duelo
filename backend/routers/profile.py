@@ -1,15 +1,21 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
+import base64
+import os
+import uuid
 from database import get_db
-from models import User, Match, PlayerFollow, Theme, UserThemeXP
+from models import User, Match, PlayerFollow, Theme, UserThemeXP, Avatar
+from config import ROOT_DIR
 from schemas import SelectTitleRequest
 from constants import COUNTRY_FLAGS
 from services.xp import (
     get_level, get_xp_progress, get_streak_badge,
     get_theme_title, get_theme_unlocked_titles, get_all_unlocked_titles_v2,
 )
+from auth_middleware import get_current_user_id
+from helpers import validate_image_base64
 
 router = APIRouter(tags=["profile"])
 
@@ -70,6 +76,7 @@ async def get_profile(user_id: str, pseudo: Optional[str] = None, db: AsyncSessi
     return {
         "user": {
             "id": user.id, "pseudo": user.pseudo, "avatar_seed": user.avatar_seed,
+            "avatar_url": user.avatar_url,
             "is_guest": user.is_guest, "total_xp": user.total_xp,
             "selected_title": user.selected_title,
             "country": user.country, "country_flag": country_flag,
@@ -102,7 +109,9 @@ async def get_profile_v2(user_id: str, pseudo: Optional[str] = None, db: AsyncSe
 
 
 @router.post("/user/select-title")
-async def select_title(data: SelectTitleRequest, db: AsyncSession = Depends(get_db)):
+async def select_title(data: SelectTitleRequest, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    if data.user_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
     result = await db.execute(select(User).where(User.id == data.user_id))
     user = result.scalar_one_or_none()
     if not user:
@@ -127,3 +136,69 @@ async def select_title(data: SelectTitleRequest, db: AsyncSession = Depends(get_
     user.selected_title = data.title
     await db.commit()
     return {"success": True, "selected_title": data.title}
+
+
+@router.post("/user/select-avatar")
+async def select_avatar(request: Request, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    body = await request.json()
+    user_id = body.get("user_id", "")
+    avatar_id = body.get("avatar_id", "")
+
+    if not user_id or not avatar_id:
+        raise HTTPException(status_code=400, detail="user_id and avatar_id required")
+    if user_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouve")
+
+    avatar_res = await db.execute(select(Avatar).where(Avatar.id == avatar_id))
+    avatar = avatar_res.scalar_one_or_none()
+    if not avatar:
+        raise HTTPException(status_code=404, detail="Avatar introuvable")
+
+    user.avatar_id = avatar.id
+    user.avatar_url = avatar.image_url
+    await db.commit()
+    return {"success": True, "avatar_url": avatar.image_url}
+
+
+@router.post("/user/upload-avatar")
+async def upload_user_avatar(request: Request, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    body = await request.json()
+    user_id = body.get("user_id", "")
+    image_b64 = body.get("image_base64", "")
+
+    if not user_id or not image_b64:
+        raise HTTPException(status_code=400, detail="user_id and image_base64 required")
+    if user_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouve")
+
+    # Validate MIME type via magic bytes before writing
+    try:
+        image_data = validate_image_base64(image_b64)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    if len(image_data) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Image trop volumineuse (max 5 MB)")
+
+    users_dir = ROOT_DIR / "static" / "avatars" / "users"
+    os.makedirs(users_dir, exist_ok=True)
+
+    filename = f"{user_id}.webp"
+    filepath = users_dir / filename
+    with open(filepath, "wb") as f:
+        f.write(image_data)
+
+    user.avatar_id = None  # Not a preset
+    user.avatar_url = f"avatars/users/{filename}"
+    await db.commit()
+    return {"success": True, "avatar_url": user.avatar_url}

@@ -11,6 +11,7 @@ import * as Haptics from 'expo-haptics';
 import { GLASS } from '../../theme/glassTheme';
 import DueloHeader from '../../components/DueloHeader';
 import { useSwipeBackProgress } from '../../components/SwipeBackContext';
+import { t } from '../../utils/i18n';
 
 // Import screen components directly for the pager
 import AccueilScreen from './accueil';
@@ -29,14 +30,14 @@ const TAB_ICONS = {
 };
 
 const TAB_CONFIG = [
-  { name: 'accueil', label: 'Accueil', icon: TAB_ICONS.home },
-  { name: 'players', label: 'Social', icon: TAB_ICONS.social },
-  { name: 'play', label: 'Jouer', icon: TAB_ICONS.play, isCenter: true },
-  { name: 'themes', label: 'Thèmes', icon: TAB_ICONS.themes },
-  { name: 'profile', label: 'Profil', icon: TAB_ICONS.profile },
+  { name: 'accueil', labelKey: 'tab.home' as const, icon: TAB_ICONS.home },
+  { name: 'players', labelKey: 'tab.players' as const, icon: TAB_ICONS.social },
+  { name: 'play', labelKey: 'tab.play' as const, icon: TAB_ICONS.play, isCenter: true },
+  { name: 'themes', labelKey: 'tab.themes' as const, icon: TAB_ICONS.themes },
+  { name: 'profile', labelKey: 'tab.profile' as const, icon: TAB_ICONS.profile },
 ];
 
-const TAB_NAMES = TAB_CONFIG.map(t => t.name);
+const TAB_NAMES = TAB_CONFIG.map(tab => tab.name);
 const TAB_COUNT = TAB_CONFIG.length;
 const SCREENS = [AccueilScreen, PlayersScreen, PlayScreen, ThemesScreen, ProfileScreen];
 
@@ -56,7 +57,7 @@ function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTa
               <View style={[styles.playTabCircle, isFocused && styles.playTabCircleActive]}>
                 <Image source={tab.icon} style={styles.playTabIconImage} resizeMode="contain" />
               </View>
-              <Text style={[styles.tabLabel, isFocused && styles.tabLabelActive]}>{tab.label}</Text>
+              <Text style={[styles.tabLabel, isFocused && styles.tabLabelActive]}>{t(tab.labelKey)}</Text>
             </TouchableOpacity>
           );
         }
@@ -64,7 +65,7 @@ function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTa
         return (
           <TouchableOpacity key={tab.name} style={styles.tabItem} onPress={() => onTabPress(index)} activeOpacity={1}>
             <Image source={tab.icon} style={styles.tabIconImage} resizeMode="contain" />
-            <Text style={[styles.tabLabel, isFocused && styles.tabLabelActive]}>{tab.label}</Text>
+            <Text style={[styles.tabLabel, isFocused && styles.tabLabelActive]}>{t(tab.labelKey)}</Text>
             {isFocused && <View style={styles.activeIndicator} />}
           </TouchableOpacity>
         );
@@ -78,18 +79,15 @@ export default function TabLayout() {
   const translateX = useSharedValue(0);
   const currentIndex = useSharedValue(0);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [renderedPages, setRenderedPages] = useState<Set<number>>(new Set([0, 1]));
   const swipeBackProgress = useSwipeBackProgress();
 
-  // Pre-render adjacent pages when active index changes
-  useEffect(() => {
-    setRenderedPages(prev => {
-      const next = new Set(prev);
-      next.add(activeIndex);
-      if (activeIndex > 0) next.add(activeIndex - 1);
-      if (activeIndex < TAB_COUNT - 1) next.add(activeIndex + 1);
-      return next;
-    });
+  // Only keep active page + adjacent pages mounted, unmount the rest
+  const renderedPages = useMemo(() => {
+    const pages = new Set<number>();
+    pages.add(activeIndex);
+    if (activeIndex > 0) pages.add(activeIndex - 1);
+    if (activeIndex < TAB_COUNT - 1) pages.add(activeIndex + 1);
+    return pages;
   }, [activeIndex]);
 
   // Handle external navigation (e.g., from results screen back to a tab)

@@ -14,12 +14,20 @@ class LoginRequest(BaseModel):
     email: str
     password: str
 
+class SocialAuthRequest(BaseModel):
+    provider: str  # 'google' | 'apple'
+    token: str     # id_token for Google, identityToken for Apple
+    email: Optional[str] = None   # Apple only sends email on first login
+    full_name: Optional[str] = None  # Apple only
+    pseudo: Optional[str] = None  # override auto-generated pseudo
+
 class UserResponse(BaseModel):
     id: str
     pseudo: str
     email: Optional[str] = None
     is_guest: bool
     avatar_seed: str
+    avatar_url: Optional[str] = None
     city: Optional[str] = None
     region: Optional[str] = None
     country: Optional[str] = None
@@ -30,6 +38,8 @@ class UserResponse(BaseModel):
     best_streak: int = 0
     current_streak: int = 0
     mmr: float = 1000.0
+    onboarding_done: bool = False
+    token: Optional[str] = None
 
 class SelectTitleRequest(BaseModel):
     user_id: str

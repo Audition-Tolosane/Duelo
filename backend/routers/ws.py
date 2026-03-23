@@ -1,7 +1,8 @@
 import json
 import logging
+from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from sqlalchemy import select, func
+from sqlalchemy import select, func, or_, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import AsyncSessionLocal
 from models import User, Question, Match, ChatMessage, UserThemeXP, Theme
@@ -77,6 +78,15 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
 
                 elif action == "game_answer":
                     await handle_game_answer(user_id, data)
+
+                elif action == "rematch_propose":
+                    await handle_rematch_propose(user_id, data)
+
+                elif action == "rematch_accept":
+                    await handle_rematch_accept(user_id, data)
+
+                elif action == "rematch_decline":
+                    await handle_rematch_decline(user_id)
 
                 else:
                     await websocket.send_json({
@@ -156,7 +166,7 @@ async def handle_chat_send(sender_id: str, data: dict):
                 notif_body = f"{sender_pseudo} t'a envoyé un message"
 
             await create_notification(
-                db, receiver_id, "message", "Nouveau message", notif_body,
+                db, receiver_id, "message", "notif.new_message", f"notif.message_body:{sender_pseudo}",
                 actor_id=sender_id,
                 data={"screen": "chat", "params": {"userId": sender_id, "pseudo": sender_pseudo}},
             )
@@ -303,6 +313,23 @@ async def save_game_results(room):
 
         for player_id in (room.player1_id, room.player2_id):
             opponent_id = room.get_opponent_id(player_id)
+
+            # ── Duplicate submission guard ──
+            recent_cutoff = datetime.now(timezone.utc) - timedelta(seconds=60)
+            dup_check = await db.execute(
+                select(Match).where(
+                    Match.created_at >= recent_cutoff,
+                    Match.category == room.theme_id,
+                    or_(
+                        and_(Match.player1_id == player_id, Match.player2_id == opponent_id),
+                        and_(Match.player1_id == opponent_id, Match.player2_id == player_id),
+                    ),
+                )
+            )
+            if dup_check.scalar_one_or_none():
+                logger.info(f"[save_game_results] Duplicate blocked for player={player_id}, theme={room.theme_id}")
+                continue
+
             player_score = room.get_score(player_id)
             opponent_score = room.get_score(opponent_id)
             correct_count = room.get_correct_count(player_id)
@@ -365,6 +392,7 @@ async def save_game_results(room):
             db.add(match)
 
             user.matches_played += 1
+            user.last_played_at = datetime.now(timezone.utc)
             if won:
                 user.matches_won += 1
                 user.current_streak += 1
@@ -404,4 +432,59 @@ async def save_game_results(room):
                 },
             })
 
-        await db.commit()
+        try:
+            await db.commit()
+        except Exception:
+            await db.rollback()
+            logger.error("Failed to save game results, rolled back transaction")
+            for player_id in (room.player1_id, room.player2_id):
+                await manager.send_to_user(player_id, {
+                    "type": "error",
+                    "data": {"message": "Erreur lors de l'enregistrement du match"},
+                })
+
+
+# ── Rematch Handlers ──
+
+async def handle_rematch_propose(user_id: str, data: dict):
+    """Player proposes a rematch to their last opponent."""
+    opponent_id = data.get("opponent_id", "")
+    theme_id = data.get("theme_id", "")
+    if not opponent_id or not theme_id:
+        return
+
+    async with AsyncSessionLocal() as db:
+        u_res = await db.execute(select(User).where(User.id == user_id))
+        user = u_res.scalar_one_or_none()
+        if not user:
+            return
+
+        xp_res = await db.execute(
+            select(UserThemeXP).where(UserThemeXP.user_id == user_id, UserThemeXP.theme_id == theme_id)
+        )
+        uxp = xp_res.scalar_one_or_none()
+        player_level = get_level(uxp.xp) if uxp else 0
+
+        proposer_data = {
+            "id": user.id,
+            "pseudo": user.pseudo,
+            "avatar_seed": user.avatar_seed,
+            "level": player_level,
+            "streak": user.current_streak,
+            "streak_badge": get_streak_badge(user.current_streak),
+            "selected_title": user.selected_title or "",
+        }
+
+    await manager.propose_rematch(user_id, opponent_id, theme_id, proposer_data)
+
+
+async def handle_rematch_accept(user_id: str, data: dict):
+    """Opponent accepts the rematch. Both navigate to matchmaking."""
+    result = await manager.accept_rematch(user_id)
+    if not result:
+        return
+
+
+async def handle_rematch_decline(user_id: str):
+    """Opponent declines the rematch."""
+    await manager.decline_rematch(user_id)

@@ -3,12 +3,18 @@ import {
   View, Text, TouchableOpacity, StyleSheet, Animated, Share, Modal, ActivityIndicator,
   ScrollView, TextInput, KeyboardAvoidingView, Platform, Keyboard,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { GLASS } from '../theme/glassTheme';
+import { authFetch } from '../utils/api';
 import SwipeBackPage from '../components/SwipeBackPage';
+import DueloHeader from '../components/DueloHeader';
+import { useWS } from '../contexts/WebSocketContext';
+import { t } from '../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -39,19 +45,21 @@ type QuizQuestion = {
 };
 
 const REPORT_REASONS = [
-  { id: 'wrong_answer', label: 'Mauvaise réponse', icon: '❌' },
-  { id: 'unclear_question', label: 'Question pas claire', icon: '❓' },
-  { id: 'typo', label: 'Faute / erreur de texte', icon: '✏️' },
-  { id: 'outdated', label: 'Information obsolète', icon: '📅' },
-  { id: 'other', label: 'Autre', icon: '💬' },
+  { id: 'wrong_answer', labelKey: 'report.reason_wrong_answer', icon: 'close-circle' as const },
+  { id: 'unclear_question', labelKey: 'report.reason_unclear', icon: 'help-circle' as const },
+  { id: 'typo', labelKey: 'report.reason_typo', icon: 'pencil' as const },
+  { id: 'outdated', labelKey: 'report.reason_outdated', icon: 'calendar-clock' as const },
+  { id: 'other', labelKey: 'report.reason_other', icon: 'message-text' as const },
 ];
 
 export default function ResultsScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { send, on } = useWS();
   const params = useLocalSearchParams<{
     playerScore: string; opponentScore: string; opponentPseudo: string;
     category: string; userId: string; isBot: string;
-    correctCount: string; opponentLevel: string;
+    correctCount: string; opponentLevel: string; opponentId: string;
   }>();
 
   const pScore = parseInt(params.playerScore || '0');
@@ -59,13 +67,16 @@ export default function ResultsScreen() {
   const correctCount = parseInt(params.correctCount || '0');
   const won = pScore > oScore;
   const draw = pScore === oScore;
+  const isBot = params.isBot === 'true';
 
+  // Rematch states: idle | waiting | declined | accepted
+  const [rematchState, setRematchState] = useState<'idle' | 'waiting' | 'declined' | 'accepted'>('idle');
   const [xpBreakdown, setXpBreakdown] = useState<XpBreakdown | null>(null);
   const [newTitle, setNewTitle] = useState<NewTitle | null>(null);
   const [newLevel, setNewLevel] = useState<number | null>(null);
   const [showTitleModal, setShowTitleModal] = useState(false);
   const [submitting, setSubmitting] = useState(true);
-  const [playerPseudo, setPlayerPseudo] = useState('Joueur');
+  const [playerPseudo, setPlayerPseudo] = useState(t('game.player'));
 
   // Report question states
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
@@ -105,12 +116,54 @@ export default function ResultsScreen() {
         Animated.timing(xpSlide, { toValue: 0, duration: 400, useNativeDriver: true }),
       ]),
     ]).start();
+
+    // Rematch WS listeners
+    const unsubs = [
+      on('rematch_accepted', () => {
+        setRematchState('accepted');
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        setTimeout(() => {
+          router.replace(`/matchmaking?category=${params.category}&rematch=true`);
+        }, 600);
+      }),
+      on('rematch_declined', () => {
+        setRematchState('declined');
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        // After a short delay, redirect to global matchmaking
+        setTimeout(() => {
+          router.replace(`/matchmaking?category=${params.category}`);
+        }, 2000);
+      }),
+      on('rematch_expired', () => {
+        if (rematchState === 'waiting') {
+          setRematchState('declined');
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          setTimeout(() => {
+            router.replace(`/matchmaking?category=${params.category}`);
+          }, 2000);
+        }
+      }),
+    ];
+    return () => unsubs.forEach((u) => u());
   }, []);
+
+  // Safety timeout: if waiting for rematch response for > 20s, fallback
+  useEffect(() => {
+    if (rematchState !== 'waiting') return;
+    const timeout = setTimeout(() => {
+      setRematchState('declined');
+      // After showing "declined", launch matchmaking search
+      setTimeout(() => {
+        router.push(`/matchmaking?category=${params.category}`);
+      }, 1500);
+    }, 20000);
+    return () => clearTimeout(timeout);
+  }, [rematchState]);
 
   const submitMatch = async () => {
     try {
       const userId = params.userId || await AsyncStorage.getItem('duelo_user_id');
-      const res = await fetch(`${API_URL}/api/game/submit-v2`, {
+      const res = await authFetch(`${API_URL}/api/game/submit-v2`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -124,6 +177,11 @@ export default function ResultsScreen() {
           opponent_level: parseInt(params.opponentLevel || '1'),
         }),
       });
+      if (!res.ok) {
+        console.warn(`[submit-v2] ${res.status} - theme_id="${params.category}"`);
+        setSubmitting(false);
+        return;
+      }
       const data = await res.json();
       if (data.xp_breakdown) {
         setXpBreakdown(data.xp_breakdown);
@@ -163,8 +221,8 @@ export default function ResultsScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const categoryName = CATEGORY_NAMES[params.category || ''] || params.category;
     const text = won
-      ? `🏆 Victoire sur Duelo ! ${pScore}-${oScore} en ${categoryName} (${correctCount}/7). Viens me défier ! ⚡`
-      : `⚡ Duel intense sur Duelo ! ${pScore}-${oScore} en ${categoryName}. Viens me battre ! 🎮`;
+      ? `${t('results.share_victory')} ${pScore}-${oScore} en ${categoryName} (${correctCount}/7). ${t('results.share_challenge')}`
+      : `${t('results.share_intense')} ${pScore}-${oScore} en ${categoryName}. ${t('results.share_beat_me')}`;
     try { await Share.share({ message: text }); } catch {}
   };
 
@@ -210,7 +268,7 @@ export default function ResultsScreen() {
     setReportError(null);
     try {
       const userId = params.userId || await AsyncStorage.getItem('duelo_user_id');
-      const res = await fetch(`${API_URL}/api/questions/report`, {
+      const res = await authFetch(`${API_URL}/api/questions/report`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -223,64 +281,146 @@ export default function ResultsScreen() {
         }),
       });
       if (res.status === 409) {
-        setReportError('Vous avez déjà signalé cette question');
+        setReportError(t('report.already_reported'));
       } else if (!res.ok) {
-        setReportError('Erreur lors de l\'envoi. Réessayez.');
+        setReportError(t('report.send_error'));
       } else {
         setReportSuccess(true);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
     } catch {
-      setReportError('Erreur réseau. Vérifiez votre connexion.');
+      setReportError(t('report.network_error'));
     }
     setReportSubmitting(false);
   };
 
+  const botTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (botTimerRef.current) clearTimeout(botTimerRef.current);
+    };
+  }, []);
+
   const playAgain = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    router.replace(`/matchmaking?category=${params.category}`);
+    if (rematchState === 'waiting') return;
+
+    setRematchState('waiting');
+
+    if (isBot || !params.opponentId) {
+      // Simulate bot response: 70% accept, 30% decline after 2-3s
+      const delay = 2000 + Math.random() * 1500;
+      const accepts = Math.random() < 0.7;
+      botTimerRef.current = setTimeout(() => {
+        if (accepts) {
+          setRematchState('accepted');
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          setTimeout(() => {
+            router.replace(`/matchmaking?category=${params.category}&rematch=true`);
+          }, 800);
+        } else {
+          setRematchState('declined');
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          setTimeout(() => {
+            router.replace(`/matchmaking?category=${params.category}`);
+          }, 2000);
+        }
+      }, delay);
+      return;
+    }
+
+    // Real player: propose rematch via WebSocket
+    send({
+      action: 'rematch_propose',
+      opponent_id: params.opponentId,
+      theme_id: params.category,
+    });
   };
+
+  const resultGradient: [string, string] = won
+    ? ['#00FF9D', '#00C97A']
+    : draw
+      ? ['#FFD700', '#FFA500']
+      : ['#FF3B30', '#CC2D26'];
+
+  const resultIcon = won ? 'trophy' : draw ? 'handshake' : 'arm-flex';
 
   return (
     <SwipeBackPage>
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <DueloHeader />
       <View style={styles.content}>
         {/* Result Header */}
         <Animated.View style={[styles.resultHeader, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
-          <Text style={styles.resultEmoji}>{won ? '🏆' : draw ? '🤝' : '💪'}</Text>
+          <LinearGradient
+            colors={resultGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.resultIconCircle}
+          >
+            <MaterialCommunityIcons name={resultIcon} size={40} color="#FFF" />
+          </LinearGradient>
           <Text style={[styles.resultTitle, won ? styles.winText : draw ? styles.drawText : styles.lossText]}>
-            {won ? 'VICTOIRE !' : draw ? 'ÉGALITÉ !' : 'DÉFAITE'}
+            {won ? t('results.victory') : draw ? t('results.draw') : t('results.defeat')}
           </Text>
-          <Text style={styles.correctBadge}>{correctCount}/7 bonnes réponses</Text>
+          <LinearGradient
+            colors={['rgba(138,43,226,0.25)', 'rgba(0,255,255,0.1)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.correctBadgeGradient}
+          >
+            <MaterialCommunityIcons name="check-circle" size={14} color="#00FF9D" />
+            <Text style={styles.correctBadge}>{correctCount}/7 {t('results.correct_answers')}</Text>
+          </LinearGradient>
           {newLevel && (
-            <View style={styles.levelUpBadge}>
-              <Text style={styles.levelUpText}>⬆️ Niveau {newLevel} !</Text>
-            </View>
+            <LinearGradient
+              colors={['rgba(138,43,226,0.3)', 'rgba(138,43,226,0.1)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.levelUpBadge}
+            >
+              <MaterialCommunityIcons name="arrow-up-bold" size={16} color="#8A2BE2" />
+              <Text style={styles.levelUpText}>{t('results.level_up')} {newLevel} !</Text>
+            </LinearGradient>
           )}
         </Animated.View>
 
         {/* Score Card */}
         <Animated.View style={[styles.scoreCard, { opacity: fadeAnim, transform: [{ translateY: cardSlide }] }]}>
-          <View style={styles.scoreCardInner}>
-            <View style={styles.playerColumn}>
-              <View style={[styles.avatarCircle, styles.avatarPlayer]}>
-                <Text style={styles.avatarText}>{playerPseudo[0]?.toUpperCase()}</Text>
+          <LinearGradient
+            colors={won ? ['rgba(0,255,157,0.08)', 'rgba(0,255,157,0.02)'] : !draw ? ['rgba(255,59,48,0.08)', 'rgba(255,59,48,0.02)'] : ['rgba(255,215,0,0.08)', 'rgba(255,215,0,0.02)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.scoreCardGradient}
+          >
+            <View style={styles.scoreCardInner}>
+              <View style={styles.playerColumn}>
+                <LinearGradient
+                  colors={['#8A2BE2', '#6A1FB0']}
+                  style={styles.avatarCircle}
+                >
+                  <Text style={styles.avatarText}>{playerPseudo[0]?.toUpperCase()}</Text>
+                </LinearGradient>
+                <Text style={styles.playerName}>{playerPseudo}</Text>
+                <Text style={[styles.playerScore, won && styles.winScore]}>{pScore}</Text>
               </View>
-              <Text style={styles.playerName}>{playerPseudo}</Text>
-              <Text style={[styles.playerScore, won && styles.winScore]}>{pScore}</Text>
-            </View>
-            <View style={styles.vsContainer}>
-              <Text style={styles.vsText}>VS</Text>
-              <Text style={styles.categoryBadge}>{CATEGORY_NAMES[params.category || '']}</Text>
-            </View>
-            <View style={styles.playerColumn}>
-              <View style={[styles.avatarCircle, styles.avatarOpponent]}>
-                <Text style={styles.avatarText}>{(params.opponentPseudo || 'B')[0].toUpperCase()}</Text>
+              <View style={styles.vsContainer}>
+                <Text style={styles.vsText}>VS</Text>
+                <Text style={styles.categoryBadge}>{CATEGORY_NAMES[params.category || '']}</Text>
               </View>
-              <Text style={styles.playerName}>{params.opponentPseudo?.slice(0, 12)}</Text>
-              <Text style={[styles.playerScore, !won && !draw && styles.winScore]}>{oScore}</Text>
+              <View style={styles.playerColumn}>
+                <LinearGradient
+                  colors={['#FF3B30', '#CC2D26']}
+                  style={styles.avatarCircle}
+                >
+                  <Text style={styles.avatarText}>{(params.opponentPseudo || 'B')[0].toUpperCase()}</Text>
+                </LinearGradient>
+                <Text style={styles.playerName}>{params.opponentPseudo?.slice(0, 12)}</Text>
+                <Text style={[styles.playerScore, !won && !draw && styles.winScore]}>{oScore}</Text>
+              </View>
             </View>
-          </View>
+          </LinearGradient>
         </Animated.View>
 
         {/* XP Breakdown */}
@@ -289,39 +429,61 @@ export default function ResultsScreen() {
             <ActivityIndicator color="#8A2BE2" />
           ) : xpBreakdown ? (
             <>
-              <Text style={styles.xpTitle}>XP GAGNÉ</Text>
+              <View style={styles.xpTitleRow}>
+                <MaterialCommunityIcons name="lightning-bolt" size={14} color="#525252" />
+                <Text style={styles.xpTitle}>{t('results.xp_title')}</Text>
+              </View>
               <View style={styles.xpRow}>
-                <Text style={styles.xpLabel}>Base (score × 2)</Text>
+                <Text style={styles.xpLabel}>{t('results.base_score')}</Text>
                 <Text style={styles.xpValue}>+{xpBreakdown.base}</Text>
               </View>
               {xpBreakdown.victory > 0 && (
                 <View style={styles.xpRow}>
-                  <Text style={styles.xpLabel}>🏆 Bonus Victoire</Text>
+                  <View style={styles.xpLabelRow}>
+                    <MaterialCommunityIcons name="trophy" size={14} color="#FFD700" />
+                    <Text style={styles.xpLabel}>{t('results.victory_bonus')}</Text>
+                  </View>
                   <Text style={[styles.xpValue, styles.xpGold]}>+{xpBreakdown.victory}</Text>
                 </View>
               )}
               {xpBreakdown.perfection > 0 && (
                 <View style={styles.xpRow}>
-                  <Text style={styles.xpLabel}>⭐ Perfection (7/7)</Text>
+                  <View style={styles.xpLabelRow}>
+                    <MaterialCommunityIcons name="star" size={14} color="#00FFFF" />
+                    <Text style={styles.xpLabel}>{t('results.perfection_bonus')}</Text>
+                  </View>
                   <Text style={[styles.xpValue, styles.xpCyan]}>+{xpBreakdown.perfection}</Text>
                 </View>
               )}
               {xpBreakdown.giant_slayer > 0 && (
                 <View style={styles.xpRow}>
-                  <Text style={styles.xpLabel}>⚔️ Giant Slayer</Text>
+                  <View style={styles.xpLabelRow}>
+                    <MaterialCommunityIcons name="sword-cross" size={14} color="#8A2BE2" />
+                    <Text style={styles.xpLabel}>{t('results.giant_slayer')}</Text>
+                  </View>
                   <Text style={[styles.xpValue, styles.xpPurple]}>+{xpBreakdown.giant_slayer}</Text>
                 </View>
               )}
               {xpBreakdown.streak > 0 && (
                 <View style={styles.xpRow}>
-                  <Text style={styles.xpLabel}>🔥 Bonus Streak</Text>
+                  <View style={styles.xpLabelRow}>
+                    <MaterialCommunityIcons name="fire" size={14} color="#FF6B35" />
+                    <Text style={styles.xpLabel}>{t('results.streak_bonus')}</Text>
+                  </View>
                   <Text style={[styles.xpValue, styles.xpOrange]}>+{xpBreakdown.streak}</Text>
                 </View>
               )}
               <View style={styles.xpDivider} />
               <View style={styles.xpRow}>
-                <Text style={styles.xpTotalLabel}>TOTAL</Text>
-                <Text style={styles.xpTotalValue}>+{xpBreakdown.total} XP</Text>
+                <Text style={styles.xpTotalLabel}>{t('results.total')}</Text>
+                <LinearGradient
+                  colors={['#00FFFF', '#8A2BE2']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.xpTotalBadge}
+                >
+                  <Text style={styles.xpTotalValue}>+{xpBreakdown.total} XP</Text>
+                </LinearGradient>
               </View>
             </>
           ) : null}
@@ -330,18 +492,67 @@ export default function ResultsScreen() {
         {/* Actions */}
         <Animated.View style={[styles.actions, { opacity: fadeAnim }]}>
           <TouchableOpacity testID="share-result-btn" style={styles.shareButton} onPress={shareResult} activeOpacity={0.8}>
-            <Text style={styles.shareText}>📤 DÉFIER UN AMI</Text>
+            <LinearGradient
+              colors={['rgba(0,255,255,0.12)', 'rgba(0,255,255,0.03)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.shareGradient}
+            >
+              <MaterialCommunityIcons name="share-variant" size={18} color="#00FFFF" />
+              <Text style={styles.shareText}>{t('results.challenge_friend')}</Text>
+            </LinearGradient>
           </TouchableOpacity>
-          <TouchableOpacity testID="play-again-btn" style={styles.playAgainButton} onPress={playAgain} activeOpacity={0.8}>
-            <Text style={styles.playAgainText}>⚡ REVANCHE</Text>
+          <TouchableOpacity
+            testID="play-again-btn"
+            onPress={playAgain}
+            activeOpacity={0.8}
+            style={styles.playAgainTouchable}
+            disabled={rematchState === 'waiting' || rematchState === 'accepted'}
+          >
+            <LinearGradient
+              colors={
+                rematchState === 'declined'
+                  ? ['#FF3B30', '#CC2D26']
+                  : rematchState === 'accepted'
+                    ? ['#00FF9D', '#00C97A']
+                    : ['#8A2BE2', '#6A1FB0']
+              }
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.playAgainButton}
+            >
+              {rematchState === 'waiting' ? (
+                <>
+                  <ActivityIndicator color="#FFF" size="small" />
+                  <Text style={styles.playAgainText}>{t('results.waiting')}</Text>
+                </>
+              ) : rematchState === 'declined' ? (
+                <>
+                  <MaterialCommunityIcons name="close-circle" size={18} color="#FFF" />
+                  <Text style={styles.playAgainText}>{t('results.declined')}</Text>
+                </>
+              ) : rematchState === 'accepted' ? (
+                <>
+                  <MaterialCommunityIcons name="check-circle" size={18} color="#FFF" />
+                  <Text style={styles.playAgainText}>{t('results.accepted')}</Text>
+                </>
+              ) : (
+                <>
+                  <MaterialCommunityIcons name="sword-cross" size={18} color="#FFF" />
+                  <Text style={styles.playAgainText}>{t('results.rematch')}</Text>
+                </>
+              )}
+            </LinearGradient>
           </TouchableOpacity>
           <TouchableOpacity testID="go-home-btn" style={styles.homeButton} onPress={() => router.replace('/(tabs)/play')}>
-            <Text style={styles.homeText}>Retour à l'accueil</Text>
+            <MaterialCommunityIcons name="home" size={18} color="#525252" />
+            <Text style={styles.homeText}>{t('results.back_home')}</Text>
           </TouchableOpacity>
 
           {quizQuestions.length > 0 && (
             <TouchableOpacity testID="report-error-btn" style={styles.reportButton} onPress={openReportModal} activeOpacity={0.7}>
-              <Text style={styles.reportButtonText}>⚠️ Signaler une erreur dans une question</Text>
+              <MaterialCommunityIcons name="alert-circle-outline" size={16} color="#FFA500" />
+              <Text style={styles.reportButtonText}>{t('results.report_error')}</Text>
             </TouchableOpacity>
           )}
         </Animated.View>
@@ -354,30 +565,49 @@ export default function ResultsScreen() {
             <View style={styles.reportModal}>
               {/* Header */}
               <View style={styles.reportHeader}>
-                <Text style={styles.reportHeaderText}>
-                  {reportSuccess ? '✅ Merci !' : reportStep === 'select' ? '⚠️ Signaler une erreur' : '📝 Détails du signalement'}
-                </Text>
+                <View style={styles.reportHeaderLeft}>
+                  {reportSuccess ? (
+                    <MaterialCommunityIcons name="check-circle" size={20} color="#00FF9D" />
+                  ) : reportStep === 'select' ? (
+                    <MaterialCommunityIcons name="alert-circle-outline" size={20} color="#FFA500" />
+                  ) : (
+                    <MaterialCommunityIcons name="pencil-box-outline" size={20} color="#00FFFF" />
+                  )}
+                  <Text style={styles.reportHeaderText}>
+                    {reportSuccess ? t('report.thanks') : reportStep === 'select' ? t('report.title') : t('report.details')}
+                  </Text>
+                </View>
                 <TouchableOpacity onPress={() => setReportModalVisible(false)} style={styles.reportClose}>
-                  <Text style={styles.reportCloseText}>✕</Text>
+                  <MaterialCommunityIcons name="close" size={18} color="#A3A3A3" />
                 </TouchableOpacity>
               </View>
 
               {reportSuccess ? (
                 /* Success State */
                 <View style={styles.reportSuccessContainer}>
-                  <Text style={styles.reportSuccessEmoji}>🎉</Text>
-                  <Text style={styles.reportSuccessTitle}>Signalement envoyé !</Text>
+                  <LinearGradient
+                    colors={['#00FF9D', '#00C97A']}
+                    style={styles.reportSuccessIconCircle}
+                  >
+                    <MaterialCommunityIcons name="check-bold" size={36} color="#FFF" />
+                  </LinearGradient>
+                  <Text style={styles.reportSuccessTitle}>{t('report.sent')}</Text>
                   <Text style={styles.reportSuccessDesc}>
-                    Merci de nous aider à améliorer Duelo. Nous examinerons cette question rapidement.
+                    {t('report.thanks_desc')}
                   </Text>
                   <TouchableOpacity style={styles.reportSuccessBtn} onPress={() => setReportModalVisible(false)} activeOpacity={0.8}>
-                    <Text style={styles.reportSuccessBtnText}>FERMER</Text>
+                    <LinearGradient
+                      colors={['#8A2BE2', '#6A1FB0']}
+                      style={styles.reportSuccessBtnGradient}
+                    >
+                      <Text style={styles.reportSuccessBtnText}>{t('report.close')}</Text>
+                    </LinearGradient>
                   </TouchableOpacity>
                 </View>
               ) : reportStep === 'select' ? (
                 /* Step 1: Select Question */
                 <ScrollView style={styles.reportScroll} showsVerticalScrollIndicator={false}>
-                  <Text style={styles.reportSubtitle}>Quelle question contenait une erreur ?</Text>
+                  <Text style={styles.reportSubtitle}>{t('report.which_question')}</Text>
                   {quizQuestions.map((q, idx) => (
                     <TouchableOpacity
                       key={q.id || idx.toString()}
@@ -385,13 +615,16 @@ export default function ResultsScreen() {
                       onPress={() => selectQuestionForReport(q)}
                       activeOpacity={0.7}
                     >
-                      <View style={styles.reportQuestionNumber}>
+                      <LinearGradient
+                        colors={['rgba(138,43,226,0.3)', 'rgba(138,43,226,0.15)']}
+                        style={styles.reportQuestionNumber}
+                      >
                         <Text style={styles.reportQuestionNumberText}>{idx + 1}</Text>
-                      </View>
+                      </LinearGradient>
                       <Text style={styles.reportQuestionText} numberOfLines={2}>
                         {q.question_text}
                       </Text>
-                      <Text style={styles.reportQuestionArrow}>›</Text>
+                      <MaterialCommunityIcons name="chevron-right" size={20} color="#525252" />
                     </TouchableOpacity>
                   ))}
                 </ScrollView>
@@ -400,11 +633,11 @@ export default function ResultsScreen() {
                 <ScrollView style={styles.reportScroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
                   {/* Selected question preview */}
                   <View style={styles.reportSelectedPreview}>
-                    <Text style={styles.reportSelectedLabel}>Question sélectionnée :</Text>
+                    <Text style={styles.reportSelectedLabel}>{t('report.selected_question')}</Text>
                     <Text style={styles.reportSelectedText} numberOfLines={2}>{selectedQuestion?.question_text}</Text>
                   </View>
 
-                  <Text style={styles.reportSubtitle}>Type d'erreur</Text>
+                  <Text style={styles.reportSubtitle}>{t('report.error_type')}</Text>
                   {REPORT_REASONS.map((r) => (
                     <TouchableOpacity
                       key={r.id}
@@ -412,18 +645,18 @@ export default function ResultsScreen() {
                       onPress={() => { setSelectedReason(r.id); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
                       activeOpacity={0.7}
                     >
-                      <Text style={styles.reportReasonIcon}>{r.icon}</Text>
+                      <MaterialCommunityIcons name={r.icon} size={18} color={selectedReason === r.id ? '#00FFFF' : '#A3A3A3'} style={{ marginRight: 12 }} />
                       <Text style={[styles.reportReasonLabel, selectedReason === r.id && styles.reportReasonLabelSelected]}>
-                        {r.label}
+                        {t(r.labelKey)}
                       </Text>
-                      {selectedReason === r.id && <Text style={styles.reportReasonCheck}>✓</Text>}
+                      {selectedReason === r.id && <MaterialCommunityIcons name="check-circle" size={18} color="#00FFFF" />}
                     </TouchableOpacity>
                   ))}
 
-                  <Text style={[styles.reportSubtitle, { marginTop: 16 }]}>Description (optionnel)</Text>
+                  <Text style={[styles.reportSubtitle, { marginTop: 16 }]}>{t('report.description_optional')}</Text>
                   <TextInput
                     style={styles.reportInput}
-                    placeholder="Décrivez l'erreur..."
+                    placeholder={t('report.describe_error')}
                     placeholderTextColor="#525252"
                     value={reportDescription}
                     onChangeText={setReportDescription}
@@ -435,13 +668,15 @@ export default function ResultsScreen() {
 
                   {reportError && (
                     <View style={styles.reportErrorBanner}>
+                      <MaterialCommunityIcons name="alert-circle" size={16} color="#FF3B30" />
                       <Text style={styles.reportErrorText}>{reportError}</Text>
                     </View>
                   )}
 
                   <View style={styles.reportActions}>
                     <TouchableOpacity style={styles.reportBackBtn} onPress={() => setReportStep('select')} activeOpacity={0.7}>
-                      <Text style={styles.reportBackText}>← Retour</Text>
+                      <MaterialCommunityIcons name="chevron-left" size={18} color="#A3A3A3" />
+                      <Text style={styles.reportBackText}>{t('common.back')}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.reportSubmitBtn, (!selectedReason || reportSubmitting) && styles.reportSubmitDisabled]}
@@ -452,7 +687,12 @@ export default function ResultsScreen() {
                       {reportSubmitting ? (
                         <ActivityIndicator color="#FFF" size="small" />
                       ) : (
-                        <Text style={styles.reportSubmitText}>ENVOYER</Text>
+                        <LinearGradient
+                          colors={(!selectedReason || reportSubmitting) ? ['rgba(255,165,0,0.3)', 'rgba(255,165,0,0.2)'] : ['#FFA500', '#E69500']}
+                          style={styles.reportSubmitGradient}
+                        >
+                          <Text style={styles.reportSubmitText}>{t('report.send')}</Text>
+                        </LinearGradient>
                       )}
                     </TouchableOpacity>
                   </View>
@@ -471,29 +711,43 @@ export default function ResultsScreen() {
               opacity: titleOpacity,
               transform: [{ scale: titleScale }],
             }]}>
-              <Text style={styles.celebrationStar}>🌟</Text>
-              <Text style={styles.celebrationHeader}>NOUVEAU TITRE DÉBLOQUÉ</Text>
+              <LinearGradient
+                colors={['#FFD700', '#FFA500']}
+                style={styles.celebrationStarCircle}
+              >
+                <MaterialCommunityIcons name="star-four-points" size={48} color="#FFF" />
+              </LinearGradient>
+              <Text style={styles.celebrationHeader}>{t('results.new_title_unlocked')}</Text>
               <Animated.Text style={[styles.celebrationTitle, { opacity: titleGlow }]}>
                 {newTitle.title}
               </Animated.Text>
               <View style={styles.celebrationCategory}>
-                <Text style={styles.celebrationCatIcon}>{CATEGORY_ICONS[newTitle.category] || '❓'}</Text>
+                <MaterialCommunityIcons
+                  name="help-circle"
+                  size={18}
+                  color="#A3A3A3"
+                />
                 <Text style={styles.celebrationCatText}>
-                  {CATEGORY_NAMES[newTitle.category]} • Niveau {newTitle.level}
+                  {CATEGORY_NAMES[newTitle.category]} - {t('results.level_up')} {newTitle.level}
                 </Text>
               </View>
               <TouchableOpacity
-                style={styles.celebrationBtn}
                 onPress={() => setShowTitleModal(false)}
                 activeOpacity={0.8}
+                style={styles.celebrationBtnTouchable}
               >
-                <Text style={styles.celebrationBtnText}>CONTINUER</Text>
+                <LinearGradient
+                  colors={['#8A2BE2', '#6A1FB0']}
+                  style={styles.celebrationBtn}
+                >
+                  <Text style={styles.celebrationBtnText}>{t('results.continue')}</Text>
+                </LinearGradient>
               </TouchableOpacity>
             </Animated.View>
           </View>
         </Modal>
       )}
-    </SafeAreaView>
+    </View>
     </SwipeBackPage>
   );
 }
@@ -501,27 +755,41 @@ export default function ResultsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#050510' },
   content: { flex: 1, justifyContent: 'center', paddingHorizontal: 24, paddingBottom: 16 },
+  // Result Header
   resultHeader: { alignItems: 'center', marginBottom: 20 },
-  resultEmoji: { fontSize: 56, marginBottom: 8 },
+  resultIconCircle: {
+    width: 80, height: 80, borderRadius: 40,
+    justifyContent: 'center', alignItems: 'center', marginBottom: 12,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 12,
+  },
   resultTitle: { fontSize: 32, fontWeight: '900', letterSpacing: 4 },
   winText: { color: '#00FF9D' },
   drawText: { color: '#FFD700' },
   lossText: { color: '#FF3B30' },
-  correctBadge: { color: '#A3A3A3', fontSize: 14, fontWeight: '600', marginTop: 6 },
+  correctBadgeGradient: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    marginTop: 8, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 6,
+  },
+  correctBadge: { color: '#A3A3A3', fontSize: 14, fontWeight: '600' },
   levelUpBadge: {
-    marginTop: 8, backgroundColor: 'rgba(138,43,226,0.2)', borderRadius: 12,
-    paddingHorizontal: 14, paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(138,43,226,0.3)',
+    marginTop: 8, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 4,
+    paddingHorizontal: 14, paddingVertical: 6, borderWidth: 1, borderColor: 'rgba(138,43,226,0.3)',
   },
   levelUpText: { color: '#8A2BE2', fontSize: 14, fontWeight: '800' },
+  // Score Card
   scoreCard: {
-    backgroundColor: GLASS.bgLight, borderRadius: GLASS.radiusLg, padding: 20,
+    borderRadius: GLASS.radiusLg, overflow: 'hidden',
     borderWidth: 1, borderColor: GLASS.borderCyan, marginBottom: 16,
+  },
+  scoreCardGradient: {
+    padding: 20, borderRadius: GLASS.radiusLg,
   },
   scoreCardInner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   playerColumn: { alignItems: 'center', flex: 1 },
-  avatarCircle: { width: 48, height: 48, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 6 },
-  avatarPlayer: { backgroundColor: '#8A2BE2' },
-  avatarOpponent: { backgroundColor: '#FF3B30' },
+  avatarCircle: {
+    width: 48, height: 48, borderRadius: 24,
+    justifyContent: 'center', alignItems: 'center', marginBottom: 6,
+  },
   avatarText: { color: '#FFF', fontSize: 22, fontWeight: '900' },
   playerName: { color: '#A3A3A3', fontSize: 11, fontWeight: '600', marginBottom: 2 },
   playerScore: { fontSize: 28, fontWeight: '900', color: '#FFF' },
@@ -534,8 +802,10 @@ const styles = StyleSheet.create({
     backgroundColor: GLASS.bg, borderRadius: 16, padding: 18,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', marginBottom: 16,
   },
-  xpTitle: { fontSize: 11, fontWeight: '800', color: '#525252', letterSpacing: 3, marginBottom: 12 },
-  xpRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
+  xpTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
+  xpTitle: { fontSize: 11, fontWeight: '800', color: '#525252', letterSpacing: 3 },
+  xpRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 },
+  xpLabelRow: { flexDirection: 'row', alignItems: 'center' },
   xpLabel: { color: '#A3A3A3', fontSize: 14, fontWeight: '500' },
   xpValue: { color: '#00FF9D', fontSize: 14, fontWeight: '700' },
   xpGold: { color: '#FFD700' },
@@ -544,27 +814,48 @@ const styles = StyleSheet.create({
   xpOrange: { color: '#FF6B35' },
   xpDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: 8 },
   xpTotalLabel: { color: '#FFF', fontSize: 16, fontWeight: '800' },
-  xpTotalValue: { color: '#00FFFF', fontSize: 18, fontWeight: '900' },
+  xpTotalBadge: { borderRadius: 10, paddingHorizontal: 12, paddingVertical: 4 },
+  xpTotalValue: { color: '#FFF', fontSize: 16, fontWeight: '900' },
   // Actions
   actions: { gap: 10 },
   shareButton: {
-    borderWidth: 1, borderColor: '#00FFFF', borderRadius: 14, padding: 14,
-    backgroundColor: 'rgba(0,255,255,0.05)', alignItems: 'center',
+    borderRadius: 14, overflow: 'hidden',
+    borderWidth: 1, borderColor: 'rgba(0,255,255,0.2)',
+  },
+  shareGradient: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+    padding: 14, borderRadius: 14,
   },
   shareText: { color: '#00FFFF', fontSize: 14, fontWeight: '800', letterSpacing: 2 },
+  playAgainTouchable: { borderRadius: 14, overflow: 'hidden' },
   playAgainButton: {
-    backgroundColor: '#8A2BE2', borderRadius: 14, padding: 16, alignItems: 'center',
+    borderRadius: 14, padding: 16, alignItems: 'center',
+    flexDirection: 'row', justifyContent: 'center', gap: 8,
     shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 12,
   },
   playAgainText: { color: '#FFF', fontSize: 15, fontWeight: '800', letterSpacing: 2 },
-  homeButton: { padding: 12, alignItems: 'center' },
+  homeButton: {
+    padding: 12, alignItems: 'center',
+    flexDirection: 'row', justifyContent: 'center', gap: 6,
+  },
   homeText: { color: '#525252', fontSize: 14, fontWeight: '600' },
+  // Report Button
+  reportButton: {
+    marginTop: 6, padding: 12, alignItems: 'center', borderRadius: 12,
+    borderWidth: 1, borderColor: 'rgba(255,165,0,0.2)', backgroundColor: 'rgba(255,165,0,0.05)',
+    flexDirection: 'row', justifyContent: 'center', gap: 6,
+  },
+  reportButtonText: { color: '#FFA500', fontSize: 12, fontWeight: '600' },
   // Celebration Modal
   celebrationOverlay: {
     flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32,
   },
   celebrationContent: { alignItems: 'center', width: '100%' },
-  celebrationStar: { fontSize: 72, marginBottom: 16 },
+  celebrationStarCircle: {
+    width: 96, height: 96, borderRadius: 48,
+    justifyContent: 'center', alignItems: 'center', marginBottom: 20,
+    shadowColor: '#FFD700', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 16,
+  },
   celebrationHeader: {
     fontSize: 14, fontWeight: '800', color: '#FFD700', letterSpacing: 4, marginBottom: 12,
   },
@@ -576,19 +867,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 32,
     backgroundColor: GLASS.bgLight, borderRadius: GLASS.radiusLg, paddingHorizontal: 16, paddingVertical: 8,
   },
-  celebrationCatIcon: { fontSize: 18 },
   celebrationCatText: { color: '#A3A3A3', fontSize: 14, fontWeight: '600' },
+  celebrationBtnTouchable: { borderRadius: 16, overflow: 'hidden' },
   celebrationBtn: {
-    backgroundColor: '#8A2BE2', borderRadius: 16, paddingHorizontal: 48, paddingVertical: 16,
+    borderRadius: 16, paddingHorizontal: 48, paddingVertical: 16,
     shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.6, shadowRadius: 16,
   },
   celebrationBtnText: { color: '#FFF', fontSize: 16, fontWeight: '900', letterSpacing: 3 },
-  // Report Button
-  reportButton: {
-    marginTop: 6, padding: 12, alignItems: 'center', borderRadius: 12,
-    borderWidth: 1, borderColor: 'rgba(255,165,0,0.2)', backgroundColor: 'rgba(255,165,0,0.05)',
-  },
-  reportButtonText: { color: '#FFA500', fontSize: 12, fontWeight: '600' },
   // Report Modal
   reportOverlay: {
     flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end',
@@ -604,9 +889,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, paddingTop: 20, paddingBottom: 12,
     borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)',
   },
+  reportHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   reportHeaderText: { color: '#FFF', fontSize: 16, fontWeight: '800', letterSpacing: 1 },
-  reportClose: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.08)', justifyContent: 'center', alignItems: 'center' },
-  reportCloseText: { color: '#A3A3A3', fontSize: 16, fontWeight: '600' },
+  reportClose: {
+    width: 32, height: 32, borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.08)', justifyContent: 'center', alignItems: 'center',
+  },
   reportScroll: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 24 },
   reportSubtitle: { color: '#A3A3A3', fontSize: 13, fontWeight: '600', marginBottom: 12 },
   // Question list item
@@ -616,12 +904,11 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
   },
   reportQuestionNumber: {
-    width: 28, height: 28, borderRadius: 10, backgroundColor: 'rgba(138,43,226,0.2)',
+    width: 28, height: 28, borderRadius: 10,
     justifyContent: 'center', alignItems: 'center', marginRight: 12,
   },
-  reportQuestionNumberText: { color: '#8A2BE2', fontSize: 13, fontWeight: '800' },
+  reportQuestionNumberText: { color: '#FFF', fontSize: 13, fontWeight: '800' },
   reportQuestionText: { flex: 1, color: '#E5E5E5', fontSize: 13, fontWeight: '500', lineHeight: 18 },
-  reportQuestionArrow: { color: '#525252', fontSize: 20, fontWeight: '300', marginLeft: 8 },
   // Selected question preview
   reportSelectedPreview: {
     backgroundColor: 'rgba(138,43,226,0.08)', borderRadius: 12, padding: 14, marginBottom: 16,
@@ -638,10 +925,8 @@ const styles = StyleSheet.create({
   reportReasonSelected: {
     backgroundColor: 'rgba(0,255,255,0.06)', borderColor: 'rgba(0,255,255,0.25)',
   },
-  reportReasonIcon: { fontSize: 18, marginRight: 12 },
   reportReasonLabel: { flex: 1, color: '#A3A3A3', fontSize: 14, fontWeight: '600' },
   reportReasonLabelSelected: { color: '#FFF' },
-  reportReasonCheck: { color: '#00FFFF', fontSize: 16, fontWeight: '800' },
   // Description input
   reportInput: {
     backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 14,
@@ -653,6 +938,7 @@ const styles = StyleSheet.create({
   reportErrorBanner: {
     backgroundColor: 'rgba(255,59,48,0.1)', borderRadius: 10, padding: 12, marginTop: 12,
     borderWidth: 1, borderColor: 'rgba(255,59,48,0.2)',
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
   },
   reportErrorText: { color: '#FF3B30', fontSize: 13, fontWeight: '600', textAlign: 'center' },
   // Action buttons
@@ -662,23 +948,30 @@ const styles = StyleSheet.create({
   reportBackBtn: {
     flex: 1, padding: 14, borderRadius: 14, alignItems: 'center',
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    flexDirection: 'row', justifyContent: 'center', gap: 4,
   },
   reportBackText: { color: '#A3A3A3', fontSize: 14, fontWeight: '700' },
   reportSubmitBtn: {
-    flex: 2, padding: 14, borderRadius: 14, alignItems: 'center',
-    backgroundColor: '#FFA500',
+    flex: 2, borderRadius: 14, overflow: 'hidden',
   },
-  reportSubmitDisabled: { backgroundColor: 'rgba(255,165,0,0.3)' },
+  reportSubmitDisabled: { opacity: 0.5 },
+  reportSubmitGradient: {
+    padding: 14, borderRadius: 14, alignItems: 'center',
+  },
   reportSubmitText: { color: '#FFF', fontSize: 14, fontWeight: '800', letterSpacing: 1 },
   // Success state
   reportSuccessContainer: {
     alignItems: 'center', paddingVertical: 40, paddingHorizontal: 20,
   },
-  reportSuccessEmoji: { fontSize: 56, marginBottom: 16 },
+  reportSuccessIconCircle: {
+    width: 72, height: 72, borderRadius: 36,
+    justifyContent: 'center', alignItems: 'center', marginBottom: 16,
+  },
   reportSuccessTitle: { color: '#00FF9D', fontSize: 20, fontWeight: '800', marginBottom: 8 },
   reportSuccessDesc: { color: '#A3A3A3', fontSize: 14, fontWeight: '500', textAlign: 'center', lineHeight: 20, marginBottom: 24 },
-  reportSuccessBtn: {
-    backgroundColor: '#8A2BE2', borderRadius: 14, paddingHorizontal: 40, paddingVertical: 14,
+  reportSuccessBtn: { borderRadius: 14, overflow: 'hidden' },
+  reportSuccessBtnGradient: {
+    borderRadius: 14, paddingHorizontal: 40, paddingVertical: 14,
   },
   reportSuccessBtnText: { color: '#FFF', fontSize: 14, fontWeight: '800', letterSpacing: 2 },
 });

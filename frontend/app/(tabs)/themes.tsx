@@ -15,6 +15,7 @@ import Animated, {
 import Svg, { Circle } from 'react-native-svg';
 import CosmicBackground from '../../components/CosmicBackground';
 import CategoryIcon from '../../components/CategoryIcon';
+import { t } from '../../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -59,6 +60,7 @@ export default function ThemesScreen() {
   const router = useRouter();
   const [pillars, setPillars] = useState<PillarData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [activePillar, setActivePillar] = useState<string>('');
   const [previewTheme, setPreviewTheme] = useState<ThemeData | null>(null);
   const [previewColor, setPreviewColor] = useState('#8A2BE2');
@@ -67,6 +69,7 @@ export default function ThemesScreen() {
   useEffect(() => { loadThemes(); }, []);
 
   const loadThemes = async () => {
+    setLoadError(false);
     const userId = await AsyncStorage.getItem('duelo_user_id');
     try {
       const url = userId
@@ -77,7 +80,9 @@ export default function ThemesScreen() {
       const p = data.pillars || [];
       setPillars(p);
       if (p.length > 0) setActivePillar(p[0].id);
-    } catch (e) { console.log('Error loading themes:', e); }
+    } catch {
+      setLoadError(true);
+    }
     setLoading(false);
   };
 
@@ -105,6 +110,20 @@ export default function ThemesScreen() {
     );
   }
 
+  if (loadError) {
+    return (
+      <CosmicBackground>
+        <View style={s.container}>
+          <View style={s.loadCenter}>
+            <TouchableOpacity onPress={() => { setLoadError(false); setLoading(true); loadThemes(); }} style={{ padding: 20, alignItems: 'center' }}>
+              <Text style={{ color: '#aaa', fontSize: 14 }}>{t('themes.load_error')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </CosmicBackground>
+    );
+  }
+
   return (
     <CosmicBackground>
     <View style={s.container}>
@@ -120,8 +139,8 @@ export default function ThemesScreen() {
             <MaterialCommunityIcons name="hammer-wrench" size={26} color="#FFF" />
           </View>
           <View style={s.forgeText}>
-            <Text style={s.forgeTitle}>Créer mon Thème</Text>
-            <Text style={s.forgeSub}>Génère tes propres quiz avec l'IA</Text>
+            <Text style={s.forgeTitle}>{t('themes.create_theme')}</Text>
+            <Text style={s.forgeSub}>{t('themes.create_subtitle')}</Text>
           </View>
           <View style={s.forgeArrow}>
             <MaterialCommunityIcons name="chevron-right" size={22} color="rgba(255,255,255,0.5)" />
@@ -129,7 +148,7 @@ export default function ThemesScreen() {
         </TouchableOpacity>
 
         {/* ── PILLAR CHIPS ── */}
-        <Text style={s.sectionLabel}>UNIVERS</Text>
+        <Text style={s.sectionLabel}>{t('themes.universes')}</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}
           contentContainerStyle={s.pillarsScroll}>
           {pillars.map((pillar) => {
@@ -184,7 +203,7 @@ export default function ThemesScreen() {
                   </View>
                   <Text style={s.clusterName}>{theme.name}</Text>
                   <Text style={[s.clusterCount, { color: accent + '80' }]}>
-                    {theme.topics?.length || 0} thèmes
+                    {theme.topics?.length || 0} {t('themes.themes_count')}
                   </Text>
                 </View>
 
@@ -211,7 +230,7 @@ export default function ThemesScreen() {
         )}
 
         {/* ── OTHER PILLARS ── */}
-        <Text style={[s.sectionLabel, { marginTop: 24 }]}>AUTRES UNIVERS</Text>
+        <Text style={[s.sectionLabel, { marginTop: 24 }]}>{t('themes.other_universes')}</Text>
         {pillars.filter(p => p.id !== activePillar).map((pillar) => (
           <View key={pillar.id} style={{ marginBottom: 20 }}>
             <TouchableOpacity style={s.miniPillarHeader} onPress={() => handlePillarSelect(pillar.id)} activeOpacity={0.7}>
@@ -278,7 +297,7 @@ export default function ThemesScreen() {
                 {previewTheme.level > 0 && (
                   <View style={[s.previewBadge, { backgroundColor: previewColor+'25' }]}>
                     <Text style={[s.previewBadgeText, { color: previewColor }]}>
-                      Niveau {previewTheme.level}
+                      {t('themes.level')} {previewTheme.level}
                     </Text>
                   </View>
                 )}
@@ -292,7 +311,7 @@ export default function ThemesScreen() {
                 <View style={s.previewStats}>
                   <View style={s.previewStat}>
                     <Text style={s.previewStatVal}>{previewTheme.total_questions}</Text>
-                    <Text style={s.previewStatLbl}>Questions</Text>
+                    <Text style={s.previewStatLbl}>{t('themes.questions')}</Text>
                   </View>
                   <View style={[s.previewDivider, { backgroundColor: previewColor+'30' }]} />
                   <View style={s.previewStat}>
@@ -303,7 +322,7 @@ export default function ThemesScreen() {
 
                 {previewTheme.title_lvl50 ? (
                   <View style={s.previewGoal}>
-                    <Text style={s.previewGoalLabel}>Titre Niveau 50</Text>
+                    <Text style={s.previewGoalLabel}>{t('themes.title_level_50')}</Text>
                     <Text style={[s.previewGoalTitle, { color: previewColor }]}>
                       {previewTheme.title_lvl50}
                     </Text>
@@ -315,7 +334,7 @@ export default function ThemesScreen() {
                     style={[s.previewPlayBtn, { backgroundColor: previewColor }]}
                     onPress={() => { setPreviewTheme(null); handleThemePress(previewTheme); }}
                     activeOpacity={0.8}>
-                    <Text style={s.previewPlayText}>JOUER</Text>
+                    <Text style={s.previewPlayText}>{t('themes.play')}</Text>
                   </TouchableOpacity>
                 )}
               </Animated.View>

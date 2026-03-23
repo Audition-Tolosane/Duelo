@@ -11,6 +11,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
+import { t, getLocale } from '../utils/i18n';
+import UserAvatar from '../components/UserAvatar';
+import { authFetch } from '../utils/api';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -24,6 +27,7 @@ interface NotificationItem {
   actor_id: string | null;
   actor_pseudo: string | null;
   actor_avatar_seed: string | null;
+  actor_avatar_url?: string | null;
   read: boolean;
   created_at: string;
 }
@@ -40,6 +44,22 @@ const TYPE_META: Record<string, { icon: string; colors: [string, string]; color:
 };
 
 const DEFAULT_META = { icon: 'bell-outline', colors: ['#6B7280', '#9CA3AF'] as [string, string], color: '#888' };
+
+function translateNotif(text: string): string {
+  // Format: "notif.key:actorName" or just "notif.key"
+  if (text.startsWith('notif.')) {
+    const colonIdx = text.indexOf(':');
+    if (colonIdx > -1) {
+      const key = text.substring(0, colonIdx);
+      const actor = text.substring(colonIdx + 1);
+      const template = t(key);
+      return template.replace('{name}', actor);
+    }
+    return t(text);
+  }
+  // Fallback for old notifications already stored in French
+  return text;
+}
 
 function getInitial(pseudo: string | null, seed: string | null): string {
   if (pseudo && pseudo.length > 0) return pseudo[0].toUpperCase();
@@ -65,11 +85,11 @@ function getTimeAgo(dateStr: string): string {
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
 
-  if (minutes < 1) return "À l'instant";
-  if (minutes < 60) return `il y a ${minutes}m`;
-  if (hours < 24) return `il y a ${hours}h`;
-  if (days < 7) return `il y a ${days}j`;
-  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  if (minutes < 1) return t('notifications.just_now');
+  if (minutes < 60) return `${minutes}m`;
+  if (hours < 24) return `${hours}h`;
+  if (days < 7) return `${days}${t('notifications.days_short')}`;
+  return date.toLocaleDateString(getLocale(), { day: 'numeric', month: 'short' });
 }
 
 function getDateGroup(dateStr: string): string {
@@ -77,10 +97,10 @@ function getDateGroup(dateStr: string): string {
   const date = new Date(dateStr);
   const diffDays = Math.floor((now.getTime() - date.getTime()) / 86400000);
 
-  if (diffDays === 0) return "Aujourd'hui";
-  if (diffDays === 1) return 'Hier';
-  if (diffDays < 7) return 'Cette semaine';
-  return 'Plus ancien';
+  if (diffDays === 0) return t('notifications.today');
+  if (diffDays === 1) return t('notifications.yesterday_label');
+  if (diffDays < 7) return t('notifications.this_week');
+  return t('notifications.older');
 }
 
 export default function NotificationsScreen() {
@@ -122,7 +142,7 @@ export default function NotificationsScreen() {
   const markAsRead = async (notifId: string) => {
     if (!userId) return;
     try {
-      await fetch(`${API_URL}/api/notifications/${notifId}/read`, {
+      await authFetch(`${API_URL}/api/notifications/${notifId}/read`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId }),
@@ -137,7 +157,7 @@ export default function NotificationsScreen() {
     if (!userId) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
-      await fetch(`${API_URL}/api/notifications/read-all`, {
+      await authFetch(`${API_URL}/api/notifications/read-all`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId }),
@@ -210,11 +230,7 @@ export default function NotificationsScreen() {
         {/* Avatar or type icon */}
         <View style={styles.avatarWrap}>
           {item.actor_pseudo || item.actor_avatar_seed ? (
-            <View style={[styles.avatarCircle, { backgroundColor: getAvatarColor(item.actor_avatar_seed) }]}>
-              <Text style={styles.avatarLetter}>
-                {getInitial(item.actor_pseudo, item.actor_avatar_seed)}
-              </Text>
-            </View>
+            <UserAvatar avatarUrl={item.actor_avatar_url} avatarSeed={item.actor_avatar_seed || ''} pseudo={item.actor_pseudo || '?'} size={46} />
           ) : (
             <LinearGradient colors={meta.colors} style={styles.avatarCircle}>
               <MaterialCommunityIcons name={meta.icon as any} size={22} color="#FFF" />
@@ -229,7 +245,7 @@ export default function NotificationsScreen() {
         {/* Content */}
         <View style={styles.notifContent}>
           <Text style={[styles.notifBody, !item.read && styles.notifBodyUnread]} numberOfLines={2}>
-            {item.body}
+            {translateNotif(item.body)}
           </Text>
           <View style={styles.notifMeta}>
             <MaterialCommunityIcons name="clock-outline" size={11} color="#555" />
@@ -262,7 +278,7 @@ export default function NotificationsScreen() {
 
         <View style={styles.headerCenter}>
           <MaterialCommunityIcons name="bell" size={18} color="#8A2BE2" />
-          <Text style={styles.headerTitle}>Notifications</Text>
+          <Text style={styles.headerTitle}>{t('notifications.title')}</Text>
           {unreadCount > 0 && (
             <View style={styles.headerBadge}>
               <Text style={styles.headerBadgeText}>{unreadCount}</Text>
@@ -274,7 +290,7 @@ export default function NotificationsScreen() {
           {unreadCount > 0 && (
             <TouchableOpacity style={styles.readAllBtn} onPress={markAllAsRead}>
               <MaterialCommunityIcons name="check-all" size={14} color="#8A2BE2" />
-              <Text style={styles.readAllText}>Tout lire</Text>
+              <Text style={styles.readAllText}>{t('notifications.read_all')}</Text>
             </TouchableOpacity>
           )}
           <TouchableOpacity
@@ -299,9 +315,9 @@ export default function NotificationsScreen() {
           <LinearGradient colors={['#8A2BE2', '#A855F7']} style={styles.emptyIconCircle}>
             <MaterialCommunityIcons name="bell-outline" size={40} color="#FFF" />
           </LinearGradient>
-          <Text style={styles.emptyTitle}>Aucune notification</Text>
+          <Text style={styles.emptyTitle}>{t('notifications.empty_title')}</Text>
           <Text style={styles.emptyText}>
-            Tu recevras des notifications pour les défis, messages, follows et interactions.
+            {t('notifications.empty_text')}
           </Text>
         </View>
       ) : (

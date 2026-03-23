@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import Notification, NotificationSettings
 from schemas import NotifReadRequest, NotifSettingsUpdate
+from auth_middleware import get_current_user_id
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
 
@@ -20,6 +21,7 @@ async def get_notifications(user_id: str, limit: int = 50, offset: int = 0, db: 
         "id": n.id, "type": n.type, "title": n.title, "body": n.body,
         "icon": n.icon, "data": n.data, "actor_id": n.actor_id,
         "actor_pseudo": n.actor_pseudo, "actor_avatar_seed": n.actor_avatar_seed,
+        "actor_avatar_url": getattr(n, 'actor_avatar_url', None),
         "read": n.read, "created_at": n.created_at.isoformat(),
     } for n in notifications]
 
@@ -35,7 +37,9 @@ async def get_notification_unread_count(user_id: str, db: AsyncSession = Depends
 
 
 @router.post("/{notification_id}/read")
-async def mark_notification_read(notification_id: str, data: NotifReadRequest, db: AsyncSession = Depends(get_db)):
+async def mark_notification_read(notification_id: str, data: NotifReadRequest, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    if data.user_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
     result = await db.execute(
         select(Notification).where(
             Notification.id == notification_id, Notification.user_id == data.user_id,
@@ -51,7 +55,9 @@ async def mark_notification_read(notification_id: str, data: NotifReadRequest, d
 
 
 @router.post("/read-all")
-async def mark_all_notifications_read(data: NotifReadRequest, db: AsyncSession = Depends(get_db)):
+async def mark_all_notifications_read(data: NotifReadRequest, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    if data.user_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
     await db.execute(
         text("UPDATE notifications SET read = true WHERE user_id = :user_id AND read = false"),
         {"user_id": data.user_id}
@@ -81,7 +87,9 @@ async def get_notification_settings(user_id: str, db: AsyncSession = Depends(get
 
 
 @router.post("/{user_id}/settings")
-async def update_notification_settings(user_id: str, data: NotifSettingsUpdate, db: AsyncSession = Depends(get_db)):
+async def update_notification_settings(user_id: str, data: NotifSettingsUpdate, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    if data.user_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
     result = await db.execute(
         select(NotificationSettings).where(NotificationSettings.user_id == user_id)
     )

@@ -11,8 +11,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import CosmicBackground from '../components/CosmicBackground';
 import { GLASS } from '../theme/glassTheme';
+import { t, getLocale } from '../utils/i18n';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
+import UserAvatar from '../components/UserAvatar';
+import { useWS } from '../contexts/WebSocketContext';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -21,6 +24,7 @@ type Conversation = {
   partner_id: string;
   partner_pseudo: string;
   partner_avatar_seed: string;
+  partner_avatar_url?: string;
   last_message: string;
   last_message_type: string;
   last_message_time: string;
@@ -28,7 +32,7 @@ type Conversation = {
   is_sender: boolean;
 };
 
-const AVATAR_COLORS = [
+const AVATAR_COLORS: [string, string][] = [
   ['#8A2BE2', '#00BFFF'],
   ['#FF6B6B', '#FFD93D'],
   ['#00FF9D', '#00BFFF'],
@@ -52,38 +56,40 @@ function getInitial(pseudo: string): string {
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const m = Math.floor(diff / 60000);
-  if (m < 1) return "à l'instant";
+  if (m < 1) return t('conversations.just_now');
   if (m < 60) return `${m} min`;
   const h = Math.floor(diff / 3600000);
   if (h < 24) return `${h}h`;
   const d = Math.floor(diff / 86400000);
-  if (d === 1) return 'hier';
-  if (d < 7) return `${d}j`;
-  return new Date(dateStr).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  if (d === 1) return t('conversations.yesterday');
+  if (d < 7) return `${d}${t('conversations.days_short')}`;
+  return new Date(dateStr).toLocaleDateString(getLocale(), { day: 'numeric', month: 'short' });
 }
 
 function getMessagePreview(conv: Conversation): { text: string; icon?: React.ComponentProps<typeof MaterialCommunityIcons>['name'] } {
-  const prefix = conv.is_sender ? 'Vous : ' : '';
-  if (conv.last_message_type === 'image') return { text: `${prefix}Photo`, icon: 'camera' };
-  if (conv.last_message_type === 'game_card') return { text: `${prefix}Résultat de match`, icon: 'gamepad-variant' };
+  const prefix = conv.is_sender ? t('conversations.you_prefix') : '';
+  if (conv.last_message_type === 'image') return { text: `${prefix}${t('conversations.photo')}`, icon: 'camera' };
+  if (conv.last_message_type === 'game_card') return { text: `${prefix}${t('conversations.match_result')}`, icon: 'gamepad-variant' };
   return { text: `${prefix}${conv.last_message}` };
 }
 
 export default function ConversationsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { on } = useWS();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [filtered, setFiltered] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
   const [myPseudo, setMyPseudo] = useState('');
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     loadConversations();
-    pollRef.current = setInterval(loadConversations, 5000);
-    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+    // Refresh list when a new message is received or sent via WS
+    const unsub1 = on('chat_message', () => loadConversations());
+    const unsub2 = on('chat_sent', () => loadConversations());
+    return () => { unsub1(); unsub2(); };
   }, []);
 
   useEffect(() => {
@@ -127,7 +133,6 @@ export default function ConversationsScreen() {
   const totalUnread = conversations.reduce((sum, c) => sum + c.unread_count, 0);
 
   const renderConversation = ({ item }: { item: Conversation; index: number }) => {
-    const colors = getAvatarColors(item.partner_avatar_seed || item.partner_id);
     const hasUnread = item.unread_count > 0;
     const preview = getMessagePreview(item);
 
@@ -138,17 +143,16 @@ export default function ConversationsScreen() {
         onPress={() => openChat(item)}
         activeOpacity={0.6}
       >
-        {/* Avatar with gradient */}
+        {/* Avatar */}
         <View style={styles.avatarWrap}>
           {hasUnread && (
             <View style={styles.avatarRing}>
               <LinearGradient colors={['#8A2BE2', '#00FFFF']} style={styles.avatarRingGradient} />
             </View>
           )}
-          <LinearGradient colors={colors} style={styles.avatar}>
-            <Text style={styles.avatarLetter}>{getInitial(item.partner_pseudo)}</Text>
-          </LinearGradient>
-          <View style={styles.onlineDot} />
+          <View style={styles.avatar}>
+            <UserAvatar avatarUrl={item.partner_avatar_url} avatarSeed={item.partner_avatar_seed || item.partner_id} pseudo={item.partner_pseudo} size={50} />
+          </View>
         </View>
 
         {/* Message info */}
@@ -215,7 +219,7 @@ export default function ConversationsScreen() {
           </TouchableOpacity>
           <View style={styles.headerCenter}>
             <MaterialCommunityIcons name="chat" size={16} color="#8A2BE2" />
-            <Text style={styles.headerTitle}>Messages</Text>
+            <Text style={styles.headerTitle}>{t('conversations.title')}</Text>
             {totalUnread > 0 && (
               <View style={styles.headerBadge}>
                 <Text style={styles.headerBadgeText}>{totalUnread > 99 ? '99+' : totalUnread}</Text>
@@ -232,7 +236,7 @@ export default function ConversationsScreen() {
             <TextInput
               data-testid="conversations-search"
               style={styles.searchInput}
-              placeholder="Rechercher une conversation..."
+              placeholder={t('conversations.search')}
               placeholderTextColor="rgba(255,255,255,0.25)"
               value={search}
               onChangeText={setSearch}
@@ -255,9 +259,9 @@ export default function ConversationsScreen() {
             <LinearGradient colors={['#8A2BE2', '#00BFFF']} style={styles.emptyCircle}>
               <MaterialCommunityIcons name="chat-outline" size={36} color="#FFF" />
             </LinearGradient>
-            <Text style={styles.emptyTitle}>Vos messages</Text>
+            <Text style={styles.emptyTitle}>{t('conversations.your_messages')}</Text>
             <Text style={styles.emptyText}>
-              Défiez un joueur pour commencer une conversation !
+              {t('conversations.empty_text')}
             </Text>
             <TouchableOpacity
               data-testid="start-conversation-btn"
@@ -270,15 +274,15 @@ export default function ConversationsScreen() {
             >
               <LinearGradient colors={['#8A2BE2', '#00BFFF']} start={{x:0,y:0}} end={{x:1,y:0}} style={styles.emptyBtnGradient}>
                 <MaterialCommunityIcons name="magnify" size={16} color="#FFF" style={{ marginRight: 6 }} />
-                <Text style={styles.emptyBtnText}>Trouver un joueur</Text>
+                <Text style={styles.emptyBtnText}>{t('conversations.find_player')}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
         ) : filtered.length === 0 && search ? (
           <View style={styles.emptyWrap}>
             <MaterialCommunityIcons name="magnify" size={48} color="#525252" style={{ marginBottom: 12 }} />
-            <Text style={styles.emptyTitle}>Aucun résultat</Text>
-            <Text style={styles.emptyText}>Aucune conversation ne correspond à "{search}"</Text>
+            <Text style={styles.emptyTitle}>{t('conversations.no_results')}</Text>
+            <Text style={styles.emptyText}>{t('conversations.no_match')} "{search}"</Text>
           </View>
         ) : (
           <FlatList
@@ -434,17 +438,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '800',
     color: '#FFF',
-  },
-  onlineDot: {
-    position: 'absolute',
-    bottom: 1,
-    right: 1,
-    width: 13,
-    height: 13,
-    borderRadius: 7,
-    backgroundColor: '#00FF9D',
-    borderWidth: 2.5,
-    borderColor: '#050510',
   },
 
   // Conversation info

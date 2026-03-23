@@ -1,15 +1,19 @@
 import csv
 import io
+import base64
+import os
+import uuid
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
-from sqlalchemy import select, func, text, delete
+from sqlalchemy import select, func, text, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from database import get_db
-from models import User, Question, Match, Theme, QuestionReport, generate_uuid
+from models import User, Question, Match, Theme, QuestionReport, Avatar, UserThemeXP, WallPost, PostLike, PostComment, generate_uuid
 from schemas import AdminVerify, BulkImportRequest, CSVUploadRequest, DeleteThemesRequest
 from config import ADMIN_PASSWORD, ROOT_DIR
 from constants import SUPER_CATEGORY_META, CLUSTER_ICONS
+from helpers import validate_image_base64
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -115,17 +119,17 @@ async def import_csv_data(request: Request, db: AsyncSession = Depends(get_db)):
 
     for row in questions_reader:
         q_id = row.get("ID", "").strip()
-        theme_id = row.get("Catégorie", row.get("Categorie", "")).strip()
-        question_text = row.get("Question", "").strip()
+        theme_id = (row.get("Catégorie") or row.get("Categorie") or row.get("category") or "").strip()
+        question_text = (row.get("Question") or row.get("question_text") or "").strip()
         if not q_id or not question_text:
             continue
 
-        rep_a = row.get("Rep A", "").strip()
-        rep_b = row.get(" Rep B", row.get("Rep B", "")).strip()
-        rep_c = row.get("Rep C", "").strip()
-        rep_d = row.get("Rep D", "").strip()
-        bonne_rep = row.get("Bonne rep", "").strip().upper()
-        difficulte = row.get("Difficulté", row.get("Difficulte", "")).strip()
+        rep_a = (row.get("Rep A") or row.get("option_a") or "").strip()
+        rep_b = (row.get(" Rep B") or row.get("Rep B") or row.get("option_b") or "").strip()
+        rep_c = (row.get("Rep C") or row.get("option_c") or "").strip()
+        rep_d = (row.get("Rep D") or row.get("option_d") or "").strip()
+        bonne_rep = (row.get("Bonne rep") or row.get("correct_option") or "").strip().upper()
+        difficulte = (row.get("Difficulté") or row.get("Difficulte") or row.get("difficulty") or "").strip()
 
         correct_option = ANSWER_MAP.get(bonne_rep, 0)
         options = [rep_a, rep_b, rep_c, rep_d]
@@ -271,7 +275,8 @@ async def upload_csv_questions(data: CSVUploadRequest, db: AsyncSession = Depend
 
 
 @router.get("/questions-stats")
-async def get_questions_stats(db: AsyncSession = Depends(get_db)):
+async def get_questions_stats(limit: int = 100, offset: int = 0, db: AsyncSession = Depends(get_db)):
+    limit = min(limit, 200)
     total_res = await db.execute(select(func.count(Question.id)))
     total = total_res.scalar() or 0
 
@@ -279,6 +284,7 @@ async def get_questions_stats(db: AsyncSession = Depends(get_db)):
     categories_res = await db.execute(
         select(Question.category, func.count(Question.id).label("count"))
         .group_by(Question.category).order_by(func.count(Question.id).desc())
+        .limit(limit).offset(offset)
     )
     for row in categories_res:
         cat_stats.append({"category": row[0], "count": row[1]})
@@ -306,6 +312,20 @@ async def upload_themes_csv(request: Request, db: AsyncSession = Depends(get_db)
     if not themes_csv_text.strip():
         raise HTTPException(status_code=400, detail="CSV vide")
 
+    # Clean up related records before deleting all themes
+    # Delete UserThemeXP records
+    await db.execute(text("DELETE FROM user_theme_xp"))
+    # Delete wall post likes/comments, then wall posts
+    wall_posts_result = await db.execute(select(WallPost.id))
+    wall_post_ids = [row[0] for row in wall_posts_result.fetchall()]
+    if wall_post_ids:
+        await db.execute(text("DELETE FROM post_likes WHERE post_id IN (SELECT id FROM wall_posts)"))
+        await db.execute(text("DELETE FROM post_comments WHERE post_id IN (SELECT id FROM wall_posts)"))
+        await db.execute(text("DELETE FROM wall_posts"))
+    # Nullify theme references in matches and reports
+    await db.execute(text("UPDATE matches SET category='deleted' WHERE category IN (SELECT id FROM themes)"))
+    await db.execute(text("UPDATE question_reports SET category=NULL WHERE category IN (SELECT id FROM themes)"))
+    # Now delete themes
     await db.execute(text("DELETE FROM themes"))
     await db.commit()
 
@@ -435,10 +455,12 @@ async def admin_themes_overview(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/match-stats-by-theme")
-async def admin_match_stats_by_theme(db: AsyncSession = Depends(get_db)):
+async def admin_match_stats_by_theme(limit: int = 100, offset: int = 0, db: AsyncSession = Depends(get_db)):
+    limit = min(limit, 200)
     result = await db.execute(
         select(Match.category, func.count(Match.id).label("match_count"))
         .group_by(Match.category).order_by(func.count(Match.id).desc())
+        .limit(limit).offset(offset)
     )
     rows = result.all()
 
@@ -457,11 +479,12 @@ async def admin_match_stats_by_theme(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/reports")
-async def admin_get_reports(status: Optional[str] = None, limit: int = 100, db: AsyncSession = Depends(get_db)):
+async def admin_get_reports(status: Optional[str] = None, limit: int = 100, offset: int = 0, db: AsyncSession = Depends(get_db)):
+    limit = min(limit, 200)
     query = select(QuestionReport).order_by(QuestionReport.created_at.desc())
     if status:
         query = query.where(QuestionReport.status == status)
-    query = query.limit(limit)
+    query = query.limit(limit).offset(offset)
 
     result = await db.execute(query)
     reports = result.scalars().all()
@@ -523,8 +546,96 @@ async def delete_themes(data: DeleteThemesRequest, db: AsyncSession = Depends(ge
         result = await db.execute(delete(Question).where(Question.category.in_(data.theme_ids)))
         deleted_questions = result.rowcount
 
+    # Delete associated UserThemeXP records
+    await db.execute(delete(UserThemeXP).where(UserThemeXP.theme_id.in_(data.theme_ids)))
+
+    # Delete associated WallPost records (and their likes/comments)
+    wall_posts_result = await db.execute(select(WallPost.id).where(WallPost.category_id.in_(data.theme_ids)))
+    wall_post_ids = [row[0] for row in wall_posts_result.fetchall()]
+    if wall_post_ids:
+        await db.execute(delete(PostLike).where(PostLike.post_id.in_(wall_post_ids)))
+        await db.execute(delete(PostComment).where(PostComment.post_id.in_(wall_post_ids)))
+        await db.execute(delete(WallPost).where(WallPost.category_id.in_(data.theme_ids)))
+
+    # Nullify category on QuestionReport records for deleted themes
+    await db.execute(update(QuestionReport).where(QuestionReport.category.in_(data.theme_ids)).values(category=None))
+
+    # Nullify category on Match records for deleted themes (preserve match history)
+    await db.execute(update(Match).where(Match.category.in_(data.theme_ids)).values(category="deleted"))
+
     result = await db.execute(delete(Theme).where(Theme.id.in_(data.theme_ids)))
     deleted_themes = result.rowcount
 
     await db.commit()
     return {"success": True, "deleted_themes": deleted_themes, "deleted_questions": deleted_questions}
+
+
+@router.get("/avatars")
+async def list_avatars(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Avatar).order_by(Avatar.category, Avatar.created_at))
+    avatars = result.scalars().all()
+    return {"avatars": [
+        {"id": a.id, "name": a.name, "image_url": a.image_url, "category": a.category}
+        for a in avatars
+    ]}
+
+
+@router.post("/avatars/upload")
+async def upload_avatar(request: Request, db: AsyncSession = Depends(get_db)):
+    body = await request.json()
+    password = body.get("password", "")
+    if password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=403, detail="Mot de passe incorrect")
+
+    category = body.get("category", "default").strip()
+    image_b64 = body.get("image_base64", "")
+
+    if not image_b64:
+        raise HTTPException(status_code=400, detail="image_base64 required")
+
+    # Validate MIME type via magic bytes before writing
+    try:
+        image_data = validate_image_base64(image_b64)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    if len(image_data) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Image trop volumineuse (max 5 MB)")
+
+    file_id = str(uuid.uuid4())[:12]
+    filename = f"{file_id}.webp"
+    filepath = ROOT_DIR / "static" / "avatars" / filename
+
+    with open(filepath, "wb") as f:
+        f.write(image_data)
+
+    avatar = Avatar(name=filename, image_url=f"avatars/{filename}", category=category)
+    db.add(avatar)
+    await db.commit()
+    await db.refresh(avatar)
+
+    return {"success": True, "avatar": {"id": avatar.id, "name": avatar.name, "image_url": avatar.image_url, "category": avatar.category}}
+
+
+@router.delete("/avatars/{avatar_id}")
+async def delete_avatar(avatar_id: str, request: Request, db: AsyncSession = Depends(get_db)):
+    body = await request.json()
+    if body.get("password", "") != ADMIN_PASSWORD:
+        raise HTTPException(status_code=403, detail="Mot de passe incorrect")
+
+    result = await db.execute(select(Avatar).where(Avatar.id == avatar_id))
+    avatar = result.scalar_one_or_none()
+    if not avatar:
+        raise HTTPException(status_code=404, detail="Avatar introuvable")
+
+    # Delete file
+    filepath = ROOT_DIR / "static" / avatar.image_url
+    if os.path.exists(filepath):
+        os.remove(filepath)
+
+    # Null out users who had this avatar
+    await db.execute(update(User).where(User.avatar_id == avatar_id).values(avatar_id=None, avatar_url=None))
+
+    await db.delete(avatar)
+    await db.commit()
+    return {"success": True}

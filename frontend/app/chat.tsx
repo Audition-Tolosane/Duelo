@@ -12,21 +12,23 @@ import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { GLASS } from '../theme/glassTheme';
+import { t, getLocale } from '../utils/i18n';
 import SwipeBackPage from '../components/SwipeBackPage';
+import UserAvatar from '../components/UserAvatar';
 import { useWS } from '../contexts/WebSocketContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-const CATEGORY_META: Record<string, { icon: string; color: string; name: string }> = {
-  series_tv: { icon: 'television-classic', color: '#E040FB', name: 'Séries TV' },
-  geographie: { icon: 'earth', color: '#00FFFF', name: 'Géographie' },
-  histoire: { icon: 'bank', color: '#FFD700', name: 'Histoire' },
-  cinema: { icon: 'movie-open', color: '#FF6B6B', name: 'Cinéma' },
-  sport: { icon: 'soccer', color: '#00FF9D', name: 'Sport' },
-  musique: { icon: 'music-note', color: '#FF8C00', name: 'Musique' },
-  sciences: { icon: 'microscope', color: '#7B68EE', name: 'Sciences' },
-  gastronomie: { icon: 'silverware-fork-knife', color: '#FF69B4', name: 'Gastronomie' },
+const CATEGORY_META: Record<string, { icon: string; color: string; nameKey: string }> = {
+  series_tv: { icon: 'television-classic', color: '#E040FB', nameKey: 'chat.category.series_tv' },
+  geographie: { icon: 'earth', color: '#00FFFF', nameKey: 'chat.category.geographie' },
+  histoire: { icon: 'bank', color: '#FFD700', nameKey: 'chat.category.histoire' },
+  cinema: { icon: 'movie-open', color: '#FF6B6B', nameKey: 'chat.category.cinema' },
+  sport: { icon: 'soccer', color: '#00FF9D', nameKey: 'chat.category.sport' },
+  musique: { icon: 'music-note', color: '#FF8C00', nameKey: 'chat.category.musique' },
+  sciences: { icon: 'microscope', color: '#7B68EE', nameKey: 'chat.category.sciences' },
+  gastronomie: { icon: 'silverware-fork-knife', color: '#FF69B4', nameKey: 'chat.category.gastronomie' },
 };
 
 type Message = {
@@ -181,16 +183,17 @@ export default function ChatScreen() {
     const d = new Date(dateStr);
     const now = new Date();
     const diffDays = Math.floor((now.getTime() - d.getTime()) / 86400000);
-    const time = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    const locale = getLocale();
+    const time = d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
     if (diffDays === 0) return time;
-    if (diffDays === 1) return `Hier ${time}`;
-    if (diffDays < 7) return `${d.toLocaleDateString('fr-FR', { weekday: 'short' })} ${time}`;
-    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }) + ` ${time}`;
+    if (diffDays === 1) return `${t('chat.yesterday')} ${time}`;
+    if (diffDays < 7) return `${d.toLocaleDateString(locale, { weekday: 'short' })} ${time}`;
+    return d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit' }) + ` ${time}`;
   };
 
   // ── Game Card Component ──
   const GameCard = ({ data, isMe }: { data: any; isMe: boolean }) => {
-    const cat = CATEGORY_META[data?.category] || { icon: 'controller-classic', color: '#8A2BE2', name: 'Quiz' };
+    const cat = CATEGORY_META[data?.category] || { icon: 'controller-classic', color: '#8A2BE2', nameKey: '' };
     const won = data?.winner_id === myId;
     const myScore = isMe ? data?.sender_score : data?.receiver_score;
     const theirScore = isMe ? data?.receiver_score : data?.sender_score;
@@ -204,7 +207,7 @@ export default function ChatScreen() {
         >
           <View style={st.gameCardCategoryRow}>
             <MaterialCommunityIcons name={cat.icon as any} size={16} color={cat.color} />
-            <Text style={st.gameCardCategory}> {cat.name}</Text>
+            <Text style={st.gameCardCategory}> {cat.nameKey ? t(cat.nameKey) : 'Quiz'}</Text>
           </View>
           <View style={[st.gameCardResultBadge, { backgroundColor: won ? '#00FF9D20' : '#FF6B6B20' }]}>
             <View style={st.gameCardResultRow}>
@@ -214,7 +217,7 @@ export default function ChatScreen() {
                 color={won ? '#00FF9D' : '#FF6B6B'}
               />
               <Text style={[st.gameCardResultText, { color: won ? '#00FF9D' : '#FF6B6B' }]}>
-                {' '}{won ? 'VICTOIRE' : 'DÉFAITE'}
+                {' '}{won ? t('chat.victory') : t('chat.defeat')}
               </Text>
             </View>
           </View>
@@ -223,7 +226,7 @@ export default function ChatScreen() {
         {/* Score */}
         <View style={st.gameCardScore}>
           <View style={st.scoreColumn}>
-            <Text style={st.scoreName}>Moi</Text>
+            <Text style={st.scoreName}>{t('chat.me')}</Text>
             <Text style={[st.scoreValue, { color: won ? '#00FF9D' : '#FF6B6B' }]}>{myScore ?? '?'}</Text>
           </View>
           <Text style={st.scoreVs}>VS</Text>
@@ -235,7 +238,7 @@ export default function ChatScreen() {
 
         {/* XP Gained */}
         {data?.xp_gained && (
-          <Text style={st.gameCardXp}>+{data.xp_gained} XP gagnés</Text>
+          <Text style={st.gameCardXp}>+{data.xp_gained} {t('chat.xp_earned')}</Text>
         )}
 
         {/* Revanche Button */}
@@ -252,7 +255,7 @@ export default function ChatScreen() {
           >
             <View style={st.revancheContent}>
               <MaterialCommunityIcons name="sword-cross" size={16} color="#FFF" />
-              <Text style={st.revancheText}> REVANCHE</Text>
+              <Text style={st.revancheText}> {t('chat.rematch')}</Text>
             </View>
           </LinearGradient>
         </TouchableOpacity>
@@ -287,7 +290,7 @@ export default function ChatScreen() {
       <View style={st.dateSeparator}>
         <View style={st.dateLine} />
         <Text style={st.dateText}>
-          {new Date(item.created_at).toLocaleDateString('fr-FR', {
+          {new Date(item.created_at).toLocaleDateString(getLocale(), {
             weekday: 'long', day: 'numeric', month: 'long'
           })}
         </Text>
@@ -302,7 +305,7 @@ export default function ChatScreen() {
           {/* Opponent avatar */}
           {!isMe && (
             <View style={st.msgAvatar}>
-              <Text style={st.msgAvatarText}>{(partnerPseudo || '?')[0]?.toUpperCase()}</Text>
+              <UserAvatar avatarSeed={partnerId || ''} pseudo={partnerPseudo || '?'} size={30} />
             </View>
           )}
 
@@ -362,9 +365,25 @@ export default function ChatScreen() {
 
   if (loading) {
     return (
-      <View style={st.loadingContainer}>
-        <ActivityIndicator size="large" color="#8A2BE2" />
-      </View>
+      <SwipeBackPage>
+      <SafeAreaView style={st.container}>
+        <View style={st.header}>
+          <TouchableOpacity onPress={() => router.back()} style={st.headerBack}>
+            <MaterialCommunityIcons name="chevron-left" size={26} color="#FFF" />
+          </TouchableOpacity>
+          <View style={st.headerCenter}>
+            <View style={st.headerInfo}>
+              <Text style={st.headerName}>{partnerPseudo || t('chat.player')}</Text>
+            </View>
+          </View>
+          <View style={{ width: 36 }} />
+        </View>
+        <View style={st.loadingContainer}>
+          <ActivityIndicator size="large" color="#8A2BE2" />
+          <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginTop: 12, fontWeight: '600' }}>{t('chat.loading_messages')}</Text>
+        </View>
+      </SafeAreaView>
+      </SwipeBackPage>
     );
   }
 
@@ -381,17 +400,14 @@ export default function ChatScreen() {
           onPress={() => router.push(`/player-profile?id=${partnerId}`)}
           activeOpacity={0.7}
         >
-          <LinearGradient
-            colors={['#8A2BE2', '#00BFFF']}
-            style={st.headerAvatar}
-          >
-            <Text style={st.headerAvatarText}>{(partnerPseudo || '?')[0]?.toUpperCase()}</Text>
-          </LinearGradient>
+          <View style={st.headerAvatar}>
+            <UserAvatar avatarSeed={partnerId || ''} pseudo={partnerPseudo || '?'} size={42} />
+          </View>
           <View style={st.headerInfo}>
-            <Text style={st.headerName}>{partnerPseudo || 'Joueur'}</Text>
+            <Text style={st.headerName}>{partnerPseudo || t('chat.player')}</Text>
             <View style={st.headerOnlineRow}>
               <View style={st.onlineDot} />
-              <Text style={st.headerSub}>{isTyping ? 'écrit...' : 'En ligne'}</Text>
+              <Text style={st.headerSub}>{isTyping ? t('chat.typing') : t('chat.online')}</Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -421,11 +437,11 @@ export default function ChatScreen() {
               >
                 <MaterialCommunityIcons name="chat-outline" size={36} color="#FFF" />
               </LinearGradient>
-              <Text style={st.emptyChatText}>Commencez la conversation !</Text>
-              <Text style={st.emptyChatSub}>Défiez-vous et partagez vos résultats</Text>
+              <Text style={st.emptyChatText}>{t('chat.start_conversation')}</Text>
+              <Text style={st.emptyChatSub}>{t('chat.challenge_share')}</Text>
               <View style={st.emptyChatTtlRow}>
                 <MaterialCommunityIcons name="pin" size={13} color="#525252" />
-                <Text style={st.emptyChatTtl}> Les messages expirent après 7 jours</Text>
+                <Text style={st.emptyChatTtl}> {t('chat.messages_expire')}</Text>
               </View>
             </View>
           }
@@ -444,7 +460,7 @@ export default function ChatScreen() {
               <TextInput
                 data-testid="chat-input"
                 style={st.input}
-                placeholder="Votre message..."
+                placeholder={t('chat.your_message')}
                 placeholderTextColor="#525252"
                 value={text}
                 onChangeText={handleTextChange}

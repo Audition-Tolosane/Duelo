@@ -11,6 +11,7 @@ from schemas import WallPostCreate, CommentCreate, FollowToggle, PlayerFollowTog
 from constants import COUNTRY_FLAGS, SUPER_CATEGORY_META
 from services.xp import get_level, get_theme_title, get_streak_badge
 from services.notifications import create_notification
+from auth_middleware import get_current_user_id
 
 router = APIRouter(tags=["social"])
 
@@ -19,29 +20,50 @@ router = APIRouter(tags=["social"])
 
 @router.get("/category/{category_id}/wall")
 async def get_wall_posts(category_id: str, user_id: Optional[str] = None, limit: int = 20, offset: int = 0, db: AsyncSession = Depends(get_db)):
+    limit = min(limit, 100)
     result = await db.execute(
         select(WallPost).where(WallPost.category_id == category_id)
         .order_by(WallPost.created_at.desc()).limit(limit).offset(offset)
     )
     posts = result.scalars().all()
 
+    if not posts:
+        return []
+
+    post_ids = [p.id for p in posts]
+    author_ids = list(set(p.user_id for p in posts))
+
+    # Batch fetch authors
+    authors_res = await db.execute(select(User).where(User.id.in_(author_ids)))
+    authors_map = {u.id: u for u in authors_res.scalars().all()}
+
+    # Batch fetch like counts
+    likes_res = await db.execute(
+        select(PostLike.post_id, func.count(PostLike.id))
+        .where(PostLike.post_id.in_(post_ids))
+        .group_by(PostLike.post_id)
+    )
+    likes_map = dict(likes_res.all())
+
+    # Batch fetch comment counts
+    comments_res = await db.execute(
+        select(PostComment.post_id, func.count(PostComment.id))
+        .where(PostComment.post_id.in_(post_ids))
+        .group_by(PostComment.post_id)
+    )
+    comments_map = dict(comments_res.all())
+
+    # Batch fetch user likes
+    user_liked_set = set()
+    if user_id:
+        user_likes_res = await db.execute(
+            select(PostLike.post_id).where(PostLike.post_id.in_(post_ids), PostLike.user_id == user_id)
+        )
+        user_liked_set = set(r[0] for r in user_likes_res.all())
+
     posts_data = []
     for p in posts:
-        u_res = await db.execute(select(User).where(User.id == p.user_id))
-        post_user = u_res.scalar_one_or_none()
-
-        lk_count = await db.execute(select(func.count(PostLike.id)).where(PostLike.post_id == p.id))
-        likes = lk_count.scalar() or 0
-
-        cm_count = await db.execute(select(func.count(PostComment.id)).where(PostComment.post_id == p.id))
-        comments = cm_count.scalar() or 0
-
-        is_liked = False
-        if user_id:
-            lk_check = await db.execute(
-                select(PostLike).where(PostLike.post_id == p.id, PostLike.user_id == user_id)
-            )
-            is_liked = lk_check.scalar_one_or_none() is not None
+        post_user = authors_map.get(p.user_id)
 
         posts_data.append({
             "id": p.id,
@@ -49,16 +71,19 @@ async def get_wall_posts(category_id: str, user_id: Optional[str] = None, limit:
                 "id": post_user.id if post_user else "",
                 "pseudo": post_user.pseudo if post_user else "Inconnu",
                 "avatar_seed": post_user.avatar_seed if post_user else "",
+                "avatar_url": getattr(post_user, 'avatar_url', None) if post_user else None,
             },
             "content": p.content, "image_base64": p.image_base64,
-            "likes_count": likes, "comments_count": comments,
-            "is_liked": is_liked, "created_at": p.created_at.isoformat(),
+            "likes_count": likes_map.get(p.id, 0), "comments_count": comments_map.get(p.id, 0),
+            "is_liked": p.id in user_liked_set, "created_at": p.created_at.isoformat(),
         })
     return posts_data
 
 
 @router.post("/category/{category_id}/wall")
-async def create_wall_post(category_id: str, data: WallPostCreate, db: AsyncSession = Depends(get_db)):
+async def create_wall_post(category_id: str, data: WallPostCreate, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    if data.user_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
     if not data.content.strip():
         raise HTTPException(status_code=400, detail="Le contenu ne peut pas être vide")
     if data.image_base64 and len(data.image_base64) > 700000:
@@ -78,6 +103,7 @@ async def create_wall_post(category_id: str, data: WallPostCreate, db: AsyncSess
             "id": post_user.id if post_user else "",
             "pseudo": post_user.pseudo if post_user else "Inconnu",
             "avatar_seed": post_user.avatar_seed if post_user else "",
+            "avatar_url": getattr(post_user, 'avatar_url', None) if post_user else None,
         },
         "content": post.content, "image_base64": post.image_base64,
         "likes_count": 0, "comments_count": 0, "is_liked": False,
@@ -86,7 +112,9 @@ async def create_wall_post(category_id: str, data: WallPostCreate, db: AsyncSess
 
 
 @router.post("/wall/{post_id}/like")
-async def toggle_like(post_id: str, data: FollowToggle, db: AsyncSession = Depends(get_db)):
+async def toggle_like(post_id: str, data: FollowToggle, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    if data.user_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
     existing = await db.execute(
         select(PostLike).where(PostLike.post_id == post_id, PostLike.user_id == data.user_id)
     )
@@ -106,8 +134,7 @@ async def toggle_like(post_id: str, data: FollowToggle, db: AsyncSession = Depen
             liker = liker_res.scalar_one_or_none()
             liker_name = liker.pseudo if liker else "Quelqu'un"
             await create_notification(
-                db, post.user_id, "like", "Nouveau like",
-                f"{liker_name} a aimé ta publication",
+                db, post.user_id, "like", "notif.new_like", f"notif.like_body:{liker_name}",
                 actor_id=data.user_id,
                 data={"screen": "category-detail", "params": {"id": post.category_id}},
             )
@@ -116,7 +143,9 @@ async def toggle_like(post_id: str, data: FollowToggle, db: AsyncSession = Depen
 
 
 @router.post("/wall/{post_id}/comment")
-async def add_comment(post_id: str, data: CommentCreate, db: AsyncSession = Depends(get_db)):
+async def add_comment(post_id: str, data: CommentCreate, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    if data.user_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
     if not data.content.strip():
         raise HTTPException(status_code=400, detail="Le commentaire ne peut pas être vide")
 
@@ -130,8 +159,7 @@ async def add_comment(post_id: str, data: CommentCreate, db: AsyncSession = Depe
         commenter = commenter_res.scalar_one_or_none()
         commenter_name = commenter.pseudo if commenter else "Quelqu'un"
         await create_notification(
-            db, post.user_id, "comment", "Nouveau commentaire",
-            f"{commenter_name} a commenté ta publication",
+            db, post.user_id, "comment", "notif.new_comment", f"notif.comment_body:{commenter_name}",
             actor_id=data.user_id,
             data={"screen": "category-detail", "params": {"id": post.category_id}},
         )
@@ -147,6 +175,7 @@ async def add_comment(post_id: str, data: CommentCreate, db: AsyncSession = Depe
         "user": {
             "id": user.id if user else "", "pseudo": user.pseudo if user else "Inconnu",
             "avatar_seed": user.avatar_seed if user else "",
+            "avatar_url": getattr(user, 'avatar_url', None) if user else None,
         },
         "content": comment.content, "created_at": comment.created_at.isoformat(),
     }
@@ -168,6 +197,7 @@ async def get_comments(post_id: str, db: AsyncSession = Depends(get_db)):
             "user": {
                 "id": user.id if user else "", "pseudo": user.pseudo if user else "Inconnu",
                 "avatar_seed": user.avatar_seed if user else "",
+                "avatar_url": getattr(user, 'avatar_url', None) if user else None,
             },
             "content": c.content, "created_at": c.created_at.isoformat(),
         })
@@ -204,7 +234,7 @@ async def _get_user_best_theme(db: AsyncSession, user_id: str):
 # ── Player Profile & Follow ──
 
 @router.get("/player/{user_id}/profile")
-async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, posts_limit: int = 20, posts_offset: int = 0, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
     if not user:
@@ -222,6 +252,14 @@ async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, db: 
         themes_res = await db.execute(select(Theme).where(Theme.id.in_(theme_ids)))
         themes = {t.id: t for t in themes_res.scalars().all()}
 
+        # Batch fetch top XP per theme to check champion status
+        top_xp_res = await db.execute(
+            select(UserThemeXP.theme_id, func.max(UserThemeXP.xp).label('max_xp'))
+            .where(UserThemeXP.theme_id.in_(theme_ids))
+            .group_by(UserThemeXP.theme_id)
+        )
+        top_xp_map = dict(top_xp_res.all())
+
         for tid, xp in xp_map.items():
             t = themes.get(tid)
             if not t:
@@ -232,13 +270,8 @@ async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, db: 
                 "name": t.name, "color_hex": t.color_hex or "#8A2BE2",
             }
 
-            # Check if this user is #1 in this theme
-            top_res = await db.execute(
-                select(UserThemeXP).where(UserThemeXP.theme_id == tid)
-                .order_by(UserThemeXP.xp.desc()).limit(1)
-            )
-            top_uxp = top_res.scalar_one_or_none()
-            if top_uxp and top_uxp.user_id == user_id:
+            # Check if this user is #1 in this theme (their xp equals the max)
+            if top_xp_map.get(tid) is not None and xp >= top_xp_map[tid]:
                 champion_titles.append({
                     "theme_id": tid, "theme_name": t.name,
                     "scope": "Monde",
@@ -264,33 +297,55 @@ async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, db: 
         )
         is_following = f_check.scalar_one_or_none() is not None
 
+    posts_limit = min(posts_limit, 100)
     posts_result = await db.execute(
-        select(WallPost).where(WallPost.user_id == user_id).order_by(WallPost.created_at.desc()).limit(20)
+        select(WallPost).where(WallPost.user_id == user_id).order_by(WallPost.created_at.desc()).limit(posts_limit).offset(posts_offset)
     )
     user_posts = posts_result.scalars().all()
 
     posts_data = []
-    for p in user_posts:
-        lk_count = await db.execute(select(func.count(PostLike.id)).where(PostLike.post_id == p.id))
-        likes = lk_count.scalar() or 0
-        cm_count = await db.execute(select(func.count(PostComment.id)).where(PostComment.post_id == p.id))
-        comments = cm_count.scalar() or 0
+    if user_posts:
+        post_ids = [p.id for p in user_posts]
+        category_ids = list(set(p.category_id for p in user_posts))
 
-        is_liked = False
+        # Batch fetch like counts for profile posts
+        p_likes_res = await db.execute(
+            select(PostLike.post_id, func.count(PostLike.id))
+            .where(PostLike.post_id.in_(post_ids))
+            .group_by(PostLike.post_id)
+        )
+        p_likes_map = dict(p_likes_res.all())
+
+        # Batch fetch comment counts for profile posts
+        p_comments_res = await db.execute(
+            select(PostComment.post_id, func.count(PostComment.id))
+            .where(PostComment.post_id.in_(post_ids))
+            .group_by(PostComment.post_id)
+        )
+        p_comments_map = dict(p_comments_res.all())
+
+        # Batch fetch viewer likes for profile posts
+        p_user_liked_set = set()
         if viewer_id:
-            lk_check = await db.execute(
-                select(PostLike).where(PostLike.post_id == p.id, PostLike.user_id == viewer_id)
+            p_user_likes_res = await db.execute(
+                select(PostLike.post_id).where(PostLike.post_id.in_(post_ids), PostLike.user_id == viewer_id)
             )
-            is_liked = lk_check.scalar_one_or_none() is not None
+            p_user_liked_set = set(r[0] for r in p_user_likes_res.all())
 
-        theme_name, theme_color = await _get_theme_info(db, p.category_id)
-        posts_data.append({
-            "id": p.id, "category_id": p.category_id,
-            "category_name": theme_name,
-            "content": p.content, "image_base64": p.image_base64,
-            "likes_count": likes, "comments_count": comments,
-            "is_liked": is_liked, "created_at": p.created_at.isoformat(),
-        })
+        # Batch fetch themes for post categories
+        p_themes_res = await db.execute(select(Theme).where(Theme.id.in_(category_ids)))
+        p_themes_map = {t.id: t for t in p_themes_res.scalars().all()}
+
+        for p in user_posts:
+            p_theme = p_themes_map.get(p.category_id)
+            theme_name = p_theme.name if p_theme else p.category_id
+            posts_data.append({
+                "id": p.id, "category_id": p.category_id,
+                "category_name": theme_name,
+                "content": p.content, "image_base64": p.image_base64,
+                "likes_count": p_likes_map.get(p.id, 0), "comments_count": p_comments_map.get(p.id, 0),
+                "is_liked": p.id in p_user_liked_set, "created_at": p.created_at.isoformat(),
+            })
 
     country_flag = COUNTRY_FLAGS.get(user.country or "", "")
 
@@ -299,6 +354,7 @@ async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, db: 
 
     return {
         "id": user.id, "pseudo": user.pseudo, "avatar_seed": user.avatar_seed,
+        "avatar_url": getattr(user, 'avatar_url', None),
         "selected_title": user.selected_title or best_title or "Novice",
         "country": user.country, "country_flag": country_flag,
         "matches_played": user.matches_played, "matches_won": user.matches_won,
@@ -312,7 +368,9 @@ async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, db: 
 
 
 @router.post("/player/{user_id}/follow")
-async def toggle_player_follow(user_id: str, data: PlayerFollowToggle, db: AsyncSession = Depends(get_db)):
+async def toggle_player_follow(user_id: str, data: PlayerFollowToggle, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    if data.follower_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
     if data.follower_id == user_id:
         raise HTTPException(status_code=400, detail="Vous ne pouvez pas vous suivre vous-même")
 
@@ -334,8 +392,7 @@ async def toggle_player_follow(user_id: str, data: PlayerFollowToggle, db: Async
         follower_user = follower_res.scalar_one_or_none()
         follower_name = follower_user.pseudo if follower_user else "Quelqu'un"
         await create_notification(
-            db, user_id, "follow", "Nouveau follower",
-            f"{follower_name} a commencé à te suivre",
+            db, user_id, "follow", "notif.new_follower", f"notif.follow_body:{follower_name}",
             actor_id=data.follower_id,
             data={"screen": "player-profile", "params": {"id": data.follower_id}},
         )
@@ -345,15 +402,16 @@ async def toggle_player_follow(user_id: str, data: PlayerFollowToggle, db: Async
 
 @router.get("/players/search")
 async def search_players(
-    q: Optional[str] = None, country: Optional[str] = None, limit: int = 20,
+    q: Optional[str] = None, country: Optional[str] = None, limit: int = 20, offset: int = 0,
     db: AsyncSession = Depends(get_db)
 ):
+    limit = min(limit, 100)
     query = select(User)
     if q and q.strip():
         query = query.where(User.pseudo.ilike(f"%{q.strip()}%"))
     if country and country.strip():
         query = query.where(User.country == country.strip())
-    query = query.order_by(User.total_xp.desc()).limit(limit)
+    query = query.order_by(User.total_xp.desc()).limit(limit).offset(offset)
 
     result = await db.execute(query)
     users = result.scalars().all()
@@ -363,6 +421,7 @@ async def search_players(
         _, best_level, best_title = await _get_user_best_theme(db, u.id)
         players.append({
             "id": u.id, "pseudo": u.pseudo, "avatar_seed": u.avatar_seed,
+            "avatar_url": getattr(u, 'avatar_url', None),
             "country": u.country, "country_flag": COUNTRY_FLAGS.get(u.country or "", ""),
             "total_xp": u.total_xp, "matches_played": u.matches_played,
             "selected_title": u.selected_title or best_title or "Novice",
@@ -406,6 +465,7 @@ async def social_pulse(user_id: str, db: AsyncSession = Depends(get_db)):
         feed.append({
             "type": exploit_type, "id": f"match_{m.id}",
             "user_id": u.id, "user_pseudo": u.pseudo, "user_avatar_seed": u.avatar_seed,
+            "user_avatar_url": getattr(u, 'avatar_url', None),
             "user_level": user_level,
             "category": m.category, "category_name": theme_name,
             "category_color": theme_color, "pillar_color": theme_color,
@@ -428,6 +488,7 @@ async def social_pulse(user_id: str, db: AsyncSession = Depends(get_db)):
         feed.append({
             "type": "streak", "id": f"streak_{u.id}",
             "user_id": u.id, "user_pseudo": u.pseudo, "user_avatar_seed": u.avatar_seed,
+            "user_avatar_url": getattr(u, 'avatar_url', None),
             "user_level": 0,
             "category": "", "category_name": "",
             "category_color": "#FFD700", "pillar_color": "#FFD700",
@@ -463,6 +524,7 @@ async def social_tribes(user_id: Optional[str] = None, db: AsyncSession = Depend
                 lvl = get_level(top_uxp.xp)
                 throne = {
                     "id": top_user.id, "pseudo": top_user.pseudo, "avatar_seed": top_user.avatar_seed,
+                    "avatar_url": getattr(top_user, 'avatar_url', None),
                     "level": lvl, "title": get_theme_title(theme, lvl), "xp": top_uxp.xp,
                 }
             count_res = await db.execute(
@@ -512,6 +574,7 @@ async def social_coach(user_id: str, db: AsyncSession = Depends(get_db)):
                 suggestions.append({
                     "type": "rivalry", "rival_id": rival.id,
                     "rival_pseudo": rival.pseudo, "rival_avatar_seed": rival.avatar_seed,
+                    "rival_avatar_url": getattr(rival, 'avatar_url', None),
                     "category": rival_uxp.theme_id, "category_name": theme_name, "category_color": theme_color,
                     "rival_level": get_level(rival_uxp.xp),
                     "my_level": get_level(my_xp),
@@ -538,7 +601,8 @@ async def social_coach(user_id: str, db: AsyncSession = Depends(get_db)):
 # ── Home Feed ──
 
 @router.get("/feed/home/{user_id}")
-async def get_home_feed(user_id: str, db: AsyncSession = Depends(get_db)):
+async def get_home_feed(user_id: str, limit: int = 20, offset: int = 0, db: AsyncSession = Depends(get_db)):
+    limit = min(limit, 100)
     u_res = await db.execute(select(User).where(User.id == user_id))
     user = u_res.scalar_one_or_none()
     if not user:
@@ -573,6 +637,8 @@ async def get_home_feed(user_id: str, db: AsyncSession = Depends(get_db)):
         social_feed.append({
             "type": "record", "id": f"record_{m.id}",
             "user_pseudo": u.pseudo, "user_avatar_seed": u.avatar_seed,
+            "user_avatar_url": getattr(u, 'avatar_url', None),
+            "theme_id": m.category,
             "category": m.category, "category_name": theme_name, "category_color": theme_color,
             "title": "Score parfait !", "body": f"@{u.pseudo} a réalisé un 7/7 en {theme_name} !",
             "score": f"{m.player1_score} - {m.player2_score}", "icon": "🏆",
@@ -584,32 +650,52 @@ async def get_home_feed(user_id: str, db: AsyncSession = Depends(get_db)):
     )
     posts = recent_posts.scalars().all()
 
-    for p in posts:
-        p_user_res = await db.execute(select(User).where(User.id == p.user_id))
-        p_user = p_user_res.scalar_one_or_none()
+    if posts:
+        post_ids = [p.id for p in posts]
+        author_ids = list({p.user_id for p in posts})
 
-        lk_count = await db.execute(select(func.count(PostLike.id)).where(PostLike.post_id == p.id))
-        likes = lk_count.scalar() or 0
-        cm_count = await db.execute(select(func.count(PostComment.id)).where(PostComment.post_id == p.id))
-        comments = cm_count.scalar() or 0
+        # Batch fetch authors
+        authors_res = await db.execute(select(User).where(User.id.in_(author_ids)))
+        authors_map = {u.id: u for u in authors_res.scalars().all()}
 
-        lk_check = await db.execute(
-            select(PostLike).where(PostLike.post_id == p.id, PostLike.user_id == user_id)
+        # Batch fetch likes counts
+        likes_res = await db.execute(
+            select(PostLike.post_id, func.count(PostLike.id))
+            .where(PostLike.post_id.in_(post_ids))
+            .group_by(PostLike.post_id)
         )
-        is_liked = lk_check.scalar_one_or_none() is not None
+        likes_map = {row[0]: row[1] for row in likes_res}
 
-        theme_name, theme_color = await _get_theme_info(db, p.category_id)
+        # Batch fetch comments counts
+        comments_res = await db.execute(
+            select(PostComment.post_id, func.count(PostComment.id))
+            .where(PostComment.post_id.in_(post_ids))
+            .group_by(PostComment.post_id)
+        )
+        comments_map = {row[0]: row[1] for row in comments_res}
 
-        social_feed.append({
-            "type": "community", "id": f"post_{p.id}", "post_id": p.id,
-            "user_id": p.user_id,
-            "user_pseudo": p_user.pseudo if p_user else "Inconnu",
-            "user_avatar_seed": p_user.avatar_seed if p_user else "",
-            "category": p.category_id, "category_name": theme_name, "category_color": theme_color,
-            "content": p.content, "has_image": bool(p.image_base64),
-            "likes_count": likes, "comments_count": comments,
-            "is_liked": is_liked, "created_at": p.created_at.isoformat(),
-        })
+        # Batch fetch user's likes
+        user_likes_res = await db.execute(
+            select(PostLike.post_id).where(PostLike.post_id.in_(post_ids), PostLike.user_id == user_id)
+        )
+        user_liked_set = {row[0] for row in user_likes_res}
+
+        for p in posts:
+            p_user = authors_map.get(p.user_id)
+            theme_name, theme_color = await _get_theme_info(db, p.category_id)
+
+            social_feed.append({
+                "type": "community", "id": f"post_{p.id}", "post_id": p.id,
+                "user_id": p.user_id,
+                "user_pseudo": p_user.pseudo if p_user else "Inconnu",
+                "user_avatar_seed": p_user.avatar_seed if p_user else "",
+                "user_avatar_url": getattr(p_user, 'avatar_url', None) if p_user else None,
+                "theme_id": p.category_id,
+                "category": p.category_id, "category_name": theme_name, "category_color": theme_color,
+                "content": p.content, "has_image": bool(p.image_base64),
+                "likes_count": likes_map.get(p.id, 0), "comments_count": comments_map.get(p.id, 0),
+                "is_liked": p.id in user_liked_set, "created_at": p.created_at.isoformat(),
+            })
 
     # Random theme events
     themes_res = await db.execute(select(Theme).order_by(func.random()).limit(2))
@@ -617,6 +703,7 @@ async def get_home_feed(user_id: str, db: AsyncSession = Depends(get_db)):
     for et in event_themes:
         social_feed.append({
             "type": "event", "id": f"event_{et.id}",
+            "theme_id": et.id,
             "category": et.id, "category_name": et.name,
             "category_color": et.color_hex or "#8A2BE2",
             "title": f"XP x2 en {et.name}", "body": f"Double XP sur le thème {et.name} pendant 1h !",
@@ -629,12 +716,15 @@ async def get_home_feed(user_id: str, db: AsyncSession = Depends(get_db)):
     return {
         "user": {
             "pseudo": user.pseudo, "avatar_seed": user.avatar_seed,
+            "avatar_url": getattr(user, 'avatar_url', None),
             "total_xp": user.total_xp, "current_streak": user.current_streak,
+            "last_played_at": user.last_played_at.isoformat() if user.last_played_at else None,
+            "best_streak": user.best_streak,
             "streak_badge": get_streak_badge(user.current_streak),
             "matches_played": user.matches_played, "matches_won": user.matches_won,
             "country_flag": country_flag,
             "selected_title": user.selected_title or "Novice",
         },
         "pending_duels": pending_duels[:5],
-        "social_feed": social_feed[:20],
+        "social_feed": social_feed[offset:offset + limit],
     }

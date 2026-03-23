@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, Integer, Boolean, Float, DateTime, JSON, Text, UniqueConstraint
+from sqlalchemy import Column, String, Integer, Boolean, Float, DateTime, JSON, Text, UniqueConstraint, func
 from database import Base
 
 
@@ -21,6 +21,8 @@ class User(Base):
     password_hash = Column(String(255), nullable=True)
     is_guest = Column(Boolean, default=True)
     avatar_seed = Column(String(50), default=lambda: str(uuid.uuid4())[:8])
+    avatar_id = Column(String(36), nullable=True)
+    avatar_url = Column(Text, nullable=True)
 
     # Location
     city = Column(String(100), nullable=True)
@@ -42,6 +44,23 @@ class User(Base):
     # Selected title for display in duels
     selected_title = Column(String(100), nullable=True)
 
+    google_id = Column(String(255), unique=True, nullable=True, index=True)
+    apple_id = Column(String(255), unique=True, nullable=True, index=True)
+
+    last_played_at = Column(DateTime(timezone=True), nullable=True)
+    onboarding_done = Column(Boolean, default=False)
+
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+    updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
+
+class Avatar(Base):
+    __tablename__ = 'avatars'
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    name = Column(String(100), nullable=True)
+    image_url = Column(Text, nullable=False)
+    category = Column(String(50), default='default')
     created_at = Column(DateTime(timezone=True), default=utc_now)
 
 
@@ -62,6 +81,7 @@ class Question(Base):
     option_c = Column(Text, nullable=True)
     option_d = Column(Text, nullable=True)
     angle = Column(Text, nullable=True)
+    angle_num = Column(Integer, nullable=True, default=0)
     batch = Column(Text, nullable=True)
 
     __table_args__ = (
@@ -74,7 +94,7 @@ class Match(Base):
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
     player1_id = Column(String(36), nullable=False, index=True)
-    player2_id = Column(String(36), nullable=True)
+    player2_id = Column(String(36), nullable=True, index=True)
     player2_pseudo = Column(String(50), nullable=True)
     player2_is_bot = Column(Boolean, default=False)
     category = Column(String(100), nullable=False)
@@ -85,7 +105,8 @@ class Match(Base):
     xp_earned = Column(Integer, default=0)
     xp_breakdown = Column(JSON, nullable=True)  # {base, victory, perfection, giant_slayer, streak}
     questions_data = Column(JSON, nullable=True)
-    created_at = Column(DateTime(timezone=True), default=utc_now)
+    created_at = Column(DateTime(timezone=True), default=utc_now, index=True)
+    updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
 
 
 
@@ -98,7 +119,8 @@ class WallPost(Base):
     category_id = Column(String(100), nullable=False, index=True)
     content = Column(Text, nullable=False)
     image_base64 = Column(Text, nullable=True)
-    created_at = Column(DateTime(timezone=True), default=utc_now)
+    created_at = Column(DateTime(timezone=True), default=utc_now, index=True)
+    updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
 
 
 class PostLike(Base):
@@ -163,6 +185,7 @@ class Notification(Base):
     actor_id = Column(String(36), nullable=True, index=True)  # Who triggered the notification
     actor_pseudo = Column(String(50), nullable=True)
     actor_avatar_seed = Column(String(50), nullable=True)
+    actor_avatar_url = Column(Text, nullable=True)
     read = Column(Boolean, default=False, index=True)
     created_at = Column(DateTime(timezone=True), default=utc_now)
 
@@ -201,6 +224,7 @@ class Theme(Base):
     icon_url = Column(Text, nullable=True)
     question_count = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), default=utc_now)
+    updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
 
 
 class UserThemeXP(Base):

@@ -1,3 +1,4 @@
+from collections import defaultdict
 from fastapi import APIRouter, Depends
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,8 +14,10 @@ router = APIRouter(prefix="/search", tags=["search"])
 @router.get("/themes")
 async def search_themes(
     q: Optional[str] = None, difficulty: Optional[str] = None,
-    user_id: Optional[str] = None, db: AsyncSession = Depends(get_db)
+    user_id: Optional[str] = None, limit: int = 20, offset: int = 0,
+    db: AsyncSession = Depends(get_db)
 ):
+    limit = min(limit, 100)
     query_lower = (q or "").strip().lower()
 
     # Get all themes from DB
@@ -70,15 +73,16 @@ async def search_themes(
         })
 
     results.sort(key=lambda x: x["relevance_score"], reverse=True)
-    return results
+    return results[offset:offset + limit]
 
 
 @router.get("/players")
 async def search_players_enhanced(
     q: Optional[str] = None, title: Optional[str] = None,
     country: Optional[str] = None, min_level: Optional[int] = None,
-    limit: int = 20, db: AsyncSession = Depends(get_db)
+    limit: int = 20, offset: int = 0, db: AsyncSession = Depends(get_db)
 ):
+    limit = min(limit, 100)
     query = select(User)
 
     if q and q.strip():
@@ -93,21 +97,41 @@ async def search_players_enhanced(
 
     query = query.order_by(User.total_xp.desc())
 
-    result = await db.execute(query.limit(limit))
+    result = await db.execute(query.limit(limit).offset(offset))
     users = result.scalars().all()
+
+    if not users:
+        return []
+
+    player_ids = [u.id for u in users]
+
+    # Batch fetch all theme XP for these players
+    theme_xp_res = await db.execute(
+        select(UserThemeXP).where(UserThemeXP.user_id.in_(player_ids))
+    )
+    all_theme_xp = theme_xp_res.scalars().all()
+
+    # Group by user
+    user_themes = defaultdict(list)
+    for txp in all_theme_xp:
+        user_themes[txp.user_id].append(txp)
+
+    # Batch fetch all referenced themes
+    all_theme_ids = list(set(txp.theme_id for txp in all_theme_xp))
+    themes_map = {}
+    if all_theme_ids:
+        themes_res = await db.execute(select(Theme).where(Theme.id.in_(all_theme_ids)))
+        themes_map = {t.id: t for t in themes_res.scalars().all()}
 
     players = []
     for u in users:
-        # Get best theme
-        best_res = await db.execute(
-            select(UserThemeXP).where(UserThemeXP.user_id == u.id).order_by(UserThemeXP.xp.desc()).limit(1)
-        )
-        best_uxp = best_res.scalar_one_or_none()
+        # Find best theme XP for this user
+        user_txps = user_themes.get(u.id, [])
+        best_uxp = max(user_txps, key=lambda x: x.xp) if user_txps else None
         best_level = get_level(best_uxp.xp) if best_uxp else 0
         best_title = ""
         if best_uxp:
-            t_res = await db.execute(select(Theme).where(Theme.id == best_uxp.theme_id))
-            best_theme = t_res.scalar_one_or_none()
+            best_theme = themes_map.get(best_uxp.theme_id)
             if best_theme:
                 best_title = get_theme_title(best_theme, best_level)
 
@@ -123,6 +147,7 @@ async def search_players_enhanced(
 
         players.append({
             "id": u.id, "pseudo": u.pseudo, "avatar_seed": u.avatar_seed,
+            "avatar_url": getattr(u, 'avatar_url', None),
             "country": u.country, "country_flag": COUNTRY_FLAGS.get(u.country or "", ""),
             "total_xp": u.total_xp, "matches_played": u.matches_played,
             "selected_title": player_title, "best_level": best_level,
@@ -134,9 +159,10 @@ async def search_players_enhanced(
 @router.get("/content")
 async def search_content(
     q: str, category: Optional[str] = None,
-    user_id: Optional[str] = None, limit: int = 20,
+    user_id: Optional[str] = None, limit: int = 20, offset: int = 0,
     db: AsyncSession = Depends(get_db)
 ):
+    limit = min(limit, 100)
     if not q or not q.strip():
         return {"posts": [], "comments": []}
 
@@ -145,7 +171,7 @@ async def search_content(
     post_query = select(WallPost).where(WallPost.content.ilike(f"%{search_term}%"))
     if category:
         post_query = post_query.where(WallPost.category_id == category)
-    post_query = post_query.order_by(WallPost.created_at.desc()).limit(limit)
+    post_query = post_query.order_by(WallPost.created_at.desc()).limit(limit).offset(offset)
     post_result = await db.execute(post_query)
     posts = post_result.scalars().all()
 
@@ -180,6 +206,7 @@ async def search_content(
             "user": {
                 "id": author.id if author else "", "pseudo": author.pseudo if author else "Inconnu",
                 "avatar_seed": author.avatar_seed if author else "",
+                "avatar_url": getattr(author, 'avatar_url', None) if author else None,
             },
             "content": p.content, "has_image": bool(p.image_base64),
             "likes_count": likes_count, "comments_count": comments_count,
@@ -187,7 +214,7 @@ async def search_content(
         })
 
     comment_query = select(PostComment).where(PostComment.content.ilike(f"%{search_term}%"))
-    comment_query = comment_query.order_by(PostComment.created_at.desc()).limit(limit)
+    comment_query = comment_query.order_by(PostComment.created_at.desc()).limit(limit).offset(offset)
     comment_result = await db.execute(comment_query)
     comments = comment_result.scalars().all()
 
@@ -211,6 +238,7 @@ async def search_content(
             "user": {
                 "id": author.id if author else "", "pseudo": author.pseudo if author else "Inconnu",
                 "avatar_seed": author.avatar_seed if author else "",
+                "avatar_url": getattr(author, 'avatar_url', None) if author else None,
             },
             "content": c.content, "created_at": c.created_at.isoformat(),
         })
@@ -246,6 +274,7 @@ async def get_trending(db: AsyncSession = Depends(get_db)):
     top_players = top_players_res.scalars().all()
     top_players_data = [{
         "id": u.id, "pseudo": u.pseudo, "avatar_seed": u.avatar_seed,
+        "avatar_url": getattr(u, 'avatar_url', None),
         "total_xp": u.total_xp, "country_flag": COUNTRY_FLAGS.get(u.country or "", ""),
     } for u in top_players]
 

@@ -35,12 +35,14 @@ async def create_notification(
 
     actor_pseudo = None
     actor_avatar_seed = None
+    actor_avatar_url = None
     if actor_id:
         actor_res = await db.execute(select(User).where(User.id == actor_id))
         actor = actor_res.scalar_one_or_none()
         if actor:
             actor_pseudo = actor.pseudo
             actor_avatar_seed = actor.avatar_seed
+            actor_avatar_url = getattr(actor, 'avatar_url', None)
 
     icon = NOTIFICATION_TYPE_MAP.get(notif_type, {}).get("icon", "🔔")
 
@@ -54,6 +56,7 @@ async def create_notification(
         actor_id=actor_id,
         actor_pseudo=actor_pseudo,
         actor_avatar_seed=actor_avatar_seed,
+        actor_avatar_url=actor_avatar_url,
     )
     db.add(notif)
 
@@ -71,6 +74,7 @@ async def create_notification(
             "actor_id": actor_id,
             "actor_pseudo": actor_pseudo,
             "actor_avatar_seed": actor_avatar_seed,
+            "actor_avatar_url": actor_avatar_url,
             "read": False,
             "created_at": notif.created_at.isoformat() if notif.created_at else None,
         })

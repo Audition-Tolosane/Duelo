@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
-  Modal
+  Modal, Image, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DueloHeader from '../../components/DueloHeader';
+import UserAvatar from '../../components/UserAvatar';
 import { GLASS } from '../../theme/glassTheme';
+import { authFetch, clearToken } from '../../utils/api';
 import CosmicBackground from '../../components/CosmicBackground';
+import { t } from '../../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const GRID_PAD = 16;
@@ -38,7 +42,7 @@ type UnlockedTitle = {
 
 type ProfileData = {
   user: {
-    id: string; pseudo: string; avatar_seed: string; is_guest: boolean;
+    id: string; pseudo: string; avatar_seed: string; avatar_url?: string | null; is_guest: boolean;
     total_xp: number; selected_title: string | null;
     country: string | null; country_flag: string;
     matches_played: number; matches_won: number;
@@ -59,12 +63,17 @@ export default function ProfileScreen() {
   const router = useRouter();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profileError, setProfileError] = useState(false);
   const [showTitleModal, setShowTitleModal] = useState(false);
   const [savingTitle, setSavingTitle] = useState(false);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [presetAvatars, setPresetAvatars] = useState<{id: string; name: string; image_url: string; category: string}[]>([]);
+  const [savingAvatar, setSavingAvatar] = useState(false);
 
   useEffect(() => { loadProfile(); }, []);
 
   const loadProfile = async () => {
+    setProfileError(false);
     const userId = await AsyncStorage.getItem('duelo_user_id');
     const pseudo = await AsyncStorage.getItem('duelo_pseudo');
     const avatarSeed = await AsyncStorage.getItem('duelo_avatar_seed');
@@ -76,9 +85,10 @@ export default function ProfileScreen() {
         setProfile(data);
       } else {
         // API failed but user is logged in - show basic profile from local storage
+        setProfileError(true);
         setProfile({
           user: {
-            id: userId, pseudo: pseudo || 'Joueur', avatar_seed: avatarSeed || '',
+            id: userId, pseudo: pseudo || t('profile.player_default'), avatar_seed: avatarSeed || '',
             is_guest: true, total_xp: 0, selected_title: null,
             country: null, country_flag: '',
             matches_played: 0, matches_won: 0,
@@ -90,9 +100,10 @@ export default function ProfileScreen() {
       }
     } catch {
       // Network error - show basic profile from local storage
+      setProfileError(true);
       setProfile({
         user: {
-          id: userId, pseudo: pseudo || 'Joueur', avatar_seed: avatarSeed || '',
+          id: userId, pseudo: pseudo || t('profile.player_default'), avatar_seed: avatarSeed || '',
           is_guest: true, total_xp: 0, selected_title: null,
           country: null, country_flag: '',
           matches_played: 0, matches_won: 0,
@@ -107,24 +118,108 @@ export default function ProfileScreen() {
 
   const handleSelectTitle = async (title: string) => {
     if (!profile) return;
+    const previousTitle = profile.user.selected_title;
     setSavingTitle(true);
+    // Optimistic update
+    setProfile(prev => prev ? { ...prev, user: { ...prev.user, selected_title: title } } : null);
     try {
-      const res = await fetch(`${API_URL}/api/user/select-title`, {
+      const res = await authFetch(`${API_URL}/api/user/select-title`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: profile?.user?.id, title }),
       });
       if (res.ok) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        setProfile(prev => prev ? { ...prev, user: { ...prev.user, selected_title: title } } : null);
+      } else {
+        // Rollback on failure
+        setProfile(prev => prev ? { ...prev, user: { ...prev.user, selected_title: previousTitle } } : null);
+        Alert.alert(t('common.error'), t('profile.error_change_title'));
       }
-    } catch {}
+    } catch {
+      // Rollback on network error
+      setProfile(prev => prev ? { ...prev, user: { ...prev.user, selected_title: previousTitle } } : null);
+      Alert.alert(t('common.error'), t('profile.error_network'));
+    }
     setSavingTitle(false);
     setShowTitleModal(false);
   };
 
   const handleLogout = async () => {
-    await AsyncStorage.multiRemove(['duelo_user_id', 'duelo_pseudo', 'duelo_avatar_seed']);
+    await clearToken();
+    await AsyncStorage.multiRemove(['duelo_user_id', 'duelo_pseudo', 'duelo_avatar_seed', 'duelo_avatar_url']);
     router.replace('/');
+  };
+
+  const openAvatarModal = async () => {
+    setShowAvatarModal(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    try {
+      const res = await fetch(`${API_URL}/api/admin/avatars`);
+      const data = await res.json();
+      setPresetAvatars(data.avatars || []);
+    } catch {}
+  };
+
+  const handleSelectAvatar = async (avatarId: string) => {
+    if (!profile) return;
+    const previousAvatarUrl = profile.user.avatar_url;
+    setSavingAvatar(true);
+    try {
+      const res = await authFetch(`${API_URL}/api/user/select-avatar`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: profile.user.id, avatar_id: avatarId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        setProfile(prev => prev ? { ...prev, user: { ...prev.user, avatar_url: data.avatar_url } } : null);
+        await AsyncStorage.setItem('duelo_avatar_url', data.avatar_url);
+        setShowAvatarModal(false);
+      } else {
+        // Rollback on failure
+        setProfile(prev => prev ? { ...prev, user: { ...prev.user, avatar_url: previousAvatarUrl } } : null);
+        Alert.alert(t('common.error'), t('profile.error_change_avatar'));
+      }
+    } catch {
+      // Rollback on network error
+      setProfile(prev => prev ? { ...prev, user: { ...prev.user, avatar_url: previousAvatarUrl } } : null);
+      Alert.alert(t('common.error'), t('profile.error_network'));
+    }
+    setSavingAvatar(false);
+  };
+
+  const handleUploadPhoto = async () => {
+    if (!profile) return;
+    const previousAvatarUrl = profile.user.avatar_url;
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      base64: true, quality: 0.8, allowsEditing: true, aspect: [1, 1],
+    });
+    if (result.canceled || !result.assets[0]?.base64) return;
+
+    setSavingAvatar(true);
+    try {
+      const res = await authFetch(`${API_URL}/api/user/upload-avatar`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: profile.user.id, image_base64: result.assets[0].base64 }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        const urlWithCache = `${data.avatar_url}?t=${Date.now()}`;
+        setProfile(prev => prev ? { ...prev, user: { ...prev.user, avatar_url: urlWithCache } } : null);
+        await AsyncStorage.setItem('duelo_avatar_url', urlWithCache);
+        setShowAvatarModal(false);
+      } else {
+        // Rollback on failure
+        setProfile(prev => prev ? { ...prev, user: { ...prev.user, avatar_url: previousAvatarUrl } } : null);
+        Alert.alert(t('common.error'), t('profile.error_upload_avatar'));
+      }
+    } catch {
+      // Rollback on network error
+      setProfile(prev => prev ? { ...prev, user: { ...prev.user, avatar_url: previousAvatarUrl } } : null);
+      Alert.alert(t('common.error'), t('profile.error_network'));
+    }
+    setSavingAvatar(false);
   };
 
   if (loading) {
@@ -135,9 +230,9 @@ export default function ProfileScreen() {
       <CosmicBackground>
         <View style={s.container}>
         <View style={s.emptyContainer}>
-          <Text style={s.emptyText}>Connecte-toi pour voir ton profil</Text>
+          <Text style={s.emptyText}>{t('profile.login_prompt')}</Text>
           <TouchableOpacity style={s.loginBtn} onPress={() => router.replace('/')}>
-            <Text style={s.loginBtnText}>Se connecter</Text>
+            <Text style={s.loginBtnText}>{t('profile.login_button')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -153,15 +248,29 @@ export default function ProfileScreen() {
     <View style={s.container}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
 
+        {profileError && (
+          <TouchableOpacity onPress={() => { setProfileError(false); setLoading(true); loadProfile(); }} style={{ padding: 12, alignItems: 'center', backgroundColor: 'rgba(255,59,48,0.08)', marginHorizontal: 16, borderRadius: 12, marginBottom: 8 }}>
+            <Text style={{ color: '#FF3B30', fontSize: 13, fontWeight: '600' }}>{t('profile.offline_error')}</Text>
+          </TouchableOpacity>
+        )}
+
         {/* ── Profile Header: Avatar left + info right ── */}
         <View style={s.profileHeader}>
-          <View style={s.avatarContainer}>
-            <View style={s.avatar}>
-              <Text style={s.avatarText}>{user?.pseudo?.[0]?.toUpperCase() || '?'}</Text>
+          <TouchableOpacity style={s.avatarContainer} onPress={openAvatarModal} activeOpacity={0.8}>
+            <UserAvatar
+              avatarUrl={user?.avatar_url}
+              avatarSeed={user?.avatar_seed}
+              pseudo={user?.pseudo}
+              size={72}
+              borderColor="#8A2BE2"
+              borderWidth={3}
+            />
+            <View style={s.avatarEditBadge}>
+              <MaterialCommunityIcons name="pencil" size={12} color="#FFF" />
             </View>
-          </View>
+          </TouchableOpacity>
           <View style={s.profileInfo}>
-            <Text style={s.pseudo}>{user?.pseudo || 'Joueur'}</Text>
+            <Text style={s.pseudo}>{user?.pseudo || t('profile.player_default')}</Text>
             {displayTitle ? (
               <TouchableOpacity style={s.titleBadge} onPress={() => setShowTitleModal(true)}>
                 <Text style={s.titleText}>{displayTitle}</Text>
@@ -169,7 +278,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             ) : (
               <TouchableOpacity style={s.titleBadge} onPress={() => setShowTitleModal(true)}>
-                <Text style={s.titleTextEmpty}>Aucun titre</Text>
+                <Text style={s.titleTextEmpty}>{t('profile.no_title')}</Text>
                 <Text style={s.titleEditIcon}> ✎</Text>
               </TouchableOpacity>
             )}
@@ -181,7 +290,7 @@ export default function ProfileScreen() {
             ) : (
               <View style={s.locationRow}>
                 <Text style={s.locationFlag}>🌍</Text>
-                <Text style={s.locationText}>Monde</Text>
+                <Text style={s.locationText}>{t('profile.world')}</Text>
               </View>
             )}
           </View>
@@ -191,40 +300,40 @@ export default function ProfileScreen() {
         <View style={s.statsRow}>
           <View style={s.statItem}>
             <Text style={s.statValue}>{user?.matches_played || 0}</Text>
-            <Text style={s.statLabel}>PARTIES</Text>
+            <Text style={s.statLabel}>{t('profile.matches_label')}</Text>
           </View>
           <View style={s.statDivider} />
           <View style={s.statItem}>
             <Text style={s.statValue}>{user?.followers_count || 0}</Text>
-            <Text style={s.statLabel}>ABONNÉS</Text>
+            <Text style={s.statLabel}>{t('profile.followers_label')}</Text>
           </View>
           <View style={s.statDivider} />
           <View style={s.statItem}>
             <Text style={s.statValue}>{user?.following_count || 0}</Text>
-            <Text style={s.statLabel}>ABONNEMENTS</Text>
+            <Text style={s.statLabel}>{t('profile.following_label')}</Text>
           </View>
         </View>
 
         {/* ── Mes Thèmes (theme-based XP) ── */}
         {themes && themes.length > 0 && (
           <>
-            <Text style={s.sectionTitle}>MES THÈMES</Text>
+            <Text style={s.sectionTitle}>{t('profile.my_themes')}</Text>
             <View style={s.topicsGrid}>
-              {themes.map((t) => (
+              {themes.map((thm) => (
                 <TouchableOpacity
-                  key={t.id}
+                  key={thm.id}
                   style={s.topicCard}
-                  onPress={() => router.push(`/matchmaking?category=${t.id}&themeName=${encodeURIComponent(t.name)}`)}
+                  onPress={() => router.push(`/matchmaking?category=${thm.id}&themeName=${encodeURIComponent(thm.name)}`)}
                   activeOpacity={0.8}
                 >
-                  <View style={[s.topicCardInner, { borderColor: t.color_hex + '30' }]}>
-                    <View style={[s.topicIconBox, { backgroundColor: t.color_hex + '20' }]}>
-                      <Text style={s.topicIcon}>{t.name.charAt(0).toUpperCase()}</Text>
+                  <View style={[s.topicCardInner, { borderColor: thm.color_hex + '30' }]}>
+                    <View style={[s.topicIconBox, { backgroundColor: thm.color_hex + '20' }]}>
+                      <Text style={s.topicIcon}>{thm.name.charAt(0).toUpperCase()}</Text>
                     </View>
-                    <Text style={[s.topicName, { color: t.color_hex }]} numberOfLines={1}>{t.name}</Text>
-                    <Text style={s.topicLevel}>Niv. {t.level}</Text>
+                    <Text style={[s.topicName, { color: thm.color_hex }]} numberOfLines={1}>{thm.name}</Text>
+                    <Text style={s.topicLevel}>{t('profile.level_short')} {thm.level}</Text>
                     <View style={s.topicBarBg}>
-                      <View style={[s.topicBarFill, { width: `${(t.xp_progress?.progress || 0) * 100}%`, backgroundColor: t.color_hex }]} />
+                      <View style={[s.topicBarFill, { width: `${(thm.xp_progress?.progress || 0) * 100}%`, backgroundColor: thm.color_hex }]} />
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -235,47 +344,47 @@ export default function ProfileScreen() {
 
         {(!themes || themes.length === 0) && (
           <>
-            <Text style={s.sectionTitle}>MES THÈMES</Text>
-            <Text style={s.noHistory}>Joue un quiz pour commencer à progresser !</Text>
+            <Text style={s.sectionTitle}>{t('profile.my_themes')}</Text>
+            <Text style={s.noHistory}>{t('profile.play_to_progress')}</Text>
           </>
         )}
 
         {/* ── Quick Stats ── */}
-        <Text style={s.sectionTitle}>STATISTIQUES</Text>
+        <Text style={s.sectionTitle}>{t('profile.statistics')}</Text>
         <View style={s.quickStats}>
           <View style={s.qStatBox}>
             <Text style={[s.qStatVal, { color: '#00FF9D' }]}>{user?.matches_won || 0}</Text>
-            <Text style={s.qStatLbl}>Victoires</Text>
+            <Text style={s.qStatLbl}>{t('profile.wins')}</Text>
           </View>
           <View style={s.qStatBox}>
             <Text style={s.qStatVal}>{user?.win_rate || 0}%</Text>
-            <Text style={s.qStatLbl}>Win Rate</Text>
+            <Text style={s.qStatLbl}>{t('profile.win_rate')}</Text>
           </View>
           <View style={s.qStatBox}>
             <Text style={[s.qStatVal, { color: '#FFD700' }]}>{user?.best_streak || 0}</Text>
-            <Text style={s.qStatLbl}>Best Streak</Text>
+            <Text style={s.qStatLbl}>{t('profile.best_streak')}</Text>
           </View>
           <View style={s.qStatBox}>
             <Text style={[s.qStatVal, { color: '#00FFFF' }]}>{(user?.total_xp || 0).toLocaleString()}</Text>
-            <Text style={s.qStatLbl}>XP Total</Text>
+            <Text style={s.qStatLbl}>{t('profile.xp_total')}</Text>
           </View>
         </View>
 
         {/* ── Titles ── */}
         {all_unlocked_titles && all_unlocked_titles.length > 0 && (
           <>
-            <Text style={s.sectionTitle}>MES TITRES</Text>
+            <Text style={s.sectionTitle}>{t('profile.my_titles')}</Text>
             <View style={s.titlesWrap}>
-              {all_unlocked_titles.map((t, i) => {
-                const isSelected = user?.selected_title === t.title;
+              {all_unlocked_titles.map((ttl, i) => {
+                const isSelected = user?.selected_title === ttl.title;
                 return (
                   <TouchableOpacity
-                    key={`${t.theme_id}-${t.level}`}
+                    key={`${ttl.theme_id}-${ttl.level}`}
                     style={[s.titleChip, isSelected && { borderColor: '#8A2BE2', backgroundColor: 'rgba(138,43,226,0.15)' }]}
-                    onPress={() => handleSelectTitle(t.title)}
+                    onPress={() => handleSelectTitle(ttl.title)}
                   >
-                    <Text style={s.titleChipText}>{t.theme_name}</Text>
-                    <Text style={[s.titleChipTitle, isSelected && { color: '#B57EDC' }]}>{t.title}</Text>
+                    <Text style={s.titleChipText}>{ttl.theme_name}</Text>
+                    <Text style={[s.titleChipTitle, isSelected && { color: '#B57EDC' }]}>{ttl.title}</Text>
                     {isSelected && <Text style={s.titleChipCheck}>✓</Text>}
                   </TouchableOpacity>
                 );
@@ -285,9 +394,9 @@ export default function ProfileScreen() {
         )}
 
         {/* ── Match History ── */}
-        <Text style={s.sectionTitle}>HISTORIQUE</Text>
+        <Text style={s.sectionTitle}>{t('profile.history')}</Text>
         {match_history && match_history.length === 0 ? (
-          <Text style={s.noHistory}>Aucun match pour le moment</Text>
+          <Text style={s.noHistory}>{t('profile.no_matches')}</Text>
         ) : (
           match_history.map((m) => (
             <View key={m.id} style={[s.matchCard, m.won && s.matchCardWon]}>
@@ -306,7 +415,7 @@ export default function ProfileScreen() {
                 </Text>
                 <View style={s.matchXpRow}>
                   <Text style={[s.matchResult, m.won ? s.resultWin : s.resultLoss]}>
-                    {m.won ? 'VICTOIRE' : 'DÉFAITE'}
+                    {m.won ? t('profile.victory') : t('profile.defeat')}
                   </Text>
                   {m.xp_earned > 0 && <Text style={s.matchXp}>+{m.xp_earned} XP</Text>}
                 </View>
@@ -316,14 +425,16 @@ export default function ProfileScreen() {
         )}
 
         {/* ── Paramètres ── */}
-        <Text style={s.sectionTitle}>PARAMÈTRES</Text>
+        <Text style={s.sectionTitle}>{t('profile.settings')}</Text>
         <View style={s.settingsWrap}>
           {[
-            { icon: 'tag-outline' as const, label: 'Changer de titre', color: '#8A2BE2', onPress: () => setShowTitleModal(true) },
-            { icon: 'bell-outline' as const, label: 'Notifications', color: '#FFD700' },
-            { icon: 'translate' as const, label: 'Langue', color: '#4ECDC4' },
-            { icon: 'file-document-outline' as const, label: 'Conditions d\'utilisation', color: '#A3A3A3' },
-          ].map((item, idx) => (
+            { icon: 'account-circle-outline' as const, label: t('profile.change_avatar'), color: '#00BFFF', onPress: openAvatarModal },
+            { icon: 'tag-outline' as const, label: t('profile.change_title'), color: '#8A2BE2', onPress: () => setShowTitleModal(true) },
+            { icon: 'bell-outline' as const, label: t('settings.notifications'), color: '#FFD700', onPress: () => router.push('/notification-settings') },
+            { icon: 'translate' as const, label: t('settings.language'), color: '#4ECDC4', onPress: () => router.push('/language-settings') },
+            { icon: 'file-document-outline' as const, label: t('settings.terms'), color: '#A3A3A3', onPress: () => router.push('/terms') },
+            { icon: 'headset' as const, label: t('settings.support'), color: '#FF6B35', onPress: () => router.push('/support') },
+          ].map((item, idx, arr) => (
             <React.Fragment key={item.label}>
               <TouchableOpacity style={s.settingsRow} onPress={item.onPress} activeOpacity={0.7}>
                 <LinearGradient
@@ -335,7 +446,7 @@ export default function ProfileScreen() {
                 <Text style={s.settingsText}>{item.label}</Text>
                 <MaterialCommunityIcons name="chevron-right" size={20} color="rgba(255,255,255,0.2)" />
               </TouchableOpacity>
-              {idx < 3 && <View style={s.settingsDivider} />}
+              {idx < arr.length - 1 && <View style={s.settingsDivider} />}
             </React.Fragment>
           ))}
         </View>
@@ -348,35 +459,99 @@ export default function ProfileScreen() {
           >
             <MaterialCommunityIcons name="logout" size={20} color="#FF3B30" />
           </LinearGradient>
-          <Text style={[s.settingsText, { color: '#FF3B30' }]}>Se déconnecter</Text>
+          <Text style={[s.settingsText, { color: '#FF3B30' }]}>{t('settings.logout')}</Text>
           <MaterialCommunityIcons name="chevron-right" size={20} color="#FF3B3040" />
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Avatar Selection Modal */}
+      <Modal visible={showAvatarModal} transparent animationType="fade" onRequestClose={() => setShowAvatarModal(false)}>
+        <View style={s.modalOverlay}>
+          <View style={s.modalContent}>
+            <Text style={s.modalTitle}>{t('profile.choose_avatar')}</Text>
+            <Text style={s.modalHint}>{t('profile.avatar_hint')}</Text>
+
+            {/* Upload photo button */}
+            <TouchableOpacity
+              style={s.uploadPhotoBtn}
+              onPress={handleUploadPhoto}
+              disabled={savingAvatar}
+              activeOpacity={0.7}
+            >
+              <LinearGradient
+                colors={['#00BFFF20', '#00BFFF08']}
+                style={s.uploadPhotoGradient}
+              >
+                <MaterialCommunityIcons name="camera-plus" size={22} color="#00BFFF" />
+                <Text style={s.uploadPhotoText}>{t('profile.upload_photo')}</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {/* Presets grid */}
+            {presetAvatars.length > 0 && (
+              <ScrollView style={s.modalScroll} showsVerticalScrollIndicator={false}>
+                <Text style={s.avatarGridLabel}>{t('profile.available_avatars')}</Text>
+                <View style={s.avatarGrid}>
+                  {presetAvatars.map((a) => {
+                    const isSelected = user?.avatar_url === a.image_url;
+                    return (
+                      <TouchableOpacity
+                        key={a.id}
+                        style={[s.avatarGridItem, isSelected && s.avatarGridItemSelected]}
+                        onPress={() => handleSelectAvatar(a.id)}
+                        disabled={savingAvatar}
+                        activeOpacity={0.7}
+                      >
+                        <Image
+                          source={{ uri: `${API_URL}/static/${a.image_url}` }}
+                          style={s.avatarGridImage}
+                        />
+                        <Text style={s.avatarGridName} numberOfLines={1}>{a.name}</Text>
+                        {isSelected && (
+                          <View style={s.avatarGridCheck}>
+                            <MaterialCommunityIcons name="check-circle" size={18} color="#00FF9D" />
+                          </View>
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </ScrollView>
+            )}
+
+            {savingAvatar && <ActivityIndicator color="#8A2BE2" style={{ marginVertical: 12 }} />}
+
+            <TouchableOpacity style={s.modalClose} onPress={() => setShowAvatarModal(false)}>
+              <Text style={s.modalCloseText}>{t('profile.close')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {/* Title Selection Modal */}
       <Modal visible={showTitleModal} transparent animationType="fade" onRequestClose={() => setShowTitleModal(false)}>
         <View style={s.modalOverlay}>
           <View style={s.modalContent}>
-            <Text style={s.modalTitle}>Choisir un titre</Text>
-            <Text style={s.modalHint}>Ce titre sera affiché sous ton pseudo en duel</Text>
+            <Text style={s.modalTitle}>{t('profile.choose_title')}</Text>
+            <Text style={s.modalHint}>{t('profile.title_hint')}</Text>
             {(!all_unlocked_titles || all_unlocked_titles.length === 0) ? (
               <View style={s.modalEmpty}>
-                <Text style={s.modalEmptyText}>Joue des parties pour débloquer des titres !</Text>
+                <Text style={s.modalEmptyText}>{t('profile.play_to_unlock_titles')}</Text>
               </View>
             ) : (
               <ScrollView style={s.modalScroll}>
-                {all_unlocked_titles.map((t) => {
-                  const isSelected = user?.selected_title === t.title;
+                {all_unlocked_titles.map((ttl) => {
+                  const isSelected = user?.selected_title === ttl.title;
                   return (
                     <TouchableOpacity
-                      key={`${t.theme_id}-${t.level}`}
+                      key={`${ttl.theme_id}-${ttl.level}`}
                       style={[s.modalItem, isSelected && { borderColor: '#8A2BE2', backgroundColor: 'rgba(138,43,226,0.1)' }]}
-                      onPress={() => handleSelectTitle(t.title)}
+                      onPress={() => handleSelectTitle(ttl.title)}
                       disabled={savingTitle}
                     >
                       <View style={s.modalItemInfo}>
-                        <Text style={[s.modalItemTitle, isSelected && { color: '#B57EDC' }]}>{t.title}</Text>
-                        <Text style={s.modalItemSub}>{t.theme_name} - Niv. {t.level}</Text>
+                        <Text style={[s.modalItemTitle, isSelected && { color: '#B57EDC' }]}>{ttl.title}</Text>
+                        <Text style={s.modalItemSub}>{ttl.theme_name} - {t('profile.level_short')} {ttl.level}</Text>
                       </View>
                       {isSelected && <Text style={s.modalItemCheck}>✓</Text>}
                     </TouchableOpacity>
@@ -385,7 +560,7 @@ export default function ProfileScreen() {
               </ScrollView>
             )}
             <TouchableOpacity style={s.modalClose} onPress={() => setShowTitleModal(false)}>
-              <Text style={s.modalCloseText}>Fermer</Text>
+              <Text style={s.modalCloseText}>{t('profile.close')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -409,13 +584,13 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center',
     paddingHorizontal: GRID_PAD, paddingVertical: 20, gap: 16,
   },
-  avatarContainer: {},
-  avatar: {
-    width: 72, height: 72, borderRadius: 36, backgroundColor: '#1A1A2E',
-    justifyContent: 'center', alignItems: 'center',
-    borderWidth: 3, borderColor: '#8A2BE2',
+  avatarContainer: { position: 'relative' as const },
+  avatarEditBadge: {
+    position: 'absolute' as const, bottom: 0, right: -2,
+    width: 24, height: 24, borderRadius: 12,
+    backgroundColor: '#8A2BE2', justifyContent: 'center' as const, alignItems: 'center' as const,
+    borderWidth: 2, borderColor: '#050510',
   },
-  avatarText: { fontSize: 32, fontWeight: '900', color: '#8A2BE2' },
   profileInfo: { flex: 1 },
   pseudo: { fontSize: 24, fontWeight: '900', color: '#FFF' },
   titleBadge: { flexDirection: 'row', alignItems: 'center', marginTop: 4, alignSelf: 'flex-start' },
@@ -530,6 +705,24 @@ const s = StyleSheet.create({
     borderRadius: 20, backgroundColor: 'rgba(255,59,48,0.06)',
     borderWidth: 1, borderColor: 'rgba(255,59,48,0.12)', marginBottom: 24,
   },
+
+  /* Avatar Modal */
+  uploadPhotoBtn: { marginBottom: 16, borderRadius: 14, overflow: 'hidden' as const },
+  uploadPhotoGradient: {
+    flexDirection: 'row' as const, alignItems: 'center' as const, justifyContent: 'center' as const,
+    gap: 8, padding: 14, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(0,191,255,0.2)',
+  },
+  uploadPhotoText: { color: '#00BFFF', fontSize: 14, fontWeight: '700' },
+  avatarGridLabel: { fontSize: 10, fontWeight: '800', color: '#525252', letterSpacing: 2, marginBottom: 10 },
+  avatarGrid: { flexDirection: 'row' as const, flexWrap: 'wrap' as const, gap: 10 },
+  avatarGridItem: {
+    width: 72, alignItems: 'center' as const, padding: 6, borderRadius: 14,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(255,255,255,0.03)',
+  },
+  avatarGridItemSelected: { borderColor: '#00FF9D', backgroundColor: 'rgba(0,255,157,0.08)' },
+  avatarGridImage: { width: 52, height: 52, borderRadius: 26, marginBottom: 4 },
+  avatarGridName: { color: '#A3A3A3', fontSize: 9, fontWeight: '600', textAlign: 'center' as const },
+  avatarGridCheck: { position: 'absolute' as const, top: 4, right: 4 },
 
   /* Modal */
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', paddingHorizontal: 24 },

@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions,
-  Platform, UIManager, ActivityIndicator, Easing
+  Platform, UIManager, ActivityIndicator, Easing, Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { GLASS } from '../theme/glassTheme';
 import SwipeBackPage from '../components/SwipeBackPage';
 import { useWS } from '../contexts/WebSocketContext';
+import { t } from '../utils/i18n';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -29,7 +32,7 @@ type Question = {
 };
 
 // ── Animated Score Bar component ──
-function AnimatedBar({ score, showPending }: { score: number; showPending: boolean }) {
+function AnimatedBar({ score, showPending, isPlayer }: { score: number; showPending: boolean; isPlayer?: boolean }) {
   const [trackHeight, setTrackHeight] = useState(0);
   const barHeightAnim = useRef(new Animated.Value(0)).current;
   const pendingOpacity = useRef(new Animated.Value(1)).current;
@@ -60,6 +63,8 @@ function AnimatedBar({ score, showPending }: { score: number; showPending: boole
   }, [showPending]);
 
   const pendingHeight = trackHeight > 0 ? (MAX_PTS_PER_Q / MAX_TOTAL) * trackHeight : 0;
+  const barColor = isPlayer ? '#8A2BE2' : '#2196F3';
+  const pendingColor = isPlayer ? 'rgba(138,43,226,0.30)' : 'rgba(33,150,243,0.30)';
 
   return (
     <View style={styles.barColumn}>
@@ -73,19 +78,23 @@ function AnimatedBar({ score, showPending }: { score: number; showPending: boole
           left: 0, right: 0,
           bottom: barHeightAnim,
           height: pendingHeight,
-          backgroundColor: 'rgba(0,200,83,0.30)',
+          backgroundColor: pendingColor,
           borderRadius: 7,
           opacity: pendingOpacity,
         }} />
 
-        {/* Earned (solid green, grows from bottom) */}
+        {/* Earned (solid, grows from bottom) */}
         <Animated.View style={{
           position: 'absolute',
           left: 0, right: 0, bottom: 0,
           height: barHeightAnim,
-          backgroundColor: '#00C853',
+          backgroundColor: barColor,
           borderRadius: 7,
         }} />
+      </View>
+      <View style={styles.barScoreLabel}>
+        <MaterialCommunityIcons name="star" size={10} color={barColor} />
+        <Text style={[styles.barScoreText, { color: barColor }]}>{score}</Text>
       </View>
     </View>
   );
@@ -94,9 +103,15 @@ function AnimatedBar({ score, showPending }: { score: number; showPending: boole
 export default function GameScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{
-    category: string; opponentPseudo: string; opponentSeed: string; isBot: string; roomId: string; opponentLevel: string;
+    category: string; opponentPseudo: string; opponentSeed: string; isBot: string; roomId: string; opponentLevel: string; opponentId: string;
   }>();
   const { send: wsSend, on: wsOn } = useWS();
+
+  const themeId = params.category;
+  if (!themeId) {
+    Alert.alert(t('common.error'), t('game.invalid_game'), [{ text: t('common.ok'), onPress: () => router.replace('/(tabs)/play') }]);
+    return null;
+  }
 
   const isLive = params.roomId && params.isBot !== 'true';
 
@@ -108,7 +123,7 @@ export default function GameScreen() {
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [pseudo, setPseudo] = useState('Joueur');
+  const [pseudo, setPseudo] = useState(t('game.player'));
   const [showPending, setShowPending] = useState(true);
 
   // Loading spinner animation
@@ -244,7 +259,17 @@ export default function GameScreen() {
         const { your_score, opponent_score, your_correct } = msg.data || {};
         const userId = userIdRef.current;
         router.replace(
-          `/results?playerScore=${your_score}&opponentScore=${opponent_score}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=false&correctCount=${your_correct || correctCountRef.current}&opponentLevel=${params.opponentLevel || 1}`
+          `/results?playerScore=${your_score}&opponentScore=${opponent_score}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=false&correctCount=${your_correct || correctCountRef.current}&opponentLevel=${params.opponentLevel || 1}&opponentId=${params.opponentId || ''}`
+        );
+      }),
+      // Opponent disconnected
+      wsOn('opponent_disconnected', (msg) => {
+        if (timerRef.current) clearInterval(timerRef.current);
+        const { your_score, opponent_score, your_correct, compensation_points } = msg.data || {};
+        // Navigate to results with auto-victory
+        const userId = userIdRef.current;
+        router.replace(
+          `/results?playerScore=${your_score}&opponentScore=${opponent_score}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=false&correctCount=${your_correct || correctCountRef.current}&opponentLevel=${params.opponentLevel || 1}&opponentId=${params.opponentId || ''}&opponentDisconnected=true`
         );
       }),
       // XP breakdown (sent after game_over)
@@ -268,13 +293,14 @@ export default function GameScreen() {
     setLoading(true);
     setLoadError(null);
     try {
-      const res = await fetch(`${API_URL}/api/game/questions-v2?theme=${params.category}`);
+      const url = `${API_URL}/api/game/questions-v2?theme=${params.category}`;
+      const res = await fetch(url);
       if (!res.ok) {
-        throw new Error(`Erreur serveur (${res.status})`);
+        throw new Error(`${t('game.server_error')} (${res.status})`);
       }
       const data = await res.json();
       if (!Array.isArray(data) || data.length === 0) {
-        throw new Error('Aucune question disponible pour cette catégorie');
+        throw new Error(t('game.no_questions'));
       }
       setQuestions(data.slice(0, TOTAL_QUESTIONS));
       setLoading(false);
@@ -282,7 +308,7 @@ export default function GameScreen() {
       startTimer();
     } catch (err: any) {
       setLoading(false);
-      setLoadError(err.message || 'Impossible de charger les questions');
+      setLoadError(err.message || t('game.cannot_load_questions'));
     }
   };
 
@@ -440,7 +466,7 @@ export default function GameScreen() {
       await AsyncStorage.setItem('duelo_last_quiz_questions', JSON.stringify(questions));
     } catch {}
     router.replace(
-      `/results?playerScore=${ps}&opponentScore=${bs}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=${params.isBot}&correctCount=${cc}&opponentLevel=${ol}`
+      `/results?playerScore=${ps}&opponentScore=${bs}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=${params.isBot}&correctCount=${cc}&opponentLevel=${ol}&opponentId=${params.opponentId || ''}`
     );
   };
 
@@ -456,14 +482,25 @@ export default function GameScreen() {
         <View style={styles.container}>
           <SafeAreaView style={styles.safeArea}>
             <View style={styles.loadingView}>
-              <Text style={styles.errorIcon}>⚠️</Text>
-              <Text style={styles.errorTitle}>Erreur de chargement</Text>
+              <View style={styles.errorIconWrap}>
+                <MaterialCommunityIcons name="alert-circle-outline" size={48} color="#FF6B6B" />
+              </View>
+              <Text style={styles.errorTitle}>{t('game.loading_error')}</Text>
               <Text style={styles.errorMessage}>{loadError}</Text>
               <TouchableOpacity style={styles.retryBtn} onPress={fetchQuestions} activeOpacity={0.8}>
-                <Text style={styles.retryBtnText}>Réessayer</Text>
+                <LinearGradient
+                  colors={['#8A2BE2', '#6A1FBF']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.retryBtnGradient}
+                >
+                  <MaterialCommunityIcons name="refresh" size={18} color="#FFF" style={{ marginRight: 6 }} />
+                  <Text style={styles.retryBtnText}>{t('common.retry')}</Text>
+                </LinearGradient>
               </TouchableOpacity>
               <TouchableOpacity style={styles.backBtnLoading} onPress={() => router.back()} activeOpacity={0.8}>
-                <Text style={styles.backBtnLoadingText}>Retour</Text>
+                <MaterialCommunityIcons name="arrow-left" size={16} color="#888" style={{ marginRight: 6 }} />
+                <Text style={styles.backBtnLoadingText}>{t('common.back')}</Text>
               </TouchableOpacity>
             </View>
           </SafeAreaView>
@@ -483,14 +520,14 @@ export default function GameScreen() {
                 <View style={styles.spinnerDot} />
               </Animated.View>
               <Animated.View style={[styles.spinnerInner, { opacity: pulseAnim }]}>
-                <Text style={styles.spinnerIcon}>🎯</Text>
+                <MaterialCommunityIcons name="target" size={28} color="#8A2BE2" />
               </Animated.View>
             </View>
             <Animated.Text style={[styles.loadingTitle, { opacity: pulseAnim }]}>
-              Chargement des questions
+              {t('game.loading_questions')}
             </Animated.Text>
             <Text style={styles.loadingSubtitle}>
-              Récupération depuis la base de données...
+              {t('game.fetching_from_db')}
             </Text>
             <ActivityIndicator color="#8A2BE2" size="small" style={{ marginTop: 16 }} />
           </View>
@@ -518,19 +555,36 @@ export default function GameScreen() {
   };
 
   const getOptionTextColor = (index: number) => {
-    if (!showResult) return '#1A1A1A';
+    if (!showResult) return '#FFF';
     if (isLive) {
       if (index === selectedOption) {
         return lastAnswerCorrectRef.current ? '#00C853' : '#FF3B30';
       }
-      return '#999';
+      return '#666';
     }
     if (index === question.correct_option) return '#00C853';
     if (index === selectedOption) return '#FF3B30';
-    return '#999';
+    return '#666';
+  };
+
+  const getOptionIcon = (index: number) => {
+    if (!showResult) return null;
+    if (isLive) {
+      if (index === selectedOption) {
+        return lastAnswerCorrectRef.current
+          ? <MaterialCommunityIcons name="check-circle" size={20} color="#00C853" />
+          : <MaterialCommunityIcons name="close-circle" size={20} color="#FF3B30" />;
+      }
+      return null;
+    }
+    if (index === question.correct_option) return <MaterialCommunityIcons name="check-circle" size={20} color="#00C853" />;
+    if (index === selectedOption) return <MaterialCommunityIcons name="close-circle" size={20} color="#FF3B30" />;
+    return null;
   };
 
   const oneQPct = (1 / TOTAL_QUESTIONS) * 100; // ~14.3%
+
+  const timerColor = timeLeft <= 3 ? '#FF3B30' : '#00BFFF';
 
   return (
     <SwipeBackPage>
@@ -543,7 +597,14 @@ export default function GameScreen() {
             inputRange: [0, 1],
             outputRange: ['0%', '100%'],
           }),
-        }]} />
+        }]}>
+          <LinearGradient
+            colors={['#8A2BE2', '#B24BF3']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={StyleSheet.absoluteFill}
+          />
+        </Animated.View>
         {/* Pending portion for current question */}
         <Animated.View style={[styles.progressBarPending, {
           width: `${oneQPct}%`,
@@ -559,20 +620,33 @@ export default function GameScreen() {
         {/* ── Header ── */}
         <View style={styles.headerRow}>
           <View style={styles.playerInfo}>
-            <View style={styles.avatarCircle}>
+            <LinearGradient
+              colors={['#8A2BE2', '#6A1FBF']}
+              style={styles.avatarCircle}
+            >
               <Text style={styles.avatarLetter}>{pseudo[0]?.toUpperCase()}</Text>
-            </View>
+            </LinearGradient>
             <View style={styles.playerMeta}>
               <Text style={styles.playerName} numberOfLines={1}>{pseudo}</Text>
-              <Text style={styles.playerTitle}>Challenger</Text>
-              <Text style={styles.playerScoreNum}>{playerScore}</Text>
+              <Text style={styles.playerTitle}>{t('game.challenger')}</Text>
+              <View style={styles.scoreRow}>
+                <MaterialCommunityIcons name="star" size={14} color="#FFD700" />
+                <Text style={styles.playerScoreNum}>{playerScore}</Text>
+              </View>
             </View>
           </View>
 
           <View style={styles.timerCenter}>
-            <Text style={styles.timerLabel}>Temps restant</Text>
+            <View style={styles.timerLabelRow}>
+              <MaterialCommunityIcons name="timer-outline" size={10} color="#888" />
+              <Text style={styles.timerLabel}>{t('game.time')}</Text>
+            </View>
             <View style={[styles.timerCircle, timeLeft <= 3 && styles.timerDanger]}>
-              <Text style={[styles.timerNum, timeLeft <= 3 && styles.timerNumDanger]}>{timeLeft}</Text>
+              <LinearGradient
+                colors={timeLeft <= 3 ? ['rgba(255,59,48,0.15)', 'rgba(255,59,48,0.05)'] : ['rgba(0,191,255,0.15)', 'rgba(0,191,255,0.05)']}
+                style={StyleSheet.absoluteFill}
+              />
+              <Text style={[styles.timerNum, { color: timerColor }]}>{timeLeft}</Text>
             </View>
           </View>
 
@@ -581,32 +655,47 @@ export default function GameScreen() {
               <Text style={[styles.playerName, { textAlign: 'right' }]} numberOfLines={1}>
                 {params.opponentPseudo?.slice(0, 10)}
               </Text>
-              <Text style={[styles.playerTitle, { textAlign: 'right' }]}>{isLive ? 'En ligne' : 'Bot'}</Text>
-              <Text style={[styles.playerScoreNum, { textAlign: 'right' }]}>{botScore}</Text>
+              <Text style={[styles.playerTitle, { textAlign: 'right' }]}>
+                {isLive ? t('game.online') : t('game.bot')}
+              </Text>
+              <View style={[styles.scoreRow, { justifyContent: 'flex-end' }]}>
+                <MaterialCommunityIcons name="star" size={14} color="#FFD700" />
+                <Text style={[styles.playerScoreNum, { textAlign: 'right' }]}>{botScore}</Text>
+              </View>
             </View>
-            <View style={[styles.avatarCircle, styles.avatarBot]}>
+            <LinearGradient
+              colors={['#2196F3', '#1976D2']}
+              style={styles.avatarCircle}
+            >
               <Text style={styles.avatarLetter}>{(params.opponentPseudo || 'B')[0]?.toUpperCase()}</Text>
-            </View>
+            </LinearGradient>
           </View>
         </View>
 
-        <Text style={styles.questionCounter}>Question {currentIndex + 1}/{questions.length}</Text>
+        <View style={styles.questionCounterRow}>
+          <MaterialCommunityIcons name="progress-check" size={14} color="#666" />
+          <Text style={styles.questionCounter}>{t('game.question')} {currentIndex + 1}/{questions.length}</Text>
+        </View>
 
         {/* ── Main Area ── */}
         <View style={styles.gameArea}>
           {/* LEFT BAR (Player) */}
-          <AnimatedBar score={playerScore} showPending={showPending} />
+          <AnimatedBar score={playerScore} showPending={showPending} isPlayer={true} />
 
           {/* CENTER CONTENT */}
           <View style={styles.centerContent}>
             <Animated.View style={[styles.questionBox, { opacity: questionFade }]}>
-              <Text style={styles.questionText}>{question.question_text}</Text>
+              <View style={styles.questionInner}>
+                <MaterialCommunityIcons name="help-circle-outline" size={20} color="rgba(138,43,226,0.5)" style={{ marginBottom: 8 }} />
+                <Text style={styles.questionText}>{question.question_text}</Text>
+              </View>
             </Animated.View>
 
             <View style={styles.optionsBox}>
               {question.options.map((option, index) => {
                 const isPlayerPick = selectedOption === index;
                 const isBotPick = botAnswer === index;
+                const icon = getOptionIcon(index);
 
                 return (
                   <TouchableOpacity
@@ -623,9 +712,12 @@ export default function GameScreen() {
                       </View>
                     )}
 
-                    <Text style={[styles.optionText, { color: getOptionTextColor(index) }]} numberOfLines={2}>
-                      {option}
-                    </Text>
+                    <View style={styles.optionContent}>
+                      {icon && <View style={styles.optionIcon}>{icon}</View>}
+                      <Text style={[styles.optionText, { color: getOptionTextColor(index) }]} numberOfLines={2}>
+                        {option}
+                      </Text>
+                    </View>
 
                     {showResult && isBotPick && (
                       <View style={styles.triRightAnchor}>
@@ -639,7 +731,7 @@ export default function GameScreen() {
           </View>
 
           {/* RIGHT BAR (Bot) */}
-          <AnimatedBar score={botScore} showPending={showPending} />
+          <AnimatedBar score={botScore} showPending={showPending} isPlayer={false} />
         </View>
       </SafeAreaView>
     </View>
@@ -662,7 +754,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   spinnerInner: { justifyContent: 'center', alignItems: 'center' },
-  spinnerIcon: { fontSize: 28 },
   spinnerDot: {
     width: 8, height: 8, borderRadius: 4, backgroundColor: '#8A2BE2',
     position: 'absolute', top: 0, left: '50%', marginLeft: -4,
@@ -671,75 +762,93 @@ const styles = StyleSheet.create({
   loadingSubtitle: { color: '#888', fontSize: 13, textAlign: 'center' },
 
   // Error state
-  errorIcon: { fontSize: 48, marginBottom: 16 },
+  errorIconWrap: { marginBottom: 16 },
   errorTitle: { color: '#FFF', fontSize: 20, fontWeight: '800', marginBottom: 8 },
   errorMessage: { color: '#AAA', fontSize: 14, textAlign: 'center', marginBottom: 24, lineHeight: 20 },
   retryBtn: {
-    backgroundColor: '#8A2BE2', borderRadius: 12, paddingVertical: 14, paddingHorizontal: 40,
+    borderRadius: 12, overflow: 'hidden',
     marginBottom: 12,
+  },
+  retryBtnGradient: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    paddingVertical: 14, paddingHorizontal: 40, borderRadius: 12,
   },
   retryBtnText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
   backBtnLoading: {
+    flexDirection: 'row', alignItems: 'center',
     borderRadius: 12, paddingVertical: 12, paddingHorizontal: 32,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: GLASS.bg,
   },
   backBtnLoadingText: { color: '#888', fontSize: 14, fontWeight: '600' },
 
   // Progress bar (question advancement)
-  progressBarBg: { height: 6, backgroundColor: '#333', width: '100%', borderRadius: 3, overflow: 'hidden' },
+  progressBarBg: {
+    height: 4, backgroundColor: 'rgba(255,255,255,0.06)', width: '100%',
+    overflow: 'hidden',
+  },
   progressBarSolid: {
-    position: 'absolute', height: 6, backgroundColor: '#8A2BE2',
-    borderRadius: 3,
+    position: 'absolute', height: 4,
+    borderRadius: 0, overflow: 'hidden',
   },
   progressBarPending: {
-    position: 'absolute', height: 6,
+    position: 'absolute', height: 4,
     backgroundColor: 'rgba(138,43,226,0.35)',
-    borderRadius: 3,
   },
 
   // Header
   headerRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 12, paddingVertical: 8, backgroundColor: 'rgba(0,0,0,0.3)',
+    paddingHorizontal: 12, paddingVertical: 10,
+    backgroundColor: GLASS.bg,
+    borderBottomWidth: 1, borderBottomColor: GLASS.borderSubtle,
   },
   playerInfo: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   opponentInfo: { flexDirection: 'row', alignItems: 'center', flex: 1, justifyContent: 'flex-end' },
   avatarCircle: {
-    width: 44, height: 44, borderRadius: 22, backgroundColor: '#8A2BE2',
-    justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#fff',
+    width: 44, height: 44, borderRadius: 22,
+    justifyContent: 'center', alignItems: 'center',
+    borderWidth: 2, borderColor: 'rgba(255,255,255,0.15)',
   },
-  avatarBot: { backgroundColor: '#2196F3' },
   avatarLetter: { color: '#FFF', fontSize: 20, fontWeight: '800' },
   playerMeta: { marginHorizontal: 8 },
   playerName: { color: '#FFF', fontSize: 13, fontWeight: '700', maxWidth: 80 },
-  playerTitle: { color: '#888', fontSize: 10 },
+  playerTitle: { color: '#666', fontSize: 10, marginBottom: 2 },
+  scoreRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   playerScoreNum: { color: '#00C853', fontSize: 20, fontWeight: '900' },
 
   // Timer
   timerCenter: { alignItems: 'center', paddingHorizontal: 8 },
-  timerLabel: { color: '#888', fontSize: 9, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 },
+  timerLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginBottom: 4 },
+  timerLabel: { color: '#888', fontSize: 9, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1 },
   timerCircle: {
-    width: 48, height: 48, borderRadius: 24, borderWidth: 3, borderColor: '#00BFFF',
-    justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,191,255,0.1)',
+    width: 50, height: 50, borderRadius: 25, borderWidth: 2.5, borderColor: '#00BFFF',
+    justifyContent: 'center', alignItems: 'center', overflow: 'hidden',
   },
-  timerDanger: { borderColor: '#FF3B30', backgroundColor: 'rgba(255,59,48,0.1)' },
+  timerDanger: { borderColor: '#FF3B30' },
   timerNum: { color: '#00BFFF', fontSize: 22, fontWeight: '900' },
   timerNumDanger: { color: '#FF3B30' },
 
+  questionCounterRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 6, paddingVertical: 8,
+  },
   questionCounter: {
-    color: '#666', fontSize: 11, fontWeight: '700', textAlign: 'center',
-    textTransform: 'uppercase', letterSpacing: 2, paddingVertical: 6,
+    color: '#666', fontSize: 11, fontWeight: '700',
+    textTransform: 'uppercase', letterSpacing: 2,
   },
 
   // Game area
   gameArea: { flex: 1, flexDirection: 'row' },
 
   // Score bars
-  barColumn: { width: 18, paddingVertical: 12, alignItems: 'center' },
+  barColumn: { width: 22, paddingVertical: 8, alignItems: 'center' },
   barTrack: {
-    width: 14, flex: 1, backgroundColor: '#2A2A2A',
+    width: 14, flex: 1, backgroundColor: 'rgba(255,255,255,0.06)',
     borderRadius: 7, overflow: 'hidden', position: 'relative',
   },
+  barScoreLabel: { flexDirection: 'column', alignItems: 'center', marginTop: 4 },
+  barScoreText: { fontSize: 9, fontWeight: '800' },
 
   // Center
   centerContent: { flex: 1, paddingHorizontal: 4 },
@@ -747,22 +856,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 16,
     justifyContent: 'center', alignItems: 'center', minHeight: 80,
   },
+  questionInner: { alignItems: 'center' },
   questionText: { color: '#FFF', fontSize: 20, fontWeight: '800', textAlign: 'center', lineHeight: 28 },
 
   // Options
   optionsBox: { flex: 1, justifyContent: 'center', gap: 10, paddingBottom: 16, paddingHorizontal: 8 },
   optionCard: {
-    backgroundColor: '#FFFFFF', borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: GLASS.radius,
     paddingVertical: 16, paddingHorizontal: 20,
     justifyContent: 'center', alignItems: 'center',
-    minHeight: 56, borderWidth: 1, borderColor: '#E0E0E0',
+    minHeight: 56, borderWidth: 1, borderColor: GLASS.borderSubtle,
     position: 'relative', overflow: 'visible',
-    ...Platform.select({
-      ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 },
-      android: { elevation: 2 },
-    }),
   },
-  optionText: { fontSize: 17, fontWeight: '800', textAlign: 'center', color: '#1A1A1A' },
+  optionContent: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  optionIcon: { marginRight: 4 },
+  optionText: { fontSize: 17, fontWeight: '800', textAlign: 'center', color: '#FFF', flexShrink: 1 },
 
   // Triangles
   triLeftAnchor: {
@@ -773,7 +881,7 @@ const styles = StyleSheet.create({
     width: 0, height: 0,
     borderTopWidth: 14, borderTopColor: 'transparent',
     borderBottomWidth: 14, borderBottomColor: 'transparent',
-    borderLeftWidth: 16, borderLeftColor: '#111',
+    borderLeftWidth: 16, borderLeftColor: '#8A2BE2',
   },
   triRightAnchor: {
     position: 'absolute', right: -16, top: 0, bottom: 0,
@@ -783,6 +891,6 @@ const styles = StyleSheet.create({
     width: 0, height: 0,
     borderTopWidth: 14, borderTopColor: 'transparent',
     borderBottomWidth: 14, borderBottomColor: 'transparent',
-    borderRightWidth: 16, borderRightColor: '#111',
+    borderRightWidth: 16, borderRightColor: '#2196F3',
   },
 });

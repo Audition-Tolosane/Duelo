@@ -3,13 +3,61 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from database import get_db
-from models import User, Question, Theme, UserThemeXP
+from models import User, Question, Theme, UserThemeXP, Match
 from constants import SUPER_CATEGORY_META, CLUSTER_ICONS
 from services.xp import (
     get_level, get_xp_progress, get_theme_title, get_theme_unlocked_titles,
 )
 
 router = APIRouter(tags=["themes"])
+
+
+@router.get("/themes/trending")
+async def get_trending_themes(db: AsyncSession = Depends(get_db)):
+    """Return top 6 most played themes in the last 7 days."""
+    from datetime import datetime, timezone, timedelta
+    cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+
+    result = await db.execute(
+        select(Match.category, func.count(Match.id).label("match_count"))
+        .where(Match.created_at >= cutoff)
+        .group_by(Match.category)
+        .order_by(func.count(Match.id).desc())
+        .limit(6)
+    )
+    rows = result.all()
+
+    trending = []
+    for cat_id, count in rows:
+        theme_res = await db.execute(select(Theme).where(Theme.id == cat_id))
+        theme = theme_res.scalar_one_or_none()
+        if theme:
+            trending.append({
+                "id": theme.id,
+                "name": theme.name,
+                "color_hex": theme.color_hex or "#8A2BE2",
+                "description": theme.description or "",
+                "match_count": count,
+                "icon_url": theme.icon_url or "",
+            })
+
+    # If fewer than 6, fill with random themes
+    if len(trending) < 6:
+        existing_ids = [t["id"] for t in trending]
+        filler_res = await db.execute(
+            select(Theme).where(Theme.id.notin_(existing_ids)).order_by(func.random()).limit(6 - len(trending))
+        )
+        for theme in filler_res.scalars().all():
+            trending.append({
+                "id": theme.id,
+                "name": theme.name,
+                "color_hex": theme.color_hex or "#8A2BE2",
+                "description": theme.description or "",
+                "match_count": 0,
+                "icon_url": theme.icon_url or "",
+            })
+
+    return {"trending": trending}
 
 
 @router.get("/themes/explore")
@@ -186,25 +234,33 @@ async def get_theme_detail(theme_id: str, user_id: Optional[str] = None, db: Asy
 
 
 @router.get("/theme/{theme_id}/leaderboard")
-async def theme_leaderboard(theme_id: str, limit: int = 20, db: AsyncSession = Depends(get_db)):
+async def theme_leaderboard(theme_id: str, limit: int = 50, offset: int = 0, db: AsyncSession = Depends(get_db)):
+    limit = min(limit, 100)
     result = await db.execute(
         select(UserThemeXP).where(UserThemeXP.theme_id == theme_id, UserThemeXP.xp > 0)
-        .order_by(UserThemeXP.xp.desc()).limit(limit)
+        .order_by(UserThemeXP.xp.desc()).limit(limit).offset(offset)
     )
     entries_xp = result.scalars().all()
 
     theme_res = await db.execute(select(Theme).where(Theme.id == theme_id))
     theme = theme_res.scalar_one_or_none()
 
+    if not entries_xp:
+        return []
+
+    # Batch fetch all users for leaderboard entries
+    user_ids = [entry.user_id for entry in entries_xp]
+    users_res = await db.execute(select(User).where(User.id.in_(user_ids)))
+    users_map = {u.id: u for u in users_res.scalars().all()}
+
     entries = []
     for i, uxp in enumerate(entries_xp):
-        user_res = await db.execute(select(User).where(User.id == uxp.user_id))
-        user = user_res.scalar_one_or_none()
+        user = users_map.get(uxp.user_id)
         if not user:
             continue
         lvl = get_level(uxp.xp)
         entries.append({
-            "id": user.id, "rank": i + 1, "pseudo": user.pseudo,
+            "id": user.id, "rank": offset + i + 1, "pseudo": user.pseudo,
             "avatar_seed": user.avatar_seed, "level": lvl,
             "title": get_theme_title(theme, lvl) if theme else "", "xp": uxp.xp,
         })

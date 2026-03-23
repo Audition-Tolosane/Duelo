@@ -6,12 +6,15 @@ from database import get_db
 from models import User, ChatMessage
 from schemas import ChatSend
 from services.notifications import create_notification
+from auth_middleware import get_current_user_id
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 @router.post("/send")
-async def send_message(data: ChatSend, db: AsyncSession = Depends(get_db)):
+async def send_message(data: ChatSend, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    if data.sender_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
     if data.message_type == "text":
         if not data.content.strip():
             raise HTTPException(status_code=400, detail="Le message ne peut pas être vide")
@@ -45,7 +48,7 @@ async def send_message(data: ChatSend, db: AsyncSession = Depends(get_db)):
         notif_body = f"{sender_name} t'a envoyé un message"
 
     await create_notification(
-        db, data.receiver_id, "message", "Nouveau message", notif_body,
+        db, data.receiver_id, "message", "notif.new_message", f"notif.message_body:{sender_name}",
         actor_id=data.sender_id,
         data={"screen": "chat", "params": {"userId": data.sender_id, "pseudo": sender_name}},
     )
@@ -117,6 +120,7 @@ async def get_conversations(user_id: str, db: AsyncSession = Depends(get_db)):
         conversations.append({
             "partner_id": pid, "partner_pseudo": partner.pseudo,
             "partner_avatar_seed": partner.avatar_seed,
+            "partner_avatar_url": getattr(partner, 'avatar_url', None),
             "last_message": last_msg_preview,
             "last_message_type": last_msg.message_type or "text",
             "last_message_time": last_msg.created_at.isoformat(),

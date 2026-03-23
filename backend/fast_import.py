@@ -69,19 +69,19 @@ async def import_data(themes_path: str, questions_path: str):
             
             for row in reader:
                 q_id = row.get("ID", "").strip()
-                theme_id = row.get("Catégorie", row.get("Categorie", "")).strip()
-                question_text = row.get("Question", "").strip()
+                theme_id = (row.get("Catégorie") or row.get("Categorie") or row.get("category") or "").strip()
+                question_text = (row.get("Question") or row.get("question_text") or "").strip()
                 if not q_id or not question_text:
                     continue
-                
-                rep_a = row.get("Rep A", "").strip()
-                rep_b = row.get(" Rep B", row.get("Rep B", "")).strip()
-                rep_c = row.get("Rep C", "").strip()
-                rep_d = row.get("Rep D", "").strip()
-                bonne_rep = row.get("Bonne rep", "").strip().upper()
-                difficulte = row.get("Difficulté", row.get("Difficulte", "")).strip()
-                angle = row.get("Angle", "").strip()
-                angle_num_str = row.get("Angle Num", "").strip()
+
+                rep_a = (row.get("Rep A") or row.get("option_a") or "").strip()
+                rep_b = (row.get(" Rep B") or row.get("Rep B") or row.get("option_b") or "").strip()
+                rep_c = (row.get("Rep C") or row.get("option_c") or "").strip()
+                rep_d = (row.get("Rep D") or row.get("option_d") or "").strip()
+                bonne_rep = (row.get("Bonne rep") or row.get("correct_option") or "").strip().upper()
+                difficulte = (row.get("Difficulté") or row.get("Difficulte") or row.get("difficulty") or "").strip()
+                angle = (row.get("Angle") or "").strip()
+                angle_num_str = (row.get("Angle Num") or "").strip()
 
                 correct_option = ANSWER_MAP.get(bonne_rep, 0)
                 options_json = json.dumps([rep_a, rep_b, rep_c, rep_d])

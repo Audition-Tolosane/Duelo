@@ -8,20 +8,22 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
+import UserAvatar from '../components/UserAvatar';
+import { t } from '../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 const SCOPES = [
-  { id: 'world', label: 'Monde', icon: 'earth' as const },
-  { id: 'continent', label: 'Continent', icon: 'map' as const },
-  { id: 'country', label: 'Pays', icon: 'flag' as const },
-  { id: 'region', label: 'Region', icon: 'map-marker' as const },
-  { id: 'city', label: 'Ville', icon: 'city' as const },
+  { id: 'world', labelKey: 'leaderboard.scope_world', icon: 'earth' as const },
+  { id: 'continent', labelKey: 'leaderboard.scope_continent', icon: 'map' as const },
+  { id: 'country', labelKey: 'leaderboard.scope_country', icon: 'flag' as const },
+  { id: 'region', labelKey: 'leaderboard.scope_region', icon: 'map-marker' as const },
+  { id: 'city', labelKey: 'leaderboard.scope_city', icon: 'city' as const },
 ];
 
 const VIEWS = [
-  { id: 'alltime', label: 'All-Time' },
-  { id: 'seasonal', label: 'Saison' },
+  { id: 'alltime', labelKey: 'leaderboard.view_alltime' },
+  { id: 'seasonal', labelKey: 'leaderboard.view_seasonal' },
 ];
 
 const RANK_COLORS = ['#FFD700', '#C0C0C0', '#CD7F32'];
@@ -41,6 +43,7 @@ type LeaderEntry = {
   id?: string;
   pseudo: string;
   avatar_seed: string;
+  avatar_url?: string;
   total_xp?: number;
   xp?: number;
   matches_won?: number;
@@ -116,7 +119,7 @@ export default function LeaderboardScreen() {
           </View>
         )}
         <View style={styles.avatarCircle}>
-          <Text style={styles.avatarText}>{item.pseudo[0]?.toUpperCase()}</Text>
+          <UserAvatar avatarUrl={item.avatar_url} avatarSeed={item.avatar_seed} pseudo={item.pseudo} size={40} />
         </View>
         <View style={styles.entryInfo}>
           <View style={styles.pseudoRow}>
@@ -130,8 +133,8 @@ export default function LeaderboardScreen() {
             ) : null}
           </View>
           <Text style={styles.entryStats}>
-            Niv. {item.level} {item.title ? `\u2022 ${item.title}` : ''}
-            {item.matches_won != null ? ` \u2022 ${item.matches_won} V` : ''}
+            {t('leaderboard.level_short')} {item.level} {item.title ? `\u2022 ${item.title}` : ''}
+            {item.matches_won != null ? ` \u2022 ${item.matches_won} ${t('leaderboard.wins_short')}` : ''}
           </Text>
         </View>
         <View style={styles.xpContainer}>
@@ -143,8 +146,8 @@ export default function LeaderboardScreen() {
   };
 
   const headerTitle = isThemeMode
-    ? `Classement ${themeName ? decodeURIComponent(themeName) : ''}`
-    : 'Classement';
+    ? `${t('leaderboard.theme_ranking')} ${themeName ? decodeURIComponent(themeName) : ''}`
+    : t('leaderboard.title');
 
   return (
     <SwipeBackPage>
@@ -156,7 +159,7 @@ export default function LeaderboardScreen() {
         {/* Back button */}
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
           <MaterialCommunityIcons name="chevron-left" size={28} color="#A3A3A3" />
-          <Text style={styles.backBtnText}>Retour</Text>
+          <Text style={styles.backBtnText}>{t('leaderboard.back')}</Text>
         </TouchableOpacity>
 
         <Text style={styles.title}>{headerTitle}</Text>
@@ -172,7 +175,7 @@ export default function LeaderboardScreen() {
                   style={[styles.viewBtn, view === v.id && styles.viewBtnActive]}
                   onPress={() => setView(v.id)}
                 >
-                  <Text style={[styles.viewText, view === v.id && styles.viewTextActive]}>{v.label}</Text>
+                  <Text style={[styles.viewText, view === v.id && styles.viewTextActive]}>{t(v.labelKey)}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -192,7 +195,7 @@ export default function LeaderboardScreen() {
                       size={16}
                       color={scope === s.id ? '#FFF' : '#525252'}
                     />
-                    <Text style={[styles.scopeText, scope === s.id && styles.scopeTextActive]}>{s.label}</Text>
+                    <Text style={[styles.scopeText, scope === s.id && styles.scopeTextActive]}>{t(s.labelKey)}</Text>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -201,7 +204,7 @@ export default function LeaderboardScreen() {
             {view === 'seasonal' && (
               <View style={styles.seasonInfo}>
                 <Text style={styles.seasonText}>
-                  Saison en cours {'\u2022'} Reset le 1er du mois
+                  {t('leaderboard.season_info')}
                 </Text>
               </View>
             )}
@@ -213,8 +216,8 @@ export default function LeaderboardScreen() {
         ) : entries.length === 0 ? (
           <View style={styles.emptyContainer}>
             <MaterialCommunityIcons name="trophy-outline" size={56} color="#525252" />
-            <Text style={styles.emptyText}>Aucun joueur pour le moment</Text>
-            <Text style={styles.emptySubtext}>Sois le premier a jouer !</Text>
+            <Text style={styles.emptyText}>{t('leaderboard.empty')}</Text>
+            <Text style={styles.emptySubtext}>{t('leaderboard.be_first')}</Text>
           </View>
         ) : (
           <FlatList
