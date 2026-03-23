@@ -1,5 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { View, Text, Image, StyleSheet, Platform, TouchableOpacity, Dimensions, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, Platform, TouchableOpacity, useWindowDimensions } from 'react-native';
+import Svg, { Path, Circle, Line } from 'react-native-svg';
+import { Image } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
@@ -20,21 +22,66 @@ import PlayScreen from './play';
 import ThemesScreen from './themes';
 import ProfileScreen from './profile';
 
-// Tab icon assets
-const TAB_ICONS = {
-  home: require('../../assets/tabs/home.webp'),
-  social: require('../../assets/tabs/social.webp'),
-  play: require('../../assets/tabs/play.webp'),
-  themes: require('../../assets/tabs/themes.webp'),
-  profile: require('../../assets/tabs/profile.webp'),
+// ── Neon SVG tab icons ────────────────────────────────────────────────────────
+
+function HomeIcon({ color, size = 26 }: { color: string; size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M3 12L12 3l9 9" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M5 10v9a1 1 0 0 0 1 1h4v-5h4v5h4a1 1 0 0 0 1-1v-9" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
+
+function PlayersIcon({ color, size = 26 }: { color: string; size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx="9" cy="7" r="3.5" stroke={color} strokeWidth="2" />
+      <Path d="M2 21v-1a7 7 0 0 1 7-7h1" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <Circle cx="17" cy="9" r="3" stroke={color} strokeWidth="2" />
+      <Path d="M13 21v-1a5 5 0 0 1 5-5h0a5 5 0 0 1 5 5v1" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+const PLAY_ICON = require('../../assets/tabs/play.webp');
+
+function ThemesIcon({ color, size = 26 }: { color: string; size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"
+        stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"
+      />
+    </Svg>
+  );
+}
+
+function ProfileIcon({ color, size = 26 }: { color: string; size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx="12" cy="8" r="4" stroke={color} strokeWidth="2" />
+      <Path d="M4 20a8 8 0 0 1 16 0" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+// ── Tab config ────────────────────────────────────────────────────────────────
+
+const TAB_COLORS = {
+  accueil: '#00E5FF',   // cyan
+  players: '#BF5FFF',  // violet
+  play:    '#FFFFFF',  // blanc (bouton central)
+  themes:  '#FF3E9D',  // rose
+  profile: '#FF9F0A',  // orange
 };
 
 const TAB_CONFIG = [
-  { name: 'accueil', labelKey: 'tab.home' as const, icon: TAB_ICONS.home },
-  { name: 'players', labelKey: 'tab.players' as const, icon: TAB_ICONS.social },
-  { name: 'play', labelKey: 'tab.play' as const, icon: TAB_ICONS.play, isCenter: true },
-  { name: 'themes', labelKey: 'tab.themes' as const, icon: TAB_ICONS.themes },
-  { name: 'profile', labelKey: 'tab.profile' as const, icon: TAB_ICONS.profile },
+  { name: 'accueil', labelKey: 'tab.home' as const },
+  { name: 'players', labelKey: 'tab.players' as const },
+  { name: 'play', labelKey: 'tab.play' as const, isCenter: true },
+  { name: 'themes', labelKey: 'tab.themes' as const },
+  { name: 'profile', labelKey: 'tab.profile' as const },
 ];
 
 const TAB_NAMES = TAB_CONFIG.map(tab => tab.name);
@@ -43,6 +90,15 @@ const SCREENS = [AccueilScreen, PlayersScreen, PlayScreen, ThemesScreen, Profile
 
 const SPRING_CONFIG = { damping: 22, stiffness: 220, mass: 0.8 };
 
+function TabIcon({ name, color, size }: { name: string; color: string; size?: number }) {
+  if (name === 'accueil') return <HomeIcon color={color} size={size} />;
+  if (name === 'players') return <PlayersIcon color={color} size={size} />;
+  if (name === 'play')    return <Image source={PLAY_ICON} style={{ width: size ?? 30, height: size ?? 30 }} resizeMode="contain" />;
+  if (name === 'themes')  return <ThemesIcon color={color} size={size} />;
+  if (name === 'profile') return <ProfileIcon color={color} size={size} />;
+  return null;
+}
+
 function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTabPress: (index: number) => void }) {
   const insets = useSafeAreaInsets();
 
@@ -50,23 +106,35 @@ function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTa
     <View style={[styles.tabBar, { paddingBottom: insets.bottom > 0 ? insets.bottom : 8 }]}>
       {TAB_CONFIG.map((tab, index) => {
         const isFocused = currentIndex === index;
+        const color = TAB_COLORS[tab.name as keyof typeof TAB_COLORS];
 
         if (tab.isCenter) {
           return (
             <TouchableOpacity key={tab.name} style={styles.playTabWrap} onPress={() => onTabPress(index)} activeOpacity={1}>
-              <View style={[styles.playTabCircle, isFocused && styles.playTabCircleActive]}>
-                <Image source={tab.icon} style={styles.playTabIconImage} resizeMode="contain" />
+              <View style={[
+                styles.playTabCircle,
+                isFocused && { borderColor: 'rgba(0,255,255,0.8)', shadowOpacity: 0.8, shadowRadius: 18 },
+              ]}>
+                <TabIcon name={tab.name} color="#FFF" size={30} />
               </View>
-              <Text style={[styles.tabLabel, isFocused && styles.tabLabelActive]}>{t(tab.labelKey)}</Text>
+              <Text style={[styles.tabLabel, isFocused && { color: '#00FFFF' }]}>{t(tab.labelKey)}</Text>
             </TouchableOpacity>
           );
         }
 
         return (
           <TouchableOpacity key={tab.name} style={styles.tabItem} onPress={() => onTabPress(index)} activeOpacity={1}>
-            <Image source={tab.icon} style={styles.tabIconImage} resizeMode="contain" />
-            <Text style={[styles.tabLabel, isFocused && styles.tabLabelActive]}>{t(tab.labelKey)}</Text>
-            {isFocused && <View style={styles.activeIndicator} />}
+            {/* Glow spot when active */}
+            {isFocused && (
+              <View style={[styles.iconGlow, { backgroundColor: color + '22', shadowColor: color }]} />
+            )}
+            <View style={{ opacity: isFocused ? 1 : 0.38 }}>
+              <TabIcon name={tab.name} color={color} size={26} />
+            </View>
+            <Text style={[styles.tabLabel, isFocused && { color }]}>{t(tab.labelKey)}</Text>
+            {isFocused && (
+              <View style={[styles.activeIndicator, { backgroundColor: color, shadowColor: color }]} />
+            )}
           </TouchableOpacity>
         );
       })}
@@ -269,47 +337,42 @@ const styles = StyleSheet.create({
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 4,
+    paddingTop: 6,
     minWidth: 56,
+    position: 'relative',
   },
-  tabIconImage: {
-    width: 40,
-    height: 40,
+  iconGlow: {
+    position: 'absolute',
+    top: 2, width: 44, height: 36,
+    borderRadius: 12,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
   },
   tabLabel: {
     fontSize: 9,
-    color: 'rgba(255,255,255,0.5)',
-    marginTop: 3,
+    color: 'rgba(255,255,255,0.38)',
+    marginTop: 4,
     fontWeight: '700',
-    fontFamily: Platform.OS === 'ios' ? 'System' : 'sans-serif',
     letterSpacing: 0.5,
   },
-  tabLabelActive: { color: '#00FFFF' },
   activeIndicator: {
     width: 4, height: 4, borderRadius: 2,
-    backgroundColor: '#00FFFF', marginTop: 3,
-    shadowColor: '#00FFFF', shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8, shadowRadius: 6,
+    marginTop: 4,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1, shadowRadius: 6,
   },
   playTabWrap: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -12,
+    marginTop: -14,
   },
   playTabCircle: {
-    width: 52, height: 52, borderRadius: 26,
-    backgroundColor: '#8A2BE2', justifyContent: 'center', alignItems: 'center',
-    borderWidth: 1.5, borderColor: 'rgba(0, 255, 255, 0.4)',
+    width: 56, height: 56, borderRadius: 28,
+    backgroundColor: '#7B22E2',
+    justifyContent: 'center', alignItems: 'center',
+    borderWidth: 1.5, borderColor: 'rgba(0,255,255,0.45)',
     shadowColor: '#00FFFF', shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4, shadowRadius: 12, elevation: 8,
-  },
-  playTabCircleActive: {
-    backgroundColor: '#9B3FFF',
-    borderColor: 'rgba(0, 255, 255, 0.7)',
-    shadowOpacity: 0.7, shadowRadius: 16,
-  },
-  playTabIconImage: {
-    width: 38,
-    height: 38,
+    shadowOpacity: 0.5, shadowRadius: 14, elevation: 8,
   },
 });

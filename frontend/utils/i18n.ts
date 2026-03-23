@@ -24,7 +24,7 @@ const translations: Translations = {
   // Tabs
   'tab.home': { fr: 'Accueil', en: 'Home', es: 'Inicio', de: 'Startseite', pt: 'Início', it: 'Home', ar: 'الرئيسية', ja: 'ホーム', ko: '홈', zh: '首页' },
   'tab.play': { fr: 'Jouer', en: 'Play', es: 'Jugar', de: 'Spielen', pt: 'Jogar', it: 'Gioca', ar: 'العب', ja: 'プレイ', ko: '플레이', zh: '开始' },
-  'tab.players': { fr: 'Joueurs', en: 'Players', es: 'Jugadores', de: 'Spieler', pt: 'Jogadores', it: 'Giocatori', ar: 'اللاعبون', ja: 'プレイヤー', ko: '플레이어', zh: '玩家' },
+  'tab.players': { fr: 'Social', en: 'Social', es: 'Social', de: 'Social', pt: 'Social', it: 'Social', ar: 'اجتماعي', ja: 'ソーシャル', ko: '소셜', zh: '社交' },
   'tab.themes': { fr: 'Thèmes', en: 'Themes', es: 'Temas', de: 'Themen', pt: 'Temas', it: 'Temi', ar: 'المواضيع', ja: 'テーマ', ko: '테마', zh: '主题' },
   'tab.profile': { fr: 'Profil', en: 'Profile', es: 'Perfil', de: 'Profil', pt: 'Perfil', it: 'Profilo', ar: 'الملف', ja: 'プロフィール', ko: '프로필', zh: '个人资料' },
 
