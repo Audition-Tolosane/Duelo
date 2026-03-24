@@ -132,6 +132,7 @@ export default function ThemesScreen() {
         {/* ── LA FORGE ── */}
         <TouchableOpacity style={s.forgeCard} activeOpacity={0.8} onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          router.push('/create-theme');
         }}>
           <LinearGradient colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']}
             start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.forgeBg} />

@@ -55,6 +55,7 @@ SUPER_CATEGORY_META = {
 }
 
 CLUSTER_ICONS = {
+    "Communauté": "⚒",
     # SCREEN
     "Séries TV": "📺",
     "Cinéma": "🎬",
