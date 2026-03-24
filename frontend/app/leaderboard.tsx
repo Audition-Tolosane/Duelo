@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, FlatList
 } from 'react-native';
@@ -9,6 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
 import UserAvatar from '../components/UserAvatar';
+import { authFetch } from '../utils/api';
 import { t } from '../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
@@ -54,6 +55,23 @@ type LeaderEntry = {
   rank: number;
 };
 
+type CitySuggestion = {
+  city: string;
+  player_count: number;
+  distance_km: number;
+};
+
+type LeaderMeta = {
+  scope_used: string;
+  city_name?: string;
+  country_name?: string;
+  too_small?: boolean;
+  city_player_count?: number;
+  fallback?: boolean;
+  missing?: boolean;
+  suggestions?: CitySuggestion[];
+};
+
 export default function LeaderboardScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -64,7 +82,9 @@ export default function LeaderboardScreen() {
   const [scope, setScope] = useState('world');
   const [view, setView] = useState('alltime');
   const [entries, setEntries] = useState<LeaderEntry[]>([]);
+  const [meta, setMeta] = useState<LeaderMeta | null>(null);
   const [loading, setLoading] = useState(true);
+  const [noLocation, setNoLocation] = useState(false);
 
   useEffect(() => {
     fetchLeaderboard();
@@ -72,20 +92,45 @@ export default function LeaderboardScreen() {
 
   const fetchLeaderboard = async () => {
     setLoading(true);
+    setNoLocation(false);
+    setMeta(null);
     try {
       const url = isThemeMode
-        ? `${API_URL}/api/theme/${themeId}/leaderboard`
+        ? `${API_URL}/api/theme/${themeId}/leaderboard?scope=${scope}&limit=50`
         : `${API_URL}/api/leaderboard?scope=${scope}&view=${view}&limit=50`;
-      const res = await fetch(url);
+      const res = await authFetch(url);
       const data = await res.json();
-      setEntries(data);
+
+      const responseEntries = data.entries ?? data;
+      const responseMeta: LeaderMeta = data.meta ?? { scope_used: scope };
+      setEntries(Array.isArray(responseEntries) ? responseEntries : []);
+      setMeta(responseMeta);
+      const locationScopes = ['country', 'city', 'continent', 'region'];
+      if (locationScopes.includes(scope) && responseMeta.missing) {
+        setNoLocation(true);
+      }
+    } catch {}
+    setLoading(false);
+  };
+
+  const fetchCityLeaderboard = async (cityName: string) => {
+    setLoading(true);
+    setMeta(null);
+    try {
+      const url = isThemeMode
+        ? `${API_URL}/api/theme/${themeId}/leaderboard?scope=city&city_override=${encodeURIComponent(cityName)}&limit=50`
+        : `${API_URL}/api/leaderboard?scope=city&city_override=${encodeURIComponent(cityName)}&limit=50`;
+      const res = await authFetch(url);
+      const data = await res.json();
+      setEntries(Array.isArray(data.entries) ? data.entries : []);
+      setMeta(data.meta ?? { scope_used: 'city', city_name: cityName });
     } catch {}
     setLoading(false);
   };
 
   const getXp = (item: LeaderEntry) => item.total_xp ?? item.xp ?? 0;
 
-  const renderEntry = ({ item, index }: { item: LeaderEntry; index: number }) => {
+  const renderEntry = useCallback(({ item, index }: { item: LeaderEntry; index: number }) => {
     const isTop3 = item.rank <= 3 && item.rank >= 1;
     const top3Index = item.rank - 1;
     const badgeInfo = item.streak_badge ? BADGE_ICON_MAP[item.streak_badge] : null;
@@ -143,7 +188,7 @@ export default function LeaderboardScreen() {
         </View>
       </TouchableOpacity>
     );
-  };
+  }, [router]);
 
   const headerTitle = isThemeMode
     ? `${t('leaderboard.theme_ranking')} ${themeName ? decodeURIComponent(themeName) : ''}`
@@ -164,62 +209,89 @@ export default function LeaderboardScreen() {
 
         <Text style={styles.title}>{headerTitle}</Text>
 
-        {/* Global mode: View Toggle + Scope Filters */}
+        {/* View Toggle — global mode only */}
         {!isThemeMode && (
-          <>
-            <View style={styles.viewToggle}>
-              {VIEWS.map((v) => (
-                <TouchableOpacity
-                  testID={`view-${v.id}`}
-                  key={v.id}
-                  style={[styles.viewBtn, view === v.id && styles.viewBtnActive]}
-                  onPress={() => setView(v.id)}
-                >
-                  <Text style={[styles.viewText, view === v.id && styles.viewTextActive]}>{t(v.labelKey)}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+          <View style={styles.viewToggle}>
+            {VIEWS.map((v) => (
+              <TouchableOpacity
+                testID={`view-${v.id}`}
+                key={v.id}
+                style={[styles.viewBtn, view === v.id && styles.viewBtnActive]}
+                onPress={() => setView(v.id)}
+              >
+                <Text style={[styles.viewText, view === v.id && styles.viewTextActive]}>{t(v.labelKey)}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scopeScroll} contentContainerStyle={styles.scopeContainer}>
-              {SCOPES.map((s) => (
-                <TouchableOpacity
-                  testID={`scope-${s.id}`}
-                  key={s.id}
-                  style={[styles.scopeBtn, scope === s.id && styles.scopeBtnActive]}
-                  onPress={() => setScope(s.id)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.scopeInner}>
-                    <MaterialCommunityIcons
-                      name={s.icon}
-                      size={16}
-                      color={scope === s.id ? '#FFF' : '#525252'}
-                    />
-                    <Text style={[styles.scopeText, scope === s.id && styles.scopeTextActive]}>{t(s.labelKey)}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-
-            {view === 'seasonal' && (
-              <View style={styles.seasonInfo}>
-                <Text style={styles.seasonText}>
-                  {t('leaderboard.season_info')}
-                </Text>
+        {/* Scope Filters — always visible */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scopeScroll} contentContainerStyle={styles.scopeContainer}>
+          {SCOPES.map((s) => (
+            <TouchableOpacity
+              testID={`scope-${s.id}`}
+              key={s.id}
+              style={[styles.scopeBtn, scope === s.id && styles.scopeBtnActive]}
+              onPress={() => setScope(s.id)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.scopeInner}>
+                <MaterialCommunityIcons
+                  name={s.icon}
+                  size={16}
+                  color={scope === s.id ? '#FFF' : '#525252'}
+                />
+                <Text style={[styles.scopeText, scope === s.id && styles.scopeTextActive]}>{t(s.labelKey)}</Text>
               </View>
-            )}
-          </>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {!isThemeMode && view === 'seasonal' && (
+          <View style={styles.seasonInfo}>
+            <Text style={styles.seasonText}>{t('leaderboard.season_info')}</Text>
+          </View>
         )}
 
         {loading ? (
           <View style={styles.loadingContainer}><ActivityIndicator size="large" color="#8A2BE2" /></View>
-        ) : entries.length === 0 ? (
+        ) : noLocation ? (
           <View style={styles.emptyContainer}>
-            <MaterialCommunityIcons name="trophy-outline" size={56} color="#525252" />
-            <Text style={styles.emptyText}>{t('leaderboard.empty')}</Text>
-            <Text style={styles.emptySubtext}>{t('leaderboard.be_first')}</Text>
+            <MaterialCommunityIcons name="map-marker-off" size={56} color="#525252" />
+            <Text style={styles.emptyText}>{t('leaderboard.no_location')}</Text>
+            <Text style={styles.emptySubtext}>{t('leaderboard.set_location_hint')}</Text>
           </View>
-        ) : (
+        ) : meta?.too_small && meta.suggestions && meta.suggestions.length > 0 ? (
+          <View style={styles.suggestionsContainer}>
+            <MaterialCommunityIcons name="map-marker-question" size={40} color="#525252" />
+            <Text style={styles.emptyText}>{t('leaderboard.city_too_small', { city: meta.city_name ?? '', count: String(meta.city_player_count ?? 0) })}</Text>
+            <Text style={styles.emptySubtext}>{t('leaderboard.nearby_cities')}</Text>
+            {meta.suggestions.map((s) => (
+              <TouchableOpacity
+                key={s.city}
+                style={styles.suggestionBtn}
+                onPress={() => fetchCityLeaderboard(s.city)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.suggestionLeft}>
+                  <MaterialCommunityIcons name="city" size={18} color="#00E5FF" />
+                  <Text style={styles.suggestionCity}>{s.city}</Text>
+                </View>
+                <View style={styles.suggestionRight}>
+                  <Text style={styles.suggestionCount}>{s.player_count} joueurs</Text>
+                  <Text style={styles.suggestionDist}>{s.distance_km} km</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ) : meta?.too_small && meta.fallback ? (
+          <View style={styles.fallbackBanner}>
+            <MaterialCommunityIcons name="information-outline" size={16} color="#A3A3A3" />
+            <Text style={styles.fallbackText}>{t('leaderboard.city_fallback', { city: meta.city_name ?? '', country: meta.country_name ?? '' })}</Text>
+          </View>
+        ) : null}
+
+        {!loading && entries.length > 0 && (
           <FlatList
             data={entries}
             renderItem={renderEntry}
@@ -227,6 +299,14 @@ export default function LeaderboardScreen() {
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
           />
+        )}
+
+        {!loading && entries.length === 0 && !noLocation && !meta?.too_small && (
+          <View style={styles.emptyContainer}>
+            <MaterialCommunityIcons name="trophy-outline" size={56} color="#525252" />
+            <Text style={styles.emptyText}>{t('leaderboard.empty')}</Text>
+            <Text style={styles.emptySubtext}>{t('leaderboard.be_first')}</Text>
+          </View>
         )}
       </View>
     </SwipeBackPage>
@@ -299,4 +379,30 @@ const styles = StyleSheet.create({
   xpContainer: { alignItems: 'flex-end' },
   xpValue: { fontSize: 16, fontWeight: '800', color: '#00FFFF' },
   xpLabel: { fontSize: 10, color: '#525252', fontWeight: '600' },
+
+  // Suggestions
+  suggestionsContainer: {
+    flex: 1, alignItems: 'center', paddingHorizontal: 20, paddingTop: 24, gap: 10,
+  },
+  suggestionBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    width: '100%', backgroundColor: 'rgba(0,229,255,0.06)',
+    borderRadius: 14, borderWidth: 1, borderColor: 'rgba(0,229,255,0.15)',
+    paddingHorizontal: 16, paddingVertical: 14, marginTop: 4,
+  },
+  suggestionLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  suggestionCity: { color: '#FFF', fontSize: 15, fontWeight: '700' },
+  suggestionRight: { alignItems: 'flex-end' },
+  suggestionCount: { color: '#00E5FF', fontSize: 13, fontWeight: '700' },
+  suggestionDist: { color: '#525252', fontSize: 11, fontWeight: '600', marginTop: 2 },
+
+  // Fallback banner
+  fallbackBanner: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    marginHorizontal: 20, marginBottom: 12,
+    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 10,
+    paddingHorizontal: 14, paddingVertical: 10,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+  },
+  fallbackText: { color: '#A3A3A3', fontSize: 12, fontWeight: '600', flex: 1 },
 });

@@ -6,7 +6,7 @@ from models import User
 from schemas import GuestRegister, EmailRegister, LoginRequest, UserResponse, SocialAuthRequest
 from helpers import hash_password, verify_password, detect_country_from_ip
 from auth_middleware import create_access_token, get_current_user_id
-from rate_limit import rate_limit_auth
+from rate_limit import rate_limit_auth, _limiter
 from config import GOOGLE_CLIENT_IDS, APPLE_BUNDLE_ID
 
 import re
@@ -76,9 +76,18 @@ async def register_email(data: EmailRegister, request: Request, db: AsyncSession
 
 @router.post("/login", response_model=UserResponse)
 async def login(data: LoginRequest, request: Request, db: AsyncSession = Depends(get_db), _rate=Depends(rate_limit_auth)):
+    # Per-email lockout: 5 failed attempts per 15 min
+    email_key = f"login_fail:{data.email.lower()}"
+    try:
+        _limiter.check(email_key, 5, 900)
+    except HTTPException:
+        raise HTTPException(status_code=429, detail="Trop de tentatives, réessayez dans 15 minutes")
+
     result = await db.execute(select(User).where(User.email == data.email))
     user = result.scalar_one_or_none()
     if not user or not user.password_hash or not verify_password(data.password, user.password_hash):
+        # Record failed attempt
+        _limiter.requests[email_key].append(__import__('time').time())
         raise HTTPException(status_code=401, detail="Email ou mot de passe incorrect")
 
     # Migrate legacy SHA256 hash to bcrypt on successful login
@@ -87,6 +96,51 @@ async def login(data: LoginRequest, request: Request, db: AsyncSession = Depends
         await db.commit()
 
     return _user_response(user)
+
+
+@router.delete("/delete-account")
+async def delete_account(
+    current_user_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    """RGPD — permanently delete account and anonymise related data."""
+    from sqlalchemy import delete as sql_delete, update as sql_update
+    from models import (
+        Match, WallPost, PostLike, PostComment, PlayerFollow,
+        ChatMessage, Notification, NotificationSettings, UserThemeXP,
+    )
+
+    result = await db.execute(select(User).where(User.id == current_user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+
+    # Anonymise matches instead of deleting (preserve game history integrity)
+    await db.execute(
+        sql_update(Match)
+        .where(Match.player1_id == current_user_id)
+        .values(player1_id="deleted")
+    )
+    await db.execute(
+        sql_update(Match)
+        .where(Match.player2_id == current_user_id)
+        .values(player2_id="deleted")
+    )
+
+    # Delete personal data
+    for model, col in [
+        (WallPost, WallPost.user_id), (PostLike, PostLike.user_id),
+        (PostComment, PostComment.user_id), (PlayerFollow, PlayerFollow.follower_id),
+        (PlayerFollow, PlayerFollow.followed_id), (ChatMessage, ChatMessage.sender_id),
+        (ChatMessage, ChatMessage.receiver_id), (Notification, Notification.user_id),
+        (NotificationSettings, NotificationSettings.user_id),
+        (UserThemeXP, UserThemeXP.user_id),
+    ]:
+        await db.execute(sql_delete(model).where(col == current_user_id))
+
+    await db.delete(user)
+    await db.commit()
+    return {"success": True, "message": "Compte supprimé définitivement"}
 
 
 @router.get("/user/{user_id}", response_model=UserResponse)

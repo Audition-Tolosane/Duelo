@@ -24,6 +24,17 @@ app = FastAPI()
 
 
 @app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    return response
+
+
+@app.middleware("http")
 async def global_rate_limit(request: Request, call_next):
     client_ip = request.client.host if request.client else "unknown"
     # Skip rate limit for WebSocket upgrades
@@ -133,6 +144,16 @@ async def _ensure_columns():
             "CREATE TABLE IF NOT EXISTS avatars (id VARCHAR(36) PRIMARY KEY, name VARCHAR(100), image_url TEXT NOT NULL, category VARCHAR(50) DEFAULT 'default', created_at TIMESTAMPTZ DEFAULT NOW())",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS last_played_at TIMESTAMPTZ",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_done BOOLEAN DEFAULT FALSE",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS privacy_accepted_at TIMESTAMPTZ",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS lat FLOAT",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS lng FLOAT",
+            """CREATE TABLE IF NOT EXISTS theme_follows (
+                id VARCHAR(36) PRIMARY KEY,
+                user_id VARCHAR(36) NOT NULL,
+                theme_id VARCHAR(20) NOT NULL,
+                created_at TIMESTAMPTZ DEFAULT NOW(),
+                UNIQUE(user_id, theme_id)
+            )""",
         ]:
             try:
                 await conn.execute(text(stmt))

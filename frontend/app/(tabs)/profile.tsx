@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
-  Modal, Image, Alert,
+  Modal, Image, Alert, TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -44,7 +44,7 @@ type ProfileData = {
   user: {
     id: string; pseudo: string; avatar_seed: string; avatar_url?: string | null; is_guest: boolean;
     total_xp: number; selected_title: string | null;
-    country: string | null; country_flag: string;
+    country: string | null; city: string | null; country_flag: string;
     matches_played: number; matches_won: number;
     best_streak: number; current_streak: number; streak_badge: string;
     win_rate: number;
@@ -69,6 +69,10 @@ export default function ProfileScreen() {
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [presetAvatars, setPresetAvatars] = useState<{id: string; name: string; image_url: string; category: string}[]>([]);
   const [savingAvatar, setSavingAvatar] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [locationCity, setLocationCity] = useState('');
+  const [locationCountry, setLocationCountry] = useState('');
+  const [savingLocation, setSavingLocation] = useState(false);
 
   useEffect(() => { loadProfile(); }, []);
 
@@ -90,7 +94,7 @@ export default function ProfileScreen() {
           user: {
             id: userId, pseudo: pseudo || t('profile.player_default'), avatar_seed: avatarSeed || '',
             is_guest: true, total_xp: 0, selected_title: null,
-            country: null, country_flag: '',
+            country: null, city: null, country_flag: '',
             matches_played: 0, matches_won: 0,
             best_streak: 0, current_streak: 0, streak_badge: '',
             win_rate: 0, followers_count: 0, following_count: 0,
@@ -141,6 +145,38 @@ export default function ProfileScreen() {
     }
     setSavingTitle(false);
     setShowTitleModal(false);
+  };
+
+  const openLocationModal = () => {
+    setLocationCity(profile?.user?.city || '');
+    setLocationCountry(profile?.user?.country || '');
+    setShowLocationModal(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const handleSaveLocation = async () => {
+    if (!profile) return;
+    setSavingLocation(true);
+    try {
+      const res = await authFetch(`${API_URL}/api/user/location`, {
+        method: 'PATCH',
+        body: JSON.stringify({ city: locationCity, country: locationCountry }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        setProfile(prev => prev ? {
+          ...prev,
+          user: { ...prev.user, city: data.city, country: data.country, country_flag: '' }
+        } : null);
+        setShowLocationModal(false);
+      } else {
+        Alert.alert(t('common.error'), t('profile.error_network'));
+      }
+    } catch {
+      Alert.alert(t('common.error'), t('profile.error_network'));
+    }
+    setSavingLocation(false);
   };
 
   const handleLogout = async () => {
@@ -282,17 +318,15 @@ export default function ProfileScreen() {
                 <Text style={s.titleEditIcon}> ✎</Text>
               </TouchableOpacity>
             )}
-            {user?.country ? (
-              <View style={s.locationRow}>
-                <Text style={s.locationFlag}>{user?.country_flag}</Text>
-                <Text style={s.locationText}>{user?.country}</Text>
-              </View>
-            ) : (
-              <View style={s.locationRow}>
-                <Text style={s.locationFlag}>🌍</Text>
-                <Text style={s.locationText}>{t('profile.world')}</Text>
-              </View>
-            )}
+            <TouchableOpacity style={s.locationRow} onPress={openLocationModal} activeOpacity={0.7}>
+              <Text style={s.locationFlag}>{user?.country_flag || '🌍'}</Text>
+              <Text style={s.locationText}>
+                {user?.city && user?.country
+                  ? `${user.city}, ${user.country}`
+                  : user?.country || t('profile.world')}
+              </Text>
+              <MaterialCommunityIcons name="pencil" size={12} color="#525252" style={{ marginLeft: 4 }} />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -462,6 +496,43 @@ export default function ProfileScreen() {
           <Text style={[s.settingsText, { color: '#FF3B30' }]}>{t('settings.logout')}</Text>
           <MaterialCommunityIcons name="chevron-right" size={20} color="#FF3B3040" />
         </TouchableOpacity>
+
+        {/* Suppression de compte */}
+        {!profile?.user?.is_guest && (
+          <TouchableOpacity
+            style={s.deleteAccountRow}
+            onPress={() => {
+              Alert.alert(
+                t('profile.delete_account_title'),
+                t('profile.delete_account_confirm'),
+                [
+                  { text: t('common.cancel'), style: 'cancel' },
+                  {
+                    text: t('profile.delete_account_confirm_btn'),
+                    style: 'destructive',
+                    onPress: async () => {
+                      try {
+                        const res = await authFetch(`${API_URL}/api/auth/delete-account`, { method: 'DELETE' });
+                        if (res.ok) {
+                          await clearToken();
+                          await AsyncStorage.multiRemove(['duelo_user_id', 'duelo_pseudo', 'duelo_avatar_seed', 'duelo_avatar_url']);
+                          router.replace('/');
+                        } else {
+                          Alert.alert(t('common.error'), t('profile.error_network'));
+                        }
+                      } catch {
+                        Alert.alert(t('common.error'), t('profile.error_network'));
+                      }
+                    },
+                  },
+                ]
+              );
+            }}
+            activeOpacity={0.7}
+          >
+            <Text style={s.deleteAccountText}>{t('profile.delete_account')}</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
 
       {/* Avatar Selection Modal */}
@@ -522,6 +593,44 @@ export default function ProfileScreen() {
             {savingAvatar && <ActivityIndicator color="#8A2BE2" style={{ marginVertical: 12 }} />}
 
             <TouchableOpacity style={s.modalClose} onPress={() => setShowAvatarModal(false)}>
+              <Text style={s.modalCloseText}>{t('profile.close')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Location Edit Modal */}
+      <Modal visible={showLocationModal} transparent animationType="fade" onRequestClose={() => setShowLocationModal(false)}>
+        <View style={s.modalOverlay}>
+          <View style={[s.modalContent, { gap: 12 }]}>
+            <Text style={s.modalTitle}>{t('profile.edit_location')}</Text>
+            <TextInput
+              style={s.locationInput}
+              placeholder={t('profile.your_city')}
+              placeholderTextColor="#525252"
+              value={locationCity}
+              onChangeText={setLocationCity}
+              autoCapitalize="words"
+            />
+            <TextInput
+              style={s.locationInput}
+              placeholder={t('profile.your_country')}
+              placeholderTextColor="#525252"
+              value={locationCountry}
+              onChangeText={setLocationCountry}
+              autoCapitalize="words"
+            />
+            <TouchableOpacity
+              style={[s.modalClose, { backgroundColor: '#8A2BE2' }]}
+              onPress={handleSaveLocation}
+              disabled={savingLocation}
+            >
+              {savingLocation
+                ? <ActivityIndicator color="#FFF" size="small" />
+                : <Text style={[s.modalCloseText, { color: '#FFF' }]}>{t('profile.save_location')}</Text>
+              }
+            </TouchableOpacity>
+            <TouchableOpacity style={s.modalClose} onPress={() => setShowLocationModal(false)}>
               <Text style={s.modalCloseText}>{t('profile.close')}</Text>
             </TouchableOpacity>
           </View>
@@ -703,7 +812,15 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center',
     marginHorizontal: GRID_PAD, paddingVertical: 12, paddingHorizontal: 14,
     borderRadius: 20, backgroundColor: 'rgba(255,59,48,0.06)',
-    borderWidth: 1, borderColor: 'rgba(255,59,48,0.12)', marginBottom: 24,
+    borderWidth: 1, borderColor: 'rgba(255,59,48,0.12)', marginBottom: 12,
+  },
+  deleteAccountRow: {
+    marginHorizontal: GRID_PAD, marginBottom: 32,
+    paddingVertical: 10, alignItems: 'center',
+  },
+  deleteAccountText: {
+    color: 'rgba(255,59,48,0.45)', fontSize: 12, fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 
   /* Avatar Modal */
@@ -749,4 +866,10 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)',
   },
   modalCloseText: { color: '#A3A3A3', fontSize: 14, fontWeight: '600' },
+  locationInput: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
+    color: '#FFF', fontSize: 15, paddingHorizontal: 14, paddingVertical: 12,
+    width: '100%',
+  },
 });

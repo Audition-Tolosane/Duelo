@@ -66,6 +66,8 @@ export default function CategoryDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
+  const [postSuccess, setPostSuccess] = useState(false);
 
   // Post creation
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -96,7 +98,9 @@ export default function CategoryDetailScreen() {
   const fetchDetail = async (uid: string) => {
     try {
       const res = await fetch(`${API_URL}/api/theme/${id}/detail${uid ? `?user_id=${uid}` : ''}`);
+      if (!res.ok) { setFetchError(true); return; }
       const data = await res.json();
+      setFetchError(false);
       setDetail({
         id: data.id,
         name: data.name,
@@ -118,14 +122,13 @@ export default function CategoryDetailScreen() {
         color: data.color_hex || '#8A2BE2',
         bgPattern: '',
       });
-    } catch {}
+    } catch { setFetchError(true); }
   };
 
   const fetchWall = async (uid: string) => {
     try {
       const res = await fetch(`${API_URL}/api/category/${id}/wall?user_id=${uid}`);
-      const data = await res.json();
-      setPosts(data);
+      if (res.ok) setPosts(await res.json());
     } catch {}
   };
 
@@ -137,7 +140,25 @@ export default function CategoryDetailScreen() {
   };
 
   const handleFollow = async () => {
-    // Theme follow not yet implemented
+    if (!userId || !detail || followLoading) return;
+    setFollowLoading(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const wasFollowing = detail.is_following;
+    // Optimistic update
+    setDetail(prev => prev ? { ...prev, is_following: !wasFollowing, followers_count: prev.followers_count + (wasFollowing ? -1 : 1) } : null);
+    try {
+      const res = await authFetch(`${API_URL}/api/theme/${id}/follow`, {
+        method: 'POST',
+        body: JSON.stringify({ user_id: userId }),
+      });
+      if (!res.ok) {
+        // Rollback
+        setDetail(prev => prev ? { ...prev, is_following: wasFollowing, followers_count: prev.followers_count + (wasFollowing ? 1 : -1) } : null);
+      }
+    } catch {
+      setDetail(prev => prev ? { ...prev, is_following: wasFollowing, followers_count: prev.followers_count + (wasFollowing ? 1 : -1) } : null);
+    }
+    setFollowLoading(false);
   };
 
   const handlePlay = () => {
@@ -182,7 +203,12 @@ export default function CategoryDetailScreen() {
       setNewPostText('');
       setNewPostImage(null);
       setShowCreatePost(false);
-    } catch {}
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setPostSuccess(true);
+      setTimeout(() => setPostSuccess(false), 3000);
+    } catch {
+      Alert.alert(t('common.error'), t('category.error_post_failed'));
+    }
     setPosting(false);
   };
 
@@ -248,11 +274,28 @@ export default function CategoryDetailScreen() {
     return <View style={styles.loadingContainer}><ActivityIndicator size="large" color={meta.color} /></View>;
   }
 
+  if (fetchError && !detail) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={{ color: '#FF3B30', fontSize: 16, fontWeight: '700' }}>{t('common.error_loading')}</Text>
+        <TouchableOpacity onPress={() => { setFetchError(false); setLoading(true); init(); }} style={{ marginTop: 16, padding: 12, backgroundColor: 'rgba(255,59,48,0.12)', borderRadius: 12 }}>
+          <Text style={{ color: '#FF3B30', fontWeight: '600' }}>{t('common.retry')}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   if (!detail) return null;
 
   return (
     <SwipeBackPage>
     <View style={styles.container}>
+      {/* Post success toast */}
+      {postSuccess && (
+        <View style={styles.successToast}>
+          <Text style={styles.successToastText}>{t('category.post_published')}</Text>
+        </View>
+      )}
       <View style={{ paddingTop: insets.top, backgroundColor: GLASS.bgDark }}>
         <DueloHeader />
       </View>
@@ -489,7 +532,13 @@ export default function CategoryDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
-  loadingContainer: { flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' },
+  loadingContainer: { flex: 1, backgroundColor: '#050510', justifyContent: 'center', alignItems: 'center' },
+  successToast: {
+    position: 'absolute', top: 60, alignSelf: 'center', zIndex: 999,
+    backgroundColor: 'rgba(0,255,157,0.15)', borderWidth: 1, borderColor: 'rgba(0,255,157,0.4)',
+    borderRadius: 20, paddingHorizontal: 20, paddingVertical: 10,
+  },
+  successToastText: { color: '#00FF9D', fontWeight: '700', fontSize: 14 },
   scrollContent: { paddingBottom: 40 },
 
   // Back

@@ -5,6 +5,7 @@ from typing import Optional
 import base64
 import os
 import uuid
+import httpx
 from database import get_db
 from models import User, Match, PlayerFollow, Theme, UserThemeXP, Avatar
 from config import ROOT_DIR
@@ -18,6 +19,23 @@ from auth_middleware import get_current_user_id
 from helpers import validate_image_base64
 
 router = APIRouter(tags=["profile"])
+
+
+async def geocode_city(city: str, country: str) -> tuple:
+    """Geocode a city via Nominatim (OSM). Returns (lat, lng) or (None, None)."""
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(
+                "https://nominatim.openstreetmap.org/search",
+                params={"q": f"{city}, {country}", "format": "json", "limit": 1},
+                headers={"User-Agent": "DueloApp/1.0"},
+            )
+            data = resp.json()
+            if data:
+                return float(data[0]["lat"]), float(data[0]["lon"])
+    except Exception:
+        pass
+    return None, None
 
 
 @router.get("/profile/{user_id}")
@@ -79,7 +97,7 @@ async def get_profile(user_id: str, pseudo: Optional[str] = None, db: AsyncSessi
             "avatar_url": user.avatar_url,
             "is_guest": user.is_guest, "total_xp": user.total_xp,
             "selected_title": user.selected_title,
-            "country": user.country, "country_flag": country_flag,
+            "country": user.country, "city": user.city, "country_flag": country_flag,
             "matches_played": user.matches_played, "matches_won": user.matches_won,
             "best_streak": user.best_streak, "current_streak": user.current_streak,
             "streak_badge": get_streak_badge(user.current_streak),
@@ -163,6 +181,43 @@ async def select_avatar(request: Request, current_user: str = Depends(get_curren
     user.avatar_url = avatar.image_url
     await db.commit()
     return {"success": True, "avatar_url": avatar.image_url}
+
+
+@router.patch("/user/location")
+async def update_location(
+    request: Request,
+    current_user_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    body = await request.json()
+    result = await db.execute(select(User).where(User.id == current_user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+
+    if "city" in body:
+        user.city = body["city"].strip() or None
+    if "country" in body:
+        user.country = body["country"].strip() or None
+    if "continent" in body:
+        user.continent = body["continent"].strip() or None
+    if "region" in body:
+        user.region = body["region"].strip() or None
+
+    # Geocode to get coordinates whenever city or country changes
+    if ("city" in body or "country" in body) and user.city and user.country:
+        lat, lng = await geocode_city(user.city, user.country)
+        user.lat = lat
+        user.lng = lng
+
+    await db.commit()
+    return {
+        "success": True,
+        "city": user.city,
+        "country": user.country,
+        "continent": user.continent,
+        "region": user.region,
+    }
 
 
 @router.post("/user/upload-avatar")

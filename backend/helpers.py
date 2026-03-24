@@ -40,7 +40,40 @@ def validate_image_base64(data_uri: str) -> bytes:
     if not is_valid:
         raise ValueError("Le fichier n'est pas une image valide (PNG, JPG, WebP ou GIF)")
 
+    # Check dimensions from raw bytes without external dependencies
+    _check_image_dimensions(raw)
+
     return raw
+
+
+def _check_image_dimensions(raw: bytes, max_pixels: int = 4096 * 4096):
+    """Reject absurdly large images by parsing dimensions from magic bytes."""
+    import struct
+    width = height = 0
+    try:
+        if raw[:8] == b'\x89PNG\r\n\x1a\n' and len(raw) > 24:
+            width, height = struct.unpack('>II', raw[16:24])
+        elif raw[:3] == b'\xff\xd8\xff':
+            # Scan JPEG SOF markers
+            i = 2
+            while i < len(raw) - 8:
+                if raw[i] != 0xFF:
+                    break
+                marker = raw[i + 1]
+                seg_len = struct.unpack('>H', raw[i + 2:i + 4])[0]
+                if marker in (0xC0, 0xC1, 0xC2):
+                    height, width = struct.unpack('>HH', raw[i + 5:i + 9])
+                    break
+                i += 2 + seg_len
+        elif raw[:4] == b'RIFF' and raw[8:12] == b'WEBP' and len(raw) > 30:
+            if raw[12:16] == b'VP8 ':
+                width = (struct.unpack('<H', raw[26:28])[0]) & 0x3FFF
+                height = (struct.unpack('<H', raw[28:30])[0]) & 0x3FFF
+    except Exception:
+        return  # Can't parse → allow through
+
+    if width > 0 and height > 0 and width * height > max_pixels:
+        raise ValueError(f"Image trop grande ({width}×{height}px, max 4096×4096)")
 
 
 def hash_password(password: str) -> str:

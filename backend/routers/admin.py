@@ -628,9 +628,10 @@ async def delete_avatar(avatar_id: str, request: Request, db: AsyncSession = Dep
     if not avatar:
         raise HTTPException(status_code=404, detail="Avatar introuvable")
 
-    # Delete file
-    filepath = ROOT_DIR / "static" / avatar.image_url
-    if os.path.exists(filepath):
+    # Delete file — validate path stays within static/avatars to prevent path traversal
+    static_dir = (ROOT_DIR / "static" / "avatars").resolve()
+    filepath = (ROOT_DIR / "static" / avatar.image_url).resolve()
+    if filepath.is_relative_to(static_dir) and filepath.exists():
         os.remove(filepath)
 
     # Null out users who had this avatar

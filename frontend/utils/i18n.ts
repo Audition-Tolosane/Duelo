@@ -31,6 +31,11 @@ const translations: Translations = {
   // Common
   'common.loading': { fr: 'Chargement...', en: 'Loading...', es: 'Cargando...', de: 'Laden...', pt: 'Carregando...', it: 'Caricamento...', ar: 'جاري التحميل...', ja: '読み込み中...', ko: '로딩 중...', zh: '加载中...' },
   'common.error': { fr: 'Erreur', en: 'Error', es: 'Error', de: 'Fehler', pt: 'Erro', it: 'Errore', ar: 'خطأ', ja: 'エラー', ko: '오류', zh: '错误' },
+  'common.error_loading': { fr: 'Impossible de charger les données', en: 'Failed to load data', es: 'No se pueden cargar los datos', de: 'Daten konnten nicht geladen werden', pt: 'Não foi possível carregar os dados', it: 'Impossibile caricare i dati', ar: 'تعذر تحميل البيانات', ja: 'データを読み込めません', ko: '데이터를 불러올 수 없습니다', zh: '无法加载数据' },
+  'category.post_published': { fr: 'Publication envoyée !', en: 'Post published!', es: '¡Publicación enviada!', de: 'Beitrag veröffentlicht!', pt: 'Publicação enviada!', it: 'Pubblicazione inviata!', ar: 'تم نشر المنشور!', ja: '投稿が公開されました！', ko: '게시물이 게시되었습니다!', zh: '帖子已发布！' },
+  'category.error_post_failed': { fr: 'Impossible de publier', en: 'Failed to publish', es: 'No se pudo publicar', de: 'Veröffentlichung fehlgeschlagen', pt: 'Não foi possível publicar', it: 'Impossibile pubblicare', ar: 'تعذر النشر', ja: '公開できませんでした', ko: '게시할 수 없습니다', zh: '发布失败' },
+  'welcome.continue_google': { fr: 'Continuer avec Google', en: 'Continue with Google', es: 'Continuar con Google', de: 'Mit Google fortfahren', pt: 'Continuar com o Google', it: 'Continua con Google', ar: 'المتابعة باستخدام Google', ja: 'Googleで続ける', ko: 'Google로 계속', zh: '使用 Google 继续' },
+  'welcome.pseudo_placeholder': { fr: 'Ex: QuizMaster_42', en: 'e.g. QuizMaster_42', es: 'Ej: QuizMaster_42', de: 'z.B. QuizMaster_42', pt: 'Ex: QuizMaster_42', it: 'Es: QuizMaster_42', ar: 'مثال: QuizMaster_42', ja: '例: QuizMaster_42', ko: '예: QuizMaster_42', zh: '例: QuizMaster_42' },
   'common.retry': { fr: 'Réessayer', en: 'Retry', es: 'Reintentar', de: 'Erneut versuchen', pt: 'Tentar novamente', it: 'Riprova', ar: 'إعادة المحاولة', ja: '再試行', ko: '다시 시도', zh: '重试' },
   'common.cancel': { fr: 'Annuler', en: 'Cancel', es: 'Cancelar', de: 'Abbrechen', pt: 'Cancelar', it: 'Annulla', ar: 'إلغاء', ja: 'キャンセル', ko: '취소', zh: '取消' },
   'common.ok': { fr: 'OK', en: 'OK', es: 'OK', de: 'OK', pt: 'OK', it: 'OK', ar: 'حسنا', ja: 'OK', ko: '확인', zh: '确定' },
@@ -217,6 +222,14 @@ const translations: Translations = {
   'profile.offline_error': { fr: 'Profil hors-ligne. Appuyez pour réessayer', en: 'Profile offline. Tap to retry', es: 'Perfil sin conexión. Toca para reintentar', de: 'Profil offline. Tippen zum Wiederholen', pt: 'Perfil offline. Toque para tentar novamente', it: 'Profilo offline. Tocca per riprovare', ar: 'الملف غير متصل. اضغط لإعادة المحاولة', ja: 'プロフィールオフライン。タップして再試行', ko: '프로필 오프라인. 탭하여 다시 시도', zh: '资料离线。点击重试' },
   'profile.no_title': { fr: 'Aucun titre', en: 'No title', es: 'Sin título', de: 'Kein Titel', pt: 'Sem título', it: 'Nessun titolo', ar: 'بدون لقب', ja: 'タイトルなし', ko: '칭호 없음', zh: '无称号' },
   'profile.world': { fr: 'Monde', en: 'World', es: 'Mundo', de: 'Welt', pt: 'Mundo', it: 'Mondo', ar: 'العالم', ja: '世界', ko: '세계', zh: '世界' },
+  'profile.delete_account': { fr: 'Supprimer mon compte', en: 'Delete my account', es: 'Eliminar mi cuenta', de: 'Konto löschen', pt: 'Excluir minha conta', it: 'Elimina il mio account', ar: 'حذف حسابي', ja: 'アカウントを削除', ko: '계정 삭제', zh: '删除我的账户' },
+  'profile.delete_account_title': { fr: 'Supprimer le compte', en: 'Delete account', es: 'Eliminar cuenta', de: 'Konto löschen', pt: 'Excluir conta', it: 'Elimina account', ar: 'حذف الحساب', ja: 'アカウント削除', ko: '계정 삭제', zh: '删除账户' },
+  'profile.delete_account_confirm': { fr: 'Cette action est irréversible. Toutes tes données seront supprimées définitivement.', en: 'This action is irreversible. All your data will be permanently deleted.', es: 'Esta acción es irreversible. Todos tus datos serán eliminados definitivamente.', de: 'Diese Aktion ist unwiderruflich. Alle deine Daten werden dauerhaft gelöscht.', pt: 'Esta ação é irreversível. Todos os seus dados serão excluídos definitivamente.', it: 'Questa azione è irreversibile. Tutti i tuoi dati saranno eliminati definitivamente.', ar: 'هذا الإجراء لا رجعة فيه. سيتم حذف جميع بياناتك نهائيًا.', ja: 'この操作は取り消せません。すべてのデータが完全に削除されます。', ko: '이 작업은 되돌릴 수 없습니다. 모든 데이터가 영구적으로 삭제됩니다.', zh: '此操作不可逆。您的所有数据将被永久删除。' },
+  'profile.delete_account_confirm_btn': { fr: 'Supprimer définitivement', en: 'Delete permanently', es: 'Eliminar definitivamente', de: 'Dauerhaft löschen', pt: 'Excluir definitivamente', it: 'Elimina definitivamente', ar: 'حذف نهائيًا', ja: '完全に削除', ko: '영구 삭제', zh: '永久删除' },
+  'profile.edit_location': { fr: 'Ma localisation', en: 'My location', es: 'Mi ubicación', de: 'Mein Standort', pt: 'Minha localização', it: 'La mia posizione', ar: 'موقعي', ja: '私の場所', ko: '내 위치', zh: '我的位置' },
+  'profile.your_city': { fr: 'Ville (ex: Paris)', en: 'City (e.g. Paris)', es: 'Ciudad (ej: Madrid)', de: 'Stadt (z.B. Berlin)', pt: 'Cidade (ex: Lisboa)', it: 'Città (es: Roma)', ar: 'المدينة', ja: '都市（例: 東京）', ko: '도시 (예: 서울)', zh: '城市（例如：北京）' },
+  'profile.your_country': { fr: 'Pays (ex: France)', en: 'Country (e.g. France)', es: 'País (ej: España)', de: 'Land (z.B. Deutschland)', pt: 'País (ex: Portugal)', it: 'Paese (es: Italia)', ar: 'البلد', ja: '国（例: 日本）', ko: '국가 (예: 한국)', zh: '国家（例如：中国）' },
+  'profile.save_location': { fr: 'Enregistrer', en: 'Save', es: 'Guardar', de: 'Speichern', pt: 'Salvar', it: 'Salva', ar: 'حفظ', ja: '保存', ko: '저장', zh: '保存' },
   'profile.matches_label': { fr: 'PARTIES', en: 'MATCHES', es: 'PARTIDAS', de: 'SPIELE', pt: 'PARTIDAS', it: 'PARTITE', ar: 'المباريات', ja: '試合', ko: '경기', zh: '比赛' },
   'profile.followers_label': { fr: 'ABONNÉS', en: 'FOLLOWERS', es: 'SEGUIDORES', de: 'FOLLOWER', pt: 'SEGUIDORES', it: 'FOLLOWER', ar: 'المتابعون', ja: 'フォロワー', ko: '팔로워', zh: '粉丝' },
   'profile.following_label': { fr: 'ABONNEMENTS', en: 'FOLLOWING', es: 'SIGUIENDO', de: 'FOLGE ICH', pt: 'SEGUINDO', it: 'SEGUITI', ar: 'المتابَعون', ja: 'フォロー中', ko: '팔로잉', zh: '关注' },
@@ -487,6 +500,11 @@ const translations: Translations = {
   'leaderboard.season_info': { fr: 'Saison en cours \u2022 Reset le 1er du mois', en: 'Current season \u2022 Resets on the 1st of the month', es: 'Temporada actual \u2022 Se reinicia el 1 del mes', de: 'Aktuelle Saison \u2022 Reset am 1. des Monats', pt: 'Temporada atual \u2022 Reinicia no 1º do mês', it: 'Stagione in corso \u2022 Reset il 1° del mese', ar: 'الموسم الحالي \u2022 يُعاد في أول الشهر', ja: '現在のシーズン \u2022 毎月1日にリセット', ko: '현재 시즌 \u2022 매월 1일 초기화', zh: '当前赛季 \u2022 每月1日重置' },
   'leaderboard.empty': { fr: 'Aucun joueur pour le moment', en: 'No players yet', es: 'Aún no hay jugadores', de: 'Noch keine Spieler', pt: 'Nenhum jogador por enquanto', it: 'Nessun giocatore per ora', ar: 'لا يوجد لاعبون حاليًا', ja: 'まだプレイヤーがいません', ko: '아직 플레이어가 없습니다', zh: '暂无玩家' },
   'leaderboard.be_first': { fr: 'Sois le premier a jouer !', en: 'Be the first to play!', es: '¡Sé el primero en jugar!', de: 'Sei der Erste, der spielt!', pt: 'Seja o primeiro a jogar!', it: 'Sii il primo a giocare!', ar: 'كن أول من يلعب!', ja: '最初のプレイヤーになろう！', ko: '첫 번째 플레이어가 되세요!', zh: '成为第一个玩的人！' },
+  'leaderboard.city_too_small': { fr: 'Seulement {count} joueur(s) à {city}', en: 'Only {count} player(s) in {city}', es: 'Solo {count} jugador(es) en {city}', de: 'Nur {count} Spieler in {city}', pt: 'Apenas {count} jogador(es) em {city}', it: 'Solo {count} giocatore/i a {city}', ar: '{count} لاعب فقط في {city}', ja: '{city}には{count}人のプレイヤーのみ', ko: '{city}에 {count}명의 플레이어만 있습니다', zh: '{city}只有{count}名玩家' },
+  'leaderboard.nearby_cities': { fr: 'Villes proches avec plus de joueurs :', en: 'Nearby cities with more players:', es: 'Ciudades cercanas con más jugadores:', de: 'Nahegelegene Städte mit mehr Spielern:', pt: 'Cidades próximas com mais jogadores:', it: 'Città vicine con più giocatori:', ar: 'مدن قريبة بعدد أكبر من اللاعبين:', ja: '近くのプレイヤーが多い都市：', ko: '더 많은 플레이어가 있는 인근 도시:', zh: '附近玩家更多的城市：' },
+  'leaderboard.city_fallback': { fr: 'Pas encore assez de joueurs à {city} — classement {country} pour l\'instant', en: 'Not enough players in {city} yet — showing {country} ranking', es: 'Todavía no hay suficientes jugadores en {city} — clasificación {country} por ahora', de: 'Noch nicht genug Spieler in {city} — {country}-Rangliste für jetzt', pt: 'Ainda não há jogadores suficientes em {city} — classificação {country} por enquanto', it: 'Non abbastanza giocatori a {city} ancora — classifica {country} per ora', ar: 'لا يوجد لاعبون كافيون في {city} بعد — تصنيف {country} في الوقت الحالي', ja: '{city}にはまだ十分なプレイヤーがいません — 現在{country}のランキングを表示', ko: '{city}에 아직 플레이어가 충분하지 않습니다 — {country} 순위 표시 중', zh: '{city}的玩家还不够 — 暂时显示{country}排名' },
+  'leaderboard.no_location': { fr: 'Localisation non définie', en: 'Location not set', es: 'Ubicación no definida', de: 'Standort nicht festgelegt', pt: 'Localização não definida', it: 'Posizione non impostata', ar: 'الموقع غير محدد', ja: '場所が設定されていません', ko: '위치가 설정되지 않았습니다', zh: '未设置位置' },
+  'leaderboard.set_location_hint': { fr: 'Renseigne ta ville et ton pays dans ton profil', en: 'Set your city and country in your profile', es: 'Configura tu ciudad y país en tu perfil', de: 'Lege deine Stadt und dein Land im Profil fest', pt: 'Define a tua cidade e país no perfil', it: 'Imposta la tua città e paese nel profilo', ar: 'قم بتعيين مدينتك وبلدك في ملفك الشخصي', ja: 'プロフィールで都市と国を設定してください', ko: '프로필에서 도시와 국가를 설정하세요', zh: '在个人资料中设置您的城市和国家' },
   'leaderboard.level_short': { fr: 'Niv.', en: 'Lv.', es: 'Niv.', de: 'Lv.', pt: 'Nív.', it: 'Liv.', ar: 'مست.', ja: 'Lv.', ko: 'Lv.', zh: '等级' },
   'leaderboard.wins_short': { fr: 'V', en: 'W', es: 'V', de: 'S', pt: 'V', it: 'V', ar: 'ف', ja: '勝', ko: '승', zh: '胜' },
   'leaderboard.theme_ranking': { fr: 'Classement', en: 'Ranking', es: 'Clasificación', de: 'Rangliste', pt: 'Classificação', it: 'Classifica', ar: 'تصنيف', ja: 'ランキング', ko: '랭킹', zh: '排名' },
@@ -585,8 +603,14 @@ export function getLocale(): string {
   return LOCALE_MAP[currentLanguage] || 'fr-FR';
 }
 
-export function t(key: string): string {
+export function t(key: string, params?: Record<string, string>): string {
   const entry = translations[key];
   if (!entry) return key;
-  return entry[currentLanguage] || entry['fr'] || key;
+  let str = entry[currentLanguage] || entry['fr'] || key;
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
+    }
+  }
+  return str;
 }

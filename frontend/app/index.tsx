@@ -214,10 +214,9 @@ export default function WelcomeScreen() {
 
   const checkExistingUser = async () => {
     try {
-      const userId = await AsyncStorage.getItem('duelo_user_id');
-      if (userId) {
-        const onboardingDone = await AsyncStorage.getItem('duelo_onboarding_done');
-        router.replace(onboardingDone ? '/(tabs)/play' : '/onboarding');
+      const [userId, onboardingDone] = await AsyncStorage.multiGet(['duelo_user_id', 'duelo_onboarding_done']);
+      if (userId[1]) {
+        router.replace(onboardingDone[1] ? '/(tabs)/play' : '/onboarding');
         return;
       }
     } catch {}
@@ -451,7 +450,7 @@ export default function WelcomeScreen() {
                       <View style={styles.inputWrapper}>
                         <TextInput
                           style={[styles.input, available === true && styles.inputValid, available === false && styles.inputError]}
-                          placeholder="Ex: QuizMaster_42"
+                          placeholder={t('welcome.pseudo_placeholder')}
                           placeholderTextColor="#525252"
                           value={pseudo}
                           onChangeText={setPseudo}
@@ -550,7 +549,7 @@ export default function WelcomeScreen() {
                         <Path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                       </Svg>
                     </View>
-                    <Text style={styles.googleText}>Continuer avec Google</Text>
+                    <Text style={styles.googleText}>{t('welcome.continue_google')}</Text>
                   </TouchableOpacity>
 
                   {/* Apple — bouton officiel (langue = langue du système iOS) */}

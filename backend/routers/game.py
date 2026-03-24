@@ -117,8 +117,8 @@ async def get_game_questions(theme: str, db: AsyncSession = Depends(get_db)):
     return result_list
 
 
-# Keep /questions-v2 as alias for frontend compatibility
-@router.get("/questions-v2")
+# Deprecated alias — use /questions directly
+@router.get("/questions-v2", deprecated=True)
 async def get_game_questions_v2(theme: str, db: AsyncSession = Depends(get_db)):
     return await get_game_questions(theme, db)
 

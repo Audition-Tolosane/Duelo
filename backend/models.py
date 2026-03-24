@@ -29,6 +29,8 @@ class User(Base):
     region = Column(String(100), nullable=True)
     country = Column(String(100), nullable=True)
     continent = Column(String(50), nullable=True)
+    lat = Column(Float, nullable=True)
+    lng = Column(Float, nullable=True)
 
     total_xp = Column(Integer, default=0)
 
@@ -49,6 +51,7 @@ class User(Base):
 
     last_played_at = Column(DateTime(timezone=True), nullable=True)
     onboarding_done = Column(Boolean, default=False)
+    privacy_accepted_at = Column(DateTime(timezone=True), nullable=True)
 
     created_at = Column(DateTime(timezone=True), default=utc_now)
     updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
@@ -239,6 +242,19 @@ class UserThemeXP(Base):
         UniqueConstraint('user_id', 'theme_id', name='uq_user_theme_xp'),
     )
 
+
+
+class ThemeFollow(Base):
+    __tablename__ = 'theme_follows'
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), nullable=False, index=True)
+    theme_id = Column(String(20), nullable=False, index=True)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+
+    __table_args__ = (
+        UniqueConstraint('user_id', 'theme_id', name='uq_user_theme_follow'),
+    )
 
 
 class QuestionReport(Base):

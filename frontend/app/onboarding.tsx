@@ -81,6 +81,9 @@ export default function OnboardingScreen() {
     setLoadingTrending(false);
   };
 
+  const isMounted = useRef(true);
+  useEffect(() => { return () => { isMounted.current = false; }; }, []);
+
   const finishOnboarding = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
@@ -94,7 +97,7 @@ export default function OnboardingScreen() {
       }
       await AsyncStorage.setItem('duelo_onboarding_done', 'true');
     } catch {}
-    router.replace('/(tabs)/play');
+    if (isMounted.current) router.replace('/(tabs)/play');
   };
 
   const nextStep = () => {

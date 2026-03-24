@@ -1,13 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from database import get_db
-from models import User, Question, Theme, UserThemeXP, Match
+from models import User, Question, Theme, UserThemeXP, Match, ThemeFollow
 from constants import SUPER_CATEGORY_META, CLUSTER_ICONS
 from services.xp import (
     get_level, get_xp_progress, get_theme_title, get_theme_unlocked_titles,
 )
+from services.geo import haversine, CITY_MIN_PLAYERS
+from auth_middleware import get_optional_user_id
 
 router = APIRouter(tags=["themes"])
 
@@ -200,6 +202,11 @@ async def get_theme_detail(theme_id: str, user_id: Optional[str] = None, db: Asy
     user_level = 0
     user_title = ""
     is_following = False
+    followers_count = 0
+
+    # Count followers
+    fc_res = await db.execute(select(func.count(ThemeFollow.id)).where(ThemeFollow.theme_id == theme_id))
+    followers_count = fc_res.scalar() or 0
 
     if user_id:
         xp_result = await db.execute(
@@ -211,7 +218,10 @@ async def get_theme_detail(theme_id: str, user_id: Optional[str] = None, db: Asy
             user_level = get_level(user_xp)
             user_title = get_theme_title(theme, user_level)
 
-    followers_count = 0
+        follow_res = await db.execute(
+            select(ThemeFollow).where(ThemeFollow.user_id == user_id, ThemeFollow.theme_id == theme_id)
+        )
+        is_following = follow_res.scalar_one_or_none() is not None
 
     xp_progress = get_xp_progress(user_xp, user_level)
     unlocked_titles = get_theme_unlocked_titles(theme, user_level)
@@ -233,35 +243,200 @@ async def get_theme_detail(theme_id: str, user_id: Optional[str] = None, db: Asy
     }
 
 
-@router.get("/theme/{theme_id}/leaderboard")
-async def theme_leaderboard(theme_id: str, limit: int = 50, offset: int = 0, db: AsyncSession = Depends(get_db)):
-    limit = min(limit, 100)
-    result = await db.execute(
-        select(UserThemeXP).where(UserThemeXP.theme_id == theme_id, UserThemeXP.xp > 0)
-        .order_by(UserThemeXP.xp.desc()).limit(limit).offset(offset)
+@router.post("/theme/{theme_id}/follow")
+async def toggle_theme_follow(
+    theme_id: str,
+    request: Request,
+    current_user_id: str = Depends(get_optional_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    body = await request.json()
+    user_id = body.get("user_id") or current_user_id
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Non authentifié")
+
+    existing = await db.execute(
+        select(ThemeFollow).where(ThemeFollow.user_id == user_id, ThemeFollow.theme_id == theme_id)
     )
-    entries_xp = result.scalars().all()
+    follow = existing.scalar_one_or_none()
+
+    if follow:
+        await db.delete(follow)
+        await db.commit()
+        return {"following": False}
+    else:
+        db.add(ThemeFollow(user_id=user_id, theme_id=theme_id))
+        await db.commit()
+        return {"following": True}
+
+
+@router.get("/theme/{theme_id}/leaderboard")
+async def theme_leaderboard(
+    theme_id: str,
+    scope: str = "world",
+    city_override: Optional[str] = None,
+    limit: int = 50,
+    offset: int = 0,
+    user_id: Optional[str] = Depends(get_optional_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    limit = min(limit, 100)
+
+    # Fetch current user for location filtering
+    current_user = None
+    if user_id and scope != "world":
+        res = await db.execute(select(User).where(User.id == user_id))
+        current_user = res.scalar_one_or_none()
 
     theme_res = await db.execute(select(Theme).where(Theme.id == theme_id))
     theme = theme_res.scalar_one_or_none()
 
-    if not entries_xp:
-        return []
+    async def _fetch_entries(user_ids_filter=None, city_filter=None, country_filter=None,
+                              continent_filter=None, region_filter=None):
+        """Fetch theme XP entries with optional user location filter."""
+        uxp_q = (
+            select(UserThemeXP)
+            .where(UserThemeXP.theme_id == theme_id, UserThemeXP.xp > 0)
+        )
+        if user_ids_filter is not None:
+            uxp_q = uxp_q.where(UserThemeXP.user_id.in_(user_ids_filter))
 
-    # Batch fetch all users for leaderboard entries
-    user_ids = [entry.user_id for entry in entries_xp]
-    users_res = await db.execute(select(User).where(User.id.in_(user_ids)))
-    users_map = {u.id: u for u in users_res.scalars().all()}
+        uxp_q = uxp_q.order_by(UserThemeXP.xp.desc()).limit(limit).offset(offset)
+        result = await db.execute(uxp_q)
+        entries_xp = result.scalars().all()
+        if not entries_xp:
+            return []
 
-    entries = []
-    for i, uxp in enumerate(entries_xp):
-        user = users_map.get(uxp.user_id)
-        if not user:
-            continue
-        lvl = get_level(uxp.xp)
-        entries.append({
-            "id": user.id, "rank": offset + i + 1, "pseudo": user.pseudo,
-            "avatar_seed": user.avatar_seed, "level": lvl,
-            "title": get_theme_title(theme, lvl) if theme else "", "xp": uxp.xp,
-        })
-    return entries
+        all_user_ids = [e.user_id for e in entries_xp]
+        u_q = select(User).where(User.id.in_(all_user_ids))
+        if city_filter:
+            u_q = u_q.where(User.city == city_filter)
+        if country_filter:
+            u_q = u_q.where(User.country == country_filter)
+        if continent_filter:
+            u_q = u_q.where(User.continent == continent_filter)
+        if region_filter:
+            u_q = u_q.where(User.region == region_filter)
+        users_res = await db.execute(u_q)
+        users_map = {u.id: u for u in users_res.scalars().all()}
+
+        out = []
+        rank = offset + 1
+        for uxp in entries_xp:
+            user = users_map.get(uxp.user_id)
+            if not user:
+                continue
+            lvl = get_level(uxp.xp)
+            out.append({
+                "id": user.id, "rank": rank, "pseudo": user.pseudo,
+                "avatar_seed": user.avatar_seed, "avatar_url": user.avatar_url,
+                "level": lvl, "title": get_theme_title(theme, lvl) if theme else "",
+                "xp": uxp.xp, "total_xp": uxp.xp,
+            })
+            rank += 1
+        return out
+
+    # ── World ──────────────────────────────────────────────────────────────────
+    if scope == "world":
+        entries = await _fetch_entries()
+        return {"entries": entries, "meta": {"scope_used": "world"}}
+
+    # ── Continent ──────────────────────────────────────────────────────────────
+    if scope == "continent":
+        if not current_user or not current_user.continent:
+            return {"entries": [], "meta": {"scope_used": "continent", "missing": True}}
+        entries = await _fetch_entries(continent_filter=current_user.continent)
+        return {"entries": entries, "meta": {"scope_used": "continent"}}
+
+    # ── Region ─────────────────────────────────────────────────────────────────
+    if scope == "region":
+        if not current_user or not current_user.region:
+            return {"entries": [], "meta": {"scope_used": "region", "missing": True}}
+        entries = await _fetch_entries(
+            region_filter=current_user.region,
+            country_filter=current_user.country,
+        )
+        return {"entries": entries, "meta": {"scope_used": "region"}}
+
+    # ── Country ────────────────────────────────────────────────────────────────
+    if scope == "country":
+        if not current_user or not current_user.country:
+            return {"entries": [], "meta": {"scope_used": "country", "missing": True}}
+        entries = await _fetch_entries(country_filter=current_user.country)
+        return {"entries": entries, "meta": {"scope_used": "country"}}
+
+    # ── City ───────────────────────────────────────────────────────────────────
+    if scope == "city":
+        if not current_user or not current_user.city:
+            return {"entries": [], "meta": {"scope_used": "city", "missing": True}}
+
+        target_city = city_override or current_user.city
+        city_entries = await _fetch_entries(
+            city_filter=target_city,
+            country_filter=current_user.country,
+        )
+
+        if len(city_entries) >= CITY_MIN_PLAYERS or city_override:
+            return {"entries": city_entries, "meta": {"scope_used": "city", "city_name": target_city}}
+
+        # Not enough → find nearby cities with 10+ theme players
+        suggestions = []
+        if current_user.lat and current_user.lng:
+            cities_q = (
+                select(
+                    User.city,
+                    func.count(UserThemeXP.user_id).label("player_count"),
+                    func.avg(User.lat).label("avg_lat"),
+                    func.avg(User.lng).label("avg_lng"),
+                )
+                .join(UserThemeXP, UserThemeXP.user_id == User.id)
+                .where(
+                    UserThemeXP.theme_id == theme_id,
+                    UserThemeXP.xp > 0,
+                    User.country == current_user.country,
+                    User.city.isnot(None),
+                    User.city != target_city,
+                    User.lat.isnot(None),
+                )
+                .group_by(User.city)
+                .having(func.count(UserThemeXP.user_id) >= CITY_MIN_PLAYERS)
+            )
+            cities_result = await db.execute(cities_q)
+            with_distance = [
+                {
+                    "city": row.city,
+                    "player_count": row.player_count,
+                    "distance_km": round(haversine(
+                        current_user.lat, current_user.lng,
+                        row.avg_lat, row.avg_lng,
+                    )),
+                }
+                for row in cities_result.all()
+                if row.avg_lat and row.avg_lng
+            ]
+            suggestions = sorted(with_distance, key=lambda x: x["distance_km"])[:5]
+
+        if suggestions:
+            return {
+                "entries": [],
+                "meta": {
+                    "scope_used": "city", "city_name": target_city,
+                    "too_small": True, "city_player_count": len(city_entries),
+                    "suggestions": suggestions,
+                },
+            }
+
+        # Fallback to country
+        fallback_entries = await _fetch_entries(country_filter=current_user.country)
+        return {
+            "entries": fallback_entries,
+            "meta": {
+                "scope_used": "country", "city_name": target_city,
+                "country_name": current_user.country,
+                "too_small": True, "city_player_count": len(city_entries),
+                "fallback": True,
+            },
+        }
+
+    entries = await _fetch_entries()
+    return {"entries": entries, "meta": {"scope_used": scope}}

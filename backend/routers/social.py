@@ -21,6 +21,7 @@ router = APIRouter(tags=["social"])
 @router.get("/category/{category_id}/wall")
 async def get_wall_posts(category_id: str, user_id: Optional[str] = None, limit: int = 20, offset: int = 0, db: AsyncSession = Depends(get_db)):
     limit = min(limit, 100)
+    offset = min(offset, 10000)
     result = await db.execute(
         select(WallPost).where(WallPost.category_id == category_id)
         .order_by(WallPost.created_at.desc()).limit(limit).offset(offset)
@@ -402,10 +403,12 @@ async def toggle_player_follow(user_id: str, data: PlayerFollowToggle, current_u
 
 @router.get("/players/search")
 async def search_players(
-    q: Optional[str] = None, country: Optional[str] = None, limit: int = 20, offset: int = 0,
+    q: Optional[str] = None, country: Optional[str] = None,
+    limit: int = 20, offset: int = min(0, 10000),
     db: AsyncSession = Depends(get_db)
 ):
     limit = min(limit, 100)
+    offset = min(offset, 10000)
     query = select(User)
     if q and q.strip():
         query = query.where(User.pseudo.ilike(f"%{q.strip()}%"))
@@ -416,9 +419,37 @@ async def search_players(
     result = await db.execute(query)
     users = result.scalars().all()
 
+    if not users:
+        return []
+
+    # Batch fetch best theme for all users in one query (fixes N+1)
+    user_ids = [u.id for u in users]
+    uxp_res = await db.execute(
+        select(UserThemeXP)
+        .where(UserThemeXP.user_id.in_(user_ids), UserThemeXP.xp > 0)
+        .order_by(UserThemeXP.xp.desc())
+    )
+    all_uxp = uxp_res.scalars().all()
+
+    # Group by user_id, keep highest XP entry
+    best_uxp: dict = {}
+    for uxp in all_uxp:
+        if uxp.user_id not in best_uxp:
+            best_uxp[uxp.user_id] = uxp
+
+    # Fetch relevant themes
+    theme_ids = list({uxp.theme_id for uxp in best_uxp.values()})
+    themes_map: dict = {}
+    if theme_ids:
+        themes_res = await db.execute(select(Theme).where(Theme.id.in_(theme_ids)))
+        themes_map = {t.id: t for t in themes_res.scalars().all()}
+
     players = []
     for u in users:
-        _, best_level, best_title = await _get_user_best_theme(db, u.id)
+        uxp = best_uxp.get(u.id)
+        best_level = get_level(uxp.xp) if uxp else 0
+        theme = themes_map.get(uxp.theme_id) if uxp else None
+        best_title = get_theme_title(theme, best_level) if theme else ""
         players.append({
             "id": u.id, "pseudo": u.pseudo, "avatar_seed": u.avatar_seed,
             "avatar_url": getattr(u, 'avatar_url', None),

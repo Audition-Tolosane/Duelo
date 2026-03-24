@@ -14,6 +14,19 @@ def create_access_token(user_id: str) -> str:
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
+async def get_optional_user_id(request: Request) -> str | None:
+    """Extract user_id from JWT if present, without raising on missing/invalid token."""
+    auth = request.headers.get("Authorization", "")
+    if not auth.startswith("Bearer "):
+        return None
+    token = auth.split(" ", 1)[1]
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        return payload.get("sub")
+    except Exception:
+        return None
+
+
 async def get_current_user_id(request: Request) -> str:
     """Extract and validate JWT from Authorization Bearer header."""
     auth_header = request.headers.get("Authorization")
