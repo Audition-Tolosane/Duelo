@@ -100,6 +100,7 @@ export default function SearchScreen() {
   // Content
   const [posts, setPosts] = useState<PostResult[]>([]);
   const [comments, setComments] = useState<CommentResult[]>([]);
+  const [searchError, setSearchError] = useState(false);
 
   // Trending
   const [trendingTags, setTrendingTags] = useState<TrendingTag[]>([]);
@@ -131,6 +132,7 @@ export default function SearchScreen() {
 
   const fetchThemes = async (q: string, diff: string, userId: string) => {
     setIsSearching(true);
+    setSearchError(false);
     try {
       let url = `${API_URL}/api/search/themes?`;
       if (q.trim()) url += `q=${encodeURIComponent(q.trim())}&`;
@@ -139,12 +141,15 @@ export default function SearchScreen() {
       const res = await fetch(url);
       const data = await res.json();
       setThemes(data);
-    } catch {}
+    } catch {
+      setSearchError(true);
+    }
     setIsSearching(false);
   };
 
   const fetchPlayers = async (q: string, cat: string | null) => {
     setIsSearching(true);
+    setSearchError(false);
     try {
       let url = `${API_URL}/api/search/players?limit=25`;
       if (q.trim()) url += `&q=${encodeURIComponent(q.trim())}`;
@@ -152,7 +157,9 @@ export default function SearchScreen() {
       const res = await fetch(url);
       const data = await res.json();
       setPlayers(data.filter((p: PlayerResult) => p.id !== myId));
-    } catch {}
+    } catch {
+      setSearchError(true);
+    }
     setIsSearching(false);
   };
 
@@ -163,6 +170,7 @@ export default function SearchScreen() {
       return;
     }
     setIsSearching(true);
+    setSearchError(false);
     try {
       let url = `${API_URL}/api/search/content?q=${encodeURIComponent(q.trim())}`;
       if (myId) url += `&user_id=${myId}`;
@@ -170,7 +178,9 @@ export default function SearchScreen() {
       const data = await res.json();
       setPosts(data.posts || []);
       setComments(data.comments || []);
-    } catch {}
+    } catch {
+      setSearchError(true);
+    }
     setIsSearching(false);
   };
 
@@ -558,7 +568,12 @@ export default function SearchScreen() {
             <View style={st.filterRow}>
               {renderDifficultyFilters()}
             </View>
-            {isSearching ? (
+            {searchError ? (
+              <View style={st.emptyState}>
+                <MaterialCommunityIcons name="wifi-off" size={40} color="#FF3B30" style={{ marginBottom: 12 }} />
+                <Text style={[st.emptyTitle, { color: '#FF3B30' }]}>{t('search.error')}</Text>
+              </View>
+            ) : isSearching ? (
               <ActivityIndicator size="large" color="#8A2BE2" style={{ marginTop: 40 }} />
             ) : (
               <FlatList

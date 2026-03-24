@@ -7,6 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useWS } from '../contexts/WebSocketContext';
+import { t } from '../utils/i18n';
 
 const TIMEOUT_SECONDS = 15;
 
@@ -107,9 +108,9 @@ export default function RematchModal() {
             <MaterialCommunityIcons name="sword-cross" size={32} color="#FFF" />
           </LinearGradient>
 
-          <Text style={styles.title}>REVANCHE !</Text>
+          <Text style={styles.title}>{t('rematch.title')}</Text>
           <Text style={styles.subtitle}>
-            <Text style={styles.pseudo}>{proposerPseudo}</Text> veut une revanche
+            <Text style={styles.pseudo}>{proposerPseudo}</Text> {t('rematch.wants_rematch')}
           </Text>
 
           {/* Countdown bar */}
@@ -132,7 +133,7 @@ export default function RematchModal() {
           <View style={styles.buttons}>
             <TouchableOpacity style={styles.declineBtn} onPress={handleDecline} activeOpacity={0.8}>
               <MaterialCommunityIcons name="close" size={18} color="#FF3B30" />
-              <Text style={styles.declineText}>Refuser</Text>
+              <Text style={styles.declineText}>{t('rematch.decline')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.acceptBtn} onPress={handleAccept} activeOpacity={0.8}>
@@ -143,7 +144,7 @@ export default function RematchModal() {
                 style={styles.acceptGradient}
               >
                 <MaterialCommunityIcons name="check" size={18} color="#FFF" />
-                <Text style={styles.acceptText}>Accepter</Text>
+                <Text style={styles.acceptText}>{t('rematch.accept')}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>

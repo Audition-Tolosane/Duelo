@@ -62,6 +62,8 @@ export default function ResultsScreen() {
     correctCount: string; opponentLevel: string; opponentId: string;
   }>();
 
+  const category = params.category || '';
+
   const pScore = parseInt(params.playerScore || '0');
   const oScore = parseInt(params.opponentScore || '0');
   const correctCount = parseInt(params.correctCount || '0');
@@ -71,6 +73,7 @@ export default function ResultsScreen() {
 
   // Rematch states: idle | waiting | declined | accepted
   const [rematchState, setRematchState] = useState<'idle' | 'waiting' | 'declined' | 'accepted'>('idle');
+  const rematchStateRef = useRef(rematchState);
   const [xpBreakdown, setXpBreakdown] = useState<XpBreakdown | null>(null);
   const [newTitle, setNewTitle] = useState<NewTitle | null>(null);
   const [newLevel, setNewLevel] = useState<number | null>(null);
@@ -99,6 +102,9 @@ export default function ResultsScreen() {
   const titleOpacity = useRef(new Animated.Value(0)).current;
   const titleGlow = useRef(new Animated.Value(0)).current;
 
+  // Keep ref in sync to avoid stale closures in WS listeners
+  useEffect(() => { rematchStateRef.current = rematchState; }, [rematchState]);
+
   useEffect(() => {
     submitMatch();
     loadQuizQuestions();
@@ -123,23 +129,22 @@ export default function ResultsScreen() {
         setRematchState('accepted');
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         setTimeout(() => {
-          router.replace(`/matchmaking?category=${params.category}&rematch=true`);
+          router.replace(`/matchmaking?category=${category}&rematch=true`);
         }, 600);
       }),
       on('rematch_declined', () => {
         setRematchState('declined');
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        // After a short delay, redirect to global matchmaking
         setTimeout(() => {
-          router.replace(`/matchmaking?category=${params.category}`);
+          router.replace(`/matchmaking?category=${category}`);
         }, 2000);
       }),
       on('rematch_expired', () => {
-        if (rematchState === 'waiting') {
+        if (rematchStateRef.current === 'waiting') {
           setRematchState('declined');
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
           setTimeout(() => {
-            router.replace(`/matchmaking?category=${params.category}`);
+            router.replace(`/matchmaking?category=${category}`);
           }, 2000);
         }
       }),
@@ -154,7 +159,7 @@ export default function ResultsScreen() {
       setRematchState('declined');
       // After showing "declined", launch matchmaking search
       setTimeout(() => {
-        router.push(`/matchmaking?category=${params.category}`);
+        router.push(`/matchmaking?category=${category}`);
       }, 1500);
     }, 20000);
     return () => clearTimeout(timeout);
@@ -168,7 +173,7 @@ export default function ResultsScreen() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           player_id: userId,
-          theme_id: params.category,
+          theme_id: category,
           player_score: pScore,
           opponent_score: oScore,
           opponent_pseudo: params.opponentPseudo,
@@ -178,7 +183,7 @@ export default function ResultsScreen() {
         }),
       });
       if (!res.ok) {
-        console.warn(`[submit-v2] ${res.status} - theme_id="${params.category}"`);
+        console.warn(`[submit-v2] ${res.status} - theme_id="${category}"`);
         setSubmitting(false);
         return;
       }
@@ -219,7 +224,7 @@ export default function ResultsScreen() {
 
   const shareResult = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    const categoryName = CATEGORY_NAMES[params.category || ''] || params.category;
+    const categoryName = CATEGORY_NAMES[category || ''] || category;
     const text = won
       ? `${t('results.share_victory')} ${pScore}-${oScore} en ${categoryName} (${correctCount}/7). ${t('results.share_challenge')}`
       : `${t('results.share_intense')} ${pScore}-${oScore} en ${categoryName}. ${t('results.share_beat_me')}`;
@@ -275,7 +280,7 @@ export default function ResultsScreen() {
           user_id: userId,
           question_id: selectedQuestion.id,
           question_text: selectedQuestion.question_text,
-          category: params.category,
+          category: category,
           reason_type: selectedReason,
           description: reportDescription.trim() || undefined,
         }),
@@ -317,13 +322,13 @@ export default function ResultsScreen() {
           setRematchState('accepted');
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           setTimeout(() => {
-            router.replace(`/matchmaking?category=${params.category}&rematch=true`);
+            router.replace(`/matchmaking?category=${category}&rematch=true`);
           }, 800);
         } else {
           setRematchState('declined');
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
           setTimeout(() => {
-            router.replace(`/matchmaking?category=${params.category}`);
+            router.replace(`/matchmaking?category=${category}`);
           }, 2000);
         }
       }, delay);
@@ -334,7 +339,7 @@ export default function ResultsScreen() {
     send({
       action: 'rematch_propose',
       opponent_id: params.opponentId,
-      theme_id: params.category,
+      theme_id: category,
     });
   };
 
@@ -407,7 +412,7 @@ export default function ResultsScreen() {
               </View>
               <View style={styles.vsContainer}>
                 <Text style={styles.vsText}>VS</Text>
-                <Text style={styles.categoryBadge}>{CATEGORY_NAMES[params.category || '']}</Text>
+                <Text style={styles.categoryBadge}>{CATEGORY_NAMES[category || '']}</Text>
               </View>
               <View style={styles.playerColumn}>
                 <LinearGradient

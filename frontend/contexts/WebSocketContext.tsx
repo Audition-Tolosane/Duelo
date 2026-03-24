@@ -38,6 +38,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [unreadNotifs, setUnreadNotifs] = useState(0);
   const userIdRef = useRef<string | null>(null);
+  const fetchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Initialize connection
   useEffect(() => {
@@ -89,7 +90,12 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     return () => unsubs.forEach((u) => u());
   }, []);
 
-  const fetchUnreadCounts = async (userId: string) => {
+  const fetchUnreadCounts = (userId: string) => {
+    if (fetchDebounceRef.current) clearTimeout(fetchDebounceRef.current);
+    fetchDebounceRef.current = setTimeout(() => _doFetchUnreadCounts(userId), 500);
+  };
+
+  const _doFetchUnreadCounts = async (userId: string) => {
     try {
       const [msgRes, notifRes] = await Promise.all([
         fetch(`${API_URL}/api/chat/unread-count/${userId}`),

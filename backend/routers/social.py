@@ -472,13 +472,34 @@ async def social_pulse(user_id: str, db: AsyncSession = Depends(get_db)):
 
     feed = []
 
-    recent = await db.execute(
+    recent_rows = (await db.execute(
         select(Match, User).join(User, User.id == Match.player1_id)
         .order_by(Match.created_at.desc()).limit(20)
-    )
-    for row in recent:
+    )).all()
+
+    if recent_rows:
+        category_ids = list({row[0].category for row in recent_rows})
+        user_ids = list({row[1].id for row in recent_rows})
+
+        themes_res = await db.execute(select(Theme).where(Theme.id.in_(category_ids)))
+        themes_map = {t.id: t for t in themes_res.scalars().all()}
+
+        uxp_res = await db.execute(
+            select(UserThemeXP).where(
+                UserThemeXP.user_id.in_(user_ids),
+                UserThemeXP.theme_id.in_(category_ids),
+            )
+        )
+        uxp_map = {(ux.user_id, ux.theme_id): ux for ux in uxp_res.scalars().all()}
+    else:
+        themes_map: dict = {}
+        uxp_map: dict = {}
+
+    for row in recent_rows:
         m, u = row[0], row[1]
-        theme_name, theme_color = await _get_theme_info(db, m.category)
+        theme_obj = themes_map.get(m.category)
+        theme_name = theme_obj.name if theme_obj else m.category
+        theme_color = (theme_obj.color_hex if theme_obj else None) or "#8A2BE2"
         is_perfect = m.player1_correct == 7
         is_self = u.id == user_id
 
@@ -486,11 +507,7 @@ async def social_pulse(user_id: str, db: AsyncSession = Depends(get_db)):
         if is_perfect:
             exploit_type = "perfect"
 
-        # Get user level in this theme
-        uxp_res = await db.execute(
-            select(UserThemeXP).where(UserThemeXP.user_id == u.id, UserThemeXP.theme_id == m.category)
-        )
-        uxp = uxp_res.scalar_one_or_none()
+        uxp = uxp_map.get((u.id, m.category))
         user_level = get_level(uxp.xp) if uxp else 0
 
         feed.append({

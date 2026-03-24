@@ -399,6 +399,13 @@ export default function AccueilScreen() {
   const [userId, setUserId] = useState<string | null>(null);
   const [feedError, setFeedError] = useState(false);
 
+  const hasPlayedToday = React.useMemo(() => {
+    if (!userData?.last_played_at) return false;
+    const last = new Date(userData.last_played_at);
+    const now = new Date();
+    return last.toDateString() === now.toDateString();
+  }, [userData?.last_played_at]);
+
   useEffect(() => {
     loadFeed();
   }, []);
@@ -514,13 +521,6 @@ export default function AccueilScreen() {
   const winRate = userData && userData.matches_played > 0
     ? Math.round((userData.matches_won / userData.matches_played) * 100)
     : 0;
-
-  const hasPlayedToday = (() => {
-    if (!userData?.last_played_at) return false;
-    const last = new Date(userData.last_played_at);
-    const now = new Date();
-    return last.toDateString() === now.toDateString();
-  })();
 
   if (loading) {
     return (

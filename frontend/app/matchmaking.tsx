@@ -143,7 +143,8 @@ function PlayerPin({ x, y, name, color, isTarget }: {
 export default function MatchmakingScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { category, themeName, rematch } = useLocalSearchParams<{ category: string; themeName: string; rematch: string }>();
+  const { category: rawCategory, themeName, rematch } = useLocalSearchParams<{ category: string; themeName: string; rematch: string }>();
+  const category = rawCategory || '';
   const isRematch = rematch === 'true';
   const { send: wsSend, on: wsOn } = useWS();
   const [dots, setDots] = useState('');

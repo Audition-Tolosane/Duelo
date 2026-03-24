@@ -94,6 +94,18 @@ const translations: Translations = {
   'home.xp_double_duration': { fr: 'pendant 1h !', en: 'for 1 hour!', es: 'durante 1 hora!', de: 'für 1 Stunde!', pt: 'por 1 hora!', it: 'per 1 ora!', ar: 'لمدة ساعة!', ja: '1時間！', ko: '1시간 동안!', zh: '持续1小时！' },
   'notifications.days_short': { fr: 'j', en: 'd', es: 'd', de: 'T', pt: 'd', it: 'g', ar: 'ي', ja: '日', ko: '일', zh: '天' },
 
+  // Rematch modal
+  'rematch.title': { fr: 'REVANCHE !', en: 'REMATCH!', es: '¡REVANCHA!', de: 'REVANCHE!', pt: 'REVANCHE!', it: 'RIVINCITA!', ar: 'إعادة!', ja: 'リマッチ！', ko: '재대결!', zh: '再来一局！' },
+  'rematch.wants_rematch': { fr: 'veut une revanche', en: 'wants a rematch', es: 'quiere una revancha', de: 'will eine Revanche', pt: 'quer uma revanche', it: 'vuole una rivincita', ar: 'يريد إعادة', ja: 'がリマッチを要求', ko: '재대결을 원합니다', zh: '想要再来一局' },
+  'rematch.decline': { fr: 'Refuser', en: 'Decline', es: 'Rechazar', de: 'Ablehnen', pt: 'Recusar', it: 'Rifiuta', ar: 'رفض', ja: '断る', ko: '거절', zh: '拒绝' },
+  'rematch.accept': { fr: 'Accepter', en: 'Accept', es: 'Aceptar', de: 'Annehmen', pt: 'Aceitar', it: 'Accetta', ar: 'قبول', ja: '受ける', ko: '수락', zh: '接受' },
+
+  // Search
+  'search.error': { fr: 'Erreur lors de la recherche', en: 'Search failed', es: 'Error en la búsqueda', de: 'Suche fehlgeschlagen', pt: 'Falha na pesquisa', it: 'Ricerca fallita', ar: 'فشل البحث', ja: '検索に失敗しました', ko: '검색 실패', zh: '搜索失败' },
+
+  // Welcome (email)
+  'welcome.invalid_email_format': { fr: 'Adresse email invalide', en: 'Invalid email address', es: 'Dirección de correo inválida', de: 'Ungültige E-Mail-Adresse', pt: 'Endereço de e-mail inválido', it: 'Indirizzo email non valido', ar: 'عنوان بريد إلكتروني غير صالح', ja: 'メールアドレスが無効です', ko: '이메일 주소가 유효하지 않습니다', zh: '无效的电子邮件地址' },
+
   // Play
   'play.find_match': { fr: 'Trouver un adversaire', en: 'Find opponent', es: 'Buscar oponente', de: 'Gegner finden', pt: 'Encontrar oponente', it: 'Trova avversario', ar: 'ابحث عن خصم', ja: '対戦相手を探す', ko: '상대 찾기', zh: '寻找对手' },
   'play.random': { fr: 'Aléatoire', en: 'Random', es: 'Aleatorio', de: 'Zufällig', pt: 'Aleatório', it: 'Casuale', ar: 'عشوائي', ja: 'ランダム', ko: '랜덤', zh: '随机' },

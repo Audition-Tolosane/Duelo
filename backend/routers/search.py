@@ -176,42 +176,53 @@ async def search_content(
     posts = post_result.scalars().all()
 
     post_data = []
-    for p in posts:
-        u_res = await db.execute(select(User).where(User.id == p.user_id))
-        author = u_res.scalar_one_or_none()
+    if posts:
+        post_ids = [p.id for p in posts]
+        post_user_ids = list({p.user_id for p in posts})
+        post_cat_ids = list({p.category_id for p in posts})
 
-        likes_res = await db.execute(select(func.count(PostLike.id)).where(PostLike.post_id == p.id))
-        likes_count = likes_res.scalar() or 0
+        post_authors_res = await db.execute(select(User).where(User.id.in_(post_user_ids)))
+        post_authors_map = {u.id: u for u in post_authors_res.scalars().all()}
 
-        comments_res = await db.execute(select(func.count(PostComment.id)).where(PostComment.post_id == p.id))
-        comments_count = comments_res.scalar() or 0
+        likes_res = await db.execute(
+            select(PostLike.post_id, func.count(PostLike.id))
+            .where(PostLike.post_id.in_(post_ids))
+            .group_by(PostLike.post_id)
+        )
+        likes_map = dict(likes_res.all())
 
-        is_liked = False
+        comments_cnt_res = await db.execute(
+            select(PostComment.post_id, func.count(PostComment.id))
+            .where(PostComment.post_id.in_(post_ids))
+            .group_by(PostComment.post_id)
+        )
+        comments_map = dict(comments_cnt_res.all())
+
+        liked_set: set = set()
         if user_id:
-            like_check = await db.execute(
-                select(PostLike).where(PostLike.user_id == user_id, PostLike.post_id == p.id)
+            liked_res = await db.execute(
+                select(PostLike.post_id).where(PostLike.user_id == user_id, PostLike.post_id.in_(post_ids))
             )
-            is_liked = like_check.scalar_one_or_none() is not None
+            liked_set = {row[0] for row in liked_res.all()}
 
-        # Get theme name
-        theme_name = p.category_id
-        t_res = await db.execute(select(Theme).where(Theme.id == p.category_id))
-        theme = t_res.scalar_one_or_none()
-        if theme:
-            theme_name = theme.name
+        post_themes_res = await db.execute(select(Theme).where(Theme.id.in_(post_cat_ids)))
+        post_themes_map = {t.id: t for t in post_themes_res.scalars().all()}
 
-        post_data.append({
-            "id": p.id, "category_id": p.category_id,
-            "category_name": theme_name,
-            "user": {
-                "id": author.id if author else "", "pseudo": author.pseudo if author else "Inconnu",
-                "avatar_seed": author.avatar_seed if author else "",
-                "avatar_url": getattr(author, 'avatar_url', None) if author else None,
-            },
-            "content": p.content, "has_image": bool(p.image_base64),
-            "likes_count": likes_count, "comments_count": comments_count,
-            "is_liked": is_liked, "created_at": p.created_at.isoformat(),
-        })
+        for p in posts:
+            author = post_authors_map.get(p.user_id)
+            theme = post_themes_map.get(p.category_id)
+            post_data.append({
+                "id": p.id, "category_id": p.category_id,
+                "category_name": theme.name if theme else p.category_id,
+                "user": {
+                    "id": author.id if author else "", "pseudo": author.pseudo if author else "Inconnu",
+                    "avatar_seed": author.avatar_seed if author else "",
+                    "avatar_url": getattr(author, 'avatar_url', None) if author else None,
+                },
+                "content": p.content, "has_image": bool(p.image_base64),
+                "likes_count": likes_map.get(p.id, 0), "comments_count": comments_map.get(p.id, 0),
+                "is_liked": p.id in liked_set, "created_at": p.created_at.isoformat(),
+            })
 
     comment_query = select(PostComment).where(PostComment.content.ilike(f"%{search_term}%"))
     comment_query = comment_query.order_by(PostComment.created_at.desc()).limit(limit).offset(offset)
@@ -219,29 +230,39 @@ async def search_content(
     comments = comment_result.scalars().all()
 
     comment_data = []
-    for c in comments:
-        u_res = await db.execute(select(User).where(User.id == c.user_id))
-        author = u_res.scalar_one_or_none()
-        p_res = await db.execute(select(WallPost).where(WallPost.id == c.post_id))
-        parent_post = p_res.scalar_one_or_none()
+    if comments:
+        c_user_ids = list({c.user_id for c in comments})
+        c_post_ids = list({c.post_id for c in comments})
 
-        cat_name = ""
-        if parent_post:
-            t_res = await db.execute(select(Theme).where(Theme.id == parent_post.category_id))
-            theme = t_res.scalar_one_or_none()
-            cat_name = theme.name if theme else parent_post.category_id
+        c_authors_res = await db.execute(select(User).where(User.id.in_(c_user_ids)))
+        c_authors_map = {u.id: u for u in c_authors_res.scalars().all()}
 
-        comment_data.append({
-            "id": c.id, "post_id": c.post_id,
-            "category_id": parent_post.category_id if parent_post else "",
-            "category_name": cat_name,
-            "user": {
-                "id": author.id if author else "", "pseudo": author.pseudo if author else "Inconnu",
-                "avatar_seed": author.avatar_seed if author else "",
-                "avatar_url": getattr(author, 'avatar_url', None) if author else None,
-            },
-            "content": c.content, "created_at": c.created_at.isoformat(),
-        })
+        c_posts_res = await db.execute(select(WallPost).where(WallPost.id.in_(c_post_ids)))
+        c_posts_map = {wp.id: wp for wp in c_posts_res.scalars().all()}
+
+        c_cat_ids = list({wp.category_id for wp in c_posts_map.values() if wp.category_id})
+        c_themes_map: dict = {}
+        if c_cat_ids:
+            c_themes_res = await db.execute(select(Theme).where(Theme.id.in_(c_cat_ids)))
+            c_themes_map = {t.id: t for t in c_themes_res.scalars().all()}
+
+        for c in comments:
+            author = c_authors_map.get(c.user_id)
+            parent_post = c_posts_map.get(c.post_id)
+            cat_id = parent_post.category_id if parent_post else ""
+            cat_theme = c_themes_map.get(cat_id)
+            cat_name = cat_theme.name if cat_theme else cat_id
+            comment_data.append({
+                "id": c.id, "post_id": c.post_id,
+                "category_id": cat_id,
+                "category_name": cat_name,
+                "user": {
+                    "id": author.id if author else "", "pseudo": author.pseudo if author else "Inconnu",
+                    "avatar_seed": author.avatar_seed if author else "",
+                    "avatar_url": getattr(author, 'avatar_url', None) if author else None,
+                },
+                "content": c.content, "created_at": c.created_at.isoformat(),
+            })
 
     return {"posts": post_data, "comments": comment_data}
 

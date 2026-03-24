@@ -1,6 +1,7 @@
 /**
  * Shared utility functions extracted from various screens.
  */
+import { t } from './i18n';
 
 const AVATAR_PALETTE = ['#FF6B35', '#8A2BE2', '#00D4FF', '#4CAF50', '#FF3B5C', '#FFB800', '#00FF9D', '#E53935'];
 
@@ -17,7 +18,7 @@ export function getAvatarColor(seed: string): string {
 export function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const m = Math.floor(diff / 60000);
-  if (m < 1) return "À l'instant";
+  if (m < 1) return t('home.just_now');
   if (m < 60) return `${m}m`;
   const h = Math.floor(diff / 3600000);
   if (h < 24) return `${h}h`;

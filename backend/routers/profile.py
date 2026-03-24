@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,6 +8,8 @@ import os
 import uuid
 import httpx
 from database import get_db
+
+logger = logging.getLogger(__name__)
 from models import User, Match, PlayerFollow, Theme, UserThemeXP, Avatar
 from config import ROOT_DIR
 from schemas import SelectTitleRequest
@@ -33,8 +36,8 @@ async def geocode_city(city: str, country: str) -> tuple:
             data = resp.json()
             if data:
                 return float(data[0]["lat"]), float(data[0]["lon"])
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning(f"[geocode] Failed to geocode '{city}, {country}': {e}")
     return None, None
 
 

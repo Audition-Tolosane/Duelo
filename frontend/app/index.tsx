@@ -281,7 +281,7 @@ export default function WelcomeScreen() {
   const handleEmailAuth = async () => {
     setError('');
     const emailTrimmed = email.trim();
-    if (!emailTrimmed.includes('@')) { setError(t('welcome.invalid_email')); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) { setError(t('welcome.invalid_email_format')); return; }
     if (password.length < 8) { setError(t('welcome.password_min')); return; }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setLoading(true);

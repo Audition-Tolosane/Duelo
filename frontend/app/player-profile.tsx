@@ -19,15 +19,15 @@ import UserAvatar from '../components/UserAvatar';
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-const CATEGORY_META: Record<string, { icon: string; color: string; name: string; bg: string }> = {
-  series_tv: { icon: 'television-classic', color: '#E040FB', name: 'Series TV', bg: '#2D1B4E' },
-  geographie: { icon: 'earth', color: '#00FFFF', name: 'Geographie', bg: '#0D2B2B' },
-  histoire: { icon: 'bank', color: '#FFD700', name: 'Histoire', bg: '#2B2510' },
-  cinema: { icon: 'movie-open', color: '#FF6B6B', name: 'Cinema', bg: '#2B1515' },
-  sport: { icon: 'soccer', color: '#00FF9D', name: 'Sport', bg: '#0D2B1A' },
-  musique: { icon: 'music-note', color: '#FF8C00', name: 'Musique', bg: '#2B1E0D' },
-  sciences: { icon: 'microscope', color: '#7B68EE', name: 'Sciences', bg: '#1A1533' },
-  gastronomie: { icon: 'silverware-fork-knife', color: '#FF69B4', name: 'Gastronomie', bg: '#2B152B' },
+const CATEGORY_META: Record<string, { icon: string; color: string; bg: string }> = {
+  series_tv: { icon: 'television-classic', color: '#E040FB', bg: '#2D1B4E' },
+  geographie: { icon: 'earth', color: '#00FFFF', bg: '#0D2B2B' },
+  histoire: { icon: 'bank', color: '#FFD700', bg: '#2B2510' },
+  cinema: { icon: 'movie-open', color: '#FF6B6B', bg: '#2B1515' },
+  sport: { icon: 'soccer', color: '#00FF9D', bg: '#0D2B1A' },
+  musique: { icon: 'music-note', color: '#FF8C00', bg: '#2B1E0D' },
+  sciences: { icon: 'microscope', color: '#7B68EE', bg: '#1A1533' },
+  gastronomie: { icon: 'silverware-fork-knife', color: '#FF69B4', bg: '#2B152B' },
 };
 
 type PlayerProfile = {
@@ -299,7 +299,7 @@ export default function PlayerProfileScreen() {
         <Text style={s.sectionTitle}>{t('player.their_themes')}</Text>
         <View style={s.topicsGrid}>
           {sortedCategories.map(([catKey, catData]) => {
-            const meta = CATEGORY_META[catKey] || { icon: 'help-circle', name: catKey, color: '#8A2BE2', bg: '#1A1A2E' };
+            const meta = CATEGORY_META[catKey] || { icon: 'help-circle', color: '#8A2BE2', bg: '#1A1A2E' };
             return (
               <View
                 key={catKey}
@@ -312,7 +312,7 @@ export default function PlayerProfileScreen() {
                 >
                   <MaterialCommunityIcons name={meta.icon as any} size={22} color={meta.color} />
                 </LinearGradient>
-                <Text style={[s.topicName, { color: meta.color }]}>{meta.name}</Text>
+                <Text style={[s.topicName, { color: meta.color }]}>{catData.title || catKey}</Text>
                 <Text style={s.topicLevel}>{t('player.level_short')} {catData.level}</Text>
               </View>
             );

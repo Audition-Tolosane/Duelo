@@ -174,6 +174,7 @@ async def _ensure_columns():
             "CREATE INDEX IF NOT EXISTS ix_matches_created_at ON matches(created_at)",
             "CREATE INDEX IF NOT EXISTS ix_matches_player2_id ON matches(player2_id)",
             "CREATE INDEX IF NOT EXISTS ix_wall_posts_created_at ON wall_posts(created_at)",
+            "CREATE INDEX IF NOT EXISTS ix_users_current_streak ON users(current_streak DESC)",
         ]
         for idx_stmt in index_statements:
             try:

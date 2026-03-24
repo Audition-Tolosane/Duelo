@@ -249,14 +249,14 @@ async def upload_csv_questions(data: CSVUploadRequest, db: AsyncSession = Depend
                 await db.commit()
 
         except Exception as e:
-            errors.append(f"Ligne {i+1}: {str(e)}")
+            errors.append(f"Ligne {i+1}: erreur de format ou de données")
 
     try:
         await db.commit()
-    except Exception as e:
+    except Exception:
         await db.rollback()
         return {"success": False, "imported": 0, "duplicates": duplicates,
-                "errors": [f"Erreur DB commit: {str(e)}"] + errors[:20]}
+                "errors": ["Erreur d'enregistrement en base de données"] + errors[:20]}
 
     try:
         result = await db.execute(select(Theme))
