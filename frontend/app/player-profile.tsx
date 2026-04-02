@@ -35,7 +35,7 @@ type PlayerProfile = {
   selected_title: string; country: string | null; country_flag: string;
   matches_played: number; matches_won: number; win_rate: number;
   current_streak: number; best_streak: number; total_xp: number;
-  categories: Record<string, { xp: number; level: number; title: string }>;
+  themes: Record<string, { xp: number; level: number; title: string }>;
   champion_titles: { category: string; category_name: string; scope: string; date: string }[];
   followers_count: number; following_count: number; is_following: boolean;
   posts: {
@@ -144,8 +144,8 @@ export default function PlayerProfileScreen() {
 
   const handlePlay = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    if (profile?.categories) {
-      const cats = Object.entries(profile.categories);
+    if (profile?.themes) {
+      const cats = Object.entries(profile.themes);
       const best = cats.reduce((a, b) => b[1].xp > a[1].xp ? b : a, cats[0]);
       router.push(`/matchmaking?category=${best[0]}`);
     }
@@ -214,7 +214,7 @@ export default function PlayerProfileScreen() {
   const isOwnProfile = myId === profile.id;
 
   // Sort categories by level descending
-  const sortedCategories = Object.entries(profile.categories)
+  const sortedCategories = Object.entries(profile.themes || {})
     .sort((a, b) => b[1].level - a[1].level || b[1].xp - a[1].xp);
 
   return (
@@ -541,7 +541,7 @@ export default function PlayerProfileScreen() {
 
             {/* Theme chips from profile categories */}
             <View style={s.themesGrid}>
-              {Object.entries(profile?.categories || {}).slice(0, 6).map(([catKey, catData]) => {
+              {Object.entries(profile?.themes || {}).slice(0, 6).map(([catKey, catData]) => {
                 const meta = CATEGORY_META[catKey] || { icon: 'help-circle', color: '#8A2BE2', bg: '#1A1A2E' };
                 const isSelected = selectedTheme?.id === catKey;
                 return (
