@@ -76,7 +76,7 @@ type ProfileData = {
   all_unlocked_titles: UnlockedTitle[];
   match_history: Array<{
     id: string; category: string; player_score: number; opponent_score: number;
-    opponent: string; won: boolean; xp_earned: number;
+    opponent: string; opponent_id?: string | null; is_bot?: boolean; won: boolean; xp_earned: number;
     xp_breakdown: any; correct_count: number; created_at: string;
   }>;
 };
@@ -465,7 +465,13 @@ export default function ProfileScreen() {
                   <Text style={s.matchCatText}>{m.category}</Text>
                 </View>
                 <View>
-                  <Text style={s.matchOpp}>vs {m.opponent}</Text>
+                  {m.opponent_id && !m.is_bot ? (
+                    <TouchableOpacity onPress={() => router.push(`/player-profile?id=${m.opponent_id}`)}>
+                      <Text style={[s.matchOpp, { textDecorationLine: 'underline' }]}>vs {m.opponent}</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <Text style={s.matchOpp}>vs {m.opponent}</Text>
+                  )}
                   <Text style={s.matchDate}>{new Date(m.created_at).toLocaleDateString('fr-FR')}</Text>
                 </View>
               </View>

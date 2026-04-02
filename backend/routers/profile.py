@@ -80,6 +80,13 @@ async def get_profile(user_id: str, pseudo: Optional[str] = None, db: AsyncSessi
     )
     matches = matches_res.scalars().all()
 
+    # Resolve real pseudos for non-bot opponents
+    player2_ids = [m.player2_id for m in matches if m.player2_id and not m.player2_is_bot]
+    pseudo_map: dict = {}
+    if player2_ids:
+        p2_res = await db.execute(select(User.id, User.pseudo).where(User.id.in_(player2_ids)))
+        pseudo_map = {row.id: row.pseudo for row in p2_res.all()}
+
     followers_count_res = await db.execute(
         select(func.count(PlayerFollow.id)).where(PlayerFollow.followed_id == user_id)
     )
@@ -111,7 +118,10 @@ async def get_profile(user_id: str, pseudo: Optional[str] = None, db: AsyncSessi
             {
                 "id": m.id, "category": m.category,
                 "player_score": m.player1_score, "opponent_score": m.player2_score,
-                "opponent": m.player2_pseudo, "won": m.winner_id == user_id,
+                "opponent": pseudo_map.get(m.player2_id, m.player2_pseudo) if m.player2_id and not m.player2_is_bot else m.player2_pseudo,
+                "opponent_id": m.player2_id if not m.player2_is_bot else None,
+                "is_bot": bool(m.player2_is_bot),
+                "won": m.winner_id == user_id,
                 "xp_earned": m.xp_earned or 0, "xp_breakdown": m.xp_breakdown,
                 "correct_count": m.player1_correct or 0,
                 "created_at": m.created_at.isoformat()
