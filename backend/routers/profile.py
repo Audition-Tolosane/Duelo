@@ -87,6 +87,13 @@ async def get_profile(user_id: str, pseudo: Optional[str] = None, db: AsyncSessi
         p2_res = await db.execute(select(User.id, User.pseudo).where(User.id.in_(player2_ids)))
         pseudo_map = {row.id: row.pseudo for row in p2_res.all()}
 
+    # Resolve theme names
+    theme_ids = list({m.category for m in matches if m.category})
+    theme_name_map: dict = {}
+    if theme_ids:
+        t_res = await db.execute(select(Theme.id, Theme.name).where(Theme.id.in_(theme_ids)))
+        theme_name_map = {row.id: row.name for row in t_res.all()}
+
     followers_count_res = await db.execute(
         select(func.count(PlayerFollow.id)).where(PlayerFollow.followed_id == user_id)
     )
@@ -116,7 +123,7 @@ async def get_profile(user_id: str, pseudo: Optional[str] = None, db: AsyncSessi
         "all_unlocked_titles": all_unlocked_titles,
         "match_history": [
             {
-                "id": m.id, "category": m.category,
+                "id": m.id, "category": theme_name_map.get(m.category, m.category),
                 "player_score": m.player1_score, "opponent_score": m.player2_score,
                 "opponent": pseudo_map.get(m.player2_id, m.player2_pseudo) if m.player2_id and not m.player2_is_bot else m.player2_pseudo,
                 "opponent_id": m.player2_id if not m.player2_is_bot else None,
