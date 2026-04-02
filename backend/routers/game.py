@@ -200,6 +200,7 @@ async def start_matchmaking(request: Request, current_user: str = Depends(get_cu
         },
         "player": {"level": player_level, "title": player_title},
         "opponent": {
+            "id": bot_data["id"] if bot_data else None,
             "pseudo": bot_name, "avatar_seed": bot_seed, "is_bot": True,
             "level": bot_level, "title": bot_title,
             "streak": bot_streak, "streak_badge": get_streak_badge(bot_streak),

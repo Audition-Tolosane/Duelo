@@ -445,7 +445,7 @@ export default function ResultsScreen() {
                 >
                   <Text style={styles.avatarText}>{(params.opponentPseudo || 'B')[0].toUpperCase()}</Text>
                 </LinearGradient>
-                {params.opponentId && params.isBot !== 'true' ? (
+                {params.opponentId ? (
                   <TouchableOpacity onPress={() => router.push(`/player-profile?id=${params.opponentId}`)}>
                     <Text style={[styles.playerName, { textDecorationLine: 'underline' }]}>{params.opponentPseudo?.slice(0, 12)}</Text>
                   </TouchableOpacity>

@@ -465,7 +465,7 @@ export default function ProfileScreen() {
                   <Text style={s.matchCatText}>{m.category}</Text>
                 </View>
                 <View>
-                  {m.opponent_id && !m.is_bot ? (
+                  {m.opponent_id ? (
                     <TouchableOpacity onPress={() => router.push(`/player-profile?id=${m.opponent_id}`)}>
                       <Text style={[s.matchOpp, { textDecorationLine: 'underline' }]}>vs {m.opponent}</Text>
                     </TouchableOpacity>
