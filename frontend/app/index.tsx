@@ -219,7 +219,7 @@ export default function WelcomeScreen() {
         router.replace(onboardingDone[1] ? '/(tabs)/play' : '/onboarding');
         return;
       }
-    } catch {}
+    } catch (e) { console.error(e); }
     setInitialLoading(false);
   };
 
@@ -350,7 +350,7 @@ export default function WelcomeScreen() {
   };
 
   const handleGoogleSignIn = async () => {
-    if (!GOOGLE_CLIENT_ID) { setError('Google Sign In non configuré'); return; }
+    if (!GOOGLE_CLIENT_ID) { setError(t('welcome.google_not_configured')); return; }
     await googlePromptAsync();
   };
 

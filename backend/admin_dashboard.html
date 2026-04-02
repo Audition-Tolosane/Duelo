@@ -3,437 +3,1188 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Duelo — Content Factory</title>
+  <title>Duelo — Admin</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      background: #000;
-      color: #fff;
-      min-height: 100vh;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #050510; color: #fff; min-height: 100vh; }
 
-    /* ── Login Screen ── */
-    .login-overlay {
-      position: fixed; inset: 0; z-index: 100;
-      background: #000;
-      display: flex; align-items: center; justify-content: center;
-    }
+    /* ── Login ── */
+    .login-overlay { position: fixed; inset: 0; z-index: 100; background: #050510; display: flex; align-items: center; justify-content: center; }
     .login-overlay.hidden { display: none; }
-    .login-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 24px; padding: 48px;
-      width: 400px; text-align: center;
-    }
+    .login-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 48px; width: 400px; text-align: center; }
     .login-icon { font-size: 48px; margin-bottom: 20px; }
     .login-title { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
     .login-hint { color: #525252; font-size: 14px; margin-bottom: 32px; }
-    .login-input {
-      width: 100%; padding: 16px 20px; border-radius: 14px;
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-      color: #fff; font-size: 16px; outline: none; margin-bottom: 12px;
-      transition: border-color 0.2s;
-    }
+    .login-input { width: 100%; padding: 16px 20px; border-radius: 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 16px; outline: none; margin-bottom: 12px; }
     .login-input:focus { border-color: #8A2BE2; }
-    .login-btn {
-      width: 100%; padding: 16px; border-radius: 14px; border: none;
-      background: #8A2BE2; color: #fff; font-size: 16px; font-weight: 800;
-      letter-spacing: 2px; cursor: pointer; transition: all 0.2s;
-    }
-    .login-btn:hover { background: #9B3FF3; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(138,43,226,0.4); }
+    .login-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; background: #8A2BE2; color: #fff; font-size: 16px; font-weight: 800; letter-spacing: 2px; cursor: pointer; }
+    .login-btn:hover { background: #9B3FF3; }
     .login-error { color: #FF3B30; font-size: 13px; margin-bottom: 12px; display: none; }
     .login-error.show { display: block; }
 
-    /* ── Header ── */
-    .header {
-      padding: 24px 48px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .header-left { display: flex; align-items: center; gap: 16px; }
-    .logo-box {
-      width: 44px; height: 44px; border-radius: 12px; background: #8A2BE2;
-      display: flex; align-items: center; justify-content: center; font-size: 20px;
-    }
-    .header-title { font-size: 22px; font-weight: 800; }
-    .header-badge {
-      background: rgba(0,255,255,0.1); color: #00FFFF; border: 1px solid rgba(0,255,255,0.2);
-      padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;
-    }
-    .logout-btn {
-      padding: 10px 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
-      background: transparent; color: #A3A3A3; font-size: 13px; font-weight: 600;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .logout-btn:hover { border-color: #FF3B30; color: #FF3B30; }
-
     /* ── Layout ── */
-    .main { display: flex; min-height: calc(100vh - 93px); }
-    
+    .app { display: flex; height: 100vh; overflow: hidden; }
+
     /* ── Sidebar ── */
-    .sidebar {
-      width: 280px; padding: 32px 24px;
-      border-right: 1px solid rgba(255,255,255,0.06);
-    }
-    .sidebar-title {
-      font-size: 11px; font-weight: 800; color: #525252;
-      letter-spacing: 3px; margin-bottom: 16px; text-transform: uppercase;
-    }
-    .cat-btn {
-      display: flex; align-items: center; gap: 12px;
-      width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid transparent;
-      background: transparent; color: #A3A3A3; font-size: 15px; font-weight: 600;
-      cursor: pointer; transition: all 0.2s; text-align: left; margin-bottom: 6px;
-    }
-    .cat-btn:hover { background: rgba(255,255,255,0.04); }
-    .cat-btn.active { background: rgba(138,43,226,0.12); border-color: rgba(138,43,226,0.3); color: #fff; }
-    .cat-icon { font-size: 22px; }
-    .cat-count {
-      margin-left: auto; font-size: 12px; background: rgba(255,255,255,0.08);
-      padding: 2px 8px; border-radius: 8px; color: #525252;
-    }
-    .cat-btn.active .cat-count { background: rgba(138,43,226,0.2); color: #8A2BE2; }
+    .sidebar { width: 240px; background: rgba(255,255,255,0.02); border-right: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; padding: 24px 16px; flex-shrink: 0; overflow-y: auto; }
+    .brand { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin-bottom: 24px; }
+    .brand-icon { width: 36px; height: 36px; border-radius: 10px; background: #8A2BE2; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .brand-name { font-size: 18px; font-weight: 800; }
+    .brand-tag { font-size: 10px; color: #525252; font-weight: 600; letter-spacing: 2px; }
+    .nav-label { font-size: 10px; font-weight: 800; color: #404040; letter-spacing: 3px; padding: 0 12px; margin-bottom: 8px; margin-top: 8px; }
+    .nav-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 12px; border-radius: 10px; border: none; background: transparent; color: #737373; font-size: 14px; font-weight: 600; cursor: pointer; text-align: left; margin-bottom: 2px; transition: all 0.15s; }
+    .nav-btn:hover { background: rgba(255,255,255,0.04); color: #d4d4d4; }
+    .nav-btn.active { background: rgba(138,43,226,0.15); color: #fff; }
+    .nav-btn .nav-icon { font-size: 18px; width: 20px; text-align: center; }
+    .nav-btn .nav-badge { margin-left: auto; font-size: 11px; background: rgba(138,43,226,0.2); color: #8A2BE2; padding: 2px 7px; border-radius: 6px; font-weight: 700; }
+    .sidebar-bottom { margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .logout-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 12px; border-radius: 10px; border: none; background: transparent; color: #525252; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .logout-btn:hover { color: #FF3B30; }
 
-    .stats-section { margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.06); }
-    .stat-row { display: flex; justify-content: space-between; padding: 8px 0; }
-    .stat-label { color: #525252; font-size: 13px; }
-    .stat-value { color: #00FFFF; font-size: 13px; font-weight: 700; }
+    /* ── Main content ── */
+    .main { flex: 1; overflow-y: auto; padding: 32px 40px; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page-header { margin-bottom: 28px; }
+    .page-title { font-size: 26px; font-weight: 900; margin-bottom: 4px; }
+    .page-subtitle { color: #525252; font-size: 14px; }
 
-    /* ── Content ── */
-    .content { flex: 1; padding: 32px 48px; }
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-    .section-title { font-size: 24px; font-weight: 800; }
-    .section-desc { color: #525252; font-size: 14px; margin-top: 4px; }
+    /* ── Cards ── */
+    .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+    .card-title { font-size: 14px; font-weight: 800; color: #A3A3A3; letter-spacing: 1px; margin-bottom: 16px; text-transform: uppercase; }
 
-    /* ── JSON Editor ── */
-    .editor-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px; overflow: hidden;
-    }
-    .editor-toolbar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 20px; background: rgba(255,255,255,0.02);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
-    .editor-label { font-size: 13px; font-weight: 700; color: #A3A3A3; }
-    .editor-actions { display: flex; gap: 8px; }
-    .small-btn {
-      padding: 6px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
-      background: transparent; color: #A3A3A3; font-size: 12px; font-weight: 600;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .small-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
-    .json-textarea {
-      width: 100%; min-height: 320px; padding: 20px;
-      background: transparent; border: none; color: #E0E0E0;
-      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-      font-size: 14px; line-height: 1.7; resize: vertical; outline: none;
-    }
-    .json-textarea::placeholder { color: #333; }
+    /* ── Stats grid ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px 24px; }
+    .stat-num { font-size: 36px; font-weight: 900; color: #8A2BE2; }
+    .stat-lbl { font-size: 12px; color: #525252; font-weight: 700; letter-spacing: 1px; margin-top: 4px; text-transform: uppercase; }
 
-    /* ── Import Button ── */
-    .import-row { display: flex; gap: 12px; margin-top: 20px; align-items: center; }
-    .import-btn {
-      padding: 16px 36px; border-radius: 14px; border: none;
-      background: #8A2BE2; color: #fff; font-size: 15px; font-weight: 800;
-      letter-spacing: 2px; cursor: pointer; transition: all 0.2s;
-    }
-    .import-btn:hover { background: #9B3FF3; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(138,43,226,0.4); }
-    .import-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+    /* ── Themes tree ── */
+    .sc-block { margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; overflow: hidden; }
+    .sc-header { display: flex; align-items: center; gap: 12px; padding: 16px 20px; background: rgba(255,255,255,0.04); cursor: pointer; user-select: none; }
+    .sc-header:hover { background: rgba(255,255,255,0.06); }
+    .sc-icon { font-size: 24px; }
+    .sc-name { font-size: 15px; font-weight: 800; flex: 1; }
+    .sc-count { font-size: 13px; color: #525252; }
+    .sc-chevron { font-size: 12px; color: #525252; transition: transform 0.2s; }
+    .sc-block.open .sc-chevron { transform: rotate(180deg); }
+    .sc-body { display: none; padding: 12px 16px; }
+    .sc-block.open .sc-body { display: block; }
+    .cluster-row { margin-bottom: 12px; }
+    .cluster-name { font-size: 12px; font-weight: 800; color: #525252; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; padding: 0 4px; }
+    .theme-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 10px; background: rgba(255,255,255,0.02); margin-bottom: 4px; }
+    .theme-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .theme-name { font-size: 13px; font-weight: 600; flex: 1; }
+    .theme-id { font-size: 11px; color: #404040; font-family: monospace; }
+    .theme-qcount { font-size: 12px; color: #8A2BE2; font-weight: 700; margin-left: auto; background: rgba(138,43,226,0.1); padding: 2px 8px; border-radius: 6px; }
 
-    /* ── Result Banner ── */
-    .result-banner {
-      margin-top: 20px; padding: 20px 24px; border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);
-      display: none;
-    }
+    /* ── Buttons ── */
+    .btn { padding: 12px 24px; border-radius: 12px; border: none; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.15s; letter-spacing: 0.5px; }
+    .btn-primary { background: #8A2BE2; color: #fff; }
+    .btn-primary:hover { background: #9B3FF3; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(138,43,226,0.3); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-outline { background: transparent; color: #A3A3A3; border: 1px solid rgba(255,255,255,0.1); }
+    .btn-outline:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .btn-danger { background: rgba(255,59,48,0.1); color: #FF3B30; border: 1px solid rgba(255,59,48,0.2); }
+    .btn-danger:hover { background: rgba(255,59,48,0.2); }
+    .btn-sm { padding: 7px 14px; font-size: 12px; border-radius: 8px; }
+    .btn-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+
+    /* ── File drop zone ── */
+    .drop-zone { border: 2px dashed rgba(138,43,226,0.3); border-radius: 14px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: #8A2BE2; background: rgba(138,43,226,0.05); }
+    .drop-icon { font-size: 40px; margin-bottom: 12px; }
+    .drop-text { font-size: 16px; font-weight: 700; color: #A3A3A3; margin-bottom: 4px; }
+    .drop-hint { font-size: 13px; color: #404040; }
+    .drop-file-name { font-size: 13px; color: #00FF9D; font-weight: 600; margin-top: 8px; }
+
+    /* ── Textarea ── */
+    .code-textarea { width: 100%; min-height: 240px; padding: 16px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: #E0E0E0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.6; resize: vertical; outline: none; }
+    .code-textarea:focus { border-color: rgba(138,43,226,0.5); }
+
+    /* ── Result banner ── */
+    .result-banner { padding: 20px 24px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); display: none; margin-top: 16px; }
     .result-banner.show { display: block; }
-    .result-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
-    .result-grid { display: flex; gap: 24px; }
+    .result-grid { display: flex; gap: 24px; margin-top: 8px; }
     .result-item { text-align: center; }
-    .result-num { font-size: 28px; font-weight: 900; }
+    .result-num { font-size: 32px; font-weight: 900; }
     .result-num.green { color: #00FF9D; }
     .result-num.yellow { color: #FFD700; }
     .result-num.red { color: #FF3B30; }
-    .result-label { font-size: 11px; color: #525252; font-weight: 600; text-transform: uppercase; margin-top: 4px; }
-    .result-errors { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
-    .result-errors p { color: #FF3B30; font-size: 13px; margin-top: 4px; }
+    .result-lbl { font-size: 11px; color: #525252; font-weight: 700; text-transform: uppercase; margin-top: 4px; }
+    .result-errors { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); max-height: 160px; overflow-y: auto; }
+    .result-errors p { color: #FF3B30; font-size: 12px; margin-top: 3px; }
 
-    /* ── Format Help ── */
-    .format-help {
-      margin-top: 24px; padding: 20px 24px; border-radius: 14px;
-      background: rgba(0,255,255,0.04); border: 1px solid rgba(0,255,255,0.1);
-    }
-    .format-title { font-size: 14px; font-weight: 700; color: #00FFFF; margin-bottom: 12px; }
-    .format-code {
-      background: rgba(0,0,0,0.4); border-radius: 10px; padding: 16px;
-      font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; color: #A3A3A3;
-      line-height: 1.6; overflow-x: auto; white-space: pre;
-    }
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; background: rgba(255,255,255,0.03); border-radius: 12px; padding: 4px; width: fit-content; }
+    .tab-btn { padding: 9px 20px; border-radius: 9px; border: none; background: transparent; color: #525252; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+    .tab-btn.active { background: rgba(138,43,226,0.2); color: #fff; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Avatar grid ── */
+    .avatar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+    .avatar-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 12px; text-align: center; position: relative; }
+    .avatar-img { width: 64px; height: 64px; border-radius: 32px; object-fit: cover; margin: 0 auto 8px; display: block; background: #333; }
+    .avatar-name { font-size: 11px; color: #525252; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .avatar-delete { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; background: rgba(255,59,48,0.15); border: none; color: #FF3B30; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .avatar-delete:hover { background: rgba(255,59,48,0.3); }
+
+    /* ── Browse questions tree ── */
+    .tree-sc { margin-bottom:8px; border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden; }
+    .tree-sc-header { display:flex; align-items:center; gap:10px; padding:12px 14px; background:rgba(255,255,255,0.05); cursor:pointer; user-select:none; }
+    .tree-sc-header:hover { background:rgba(255,255,255,0.08); }
+    .tree-cluster { margin:0 0 0 24px; border-left:2px solid rgba(255,255,255,0.08); }
+    .tree-cluster-header { display:flex; align-items:center; gap:10px; padding:10px 14px; cursor:pointer; user-select:none; background:rgba(255,255,255,0.02); }
+    .tree-cluster-header:hover { background:rgba(255,255,255,0.05); }
+    .tree-questions { margin:0 0 0 24px; border-left:2px solid rgba(255,255,255,0.05); }
+    .tree-q-row { display:flex; align-items:center; gap:10px; padding:7px 14px; border-bottom:1px solid rgba(255,255,255,0.03); }
+    .tree-q-row:hover { background:rgba(255,255,255,0.03); }
+    .tree-q-text { flex:1; font-size:12px; color:#CCC; }
+    .tree-q-diff { font-size:10px; color:#525252; white-space:nowrap; }
+    .tree-toggle { color:#525252; font-size:12px; margin-left:auto; }
+    .tree-badge { font-size:11px; color:#525252; margin-left:auto; }
+    .tree-label { font-size:13px; font-weight:700; color:#FFF; }
+    .tree-cb { width:16px; height:16px; cursor:pointer; accent-color:#8A2BE2; flex-shrink:0; }
+
+    /* ── Upload avatar form ── */
+    .avatar-upload-preview { width: 80px; height: 80px; border-radius: 40px; object-fit: cover; margin: 0 auto 12px; display: block; border: 2px solid rgba(138,43,226,0.4); }
+    .select-row { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+    .select-input { padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 13px; outline: none; }
+    .select-input:focus { border-color: rgba(138,43,226,0.5); }
+
+    /* ── Reports ── */
+    .report-row { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); margin-bottom: 8px; }
+    .report-badge { padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+    .badge-pending { background: rgba(255,215,0,0.15); color: #FFD700; }
+    .badge-reviewed { background: rgba(138,43,226,0.15); color: #8A2BE2; }
+    .badge-resolved { background: rgba(0,255,157,0.1); color: #00FF9D; }
+    .report-content { flex: 1; min-width: 0; }
+    .report-question { font-size: 13px; font-weight: 600; color: #E0E0E0; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .report-meta { font-size: 12px; color: #525252; }
+    .report-reason { font-size: 12px; font-weight: 700; color: #A3A3A3; margin-top: 3px; }
+
+    /* ── Info box ── */
+    .info-box { padding: 14px 18px; border-radius: 12px; background: rgba(0,200,255,0.05); border: 1px solid rgba(0,200,255,0.15); margin-bottom: 16px; }
+    .info-box p { font-size: 13px; color: #6BE0FF; line-height: 1.6; }
+    .info-box code { background: rgba(0,0,0,0.3); padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 12px; }
+
+    /* ── Toast ── */
+    .toast { position: fixed; bottom: 32px; right: 32px; background: rgba(0,255,157,0.12); border: 1px solid rgba(0,255,157,0.3); color: #00FF9D; padding: 14px 20px; border-radius: 12px; font-size: 14px; font-weight: 700; z-index: 999; transition: all 0.3s; opacity: 0; transform: translateY(8px); pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { background: rgba(255,59,48,0.12); border-color: rgba(255,59,48,0.3); color: #FF3B30; }
+
+    /* ── Misc ── */
+    .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 20px 0; }
+    .text-muted { color: #525252; font-size: 13px; }
+    .empty-state { text-align: center; padding: 48px; color: #404040; }
+    .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+    .loading-spinner { width: 20px; height: 20px; border: 2px solid rgba(138,43,226,0.3); border-top-color: #8A2BE2; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    input[type=file] { display: none; }
   </style>
 </head>
 <body>
 
-  <!-- Login Overlay -->
-  <div class="login-overlay" id="loginOverlay">
-    <div class="login-card">
-      <div class="login-icon">🔐</div>
-      <div class="login-title">Content Factory</div>
-      <div class="login-hint">Entrez le mot de passe administrateur</div>
-      <div class="login-error" id="loginError">Mot de passe incorrect</div>
-      <input type="password" class="login-input" id="passwordInput" placeholder="Mot de passe" autofocus>
-      <button class="login-btn" id="loginBtn" onclick="verifyPassword()">ACCÉDER</button>
-    </div>
+<!-- Login -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="login-icon">⚡</div>
+    <div class="login-title">Duelo Admin</div>
+    <div class="login-hint">Entrez le mot de passe administrateur</div>
+    <div class="login-error" id="loginError">Mot de passe incorrect</div>
+    <input type="password" class="login-input" id="passwordInput" placeholder="Mot de passe" autofocus>
+    <button class="login-btn" onclick="verifyPassword()">ACCÉDER</button>
   </div>
+</div>
 
-  <!-- Header -->
-  <header class="header">
-    <div class="header-left">
-      <div class="logo-box">⚡</div>
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- App -->
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
       <div>
-        <div class="header-title">Duelo</div>
+        <div class="brand-name">Duelo</div>
+        <div class="brand-tag">ADMIN</div>
       </div>
-      <span class="header-badge">Content Factory</span>
     </div>
-    <button class="logout-btn" onclick="logout()">Déconnexion</button>
-  </header>
+
+    <div class="nav-label">Navigation</div>
+    <button class="nav-btn active" onclick="showPage('dashboard')">
+      <span class="nav-icon">🏠</span> Dashboard
+    </button>
+    <button class="nav-btn" onclick="showPage('themes')">
+      <span class="nav-icon">🎨</span> Thèmes
+      <span class="nav-badge" id="badgeThemes">—</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('questions')">
+      <span class="nav-icon">📋</span> Questions
+      <span class="nav-badge" id="badgeQuestions">—</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('avatars')">
+      <span class="nav-icon">🖼️</span> Avatars
+    </button>
+    <button class="nav-btn" onclick="showPage('reports')">
+      <span class="nav-icon">🚨</span> Signalements
+      <span class="nav-badge" id="badgeReports" style="background:rgba(255,59,48,0.15);color:#FF3B30">—</span>
+    </button>
+
+    <div class="sidebar-bottom">
+      <button class="logout-btn" onclick="logout()">🚪 Déconnexion</button>
+    </div>
+  </aside>
 
   <!-- Main -->
-  <div class="main">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-title">Catégories</div>
-      <div id="categoryList"></div>
+  <main class="main">
 
-      <div class="stats-section">
-        <div class="sidebar-title">Statistiques</div>
-        <div id="statsContainer"></div>
+    <!-- ── DASHBOARD ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="page-title">Dashboard</div>
+        <div class="page-subtitle">Vue d'ensemble du contenu Duelo</div>
       </div>
-    </aside>
+      <div class="stats-grid" id="dashStats">
+        <div class="stat-card"><div class="stat-num" id="statThemes">—</div><div class="stat-lbl">Thèmes</div></div>
+        <div class="stat-card"><div class="stat-num" id="statQuestions">—</div><div class="stat-lbl">Questions</div></div>
+        <div class="stat-card"><div class="stat-num" id="statClusters">—</div><div class="stat-lbl">Clusters</div></div>
+        <div class="stat-card"><div class="stat-num" id="statSC">—</div><div class="stat-lbl">Super-catégories</div></div>
+      </div>
+      <div class="card" id="dashThemeTable">
+        <div class="card-title">Répartition par super-catégorie</div>
+        <div id="dashTableContent"><div class="loading-spinner"></div></div>
+      </div>
+    </div>
 
-    <!-- Content -->
-    <main class="content">
-      <div class="section-header">
+    <!-- ── THEMES ── -->
+    <div class="page" id="page-themes">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
         <div>
-          <div class="section-title">Import de Questions</div>
-          <div class="section-desc">Collez votre JSON puis importez en masse</div>
+          <div class="page-title">Thèmes</div>
+          <div class="page-subtitle">Arborescence complète super-catégorie → cluster → thème</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-outline btn-sm" onclick="loadThemes()">🔄 Rafraîchir</button>
+          <button class="btn btn-outline btn-sm" onclick="recountQuestions()" id="btnRecount" style="color:#00FF9D;border-color:#00FF9D">∑ Recalculer compteurs</button>
+          <button class="btn btn-primary btn-sm" onclick="showTab('tabThemesImport','themes')">+ Importer CSV</button>
         </div>
       </div>
 
-      <div class="editor-card">
-        <div class="editor-toolbar">
-          <span class="editor-label">JSON Editor</span>
-          <div class="editor-actions">
-            <button class="small-btn" onclick="loadSample()">Exemple</button>
-            <button class="small-btn" onclick="formatJson()">Formater</button>
-            <button class="small-btn" onclick="clearEditor()">Effacer</button>
-          </div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('tabThemesTree','themes')">Arborescence</button>
+        <button class="tab-btn" onclick="showTab('tabThemesImport','themes')">Import CSV thèmes</button>
+      </div>
+
+      <div class="tab-panel active" id="tabThemesTree">
+        <div id="themesTree"><div style="text-align:center;padding:40px"><div class="loading-spinner"></div></div></div>
+      </div>
+
+      <div class="tab-panel" id="tabThemesImport">
+        <div class="info-box">
+          <p>Colonnes attendues : <code>ID_Theme</code>, <code>Super_Categorie</code>, <code>Cluster</code>, <code>Nom_Public</code>, <code>Description</code>, <code>Couleur_Hex</code>, <code>Titre_Niv_1</code>, <code>Titre_Niv_10</code>, <code>Titre_Niv_20</code>, <code>Titre_Niv_35</code>, <code>Titre_Niv_50</code>, <code>URL_Icone</code><br>
+          ⚠️ Cet import <strong>remplace tous les thèmes existants</strong>.</p>
         </div>
-        <textarea class="json-textarea" id="jsonTextarea" placeholder='[
-  {
-    "question_text": "Votre question ici ?",
-    "options": ["Option A", "Option B", "Option C", "Option D"],
-    "correct_option": 0,
-    "difficulty": "medium"
-  }
-]'></textarea>
-      </div>
-
-      <div class="import-row">
-        <button class="import-btn" id="importBtn" onclick="importQuestions()">IMPORTER EN MASSE</button>
-      </div>
-
-      <div class="result-banner" id="resultBanner">
-        <div class="result-title">Résultat de l'import</div>
-        <div class="result-grid">
-          <div class="result-item">
-            <div class="result-num green" id="resultImported">0</div>
-            <div class="result-label">Importées</div>
-          </div>
-          <div class="result-item">
-            <div class="result-num yellow" id="resultDuplicates">0</div>
-            <div class="result-label">Doublons</div>
-          </div>
-          <div class="result-item">
-            <div class="result-num red" id="resultErrors">0</div>
-            <div class="result-label">Erreurs</div>
-          </div>
+        <div class="drop-zone" id="dropThemes" onclick="document.getElementById('fileThemes').click()" ondragover="onDragOver(event,'dropThemes')" ondragleave="onDragLeave('dropThemes')" ondrop="onDrop(event,'fileThemes','dropThemes')">
+          <div class="drop-icon">📁</div>
+          <div class="drop-text">Déposer ou cliquer pour sélectionner</div>
+          <div class="drop-hint">Fichier CSV (séparateur , ; ou tabulation)</div>
+          <div class="drop-file-name" id="fileThemesName"></div>
         </div>
-        <div class="result-errors" id="resultErrorList"></div>
+        <input type="file" id="fileThemes" accept=".csv,.tsv,.txt" onchange="onFileSelected('fileThemes','fileThemesName')">
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="importThemesCSV()" id="btnImportThemes">IMPORTER LES THÈMES</button>
+        </div>
+        <div class="result-banner" id="resultThemes">
+          <div class="card-title">Résultat</div>
+          <div class="result-grid">
+            <div class="result-item"><div class="result-num green" id="rThemesOk">0</div><div class="result-lbl">Importés</div></div>
+            <div class="result-item"><div class="result-num yellow" id="rThemesDup">0</div><div class="result-lbl">Doublons</div></div>
+            <div class="result-item"><div class="result-num red" id="rThemesErr">0</div><div class="result-lbl">Erreurs</div></div>
+          </div>
+          <div class="result-errors" id="rThemesErrList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── QUESTIONS ── -->
+    <div class="page" id="page-questions">
+      <div class="page-header">
+        <div class="page-title">Questions</div>
+        <div class="page-subtitle">Import CSV (format quiz_generator) ou JSON</div>
       </div>
 
-      <div class="format-help">
-        <div class="format-title">Format attendu</div>
-        <div class="format-code">[
-  {
-    "question_text": "Quelle est la capitale de la France ?",
-    "options": ["Londres", "Paris", "Berlin", "Madrid"],
-    "correct_option": 1,
-    "difficulty": "easy"
-  }
-]
-
-// correct_option: index (0-3) de la bonne réponse
-// difficulty: "easy", "medium" ou "hard"</div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('tabQCSV','questions')">Import CSV</button>
+        <button class="tab-btn" onclick="showTab('tabQJSON','questions')">Import JSON</button>
+        <button class="tab-btn" onclick="showTab('tabQStats','questions');loadQStats()">Statistiques</button>
+        <button class="tab-btn" onclick="showTab('tabQBrowse','questions');loadQBrowse()">Parcourir & Supprimer</button>
       </div>
-    </main>
-  </div>
 
-  <script>
-    const API_BASE = window.location.origin + '/api';
-    let selectedCategory = 'series_tv';
-    let isAuthenticated = false;
+      <!-- CSV tab -->
+      <div class="tab-panel active" id="tabQCSV">
+        <div class="info-box">
+          <p>Format quiz_generator : <code>id</code>, <code>super_categorie</code>, <code>cluster</code>, <code>theme</code>, <code>question</code>, <code>a</code>, <code>b</code>, <code>c</code>, <code>d</code>, <code>bonne_reponse</code>, <code>difficulte</code>, <code>angle</code>, <code>angle_num</code><br>
+          La colonne <code>theme</code> doit contenir l'<strong>ID du thème</strong> (ex : <code>BRK_A3X7</code>).</p>
+        </div>
+        <div class="drop-zone" id="dropQ" onclick="document.getElementById('fileQ').click()" ondragover="onDragOver(event,'dropQ')" ondragleave="onDragLeave('dropQ')" ondrop="onDrop(event,'fileQ','dropQ')">
+          <div class="drop-icon">📊</div>
+          <div class="drop-text">Déposer ou cliquer pour sélectionner le CSV</div>
+          <div class="drop-hint">Fichier CSV questions (séparateur , ; ou tabulation)</div>
+          <div class="drop-file-name" id="fileQName"></div>
+        </div>
+        <input type="file" id="fileQ" accept=".csv,.tsv,.txt" onchange="onFileSelected('fileQ','fileQName')">
+        <div id="csvPreview" style="margin-top:12px;display:none">
+          <div class="text-muted" id="csvPreviewText"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="importCSVQuestions()" id="btnImportCSV">IMPORTER LES QUESTIONS</button>
+        </div>
+        <div class="result-banner" id="resultCSV">
+          <div class="card-title">Résultat</div>
+          <div class="result-grid">
+            <div class="result-item"><div class="result-num green" id="rCSVOk">0</div><div class="result-lbl">Importées</div></div>
+            <div class="result-item"><div class="result-num yellow" id="rCSVDup">0</div><div class="result-lbl">Doublons</div></div>
+            <div class="result-item"><div class="result-num red" id="rCSVErr">0</div><div class="result-lbl">Erreurs</div></div>
+          </div>
+          <div class="result-errors" id="rCSVErrList"></div>
+        </div>
+      </div>
 
-    const categories = [
-      { id: 'series_tv', name: 'Séries TV Cultes', icon: '📺' },
-      { id: 'geographie', name: 'Géographie Mondiale', icon: '🌍' },
-      { id: 'histoire', name: 'Histoire de France', icon: '🏛️' },
-    ];
+      <!-- JSON tab -->
+      <div class="tab-panel" id="tabQJSON">
+        <div class="info-box">
+          <p>Sélectionnez d'abord une catégorie cible, puis collez un tableau JSON.</p>
+        </div>
+        <div class="select-row">
+          <label style="color:#A3A3A3;font-size:13px;font-weight:700">Thème cible :</label>
+          <select class="select-input" id="jsonCategory" style="min-width:220px">
+            <option value="">— Choisir un thème —</option>
+          </select>
+        </div>
+        <textarea class="code-textarea" id="jsonTextarea" placeholder='[&#10;  {&#10;    "question_text": "Votre question ?",&#10;    "options": ["A", "B", "C", "D"],&#10;    "correct_option": 0,&#10;    "difficulty": "Facile"&#10;  }&#10;]'></textarea>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="importJSON()" id="btnImportJSON">IMPORTER</button>
+          <button class="btn btn-outline btn-sm" onclick="formatJSON()">Formater JSON</button>
+          <button class="btn btn-outline btn-sm" onclick="document.getElementById('jsonTextarea').value=''">Effacer</button>
+        </div>
+        <div class="result-banner" id="resultJSON">
+          <div class="card-title">Résultat</div>
+          <div class="result-grid">
+            <div class="result-item"><div class="result-num green" id="rJSONOk">0</div><div class="result-lbl">Importées</div></div>
+            <div class="result-item"><div class="result-num yellow" id="rJSONDup">0</div><div class="result-lbl">Doublons</div></div>
+            <div class="result-item"><div class="result-num red" id="rJSONErr">0</div><div class="result-lbl">Erreurs</div></div>
+          </div>
+          <div class="result-errors" id="rJSONErrList"></div>
+        </div>
+      </div>
 
-    // ── Auth ──
-    document.getElementById('passwordInput').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') verifyPassword();
+      <!-- Stats tab -->
+      <div class="tab-panel" id="tabQStats">
+        <div id="qStatsContent"><div style="text-align:center;padding:32px"><div class="loading-spinner"></div></div></div>
+      </div>
+
+      <div class="tab-panel" id="tabQBrowse">
+        <div id="qBrowseTree"><div style="text-align:center;padding:32px"><div class="loading-spinner"></div></div></div>
+        <div id="qBrowseBar" style="display:none;position:sticky;bottom:0;background:#0E0E1E;border-top:1px solid rgba(255,255,255,0.1);padding:14px 16px;display:none;align-items:center;justify-content:space-between;gap:12px">
+          <span id="qBrowseCount" style="color:#A3A3A3;font-size:13px;font-weight:700">0 sélectionnée(s)</span>
+          <button class="btn btn-sm" style="background:rgba(255,59,48,0.15);color:#FF3B30;border:1px solid rgba(255,59,48,0.3)" onclick="bulkDeleteQuestions()">🗑 Supprimer la sélection</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AVATARS ── -->
+    <div class="page" id="page-avatars">
+      <div class="page-header">
+        <div class="page-title">Avatars</div>
+        <div class="page-subtitle">Gérer les avatars disponibles pour les joueurs</div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('tabAvatarList','avatars');loadAvatars()">Bibliothèque</button>
+        <button class="tab-btn" onclick="showTab('tabAvatarUpload','avatars')">Ajouter un avatar</button>
+      </div>
+
+      <div class="tab-panel active" id="tabAvatarList">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+          <button class="btn btn-outline btn-sm" onclick="exportAvatarsCSV()">⬇ Exporter CSV</button>
+        </div>
+        <div id="avatarGrid">
+          <div style="text-align:center;padding:32px"><div class="loading-spinner"></div></div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tabAvatarUpload">
+        <div class="card" style="max-width:480px">
+          <div class="card-title">Uploader un avatar</div>
+          <div style="text-align:center;margin-bottom:16px">
+            <img id="avatarPreview" src="" alt="" style="display:none" class="avatar-upload-preview">
+            <div class="drop-zone" id="dropAvatar" onclick="document.getElementById('fileAvatar').click()" ondragover="onDragOver(event,'dropAvatar')" ondragleave="onDragLeave('dropAvatar')" ondrop="onDropAvatar(event)">
+              <div class="drop-icon">🖼️</div>
+              <div class="drop-text">Cliquer ou déposer des images</div>
+              <div class="drop-hint">JPG, PNG, WebP — max 5 MB — sélection multiple possible</div>
+            </div>
+            <input type="file" id="fileAvatar" accept="image/*" multiple onchange="previewAvatars(event)">
+            <div id="avatarQueue" style="display:none;margin-top:12px;display:none"></div>
+          </div>
+          <div class="select-row">
+            <label style="color:#A3A3A3;font-size:13px;font-weight:700">Catégorie :</label>
+            <select class="select-input" id="avatarCategory">
+              <option value="SCREEN">🎬 Screen</option>
+              <option value="SOUND">🎵 Sound</option>
+              <option value="ARENA">⚽ Arena</option>
+              <option value="LEGENDS">🏛️ Legends</option>
+              <option value="LAB">🔬 Lab</option>
+              <option value="GLOBE">🌍 Globe</option>
+              <option value="ART">🎨 Art</option>
+              <option value="LIFE">🌱 Life</option>
+              <option value="MIND">🧠 Mind</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="uploadAvatar()" id="btnUploadAvatar" style="width:100%">UPLOADER</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REPORTS ── -->
+    <div class="page" id="page-reports">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="page-title">Signalements</div>
+          <div class="page-subtitle">Questions signalées par les joueurs</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline btn-sm" id="filterAll" onclick="filterReports('all')" style="background:rgba(255,255,255,0.08);color:#fff">Tous</button>
+          <button class="btn btn-outline btn-sm" id="filterPending" onclick="filterReports('pending')">En attente</button>
+          <button class="btn btn-outline btn-sm" id="filterResolved" onclick="filterReports('resolved')">Résolus</button>
+        </div>
+      </div>
+      <div id="reportsList">
+        <div style="text-align:center;padding:32px"><div class="loading-spinner"></div></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const API = window.location.origin + '/api';
+let adminPassword = '';
+let themesData = [];
+let allReports = [];
+let csvParsedRows = [];
+
+// ── Auth ──
+document.getElementById('passwordInput').addEventListener('keydown', e => { if (e.key === 'Enter') verifyPassword(); });
+
+async function verifyPassword() {
+  const pw = document.getElementById('passwordInput').value.trim();
+  if (!pw) return;
+  try {
+    const r = await fetch(`${API}/admin/verify`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({password: pw}) });
+    if (r.ok) {
+      adminPassword = pw;
+      document.getElementById('loginOverlay').classList.add('hidden');
+      initDashboard();
+    } else {
+      document.getElementById('loginError').classList.add('show');
+    }
+  } catch { document.getElementById('loginError').textContent = 'Erreur réseau'; document.getElementById('loginError').classList.add('show'); }
+}
+
+function logout() {
+  adminPassword = '';
+  document.getElementById('loginOverlay').classList.remove('hidden');
+  document.getElementById('passwordInput').value = '';
+  document.getElementById('loginError').classList.remove('show');
+}
+
+async function initDashboard() {
+  await loadThemesOverview();
+  loadAvatars();
+  loadReports('all');
+  populateThemeSelect();
+}
+
+// ── Navigation ──
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+function showTab(tabId, group) {
+  const panel = document.getElementById(tabId);
+  if (!panel) return;
+  const parent = panel.closest('.page') || document.body;
+  parent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  panel.classList.add('active');
+  // find matching button
+  parent.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(tabId)) b.classList.add('active');
+  });
+}
+
+// ── Themes overview ──
+async function loadThemesOverview() {
+  try {
+    const r = await fetch(`${API}/admin/themes-overview`);
+    const data = await r.json();
+    themesData = data.super_categories || [];
+    const t = data.totals || {};
+    document.getElementById('statThemes').textContent = t.themes || 0;
+    document.getElementById('statQuestions').textContent = (t.questions || 0).toLocaleString();
+    document.getElementById('statClusters').textContent = t.clusters || 0;
+    document.getElementById('statSC').textContent = t.super_categories || 0;
+    document.getElementById('badgeThemes').textContent = t.themes || 0;
+    document.getElementById('badgeQuestions').textContent = (t.questions || 0).toLocaleString();
+    renderDashTable(themesData);
+    renderThemesTree(themesData);
+  } catch(e) { console.error(e); }
+}
+
+async function loadThemes() { await loadThemesOverview(); toast('Rafraîchi !'); }
+
+async function recountQuestions() {
+  const btn = document.getElementById('btnRecount');
+  btn.disabled = true; btn.textContent = '⏳ Calcul…';
+  try {
+    const r = await fetch(`${API}/admin/recount-questions`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ password: adminPassword })
     });
+    const d = await r.json();
+    if (d.success) {
+      toast(`${d.total_questions.toLocaleString()} questions réparties sur ${d.themes_updated} thèmes`);
+      await loadThemesOverview();
+    } else { toast('Erreur recalcul', true); }
+  } catch(e) { toast(e.message, true); }
+  btn.disabled = false; btn.textContent = '∑ Recalculer compteurs';
+}
 
-    async function verifyPassword() {
-      const pw = document.getElementById('passwordInput').value;
-      try {
-        const res = await fetch(`${API_BASE}/admin/verify`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password: pw }),
-        });
-        if (res.ok) {
-          isAuthenticated = true;
-          document.getElementById('loginOverlay').classList.add('hidden');
-          loadCategories();
-        } else {
-          document.getElementById('loginError').classList.add('show');
+function renderDashTable(scs) {
+  const html = scs.map(sc => `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+      <span style="font-size:22px">${sc.icon}</span>
+      <span style="flex:1;font-size:14px;font-weight:700">${sc.label}</span>
+      <span style="font-size:13px;color:#525252">${sc.total_themes} thèmes</span>
+      <span style="font-size:14px;font-weight:800;color:#8A2BE2;min-width:60px;text-align:right">${(sc.total_questions||0).toLocaleString()} q.</span>
+    </div>`).join('');
+  document.getElementById('dashTableContent').innerHTML = html || '<div class="empty-state"><div class="empty-icon">📭</div>Aucun thème</div>';
+}
+
+function renderThemesTree(scs) {
+  const html = scs.map(sc => {
+    const clusters = (sc.clusters || []).map(cl => {
+      const themes = (cl.themes || []).map(th => `
+        <div class="theme-row">
+          <div class="theme-dot" style="background:${th.color_hex||'#8A2BE2'}"></div>
+          <span class="theme-name">${th.name}</span>
+          <span class="theme-id">${th.id}</span>
+          <span class="theme-qcount">${th.question_count} q.</span>
+        </div>`).join('');
+      return `<div class="cluster-row">
+        <div class="cluster-name">${cl.icon||''} ${cl.name}</div>
+        ${themes}
+      </div>`;
+    }).join('');
+    return `
+      <div class="sc-block" onclick="toggleSC(this)">
+        <div class="sc-header">
+          <span class="sc-icon">${sc.icon}</span>
+          <span class="sc-name">${sc.label}</span>
+          <span class="sc-count">${sc.total_themes} thèmes · ${(sc.total_questions||0).toLocaleString()} questions</span>
+          <span class="sc-chevron">▼</span>
+        </div>
+        <div class="sc-body">${clusters}</div>
+      </div>`;
+  }).join('');
+  document.getElementById('themesTree').innerHTML = html || '<div class="empty-state"><div class="empty-icon">📭</div>Aucun thème importé</div>';
+}
+
+function toggleSC(el) { el.classList.toggle('open'); }
+
+// ── Import themes CSV ──
+async function importThemesCSV() {
+  const file = document.getElementById('fileThemes').files[0];
+  if (!file) { toast('Sélectionnez un fichier CSV', true); return; }
+  const text = await file.text();
+  const btn = document.getElementById('btnImportThemes');
+  btn.disabled = true; btn.textContent = 'Import en cours…';
+  try {
+    const r = await fetch(`${API}/admin/upload-themes-csv`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ password: adminPassword, themes_csv: text })
+    });
+    const d = await r.json();
+    showResult('Themes', d.themes_imported||0, d.duplicates_skipped||0, (d.errors||[]).length, d.errors||[]);
+    if (d.success) { toast(`${d.themes_imported} thèmes importés !`); await loadThemesOverview(); }
+    else toast(d.errors?.[0]||'Erreur', true);
+  } catch(e) { toast(e.message, true); }
+  btn.disabled = false; btn.textContent = 'IMPORTER LES THÈMES';
+}
+
+// ── Import CSV questions ──
+function onFileSelected(inputId, nameId) {
+  const f = document.getElementById(inputId).files[0];
+  if (f) { document.getElementById(nameId).textContent = '📄 ' + f.name; }
+  if (inputId === 'fileQ') previewCSV(f);
+}
+
+function parseCSV(text) {
+  const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+  if (!normalized) return [];
+
+  // Detect delimiter from first line (tab > semicolon > comma)
+  const firstLine = normalized.split('\n')[0];
+  const delim = firstLine.includes('\t') ? '\t' : firstLine.includes(';') ? ';' : ',';
+
+  // Proper RFC-4180 parser: handles quoted fields containing delimiters and newlines
+  function parseLine(line) {
+    const fields = [];
+    let i = 0;
+    while (i < line.length) {
+      if (line[i] === '"') {
+        // Quoted field
+        let val = '';
+        i++; // skip opening quote
+        while (i < line.length) {
+          if (line[i] === '"' && line[i+1] === '"') { val += '"'; i += 2; }
+          else if (line[i] === '"') { i++; break; }
+          else { val += line[i++]; }
         }
-      } catch {
-        document.getElementById('loginError').textContent = 'Erreur de connexion';
-        document.getElementById('loginError').classList.add('show');
+        fields.push(val.trim());
+        if (line[i] === delim) i++; // skip delimiter after closing quote
+      } else {
+        // Unquoted field
+        const end = line.indexOf(delim, i);
+        if (end === -1) { fields.push(line.slice(i).trim()); break; }
+        fields.push(line.slice(i, end).trim());
+        i = end + 1;
       }
     }
+    return fields;
+  }
 
-    function logout() {
-      isAuthenticated = false;
-      document.getElementById('loginOverlay').classList.remove('hidden');
-      document.getElementById('passwordInput').value = '';
-      document.getElementById('loginError').classList.remove('show');
-    }
+  const lines = normalized.split('\n');
+  const rawHeaders = parseLine(lines[0]);
+  const headers = rawHeaders.map(h => h.replace(/^\uFEFF/, ''));
 
-    // ── Categories ──
-    async function loadCategories() {
-      try {
-        const res = await fetch(`${API_BASE}/categories`);
-        const data = await res.json();
-        const container = document.getElementById('categoryList');
-        container.innerHTML = '';
-        data.forEach(cat => {
-          const info = categories.find(c => c.id === cat.id) || { icon: '❓', name: cat.id };
-          const btn = document.createElement('button');
-          btn.className = `cat-btn ${cat.id === selectedCategory ? 'active' : ''}`;
-          btn.innerHTML = `
-            <span class="cat-icon">${info.icon}</span>
-            <span>${info.name}</span>
-            <span class="cat-count">${cat.question_count}</span>
-          `;
-          btn.onclick = () => selectCategory(cat.id);
-          container.appendChild(btn);
+  return lines.slice(1)
+    .filter(l => l.trim())
+    .map(line => {
+      const vals = parseLine(line);
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = vals[i] !== undefined ? vals[i] : ''; });
+      return obj;
+    })
+    .filter(r => Object.values(r).some(v => v));
+}
+
+function previewCSV(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const rows = parseCSV(e.target.result);
+    csvParsedRows = rows;
+    const preview = document.getElementById('csvPreview');
+    preview.style.display = 'block';
+    document.getElementById('csvPreviewText').innerHTML = `<strong style="color:#00FF9D">${rows.length} lignes détectées</strong> · colonnes : <code style="font-size:12px;color:#A3A3A3">${Object.keys(rows[0]||{}).join(', ')}</code>`;
+  };
+  reader.readAsText(file);
+}
+
+async function importCSVQuestions() {
+  const file = document.getElementById('fileQ').files[0];
+  if (!file) { toast('Sélectionnez un fichier CSV', true); return; }
+  const text = await file.text();
+  const rows = parseCSV(text);
+  if (!rows.length) { toast('CSV vide ou illisible', true); return; }
+  const btn = document.getElementById('btnImportCSV');
+  btn.disabled = true; btn.textContent = 'Import en cours…';
+  try {
+    const r = await fetch(`${API}/admin/upload-csv`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ password: adminPassword, questions: rows })
+    });
+    const d = await r.json();
+    showResult('CSV', d.imported||0, d.duplicates||0, (d.errors||[]).length, d.errors||[]);
+    if (d.success) { toast(`${d.imported} questions importées !`); loadThemesOverview(); }
+    else toast('Erreur import', true);
+  } catch(e) { toast(e.message, true); }
+  btn.disabled = false; btn.textContent = 'IMPORTER LES QUESTIONS';
+}
+
+// ── Import JSON questions ──
+async function populateThemeSelect() {
+  try {
+    const r = await fetch(`${API}/admin/themes-overview`);
+    const d = await r.json();
+    const sel = document.getElementById('jsonCategory');
+    sel.innerHTML = '<option value="">— Choisir un thème —</option>';
+    (d.super_categories||[]).forEach(sc => {
+      (sc.clusters||[]).forEach(cl => {
+        const grp = document.createElement('optgroup');
+        grp.label = `${sc.label} › ${cl.name}`;
+        (cl.themes||[]).forEach(th => {
+          const o = document.createElement('option');
+          o.value = th.id; o.textContent = `${th.name} (${th.id})`;
+          grp.appendChild(o);
         });
-
-        // Stats
-        const statsContainer = document.getElementById('statsContainer');
-        const total = data.reduce((s, c) => s + c.question_count, 0);
-        statsContainer.innerHTML = `
-          <div class="stat-row"><span class="stat-label">Total questions</span><span class="stat-value">${total}</span></div>
-          ${data.map(c => {
-            const info = categories.find(x => x.id === c.id) || { name: c.id };
-            return `<div class="stat-row"><span class="stat-label">${info.name}</span><span class="stat-value">${c.question_count}</span></div>`;
-          }).join('')}
-        `;
-      } catch {}
-    }
-
-    function selectCategory(id) {
-      selectedCategory = id;
-      document.querySelectorAll('.cat-btn').forEach((btn, i) => {
-        btn.classList.toggle('active', categories[i]?.id === id);
+        sel.appendChild(grp);
       });
+    });
+  } catch {}
+}
+
+async function importJSON() {
+  const cat = document.getElementById('jsonCategory').value;
+  const text = document.getElementById('jsonTextarea').value.trim();
+  if (!cat) { toast('Sélectionnez un thème cible', true); return; }
+  if (!text) { toast('Collez votre JSON', true); return; }
+  let parsed;
+  try { parsed = JSON.parse(text); } catch { toast('JSON invalide', true); return; }
+  if (!Array.isArray(parsed)) { toast('Le JSON doit être un tableau', true); return; }
+  const btn = document.getElementById('btnImportJSON');
+  btn.disabled = true; btn.textContent = 'Import en cours…';
+  try {
+    const r = await fetch(`${API}/admin/import-questions`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ category: cat, questions: parsed })
+    });
+    const d = await r.json();
+    showResult('JSON', d.imported||0, d.duplicates||0, (d.errors||[]).length, d.errors||[]);
+    if (d.imported > 0) { toast(`${d.imported} questions importées !`); loadThemesOverview(); }
+  } catch(e) { toast(e.message, true); }
+  btn.disabled = false; btn.textContent = 'IMPORTER';
+}
+
+function formatJSON() {
+  const ta = document.getElementById('jsonTextarea');
+  try { ta.value = JSON.stringify(JSON.parse(ta.value), null, 2); }
+  catch { toast('JSON invalide', true); }
+}
+
+// ── Stats questions ──
+async function loadQStats() {
+  const el = document.getElementById('qStatsContent');
+  el.innerHTML = '<div style="text-align:center;padding:32px"><div class="loading-spinner"></div></div>';
+  try {
+    const r = await fetch(`${API}/admin/questions-stats`);
+    const d = await r.json();
+    const cats = (d.categories||[]).slice(0,50);
+    const rows = cats.map(c => `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+      <span style="flex:1;font-size:13px;font-family:monospace;color:#A3A3A3">${c.category}</span>
+      <span style="font-size:14px;font-weight:700;color:#8A2BE2">${c.count.toLocaleString()}</span>
+    </div>`).join('');
+    el.innerHTML = `<div class="card"><div class="card-title">Questions par thème — Total : ${(d.total_questions||0).toLocaleString()}</div>${rows}</div>`;
+  } catch { el.innerHTML = '<div class="empty-state">Erreur de chargement</div>'; }
+}
+
+// ── Avatars ──
+async function loadAvatars() {
+  try {
+    const r = await fetch(`${API}/admin/avatars`);
+    const d = await r.json();
+    const avs = d.avatars || [];
+    if (!avs.length) {
+      document.getElementById('avatarGrid').innerHTML = '<div class="empty-state"><div class="empty-icon">🖼️</div>Aucun avatar</div>';
+      return;
     }
+    const html = `<div class="avatar-grid">${avs.map(a => `
+      <div class="avatar-card">
+        <img class="avatar-img" src="${window.location.origin}/static/avatars/${a.image_url.replace('avatars/','')}" onerror="this.style.display='none'">
+        <div class="avatar-name" title="Cliquer pour renommer" onclick="startRenameAvatar('${a.id}',this)" style="cursor:pointer">${a.name||a.id.slice(0,8)}</div>
+        <button class="avatar-delete" onclick="deleteAvatar('${a.id}')" title="Supprimer">✕</button>
+      </div>`).join('')}</div>`;
+    document.getElementById('avatarGrid').innerHTML = html;
+  } catch { document.getElementById('avatarGrid').innerHTML = '<div class="empty-state">Erreur</div>'; }
+}
 
-    // ── Import ──
-    async function importQuestions() {
-      const textarea = document.getElementById('jsonTextarea');
-      const text = textarea.value.trim();
-      if (!text) return;
+async function exportAvatarsCSV() {
+  try {
+    const r = await fetch(`${API}/admin/avatars`);
+    const d = await r.json();
+    const avs = d.avatars || [];
+    if (!avs.length) { toast('Aucun avatar à exporter', true); return; }
+    const rows = [['id','name','category','image_url'], ...avs.map(a => [a.id, a.name, a.category, a.image_url])];
+    const csv = rows.map(r => r.map(v => `"${(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'avatars.csv'; a.click();
+    URL.revokeObjectURL(url);
+  } catch { toast('Erreur export', true); }
+}
 
-      const btn = document.getElementById('importBtn');
-      btn.disabled = true;
-      btn.textContent = 'IMPORT EN COURS...';
+function startRenameAvatar(id, el) {
+  const current = el.textContent.trim();
+  const input = document.createElement('input');
+  input.value = current;
+  input.style = 'width:100%;font-size:11px;background:rgba(255,255,255,0.08);border:1px solid #8A2BE2;border-radius:4px;color:#fff;padding:2px 4px;text-align:center';
+  el.replaceWith(input);
+  input.focus(); input.select();
+  const save = async () => {
+    const newName = input.value.trim();
+    if (!newName || newName === current) { input.replaceWith(el); return; }
+    try {
+      const r = await fetch(`${API}/admin/avatars/${id}`, {
+        method: 'PATCH', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ password: adminPassword, name: newName })
+      });
+      const d = await r.json();
+      if (d.success) { el.textContent = d.name; toast('Renommé !'); }
+      else { toast(d.detail||'Erreur', true); }
+    } catch { toast('Erreur réseau', true); }
+    input.replaceWith(el);
+  };
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') save(); if (e.key === 'Escape') input.replaceWith(el); });
+  input.addEventListener('blur', save);
+}
 
-      try {
-        const parsed = JSON.parse(text);
-        if (!Array.isArray(parsed)) throw new Error('Le JSON doit être un tableau');
+let avatarQueue = []; // [{base64, filename}, ...]
 
-        const res = await fetch(`${API_BASE}/admin/import-questions`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ category: selectedCategory, questions: parsed }),
+function previewAvatars(e) {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  avatarQueue = [];
+  document.getElementById('dropAvatar').style.display = 'none';
+  document.getElementById('avatarPreview').style.display = 'none';
+  const queueEl = document.getElementById('avatarQueue');
+  queueEl.style.display = 'flex';
+  queueEl.style.flexWrap = 'wrap';
+  queueEl.style.gap = '10px';
+  queueEl.innerHTML = '';
+  files.forEach((file, i) => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      avatarQueue[i] = { base64: ev.target.result, filename: file.name };
+      const div = document.createElement('div');
+      div.style = 'text-align:center;width:80px';
+      div.innerHTML = `<img src="${ev.target.result}" style="width:64px;height:64px;border-radius:32px;object-fit:cover;border:2px solid rgba(138,43,226,0.4)"><div style="font-size:10px;color:#A3A3A3;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px">${file.name}</div>`;
+      queueEl.appendChild(div);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function onDropAvatar(e) {
+  e.preventDefault(); onDragLeave('dropAvatar');
+  const files = e.dataTransfer.files;
+  if (files.length) {
+    const dt = new DataTransfer();
+    Array.from(files).forEach(f => dt.items.add(f));
+    document.getElementById('fileAvatar').files = dt.files;
+    previewAvatars({target:{files:dt.files}});
+  }
+}
+
+async function uploadAvatar() {
+  if (!avatarQueue.length) { toast('Sélectionnez au moins une image', true); return; }
+  const cat = document.getElementById('avatarCategory').value;
+  const btn = document.getElementById('btnUploadAvatar');
+  btn.disabled = true;
+  let ok = 0, fail = 0;
+  for (let i = 0; i < avatarQueue.length; i++) {
+    const { base64, filename } = avatarQueue[i];
+    btn.textContent = `Upload ${i+1}/${avatarQueue.length}…`;
+    try {
+      const r = await fetch(`${API}/admin/avatars/upload`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ password: adminPassword, category: cat, image_base64: base64, filename })
+      });
+      const d = await r.json();
+      if (d.success) ok++; else fail++;
+    } catch { fail++; }
+  }
+  btn.disabled = false; btn.textContent = 'UPLOADER';
+  toast(fail === 0 ? `${ok} avatar(s) uploadé(s) !` : `${ok} ok, ${fail} erreur(s)`, fail > 0);
+  avatarQueue = [];
+  document.getElementById('avatarQueue').style.display = 'none';
+  document.getElementById('avatarQueue').innerHTML = '';
+  document.getElementById('dropAvatar').style.display = '';
+  document.getElementById('fileAvatar').value = '';
+  showTab('tabAvatarList', 'avatars');
+  loadAvatars();
+}
+
+async function deleteAvatar(id) {
+  if (!confirm('Supprimer cet avatar ?')) return;
+  try {
+    const r = await fetch(`${API}/admin/avatars/${id}`, {
+      method: 'DELETE', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ password: adminPassword })
+    });
+    if (r.ok) { toast('Avatar supprimé'); loadAvatars(); }
+    else toast('Erreur suppression', true);
+  } catch(e) { toast(e.message, true); }
+}
+
+// ── Reports ──
+async function loadReports(status) {
+  try {
+    const r = await fetch(`${API}/admin/reports?limit=100`);
+    const d = await r.json();
+    allReports = d.reports || [];
+    const pending = d.counts?.pending || 0;
+    document.getElementById('badgeReports').textContent = pending;
+    filterReports(status || 'all');
+  } catch {}
+}
+
+function filterReports(f) {
+  document.querySelectorAll('#page-reports .btn-outline').forEach(b => b.style.background = 'transparent');
+  const active = {all:'filterAll', pending:'filterPending', resolved:'filterResolved'}[f];
+  if (active) document.getElementById(active).style.background = 'rgba(255,255,255,0.08)';
+  const list = f === 'all' ? allReports : allReports.filter(r => r.status === f);
+  const container = document.getElementById('reportsList');
+  if (!list.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div>Aucun signalement</div>'; return; }
+  container.innerHTML = list.map(rep => `
+    <div class="report-row">
+      <span class="report-badge badge-${rep.status}">${{pending:'En attente',reviewed:'Examiné',resolved:'Résolu'}[rep.status]||rep.status}</span>
+      <div class="report-content">
+        <div class="report-question">${rep.question_text||rep.question_id}</div>
+        <div class="report-meta">${rep.user_pseudo} · ${rep.category||'—'}</div>
+        <div class="report-reason">${{wrong_answer:'Mauvaise réponse',unclear_question:'Question floue',typo:'Faute/typo',outdated:'Info obsolète',other:'Autre'}[rep.reason_type]||rep.reason_type}${rep.description?' — '+rep.description:''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        ${rep.status!=='resolved'?`<button class="btn btn-sm" style="background:rgba(0,255,157,0.1);color:#00FF9D;border:none" onclick="setReportStatus('${rep.id}','resolved')">✓ Résolu</button>`:''}
+        ${rep.status==='pending'?`<button class="btn btn-sm" style="background:rgba(138,43,226,0.1);color:#8A2BE2;border:none" onclick="setReportStatus('${rep.id}','reviewed')">👁 Examiné</button>`:''}
+        <button class="btn btn-sm" style="background:rgba(255,59,48,0.1);color:#FF3B30;border:none" onclick="deleteQuestion('${rep.question_id}', this)">🗑 Supprimer</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── Browse & bulk delete questions ──
+let qBrowseData = null;
+let qSelected = new Set();
+let qLoadedThemes = {};
+
+async function loadQBrowse() {
+  if (qBrowseData) { renderQBrowse(); return; }
+  document.getElementById('qBrowseTree').innerHTML = '<div style="text-align:center;padding:32px"><div class="loading-spinner"></div></div>';
+  try {
+    const r = await fetch(`${API}/admin/themes-overview`);
+    const d = await r.json();
+    qBrowseData = d.super_categories || [];
+    renderQBrowse();
+  } catch { document.getElementById('qBrowseTree').innerHTML = '<div class="empty-state">Erreur chargement</div>'; }
+}
+
+function renderQBrowse() {
+  const el = document.getElementById('qBrowseTree');
+  el.innerHTML = qBrowseData.map(sc => `
+    <div class="tree-sc" id="sc_${sc.id}">
+      <div class="tree-sc-header" onclick="toggleSC('${sc.id}')">
+        <input type="checkbox" class="tree-cb" id="cb_sc_${sc.id}" onclick="event.stopPropagation();toggleCheckSC('${sc.id}',this.checked)">
+        <span style="font-size:18px">${sc.icon||'📁'}</span>
+        <span class="tree-label">${sc.label}</span>
+        <span class="tree-badge">${sc.total_themes||0} thèmes · ${sc.total_questions||0} Q</span>
+        <span class="tree-toggle" id="tog_sc_${sc.id}">▶</span>
+      </div>
+      <div id="body_sc_${sc.id}" style="display:none">
+        ${(sc.clusters||[]).map(cl => `
+          <div class="tree-cluster" id="cl_${sc.id}_${cl.name.replace(/\W/g,'_')}">
+            <div class="tree-cluster-header" onclick="toggleCL('${sc.id}','${cl.name}')">
+              <input type="checkbox" class="tree-cb" id="cb_cl_${sc.id}_${cl.name.replace(/\W/g,'_')}" onclick="event.stopPropagation();toggleCheckCL('${sc.id}','${cl.name}',this.checked)">
+              <span class="tree-label" style="font-size:12px">${cl.name}</span>
+              <span class="tree-badge">${(cl.themes||[]).length} thèmes · ${cl.total_questions||0} Q</span>
+              <span class="tree-toggle" id="tog_cl_${sc.id}_${cl.name.replace(/\W/g,'_')}">▶</span>
+            </div>
+            <div id="body_cl_${sc.id}_${cl.name.replace(/\W/g,'_')}" style="display:none">
+              ${(cl.themes||[]).map(th => `
+                <div class="tree-questions" id="th_${th.id}">
+                  <div class="tree-cluster-header" style="padding-left:24px" onclick="toggleTheme('${th.id}')">
+                    <input type="checkbox" class="tree-cb" id="cb_th_${th.id}" onclick="event.stopPropagation();toggleCheckTheme('${th.id}',this.checked)">
+                    <span class="tree-label" style="font-size:11px;color:#A3A3A3">${th.name}</span>
+                    <span class="tree-badge">${th.question_count||0} Q</span>
+                    <span class="tree-toggle" id="tog_th_${th.id}">▶</span>
+                  </div>
+                  <div id="body_th_${th.id}" style="display:none"></div>
+                </div>`).join('')}
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+  updateBrowseBar();
+}
+
+function toggleSC(scId) {
+  const body = document.getElementById(`body_sc_${scId}`);
+  const tog = document.getElementById(`tog_sc_${scId}`);
+  const open = body.style.display === 'none';
+  body.style.display = open ? '' : 'none';
+  tog.textContent = open ? '▼' : '▶';
+}
+
+function toggleCL(scId, clName) {
+  const key = `${scId}_${clName.replace(/\W/g,'_')}`;
+  const body = document.getElementById(`body_cl_${key}`);
+  const tog = document.getElementById(`tog_cl_${key}`);
+  const open = body.style.display === 'none';
+  body.style.display = open ? '' : 'none';
+  tog.textContent = open ? '▼' : '▶';
+}
+
+async function toggleTheme(themeId) {
+  const body = document.getElementById(`body_th_${themeId}`);
+  const tog = document.getElementById(`tog_th_${themeId}`);
+  const open = body.style.display === 'none';
+  body.style.display = open ? '' : 'none';
+  tog.textContent = open ? '▼' : '▶';
+  if (open && !qLoadedThemes[themeId]) {
+    body.innerHTML = '<div style="padding:12px;color:#525252;font-size:12px">Chargement…</div>';
+    try {
+      const r = await fetch(`${API}/admin/questions-browse?theme_id=${themeId}`);
+      const d = await r.json();
+      qLoadedThemes[themeId] = d.questions || [];
+      renderThemeQuestions(themeId);
+    } catch { body.innerHTML = '<div style="padding:12px;color:#FF3B30;font-size:12px">Erreur</div>'; }
+  }
+}
+
+function renderThemeQuestions(themeId) {
+  const body = document.getElementById(`body_th_${themeId}`);
+  const qs = qLoadedThemes[themeId] || [];
+  if (!qs.length) { body.innerHTML = '<div style="padding:12px;color:#525252;font-size:12px">Aucune question</div>'; return; }
+  body.innerHTML = qs.map(q => `
+    <div class="tree-q-row" id="qrow_${q.id}">
+      <input type="checkbox" class="tree-cb" id="cb_q_${q.id}" ${qSelected.has(q.id)?'checked':''} onchange="toggleQ('${q.id}','${themeId}',this.checked)">
+      <span class="tree-q-text">${q.text}</span>
+      <span class="tree-q-diff">${q.difficulty||''}</span>
+    </div>`).join('');
+  updateThemeCb(themeId);
+}
+
+function toggleQ(qId, themeId, checked) {
+  if (checked) qSelected.add(qId); else qSelected.delete(qId);
+  updateThemeCb(themeId);
+  updateBrowseBar();
+}
+
+function toggleCheckTheme(themeId, checked) {
+  const qs = qLoadedThemes[themeId] || [];
+  qs.forEach(q => { if (checked) qSelected.add(q.id); else qSelected.delete(q.id); });
+  renderThemeQuestions(themeId);
+  updateBrowseBar();
+}
+
+function toggleCheckCL(scId, clName, checked) {
+  const sc = qBrowseData.find(s => s.id === scId);
+  const cl = (sc?.clusters||[]).find(c => c.name === clName);
+  (cl?.themes||[]).forEach(th => toggleCheckTheme(th.id, checked));
+  const key = `${scId}_${clName.replace(/\W/g,'_')}`;
+  const cb = document.getElementById(`cb_cl_${key}`);
+  if (cb) cb.checked = checked;
+}
+
+function toggleCheckSC(scId, checked) {
+  const sc = qBrowseData.find(s => s.id === scId);
+  (sc?.clusters||[]).forEach(cl => toggleCheckCL(scId, cl.name, checked));
+  const cb = document.getElementById(`cb_sc_${scId}`);
+  if (cb) cb.checked = checked;
+}
+
+function updateThemeCb(themeId) {
+  const qs = qLoadedThemes[themeId] || [];
+  const cb = document.getElementById(`cb_th_${themeId}`);
+  if (!cb || !qs.length) return;
+  const selCount = qs.filter(q => qSelected.has(q.id)).length;
+  cb.checked = selCount === qs.length;
+  cb.indeterminate = selCount > 0 && selCount < qs.length;
+}
+
+function updateBrowseBar() {
+  const bar = document.getElementById('qBrowseBar');
+  const count = document.getElementById('qBrowseCount');
+  bar.style.display = qSelected.size > 0 ? 'flex' : 'none';
+  count.textContent = `${qSelected.size} sélectionnée(s)`;
+}
+
+async function bulkDeleteQuestions() {
+  if (!qSelected.size) return;
+  if (!confirm(`Supprimer définitivement ${qSelected.size} question(s) ?`)) return;
+  try {
+    const r = await fetch(`${API}/admin/questions/bulk-delete`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ password: adminPassword, ids: [...qSelected] })
+    });
+    const d = await r.json();
+    if (d.success) {
+      toast(`${d.deleted} question(s) supprimée(s)`);
+      // Remove from local cache
+      qSelected.forEach(id => {
+        Object.keys(qLoadedThemes).forEach(themeId => {
+          qLoadedThemes[themeId] = qLoadedThemes[themeId].filter(q => q.id !== id);
+          renderThemeQuestions(themeId);
         });
-        const data = await res.json();
+        const row = document.getElementById(`qrow_${id}`);
+        if (row) row.remove();
+      });
+      qSelected.clear();
+      updateBrowseBar();
+      qBrowseData = null; // force reload tree for updated counts
+    } else toast(d.detail||'Erreur', true);
+  } catch { toast('Erreur réseau', true); }
+}
 
-        document.getElementById('resultImported').textContent = data.imported;
-        document.getElementById('resultDuplicates').textContent = data.duplicates;
-        document.getElementById('resultErrors').textContent = data.errors?.length || 0;
-        
-        const errorList = document.getElementById('resultErrorList');
-        errorList.innerHTML = data.errors?.map(e => `<p>• ${e}</p>`).join('') || '';
-        
-        document.getElementById('resultBanner').classList.add('show');
-        loadCategories();
-      } catch (e) {
-        document.getElementById('resultImported').textContent = 0;
-        document.getElementById('resultDuplicates').textContent = 0;
-        document.getElementById('resultErrors').textContent = 1;
-        document.getElementById('resultErrorList').innerHTML = `<p>• ${e.message}</p>`;
-        document.getElementById('resultBanner').classList.add('show');
-      }
+async function deleteQuestion(questionId, btn) {
+  if (!confirm('Supprimer définitivement cette question ?')) return;
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const r = await fetch(`${API}/admin/questions/${questionId}`, {
+      method: 'DELETE', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ password: adminPassword })
+    });
+    const d = await r.json();
+    if (d.success) { toast('Question supprimée'); loadReports('all'); }
+    else { toast(d.detail||'Erreur', true); btn.disabled = false; btn.textContent = '🗑 Supprimer'; }
+  } catch { toast('Erreur réseau', true); btn.disabled = false; btn.textContent = '🗑 Supprimer'; }
+}
 
-      btn.disabled = false;
-      btn.textContent = 'IMPORTER EN MASSE';
-    }
+async function setReportStatus(id, status) {
+  try {
+    await fetch(`${API}/admin/reports/${id}/status`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ status })
+    });
+    toast('Statut mis à jour');
+    loadReports('all');
+  } catch { toast('Erreur', true); }
+}
 
-    // ── Helpers ──
-    function loadSample() {
-      document.getElementById('jsonTextarea').value = JSON.stringify([
-        {
-          "question_text": "Exemple de question ?",
-          "options": ["Réponse A", "Réponse B", "Réponse C", "Réponse D"],
-          "correct_option": 1,
-          "difficulty": "medium"
-        }
-      ], null, 2);
-    }
+// ── Helpers ──
+function showResult(key, ok, dup, err, errors) {
+  document.getElementById(`r${key}Ok`).textContent = ok;
+  document.getElementById(`r${key}Dup`).textContent = dup;
+  document.getElementById(`r${key}Err`).textContent = err;
+  const el = document.getElementById(`r${key}ErrList`);
+  el.innerHTML = errors.slice(0,30).map(e => `<p>• ${e}</p>`).join('');
+  document.getElementById(`result${key}`).classList.add('show');
+}
 
-    function formatJson() {
-      const textarea = document.getElementById('jsonTextarea');
-      try {
-        const parsed = JSON.parse(textarea.value);
-        textarea.value = JSON.stringify(parsed, null, 2);
-      } catch {
-        alert('JSON invalide — impossible de formater');
-      }
-    }
+function toast(msg, isErr=false) {
+  const el = document.getElementById('toast');
+  el.textContent = isErr ? '✕ ' + msg : '✓ ' + msg;
+  el.className = 'toast show' + (isErr ? ' error' : '');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
 
-    function clearEditor() {
-      document.getElementById('jsonTextarea').value = '';
-      document.getElementById('resultBanner').classList.remove('show');
-    }
-  </script>
+function onDragOver(e, id) { e.preventDefault(); document.getElementById(id).classList.add('drag-over'); }
+function onDragLeave(id) { document.getElementById(id).classList.remove('drag-over'); }
+function onDrop(e, inputId, dropId) {
+  e.preventDefault(); onDragLeave(dropId);
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    const dt = new DataTransfer(); dt.items.add(file);
+    document.getElementById(inputId).files = dt.files;
+    onFileSelected(inputId, inputId + 'Name');
+  }
+}
+</script>
 </body>
 </html>

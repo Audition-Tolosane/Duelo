@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 from database import get_db
 
-from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge
+from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge, challenges
 from schemas import QuestionReportRequest
 from models import QuestionReport
 from sqlalchemy import select
@@ -111,6 +111,7 @@ api_router.include_router(search.router)
 api_router.include_router(themes.router)
 api_router.include_router(admin.router)
 api_router.include_router(forge.router)
+api_router.include_router(challenges.router)
 
 # Serve avatar static files
 avatars_dir = ROOT_DIR / "static" / "avatars"
@@ -138,7 +139,24 @@ async def _ensure_columns():
     from database import engine
     async with engine.begin() as conn:
         for stmt in [
+            "ALTER TABLE questions ADD COLUMN IF NOT EXISTS option_a TEXT",
+            "ALTER TABLE questions ADD COLUMN IF NOT EXISTS option_b TEXT",
+            "ALTER TABLE questions ADD COLUMN IF NOT EXISTS option_c TEXT",
+            "ALTER TABLE questions ADD COLUMN IF NOT EXISTS option_d TEXT",
+            "ALTER TABLE questions ADD COLUMN IF NOT EXISTS angle TEXT",
             "ALTER TABLE questions ADD COLUMN IF NOT EXISTS angle_num INTEGER DEFAULT 0",
+            "ALTER TABLE questions ADD COLUMN IF NOT EXISTS batch TEXT",
+            "ALTER TABLE questions ADD COLUMN IF NOT EXISTS language VARCHAR(10) DEFAULT 'fr'",
+            # Widen id column to support long quiz_generator IDs
+            "ALTER TABLE questions ALTER COLUMN id TYPE VARCHAR(100)",
+            "ALTER TABLE question_reports ALTER COLUMN question_id TYPE VARCHAR(100)",
+            # Widen columns that may have been created as VARCHAR(36) by an older migration
+            "ALTER TABLE questions ALTER COLUMN option_a TYPE TEXT",
+            "ALTER TABLE questions ALTER COLUMN option_b TYPE TEXT",
+            "ALTER TABLE questions ALTER COLUMN option_c TYPE TEXT",
+            "ALTER TABLE questions ALTER COLUMN option_d TYPE TEXT",
+            "ALTER TABLE questions ALTER COLUMN angle TYPE TEXT",
+            "ALTER TABLE questions ALTER COLUMN batch TYPE TEXT",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_id VARCHAR(36)",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT",
             "ALTER TABLE notifications ADD COLUMN IF NOT EXISTS actor_avatar_url TEXT",
@@ -155,6 +173,27 @@ async def _ensure_columns():
                 created_at TIMESTAMPTZ DEFAULT NOW(),
                 UNIQUE(user_id, theme_id)
             )""",
+            """CREATE TABLE IF NOT EXISTS challenges (
+                id VARCHAR(36) PRIMARY KEY,
+                challenger_id VARCHAR(36) NOT NULL,
+                challenged_id VARCHAR(36) NOT NULL,
+                theme_id VARCHAR(100),
+                theme_name VARCHAR(200) DEFAULT '',
+                status VARCHAR(20) DEFAULT 'pending',
+                created_at TIMESTAMP DEFAULT NOW(),
+                expires_at TIMESTAMP NOT NULL
+            )""",
+            "CREATE INDEX IF NOT EXISTS idx_challenges_challenged ON challenges(challenged_id, status)",
+            "CREATE INDEX IF NOT EXISTS idx_challenges_challenger ON challenges(challenger_id, status)",
+            "ALTER TABLE challenges ADD COLUMN IF NOT EXISTS p1_score INTEGER",
+            "ALTER TABLE challenges ADD COLUMN IF NOT EXISTS p1_correct INTEGER",
+            "ALTER TABLE challenges ADD COLUMN IF NOT EXISTS p1_played_at TIMESTAMP",
+            "ALTER TABLE challenges ADD COLUMN IF NOT EXISTS p2_score INTEGER",
+            "ALTER TABLE challenges ADD COLUMN IF NOT EXISTS p2_correct INTEGER",
+            "ALTER TABLE challenges ADD COLUMN IF NOT EXISTS p2_played_at TIMESTAMP",
+            "ALTER TABLE challenges ADD COLUMN IF NOT EXISTS p1_answers TEXT",
+            "ALTER TABLE challenges ADD COLUMN IF NOT EXISTS p2_answers TEXT",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS push_token VARCHAR(200)",
         ]:
             try:
                 await conn.execute(text(stmt))

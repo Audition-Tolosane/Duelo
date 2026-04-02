@@ -52,7 +52,7 @@ async def get_leaderboard(
 ):
     # ── World ──────────────────────────────────────────────────────────────────
     if scope == "world":
-        result = await db.execute(select(User).order_by(User.total_xp.desc()).limit(limit))
+        result = await db.execute(select(User).where(User.is_bot == False).order_by(User.total_xp.desc()).limit(limit))
         return {"entries": _serialize_users(result.scalars().all()), "meta": {"scope_used": "world"}}
 
     # ── Continent ──────────────────────────────────────────────────────────────
@@ -60,7 +60,7 @@ async def get_leaderboard(
         if not current_user or not current_user.continent:
             return {"entries": [], "meta": {"scope_used": "continent", "missing": True}}
         result = await db.execute(
-            select(User).where(User.continent == current_user.continent)
+            select(User).where(User.is_bot == False, User.continent == current_user.continent)
             .order_by(User.total_xp.desc()).limit(limit)
         )
         return {"entries": _serialize_users(result.scalars().all()), "meta": {"scope_used": "continent"}}
@@ -69,7 +69,7 @@ async def get_leaderboard(
     if scope == "region":
         if not current_user or not current_user.region:
             return {"entries": [], "meta": {"scope_used": "region", "missing": True}}
-        q = select(User).where(User.region == current_user.region)
+        q = select(User).where(User.is_bot == False, User.region == current_user.region)
         if current_user.country:
             q = q.where(User.country == current_user.country)
         result = await db.execute(q.order_by(User.total_xp.desc()).limit(limit))
@@ -80,7 +80,7 @@ async def get_leaderboard(
         if not current_user or not current_user.country:
             return {"entries": [], "meta": {"scope_used": "country", "missing": True}}
         result = await db.execute(
-            select(User).where(User.country == current_user.country)
+            select(User).where(User.is_bot == False, User.country == current_user.country)
             .order_by(User.total_xp.desc()).limit(limit)
         )
         return {"entries": _serialize_users(result.scalars().all()), "meta": {"scope_used": "country"}}
@@ -94,6 +94,7 @@ async def get_leaderboard(
         target_city = city_override or current_user.city
 
         city_q = select(User).where(
+            User.is_bot == False,
             User.city == target_city,
             User.country == current_user.country,
         ).order_by(User.total_xp.desc()).limit(limit)
@@ -119,6 +120,7 @@ async def get_leaderboard(
                     func.avg(User.lng).label("avg_lng"),
                 )
                 .where(
+                    User.is_bot == False,
                     User.country == current_user.country,
                     User.city.isnot(None),
                     User.city != current_user.city,
@@ -160,7 +162,7 @@ async def get_leaderboard(
 
         # Case 4: no suggestions → fallback to country leaderboard
         fallback_result = await db.execute(
-            select(User).where(User.country == current_user.country)
+            select(User).where(User.is_bot == False, User.country == current_user.country)
             .order_by(User.total_xp.desc()).limit(limit)
         )
         return {

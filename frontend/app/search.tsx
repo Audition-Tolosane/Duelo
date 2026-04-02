@@ -4,6 +4,7 @@ import {
   ActivityIndicator, ScrollView, Animated, Keyboard, Platform,
   KeyboardAvoidingView, Dimensions
 } from 'react-native';
+import ReAnimated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,6 +16,7 @@ import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
 import CategoryIcon from '../components/CategoryIcon';
 import UserAvatar from '../components/UserAvatar';
+import ScalePressable from '../components/ScalePressable';
 import { t } from '../utils/i18n';
 
 const { width } = Dimensions.get('window');
@@ -127,7 +129,7 @@ export default function SearchScreen() {
       const data = await res.json();
       setTrendingTags(data.trending_tags || []);
       setTopPlayers(data.top_players || []);
-    } catch {}
+    } catch (e) { console.error(e); }
   };
 
   const fetchThemes = async (q: string, diff: string, userId: string) => {
@@ -241,21 +243,21 @@ export default function SearchScreen() {
 
   // ── Renders ──
 
-  const renderThemeItem = ({ item }: { item: ThemeResult }) => {
+  const renderThemeItem = ({ item, index = 0 }: { item: ThemeResult; index?: number }) => {
     const meta = CATEGORY_META[item.id] || { color: '#8A2BE2', bg: '#1A1A2E' };
     return (
-      <TouchableOpacity
+      <ReAnimated.View entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
+      <ScalePressable
         style={st.themeCard}
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           router.push(`/category-detail?id=${item.id}`);
         }}
-        activeOpacity={0.7}
       >
         <View style={[st.themeCardInner, { borderLeftColor: meta.color, borderLeftWidth: 3 }]}>
           <View style={st.themeCardLeft}>
             <View style={[st.themeIconBox, { backgroundColor: meta.color + '20' }]}>
-              <MaterialCommunityIcons name="shape" size={24} color={meta.color} />
+              <CategoryIcon themeId={item.id} size={24} color={meta.color} type="theme" />
             </View>
           </View>
           <View style={st.themeCardCenter}>
@@ -281,19 +283,20 @@ export default function SearchScreen() {
             )}
           </View>
         </View>
-      </TouchableOpacity>
+      </ScalePressable>
+      </ReAnimated.View>
     );
   };
 
-  const renderPlayerItem = ({ item }: { item: PlayerResult }) => {
+  const renderPlayerItem = ({ item, index = 0 }: { item: PlayerResult; index?: number }) => {
     return (
-      <TouchableOpacity
+      <ReAnimated.View entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
+      <ScalePressable
         style={st.playerCard}
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           router.push(`/player-profile?id=${item.id}`);
         }}
-        activeOpacity={0.7}
       >
         <View style={st.playerAvatar}>
           <UserAvatar avatarUrl={item.avatar_url} avatarSeed={item.avatar_seed} pseudo={item.pseudo} size={48} />
@@ -319,7 +322,8 @@ export default function SearchScreen() {
           </View>
         </View>
         <MaterialCommunityIcons name="chevron-right" size={20} color="#525252" />
-      </TouchableOpacity>
+      </ScalePressable>
+      </ReAnimated.View>
     );
   };
 
@@ -556,7 +560,7 @@ export default function SearchScreen() {
               </View>
               {/* Difficulty filter */}
               {renderDifficultyFilters()}
-              {themes.map((theme) => renderThemeItem({ item: theme }))}
+              {themes.map((theme, idx) => renderThemeItem({ item: theme, index: idx }))}
             </View>
           </ScrollView>
         )}

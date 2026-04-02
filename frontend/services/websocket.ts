@@ -11,6 +11,8 @@ type WSMessage = {
 
 type MessageHandler = (msg: WSMessage) => void;
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 class DueloWebSocket {
@@ -26,7 +28,7 @@ class DueloWebSocket {
   /**
    * Connect to the WebSocket server.
    */
-  connect(userId: string) {
+  async connect(userId: string) {
     if (this.ws && this.userId === userId) return; // Already connected
     this.disconnect(); // Clean up previous connection
 
@@ -34,7 +36,8 @@ class DueloWebSocket {
     this.intentionalClose = false;
     this.reconnectDelay = 1000;
 
-    const wsUrl = API_URL.replace(/^http/, 'ws') + `/ws/${userId}`;
+    const token = await AsyncStorage.getItem('duelo_token') ?? '';
+    const wsUrl = API_URL.replace(/^http/, 'ws') + `/ws/${userId}?token=${encodeURIComponent(token)}`;
     this.ws = new WebSocket(wsUrl);
 
     this.ws.onopen = () => {

@@ -2,10 +2,12 @@ import csv
 import io
 import base64
 import os
+import re
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, Request
+from pathlib import Path
+from fastapi import APIRouter, Depends, HTTPException, Request, Header
 from fastapi.responses import HTMLResponse
-from sqlalchemy import select, func, text, delete, update
+from sqlalchemy import select, func, text, delete, update, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from database import get_db
@@ -20,6 +22,12 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 CORRECT_OPTION_MAP = {"A": 0, "B": 1, "C": 2, "D": 3}
 
 
+async def verify_admin_key(x_admin_key: str = Header(default="", alias="X-Admin-Key")):
+    """Dependency: validates admin password from X-Admin-Key header."""
+    if x_admin_key != ADMIN_PASSWORD:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+
+
 @router.post("/verify")
 async def verify_admin(data: AdminVerify):
     if data.password == ADMIN_PASSWORD:
@@ -28,7 +36,7 @@ async def verify_admin(data: AdminVerify):
 
 
 @router.post("/import-questions")
-async def import_questions(data: BulkImportRequest, db: AsyncSession = Depends(get_db)):
+async def import_questions(data: BulkImportRequest, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
     imported = 0
     duplicates = 0
     errors = []
@@ -69,7 +77,7 @@ async def admin_dashboard():
 
 
 @router.post("/import-csv")
-async def import_csv_data(request: Request, db: AsyncSession = Depends(get_db)):
+async def import_csv_data(request: Request, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
     body = await request.json()
     themes_csv_text = body.get("themes_csv", "")
     questions_csv_text = body.get("questions_csv", "")
@@ -177,10 +185,7 @@ async def import_csv_data(request: Request, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/upload-csv")
-async def upload_csv_questions(data: CSVUploadRequest, db: AsyncSession = Depends(get_db)):
-    if data.password != ADMIN_PASSWORD:
-        raise HTTPException(status_code=403, detail="Mot de passe administrateur incorrect")
-
+async def upload_csv_questions(data: CSVUploadRequest, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
     imported = 0
     duplicates = 0
     errors = []
@@ -202,21 +207,29 @@ async def upload_csv_questions(data: CSVUploadRequest, db: AsyncSession = Depend
             existing_ids.update(row[0] for row in result.fetchall())
 
     # Now insert without per-row SELECT
+    def _get(row, *keys, default=""):
+        for k in keys:
+            v = row.get(k)
+            if v is not None and str(v).strip():
+                return str(v).strip()
+        return default
+
     for i, row in enumerate(data.questions):
         try:
-            q_id = str(row.get("id", "")).strip()
-            category = str(row.get("category", "")).strip()
-            question_text = str(row.get("question_text", "")).strip()
-            opt_a = str(row.get("option_a", "")).strip()
-            opt_b = str(row.get("option_b", "")).strip()
-            opt_c = str(row.get("option_c", "")).strip()
-            opt_d = str(row.get("option_d", "")).strip()
-            correct_str = str(row.get("correct_option", "")).strip().upper()
-            raw_diff = str(row.get("difficulty", "medium")).strip().lower() or "medium"
-            difficulty = {"facile": "easy", "moyen": "medium", "moyenne": "medium",
-                          "difficile": "hard", "expert": "hard"}.get(raw_diff, raw_diff)
-            angle = str(row.get("angle", "")).strip()
-            batch = str(row.get("batch", "")).strip()
+            q_id = _get(row, "id")
+            category = _get(row, "category", "theme")
+            question_text = _get(row, "question_text", "question")
+            opt_a = _get(row, "option_a", "a")
+            opt_b = _get(row, "option_b", "b")
+            opt_c = _get(row, "option_c", "c")
+            opt_d = _get(row, "option_d", "d")
+            correct_str = _get(row, "correct_option", "bonne_reponse", "bonne_rep").upper()
+            raw_diff = _get(row, "difficulty", "difficulte", "difficulté").lower() or "moyen"
+            # Keep French difficulty labels as-is; map English fallbacks
+            difficulty = {"easy": "Facile", "medium": "Moyen", "hard": "Difficile"}.get(raw_diff, raw_diff.capitalize()) or "Moyen"
+            angle = _get(row, "angle")
+            angle_num_str = _get(row, "angle_num")
+            batch = _get(row, "batch")
             if not question_text:
                 errors.append(f"Ligne {i+1}: question_text manquant"); continue
             if not category:
@@ -235,21 +248,29 @@ async def upload_csv_questions(data: CSVUploadRequest, db: AsyncSession = Depend
             correct_int = CORRECT_OPTION_MAP[correct_str]
             options_json = [opt_a, opt_b, opt_c, opt_d]
 
+            angle_num = int(angle_num_str) if angle_num_str.isdigit() else 0
             question = Question(
                 id=q_id, category=category, question_text=question_text,
                 options=options_json, correct_option=correct_int, difficulty=difficulty,
                 option_a=opt_a, option_b=opt_b, option_c=opt_c, option_d=opt_d,
-                angle=angle, batch=batch,
+                angle=angle, angle_num=angle_num, batch=batch,
             )
             db.add(question)
             existing_ids.add(q_id)
             imported += 1
 
-            if imported % 500 == 0 and imported > 0:
-                await db.commit()
-
         except Exception as e:
             errors.append(f"Ligne {i+1}: erreur de format ou de données")
+            continue
+
+        # Intermediate commit outside per-row try/except so failures are not silently swallowed
+        if imported % 500 == 0 and imported > 0:
+            try:
+                await db.commit()
+            except Exception as commit_err:
+                await db.rollback()
+                return {"success": False, "imported": 0, "duplicates": duplicates,
+                        "errors": [f"Erreur commit intermédiaire ({imported} lignes) : {commit_err}"] + errors[:20]}
 
     try:
         await db.commit()
@@ -262,7 +283,12 @@ async def upload_csv_questions(data: CSVUploadRequest, db: AsyncSession = Depend
         result = await db.execute(select(Theme))
         themes_list = result.scalars().all()
         for t in themes_list:
-            count_res = await db.execute(select(func.count(Question.id)).where(Question.category == t.id))
+            # Questions may store category as theme.id OR theme.name
+            count_res = await db.execute(
+                select(func.count(Question.id)).where(
+                    or_(Question.category == t.id, Question.category == t.name)
+                )
+            )
             t.question_count = count_res.scalar() or 0
         await db.commit()
     except Exception:
@@ -275,7 +301,7 @@ async def upload_csv_questions(data: CSVUploadRequest, db: AsyncSession = Depend
 
 
 @router.get("/questions-stats")
-async def get_questions_stats(limit: int = 100, offset: int = 0, db: AsyncSession = Depends(get_db)):
+async def get_questions_stats(limit: int = 100, offset: int = 0, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
     limit = min(limit, 200)
     total_res = await db.execute(select(func.count(Question.id)))
     total = total_res.scalar() or 0
@@ -302,13 +328,10 @@ async def get_questions_stats(limit: int = 100, offset: int = 0, db: AsyncSessio
 
 
 @router.post("/upload-themes-csv")
-async def upload_themes_csv(request: Request, db: AsyncSession = Depends(get_db)):
+async def upload_themes_csv(request: Request, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
     body = await request.json()
-    password = body.get("password", "")
     themes_csv_text = body.get("themes_csv", "")
 
-    if password != ADMIN_PASSWORD:
-        raise HTTPException(status_code=403, detail="Mot de passe administrateur incorrect")
     if not themes_csv_text.strip():
         raise HTTPException(status_code=400, detail="CSV vide")
 
@@ -411,7 +434,7 @@ async def upload_themes_csv(request: Request, db: AsyncSession = Depends(get_db)
 
 
 @router.get("/themes-overview")
-async def admin_themes_overview(db: AsyncSession = Depends(get_db)):
+async def admin_themes_overview(_: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Theme).order_by(Theme.super_category, Theme.cluster, Theme.name))
     all_themes = result.scalars().all()
 
@@ -454,8 +477,27 @@ async def admin_themes_overview(db: AsyncSession = Depends(get_db)):
     }
 
 
+@router.post("/recount-questions")
+async def admin_recount_questions(data: dict, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
+    """Recalculate question_count for all themes (id OR name match)."""
+    result = await db.execute(select(Theme))
+    themes_list = result.scalars().all()
+    updated = 0
+    for t in themes_list:
+        count_res = await db.execute(
+            select(func.count(Question.id)).where(
+                or_(Question.category == t.id, Question.category == t.name)
+            )
+        )
+        t.question_count = count_res.scalar() or 0
+        updated += 1
+    await db.commit()
+    total_q = sum(t.question_count for t in themes_list)
+    return {"success": True, "themes_updated": updated, "total_questions": total_q}
+
+
 @router.get("/match-stats-by-theme")
-async def admin_match_stats_by_theme(limit: int = 100, offset: int = 0, db: AsyncSession = Depends(get_db)):
+async def admin_match_stats_by_theme(limit: int = 100, offset: int = 0, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
     limit = min(limit, 200)
     result = await db.execute(
         select(Match.category, func.count(Match.id).label("match_count"))
@@ -479,7 +521,7 @@ async def admin_match_stats_by_theme(limit: int = 100, offset: int = 0, db: Asyn
 
 
 @router.get("/reports")
-async def admin_get_reports(status: Optional[str] = None, limit: int = 100, offset: int = 0, db: AsyncSession = Depends(get_db)):
+async def admin_get_reports(status: Optional[str] = None, limit: int = 100, offset: int = 0, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
     limit = min(limit, 200)
     query = select(QuestionReport).order_by(QuestionReport.created_at.desc())
     if status:
@@ -489,10 +531,16 @@ async def admin_get_reports(status: Optional[str] = None, limit: int = 100, offs
     result = await db.execute(query)
     reports = result.scalars().all()
 
+    # Batch-load users to avoid N+1
+    user_ids = list({r.user_id for r in reports if r.user_id})
+    users_map: dict = {}
+    if user_ids:
+        users_res = await db.execute(select(User).where(User.id.in_(user_ids)))
+        users_map = {u.id: u for u in users_res.scalars().all()}
+
     reports_data = []
     for r in reports:
-        user_res = await db.execute(select(User).where(User.id == r.user_id))
-        user = user_res.scalar_one_or_none()
+        user = users_map.get(r.user_id)
         reports_data.append({
             "id": r.id, "user_id": r.user_id, "user_pseudo": user.pseudo if user else "Inconnu",
             "question_id": r.question_id, "question_text": r.question_text or "",
@@ -518,7 +566,7 @@ async def admin_get_reports(status: Optional[str] = None, limit: int = 100, offs
 
 
 @router.post("/reports/{report_id}/status")
-async def admin_update_report_status(report_id: str, request: Request, db: AsyncSession = Depends(get_db)):
+async def admin_update_report_status(report_id: str, request: Request, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
     body = await request.json()
     new_status = body.get("status", "")
     if new_status not in ("pending", "reviewed", "resolved"):
@@ -535,9 +583,7 @@ async def admin_update_report_status(report_id: str, request: Request, db: Async
 
 
 @router.post("/delete-themes")
-async def delete_themes(data: DeleteThemesRequest, db: AsyncSession = Depends(get_db)):
-    if data.password != ADMIN_PASSWORD:
-        raise HTTPException(status_code=403, detail="Mot de passe administrateur incorrect")
+async def delete_themes(data: DeleteThemesRequest, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
     if not data.theme_ids:
         raise HTTPException(status_code=400, detail="Aucun theme selectionne")
 
@@ -570,8 +616,62 @@ async def delete_themes(data: DeleteThemesRequest, db: AsyncSession = Depends(ge
     return {"success": True, "deleted_themes": deleted_themes, "deleted_questions": deleted_questions}
 
 
+@router.get("/questions-browse")
+async def browse_questions(theme_id: str, limit: int = 200, offset: int = 0, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
+    res = await db.execute(
+        select(Question).where(Question.category == theme_id)
+        .order_by(Question.question_text).limit(min(limit, 500)).offset(offset)
+    )
+    questions = res.scalars().all()
+    total = await db.execute(select(func.count(Question.id)).where(Question.category == theme_id))
+    return {
+        "total": total.scalar() or 0,
+        "questions": [{"id": q.id, "text": q.question_text, "difficulty": q.difficulty or ""} for q in questions]
+    }
+
+
+@router.post("/questions/bulk-delete")
+async def bulk_delete_questions(request: Request, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
+    body = await request.json()
+    ids = body.get("ids", [])
+    if not ids:
+        raise HTTPException(status_code=400, detail="ids requis")
+    # Get affected theme ids for counter update
+    themes_res = await db.execute(select(Question.category).where(Question.id.in_(ids)).distinct())
+    theme_ids = [r[0] for r in themes_res]
+    result = await db.execute(delete(Question).where(Question.id.in_(ids)))
+    deleted = result.rowcount
+    for tid in theme_ids:
+        count_res = await db.execute(select(func.count(Question.id)).where(Question.category == tid))
+        theme_res = await db.execute(select(Theme).where(Theme.id == tid))
+        theme = theme_res.scalar_one_or_none()
+        if theme:
+            theme.question_count = count_res.scalar() or 0
+    await db.commit()
+    return {"success": True, "deleted": deleted}
+
+
+@router.delete("/questions/{question_id}")
+async def delete_question(question_id: str, request: Request, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
+    body = await request.json()
+    result = await db.execute(select(Question).where(Question.id == question_id))
+    question = result.scalar_one_or_none()
+    if not question:
+        raise HTTPException(status_code=404, detail="Question introuvable")
+    theme_id = question.category
+    await db.delete(question)
+    # Mise à jour du compteur du thème
+    count_res = await db.execute(select(func.count(Question.id)).where(Question.category == theme_id))
+    theme_res = await db.execute(select(Theme).where(Theme.id == theme_id))
+    theme = theme_res.scalar_one_or_none()
+    if theme:
+        theme.question_count = count_res.scalar() or 0
+    await db.commit()
+    return {"success": True}
+
+
 @router.get("/avatars")
-async def list_avatars(db: AsyncSession = Depends(get_db)):
+async def list_avatars(_: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Avatar).order_by(Avatar.category, Avatar.created_at))
     avatars = result.scalars().all()
     return {"avatars": [
@@ -581,14 +681,11 @@ async def list_avatars(db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/avatars/upload")
-async def upload_avatar(request: Request, db: AsyncSession = Depends(get_db)):
+async def upload_avatar(request: Request, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
     body = await request.json()
-    password = body.get("password", "")
-    if password != ADMIN_PASSWORD:
-        raise HTTPException(status_code=403, detail="Mot de passe incorrect")
-
     category = body.get("category", "default").strip()
     image_b64 = body.get("image_base64", "")
+    original_filename = body.get("filename", "").strip()
 
     if not image_b64:
         raise HTTPException(status_code=400, detail="image_base64 required")
@@ -602,9 +699,23 @@ async def upload_avatar(request: Request, db: AsyncSession = Depends(get_db)):
     if len(image_data) > 5 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="Image trop volumineuse (max 5 MB)")
 
-    file_id = str(uuid.uuid4())[:12]
-    filename = f"{file_id}.webp"
-    filepath = ROOT_DIR / "static" / "avatars" / filename
+    # Build filename from original name (sanitized) or fallback to UUID
+    if original_filename:
+        safe_stem = re.sub(r'[^\w\-]', '_', Path(original_filename).stem)[:60]
+        base_filename = f"{safe_stem}.webp"
+    else:
+        base_filename = f"{str(uuid.uuid4())[:12]}.webp"
+
+    # Handle conflicts: append counter if file already exists
+    avatars_dir = ROOT_DIR / "static" / "avatars"
+    filepath = avatars_dir / base_filename
+    if filepath.exists():
+        stem = Path(base_filename).stem
+        counter = 1
+        while filepath.exists():
+            filepath = avatars_dir / f"{stem}_{counter}.webp"
+            counter += 1
+    filename = filepath.name
 
     with open(filepath, "wb") as f:
         f.write(image_data)
@@ -617,12 +728,24 @@ async def upload_avatar(request: Request, db: AsyncSession = Depends(get_db)):
     return {"success": True, "avatar": {"id": avatar.id, "name": avatar.name, "image_url": avatar.image_url, "category": avatar.category}}
 
 
-@router.delete("/avatars/{avatar_id}")
-async def delete_avatar(avatar_id: str, request: Request, db: AsyncSession = Depends(get_db)):
+@router.patch("/avatars/{avatar_id}")
+async def rename_avatar(avatar_id: str, request: Request, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
     body = await request.json()
-    if body.get("password", "") != ADMIN_PASSWORD:
-        raise HTTPException(status_code=403, detail="Mot de passe incorrect")
+    new_name = body.get("name", "").strip()
+    if not new_name:
+        raise HTTPException(status_code=400, detail="name requis")
+    result = await db.execute(select(Avatar).where(Avatar.id == avatar_id))
+    avatar = result.scalar_one_or_none()
+    if not avatar:
+        raise HTTPException(status_code=404, detail="Avatar introuvable")
+    avatar.name = re.sub(r'[^\w\-. ]', '_', new_name)[:80]
+    await db.commit()
+    return {"success": True, "name": avatar.name}
 
+
+@router.delete("/avatars/{avatar_id}")
+async def delete_avatar(avatar_id: str, request: Request, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
+    body = await request.json()
     result = await db.execute(select(Avatar).where(Avatar.id == avatar_id))
     avatar = result.scalar_one_or_none()
     if not avatar:

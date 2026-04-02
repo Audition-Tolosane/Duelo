@@ -1,10 +1,16 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "Duelo",
+    "slug": "duelo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon-v2.png",
+    "splash": {
+      "image": "./assets/images/splash-duelo.png",
+      "imageWidth": 200,
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
     "scheme": "duelo",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -18,7 +24,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/adaptive-icon-v2.png",
         "backgroundColor": "#000"
       },
       "edgeToEdgeEnabled": true,
@@ -34,7 +40,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/splash-duelo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#000"

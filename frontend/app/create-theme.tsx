@@ -13,6 +13,7 @@ import { GLASS } from '../theme/glassTheme';
 import { authFetch } from '../utils/api';
 import { t } from '../utils/i18n';
 import DueloHeader from '../components/DueloHeader';
+import SwipeBackPage from '../components/SwipeBackPage';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -142,9 +143,17 @@ export default function CreateThemeScreen() {
   };
 
   return (
+    <SwipeBackPage>
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={[styles.container, { paddingTop: insets.top }]}>
-        <DueloHeader title={t('forge.title')} />
+        <DueloHeader />
+        <View style={styles.subHeader}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backCircle} activeOpacity={0.6}>
+            <MaterialCommunityIcons name="chevron-left" size={26} color="#FFF" />
+          </TouchableOpacity>
+          <Text style={styles.subHeaderTitle}>{t('forge.title')}</Text>
+          <View style={{ width: 40 }} />
+        </View>
 
         {phase === 'form' && (
           <ScrollView
@@ -290,6 +299,7 @@ export default function CreateThemeScreen() {
         )}
       </View>
     </KeyboardAvoidingView>
+    </SwipeBackPage>
   );
 }
 
@@ -297,6 +307,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#060611',
+  },
+  subHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 12, paddingVertical: 10,
+  },
+  backCircle: {
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    justifyContent: 'center', alignItems: 'center',
+  },
+  subHeaderTitle: {
+    fontSize: 17, fontWeight: '900', color: '#FFF', letterSpacing: 1,
   },
   scroll: {
     padding: 20,

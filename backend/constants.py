@@ -1,9 +1,3 @@
-BOT_NAMES = [
-    "NeoQuizzer", "BrainStorm_42", "QuizNinja_FR", "Le_Sage_77", "MindBlaster",
-    "Trivia_King", "CyberBrain_X", "Le_Savant", "QuizMaster_Pro", "Flash_Quiz",
-    "Enigma_99", "Le_Cerveau", "SmartFox_22", "Quiz_Phoenix", "Galaxy_Mind"
-]
-
 
 DIFFICULTY_LEVELS = {
     "debutant": {"min": 0, "max": 5, "label": "Débutant"},
@@ -45,10 +39,7 @@ SUPER_CATEGORY_META = {
     "ARENA": {"icon": "⚽", "color": "#00FF9D", "label": "Arena"},
     "LEGENDS": {"icon": "🏛️", "color": "#FFD700", "label": "Legends"},
     "LAB": {"icon": "🔬", "color": "#1565C0", "label": "Lab"},
-    "TASTE": {"icon": "🍽️", "color": "#FF69B4", "label": "Taste"},
     "GLOBE": {"icon": "🌍", "color": "#4ECDC4", "label": "Globe"},
-    "PIXEL": {"icon": "🎮", "color": "#FF3B5C", "label": "Pixel"},
-    "STYLE": {"icon": "✨", "color": "#E040FB", "label": "Style"},
     "ART": {"icon": "🎨", "color": "#E53935", "label": "Art"},
     "LIFE": {"icon": "🌱", "color": "#2E7D32", "label": "Life"},
     "MIND": {"icon": "🧠", "color": "#FFAB40", "label": "Mind"},

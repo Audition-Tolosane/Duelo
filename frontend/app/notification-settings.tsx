@@ -159,7 +159,7 @@ export default function NotificationSettingsScreen() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId, ...newSettings }),
       });
-    } catch {}
+    } catch (e) { console.error(e); }
   };
 
   const allEnabled = Object.values(settings).every(v => v);

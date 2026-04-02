@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, Image,
-  ActivityIndicator, RefreshControl, Dimensions
+  ActivityIndicator, RefreshControl, Dimensions, Modal,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -67,6 +67,15 @@ export default function PlayerProfileScreen() {
   const [loading, setLoading] = useState(true);
   const [followLoading, setFollowLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [challengeModalVisible, setChallengeModalVisible] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState<{id: string, name: string, color: string} | null>(null);
+  const [challengeSending, setChallengeSending] = useState(false);
+  const [challengeSent, setChallengeSent] = useState(false);
+  const [vsStats, setVsStats] = useState<{ total: number; user_wins: number; opponent_wins: number } | null>(null);
+  const [challengeHistory, setChallengeHistory] = useState<{
+    challenge_id: string; opponent_pseudo: string; theme_name: string;
+    my_score: number; opponent_score: number; won: boolean; played_at: string;
+  }[]>([]);
 
   useEffect(() => { init(); }, []);
 
@@ -74,7 +83,30 @@ export default function PlayerProfileScreen() {
     const uid = await AsyncStorage.getItem('duelo_user_id');
     if (uid) setMyId(uid);
     await fetchProfile(uid || '');
+    if (uid && uid !== id) {
+      fetchVsStats(uid);
+    }
+    if (uid === id) {
+      fetchChallengeHistory(uid);
+    }
     setLoading(false);
+  };
+
+  const fetchVsStats = async (viewerId: string) => {
+    try {
+      const res = await fetch(`${API_URL}/api/challenges/vs-stats?user_id=${viewerId}&opponent_id=${id}`);
+      if (res.ok) setVsStats(await res.json());
+    } catch (e) { console.error(e); }
+  };
+
+  const fetchChallengeHistory = async (userId: string) => {
+    try {
+      const res = await authFetch(`${API_URL}/api/challenges/history?user_id=${userId}&limit=10`);
+      if (res.ok) {
+        const data = await res.json();
+        setChallengeHistory(data.challenges || []);
+      }
+    } catch (e) { console.error(e); }
   };
 
   const fetchProfile = async (viewerId: string) => {
@@ -82,7 +114,7 @@ export default function PlayerProfileScreen() {
       const res = await fetch(`${API_URL}/api/player/${id}/profile?viewer_id=${viewerId}`);
       const data = await res.json();
       setProfile(data);
-    } catch {}
+    } catch (e) { console.error(e); }
   };
 
   const onRefresh = async () => {
@@ -106,7 +138,7 @@ export default function PlayerProfileScreen() {
         is_following: data.following,
         followers_count: prev.followers_count + (data.following ? 1 : -1)
       } : null);
-    } catch {}
+    } catch (e) { console.error(e); }
     setFollowLoading(false);
   };
 
@@ -122,6 +154,45 @@ export default function PlayerProfileScreen() {
   const handleChat = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push(`/chat?partnerId=${id}&partnerPseudo=${profile?.pseudo || ''}`);
+  };
+
+  const handleSendChallenge = async () => {
+    if (challengeSending) return;
+    setChallengeSending(true);
+    try {
+      const res = await authFetch(`${API_URL}/api/challenges/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          challenger_id: myId,
+          challenged_id: profile?.id,
+          theme_id: selectedTheme?.id || '',
+          theme_name: selectedTheme?.name || '',
+        }),
+      });
+      if (res.status === 409) {
+        // Challenge already pending — just close modal
+        setChallengeSent(true);
+        setTimeout(() => {
+          setChallengeModalVisible(false);
+          setChallengeSent(false);
+          setSelectedTheme(null);
+        }, 1500);
+      } else if (res.ok) {
+        const data = await res.json();
+        setChallengeModalVisible(false);
+        setSelectedTheme(null);
+        // Go to waiting screen immediately
+        router.push(
+          `/challenge-waiting?challenge_id=${data.challenge_id}` +
+          `&opponent_pseudo=${encodeURIComponent(profile?.pseudo || '')}` +
+          `&opponent_seed=${encodeURIComponent(profile?.avatar_seed || '')}` +
+          `&theme_id=${encodeURIComponent(selectedTheme?.id || '')}` +
+          `&theme_name=${encodeURIComponent(selectedTheme?.name || '')}`
+        );
+      }
+    } catch (e) { console.error(e); }
+    setChallengeSending(false);
   };
 
   const timeAgo = (dateStr: string) => {
@@ -233,6 +304,14 @@ export default function PlayerProfileScreen() {
                 <MaterialCommunityIcons name="comment-outline" size={16} color="#00BFFF" />
                 <Text style={[s.actionText, { color: '#00BFFF' }]}>{t('player.message')}</Text>
               </TouchableOpacity>
+              <TouchableOpacity
+                data-testid="challenge-button"
+                style={[s.actionBtn, s.challengeBtn]}
+                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); setChallengeModalVisible(true); }}
+              >
+                <MaterialCommunityIcons name="sword-cross" size={16} color="#FFF" />
+                <Text style={s.actionText}>{t('challenge.send')}</Text>
+              </TouchableOpacity>
             </View>
           )}
 
@@ -319,6 +398,68 @@ export default function PlayerProfileScreen() {
           })}
         </View>
 
+        {/* ── A vs B stats (only when viewing another player) ── */}
+        {!isOwnProfile && vsStats !== null && (
+          <>
+            <Text style={s.sectionTitle}>{t('player.vs_title')}</Text>
+            <View style={s.vsCard}>
+              {vsStats.total === 0 ? (
+                <View style={s.vsEmpty}>
+                  <MaterialCommunityIcons name="sword-cross" size={22} color="#333" />
+                  <Text style={s.vsEmptyText}>{t('player.vs_no_challenge')}</Text>
+                </View>
+              ) : (
+                <View style={s.vsRow}>
+                  <View style={s.vsBlock}>
+                    <Text style={[s.vsScore, { color: '#8A2BE2' }]}>{vsStats.user_wins}</Text>
+                    <Text style={s.vsLabel}>{t('player.vs_wins')}</Text>
+                  </View>
+                  <View style={s.vsDivider} />
+                  <View style={s.vsBlock}>
+                    <Text style={s.vsTotal}>{vsStats.total}</Text>
+                    <Text style={s.vsLabel}>défis</Text>
+                  </View>
+                  <View style={s.vsDivider} />
+                  <View style={s.vsBlock}>
+                    <Text style={[s.vsScore, { color: '#FF3B5C' }]}>{vsStats.opponent_wins}</Text>
+                    <Text style={s.vsLabel}>{t('player.vs_losses')}</Text>
+                  </View>
+                </View>
+              )}
+            </View>
+          </>
+        )}
+
+        {/* ── Challenge History (own profile only) ── */}
+        {isOwnProfile && (
+          <>
+            <Text style={s.sectionTitle}>{t('player.challenge_history')}</Text>
+            {challengeHistory.length === 0 ? (
+              <View style={s.emptyWall}>
+                <MaterialCommunityIcons name="sword-cross" size={32} color="#525252" />
+                <Text style={s.emptyText}>{t('player.no_challenges')}</Text>
+              </View>
+            ) : (
+              challengeHistory.map(ch => (
+                <View key={ch.challenge_id} style={[s.challengeHistoryCard, { borderLeftColor: ch.won ? '#00C853' : '#FF3B5C' }]}>
+                  <View style={s.chRow}>
+                    <MaterialCommunityIcons
+                      name={ch.won ? 'trophy' : 'close-circle-outline'}
+                      size={18}
+                      color={ch.won ? '#00C853' : '#FF3B5C'}
+                    />
+                    <Text style={s.chOpponent}>{ch.opponent_pseudo}</Text>
+                    {ch.theme_name ? <Text style={s.chTheme}>{ch.theme_name}</Text> : null}
+                  </View>
+                  <Text style={[s.chScore, { color: ch.won ? '#00C853' : '#FF3B5C' }]}>
+                    {ch.my_score} – {ch.opponent_score}
+                  </Text>
+                </View>
+              ))
+            )}
+          </>
+        )}
+
         {/* ── Posts Wall ── */}
         <Text style={s.sectionTitle}>{t('player.publications')}</Text>
 
@@ -368,6 +509,75 @@ export default function PlayerProfileScreen() {
           })
         )}
       </ScrollView>
+
+      {/* ── Challenge Modal ── */}
+      <Modal
+        visible={challengeModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setChallengeModalVisible(false)}
+      >
+        <View style={s.modalOverlay}>
+          <View style={s.modalSheet}>
+            <LinearGradient colors={['#1A0A2E', '#0D0D1A']} style={s.modalBg} />
+
+            <View style={s.modalHeader}>
+              <MaterialCommunityIcons name="sword-cross" size={20} color="#8A2BE2" />
+              <Text style={s.modalTitle}>{t('challenge.send')} {profile?.pseudo}</Text>
+              <TouchableOpacity onPress={() => { setChallengeModalVisible(false); setSelectedTheme(null); }}>
+                <MaterialCommunityIcons name="close" size={20} color="#555" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={s.modalSubtitle}>{t('challenge.choose_theme')}</Text>
+
+            {/* No theme option */}
+            <TouchableOpacity
+              style={[s.themeChip, !selectedTheme && s.themeChipSelected]}
+              onPress={() => setSelectedTheme(null)}
+            >
+              <Text style={[s.themeChipText, !selectedTheme && { color: '#FFF' }]}>{t('challenge.no_theme')}</Text>
+            </TouchableOpacity>
+
+            {/* Theme chips from profile categories */}
+            <View style={s.themesGrid}>
+              {Object.entries(profile?.categories || {}).slice(0, 6).map(([catKey, catData]) => {
+                const meta = CATEGORY_META[catKey] || { icon: 'help-circle', color: '#8A2BE2', bg: '#1A1A2E' };
+                const isSelected = selectedTheme?.id === catKey;
+                return (
+                  <TouchableOpacity
+                    key={catKey}
+                    style={[s.themeChip, { borderColor: meta.color + '60' }, isSelected && { backgroundColor: meta.color + '30', borderColor: meta.color }]}
+                    onPress={() => setSelectedTheme({ id: catKey, name: catData.title || catKey, color: meta.color })}
+                  >
+                    <MaterialCommunityIcons name={meta.icon as any} size={14} color={meta.color} />
+                    <Text style={[s.themeChipText, { color: meta.color }]} numberOfLines={1}>{catData.title || catKey}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {challengeSent ? (
+              <View style={s.sentRow}>
+                <MaterialCommunityIcons name="check-circle" size={20} color="#00FF9D" />
+                <Text style={s.sentText}>{t('challenge.sent')}</Text>
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={[s.sendChallengeBtn, challengeSending && { opacity: 0.6 }]}
+                onPress={handleSendChallenge}
+                disabled={challengeSending}
+                activeOpacity={0.8}
+              >
+                <LinearGradient colors={['#8A2BE2', '#BF5FFF']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={s.sendChallengeBtnGradient}>
+                  <MaterialCommunityIcons name="sword-cross" size={16} color="#FFF" />
+                  <Text style={s.sendChallengeBtnText}>{t('challenge.confirm')}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
     </SwipeBackPage>
   );
@@ -441,6 +651,7 @@ const s = StyleSheet.create({
   followBtn: { backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   followingBtn: { backgroundColor: 'rgba(0,255,157,0.1)', borderWidth: 1, borderColor: 'rgba(0,255,157,0.3)' },
   chatBtn: { backgroundColor: 'rgba(0,191,255,0.1)', borderWidth: 1, borderColor: 'rgba(0,191,255,0.3)' },
+  challengeBtn: { backgroundColor: '#8A2BE2' },
   actionText: { color: '#FFF', fontSize: 13, fontWeight: '700' },
 
   /* Stats Row */
@@ -500,6 +711,28 @@ const s = StyleSheet.create({
   emptyWall: { alignItems: 'center', paddingVertical: 30, gap: 8 },
   emptyText: { color: '#525252', fontSize: 15 },
 
+  // A vs B
+  vsCard: { marginHorizontal: 16, marginBottom: 20, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', padding: 16 },
+  vsEmpty: { alignItems: 'center', gap: 8 },
+  vsEmptyText: { color: '#525252', fontSize: 13, fontWeight: '600' },
+  vsRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' },
+  vsBlock: { alignItems: 'center', flex: 1 },
+  vsScore: { fontSize: 32, fontWeight: '900' },
+  vsTotal: { fontSize: 28, fontWeight: '900', color: '#FFF' },
+  vsLabel: { fontSize: 11, color: '#666', fontWeight: '600', marginTop: 2, textAlign: 'center' },
+  vsDivider: { width: 1, height: 40, backgroundColor: 'rgba(255,255,255,0.1)' },
+
+  // Challenge history
+  challengeHistoryCard: {
+    marginHorizontal: 16, marginBottom: 8, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', borderLeftWidth: 3, padding: 12,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+  },
+  chRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
+  chOpponent: { color: '#FFF', fontSize: 14, fontWeight: '700' },
+  chTheme: { color: '#666', fontSize: 12, fontWeight: '500' },
+  chScore: { fontSize: 15, fontWeight: '900' },
+
   /* Post */
   postCard: {
     marginHorizontal: 16, backgroundColor: GLASS.bg,
@@ -515,4 +748,47 @@ const s = StyleSheet.create({
   postActions: { flexDirection: 'row', gap: 20 },
   postActionItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   postActionCount: { color: '#A3A3A3', fontSize: 14, fontWeight: '600' },
+
+  /* Challenge Modal */
+  modalOverlay: {
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    borderTopLeftRadius: 28, borderTopRightRadius: 28,
+    overflow: 'hidden', padding: 24, paddingBottom: 40,
+    backgroundColor: '#0D0D1A',
+    borderWidth: 1, borderColor: 'rgba(138,43,226,0.3)',
+  },
+  modalBg: { ...StyleSheet.absoluteFillObject },
+  modalHeader: {
+    flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 20,
+  },
+  modalTitle: { flex: 1, color: '#FFF', fontSize: 18, fontWeight: '900' },
+  modalSubtitle: {
+    color: 'rgba(255,255,255,0.4)', fontSize: 12, fontWeight: '700',
+    letterSpacing: 2, marginBottom: 14,
+  },
+  themesGrid: {
+    flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20, marginTop: 10,
+  },
+  themeChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    marginBottom: 4,
+  },
+  themeChipSelected: {
+    backgroundColor: 'rgba(138,43,226,0.2)', borderColor: '#8A2BE2',
+  },
+  themeChipText: { color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: '700' },
+  sendChallengeBtn: { borderRadius: 16, overflow: 'hidden', marginTop: 4 },
+  sendChallengeBtnGradient: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    paddingVertical: 16, gap: 8, borderRadius: 16,
+  },
+  sendChallengeBtnText: { color: '#FFF', fontSize: 15, fontWeight: '900', letterSpacing: 1 },
+  sentRow: { flexDirection: 'row', alignItems: 'center', gap: 10, justifyContent: 'center', paddingVertical: 16 },
+  sentText: { color: '#00FF9D', fontSize: 16, fontWeight: '800' },
 });

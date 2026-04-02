@@ -1,13 +1,18 @@
 import random
 import secrets
 import logging
+import asyncio
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select, func, or_, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import User, Question, Match, Theme, UserThemeXP
-from constants import BOT_NAMES, TOTAL_QUESTIONS
+from constants import TOTAL_QUESTIONS
+from services.bots import find_bot_opponent
+
+# Per-(player_id, theme_id) lock to prevent race-condition double-submit
+_submit_locks: dict[str, asyncio.Lock] = {}
 from helpers import shuffle_question_options
 from services.xp import (
     get_level, get_streak_bonus, get_streak_badge,
@@ -59,18 +64,36 @@ async def _resolve_theme_category(theme: str, db: AsyncSession) -> str:
 
 
 @router.get("/questions")
-async def get_game_questions(theme: str, db: AsyncSession = Depends(get_db)):
-    """Get 7 questions: 2 Facile + 3 Moyen + 2 Difficile, all from different angles."""
+async def get_game_questions(theme: str, lang: str = 'fr', db: AsyncSession = Depends(get_db)):
+    """Get 7 questions: 2 Facile + 3 Moyen + 2 Difficile, all from different angles.
+    If lang='en', return English VO questions when available, fall back to 'fr'."""
     # Resolve theme to the correct Question.category value
     category = await _resolve_theme_category(theme, db)
-    logger.info(f"[questions] theme='{theme}' -> category='{category}'")
+    logger.info(f"[questions] theme='{theme}' -> category='{category}', lang='{lang}'")
+
+    # If VO requested, check if EN questions exist; otherwise fall back to FR
+    effective_lang = 'fr'
+    if lang == 'en':
+        en_count = await db.execute(
+            select(func.count()).select_from(Question).where(
+                Question.category == category, Question.language == 'en'
+            )
+        )
+        if (en_count.scalar() or 0) > 0:
+            effective_lang = 'en'
+        else:
+            logger.info(f"[questions] No EN questions for '{category}', falling back to FR")
+
+    lang_filter = Question.language == effective_lang if effective_lang == 'en' else or_(
+        Question.language == 'fr', Question.language.is_(None)
+    )
 
     selected = []
     used_angles = set()
 
     for difficulty, count in [("Facile", 2), ("Moyen", 3), ("Difficile", 2)]:
         result = await db.execute(
-            select(Question).where(Question.category == category, Question.difficulty == difficulty)
+            select(Question).where(Question.category == category, Question.difficulty == difficulty, lang_filter)
             .order_by(func.random())
         )
         candidates = result.scalars().all()
@@ -97,14 +120,14 @@ async def get_game_questions(theme: str, db: AsyncSession = Depends(get_db)):
 
     if len(selected) < 7:
         result = await db.execute(
-            select(Question).where(Question.category == category).order_by(func.random()).limit(7)
+            select(Question).where(Question.category == category, lang_filter).order_by(func.random()).limit(7)
         )
         fallback = result.scalars().all()
         for q in fallback:
             if q not in selected and len(selected) < 7:
                 selected.append(q)
 
-    logger.info(f"[questions] Found {len(selected)} questions for category='{category}'")
+    logger.info(f"[questions] Found {len(selected)} questions for category='{category}' (lang={effective_lang})")
     random.shuffle(selected)
 
     result_list = []
@@ -119,8 +142,8 @@ async def get_game_questions(theme: str, db: AsyncSession = Depends(get_db)):
 
 # Deprecated alias — use /questions directly
 @router.get("/questions-v2", deprecated=True)
-async def get_game_questions_v2(theme: str, db: AsyncSession = Depends(get_db)):
-    return await get_game_questions(theme, db)
+async def get_game_questions_v2(theme: str, lang: str = 'fr', db: AsyncSession = Depends(get_db)):
+    return await get_game_questions(theme, lang, db)
 
 
 @router.post("/matchmaking")
@@ -154,10 +177,20 @@ async def start_matchmaking(request: Request, current_user: str = Depends(get_cu
             player_level = get_level(uxp.xp)
             player_title = get_theme_title(theme, player_level)
 
-    bot_level = max(0, min(MAX_LEVEL, player_level + random.randint(-5, 5)))
-    bot_name = random.choice(BOT_NAMES)
-    bot_seed = secrets.token_hex(4)
-    bot_title = get_theme_title(theme, bot_level)
+    # Try to find a real bot profile matched to the player's skill level
+    bot_data = await find_bot_opponent(player_level, theme.id, db)
+
+    if bot_data:
+        bot_name  = bot_data["pseudo"]
+        bot_seed  = bot_data["avatar_seed"]
+        bot_level = bot_data["bot_level"]
+    else:
+        # Fallback si aucun bot en DB (ne devrait pas arriver en prod)
+        bot_name  = f"Bot_{secrets.token_hex(3)}"
+        bot_seed  = secrets.token_hex(4)
+        bot_level = max(0, min(MAX_LEVEL, player_level + random.randint(-5, 5)))
+
+    bot_title  = get_theme_title(theme, bot_level)
     bot_streak = random.choice([0, 0, 0, 1, 2, 3, 4, 5])
 
     return {
@@ -170,6 +203,10 @@ async def start_matchmaking(request: Request, current_user: str = Depends(get_cu
             "pseudo": bot_name, "avatar_seed": bot_seed, "is_bot": True,
             "level": bot_level, "title": bot_title,
             "streak": bot_streak, "streak_badge": get_streak_badge(bot_streak),
+            "avatar_url": bot_data["avatar_url"] if bot_data else None,
+            "country": bot_data["country"] if bot_data else "",
+            "skill_level": bot_data["skill_level"] if bot_data else 0.5,
+            "avg_speed": bot_data["avg_speed"] if bot_data else 5.0,
         },
     }
 
@@ -191,14 +228,13 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
     opponent_pseudo = body.get("opponent_pseudo", "Bot")
     opponent_is_bot = body.get("opponent_is_bot", True)
     correct_count = body.get("correct_count", 0)
-    opponent_level = body.get("opponent_level", 1)
     questions_data = body.get("questions_data")
 
-    # Validate scores
+    # Validate scores — never trust client values beyond these bounds
     MAX_SCORE = 140  # 20 pts max × 7 questions
     player_score = max(0, min(int(player_score), MAX_SCORE))
     opponent_score = max(0, min(int(opponent_score), MAX_SCORE))
-    correct_count = max(0, min(int(correct_count), 7))
+    correct_count = max(0, min(int(correct_count), TOTAL_QUESTIONS))
 
     logger.info(f"[submit] theme_id='{theme_id}', player_id='{player_id}', score={player_score}-{opponent_score}")
 
@@ -207,123 +243,252 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
     if player_id != current_user:
         raise HTTPException(status_code=403, detail="Non autorisé")
 
-    # ── Duplicate submission guard ──
-    recent_cutoff = datetime.now(timezone.utc) - timedelta(seconds=60)
-    existing = await db.execute(
-        select(Match).where(
-            Match.created_at >= recent_cutoff,
-            Match.player1_id == player_id,
-            Match.category == theme_id,
+    # ── Atomic duplicate-submission guard with per-player lock ──
+    lock_key = f"{player_id}:{theme_id}"
+    if lock_key not in _submit_locks:
+        _submit_locks[lock_key] = asyncio.Lock()
+    async with _submit_locks[lock_key]:
+        recent_cutoff = datetime.now(timezone.utc) - timedelta(seconds=60)
+        existing = await db.execute(
+            select(Match).where(
+                Match.created_at >= recent_cutoff,
+                Match.player1_id == player_id,
+                Match.category == theme_id,
+            )
         )
-    )
-    if existing.scalar_one_or_none():
-        logger.info(f"[submit] Duplicate blocked for player={player_id}, theme={theme_id}")
-        return {"status": "already_submitted", "message": "Match déjà enregistré"}
+        if existing.scalar_one_or_none():
+            logger.info(f"[submit] Duplicate blocked for player={player_id}, theme={theme_id}")
+            return {"status": "already_submitted", "message": "Match déjà enregistré"}
 
-    theme_res = await db.execute(select(Theme).where(Theme.id == theme_id))
-    theme = theme_res.scalar_one_or_none()
-    if not theme:
-        # Try by name as fallback
-        theme_res2 = await db.execute(select(Theme).where(Theme.name == theme_id))
-        theme = theme_res2.scalar_one_or_none()
-    if not theme:
-        logger.error(f"[submit] Theme not found: '{theme_id}'")
-        raise HTTPException(status_code=404, detail=f"Thème introuvable: {theme_id}")
+        theme_res = await db.execute(select(Theme).where(Theme.id == theme_id))
+        theme = theme_res.scalar_one_or_none()
+        if not theme:
+            theme_res2 = await db.execute(select(Theme).where(Theme.name == theme_id))
+            theme = theme_res2.scalar_one_or_none()
+        if not theme:
+            logger.error(f"[submit] Theme not found: '{theme_id}'")
+            raise HTTPException(status_code=404, detail=f"Thème introuvable: {theme_id}")
 
-    result = await db.execute(select(User).where(User.id == player_id))
-    user = result.scalar_one_or_none()
-    if not user:
-        logger.error(f"[submit] User not found: '{player_id}'")
-        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+        result = await db.execute(select(User).where(User.id == player_id))
+        user = result.scalar_one_or_none()
+        if not user:
+            logger.error(f"[submit] User not found: '{player_id}'")
+            raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
 
-    won = player_score > opponent_score
-    perfect = correct_count == TOTAL_QUESTIONS
+        won = player_score > opponent_score
+        perfect = correct_count == TOTAL_QUESTIONS
 
-    xp_res = await db.execute(
-        select(UserThemeXP).where(UserThemeXP.user_id == player_id, UserThemeXP.theme_id == theme.id)
-    )
-    uxp = xp_res.scalar_one_or_none()
-    if not uxp:
-        uxp = UserThemeXP(user_id=player_id, theme_id=theme.id, xp=0)
-        db.add(uxp)
-        await db.flush()
+        xp_res = await db.execute(
+            select(UserThemeXP).where(UserThemeXP.user_id == player_id, UserThemeXP.theme_id == theme.id)
+        )
+        uxp = xp_res.scalar_one_or_none()
+        if not uxp:
+            uxp = UserThemeXP(user_id=player_id, theme_id=theme.id, xp=0)
+            db.add(uxp)
+            await db.flush()
 
-    level_before = get_level(uxp.xp)
+        level_before = get_level(uxp.xp)
 
-    base_xp = player_score * 2
-    victory_bonus = 50 if won else 0
-    perfection_bonus = 50 if perfect else 0
-    giant_slayer_bonus = 100 if (won and opponent_level - level_before >= 15) else 0
-    new_streak = (user.current_streak + 1) if won else 0
-    streak_bonus = get_streak_bonus(new_streak) if won else 0
-    total_xp = base_xp + victory_bonus + perfection_bonus + giant_slayer_bonus + streak_bonus
+        # Fetch opponent level server-side — never trust client value (#11)
+        if opponent_is_bot:
+            opponent_level = 0
+        else:
+            opp_res = await db.execute(select(User).where(User.pseudo == opponent_pseudo))
+            opp = opp_res.scalar_one_or_none()
+            if opp:
+                opp_xp_res = await db.execute(
+                    select(UserThemeXP).where(UserThemeXP.user_id == opp.id, UserThemeXP.theme_id == theme.id)
+                )
+                opp_uxp = opp_xp_res.scalar_one_or_none()
+                opponent_level = get_level(opp_uxp.xp) if opp_uxp else 0
+            else:
+                opponent_level = 0
 
-    xp_breakdown = {
-        "base": base_xp, "victory": victory_bonus, "perfection": perfection_bonus,
-        "giant_slayer": giant_slayer_bonus, "streak": streak_bonus, "total": total_xp,
-    }
+        new_streak = (user.current_streak + 1) if won else 0
+        streak_bonus = get_streak_bonus(new_streak) if won else 0
+        base_xp = player_score * 2
+        victory_bonus = 50 if won else 0
+        perfection_bonus = 50 if perfect else 0
+        giant_slayer_bonus = 100 if (won and opponent_level - level_before >= 15) else 0
+        total_xp = base_xp + victory_bonus + perfection_bonus + giant_slayer_bonus + streak_bonus
 
-    match = Match(
-        player1_id=player_id, player2_pseudo=opponent_pseudo,
-        player2_is_bot=opponent_is_bot, category=theme.id,
-        player1_score=player_score, player2_score=opponent_score,
-        player1_correct=correct_count,
-        winner_id=player_id if won else None,
-        xp_earned=total_xp, xp_breakdown=xp_breakdown,
-        questions_data=questions_data,
-    )
-    db.add(match)
+        xp_breakdown = {
+            "base": base_xp, "victory": victory_bonus, "perfection": perfection_bonus,
+            "giant_slayer": giant_slayer_bonus, "streak": streak_bonus, "total": total_xp,
+        }
 
-    uxp.xp += total_xp
-    level_after = get_level(uxp.xp)
+        match = Match(
+            player1_id=player_id, player2_pseudo=opponent_pseudo,
+            player2_is_bot=opponent_is_bot, category=theme.id,
+            player1_score=player_score, player2_score=opponent_score,
+            player1_correct=correct_count,
+            winner_id=player_id if won else None,
+            xp_earned=total_xp, xp_breakdown=xp_breakdown,
+            questions_data=questions_data,
+        )
+        db.add(match)
 
-    new_title_info = check_new_title_theme(theme, level_before, level_after)
-    new_level = level_after if level_after > level_before else None
+        uxp.xp += total_xp
+        level_after = get_level(uxp.xp)
 
-    user.matches_played += 1
-    if won:
-        user.matches_won += 1
-        user.current_streak += 1
-        if user.current_streak > user.best_streak:
-            user.best_streak = user.current_streak
-    else:
-        user.current_streak = 0
+        new_title_info = check_new_title_theme(theme, level_before, level_after)
+        new_level = level_after if level_after > level_before else None
 
-    all_xp_res = await db.execute(
-        select(func.sum(UserThemeXP.xp)).where(UserThemeXP.user_id == player_id)
-    )
-    user.total_xp = all_xp_res.scalar() or 0
+        user.matches_played += 1
+        if won:
+            user.matches_won += 1
+            user.current_streak += 1
+            if user.current_streak > user.best_streak:
+                user.best_streak = user.current_streak
+        else:
+            user.current_streak = 0
 
-    if won:
-        notif_body = f"Victoire en {theme.name} ! +{total_xp} XP"
-    else:
-        notif_body = f"Défaite en {theme.name}. +{total_xp} XP"
-    await create_notification(
-        db, player_id, "match_result", "notif.match_result", notif_body,
-        data={"screen": "results", "params": {"matchId": match.id}},
-    )
+        all_xp_res = await db.execute(
+            select(func.sum(UserThemeXP.xp)).where(UserThemeXP.user_id == player_id)
+        )
+        user.total_xp = all_xp_res.scalar() or 0
 
-    try:
-        await db.commit()
-    except Exception:
-        await db.rollback()
-        raise HTTPException(status_code=500, detail="Erreur lors de l'enregistrement du match")
+        if won:
+            notif_body = f"Victoire en {theme.name} ! +{total_xp} XP"
+        else:
+            notif_body = f"Défaite en {theme.name}. +{total_xp} XP"
+        await create_notification(
+            db, player_id, "match_result", "notif.match_result", notif_body,
+            data={"screen": "results", "params": {"matchId": match.id}},
+        )
 
-    await db.refresh(match)
+        try:
+            await db.commit()
+        except Exception:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail="Erreur lors de l'enregistrement du match")
 
-    return {
-        "id": match.id, "player1_id": match.player1_id,
-        "player2_pseudo": match.player2_pseudo, "player2_is_bot": match.player2_is_bot,
-        "category": match.category, "theme_name": theme.name,
-        "player1_score": match.player1_score, "player2_score": match.player2_score,
-        "player1_correct": match.player1_correct, "winner_id": match.winner_id,
-        "xp_earned": match.xp_earned, "xp_breakdown": match.xp_breakdown,
-        "new_title": new_title_info, "new_level": new_level,
-        "created_at": match.created_at.isoformat(),
-    }
+        await db.refresh(match)
+
+        return {
+            "id": match.id, "player1_id": match.player1_id,
+            "player2_pseudo": match.player2_pseudo, "player2_is_bot": match.player2_is_bot,
+            "category": match.category, "theme_name": theme.name,
+            "player1_score": match.player1_score, "player2_score": match.player2_score,
+            "player1_correct": match.player1_correct, "winner_id": match.winner_id,
+            "xp_earned": match.xp_earned, "xp_breakdown": match.xp_breakdown,
+            "new_title": new_title_info, "new_level": new_level,
+            "created_at": match.created_at.isoformat(),
+        }
 
 
 # Keep /submit-v2 as alias for frontend compatibility
 @router.post("/submit-v2")
 async def submit_match_v2(request: Request, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     return await submit_match(request, current_user, db)
+
+
+VO_GENERATION_PROMPT = """Generate exactly 21 quiz questions in ENGLISH about "{theme_name}".
+Rules:
+- 7 questions difficulty: "Facile" (easy, well-known facts)
+- 7 questions difficulty: "Moyen" (medium, requires some knowledge)
+- 7 questions difficulty: "Difficile" (hard, for true fans)
+- Each question has exactly 4 answer options
+- Exactly 1 correct answer per question
+- Questions must be factual and accurate
+- Vary question types: characters, plot, actors, release dates, trivia, quotes, etc.
+
+Return ONLY a valid JSON array with exactly 21 objects, no extra text:
+[
+  {{
+    "question_text": "...",
+    "options": ["A", "B", "C", "D"],
+    "correct_option": 0,
+    "difficulty": "Facile"
+  }},
+  ...
+]
+correct_option is the 0-based index of the correct answer in options."""
+
+
+@router.post("/generate-vo/{theme_id}")
+async def generate_vo_questions(
+    theme_id: str,
+    current_user: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    """Generate English (VO) questions for a SCREEN theme via Claude AI. Idempotent — skips if already generated."""
+    import os
+    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    if not api_key:
+        raise HTTPException(status_code=503, detail="Service IA non disponible")
+
+    # Verify theme exists and is a SCREEN theme
+    theme_res = await db.execute(select(Theme).where(Theme.id == theme_id))
+    theme = theme_res.scalar_one_or_none()
+    if not theme:
+        raise HTTPException(status_code=404, detail="Thème introuvable")
+    if theme.super_category != "SCREEN":
+        raise HTTPException(status_code=400, detail="Mode VO disponible uniquement pour les thèmes SCREEN")
+
+    # Resolve the category used for questions
+    category = await _resolve_theme_category(theme_id, db)
+
+    # Idempotent: if EN questions already exist, return count
+    existing = await db.execute(
+        select(func.count()).select_from(Question).where(
+            Question.category == category, Question.language == 'en'
+        )
+    )
+    existing_count = existing.scalar() or 0
+    if existing_count > 0:
+        logger.info(f"[generate-vo] EN questions already exist for '{category}': {existing_count}")
+        return {"theme_id": theme_id, "question_count": existing_count, "status": "already_exists"}
+
+    # Generate via Claude
+    import anthropic
+    client = anthropic.Anthropic(api_key=api_key)
+    prompt = VO_GENERATION_PROMPT.format(theme_name=theme.name)
+    try:
+        message = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=4096,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw = message.content[0].text.strip()
+    except Exception as e:
+        logger.error(f"[generate-vo] Claude API error: {e}")
+        raise HTTPException(status_code=503, detail="Erreur lors de la génération IA")
+
+    # Parse JSON
+    import json, re
+    try:
+        json_match = re.search(r'\[.*\]', raw, re.DOTALL)
+        if not json_match:
+            raise ValueError("No JSON array found")
+        questions_data = json.loads(json_match.group())
+    except Exception as e:
+        logger.error(f"[generate-vo] JSON parse error: {e}\nRaw: {raw[:500]}")
+        raise HTTPException(status_code=500, detail="Erreur de parsing des questions générées")
+
+    # Save EN questions
+    saved = 0
+    for q_data in questions_data:
+        try:
+            q = Question(
+                category=category,
+                question_text=q_data["question_text"].strip(),
+                options=q_data["options"],
+                correct_option=int(q_data["correct_option"]),
+                difficulty=q_data.get("difficulty", "Moyen"),
+                language='en',
+            )
+            db.add(q)
+            saved += 1
+        except Exception as e:
+            logger.warning(f"[generate-vo] Skip question: {e}")
+
+    try:
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"[generate-vo] DB commit error: {e}")
+        raise HTTPException(status_code=500, detail="Erreur d'enregistrement")
+
+    logger.info(f"[generate-vo] Saved {saved} EN questions for '{category}'")
+    return {"theme_id": theme_id, "question_count": saved, "status": "generated"}

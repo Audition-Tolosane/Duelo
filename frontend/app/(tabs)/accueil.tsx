@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, FlatList,
   ActivityIndicator, RefreshControl, Dimensions, Platform,
@@ -14,12 +14,14 @@ import Animated, {
   Easing, interpolate,
 } from 'react-native-reanimated';
 import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 import CosmicBackground from '../../components/CosmicBackground';
 import CategoryIcon from '../../components/CategoryIcon';
 import UserAvatar from '../../components/UserAvatar';
 import { GLASS } from '../../theme/glassTheme';
 import { authFetch } from '../../utils/api';
 import { t } from '../../utils/i18n';
+import { flushPendingScores } from '../../utils/pendingScores';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -43,6 +45,19 @@ interface DuelItem {
   player_score: number;
   opponent_score: number;
   won: boolean;
+  created_at: string;
+}
+
+interface IncomingChallenge {
+  challenge_id: string;
+  challenger_id: string;
+  challenger_pseudo: string;
+  challenger_avatar_seed: string;
+  challenger_avatar_url?: string;
+  theme_id: string;
+  theme_name: string;
+  theme_color: string;
+  expires_at: string;
   created_at: string;
 }
 
@@ -165,7 +180,7 @@ const DuelCard = React.memo(function DuelCard({ duel, index, onRematch }: { duel
 
           {/* Category badge */}
           <View style={[styles.duelCatBadge, { backgroundColor: duel.category_color + '20' }]}>
-            <CategoryIcon emoji={CATEGORY_ICONS[duel.category] || '❓'} size={14} color={duel.category_color} />
+            <CategoryIcon themeId={duel.category} size={14} color={duel.category_color} type="theme" />
             <Text style={[styles.duelCatName, { color: duel.category_color }]} numberOfLines={1}>
               {duel.category_name}
             </Text>
@@ -332,7 +347,7 @@ const CommunityCard = React.memo(function CommunityCard({ item, index, userId, o
               const { Share } = require('react-native');
               try {
                 await Share.share({ message: `${item.user_pseudo} ${t('home.share_on_duelo')} "${item.content?.slice(0, 100)}"` });
-              } catch {}
+              } catch (e) { console.error(e); }
             }}
           >
             <MaterialCommunityIcons name="share-outline" size={15} color="#666" />
@@ -388,12 +403,61 @@ const EventCard = React.memo(function EventCard({ item, index }: { item: FeedIte
 });
 
 
+// ── Challenge Card ──
+const ChallengeCard = React.memo(function ChallengeCard({ challenge, onAccept, onDecline }: {
+  challenge: IncomingChallenge; onAccept: () => void; onDecline: () => void;
+}) {
+  function expiresIn(expiresAt: string): string {
+    const diff = new Date(expiresAt).getTime() - Date.now();
+    const h = Math.floor(diff / 3600000);
+    if (h < 1) return `< 1h`;
+    return `${h}h`;
+  }
+  return (
+    <Animated.View entering={FadeInRight.duration(400)}>
+      <View style={[styles.challengeCard, { borderColor: challenge.theme_color + '30' }]}>
+        <LinearGradient colors={[challenge.theme_color + '15', 'transparent']} style={styles.challengeCardGlow} />
+        <View style={styles.challengeTop}>
+          <UserAvatar avatarUrl={challenge.challenger_avatar_url} avatarSeed={challenge.challenger_avatar_seed} pseudo={challenge.challenger_pseudo} size={40} />
+          <View style={styles.challengeInfo}>
+            <Text style={styles.challengePseudo}>{challenge.challenger_pseudo}</Text>
+            <Text style={styles.challengeVs}>{t('challenge.vs')}</Text>
+            {challenge.theme_name ? (
+              <View style={[styles.challengeThemeBadge, { backgroundColor: challenge.theme_color + '20' }]}>
+                <Text style={[styles.challengeThemeName, { color: challenge.theme_color }]} numberOfLines={1}>{challenge.theme_name}</Text>
+              </View>
+            ) : (
+              <Text style={styles.challengeNoTheme}>{t('challenge.no_theme')}</Text>
+            )}
+          </View>
+          <View style={styles.challengeExpiry}>
+            <MaterialCommunityIcons name="clock-outline" size={10} color="#555" />
+            <Text style={styles.challengeExpiryText}>{expiresIn(challenge.expires_at)}</Text>
+          </View>
+        </View>
+        <View style={styles.challengeActions}>
+          <TouchableOpacity style={styles.challengeDeclineBtn} onPress={onDecline} activeOpacity={0.8}>
+            <Text style={styles.challengeDeclineText}>{t('challenge.decline')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.challengeAcceptBtn, { backgroundColor: challenge.theme_color }]} onPress={onAccept} activeOpacity={0.8}>
+            <MaterialCommunityIcons name="sword-cross" size={14} color="#FFF" />
+            <Text style={styles.challengeAcceptText}>{t('challenge.accept')}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Animated.View>
+  );
+});
+
 // ── Main Screen ──
 export default function AccueilScreen() {
   const router = useRouter();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [pendingDuels, setPendingDuels] = useState<DuelItem[]>([]);
+  const [incomingChallenges, setIncomingChallenges] = useState<IncomingChallenge[]>([]);
   const [socialFeed, setSocialFeed] = useState<FeedItem[]>([]);
+  const socialFeedRef = useRef<FeedItem[]>([]);
+  useEffect(() => { socialFeedRef.current = socialFeed; }, [socialFeed]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -408,6 +472,42 @@ export default function AccueilScreen() {
 
   useEffect(() => {
     loadFeed();
+  }, []);
+
+  // Register Expo push token + flush any offline-queued score saves
+  useEffect(() => {
+    const registerPushAndFlush = async () => {
+      try {
+        // Flush any failed async score saves from previous sessions
+        flushPendingScores();
+
+        // Register for Expo push notifications
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== 'granted') {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+        }
+        if (finalStatus !== 'granted') return;
+
+        const projectId =
+          Constants.expoConfig?.extra?.eas?.projectId ??
+          Constants.easConfig?.projectId;
+        if (!projectId) return; // Expo Go sans EAS — push tokens non supportés en SDK 53+
+
+        const tokenData = await Notifications.getExpoPushTokenAsync({ projectId });
+        const token = tokenData.data;
+        const uid = await AsyncStorage.getItem('duelo_user_id');
+        if (uid && token) {
+          await authFetch(`${API_URL}/api/profile/user/push-token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: uid, token }),
+          });
+        }
+      } catch (e) { console.error(e); }
+    };
+    registerPushAndFlush();
   }, []);
 
   // Schedule daily streak reminder notification
@@ -437,7 +537,7 @@ export default function AccueilScreen() {
             minute: 0,
           },
         });
-      } catch {}
+      } catch (e) { console.error(e); }
     };
 
     if (userData && !hasPlayedToday && (userData.current_streak || 0) > 0) {
@@ -461,6 +561,7 @@ export default function AccueilScreen() {
         const data = await res.json();
         setUserData(data.user);
         setPendingDuels(data.pending_duels || []);
+        setIncomingChallenges(data.incoming_challenges || []);
         setSocialFeed(data.social_feed || []);
       }
     } catch {
@@ -481,10 +582,47 @@ export default function AccueilScreen() {
     router.push(`/matchmaking?category=${duel.category}`);
   }, [router]);
 
+  const handleAcceptChallenge = useCallback(async (challenge: IncomingChallenge) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    try {
+      const res = await authFetch(`${API_URL}/api/challenges/${challenge.challenge_id}/accept`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId }),
+      });
+      if (res.ok) {
+        setIncomingChallenges(prev => prev.filter(c => c.challenge_id !== challenge.challenge_id));
+        // Play in reveal mode: see Player A's answers revealed after each question
+        if (challenge.theme_id) {
+          router.push(
+            `/game?category=${challenge.theme_id}&asyncMode=reveal` +
+            `&opponentPseudo=${encodeURIComponent(challenge.challenger_pseudo)}` +
+            `&opponentSeed=${encodeURIComponent(challenge.challenger_avatar_seed || '')}` +
+            `&challenge_id=${challenge.challenge_id}`
+          );
+        } else {
+          router.push('/(tabs)/play');
+        }
+      }
+    } catch (e) { console.error(e); }
+  }, [userId, router]);
+
+  const handleDeclineChallenge = useCallback(async (challengeId: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    try {
+      await authFetch(`${API_URL}/api/challenges/${challengeId}/decline`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId }),
+      });
+      setIncomingChallenges(prev => prev.filter(c => c.challenge_id !== challengeId));
+    } catch (e) { console.error(e); }
+  }, [userId]);
+
   const handleLike = useCallback(async (postId: string) => {
     if (!userId) return;
-    // Save previous feed state for rollback
-    const previousFeed = [...socialFeed];
+    // Use ref to get latest feed without capturing it in deps
+    const previousFeed = [...socialFeedRef.current];
     // Optimistic update
     setSocialFeed(prev =>
       prev.map(item =>
@@ -509,7 +647,7 @@ export default function AccueilScreen() {
     } catch {
       setSocialFeed(previousFeed); // rollback
     }
-  }, [userId, socialFeed]);
+  }, [userId]);
 
   const handleComment = useCallback((feedItem: FeedItem) => {
     const themeId = feedItem.theme_id || feedItem.category;
@@ -650,7 +788,12 @@ export default function AccueilScreen() {
             activeOpacity={0.85}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-              router.push('/(tabs)/play');
+              const last = pendingDuels[0];
+              if (last?.category) {
+                router.push(`/matchmaking?category=${last.category}&themeName=${encodeURIComponent(last.category_name)}`);
+              } else {
+                router.push('/(tabs)/play');
+              }
             }}
           >
             <LinearGradient
@@ -659,41 +802,68 @@ export default function AccueilScreen() {
               end={{ x: 1, y: 0 }}
               style={styles.quickPlayGradient}
             >
-              <MaterialCommunityIcons name="lightning-bolt" size={20} color="#FFF" />
-              <Text style={styles.quickPlayText}>{t('home.start_duel')}</Text>
+              <View style={{ alignItems: 'center' }}>
+                {pendingDuels[0]?.category_name ? (
+                  <Text style={styles.quickPlaySub}>
+                    {t('home.last_theme_played')} {pendingDuels[0].category_name}
+                  </Text>
+                ) : null}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <MaterialCommunityIcons name="lightning-bolt" size={20} color="#FFF" />
+                  <Text style={styles.quickPlayText}>{t('home.start_duel')}</Text>
+                </View>
+              </View>
             </LinearGradient>
           </TouchableOpacity>
         </Animated.View>
 
-        {/* ── Pending Duels Section ── */}
-        {pendingDuels.length > 0 && (
+        {/* ── Incoming Challenges + Revenge Section ── */}
+        {(incomingChallenges.length > 0 || pendingDuels.length > 0) && (
           <Animated.View entering={FadeInDown.delay(300).duration(500)}>
-            <View style={styles.sectionHeader}>
-              <LinearGradient colors={['#FF6B35', '#FF8F60']} style={styles.sectionIconCircle}>
-                <MaterialCommunityIcons name="sword-cross" size={12} color="#FFF" />
-              </LinearGradient>
-              <Text style={styles.sectionTitle}>{t('home.pending_duels')}</Text>
-              <View style={styles.sectionBadge}>
-                <Text style={styles.sectionBadgeText}>{pendingDuels.length}</Text>
-              </View>
-            </View>
+            {/* Incoming challenges */}
+            {incomingChallenges.length > 0 && (
+              <>
+                <View style={styles.sectionHeader}>
+                  <LinearGradient colors={['#BF5FFF', '#8A2BE2']} style={styles.sectionIconCircle}>
+                    <MaterialCommunityIcons name="sword-cross" size={12} color="#FFF" />
+                  </LinearGradient>
+                  <Text style={styles.sectionTitle}>{t('challenge.incoming_title')}</Text>
+                  <View style={[styles.sectionBadge, { backgroundColor: '#BF5FFF' }]}>
+                    <Text style={styles.sectionBadgeText}>{incomingChallenges.length}</Text>
+                  </View>
+                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.duelsScroll}>
+                  {incomingChallenges.map((c) => (
+                    <ChallengeCard
+                      key={c.challenge_id}
+                      challenge={c}
+                      onAccept={() => handleAcceptChallenge(c)}
+                      onDecline={() => handleDeclineChallenge(c.challenge_id)}
+                    />
+                  ))}
+                </ScrollView>
+              </>
+            )}
 
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.duelsScroll}
-              snapToInterval={DUEL_CARD_WIDTH + 12}
-              decelerationRate="fast"
-            >
-              {pendingDuels.map((duel, idx) => (
-                <DuelCard
-                  key={duel.id}
-                  duel={duel}
-                  index={idx}
-                  onRematch={() => handleRematch(duel)}
-                />
-              ))}
-            </ScrollView>
+            {/* Revenge duels (recent defeats) */}
+            {pendingDuels.length > 0 && (
+              <>
+                <View style={styles.sectionHeader}>
+                  <LinearGradient colors={['#FF6B35', '#FF8F60']} style={styles.sectionIconCircle}>
+                    <MaterialCommunityIcons name="fire" size={12} color="#FFF" />
+                  </LinearGradient>
+                  <Text style={styles.sectionTitle}>{t('challenge.revenge_title')}</Text>
+                  <View style={styles.sectionBadge}>
+                    <Text style={styles.sectionBadgeText}>{pendingDuels.length}</Text>
+                  </View>
+                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.duelsScroll}>
+                  {pendingDuels.map((duel, index) => (
+                    <DuelCard key={duel.id} duel={duel} index={index} onRematch={() => handleRematch(duel)} />
+                  ))}
+                </ScrollView>
+              </>
+            )}
           </Animated.View>
         )}
 
@@ -1016,6 +1186,14 @@ const styles = StyleSheet.create({
     color: '#FFF',
     letterSpacing: 2,
   },
+  quickPlaySub: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#FFF',
+    textAlign: 'center',
+    marginBottom: 6,
+    letterSpacing: 0.5,
+  },
 
   // ── Feed Cards ──
   feedCard: {
@@ -1221,4 +1399,32 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFD700',
   },
+
+  // ── Challenge Card ──
+  challengeCard: {
+    width: DUEL_CARD_WIDTH, borderRadius: 20, padding: 14,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1, overflow: 'hidden', marginRight: 4,
+  },
+  challengeCardGlow: { position: 'absolute', top: 0, left: 0, right: 0, height: '100%', borderRadius: 20 },
+  challengeTop: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
+  challengeInfo: { flex: 1 },
+  challengePseudo: { color: '#FFF', fontSize: 14, fontWeight: '800', marginBottom: 2 },
+  challengeVs: { color: 'rgba(255,255,255,0.4)', fontSize: 11, marginBottom: 4 },
+  challengeThemeBadge: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
+  challengeThemeName: { fontSize: 11, fontWeight: '700' },
+  challengeNoTheme: { color: 'rgba(255,255,255,0.3)', fontSize: 11, fontStyle: 'italic' },
+  challengeExpiry: { alignItems: 'center', gap: 2 },
+  challengeExpiryText: { color: '#555', fontSize: 9, fontWeight: '600' },
+  challengeActions: { flexDirection: 'row', gap: 8 },
+  challengeDeclineBtn: {
+    flex: 1, paddingVertical: 9, borderRadius: 12, alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+  },
+  challengeDeclineText: { color: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: '700' },
+  challengeAcceptBtn: {
+    flex: 2, paddingVertical: 9, borderRadius: 12, flexDirection: 'row',
+    alignItems: 'center', justifyContent: 'center', gap: 6,
+  },
+  challengeAcceptText: { color: '#FFF', fontSize: 12, fontWeight: '800' },
 });

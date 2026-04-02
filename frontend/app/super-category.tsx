@@ -21,6 +21,55 @@ const CAROUSEL_CARD_H = 150;
 const SEE_ALL_W = SCREEN_W * 0.25;
 const TOP_COUNT = 7;
 
+const CLUSTER_HUE_SHIFTS = [0, 50, -50];
+const DEFAULT_COLOR = '#8A2BE2';
+
+function hslToHex(h: number, s: number, l: number): string {
+  s /= 100; l /= 100;
+  const hue2rgb = (p: number, q: number, t: number) => {
+    if (t < 0) t += 1; if (t > 1) t -= 1;
+    if (t < 1/6) return p + (q - p) * 6 * t;
+    if (t < 1/2) return q;
+    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    return p;
+  };
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  const toHex = (v: number) => Math.round(v * 255).toString(16).padStart(2, '0');
+  return `#${toHex(hue2rgb(p, q, h/360 + 1/3))}${toHex(hue2rgb(p, q, h/360))}${toHex(hue2rgb(p, q, h/360 - 1/3))}`;
+}
+
+function hashColor(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    hash |= 0;
+  }
+  return hslToHex(Math.abs(hash) % 360, 65, 55);
+}
+
+function shiftHue(hex: string, degrees: number): string {
+  const rr = parseInt(hex.slice(1, 3), 16) / 255;
+  const gg = parseInt(hex.slice(3, 5), 16) / 255;
+  const bb = parseInt(hex.slice(5, 7), 16) / 255;
+  const max = Math.max(rr, gg, bb), min = Math.min(rr, gg, bb);
+  let h = 0, s = 0;
+  const l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === rr) h = ((gg - bb) / d + (gg < bb ? 6 : 0)) / 6;
+    else if (max === gg) h = ((bb - rr) / d + 2) / 6;
+    else h = ((rr - gg) / d + 4) / 6;
+  }
+  h = ((h * 360 + degrees) % 360 + 360) % 360;
+  return hslToHex(h, s * 100, l * 100);
+}
+
+function themeColor(theme: ThemeItem): string {
+  return hashColor(theme.id);
+}
+
 // Full grid layout
 const GRID_GAP = 10;
 const GRID_COLS = 3;
@@ -129,7 +178,8 @@ export default function SuperCategoryScreen() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {data.clusters.map((cluster) => {
+        {data.clusters.map((cluster, clusterIdx) => {
+          const clusterColor = shiftHue(accent, CLUSTER_HUE_SHIFTS[clusterIdx % CLUSTER_HUE_SHIFTS.length]);
           const topThemes = [...cluster.themes]
             .sort((a, b) => b.question_count - a.question_count)
             .slice(0, TOP_COUNT);
@@ -140,17 +190,17 @@ export default function SuperCategoryScreen() {
               {/* Cluster Header */}
               <View style={styles.clusterHeader}>
                 <LinearGradient
-                  colors={[accent + '20', 'transparent']}
+                  colors={[clusterColor + '20', 'transparent']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.clusterGradient}
                 />
-                <View style={[styles.clusterIconCircle, { backgroundColor: accent + '25' }]}>
-                  <CategoryIcon emoji={cluster.icon} size={20} color={accent} type="cluster" />
+                <View style={[styles.clusterIconCircle, { backgroundColor: clusterColor + '25' }]}>
+                  <CategoryIcon emoji={cluster.icon} size={20} color={clusterColor} type="cluster" />
                 </View>
                 <View style={styles.clusterInfo}>
                   <Text style={styles.clusterName}>{cluster.name}</Text>
-                  <Text style={[styles.clusterCount, { color: accent + '90' }]}>
+                  <Text style={[styles.clusterCount, { color: clusterColor + '90' }]}>
                     {cluster.themes.length} thèmes
                   </Text>
                 </View>
@@ -162,43 +212,46 @@ export default function SuperCategoryScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.carousel}
               >
-                {topThemes.map((theme, idx) => (
-                  <TouchableOpacity
-                    key={theme.id}
-                    style={styles.carouselCard}
-                    onPress={() => openThemeDetail(theme)}
-                    activeOpacity={0.8}
-                  >
-                    <LinearGradient
-                      colors={[accent + '22', accent + '08', 'transparent']}
-                      style={styles.carouselCardBg}
-                    />
-
-                    {/* Rank badge */}
-                    <View style={[styles.rankBadge, { backgroundColor: accent + '30' }]}>
-                      <Text style={[styles.rankText, { color: accent }]}>#{idx + 1}</Text>
-                    </View>
-
-                    <LinearGradient
-                      colors={[accent + '35', accent + '12']}
-                      style={styles.carouselIcon}
+                {topThemes.map((theme, idx) => {
+                  const tColor = themeColor(theme);
+                  return (
+                    <TouchableOpacity
+                      key={theme.id}
+                      style={styles.carouselCard}
+                      onPress={() => openThemeDetail(theme)}
+                      activeOpacity={0.8}
                     >
-                      <CategoryIcon themeId={theme.id} size={26} color={accent} type="theme" />
-                    </LinearGradient>
+                      <LinearGradient
+                        colors={[tColor + '22', tColor + '08', 'transparent']}
+                        style={styles.carouselCardBg}
+                      />
 
-                    <Text style={styles.carouselName} numberOfLines={2}>{theme.name}</Text>
-
-                    {theme.user_level > 0 ? (
-                      <View style={[styles.carouselBadge, { backgroundColor: accent + '25' }]}>
-                        <Text style={[styles.carouselBadgeText, { color: accent }]}>
-                          Niv.{theme.user_level}
-                        </Text>
+                      {/* Rank badge */}
+                      <View style={[styles.rankBadge, { backgroundColor: tColor + '30' }]}>
+                        <Text style={[styles.rankText, { color: tColor }]}>#{idx + 1}</Text>
                       </View>
-                    ) : theme.question_count > 0 ? (
-                      <Text style={styles.carouselQCount}>{theme.question_count} Q</Text>
-                    ) : null}
-                  </TouchableOpacity>
-                ))}
+
+                      <LinearGradient
+                        colors={[tColor + '35', tColor + '12']}
+                        style={styles.carouselIcon}
+                      >
+                        <CategoryIcon themeId={theme.id} size={26} color={tColor} type="theme" />
+                      </LinearGradient>
+
+                      <Text style={styles.carouselName} numberOfLines={2}>{theme.name}</Text>
+
+                      {theme.user_level > 0 ? (
+                        <View style={[styles.carouselBadge, { backgroundColor: tColor + '25' }]}>
+                          <Text style={[styles.carouselBadgeText, { color: tColor }]}>
+                            Niv.{theme.user_level}
+                          </Text>
+                        </View>
+                      ) : theme.question_count > 0 ? (
+                        <Text style={styles.carouselQCount}>{theme.question_count} Q</Text>
+                      ) : null}
+                    </TouchableOpacity>
+                  );
+                })}
 
                 {/* See All card */}
                 <TouchableOpacity
@@ -206,14 +259,14 @@ export default function SuperCategoryScreen() {
                   onPress={() => showAllThemes(cluster.name)}
                   activeOpacity={0.8}
                 >
-                  <View style={[styles.seeAllCircle, { backgroundColor: accent + '20' }]}>
+                  <View style={[styles.seeAllCircle, { backgroundColor: clusterColor + '20' }]}>
                     <MaterialCommunityIcons
                       name={isExpanded ? 'chevron-up' : 'grid'}
                       size={24}
-                      color={accent}
+                      color={clusterColor}
                     />
                   </View>
-                  <Text style={[styles.seeAllText, { color: accent }]}>
+                  <Text style={[styles.seeAllText, { color: clusterColor }]}>
                     {isExpanded ? 'Réduire' : 'Tout voir'}
                   </Text>
                   <Text style={styles.seeAllCount}>{cluster.themes.length} thèmes</Text>
@@ -223,33 +276,36 @@ export default function SuperCategoryScreen() {
               {/* Expanded full grid */}
               {isExpanded && (
                 <View style={styles.fullGrid}>
-                  {cluster.themes.map((theme) => (
-                    <TouchableOpacity
-                      key={theme.id}
-                      style={[styles.gridCard, { width: GRID_CARD_W }]}
-                      onPress={() => openThemeDetail(theme)}
-                      activeOpacity={0.8}
-                    >
-                      <LinearGradient
-                        colors={[accent + '18', 'transparent']}
-                        style={styles.gridCardGlow}
-                      />
-                      <LinearGradient
-                        colors={[accent + '30', accent + '10']}
-                        style={styles.gridIcon}
+                  {cluster.themes.map((theme) => {
+                    const tColor = themeColor(theme);
+                    return (
+                      <TouchableOpacity
+                        key={theme.id}
+                        style={[styles.gridCard, { width: GRID_CARD_W }]}
+                        onPress={() => openThemeDetail(theme)}
+                        activeOpacity={0.8}
                       >
-                        <CategoryIcon themeId={theme.id} size={22} color={accent} type="theme" />
-                      </LinearGradient>
-                      <Text style={styles.gridName} numberOfLines={2}>{theme.name}</Text>
-                      {theme.user_level > 0 && (
-                        <View style={[styles.gridBadge, { backgroundColor: accent + '25' }]}>
-                          <Text style={[styles.gridBadgeText, { color: accent }]}>
-                            Niv.{theme.user_level}
-                          </Text>
-                        </View>
-                      )}
-                    </TouchableOpacity>
-                  ))}
+                        <LinearGradient
+                          colors={[tColor + '18', 'transparent']}
+                          style={styles.gridCardGlow}
+                        />
+                        <LinearGradient
+                          colors={[tColor + '30', tColor + '10']}
+                          style={styles.gridIcon}
+                        >
+                          <CategoryIcon themeId={theme.id} size={22} color={tColor} type="theme" />
+                        </LinearGradient>
+                        <Text style={styles.gridName} numberOfLines={2}>{theme.name}</Text>
+                        {theme.user_level > 0 && (
+                          <View style={[styles.gridBadge, { backgroundColor: tColor + '25' }]}>
+                            <Text style={[styles.gridBadgeText, { color: tColor }]}>
+                              Niv.{theme.user_level}
+                            </Text>
+                          </View>
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
               )}
             </View>

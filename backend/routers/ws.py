@@ -1,8 +1,9 @@
 import json
 import logging
 from datetime import datetime, timezone, timedelta
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from sqlalchemy import select, func, or_, and_
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
+import jwt as pyjwt
+from sqlalchemy import select, func, or_, and_, update as sql_update
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import AsyncSessionLocal
 from models import User, Question, Match, ChatMessage, UserThemeXP, Theme
@@ -14,6 +15,7 @@ from services.xp import (
     get_theme_title, check_new_title_theme, MAX_LEVEL, TITLE_THRESHOLDS,
 )
 from services.notifications import create_notification
+from config import JWT_SECRET, JWT_ALGORITHM
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["websocket"])
@@ -26,7 +28,11 @@ async def get_session():
 
 
 @router.websocket("/ws/{user_id}")
-async def websocket_endpoint(websocket: WebSocket, user_id: str):
+async def websocket_endpoint(
+    websocket: WebSocket,
+    user_id: str,
+    token: str = Query(default=""),
+):
     """
     Main WebSocket endpoint. All real-time features go through one connection.
 
@@ -46,6 +52,17 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
     Ping:
       {"action": "ping"}
     """
+    # Validate JWT token and verify identity
+    try:
+        payload = pyjwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        token_user_id = payload.get("sub")
+        if token_user_id != user_id:
+            await websocket.close(code=1008, reason="Identity mismatch")
+            return
+    except Exception:
+        await websocket.close(code=1008, reason="Invalid or missing token")
+        return
+
     await manager.connect(user_id, websocket)
 
     try:
@@ -76,6 +93,9 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                     manager.leave_matchmaking(user_id)
                     await websocket.send_json({"type": "matchmaking_left"})
 
+                elif action == "challenge_join":
+                    await handle_challenge_join(user_id, data)
+
                 elif action == "game_answer":
                     await handle_game_answer(user_id, data)
 
@@ -98,7 +118,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                 logger.error(f"WS action error ({action}): {e}")
                 await websocket.send_json({
                     "type": "error",
-                    "data": {"message": str(e)},
+                    "data": {"message": "Une erreur est survenue"},
                 })
 
     except WebSocketDisconnect:
@@ -277,6 +297,44 @@ async def load_and_start_game(room_id: str, theme_id: str):
         manager.cleanup_room(room_id)
 
 
+async def handle_challenge_join(user_id: str, data: dict):
+    """Join a pending challenge room by room_id."""
+    room_id = data.get("room_id", "")
+    if not room_id:
+        return
+
+    theme_id = manager.get_challenge_room_theme(room_id)
+    if not theme_id:
+        await manager.send_to_user(user_id, {
+            "type": "challenge_room_expired",
+            "data": {"message": "Salle introuvable ou expirée"},
+        })
+        return
+
+    async with AsyncSessionLocal() as db:
+        u_res = await db.execute(select(User).where(User.id == user_id))
+        user = u_res.scalar_one_or_none()
+        if not user:
+            return
+
+        xp_res = await db.execute(
+            select(UserThemeXP).where(UserThemeXP.user_id == user_id, UserThemeXP.theme_id == theme_id)
+        )
+        uxp = xp_res.scalar_one_or_none()
+
+        user_data = {
+            "id": user.id,
+            "pseudo": user.pseudo,
+            "avatar_seed": user.avatar_seed,
+            "level": get_level(uxp.xp) if uxp else 0,
+            "streak": user.current_streak,
+            "streak_badge": get_streak_badge(user.current_streak),
+            "selected_title": user.selected_title or "",
+        }
+
+    await manager.join_challenge_room(user_id, room_id, user_data)
+
+
 # ── Game Handlers ──
 
 async def handle_game_answer(user_id: str, data: dict):
@@ -368,7 +426,7 @@ async def save_game_results(room):
 
             base_xp = player_score * 2
             victory_bonus = 50 if won else 0
-            perfection_bonus = 50 if correct_count == TOTAL_QUESTIONS else 0
+            perfection_bonus = 50 if correct_count == room.total_questions else 0
             giant_slayer_bonus = 100 if (won and opponent_level - level_before >= 15) else 0
             new_streak = (user.current_streak + 1) if won else 0
             streak_bonus = get_streak_bonus(new_streak) if won else 0
@@ -395,9 +453,14 @@ async def save_game_results(room):
             user.last_played_at = datetime.now(timezone.utc)
             if won:
                 user.matches_won += 1
-                user.current_streak += 1
-                if user.current_streak > user.best_streak:
-                    user.best_streak = user.current_streak
+                # Atomic increment to avoid race condition with concurrent matches
+                await db.execute(
+                    sql_update(User).where(User.id == player_id).values(
+                        current_streak=User.current_streak + 1,
+                        best_streak=func.greatest(User.best_streak, User.current_streak + 1),
+                    )
+                )
+                await db.refresh(user)
             else:
                 user.current_streak = 0
 

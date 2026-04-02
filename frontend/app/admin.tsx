@@ -16,6 +16,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
+/** Authenticated admin fetch — sends password in X-Admin-Key header, never in body. */
+const adminFetch = (url: string, adminPassword: string, options: RequestInit = {}): Promise<Response> => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'X-Admin-Key': adminPassword,
+    ...(options.headers as Record<string, string> ?? {}),
+  };
+  return fetch(url, { ...options, headers });
+};
+
 type QuestionRow = {
   id?: string;
   category: string;
@@ -200,7 +210,7 @@ export default function AdminScreen() {
   const loadThemesOverview = async () => {
     setLoadingThemes(true);
     try {
-      const res = await fetch(`${API_URL}/api/admin/themes-overview`);
+      const res = await adminFetch(`${API_URL}/api/admin/themes-overview`, password);
       const data = await res.json();
       setThemesOverview(data);
     } catch (e) {
@@ -213,7 +223,7 @@ export default function AdminScreen() {
   const loadMatchStats = async () => {
     setLoadingMatchStats(true);
     try {
-      const res = await fetch(`${API_URL}/api/admin/match-stats-by-theme`);
+      const res = await adminFetch(`${API_URL}/api/admin/match-stats-by-theme`, password);
       const data = await res.json();
       setMatchStats(data.stats || []);
       setTotalMatches(data.total_matches || 0);
@@ -230,7 +240,7 @@ export default function AdminScreen() {
       const url = reportFilter
         ? `${API_URL}/api/admin/reports?status=${reportFilter}`
         : `${API_URL}/api/admin/reports`;
-      const res = await fetch(url);
+      const res = await adminFetch(url, password);
       const data = await res.json();
       setReports(data.reports || []);
       setReportCounts(data.counts || { pending: 0, reviewed: 0, resolved: 0, total: 0 });
@@ -432,10 +442,9 @@ export default function AdminScreen() {
     try {
       for (let i = 0; i < totalBatches; i++) {
         const batch = parsedRows.slice(i * BATCH_SIZE, (i + 1) * BATCH_SIZE);
-        const res = await fetch(`${API_URL}/api/admin/upload-csv`, {
+        const res = await adminFetch(`${API_URL}/api/admin/upload-csv`, password, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password, questions: batch }),
+          body: JSON.stringify({ questions: batch }),
         });
         const data = await res.json();
         if (!res.ok) {
@@ -516,10 +525,9 @@ export default function AdminScreen() {
     setUploadingThemes(true);
     setThemesUploadResult(null);
     try {
-      const res = await fetch(`${API_URL}/api/admin/upload-themes-csv`, {
+      const res = await adminFetch(`${API_URL}/api/admin/upload-themes-csv`, password, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password, themes_csv: themesCSVText }),
+        body: JSON.stringify({ themes_csv: themesCSVText }),
       });
       const data = await res.json();
       console.log('Upload themes response:', JSON.stringify(data));
@@ -574,11 +582,9 @@ export default function AdminScreen() {
     setConfirmDelete(false);
     setDeletingThemes(true);
     try {
-      const res = await fetch(`${API_URL}/api/admin/delete-themes`, {
+      const res = await adminFetch(`${API_URL}/api/admin/delete-themes`, password, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          password,
           theme_ids: Array.from(selectedThemes),
           delete_questions: true,
         }),
@@ -599,9 +605,8 @@ export default function AdminScreen() {
 
   const updateReportStatus = async (reportId: string, newStatus: string) => {
     try {
-      await fetch(`${API_URL}/api/admin/reports/${reportId}/status`, {
+      await adminFetch(`${API_URL}/api/admin/reports/${reportId}/status`, password, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
       loadReports();
@@ -615,10 +620,10 @@ export default function AdminScreen() {
   const fetchAvatars = async () => {
     setLoadingAvatars(true);
     try {
-      const res = await fetch(`${API_URL}/api/admin/avatars`);
+      const res = await adminFetch(`${API_URL}/api/admin/avatars`, password);
       const data = await res.json();
       setAvatars(data.avatars || []);
-    } catch {}
+    } catch (e) { console.error(e); }
     setLoadingAvatars(false);
   };
 
@@ -642,12 +647,9 @@ export default function AdminScreen() {
     }
     setUploadingAvatar(true);
     try {
-      const pwd = password;
-      const res = await fetch(`${API_URL}/api/admin/avatars/upload`, {
+      const res = await adminFetch(`${API_URL}/api/admin/avatars/upload`, password, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          password: pwd,
           category: avatarCategory.trim() || 'default',
           image_base64: avatarImage,
         }),
@@ -669,17 +671,15 @@ export default function AdminScreen() {
 
   const deleteAvatar = async (avatarId: string) => {
     try {
-      const pwd = password;
-      const res = await fetch(`${API_URL}/api/admin/avatars/${avatarId}`, {
+      const res = await adminFetch(`${API_URL}/api/admin/avatars/${avatarId}`, password, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pwd }),
+        body: JSON.stringify({}),
       });
       const data = await res.json();
       if (data.success) {
         fetchAvatars();
       }
-    } catch {}
+    } catch (e) { console.error(e); }
   };
 
   useEffect(() => {

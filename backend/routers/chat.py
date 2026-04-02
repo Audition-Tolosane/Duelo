@@ -1,3 +1,4 @@
+import random
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, func, text, or_, and_
@@ -65,11 +66,13 @@ async def send_message(data: ChatSend, current_user: str = Depends(get_current_u
 
 @router.get("/conversations/{user_id}")
 async def get_conversations(user_id: str, db: AsyncSession = Depends(get_db)):
-    cutoff = datetime.now(timezone.utc) - timedelta(days=7)
-    await db.execute(
-        text("DELETE FROM chat_messages WHERE created_at < :cutoff"), {"cutoff": cutoff}
-    )
-    await db.commit()
+    # Only purge old messages ~10% of the time to avoid overhead on every request
+    if random.random() < 0.1:
+        cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+        await db.execute(
+            text("DELETE FROM chat_messages WHERE created_at < :cutoff"), {"cutoff": cutoff}
+        )
+        await db.commit()
 
     sent_result = await db.execute(
         select(ChatMessage.receiver_id).where(ChatMessage.sender_id == user_id).distinct()
@@ -132,7 +135,9 @@ async def get_conversations(user_id: str, db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/{user_id}/messages")
-async def get_chat_messages(user_id: str, with_user: str, limit: int = 50, db: AsyncSession = Depends(get_db)):
+async def get_chat_messages(user_id: str, with_user: str, limit: int = 50, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    if current_user != user_id:
+        raise HTTPException(status_code=403, detail="Non autorisé")
     result = await db.execute(
         select(ChatMessage).where(
             or_(
@@ -157,7 +162,9 @@ async def get_chat_messages(user_id: str, with_user: str, limit: int = 50, db: A
 
 
 @router.get("/unread-count/{user_id}")
-async def get_unread_count(user_id: str, db: AsyncSession = Depends(get_db)):
+async def get_unread_count(user_id: str, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    if current_user != user_id:
+        raise HTTPException(status_code=403, detail="Non autorisé")
     result = await db.execute(
         select(func.count(ChatMessage.id)).where(
             ChatMessage.receiver_id == user_id, ChatMessage.read == False,

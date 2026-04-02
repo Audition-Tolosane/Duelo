@@ -16,6 +16,28 @@ import { GLASS } from '../../theme/glassTheme';
 import { authFetch, clearToken } from '../../utils/api';
 import CosmicBackground from '../../components/CosmicBackground';
 import { t } from '../../utils/i18n';
+import CategoryIcon from '../../components/CategoryIcon';
+
+const COUNTRIES: { name: string; flag: string }[] = [
+  { name: 'France', flag: '🇫🇷' }, { name: 'Germany', flag: '🇩🇪' }, { name: 'Spain', flag: '🇪🇸' },
+  { name: 'Italy', flag: '🇮🇹' }, { name: 'United Kingdom', flag: '🇬🇧' }, { name: 'United States', flag: '🇺🇸' },
+  { name: 'Canada', flag: '🇨🇦' }, { name: 'Brazil', flag: '🇧🇷' }, { name: 'Japan', flag: '🇯🇵' },
+  { name: 'China', flag: '🇨🇳' }, { name: 'Australia', flag: '🇦🇺' }, { name: 'India', flag: '🇮🇳' },
+  { name: 'Mexico', flag: '🇲🇽' }, { name: 'Russia', flag: '🇷🇺' }, { name: 'South Korea', flag: '🇰🇷' },
+  { name: 'Netherlands', flag: '🇳🇱' }, { name: 'Belgium', flag: '🇧🇪' }, { name: 'Switzerland', flag: '🇨🇭' },
+  { name: 'Portugal', flag: '🇵🇹' }, { name: 'Sweden', flag: '🇸🇪' }, { name: 'Norway', flag: '🇳🇴' },
+  { name: 'Denmark', flag: '🇩🇰' }, { name: 'Finland', flag: '🇫🇮' }, { name: 'Poland', flag: '🇵🇱' },
+  { name: 'Austria', flag: '🇦🇹' }, { name: 'Ireland', flag: '🇮🇪' }, { name: 'Argentina', flag: '🇦🇷' },
+  { name: 'Colombia', flag: '🇨🇴' }, { name: 'Chile', flag: '🇨🇱' }, { name: 'Morocco', flag: '🇲🇦' },
+  { name: 'Algeria', flag: '🇩🇿' }, { name: 'Tunisia', flag: '🇹🇳' }, { name: 'Egypt', flag: '🇪🇬' },
+  { name: 'Turkey', flag: '🇹🇷' }, { name: 'Saudi Arabia', flag: '🇸🇦' }, { name: 'South Africa', flag: '🇿🇦' },
+  { name: 'Nigeria', flag: '🇳🇬' }, { name: 'Indonesia', flag: '🇮🇩' }, { name: 'Thailand', flag: '🇹🇭' },
+  { name: 'Vietnam', flag: '🇻🇳' }, { name: 'Philippines', flag: '🇵🇭' }, { name: 'Malaysia', flag: '🇲🇾' },
+  { name: 'Singapore', flag: '🇸🇬' }, { name: 'New Zealand', flag: '🇳🇿' }, { name: 'Israel', flag: '🇮🇱' },
+  { name: 'Greece', flag: '🇬🇷' }, { name: 'Czech Republic', flag: '🇨🇿' }, { name: 'Romania', flag: '🇷🇴' },
+  { name: 'Hungary', flag: '🇭🇺' }, { name: 'Ukraine', flag: '🇺🇦' }, { name: 'Croatia', flag: '🇭🇷' },
+  { name: 'Peru', flag: '🇵🇪' }, { name: 'Venezuela', flag: '🇻🇪' }, { name: 'Ecuador', flag: '🇪🇨' },
+];
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const GRID_PAD = 16;
@@ -72,6 +94,8 @@ export default function ProfileScreen() {
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [locationCity, setLocationCity] = useState('');
   const [locationCountry, setLocationCountry] = useState('');
+  const [countrySearch, setCountrySearch] = useState('');
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [savingLocation, setSavingLocation] = useState(false);
 
   useEffect(() => { loadProfile(); }, []);
@@ -150,6 +174,8 @@ export default function ProfileScreen() {
   const openLocationModal = () => {
     setLocationCity(profile?.user?.city || '');
     setLocationCountry(profile?.user?.country || '');
+    setCountrySearch('');
+    setShowCountryDropdown(false);
     setShowLocationModal(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
@@ -167,7 +193,7 @@ export default function ProfileScreen() {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         setProfile(prev => prev ? {
           ...prev,
-          user: { ...prev.user, city: data.city, country: data.country, country_flag: '' }
+          user: { ...prev.user, city: data.city, country: data.country, country_flag: data.country_flag || '' }
         } : null);
         setShowLocationModal(false);
       } else {
@@ -192,7 +218,7 @@ export default function ProfileScreen() {
       const res = await fetch(`${API_URL}/api/admin/avatars`);
       const data = await res.json();
       setPresetAvatars(data.avatars || []);
-    } catch {}
+    } catch (e) { console.error(e); }
   };
 
   const handleSelectAvatar = async (avatarId: string) => {
@@ -362,7 +388,7 @@ export default function ProfileScreen() {
                 >
                   <View style={[s.topicCardInner, { borderColor: thm.color_hex + '30' }]}>
                     <View style={[s.topicIconBox, { backgroundColor: thm.color_hex + '20' }]}>
-                      <Text style={s.topicIcon}>{thm.name.charAt(0).toUpperCase()}</Text>
+                      <CategoryIcon themeId={thm.id} size={22} color={thm.color_hex} type="theme" />
                     </View>
                     <Text style={[s.topicName, { color: thm.color_hex }]} numberOfLines={1}>{thm.name}</Text>
                     <Text style={s.topicLevel}>{t('profile.level_short')} {thm.level}</Text>
@@ -576,6 +602,7 @@ export default function ProfileScreen() {
                         <Image
                           source={{ uri: `${API_URL}/static/${a.image_url}` }}
                           style={s.avatarGridImage}
+                          onError={() => {}}
                         />
                         <Text style={s.avatarGridName} numberOfLines={1}>{a.name}</Text>
                         {isSelected && (
@@ -612,14 +639,42 @@ export default function ProfileScreen() {
               onChangeText={setLocationCity}
               autoCapitalize="words"
             />
-            <TextInput
-              style={s.locationInput}
-              placeholder={t('profile.your_country')}
-              placeholderTextColor="#525252"
-              value={locationCountry}
-              onChangeText={setLocationCountry}
-              autoCapitalize="words"
-            />
+            {/* Country selector */}
+            <TouchableOpacity
+              style={[s.locationInput, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}
+              onPress={() => { setShowCountryDropdown(v => !v); setCountrySearch(''); }}
+              activeOpacity={0.8}
+            >
+              <Text style={{ color: locationCountry ? '#FFF' : '#525252', fontSize: 15 }}>
+                {locationCountry
+                  ? `${COUNTRIES.find(c => c.name === locationCountry)?.flag || '🌍'} ${locationCountry}`
+                  : t('profile.your_country')}
+              </Text>
+              <MaterialCommunityIcons name={showCountryDropdown ? 'chevron-up' : 'chevron-down'} size={18} color="#A3A3A3" />
+            </TouchableOpacity>
+            {showCountryDropdown && (
+              <View style={s.countryDropdown}>
+                <TextInput
+                  style={s.countrySearchInput}
+                  placeholder="Rechercher..."
+                  placeholderTextColor="#525252"
+                  value={countrySearch}
+                  onChangeText={setCountrySearch}
+                  autoFocus
+                />
+                <ScrollView style={{ maxHeight: 200 }} keyboardShouldPersistTaps="handled">
+                  {COUNTRIES.filter(c => c.name.toLowerCase().includes(countrySearch.toLowerCase())).map(c => (
+                    <TouchableOpacity
+                      key={c.name}
+                      style={s.countryOption}
+                      onPress={() => { setLocationCountry(c.name); setShowCountryDropdown(false); }}
+                    >
+                      <Text style={s.countryOptionText}>{c.flag} {c.name}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
             <TouchableOpacity
               style={[s.modalClose, { backgroundColor: '#8A2BE2' }]}
               onPress={handleSaveLocation}
@@ -872,4 +927,19 @@ const s = StyleSheet.create({
     color: '#FFF', fontSize: 15, paddingHorizontal: 14, paddingVertical: 12,
     width: '100%',
   },
+  countryDropdown: {
+    width: '100%', backgroundColor: '#0E0E1E',
+    borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
+    overflow: 'hidden',
+  },
+  countrySearchInput: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    color: '#FFF', fontSize: 14, paddingHorizontal: 14, paddingVertical: 10,
+    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)',
+  },
+  countryOption: {
+    paddingHorizontal: 14, paddingVertical: 11,
+    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)',
+  },
+  countryOptionText: { color: '#FFF', fontSize: 14 },
 });

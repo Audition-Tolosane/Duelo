@@ -77,7 +77,7 @@ export default function OnboardingScreen() {
         const data = await res.json();
         setTrending(data.trending || []);
       }
-    } catch {}
+    } catch (e) { console.error(e); }
     setLoadingTrending(false);
   };
 
@@ -96,7 +96,7 @@ export default function OnboardingScreen() {
         }).catch(() => {});
       }
       await AsyncStorage.setItem('duelo_onboarding_done', 'true');
-    } catch {}
+    } catch (e) { console.error(e); }
     if (isMounted.current) router.replace('/(tabs)/play');
   };
 

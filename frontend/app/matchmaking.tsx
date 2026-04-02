@@ -143,9 +143,10 @@ function PlayerPin({ x, y, name, color, isTarget }: {
 export default function MatchmakingScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { category: rawCategory, themeName, rematch } = useLocalSearchParams<{ category: string; themeName: string; rematch: string }>();
+  const { category: rawCategory, themeName, rematch, room_id: challengeRoomId, challenge, opponentPseudo: challengeOpponentPseudo } = useLocalSearchParams<{ category: string; themeName: string; rematch: string; room_id: string; challenge: string; opponentPseudo: string }>();
   const category = rawCategory || '';
   const isRematch = rematch === 'true';
+  const isChallengeMode = challenge === 'true' && !!challengeRoomId;
   const { send: wsSend, on: wsOn } = useWS();
   const [dots, setDots] = useState('');
   const [message, setMessage] = useState(t('matchmaking.searching_opponent'));
@@ -154,6 +155,7 @@ export default function MatchmakingScreen() {
   const [playerInfo, setPlayerInfo] = useState<PlayerData | null>(null);
   const [pseudo, setPseudo] = useState(t('matchmaking.player'));
   const [roomId, setRoomId] = useState<string | null>(null);
+  const [showTimeoutModal, setShowTimeoutModal] = useState(false);
 
   const mapX = useSharedValue(INIT_X);
   const mapY = useSharedValue(INIT_Y);
@@ -184,14 +186,22 @@ export default function MatchmakingScreen() {
   ];
 
   useEffect(() => {
+    if (!category && !isChallengeMode) {
+      router.replace('/(tabs)/play');
+      return;
+    }
     loadPseudo();
     if (isRematch) {
-      // Rematch accepted → skip search, go straight to VS
       fetchBotOpponent();
+    } else if (isChallengeMode) {
+      // Challenge mode: join the private room instead of the matchmaking queue
+      wsSend({ action: 'challenge_join', room_id: challengeRoomId });
     } else {
       wsSend({ action: 'matchmaking_join', theme_id: category });
     }
-    return () => { if (!isRematch) wsSend({ action: 'matchmaking_leave' }); };
+    return () => {
+      if (!isRematch && !isChallengeMode) wsSend({ action: 'matchmaking_leave' });
+    };
   }, []);
 
   useEffect(() => {
@@ -218,6 +228,20 @@ export default function MatchmakingScreen() {
       wsOn('matchmaking_timeout', () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         fetchBotOpponent();
+      }),
+      wsOn('challenge_timeout', () => {
+        // Challenger didn't join in time — show choice modal
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        setShowTimeoutModal(true);
+      }),
+      wsOn('challenge_room_expired', () => {
+        // Room no longer exists — fall back to regular matchmaking
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        if (category) {
+          wsSend({ action: 'matchmaking_join', theme_id: category });
+        } else {
+          router.back();
+        }
       }),
     ];
     return () => unsubs.forEach((u) => u());
@@ -294,7 +318,7 @@ export default function MatchmakingScreen() {
     const vsDelay = isRematch ? 500 : 1800;
     const navDelay = isRematch ? 2800 : 4500;
 
-    setPhase(isRematch ? 'found' : 'found');
+    setPhase('found');
 
     const targetX = -(pin.x * SCALE - SW / 2);
     const targetY = -(pin.y * SCALE - SH / 2);
@@ -314,8 +338,10 @@ export default function MatchmakingScreen() {
     }, vsDelay);
 
     setTimeout(() => {
+      const skillParam = opp.skill_level != null ? `&botSkill=${opp.skill_level}` : '';
+      const speedParam = opp.avg_speed   != null ? `&botSpeed=${opp.avg_speed}`   : '';
       router.replace(
-        `/game?category=${category}&opponentPseudo=${opp.pseudo}&opponentSeed=${opp.avatar_seed}&isBot=${isBotMatch}&opponentLevel=${opp.level}&opponentStreak=${opp.streak}&opponentId=${opp.id || ''}${matchRoomId ? `&roomId=${matchRoomId}` : ''}`
+        `/game?category=${category}&opponentPseudo=${opp.pseudo}&opponentSeed=${opp.avatar_seed}&isBot=${isBotMatch}&opponentLevel=${opp.level}&opponentStreak=${opp.streak}&opponentId=${opp.id || ''}${matchRoomId ? `&roomId=${matchRoomId}` : ''}${skillParam}${speedParam}`
       );
     }, navDelay);
   };
@@ -430,19 +456,25 @@ export default function MatchmakingScreen() {
           <View style={styles.searchOverlay}>
             <View style={styles.searchCard}>
               <LinearGradient
-                colors={['rgba(138,43,226,0.12)', 'rgba(5,5,16,0.95)']}
+                colors={isChallengeMode ? ['rgba(191,95,255,0.15)', 'rgba(5,5,16,0.95)'] : ['rgba(138,43,226,0.12)', 'rgba(5,5,16,0.95)']}
                 style={styles.searchCardGradient}>
                 <View style={styles.categoryChip}>
-                  <MaterialCommunityIcons name="sword-cross" size={14} color="#8A2BE2" />
-                  <Text style={styles.categoryLabel}>{getCategoryLabel()}</Text>
+                  <MaterialCommunityIcons name="sword-cross" size={14} color={isChallengeMode ? '#BF5FFF' : '#8A2BE2'} />
+                  <Text style={[styles.categoryLabel, isChallengeMode && { color: '#BF5FFF' }]}>{getCategoryLabel()}</Text>
                 </View>
                 <View style={styles.scannerRow}>
-                  <View style={styles.scannerDot} />
-                  <Text style={styles.searchMessage}>{message}{dots}</Text>
+                  <View style={[styles.scannerDot, isChallengeMode && { backgroundColor: '#BF5FFF' }]} />
+                  <Text style={styles.searchMessage}>
+                    {isChallengeMode
+                      ? `${t('challenge.waiting_for')} ${challengeOpponentPseudo ? decodeURIComponent(challengeOpponentPseudo) : '...'}${dots}`
+                      : `${message}${dots}`}
+                  </Text>
                 </View>
                 <View style={styles.hintRow}>
-                  <MaterialCommunityIcons name="earth" size={14} color="#525252" />
-                  <Text style={styles.hint}>{t('matchmaking.scanning_active')}</Text>
+                  <MaterialCommunityIcons name={isChallengeMode ? 'shield-sword' : 'earth'} size={14} color="#525252" />
+                  <Text style={styles.hint}>
+                    {isChallengeMode ? t('challenge.ready_title') : t('matchmaking.scanning_active')}
+                  </Text>
                 </View>
               </LinearGradient>
             </View>
@@ -532,6 +564,40 @@ export default function MatchmakingScreen() {
           </>
         )}
       </View>
+
+      {/* ── Challenge Timeout Modal ── */}
+      {showTimeoutModal && (
+        <View style={styles.timeoutOverlay}>
+          <View style={styles.timeoutCard}>
+            <MaterialCommunityIcons name="clock-alert-outline" size={40} color="#FF9F0A" style={{ marginBottom: 12 }} />
+            <Text style={styles.timeoutTitle}>{t('challenge.timeout_title')}</Text>
+            <Text style={styles.timeoutBody}>{t('challenge.timeout_body')}</Text>
+            <View style={styles.timeoutButtons}>
+              <TouchableOpacity
+                style={styles.timeoutCancelBtn}
+                onPress={() => { setShowTimeoutModal(false); router.replace('/(tabs)/accueil'); }}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.timeoutCancelText}>{t('common.cancel')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.timeoutPlayBtn}
+                onPress={() => { setShowTimeoutModal(false); fetchBotOpponent(); }}
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={['#8A2BE2', '#00FFFF']}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                  style={styles.timeoutPlayGradient}
+                >
+                  <MaterialCommunityIcons name="lightning-bolt" size={16} color="#FFF" />
+                  <Text style={styles.timeoutPlayText}>{t('challenge.play_now')}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
     </SwipeBackPage>
   );
 }
@@ -615,4 +681,72 @@ const styles = StyleSheet.create({
   vsBadgeText: { color: '#FFF', fontSize: 20, fontWeight: '900', letterSpacing: 2 },
   versusHintRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 48 },
   versusHint: { color: '#525252', fontSize: 14, fontWeight: '600' },
+
+  timeoutOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.88)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+    zIndex: 200,
+  },
+  timeoutCard: {
+    width: '100%',
+    backgroundColor: '#0D0D1A',
+    borderRadius: 24,
+    padding: 28,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,159,10,0.3)',
+  },
+  timeoutTitle: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#FFF',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  timeoutBody: {
+    fontSize: 14,
+    color: '#A3A3A3',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  timeoutButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+  },
+  timeoutCancelBtn: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  timeoutCancelText: {
+    color: '#A3A3A3',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  timeoutPlayBtn: {
+    flex: 1.5,
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  timeoutPlayGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    padding: 14,
+    borderRadius: 14,
+  },
+  timeoutPlayText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '800',
+  },
 });

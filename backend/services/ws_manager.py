@@ -14,6 +14,7 @@ class ConnectionManager:
     """Manages all WebSocket connections: chat, notifications, game."""
 
     MATCHMAKING_TIMEOUT = 15  # seconds before falling back to bot
+    CHALLENGE_ROOM_TIMEOUT = 30  # seconds for challenger to join after accept
 
     def __init__(self):
         # user_id → WebSocket (one connection per user)
@@ -30,6 +31,8 @@ class ConnectionManager:
         self._rematch_by_opponent: dict[str, str] = {}
         # Quick lookup: proposer_id → rematch_id
         self._rematch_by_proposer: dict[str, str] = {}
+        # Pending challenge rooms: room_id → {acceptor_id, challenger_id, theme_id, players_data, timer}
+        self.pending_challenge_rooms: dict[str, dict] = {}
 
     async def connect(self, user_id: str, ws: WebSocket):
         await ws.accept()
@@ -75,12 +78,12 @@ class ConnectionManager:
         else:
             avg_pts = 10  # Default: base points for a correct answer
 
-        # Add compensation: average * remaining questions
+        # Add compensation: average * remaining questions (points only, not is_correct)
         compensation = round(avg_pts * remaining)
         room.scores[opponent_id] += compensation
-        room.correct_counts[opponent_id] += min(remaining, remaining)  # assume correct for remaining
+        # Do NOT increment correct_counts — compensation is not real correct answers
 
-        # Mark all remaining questions as answered by disconnected player (score 0)
+        # Mark all remaining questions for both players (score 0 for disconnected)
         for i in range(room.total_questions):
             if i not in room.answers.get(disconnected_id, {}):
                 if disconnected_id not in room.answers:
@@ -96,7 +99,7 @@ class ConnectionManager:
                     room.answers[opponent_id] = {}
                 room.answers[opponent_id][i] = {
                     "answer": -1,
-                    "is_correct": True,
+                    "is_correct": False,   # compensation ≠ correct answer
                     "points": round(avg_pts),
                     "time_ms": 5000,
                 }
@@ -398,6 +401,106 @@ class ConnectionManager:
             timer.cancel()
         self._rematch_by_opponent.pop(rematch.get("opponent_id", ""), None)
         self._rematch_by_proposer.pop(rematch.get("proposer_id", ""), None)
+
+    # ── Challenge Rooms ──
+
+    async def create_challenge_room(self, room_id: str, acceptor_id: str, challenger_id: str,
+                                     theme_id: str, opponent_pseudo: str, theme_name: str):
+        """Create a pending challenge room and notify the challenger to join."""
+        self.pending_challenge_rooms[room_id] = {
+            "acceptor_id": acceptor_id,
+            "challenger_id": challenger_id,
+            "theme_id": theme_id,
+            "players_data": {},
+        }
+
+        # Notify challenger
+        await self.send_to_user(challenger_id, {
+            "type": "challenge_ready",
+            "data": {
+                "room_id": room_id,
+                "theme_id": theme_id,
+                "theme_name": theme_name,
+                "opponent_pseudo": opponent_pseudo,
+            },
+        })
+
+        # Start timeout — notify acceptor if challenger never joins
+        task = asyncio.create_task(self._challenge_room_timeout(room_id, acceptor_id))
+        self.pending_challenge_rooms[room_id]["timer"] = task
+        logger.info(f"Challenge room pending: {room_id} ({acceptor_id} vs {challenger_id})")
+
+    async def join_challenge_room(self, user_id: str, room_id: str, user_data: dict):
+        """A player joins a pending challenge room. When both are in → start game."""
+        room = self.pending_challenge_rooms.get(room_id)
+        if not room:
+            await self.send_to_user(user_id, {
+                "type": "challenge_room_expired",
+                "data": {"message": "Salle introuvable ou expirée"},
+            })
+            return
+
+        if user_id not in (room["acceptor_id"], room["challenger_id"]):
+            return
+
+        room["players_data"][user_id] = user_data
+
+        # Both players joined → cancel timeout and start game
+        if room["acceptor_id"] in room["players_data"] and room["challenger_id"] in room["players_data"]:
+            timer = room.get("timer")
+            if timer:
+                timer.cancel()
+
+            acceptor_entry = {"user_id": room["acceptor_id"], "user_data": room["players_data"][room["acceptor_id"]]}
+            challenger_entry = {"user_id": room["challenger_id"], "user_data": room["players_data"][room["challenger_id"]]}
+            theme_id = room["theme_id"]
+
+            self.pending_challenge_rooms.pop(room_id, None)
+            await self._create_challenge_game_room(room_id, acceptor_entry, challenger_entry, theme_id)
+
+    async def _create_challenge_game_room(self, room_id: str, player1: dict, player2: dict, theme_id: str):
+        """Create a game room for a challenge match (pre-assigned room_id)."""
+        room = GameRoom(
+            room_id=room_id,
+            player1_id=player1["user_id"],
+            player2_id=player2["user_id"],
+            player1_data=player1["user_data"],
+            player2_data=player2["user_data"],
+            theme_id=theme_id,
+        )
+        self.game_rooms[room_id] = room
+
+        for player, opponent in [(player1, player2), (player2, player1)]:
+            await self.send_to_user(player["user_id"], {
+                "type": "match_found",
+                "data": {
+                    "room_id": room_id,
+                    "opponent": opponent["user_data"],
+                    "theme_id": theme_id,
+                },
+            })
+        logger.info(f"Challenge game room started: {room_id}")
+
+    async def _challenge_room_timeout(self, room_id: str, acceptor_id: str):
+        """After CHALLENGE_ROOM_TIMEOUT seconds, notify acceptor that challenger didn't join."""
+        try:
+            await asyncio.sleep(self.CHALLENGE_ROOM_TIMEOUT)
+        except asyncio.CancelledError:
+            return
+
+        room = self.pending_challenge_rooms.pop(room_id, None)
+        if not room:
+            return
+
+        await self.send_to_user(acceptor_id, {
+            "type": "challenge_timeout",
+            "data": {},
+        })
+        logger.info(f"Challenge room timed out: {room_id}")
+
+    def get_challenge_room_theme(self, room_id: str) -> str:
+        room = self.pending_challenge_rooms.get(room_id)
+        return room["theme_id"] if room else ""
 
     # ── Game Actions ──
 

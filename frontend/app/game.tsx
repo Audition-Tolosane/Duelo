@@ -12,6 +12,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { GLASS } from '../theme/glassTheme';
 import SwipeBackPage from '../components/SwipeBackPage';
 import { useWS } from '../contexts/WebSocketContext';
+import { authFetch } from '../utils/api';
+import { saveScoreWithRetry } from '../utils/pendingScores';
 import { t } from '../utils/i18n';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -104,16 +106,16 @@ export default function GameScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{
     category: string; opponentPseudo: string; opponentSeed: string; isBot: string; roomId: string; opponentLevel: string; opponentId: string;
+    challenge_id: string; asyncChallenge: string; asyncMode: string;
+    botSkill: string; botSpeed: string;
   }>();
   const { send: wsSend, on: wsOn } = useWS();
 
   const themeId = params.category;
-  if (!themeId) {
-    Alert.alert(t('common.error'), t('game.invalid_game'), [{ text: t('common.ok'), onPress: () => router.replace('/(tabs)/play') }]);
-    return null;
-  }
-
   const isLive = params.roomId && params.isBot !== 'true';
+  const isAsyncSolo = params.asyncMode === 'solo';
+  const isAsyncReveal = params.asyncMode === 'reveal';
+  const isAsync = isAsyncSolo || isAsyncReveal;
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -142,10 +144,22 @@ export default function GameScreen() {
   const [completedQuestions, setCompletedQuestions] = useState(0);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timeLeftRef = useRef(TIMER_DURATION);
+  const questionsRef = useRef<Question[]>([]);
+  const currentIndexRef = useRef(0);
   const timerAnim = useRef(new Animated.Value(1)).current;
   const questionFade = useRef(new Animated.Value(0)).current;
   const userIdRef = useRef<string | null>(null);
   const lastAnswerCorrectRef = useRef(false);
+
+  // Async challenge tracking
+  type AnswerRecord = { answer: number; is_correct: boolean; points: number; time_ms: number };
+  const playerAnswersHistoryRef = useRef<AnswerRecord[]>([]);
+  const p1AnswersRef = useRef<{ answer: number; is_correct: boolean; points: number }[]>([]);
+
+  // Guards
+  const isSubmittingRef = useRef(false);               // #18 double-tap prevention
+  const wsAnswerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // #17 WS hang timeout
 
   // Progress bar animation
   const progressAnim = useRef(new Animated.Value(0)).current;
@@ -158,7 +172,12 @@ export default function GameScreen() {
       // Live multiplayer: wait for game_start from WebSocket
       // Questions are loaded server-side and pushed to us
     } else {
-      // Bot mode: fetch questions via HTTP
+      // Bot mode: fetch questions via HTTP — guard against missing themeId (#19)
+      if (!themeId) {
+        setLoading(false);
+        setLoadError(t('game.invalid_game') || 'Thème invalide');
+        return;
+      }
       fetchQuestions();
     }
 
@@ -183,6 +202,24 @@ export default function GameScreen() {
     };
   }, []);
 
+  // ── Fetch Player A's answers for reveal mode ──
+  useEffect(() => {
+    if (!isAsyncReveal || !params.challenge_id) return;
+    const fetchP1Answers = async () => {
+      try {
+        const userId = await AsyncStorage.getItem('duelo_user_id');
+        const res = await authFetch(
+          `${API_URL}/api/challenges/${params.challenge_id}/p1-answers?user_id=${userId}`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          p1AnswersRef.current = data.answers || [];
+        }
+      } catch (e) { console.error(e); }
+    };
+    fetchP1Answers();
+  }, []);
+
   // ── Live multiplayer WebSocket listeners ──
   useEffect(() => {
     if (!isLive) return;
@@ -194,7 +231,9 @@ export default function GameScreen() {
         if (q) {
           // Store total questions count, set first question
           const total = msg.data?.total_questions || TOTAL_QUESTIONS;
-          setQuestions([q]); // We receive questions one at a time
+          questionsRef.current = [q];
+          currentIndexRef.current = 0;
+          setQuestions([q]);
           setLoading(false);
           animateQuestion();
           startTimer();
@@ -202,6 +241,10 @@ export default function GameScreen() {
       }),
       // Our answer result
       wsOn('answer_result', (msg) => {
+        // #17 clear hang timeout, #18 reset submission guard
+        if (wsAnswerTimeoutRef.current) clearTimeout(wsAnswerTimeoutRef.current);
+        isSubmittingRef.current = false;
+
         const { is_correct, points, your_score, opponent_score, question_index } = msg.data || {};
         lastAnswerCorrectRef.current = is_correct;
         playerScoreRef.current = your_score;
@@ -240,7 +283,9 @@ export default function GameScreen() {
       wsOn('next_question', (msg) => {
         const q = msg.data?.question;
         if (q) {
-          setQuestions((prev) => [...prev, q]);
+          questionsRef.current = [...questionsRef.current, q];
+          currentIndexRef.current = msg.data.question_index;
+          setQuestions(questionsRef.current);
           setCurrentIndex(msg.data.question_index);
           setSelectedOption(null);
           setBotAnswer(null);
@@ -293,7 +338,9 @@ export default function GameScreen() {
     setLoading(true);
     setLoadError(null);
     try {
-      const url = `${API_URL}/api/game/questions-v2?theme=${params.category}`;
+      const voFlag = await AsyncStorage.getItem(`duelo_vo_${params.category}`);
+      const langParam = voFlag === 'true' ? '&lang=en' : '';
+      const url = `${API_URL}/api/game/questions-v2?theme=${params.category}${langParam}`;
       const res = await fetch(url);
       if (!res.ok) {
         throw new Error(`${t('game.server_error')} (${res.status})`);
@@ -302,7 +349,10 @@ export default function GameScreen() {
       if (!Array.isArray(data) || data.length === 0) {
         throw new Error(t('game.no_questions'));
       }
-      setQuestions(data.slice(0, TOTAL_QUESTIONS));
+      const loaded = data.slice(0, TOTAL_QUESTIONS);
+      questionsRef.current = loaded;
+      currentIndexRef.current = 0;
+      setQuestions(loaded);
       setLoading(false);
       animateQuestion();
       startTimer();
@@ -318,6 +368,7 @@ export default function GameScreen() {
   };
 
   const startTimer = () => {
+    timeLeftRef.current = TIMER_DURATION;
     setTimeLeft(TIMER_DURATION);
     timerAnim.setValue(1);
     Animated.timing(timerAnim, {
@@ -326,22 +377,30 @@ export default function GameScreen() {
 
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          if (timerRef.current) clearInterval(timerRef.current);
-          handleTimeout();
-          return 0;
-        }
-        return prev - 1;
-      });
+      timeLeftRef.current -= 1;
+      const remaining = timeLeftRef.current;
+      setTimeLeft(remaining);
+      if (remaining <= 0) {
+        if (timerRef.current) clearInterval(timerRef.current);
+        timerRef.current = null;
+        handleTimeout();
+      }
     }, 1000);
   };
 
   const resolveBotAnswer = (question: Question) => {
-    const botCorrect = Math.random() > 0.35;
+    // Use real bot stats from DB if available, otherwise fall back to defaults
+    const skillLevel = parseFloat(params.botSkill || '') || 0.55;  // probability of correct answer
+    const avgSpeed   = parseFloat(params.botSpeed || '') || 5.0;   // avg response time in seconds
+
+    const botCorrect = Math.random() < skillLevel;
+    // Response time: avg_speed ± 30% variance, clamped 0.8s–14s
+    const botTimeSec = Math.max(0.8, Math.min(14, avgSpeed * (0.7 + Math.random() * 0.6)));
+    const botTimeMs  = Math.round(botTimeSec * 1000);
+
     if (botCorrect) {
-      const botTime = Math.floor(Math.random() * 7) + 2;
-      return { botPick: question.correct_option, botPts: Math.max(MAX_PTS_PER_Q - botTime, 10) };
+      const speedBonus = Math.max(0, Math.round(10 * (1 - botTimeMs / 10000)));
+      return { botPick: question.correct_option, botPts: Math.max(10 + speedBonus, 10) };
     }
     const wrongOpts = [0, 1, 2, 3].filter(i => i !== question.correct_option);
     return { botPick: wrongOpts[Math.floor(Math.random() * wrongOpts.length)], botPts: 0 };
@@ -382,7 +441,7 @@ export default function GameScreen() {
       wsSend({
         action: 'game_answer',
         room_id: params.roomId,
-        question_index: currentIndex,
+        question_index: currentIndexRef.current,
         answer: -1,
         time_ms: TIMER_DURATION * 1000,
       });
@@ -390,19 +449,38 @@ export default function GameScreen() {
     } else {
       setShowResult(true);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      const question = questions[currentIndex];
-      const { botPick, botPts } = resolveBotAnswer(question);
-      handleAnswer(0, botPts, botPick);
+      const question = questionsRef.current[currentIndexRef.current];
+      if (!question) return;
+
+      // Record timeout to history for async modes
+      if (isAsync) {
+        playerAnswersHistoryRef.current.push({
+          answer: -1,
+          is_correct: false,
+          points: 0,
+          time_ms: TIMER_DURATION * 1000,
+        });
+      }
+
+      if (isAsyncReveal) {
+        const p1 = p1AnswersRef.current[currentIndexRef.current];
+        handleAnswer(0, p1?.points ?? 0, p1?.answer ?? -1);
+      } else {
+        const { botPick, botPts } = resolveBotAnswer(question);
+        handleAnswer(0, botPts, botPick);
+      }
     }
   };
 
   const selectAnswer = useCallback((optionIndex: number) => {
     if (selectedOption !== null || showResult) return;
+    if (isSubmittingRef.current) return; // #18 double-tap guard
+    isSubmittingRef.current = true;
     if (timerRef.current) clearInterval(timerRef.current);
 
     setSelectedOption(optionIndex);
 
-    const timeTaken = TIMER_DURATION - timeLeft;
+    const timeTaken = TIMER_DURATION - timeLeftRef.current;
     const timeMs = timeTaken * 1000;
 
     if (isLive) {
@@ -414,11 +492,20 @@ export default function GameScreen() {
         answer: optionIndex,
         time_ms: timeMs,
       });
+
+      // #17 — If server hangs, auto-advance after 8s to avoid infinite freeze
+      if (wsAnswerTimeoutRef.current) clearTimeout(wsAnswerTimeoutRef.current);
+      wsAnswerTimeoutRef.current = setTimeout(() => {
+        setShowResult(true);
+        setShowPending(false);
+        isSubmittingRef.current = false;
+      }, 8000);
       // Don't show result locally — wait for server response
     } else {
       // Bot mode: resolve locally
       setShowResult(true);
 
+      isSubmittingRef.current = false; // reset guard for local (bot/async) path
       const question = questions[currentIndex];
       const isCorrect = optionIndex === question.correct_option;
       const pPts = isCorrect ? Math.max(MAX_PTS_PER_Q - timeTaken, 10) : 0;
@@ -429,17 +516,33 @@ export default function GameScreen() {
 
       if (isCorrect) correctCountRef.current += 1;
 
-      const { botPick, botPts } = resolveBotAnswer(question);
-      handleAnswer(pPts, botPts, botPick);
+      // Record answer history for async modes
+      if (isAsync) {
+        playerAnswersHistoryRef.current.push({
+          answer: optionIndex,
+          is_correct: isCorrect,
+          points: pPts,
+          time_ms: timeMs,
+        });
+      }
+
+      if (isAsyncReveal) {
+        const p1 = p1AnswersRef.current[currentIndex];
+        handleAnswer(pPts, p1?.points ?? 0, p1?.answer ?? -1);
+      } else {
+        const { botPick, botPts } = resolveBotAnswer(question);
+        handleAnswer(pPts, botPts, botPick);
+      }
     }
-  }, [selectedOption, showResult, currentIndex, questions, timeLeft, isLive]);
+  }, [selectedOption, showResult, currentIndex, questions, isLive, isAsync, isAsyncReveal]);
 
   const nextQuestion = () => {
-    if (currentIndex + 1 >= questions.length) {
+    if (currentIndexRef.current + 1 >= questionsRef.current.length) {
       endGame();
       return;
     }
-    setCurrentIndex(prev => prev + 1);
+    currentIndexRef.current += 1;
+    setCurrentIndex(currentIndexRef.current);
     setSelectedOption(null);
     setBotAnswer(null);
     setShowResult(false);
@@ -464,7 +567,27 @@ export default function GameScreen() {
     // Save questions for the report feature on results screen
     try {
       await AsyncStorage.setItem('duelo_last_quiz_questions', JSON.stringify(questions));
-    } catch {}
+    } catch (e) { console.error(e); }
+    // Async challenge mode: save score + per-question answers (with retry + offline queue)
+    if (params.challenge_id && isAsync) {
+      const { ok, data: saveData } = await saveScoreWithRetry(
+        params.challenge_id,
+        { user_id: userId || '', score: ps, correct: cc, answers: playerAnswersHistoryRef.current }
+      );
+      if (ok && saveData?.status === 'completed') {
+        // Both players have now played → show results immediately with both real scores
+        const opponentFinalScore = isAsyncSolo ? saveData.p2_score : saveData.p1_score;
+        router.replace(
+          `/results?playerScore=${ps}&opponentScore=${opponentFinalScore}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=false&correctCount=${cc}&opponentLevel=1&opponentId=`
+        );
+        return;
+      }
+      // First to finish or network error — show async banner
+      router.replace(
+        `/results?playerScore=${ps}&opponentScore=0&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=true&correctCount=${cc}&opponentLevel=1&opponentId=&asyncChallenge=true&challengeOpponent=${encodeURIComponent(params.opponentPseudo || '')}`
+      );
+      return;
+    }
     router.replace(
       `/results?playerScore=${ps}&opponentScore=${bs}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=${params.isBot}&correctCount=${cc}&opponentLevel=${ol}&opponentId=${params.opponentId || ''}`
     );
@@ -474,6 +597,12 @@ export default function GameScreen() {
     const spinInterp = spinAnim.interpolate({
       inputRange: [0, 1], outputRange: ['0deg', '360deg'],
     });
+
+    // Invalid params — guard after all hooks
+    if (!themeId) {
+      Alert.alert(t('common.error'), t('game.invalid_game'), [{ text: t('common.ok'), onPress: () => router.replace('/(tabs)/play') }]);
+      return null;
+    }
 
     // Show error state
     if (loadError) {
@@ -656,11 +785,13 @@ export default function GameScreen() {
                 {params.opponentPseudo?.slice(0, 10)}
               </Text>
               <Text style={[styles.playerTitle, { textAlign: 'right' }]}>
-                {isLive ? t('game.online') : t('game.bot')}
+                {isLive ? t('game.online') : isAsyncSolo ? t('game.async_will_play') : isAsyncReveal ? t('game.already_played') : t('game.bot')}
               </Text>
               <View style={[styles.scoreRow, { justifyContent: 'flex-end' }]}>
                 <MaterialCommunityIcons name="star" size={14} color="#FFD700" />
-                <Text style={[styles.playerScoreNum, { textAlign: 'right' }]}>{botScore}</Text>
+                <Text style={[styles.playerScoreNum, { textAlign: 'right' }]}>
+                  {isAsyncSolo ? '—' : botScore}
+                </Text>
               </View>
             </View>
             <LinearGradient

@@ -14,7 +14,7 @@ JWT_SECRET = os.environ.get('JWT_SECRET')
 if not JWT_SECRET:
     raise RuntimeError("JWT_SECRET environment variable is required")
 JWT_ALGORITHM = "HS256"
-JWT_EXPIRE_MINUTES = 43200  # 30 days
+JWT_EXPIRE_MINUTES = 10080  # 7 days
 
 ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', 'http://localhost:8081,http://localhost:19006').split(',')
 

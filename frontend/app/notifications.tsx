@@ -3,6 +3,7 @@ import {
   View, Text, TouchableOpacity, StyleSheet, FlatList,
   ActivityIndicator, RefreshControl, Platform,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
+import ScalePressable from '../components/ScalePressable';
 import { t, getLocale } from '../utils/i18n';
 import UserAvatar from '../components/UserAvatar';
 import { authFetch } from '../utils/api';
@@ -150,7 +152,7 @@ export default function NotificationsScreen() {
       setNotifications(prev =>
         prev.map(n => n.id === notifId ? { ...n, read: true } : n)
       );
-    } catch {}
+    } catch (e) { console.error(e); }
   };
 
   const markAllAsRead = async () => {
@@ -163,7 +165,7 @@ export default function NotificationsScreen() {
         body: JSON.stringify({ user_id: userId }),
       });
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    } catch {}
+    } catch (e) { console.error(e); }
   };
 
   const handleNotificationPress = (notif: NotificationItem) => {
@@ -207,7 +209,7 @@ export default function NotificationsScreen() {
     section.data.forEach(item => flatData.push(item));
   });
 
-  const renderItem = ({ item }: { item: NotificationItem | { _sectionHeader: string } }) => {
+  const renderItem = ({ item, index = 0 }: { item: NotificationItem | { _sectionHeader: string }; index?: number }) => {
     if ('_sectionHeader' in item) {
       return (
         <View style={styles.sectionHeader}>
@@ -219,10 +221,10 @@ export default function NotificationsScreen() {
     const meta = TYPE_META[item.type] || DEFAULT_META;
 
     return (
-      <TouchableOpacity
+      <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
+      <ScalePressable
         style={[styles.notifCard, !item.read && styles.notifCardUnread]}
         onPress={() => handleNotificationPress(item)}
-        activeOpacity={0.7}
       >
         {/* Unread indicator line */}
         {!item.read && <View style={[styles.unreadLine, { backgroundColor: meta.color }]} />}
@@ -255,7 +257,8 @@ export default function NotificationsScreen() {
 
         {/* Chevron */}
         <MaterialCommunityIcons name="chevron-right" size={18} color="rgba(255,255,255,0.2)" />
-      </TouchableOpacity>
+      </ScalePressable>
+      </Animated.View>
     );
   };
 

@@ -1,8 +1,8 @@
 import secrets
 import random
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, func
+from fastapi import APIRouter, Depends, HTTPException, Request
+from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from database import get_db
@@ -12,6 +12,7 @@ from constants import COUNTRY_FLAGS, SUPER_CATEGORY_META
 from services.xp import get_level, get_theme_title, get_streak_badge
 from services.notifications import create_notification
 from auth_middleware import get_current_user_id
+from rate_limit import rate_limit
 
 router = APIRouter(tags=["social"])
 
@@ -82,7 +83,7 @@ async def get_wall_posts(category_id: str, user_id: Optional[str] = None, limit:
 
 
 @router.post("/category/{category_id}/wall")
-async def create_wall_post(category_id: str, data: WallPostCreate, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+async def create_wall_post(category_id: str, data: WallPostCreate, request: Request, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db), _rate=Depends(rate_limit(limit=5, window=60))):
     if data.user_id != current_user:
         raise HTTPException(status_code=403, detail="Non autorisé")
     if not data.content.strip():
@@ -188,21 +189,27 @@ async def get_comments(post_id: str, db: AsyncSession = Depends(get_db)):
         select(PostComment).where(PostComment.post_id == post_id).order_by(PostComment.created_at.asc())
     )
     comments = result.scalars().all()
+    if not comments:
+        return []
 
-    comments_data = []
-    for c in comments:
-        u_res = await db.execute(select(User).where(User.id == c.user_id))
-        user = u_res.scalar_one_or_none()
-        comments_data.append({
+    # Batch-fetch all users in one query — no N+1
+    user_ids = list({c.user_id for c in comments})
+    users_res = await db.execute(select(User).where(User.id.in_(user_ids)))
+    users_map = {u.id: u for u in users_res.scalars().all()}
+
+    return [
+        {
             "id": c.id,
             "user": {
-                "id": user.id if user else "", "pseudo": user.pseudo if user else "Inconnu",
-                "avatar_seed": user.avatar_seed if user else "",
-                "avatar_url": getattr(user, 'avatar_url', None) if user else None,
+                "id": c.user_id,
+                "pseudo": users_map[c.user_id].pseudo if c.user_id in users_map else "Inconnu",
+                "avatar_seed": users_map[c.user_id].avatar_seed if c.user_id in users_map else "",
+                "avatar_url": getattr(users_map.get(c.user_id), 'avatar_url', None),
             },
             "content": c.content, "created_at": c.created_at.isoformat(),
-        })
-    return comments_data
+        }
+        for c in comments
+    ]
 
 
 # ── Helper: get theme name/color from theme_id ──
@@ -541,6 +548,7 @@ async def social_pulse(user_id: str, db: AsyncSession = Depends(get_db)):
             "category": "", "category_name": "",
             "category_color": "#FFD700", "pillar_color": "#FFD700",
             "title": f"Série de {u.current_streak} victoires !", "icon": "🔥",
+            "streak_count": u.current_streak,
             "can_challenge": True, "is_self": False,
             "created_at": datetime.now(timezone.utc).isoformat(),
         })
@@ -551,41 +559,69 @@ async def social_pulse(user_id: str, db: AsyncSession = Depends(get_db)):
 
 @router.get("/social/tribes")
 async def social_tribes(user_id: Optional[str] = None, db: AsyncSession = Depends(get_db)):
-    """Get top player per theme (tribes)."""
+    """Get top player per theme (tribes). Uses 4 queries total regardless of theme count."""
+    from sqlalchemy import text as sql_text
+
     themes_res = await db.execute(select(Theme).order_by(Theme.super_category, Theme.cluster, Theme.name))
     all_themes = themes_res.scalars().all()
+    if not all_themes:
+        return {"tribes": []}
+
+    theme_ids = [t.id for t in all_themes]
+    themes_map = {t.id: t for t in all_themes}
+
+    # Query 2: top UserThemeXP per theme (DISTINCT ON — one row per theme_id, ranked by xp desc)
+    top_xp_res = await db.execute(
+        sql_text("""
+            SELECT DISTINCT ON (theme_id) id, theme_id, user_id, xp
+            FROM user_theme_xp
+            WHERE theme_id = ANY(:theme_ids) AND xp > 0
+            ORDER BY theme_id, xp DESC
+        """),
+        {"theme_ids": theme_ids},
+    )
+    top_xp_rows = top_xp_res.fetchall()
+    top_xp_by_theme = {row.theme_id: row for row in top_xp_rows}
+
+    # Query 3: batch-fetch all throne users
+    throne_user_ids = [row.user_id for row in top_xp_rows]
+    users_map: dict = {}
+    if throne_user_ids:
+        users_res = await db.execute(select(User).where(User.id.in_(throne_user_ids)))
+        users_map = {u.id: u for u in users_res.scalars().all()}
+
+    # Query 4: member counts per theme in one aggregate query
+    counts_res = await db.execute(
+        sql_text("""
+            SELECT theme_id, COUNT(*) as cnt
+            FROM user_theme_xp
+            WHERE theme_id = ANY(:theme_ids) AND xp > 0
+            GROUP BY theme_id
+        """),
+        {"theme_ids": theme_ids},
+    )
+    member_counts = {row.theme_id: row.cnt for row in counts_res.fetchall()}
 
     tribes = []
     for theme in all_themes:
-        top_res = await db.execute(
-            select(UserThemeXP).where(UserThemeXP.theme_id == theme.id)
-            .order_by(UserThemeXP.xp.desc()).limit(1)
-        )
-        top_uxp = top_res.scalar_one_or_none()
         throne = None
-        member_count = 0
-
-        if top_uxp:
-            u_res = await db.execute(select(User).where(User.id == top_uxp.user_id))
-            top_user = u_res.scalar_one_or_none()
+        top = top_xp_by_theme.get(theme.id)
+        if top:
+            top_user = users_map.get(top.user_id)
             if top_user:
-                lvl = get_level(top_uxp.xp)
+                lvl = get_level(top.xp)
                 throne = {
                     "id": top_user.id, "pseudo": top_user.pseudo, "avatar_seed": top_user.avatar_seed,
                     "avatar_url": getattr(top_user, 'avatar_url', None),
-                    "level": lvl, "title": get_theme_title(theme, lvl), "xp": top_uxp.xp,
+                    "level": lvl, "title": get_theme_title(theme, lvl), "xp": top.xp,
                 }
-            count_res = await db.execute(
-                select(func.count(UserThemeXP.id)).where(UserThemeXP.theme_id == theme.id, UserThemeXP.xp > 0)
-            )
-            member_count = count_res.scalar() or 0
 
         sc_meta = SUPER_CATEGORY_META.get(theme.super_category, {})
         tribes.append({
             "id": theme.id, "name": theme.name, "icon": sc_meta.get("icon", ""),
             "pillar_id": theme.super_category, "pillar_name": theme.super_category,
             "pillar_color": theme.color_hex or sc_meta.get("color", "#8A2BE2"),
-            "throne": throne, "member_count": member_count,
+            "throne": throne, "member_count": member_counts.get(theme.id, 0),
         })
 
     return {"tribes": tribes}
@@ -656,8 +692,14 @@ async def get_home_feed(user_id: str, limit: int = 20, offset: int = 0, db: Asyn
     if not user:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
 
+    # Only show losses (for revenge proposals)
     recent_matches = await db.execute(
-        select(Match).where(Match.player1_id == user_id).order_by(Match.created_at.desc()).limit(5)
+        select(Match).where(
+            and_(
+                Match.player1_id == user_id,
+                Match.winner_id != user_id  # only defeats
+            )
+        ).order_by(Match.created_at.desc()).limit(5)
     )
     matches = recent_matches.scalars().all()
 
@@ -669,8 +711,46 @@ async def get_home_feed(user_id: str, limit: int = 20, offset: int = 0, db: Asyn
             "opponent_avatar_seed": secrets.token_hex(4),
             "category": m.category, "category_name": theme_name, "category_color": theme_color,
             "player_score": m.player1_score, "opponent_score": m.player2_score,
-            "won": m.winner_id == user_id, "created_at": m.created_at.isoformat(),
+            "won": False, "created_at": m.created_at.isoformat(),
         })
+
+    # Incoming challenges
+    from models import Challenge
+    from datetime import datetime as dt
+    challenges_res = await db.execute(
+        select(Challenge).where(
+            and_(
+                Challenge.challenged_id == user_id,
+                Challenge.status == "pending",
+                Challenge.expires_at > dt.utcnow(),
+            )
+        ).order_by(Challenge.created_at.desc()).limit(10)
+    )
+    challenges = challenges_res.scalars().all()
+
+    incoming_challenges = []
+    if challenges:
+        challenger_ids = list({c.challenger_id for c in challenges})
+        challengers_res = await db.execute(select(User).where(User.id.in_(challenger_ids)))
+        challengers_map = {u.id: u for u in challengers_res.scalars().all()}
+
+        for c in challenges:
+            challenger = challengers_map.get(c.challenger_id)
+            if not challenger:
+                continue
+            theme_name, theme_color = await _get_theme_info(db, c.theme_id) if c.theme_id else ("", "#8A2BE2")
+            incoming_challenges.append({
+                "challenge_id": c.id,
+                "challenger_id": c.challenger_id,
+                "challenger_pseudo": challenger.pseudo,
+                "challenger_avatar_seed": challenger.avatar_seed or "",
+                "challenger_avatar_url": getattr(challenger, 'avatar_url', None),
+                "theme_id": c.theme_id or "",
+                "theme_name": c.theme_name or theme_name,
+                "theme_color": theme_color,
+                "expires_at": c.expires_at.isoformat(),
+                "created_at": c.created_at.isoformat(),
+            })
 
     social_feed = []
 
@@ -774,5 +854,6 @@ async def get_home_feed(user_id: str, limit: int = 20, offset: int = 0, db: Asyn
             "selected_title": user.selected_title or "Novice",
         },
         "pending_duels": pending_duels[:5],
+        "incoming_challenges": incoming_challenges,
         "social_feed": social_feed[offset:offset + limit],
     }

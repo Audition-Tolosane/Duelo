@@ -21,15 +21,22 @@ class RateLimiter:
 _limiter = RateLimiter()
 
 
+def _get_client_ip(request: Request) -> str:
+    """Return the real client IP, honouring X-Forwarded-For from trusted proxies."""
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        # Take the leftmost IP (client), strip whitespace
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
 def rate_limit(limit: int = 60, window: int = 60):
     """Returns a dependency that rate-limits by IP. Default: 60 req/min."""
     async def dependency(request: Request):
-        client_ip = request.client.host if request.client else "unknown"
-        _limiter.check(f"global:{client_ip}", limit, window)
+        _limiter.check(f"global:{_get_client_ip(request)}", limit, window)
     return dependency
 
 
 async def rate_limit_auth(request: Request):
     """Stricter rate limit for auth endpoints: 10 req/min."""
-    client_ip = request.client.host if request.client else "unknown"
-    _limiter.check(f"auth:{client_ip}", 10, 60)
+    _limiter.check(f"auth:{_get_client_ip(request)}", 10, 60)

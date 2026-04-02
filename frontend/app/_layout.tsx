@@ -1,12 +1,18 @@
 import React from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet, Platform, LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  'expo-notifications: Android Push notifications',
+  '`expo-notifications` functionality is not fully supported in Expo Go',
+]);
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SwipeBackProvider } from '../components/SwipeBackContext';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { WebSocketProvider } from '../contexts/WebSocketContext';
 import RematchModal from '../components/RematchModal';
+import ChallengeReadyModal from '../components/ChallengeReadyModal';
 
 // All stack pages that support swipe-back with transparent overlay
 const SWIPEABLE_SCREENS = [
@@ -14,7 +20,8 @@ const SWIPEABLE_SCREENS = [
   'chat', 'player-profile', 'category-detail',
   'results', 'matchmaking', 'game',
   'super-category', 'notification-settings', 'leaderboard',
-  'language-settings', 'terms', 'support',
+  'language-settings', 'terms', 'support', 'create-theme',
+  'challenge-waiting',
 ];
 
 // Platform-specific options for swipeable screens
@@ -33,6 +40,7 @@ export default function RootLayout() {
       <WebSocketProvider>
       <ErrorBoundary>
       <RematchModal />
+      <ChallengeReadyModal />
       <SwipeBackProvider>
         <StatusBar style="light" />
         <Stack

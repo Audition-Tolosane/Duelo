@@ -47,10 +47,7 @@ async def get_profile(user_id: str, pseudo: Optional[str] = None, db: AsyncSessi
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
     if not user:
-        user = User(id=user_id, pseudo=pseudo or f"Joueur_{user_id[:6]}", is_guest=True)
-        db.add(user)
-        await db.commit()
-        await db.refresh(user)
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
 
     xp_result = await db.execute(select(UserThemeXP).where(UserThemeXP.user_id == user_id))
     user_xps = xp_result.scalars().all()
@@ -220,6 +217,7 @@ async def update_location(
         "country": user.country,
         "continent": user.continent,
         "region": user.region,
+        "country_flag": COUNTRY_FLAGS.get(user.country or "", ""),
     }
 
 
@@ -260,3 +258,21 @@ async def upload_user_avatar(request: Request, current_user: str = Depends(get_c
     user.avatar_url = f"avatars/users/{filename}"
     await db.commit()
     return {"success": True, "avatar_url": user.avatar_url}
+
+
+@router.post("/user/push-token")
+async def save_push_token(data: dict, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    """Save or update the user's Expo push token for remote notifications."""
+    user_id = data.get("user_id", "")
+    token = (data.get("token") or "").strip()
+    if not user_id or not token:
+        raise HTTPException(status_code=400, detail="user_id and token required")
+    if user_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+    res = await db.execute(select(User).where(User.id == user_id))
+    user = res.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
+    user.push_token = token
+    await db.commit()
+    return {"status": "ok"}

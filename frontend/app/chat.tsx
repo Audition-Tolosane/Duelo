@@ -114,7 +114,7 @@ export default function ChatScreen() {
       const res = await fetch(`${API_URL}/api/chat/${uid}/messages?with_user=${partnerId}`);
       const data = await res.json();
       setMessages(data);
-    } catch {}
+    } catch (e) { console.error(e); }
   };
 
   const handleSend = async () => {

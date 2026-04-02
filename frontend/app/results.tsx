@@ -60,7 +60,10 @@ export default function ResultsScreen() {
     playerScore: string; opponentScore: string; opponentPseudo: string;
     category: string; userId: string; isBot: string;
     correctCount: string; opponentLevel: string; opponentId: string;
+    asyncChallenge: string; challengeOpponent: string;
   }>();
+  const isAsyncChallenge = params.asyncChallenge === 'true';
+  const challengeOpponentName = params.challengeOpponent ? decodeURIComponent(params.challengeOpponent) : '';
 
   const category = params.category || '';
 
@@ -202,7 +205,7 @@ export default function ResultsScreen() {
       if (data.new_level) {
         setNewLevel(data.new_level);
       }
-    } catch {}
+    } catch (e) { console.error(e); }
     setSubmitting(false);
   };
 
@@ -228,7 +231,7 @@ export default function ResultsScreen() {
     const text = won
       ? `${t('results.share_victory')} ${pScore}-${oScore} en ${categoryName} (${correctCount}/7). ${t('results.share_challenge')}`
       : `${t('results.share_intense')} ${pScore}-${oScore} en ${categoryName}. ${t('results.share_beat_me')}`;
-    try { await Share.share({ message: text }); } catch {}
+    try { await Share.share({ message: text }); } catch (e) { console.error(e); }
   };
 
   const loadQuizQuestions = async () => {
@@ -238,14 +241,14 @@ export default function ResultsScreen() {
         const parsed = JSON.parse(raw);
         setQuizQuestions(parsed);
       }
-    } catch {}
+    } catch (e) { console.error(e); }
   };
 
   const loadPlayerPseudo = async () => {
     try {
       const p = await AsyncStorage.getItem('duelo_pseudo');
       if (p) setPlayerPseudo(p);
-    } catch {}
+    } catch (e) { console.error(e); }
   };
 
   const openReportModal = () => {
@@ -355,7 +358,28 @@ export default function ResultsScreen() {
     <SwipeBackPage>
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <DueloHeader />
-      <View style={styles.content}>
+      <View style={styles.subHeader}>
+        <TouchableOpacity onPress={() => router.replace('/(tabs)/accueil')} style={styles.backCircle} activeOpacity={0.6}>
+          <MaterialCommunityIcons name="chevron-left" size={26} color="#FFF" />
+        </TouchableOpacity>
+      </View>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+
+        {/* Async challenge banner */}
+        {isAsyncChallenge && (
+          <View style={styles.asyncBanner}>
+            <MaterialCommunityIcons name="clock-outline" size={16} color="#BF5FFF" />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.asyncBannerTitle}>{t('challenge.async_saved')}</Text>
+              {challengeOpponentName ? (
+                <Text style={styles.asyncBannerSub}>
+                  {challengeOpponentName} {t('challenge.async_will_play')}
+                </Text>
+              ) : null}
+            </View>
+          </View>
+        )}
+
         {/* Result Header */}
         <Animated.View style={[styles.resultHeader, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
           <LinearGradient
@@ -561,7 +585,7 @@ export default function ResultsScreen() {
             </TouchableOpacity>
           )}
         </Animated.View>
-      </View>
+      </ScrollView>
 
       {/* Report Question Modal */}
       <Modal visible={reportModalVisible} transparent animationType="slide" onRequestClose={() => setReportModalVisible(false)}>
@@ -759,7 +783,39 @@ export default function ResultsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#050510' },
-  content: { flex: 1, justifyContent: 'center', paddingHorizontal: 24, paddingBottom: 16 },
+  subHeader: {
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: 12, paddingVertical: 6,
+  },
+  asyncBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 12,
+    borderRadius: 14,
+    backgroundColor: 'rgba(191,95,255,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(191,95,255,0.25)',
+  },
+  asyncBannerTitle: {
+    color: '#BF5FFF',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  asyncBannerSub: {
+    color: 'rgba(191,95,255,0.7)',
+    fontSize: 12,
+    fontWeight: '500',
+    marginTop: 1,
+  },
+  backCircle: {
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    justifyContent: 'center', alignItems: 'center',
+  },
+  content: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingBottom: 24 },
   // Result Header
   resultHeader: { alignItems: 'center', marginBottom: 20 },
   resultIconCircle: {

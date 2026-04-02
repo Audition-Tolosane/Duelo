@@ -21,6 +21,7 @@ import CategoryIcon from '../../components/CategoryIcon';
 import { GLASS } from '../../theme/glassTheme';
 import CosmicBackground from '../../components/CosmicBackground';
 import UserAvatar from '../../components/UserAvatar';
+import ScalePressable from '../../components/ScalePressable';
 import { t } from '../../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
@@ -132,9 +133,21 @@ const forgeHero = StyleSheet.create({
   },
 });
 
+// ── Pulse title — translated client-side ──
+function getPulseTitle(item: FeedItem): string {
+  if (item.type === 'perfect') return t('pulse.perfect_score');
+  if (item.type === 'streak') {
+    const n = (item as any).streak_count ?? '';
+    return `${t('pulse.streak')} ${n} ${t('pulse.streak_wins')}`;
+  }
+  const cat = item.category_name || '';
+  if (item.type === 'victory') return `${t('pulse.victory')} ${cat}`;
+  return `${t('pulse.match')} ${cat}`;
+}
+
 // ── Exploit Card (Pulse Feed) ──
-const ExploitCard = ({ item, onChallenge, onProfile }: {
-  item: FeedItem; onChallenge: (userId: string, category: string) => void;
+const ExploitCard = ({ item, index = 0, onChallenge, onProfile }: {
+  item: FeedItem; index?: number; onChallenge: (userId: string, category: string) => void;
   onProfile: (userId: string) => void;
 }) => {
   const color = item.pillar_color || item.category_color || '#8A2BE2';
@@ -142,11 +155,10 @@ const ExploitCard = ({ item, onChallenge, onProfile }: {
   const isStreak = item.type === 'streak';
 
   return (
-    <Animated.View entering={FadeInDown.springify()}>
-      <TouchableOpacity
+    <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
+      <ScalePressable
         style={[exploitStyles.card, { borderColor: color + '20' }]}
         onPress={() => item.user_id && onProfile(item.user_id)}
-        activeOpacity={0.8}
       >
         {/* Glow background for records */}
         {isPerfect && (
@@ -174,7 +186,7 @@ const ExploitCard = ({ item, onChallenge, onProfile }: {
                 color={isPerfect ? '#FFD700' : isStreak ? '#FF6B35' : color}
               />
               <Text style={[exploitStyles.title, isPerfect && { color: '#FFD700' }]} numberOfLines={1}>
-                {item.title}
+                {getPulseTitle(item)}
               </Text>
             </View>
             <Text style={exploitStyles.pseudo}>
@@ -209,7 +221,7 @@ const ExploitCard = ({ item, onChallenge, onProfile }: {
             </TouchableOpacity>
           )}
         </View>
-      </TouchableOpacity>
+      </ScalePressable>
     </Animated.View>
   );
 };
@@ -242,15 +254,15 @@ const exploitStyles = StyleSheet.create({
 });
 
 // ── Tribe Card ──
-const TribeCard = ({ tribe, onPress, accentColor }: { tribe: Tribe; onPress: () => void; accentColor?: string }) => {
+const TribeCard = ({ tribe, onPress, accentColor, index = 0 }: { tribe: Tribe; onPress: () => void; accentColor?: string; index?: number }) => {
   const color = accentColor || tribe.pillar_color;
   const hasThrone = !!tribe.throne;
 
   return (
-    <TouchableOpacity
+    <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
+    <ScalePressable
       style={[tribeStyles.card, { borderColor: color + '20' }]}
       onPress={onPress}
-      activeOpacity={0.7}
     >
       <LinearGradient colors={[color + '30', color + '08']} style={tribeStyles.pillarBar} />
       <View style={tribeStyles.content}>
@@ -296,7 +308,8 @@ const TribeCard = ({ tribe, onPress, accentColor }: { tribe: Tribe; onPress: () 
           </Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </ScalePressable>
+    </Animated.View>
   );
 };
 
@@ -398,6 +411,10 @@ export default function PlayersScreen() {
 
   // Forge
   const [forgeThemeName, setForgeThemeName] = useState('');
+  const [forgeDescription, setForgeDescription] = useState('');
+  const [forgeLoading, setForgeLoading] = useState(false);
+  const [forgeError, setForgeError] = useState('');
+  const [forgeResult, setForgeResult] = useState<{ theme_id: string; name: string; question_count: number } | null>(null);
 
 
   const pillarFilters = [
@@ -562,10 +579,11 @@ export default function PlayersScreen() {
               <Text style={s.emptySub}>{t('players.pulse_quiet_sub')}</Text>
             </View>
           ) : (
-            feed.map((item) => (
+            feed.map((item, feedIndex) => (
               <ExploitCard
                 key={item.id}
                 item={item}
+                index={feedIndex}
                 onChallenge={handleChallenge}
                 onProfile={handleProfile}
               />
@@ -632,8 +650,8 @@ export default function PlayersScreen() {
                       horizontal showsHorizontalScrollIndicator={false}
                       contentContainerStyle={s.tribeCarousel}
                     >
-                      {pillarTribes.map((tribe) => (
-                        <TribeCard key={tribe.id} tribe={tribe} accentColor={pf?.color} onPress={() => handleTribePress(tribe)} />
+                      {pillarTribes.map((tribe, tribeIndex) => (
+                        <TribeCard key={tribe.id} tribe={tribe} accentColor={pf?.color} index={tribeIndex} onPress={() => handleTribePress(tribe)} />
                       ))}
                     </ScrollView>
                   </Animated.View>
@@ -680,18 +698,75 @@ export default function PlayersScreen() {
                   returnKeyType="done"
                 />
               </View>
-              <TouchableOpacity
-                style={[forgeStyles.generateBtn, !forgeThemeName.trim() && { opacity: 0.4 }]}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-                  // TODO: AI generation
-                }}
-                disabled={!forgeThemeName.trim()}
-                activeOpacity={0.7}
-              >
-                <MaterialCommunityIcons name="creation" size={18} color="#FFF" />
-                <Text style={forgeStyles.generateBtnText}>{t('players.generate_ai')}</Text>
-              </TouchableOpacity>
+              <View style={forgeStyles.inputRow}>
+                <TextInput
+                  style={forgeStyles.input}
+                  placeholder={t('forge.description_placeholder')}
+                  placeholderTextColor="#444"
+                  value={forgeDescription}
+                  onChangeText={setForgeDescription}
+                  multiline
+                  numberOfLines={3}
+                  returnKeyType="done"
+                />
+              </View>
+              {forgeError ? (
+                <Text style={forgeStyles.errorText}>{forgeError}</Text>
+              ) : null}
+              {forgeResult ? (
+                <TouchableOpacity
+                  style={forgeStyles.playThemeBtn}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                    router.push(`/matchmaking?category=${forgeResult.theme_id}`);
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <MaterialCommunityIcons name="play-circle" size={18} color="#FFF" />
+                  <Text style={forgeStyles.generateBtnText}>{t('forge.play_new_theme')} — {forgeResult.name}</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={[forgeStyles.generateBtn, (!forgeThemeName.trim() || forgeDescription.trim().length < 10 || forgeLoading) && { opacity: 0.4 }]}
+                  onPress={async () => {
+                    if (!forgeThemeName.trim() || forgeDescription.trim().length < 10 || forgeLoading) return;
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                    setForgeLoading(true);
+                    setForgeError('');
+                    try {
+                      const { authFetch } = await import('../../utils/api');
+                      const uid = await (await import('@react-native-async-storage/async-storage')).default.getItem('duelo_user_id');
+                      const res = await authFetch(`${API_URL}/api/forge/create`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user_id: uid, name: forgeThemeName.trim(), description: forgeDescription.trim() }),
+                      });
+                      const data = await res.json();
+                      if (res.ok) {
+                        setForgeResult({ theme_id: data.theme_id, name: data.name, question_count: data.question_count });
+                        setForgeThemeName('');
+                        setForgeDescription('');
+                      } else {
+                        setForgeError(data.detail || t('forge.error'));
+                      }
+                    } catch {
+                      setForgeError(t('forge.error'));
+                    }
+                    setForgeLoading(false);
+                  }}
+                  disabled={forgeLoading}
+                  activeOpacity={0.7}
+                >
+                  {forgeLoading ? (
+                    <ActivityIndicator size="small" color="#FFF" />
+                  ) : (
+                    <MaterialCommunityIcons name="creation" size={18} color="#FFF" />
+                  )}
+                  <Text style={forgeStyles.generateBtnText}>
+                    {forgeLoading ? t('forge.generating') : t('players.generate_ai')}
+                  </Text>
+                </TouchableOpacity>
+              )}
               <Text style={forgeStyles.generateHint}>
                 {t('players.generate_hint')}
               </Text>
@@ -730,6 +805,11 @@ const forgeStyles = StyleSheet.create({
   },
   generateBtnText: { color: '#FFF', fontSize: 15, fontWeight: '800' },
   generateHint: { fontSize: 11, color: '#555', textAlign: 'center', fontWeight: '500' },
+  errorText: { color: '#FF3B5C', fontSize: 13, fontWeight: '600', textAlign: 'center', marginBottom: 8 },
+  playThemeBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#8A2BE2', paddingVertical: 14, borderRadius: 14, gap: 8, marginBottom: 8,
+  },
 
 });
 

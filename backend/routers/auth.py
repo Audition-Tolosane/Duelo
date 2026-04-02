@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import User
@@ -68,8 +69,12 @@ async def register_email(data: EmailRegister, request: Request, db: AsyncSession
         password_hash=hash_password(data.password), is_guest=False
     )
     db.add(user)
-    await db.commit()
-    await db.refresh(user)
+    try:
+        await db.commit()
+        await db.refresh(user)
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(status_code=409, detail="Ce pseudo ou cet email est déjà utilisé")
 
     return _user_response(user)
 

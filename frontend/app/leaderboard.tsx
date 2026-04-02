@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, FlatList
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -9,6 +10,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
 import UserAvatar from '../components/UserAvatar';
+import ScalePressable from '../components/ScalePressable';
 import { authFetch } from '../utils/api';
 import { t } from '../utils/i18n';
 
@@ -109,7 +111,7 @@ export default function LeaderboardScreen() {
       if (locationScopes.includes(scope) && responseMeta.missing) {
         setNoLocation(true);
       }
-    } catch {}
+    } catch (e) { console.error(e); }
     setLoading(false);
   };
 
@@ -124,7 +126,7 @@ export default function LeaderboardScreen() {
       const data = await res.json();
       setEntries(Array.isArray(data.entries) ? data.entries : []);
       setMeta(data.meta ?? { scope_used: 'city', city_name: cityName });
-    } catch {}
+    } catch (e) { console.error(e); }
     setLoading(false);
   };
 
@@ -137,13 +139,14 @@ export default function LeaderboardScreen() {
     const isGlow = item.streak_badge === 'glow';
 
     return (
-      <TouchableOpacity
+      <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
+      <ScalePressable
         testID={`leaderboard-entry-${index}`}
         style={[styles.entry, isTop3 && styles.entryTop]}
         onPress={() => {
           if (item.id) router.push(`/player-profile?id=${item.id}`);
         }}
-        activeOpacity={item.id ? 0.7 : 1}
+        activeOpacity={item.id ? 1 : 1}
       >
         {isTop3 ? (
           <LinearGradient
@@ -186,7 +189,8 @@ export default function LeaderboardScreen() {
           <Text style={styles.xpValue}>{getXp(item).toLocaleString()}</Text>
           <Text style={styles.xpLabel}>XP</Text>
         </View>
-      </TouchableOpacity>
+      </ScalePressable>
+      </Animated.View>
     );
   }, [router]);
 

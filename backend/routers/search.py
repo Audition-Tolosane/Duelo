@@ -83,14 +83,20 @@ async def search_players_enhanced(
     limit: int = 20, offset: int = 0, db: AsyncSession = Depends(get_db)
 ):
     limit = min(limit, 100)
-    query = select(User)
+    query = select(User).where(User.is_bot == False)
 
     if q and q.strip():
         search_term = q.strip()
+        if len(search_term) < 2:
+            # Require at least 2 chars to avoid full-table scans
+            return []
         if search_term.startswith("@"):
             query = query.where(User.pseudo == search_term[1:])
         else:
-            query = query.where(User.pseudo.ilike(f"%{search_term}%"))
+            # Prefix search (can use index) + suffix fallback for UX
+            query = query.where(
+                User.pseudo.ilike(f"{search_term}%") | User.pseudo.ilike(f"%{search_term}%")
+            )
 
     if country and country.strip():
         query = query.where(User.country.ilike(f"%{country.strip()}%"))
@@ -291,7 +297,7 @@ async def get_trending(db: AsyncSession = Depends(get_db)):
         {"tag": "Astronomie", "icon": "🔭", "type": "hot"},
     ]
 
-    top_players_res = await db.execute(select(User).order_by(User.total_xp.desc()).limit(5))
+    top_players_res = await db.execute(select(User).where(User.is_bot == False).order_by(User.total_xp.desc()).limit(5))
     top_players = top_players_res.scalars().all()
     top_players_data = [{
         "id": u.id, "pseudo": u.pseudo, "avatar_seed": u.avatar_seed,

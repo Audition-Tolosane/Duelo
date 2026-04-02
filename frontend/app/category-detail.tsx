@@ -29,6 +29,7 @@ type CategoryDetail = {
   xp_progress: { current: number; needed: number; progress: number };
   is_following: boolean; completion_pct: number;
   color_hex?: string; icon_url?: string; question_count?: number;
+  super_category?: string;
 };
 
 type WallPostData = {
@@ -81,6 +82,10 @@ export default function CategoryDetailScreen() {
   const [commentText, setCommentText] = useState('');
   const [commentingPost, setCommentingPost] = useState<string | null>(null);
 
+  // VO mode (SCREEN themes only)
+  const [voMode, setVoMode] = useState(false);
+  const [voGenerating, setVoGenerating] = useState(false);
+
   // Leaderboard (navigates to separate screen)
 
   useEffect(() => {
@@ -90,6 +95,8 @@ export default function CategoryDetailScreen() {
   const init = async () => {
     const uid = await AsyncStorage.getItem('duelo_user_id');
     if (uid) setUserId(uid);
+    const storedVo = await AsyncStorage.getItem(`duelo_vo_${id}`);
+    if (storedVo === 'true') setVoMode(true);
     await fetchDetail(uid || '');
     await fetchWall(uid || '');
     setLoading(false);
@@ -116,6 +123,7 @@ export default function CategoryDetailScreen() {
         color_hex: data.color_hex,
         icon_url: data.icon_url,
         question_count: data.question_count,
+        super_category: data.super_category,
       });
       setMeta({
         icon: data.name?.[0]?.toUpperCase() || '?',
@@ -129,7 +137,7 @@ export default function CategoryDetailScreen() {
     try {
       const res = await fetch(`${API_URL}/api/category/${id}/wall?user_id=${uid}`);
       if (res.ok) setPosts(await res.json());
-    } catch {}
+    } catch (e) { console.error(e); }
   };
 
   const onRefresh = async () => {
@@ -169,6 +177,32 @@ export default function CategoryDetailScreen() {
   const handleLeaderboard = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push(`/leaderboard?themeId=${id}&themeName=${encodeURIComponent(detail?.name || '')}`);
+  };
+
+  const handleVoToggle = async () => {
+    if (voGenerating) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const newVal = !voMode;
+    if (newVal) {
+      // Enable VO: trigger generation if needed
+      setVoGenerating(true);
+      try {
+          const res = await authFetch(`${API_URL}/api/game/generate-vo/${id}`, { method: 'POST' });
+        if (res.ok) {
+          setVoMode(true);
+          await AsyncStorage.setItem(`duelo_vo_${id}`, 'true');
+        } else {
+          Alert.alert(t('common.error'), t('category.vo_unavailable'));
+        }
+      } catch {
+        Alert.alert(t('common.error'), t('category.vo_unavailable'));
+      } finally {
+        setVoGenerating(false);
+      }
+    } else {
+      setVoMode(false);
+      await AsyncStorage.removeItem(`duelo_vo_${id}`);
+    }
   };
 
   const pickImage = async () => {
@@ -226,7 +260,7 @@ export default function CategoryDetailScreen() {
         is_liked: data.liked,
         likes_count: p.likes_count + (data.liked ? 1 : -1)
       } : p));
-    } catch {}
+    } catch (e) { console.error(e); }
   };
 
   const loadComments = async (postId: string) => {
@@ -239,7 +273,7 @@ export default function CategoryDetailScreen() {
       const res = await fetch(`${API_URL}/api/wall/${postId}/comments`);
       const data = await res.json();
       setComments(prev => ({ ...prev, [postId]: data }));
-    } catch {}
+    } catch (e) { console.error(e); }
   };
 
   const handleComment = async (postId: string) => {
@@ -256,7 +290,7 @@ export default function CategoryDetailScreen() {
       setCommentText('');
       setCommentingPost(null);
       Keyboard.dismiss();
-    } catch {}
+    } catch (e) { console.error(e); }
   };
 
   const timeAgo = (dateStr: string) => {
@@ -343,6 +377,33 @@ export default function CategoryDetailScreen() {
                 <Text style={styles.leaderText}>{t('category.leaderboard')}</Text>
               </TouchableOpacity>
             </View>
+
+            {/* VO Toggle — SCREEN themes only */}
+            {detail.super_category === 'SCREEN' && (
+              <TouchableOpacity
+                style={[styles.voToggleBtn, voMode && styles.voToggleBtnActive]}
+                onPress={handleVoToggle}
+                activeOpacity={0.8}
+                disabled={voGenerating}
+              >
+                {voGenerating ? (
+                  <ActivityIndicator size="small" color="#A78BFA" />
+                ) : (
+                  <Text style={styles.voToggleIcon}>🎬</Text>
+                )}
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.voToggleText, voMode && { color: '#A78BFA' }]}>
+                    {voGenerating ? t('category.vo_generating') : t('category.vo_toggle')}
+                  </Text>
+                  <Text style={styles.voToggleSub}>
+                    {voMode ? t('category.vo_on') : t('category.vo_off')}
+                  </Text>
+                </View>
+                <View style={[styles.voToggleSwitch, voMode && styles.voToggleSwitchActive]}>
+                  <View style={[styles.voToggleKnob, voMode && styles.voToggleKnobActive]} />
+                </View>
+              </TouchableOpacity>
+            )}
 
             {/* Progress Bar */}
             <View style={styles.progressSection}>
@@ -687,5 +748,34 @@ const styles = StyleSheet.create({
   mediaBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.06)' },
   mediaBtnText: { color: '#A3A3A3', fontSize: 14 },
   charCount: { color: '#525252', fontSize: 13, fontWeight: '500' },
+
+  // VO Toggle
+  voToggleBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    backgroundColor: 'rgba(167,139,250,0.08)', borderRadius: 14,
+    paddingHorizontal: 16, paddingVertical: 12, marginTop: 4,
+    borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)',
+  },
+  voToggleBtnActive: {
+    backgroundColor: 'rgba(167,139,250,0.15)',
+    borderColor: 'rgba(167,139,250,0.4)',
+  },
+  voToggleIcon: { fontSize: 20 },
+  voToggleText: { color: '#D4D4D4', fontSize: 14, fontWeight: '700' },
+  voToggleSub: { color: '#525252', fontSize: 11, marginTop: 2 },
+  voToggleSwitch: {
+    width: 44, height: 24, borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', paddingHorizontal: 2,
+  },
+  voToggleSwitchActive: {
+    backgroundColor: 'rgba(167,139,250,0.4)', borderColor: 'rgba(167,139,250,0.6)',
+  },
+  voToggleKnob: {
+    width: 18, height: 18, borderRadius: 9, backgroundColor: '#666',
+  },
+  voToggleKnobActive: {
+    backgroundColor: '#A78BFA', alignSelf: 'flex-end',
+  },
 
 });

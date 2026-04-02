@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, Integer, Boolean, Float, DateTime, JSON, Text, UniqueConstraint, func
+from sqlalchemy import Column, String, Integer, Boolean, Float, DateTime, JSON, Text, UniqueConstraint, func, ForeignKey
 from database import Base
 
 
@@ -46,12 +46,23 @@ class User(Base):
     # Selected title for display in duels
     selected_title = Column(String(100), nullable=True)
 
+    push_token = Column(String(200), nullable=True)  # Expo push token for remote notifications
+
     google_id = Column(String(255), unique=True, nullable=True, index=True)
     apple_id = Column(String(255), unique=True, nullable=True, index=True)
 
     last_played_at = Column(DateTime(timezone=True), nullable=True)
     onboarding_done = Column(Boolean, default=False)
     privacy_accepted_at = Column(DateTime(timezone=True), nullable=True)
+
+    # Bot fields
+    is_bot = Column(Boolean, default=False, index=True)
+    skill_level = Column(Float, nullable=True)        # 0.1–0.95 (bot answer probability)
+    avg_speed = Column(Float, nullable=True)           # avg response time in seconds
+    win_rate = Column(Float, nullable=True)            # 0.25–0.80
+    language = Column(String(5), nullable=True)        # fr / en / es / pt / de / it
+    timezone = Column(String(50), nullable=True)       # IANA tz e.g. "Europe/Paris"
+    preferred_hours = Column(JSON, nullable=True)      # ["20:00-23:00", "12:00-13:00"]
 
     created_at = Column(DateTime(timezone=True), default=utc_now)
     updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
@@ -70,7 +81,7 @@ class Avatar(Base):
 class Question(Base):
     __tablename__ = 'questions'
 
-    id = Column(String(36), primary_key=True, default=generate_uuid)
+    id = Column(String(100), primary_key=True, default=generate_uuid)
     category = Column(String(100), nullable=False, index=True)
     question_text = Column(Text, nullable=False)
     options = Column(JSON, nullable=False)
@@ -86,6 +97,7 @@ class Question(Base):
     angle = Column(Text, nullable=True)
     angle_num = Column(Integer, nullable=True, default=0)
     batch = Column(Text, nullable=True)
+    language = Column(String(10), default='fr', nullable=True)  # 'fr' | 'en'
 
     __table_args__ = (
         # Removed UniqueConstraint on question_text to allow same text across themes
@@ -262,7 +274,7 @@ class QuestionReport(Base):
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
     user_id = Column(String(36), nullable=False, index=True)
-    question_id = Column(String(36), nullable=False, index=True)
+    question_id = Column(String(100), nullable=False, index=True)
     question_text = Column(Text, nullable=True)
     category = Column(String(100), nullable=True)
     reason_type = Column(String(30), nullable=False)  # wrong_answer, unclear_question, typo, outdated, other
@@ -273,3 +285,38 @@ class QuestionReport(Base):
     __table_args__ = (
         UniqueConstraint('user_id', 'question_id', name='uq_user_question_report'),
     )
+
+
+class BotTheme(Base):
+    __tablename__ = "bot_themes"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    bot_pseudo = Column(String(50), ForeignKey("users.pseudo", ondelete="CASCADE"), nullable=False, index=True)
+    theme_id = Column(String(30), nullable=False, index=True)
+    games_played_on_theme = Column(Integer, default=0)
+    win_rate_on_theme = Column(Float, default=0.5)
+
+    __table_args__ = (
+        UniqueConstraint('bot_pseudo', 'theme_id', name='uq_bot_theme'),
+    )
+
+
+class Challenge(Base):
+    __tablename__ = "challenges"
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    challenger_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    challenged_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    theme_id = Column(String(100), nullable=True)
+    theme_name = Column(String(200), default="")
+    status = Column(String(20), default="pending")  # pending / accepted / declined / expired / completed
+    created_at = Column(DateTime, default=datetime.utcnow)
+    expires_at = Column(DateTime, nullable=False)
+    # Async scores (set when each player plays in async mode)
+    p1_score = Column(Integer, nullable=True)
+    p1_correct = Column(Integer, nullable=True)
+    p1_played_at = Column(DateTime, nullable=True)
+    p1_answers = Column(Text, nullable=True)  # JSON: [{answer, is_correct, points, time_ms}, ...]
+    p2_score = Column(Integer, nullable=True)
+    p2_correct = Column(Integer, nullable=True)
+    p2_played_at = Column(DateTime, nullable=True)
+    p2_answers = Column(Text, nullable=True)  # JSON: [{answer, is_correct, points, time_ms}, ...]
