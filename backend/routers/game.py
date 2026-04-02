@@ -349,6 +349,35 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
         )
         user.total_xp = all_xp_res.scalar() or 0
 
+        # Update bot stats so their profile looks alive
+        if opponent_is_bot and opponent_pseudo:
+            bot_res = await db.execute(select(User).where(User.pseudo == opponent_pseudo, User.is_bot == True))
+            bot = bot_res.scalar_one_or_none()
+            if bot:
+                bot_won = opponent_score > player_score
+                bot.matches_played = (bot.matches_played or 0) + 1
+                if bot_won:
+                    bot.matches_won = (bot.matches_won or 0) + 1
+                    bot.current_streak = (bot.current_streak or 0) + 1
+                    if bot.current_streak > (bot.best_streak or 0):
+                        bot.best_streak = bot.current_streak
+                else:
+                    bot.current_streak = 0
+                bot_xp = opponent_score * 2 + (50 if bot_won else 0)
+                bot_uxp_res = await db.execute(
+                    select(UserThemeXP).where(UserThemeXP.user_id == bot.id, UserThemeXP.theme_id == theme.id)
+                )
+                bot_uxp = bot_uxp_res.scalar_one_or_none()
+                if not bot_uxp:
+                    bot_uxp = UserThemeXP(user_id=bot.id, theme_id=theme.id, xp=0)
+                    db.add(bot_uxp)
+                    await db.flush()
+                bot_uxp.xp += bot_xp
+                bot_all_xp_res = await db.execute(
+                    select(func.sum(UserThemeXP.xp)).where(UserThemeXP.user_id == bot.id)
+                )
+                bot.total_xp = bot_all_xp_res.scalar() or 0
+
         if won:
             notif_body = f"Victoire en {theme.name} ! +{total_xp} XP"
         else:
