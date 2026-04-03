@@ -430,6 +430,8 @@ export default function ChatScreen() {
           contentContainerStyle={st.messagesList}
           onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
           showsVerticalScrollIndicator={false}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
           ListEmptyComponent={
             <View style={st.emptyChat}>
               <LinearGradient

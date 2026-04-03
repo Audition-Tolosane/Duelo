@@ -159,6 +159,7 @@ export default function CreateThemeScreen() {
           <ScrollView
             contentContainerStyle={styles.scroll}
             showsVerticalScrollIndicator={false}
+            keyboardDismissMode="on-drag"
             keyboardShouldPersistTaps="handled"
           >
             {/* Header card */}

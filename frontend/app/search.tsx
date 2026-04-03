@@ -490,7 +490,7 @@ export default function SearchScreen() {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* Trending Section (visible when no search query + themes tab) */}
         {showTrendingSection && (
-          <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+          <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} keyboardDismissMode="on-drag" keyboardShouldPersistTaps="handled">
             {/* Trending Tags */}
             {trendingTags.length > 0 && (
               <View style={st.trendingSection}>
@@ -585,6 +585,8 @@ export default function SearchScreen() {
                 keyExtractor={item => item.id}
                 renderItem={renderThemeItem}
                 contentContainerStyle={st.listContent}
+                keyboardDismissMode="on-drag"
+                keyboardShouldPersistTaps="handled"
                 ListEmptyComponent={
                   <View style={st.emptyState}>
                     <MaterialCommunityIcons name="magnify" size={48} color="#525252" style={{ marginBottom: 12 }} />
@@ -623,6 +625,8 @@ export default function SearchScreen() {
                 keyExtractor={item => item.id}
                 renderItem={renderPlayerItem}
                 contentContainerStyle={st.listContent}
+                keyboardDismissMode="on-drag"
+                keyboardShouldPersistTaps="handled"
                 ListEmptyComponent={
                   <View style={st.emptyState}>
                     <MaterialCommunityIcons name="account-group" size={48} color="#525252" style={{ marginBottom: 12 }} />
