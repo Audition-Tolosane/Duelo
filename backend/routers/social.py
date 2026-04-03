@@ -6,7 +6,7 @@ from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from database import get_db
-from models import User, Match, WallPost, PostLike, PostComment, PlayerFollow, Theme, UserThemeXP
+from models import User, Match, WallPost, PostLike, PostComment, PlayerFollow, Theme, UserThemeXP, BotTheme, Avatar
 from schemas import WallPostCreate, CommentCreate, FollowToggle, PlayerFollowToggle
 from constants import COUNTRY_FLAGS, SUPER_CATEGORY_META
 from services.xp import get_level, get_theme_title, get_streak_badge
@@ -248,10 +248,25 @@ async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, post
     if not user:
         raise HTTPException(status_code=404, detail="Joueur non trouvé")
 
-    # Get theme-based stats
+    # Resolve avatar_url from avatar_id if not set directly
+    avatar_url = user.avatar_url
+    if not avatar_url and user.avatar_id:
+        av_res = await db.execute(select(Avatar).where(Avatar.id == user.avatar_id))
+        av = av_res.scalar_one_or_none()
+        if av:
+            avatar_url = av.image_url
+
+    # Get theme-based stats from XP (real matches played)
     xp_res = await db.execute(select(UserThemeXP).where(UserThemeXP.user_id == user_id))
     user_xps = xp_res.scalars().all()
     xp_map = {uxp.theme_id: uxp.xp for uxp in user_xps}
+
+    # For bots: also add themes from bot_themes with 0 XP if not already present
+    if user.is_bot:
+        bt_res = await db.execute(select(BotTheme.theme_id).where(BotTheme.bot_pseudo == user.pseudo))
+        for row in bt_res.all():
+            if row[0] not in xp_map:
+                xp_map[row[0]] = 0
 
     themes_data = {}
     champion_titles = []
@@ -362,11 +377,11 @@ async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, post
 
     return {
         "id": user.id, "pseudo": user.pseudo, "avatar_seed": user.avatar_seed,
-        "avatar_url": getattr(user, 'avatar_url', None),
+        "avatar_url": avatar_url,
         "selected_title": user.selected_title or best_title or "Novice",
         "country": user.country, "country_flag": country_flag,
         "matches_played": user.matches_played or 0, "matches_won": user.matches_won or 0,
-        "win_rate": round((user.matches_won or 0) / max(user.matches_played or 0, 1) * 100),
+        "win_rate": round((user.matches_won or 0) / max(user.matches_played or 0, 1) * 100) if user.matches_won is not None else round((user.win_rate or 0) * 100),
         "current_streak": user.current_streak or 0, "best_streak": user.best_streak or 0,
         "total_xp": user.total_xp or 0, "themes": themes_data,
         "champion_titles": champion_titles,
