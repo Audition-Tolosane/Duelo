@@ -497,7 +497,7 @@ export default function ChatScreen() {
           </View>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
     </SwipeBackPage>
   );
 }
