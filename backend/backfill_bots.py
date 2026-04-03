@@ -92,7 +92,17 @@ async def backfill():
             """, chunk)
             inserted += len(chunk)
 
-        # 3. Recalculer total_xp pour chaque bot
+        # 3. Recalculer win_rate depuis matches_won/matches_played (entiers cohérents)
+        print("Recalcul du win_rate...")
+        await conn.execute("""
+            UPDATE users
+            SET win_rate = ROUND(matches_won::numeric / NULLIF(matches_played, 0), 2)
+            WHERE is_bot = true
+              AND matches_won IS NOT NULL
+              AND matches_played > 0
+        """)
+
+        # 4. Recalculer total_xp pour chaque bot
         print("Recalcul du total_xp...")
         await conn.execute("""
             UPDATE users u
