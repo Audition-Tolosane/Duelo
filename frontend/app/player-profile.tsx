@@ -36,7 +36,7 @@ type PlayerProfile = {
   selected_title: string; country: string | null; country_flag: string;
   matches_played: number; matches_won: number; win_rate: number;
   current_streak: number; best_streak: number; total_xp: number;
-  themes: Record<string, { xp: number; level: number; title: string; name?: string; color_hex?: string }>;
+  themes: Record<string, { xp: number; level: number; title: string; name?: string; color_hex?: string; cluster?: string; super_category?: string }>;
   champion_titles: { category: string; category_name: string; scope: string; date: string }[];
   followers_count: number; following_count: number; is_following: boolean;
   posts: {
@@ -386,7 +386,7 @@ export default function PlayerProfileScreen() {
               >
                 <View style={[s.topicCardInner, { borderColor: color + '30' }]}>
                   <View style={[s.topicIconBox, { backgroundColor: color + '20' }]}>
-                    <CategoryIcon themeId={catKey} size={22} color={color} type="theme" />
+                    <CategoryIcon themeId={catKey} emoji={catData.cluster || catData.super_category} size={22} color={color} type="cluster" />
                   </View>
                   <Text style={[s.topicName, { color }]} numberOfLines={1}>{displayName}</Text>
                   <Text style={s.topicLevel}>{t('player.level_short')} {catData.level}</Text>

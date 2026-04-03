@@ -293,6 +293,7 @@ async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, post
             themes_data[tid] = {
                 "xp": xp, "level": lvl, "title": get_theme_title(t, lvl),
                 "name": t.name, "color_hex": t.color_hex or "#8A2BE2",
+                "cluster": t.cluster or "", "super_category": t.super_category or "",
             }
 
             # Check if this user is #1 in this theme (their xp equals the max)
