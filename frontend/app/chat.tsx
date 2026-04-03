@@ -45,7 +45,7 @@ type Message = {
 export default function ChatScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { partnerId, partnerPseudo } = useLocalSearchParams<{ partnerId: string; partnerPseudo: string }>();
+  const { partnerId, partnerPseudo, partnerAvatarSeed, partnerAvatarUrl } = useLocalSearchParams<{ partnerId: string; partnerPseudo: string; partnerAvatarSeed: string; partnerAvatarUrl: string }>();
   const { send: wsSend, on: wsOn, decrementUnread } = useWS();
   const [myId, setMyId] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -306,7 +306,7 @@ export default function ChatScreen() {
           {/* Opponent avatar */}
           {!isMe && (
             <View style={st.msgAvatar}>
-              <UserAvatar avatarSeed={partnerId || ''} pseudo={partnerPseudo || '?'} size={30} />
+              <UserAvatar avatarUrl={partnerAvatarUrl || undefined} avatarSeed={partnerAvatarSeed || partnerPseudo || ''} pseudo={partnerPseudo || '?'} size={30} />
             </View>
           )}
 
@@ -402,7 +402,12 @@ export default function ChatScreen() {
           activeOpacity={0.7}
         >
           <View style={st.headerAvatar}>
-            <UserAvatar avatarSeed={partnerId || ''} pseudo={partnerPseudo || '?'} size={42} />
+            <UserAvatar
+              avatarUrl={partnerAvatarUrl || undefined}
+              avatarSeed={partnerAvatarSeed || partnerPseudo || ''}
+              pseudo={partnerPseudo || '?'}
+              size={42}
+            />
           </View>
           <View style={st.headerInfo}>
             <Text style={st.headerName}>{partnerPseudo || t('chat.player')}</Text>
@@ -411,12 +416,6 @@ export default function ChatScreen() {
               <Text style={st.headerSub}>{isTyping ? t('chat.typing') : t('chat.online')}</Text>
             </View>
           </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={st.headerAction}
-          onPress={() => router.push(`/player-profile?id=${partnerId}`)}
-        >
-          <MaterialCommunityIcons name="account-outline" size={22} color="rgba(255,255,255,0.5)" />
         </TouchableOpacity>
       </View>
 

@@ -15,6 +15,7 @@ import { t } from '../utils/i18n';
 import DueloHeader from '../components/DueloHeader';
 import SwipeBackPage from '../components/SwipeBackPage';
 import UserAvatar from '../components/UserAvatar';
+import CategoryIcon from '../components/CategoryIcon';
 
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
@@ -35,7 +36,7 @@ type PlayerProfile = {
   selected_title: string; country: string | null; country_flag: string;
   matches_played: number; matches_won: number; win_rate: number;
   current_streak: number; best_streak: number; total_xp: number;
-  themes: Record<string, { xp: number; level: number; title: string }>;
+  themes: Record<string, { xp: number; level: number; title: string; name?: string; color_hex?: string }>;
   champion_titles: { category: string; category_name: string; scope: string; date: string }[];
   followers_count: number; following_count: number; is_following: boolean;
   posts: {
@@ -153,7 +154,7 @@ export default function PlayerProfileScreen() {
 
   const handleChat = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push(`/chat?partnerId=${id}&partnerPseudo=${profile?.pseudo || ''}`);
+    router.push(`/chat?partnerId=${id}&partnerPseudo=${encodeURIComponent(profile?.pseudo || '')}&partnerAvatarSeed=${encodeURIComponent(profile?.avatar_seed || '')}&partnerAvatarUrl=${encodeURIComponent(profile?.avatar_url || '')}`);
   };
 
   const handleSendChallenge = async () => {
@@ -324,7 +325,7 @@ export default function PlayerProfileScreen() {
               <Text style={s.statLabel}>{t('player.games')}</Text>
             </View>
             <View style={s.statDivider} />
-            <View style={s.statItem}>
+            <TouchableOpacity style={s.statItem} onPress={() => router.push(`/followers?userId=${profile.id}&type=followers`)}>
               <LinearGradient
                 colors={['rgba(0,255,255,0.20)', 'rgba(0,255,255,0.06)']}
                 style={s.statIconCircle}
@@ -333,9 +334,9 @@ export default function PlayerProfileScreen() {
               </LinearGradient>
               <Text style={s.statValue} data-testid="stat-followers">{profile.followers_count}</Text>
               <Text style={s.statLabel}>{t('player.followers')}</Text>
-            </View>
+            </TouchableOpacity>
             <View style={s.statDivider} />
-            <View style={s.statItem}>
+            <TouchableOpacity style={s.statItem} onPress={() => router.push(`/followers?userId=${profile.id}&type=following`)}>
               <LinearGradient
                 colors={['rgba(0,255,157,0.20)', 'rgba(0,255,157,0.06)']}
                 style={s.statIconCircle}
@@ -344,7 +345,7 @@ export default function PlayerProfileScreen() {
               </LinearGradient>
               <Text style={s.statValue} data-testid="stat-following">{profile.following_count}</Text>
               <Text style={s.statLabel}>{t('player.following_label')}</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -374,22 +375,23 @@ export default function PlayerProfileScreen() {
         <Text style={s.sectionTitle}>{t('player.their_themes')}</Text>
         <View style={s.topicsGrid}>
           {sortedCategories.map(([catKey, catData]) => {
-            const meta = CATEGORY_META[catKey] || { icon: 'help-circle', color: '#8A2BE2', bg: '#1A1A2E' };
+            const color = catData.color_hex || '#8A2BE2';
+            const displayName = catData.name || catKey;
             return (
-              <View
+              <TouchableOpacity
                 key={catKey}
-                data-testid={`topic-${catKey}`}
-                style={[s.topicCard, { backgroundColor: meta.bg }]}
+                style={s.topicCard}
+                activeOpacity={0.8}
+                onPress={() => router.push(`/category-detail?id=${catKey}`)}
               >
-                <LinearGradient
-                  colors={[meta.color + '30', meta.color + '10']}
-                  style={s.topicIconBox}
-                >
-                  <MaterialCommunityIcons name={meta.icon as any} size={22} color={meta.color} />
-                </LinearGradient>
-                <Text style={[s.topicName, { color: meta.color }]}>{catData.title || catKey}</Text>
-                <Text style={s.topicLevel}>{t('player.level_short')} {catData.level}</Text>
-              </View>
+                <View style={[s.topicCardInner, { borderColor: color + '30' }]}>
+                  <View style={[s.topicIconBox, { backgroundColor: color + '20' }]}>
+                    <CategoryIcon themeId={catKey} size={22} color={color} type="theme" />
+                  </View>
+                  <Text style={[s.topicName, { color }]} numberOfLines={1}>{displayName}</Text>
+                  <Text style={s.topicLevel}>{t('player.level_short')} {catData.level}</Text>
+                </View>
+              </TouchableOpacity>
             );
           })}
         </View>
@@ -538,16 +540,21 @@ export default function PlayerProfileScreen() {
             {/* Theme chips from profile categories */}
             <View style={s.themesGrid}>
               {Object.entries(profile?.themes || {}).slice(0, 6).map(([catKey, catData]) => {
-                const meta = CATEGORY_META[catKey] || { icon: 'help-circle', color: '#8A2BE2', bg: '#1A1A2E' };
+                const nameSlug = (catData.name || catKey).toLowerCase()
+                  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                  .replace(/[\s\-]+/g, '_');
+                const meta = CATEGORY_META[nameSlug] || CATEGORY_META[catKey] || { icon: 'help-circle', color: '#8A2BE2', bg: '#1A1A2E' };
+                const color = catData.color_hex || meta.color;
+                const displayName = catData.name || catKey;
                 const isSelected = selectedTheme?.id === catKey;
                 return (
                   <TouchableOpacity
                     key={catKey}
-                    style={[s.themeChip, { borderColor: meta.color + '60' }, isSelected && { backgroundColor: meta.color + '30', borderColor: meta.color }]}
-                    onPress={() => setSelectedTheme({ id: catKey, name: catData.title || catKey, color: meta.color })}
+                    style={[s.themeChip, { borderColor: color + '60' }, isSelected && { backgroundColor: color + '30', borderColor: color }]}
+                    onPress={() => setSelectedTheme({ id: catKey, name: displayName, color })}
                   >
-                    <MaterialCommunityIcons name={meta.icon as any} size={14} color={meta.color} />
-                    <Text style={[s.themeChipText, { color: meta.color }]} numberOfLines={1}>{catData.title || catKey}</Text>
+                    <MaterialCommunityIcons name={meta.icon as any} size={14} color={color} />
+                    <Text style={[s.themeChipText, { color }]} numberOfLines={1}>{displayName}</Text>
                   </TouchableOpacity>
                 );
               })}
@@ -579,7 +586,6 @@ export default function PlayerProfileScreen() {
   );
 }
 
-const CARD_SIZE = (width - 72) / 4;
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#050510' },
@@ -678,7 +684,7 @@ const s = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center', marginBottom: 6,
   },
   perfValue: { fontSize: 18, fontWeight: '800' },
-  perfLabel: { fontSize: 9, color: 'rgba(255,255,255,0.45)', marginTop: 2, fontWeight: '700', textTransform: 'uppercase' as const },
+  perfLabel: { fontSize: 9, color: 'rgba(255,255,255,0.45)', marginTop: 2, fontWeight: '700', textTransform: 'uppercase' as const, textAlign: 'center' as const },
 
   /* Section Title */
   sectionTitle: {
@@ -687,21 +693,19 @@ const s = StyleSheet.create({
   },
 
   /* ── Topics Grid ── */
-  topicsGrid: {
-    flexDirection: 'row', flexWrap: 'wrap', gap: 12,
-    paddingHorizontal: 20,
-  },
-  topicCard: {
-    width: CARD_SIZE, borderRadius: 14, padding: 10,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
-    alignItems: 'center',
+  topicsGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 15 },
+  topicCard: { width: '25%', padding: 5, alignItems: 'center' },
+  topicCardInner: {
+    width: '100%', borderRadius: GLASS.radius, paddingVertical: 12, paddingHorizontal: 6,
+    borderWidth: 1, backgroundColor: GLASS.bg, alignItems: 'center',
+    borderColor: GLASS.borderSubtle,
   },
   topicIconBox: {
     width: 44, height: 44, borderRadius: 14,
     justifyContent: 'center', alignItems: 'center', marginBottom: 6,
   },
   topicName: { fontSize: 10, fontWeight: '800', marginBottom: 2, textAlign: 'center' },
-  topicLevel: { fontSize: 9, fontWeight: '700', color: '#A3A3A3', letterSpacing: 0.5 },
+  topicLevel: { fontSize: 9, fontWeight: '700', color: '#A3A3A3', letterSpacing: 0.5, marginBottom: 6 },
 
   /* Empty Wall */
   emptyWall: { alignItems: 'center', paddingVertical: 30, gap: 8 },

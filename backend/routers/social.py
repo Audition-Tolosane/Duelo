@@ -442,6 +442,37 @@ async def toggle_player_follow(user_id: str, data: PlayerFollowToggle, current_u
         return {"following": True}
 
 
+@router.get("/player/{user_id}/followers")
+async def get_followers(user_id: str, type: str = "followers", db: AsyncSession = Depends(get_db)):
+    if type == "following":
+        res = await db.execute(
+            select(User).join(PlayerFollow, PlayerFollow.followed_id == User.id)
+            .where(PlayerFollow.follower_id == user_id)
+        )
+    else:
+        res = await db.execute(
+            select(User).join(PlayerFollow, PlayerFollow.follower_id == User.id)
+            .where(PlayerFollow.followed_id == user_id)
+        )
+    users = res.scalars().all()
+    avatar_ids = [u.avatar_id for u in users if u.avatar_id]
+    avatars = {}
+    if avatar_ids:
+        av_res = await db.execute(select(Avatar).where(Avatar.id.in_(avatar_ids)))
+        avatars = {a.id: a.file_path for a in av_res.scalars().all()}
+    return [
+        {
+            "id": u.id,
+            "pseudo": u.pseudo,
+            "avatar_seed": u.avatar_seed or "",
+            "avatar_url": avatars.get(u.avatar_id) if u.avatar_id else None,
+            "selected_title": u.selected_title or "",
+            "matches_played": u.matches_played or 0,
+        }
+        for u in users
+    ]
+
+
 @router.get("/players/search")
 async def search_players(
     q: Optional[str] = None, country: Optional[str] = None,

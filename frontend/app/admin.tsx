@@ -198,19 +198,19 @@ export default function AdminScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      loadThemesOverview();
-      loadMatchStats();
-      loadReports();
+    if (isAuthenticated && password) {
+      loadThemesOverview(password);
+      loadMatchStats(password);
+      loadReports(password);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, password]);
 
   // ── Loaders ──
 
-  const loadThemesOverview = async () => {
+  const loadThemesOverview = async (pwd = password) => {
     setLoadingThemes(true);
     try {
-      const res = await adminFetch(`${API_URL}/api/admin/themes-overview`, password);
+      const res = await adminFetch(`${API_URL}/api/admin/themes-overview`, pwd);
       const data = await res.json();
       setThemesOverview(data);
     } catch (e) {
@@ -220,10 +220,10 @@ export default function AdminScreen() {
     }
   };
 
-  const loadMatchStats = async () => {
+  const loadMatchStats = async (pwd = password) => {
     setLoadingMatchStats(true);
     try {
-      const res = await adminFetch(`${API_URL}/api/admin/match-stats-by-theme`, password);
+      const res = await adminFetch(`${API_URL}/api/admin/match-stats-by-theme`, pwd);
       const data = await res.json();
       setMatchStats(data.stats || []);
       setTotalMatches(data.total_matches || 0);
@@ -234,13 +234,13 @@ export default function AdminScreen() {
     }
   };
 
-  const loadReports = async () => {
+  const loadReports = async (pwd = password) => {
     setLoadingReports(true);
     try {
       const url = reportFilter
         ? `${API_URL}/api/admin/reports?status=${reportFilter}`
         : `${API_URL}/api/admin/reports`;
-      const res = await adminFetch(url, password);
+      const res = await adminFetch(url, pwd);
       const data = await res.json();
       setReports(data.reports || []);
       setReportCounts(data.counts || { pending: 0, reviewed: 0, resolved: 0, total: 0 });
@@ -506,16 +506,16 @@ export default function AdminScreen() {
   const uploadThemesCSV = async () => {
     if (!themesCSVText.trim()) return;
     if (Platform.OS === 'web') {
-      if (window.confirm(`Cela va supprimer TOUS les themes existants et les remplacer par les ${themesPreviewCount} themes du CSV. Continuer ?`)) {
+      if (window.confirm(`Import de ${themesPreviewCount} themes. Les themes existants seront mis à jour, les nouveaux seront ajoutés. Aucune suppression. Continuer ?`)) {
         doUploadThemes();
       }
     } else {
       Alert.alert(
-        'Confirmer le remplacement',
-        `Cela va supprimer TOUS les themes existants et les remplacer par les ${themesPreviewCount} themes du CSV. Continuer ?`,
+        "Confirmer l'import",
+        `Import de ${themesPreviewCount} themes. Les themes existants seront mis à jour, les nouveaux seront ajoutés. Aucune suppression. Continuer ?`,
         [
           { text: 'Annuler', style: 'cancel' },
-          { text: 'Remplacer', style: 'destructive', onPress: doUploadThemes },
+          { text: 'Importer', onPress: doUploadThemes },
         ],
       );
     }
@@ -919,7 +919,7 @@ export default function AdminScreen() {
     <View>
       {/* Upload Themes CSV */}
       <View style={styles.card}>
-        <SectionHeader icon="file-replace-outline" title="Upload CSV Themes" subtitle="Le CSV ecrase tous les themes existants. Colonnes attendues : ID_Theme;Super_Categorie;Cluster;Nom_Public;..." />
+        <SectionHeader icon="file-replace-outline" title="Upload CSV Themes" subtitle="Ajoute les nouveaux thèmes et met à jour les existants. Colonnes attendues : ID_Theme;Super_Categorie;Cluster;Nom_Public;..." />
         {!themesFileName ? (
           <TouchableOpacity style={styles.uploadBtn} onPress={pickThemesCSV} activeOpacity={0.7}>
             <MaterialCommunityIcons name="clipboard-file-outline" size={32} color="#8A2BE2" style={{ marginBottom: 8 }} />

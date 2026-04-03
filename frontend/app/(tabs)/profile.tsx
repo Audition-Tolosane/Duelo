@@ -363,15 +363,37 @@ export default function ProfileScreen() {
             <Text style={s.statLabel}>{t('profile.matches_label')}</Text>
           </View>
           <View style={s.statDivider} />
-          <View style={s.statItem}>
+          <TouchableOpacity style={s.statItem} onPress={() => router.push(`/followers?userId=${profile?.user.id}&type=followers`)}>
             <Text style={s.statValue}>{user?.followers_count || 0}</Text>
             <Text style={s.statLabel}>{t('profile.followers_label')}</Text>
-          </View>
+          </TouchableOpacity>
           <View style={s.statDivider} />
-          <View style={s.statItem}>
+          <TouchableOpacity style={s.statItem} onPress={() => router.push(`/followers?userId=${profile?.user.id}&type=following`)}>
             <Text style={s.statValue}>{user?.following_count || 0}</Text>
             <Text style={s.statLabel}>{t('profile.following_label')}</Text>
-          </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* ── Quick Stats ── */}
+        <Text style={s.sectionTitle}>{t('profile.statistics')}</Text>
+        <View style={s.quickStats}>
+          {[
+            { icon: 'trophy' as const, label: t('profile.wins'), value: user?.matches_won || 0, color: '#FFD700' },
+            { icon: 'chart-line' as const, label: t('profile.win_rate'), value: `${user?.win_rate || 0}%`, color: '#00FFFF' },
+            { icon: 'fire' as const, label: t('player.streak'), value: user?.current_streak || 0, color: '#FF6B35' },
+            { icon: 'star' as const, label: t('profile.best_streak'), value: user?.best_streak || 0, color: '#E040FB' },
+          ].map((stat, i) => (
+            <View key={i} style={s.qStatBox}>
+              <LinearGradient
+                colors={[stat.color + '22', stat.color + '08']}
+                style={s.qStatIconCircle}
+              >
+                <MaterialCommunityIcons name={stat.icon} size={18} color={stat.color} />
+              </LinearGradient>
+              <Text style={[s.qStatVal, { color: stat.color }]}>{stat.value}</Text>
+              <Text style={s.qStatLbl}>{stat.label}</Text>
+            </View>
+          ))}
         </View>
 
         {/* ── Mes Thèmes (theme-based XP) ── */}
@@ -408,27 +430,6 @@ export default function ProfileScreen() {
             <Text style={s.noHistory}>{t('profile.play_to_progress')}</Text>
           </>
         )}
-
-        {/* ── Quick Stats ── */}
-        <Text style={s.sectionTitle}>{t('profile.statistics')}</Text>
-        <View style={s.quickStats}>
-          <View style={s.qStatBox}>
-            <Text style={[s.qStatVal, { color: '#00FF9D' }]}>{user?.matches_won || 0}</Text>
-            <Text style={s.qStatLbl}>{t('profile.wins')}</Text>
-          </View>
-          <View style={s.qStatBox}>
-            <Text style={s.qStatVal}>{user?.win_rate || 0}%</Text>
-            <Text style={s.qStatLbl}>{t('profile.win_rate')}</Text>
-          </View>
-          <View style={s.qStatBox}>
-            <Text style={[s.qStatVal, { color: '#FFD700' }]}>{user?.best_streak || 0}</Text>
-            <Text style={s.qStatLbl}>{t('profile.best_streak')}</Text>
-          </View>
-          <View style={s.qStatBox}>
-            <Text style={[s.qStatVal, { color: '#00FFFF' }]}>{(user?.total_xp || 0).toLocaleString()}</Text>
-            <Text style={s.qStatLbl}>{t('profile.xp_total')}</Text>
-          </View>
-        </View>
 
         {/* ── Titles ── */}
         {all_unlocked_titles && all_unlocked_titles.length > 0 && (
@@ -811,10 +812,14 @@ const s = StyleSheet.create({
   quickStats: { flexDirection: 'row', gap: 8, paddingHorizontal: GRID_PAD },
   qStatBox: {
     flex: 1, backgroundColor: GLASS.bg, borderRadius: GLASS.radius,
-    padding: 14, alignItems: 'center', borderWidth: 1, borderColor: GLASS.borderCyan,
+    padding: 12, alignItems: 'center', borderWidth: 1, borderColor: GLASS.borderCyan,
   },
-  qStatVal: { fontSize: 20, fontWeight: '800', color: '#FFF' },
-  qStatLbl: { fontSize: 9, color: 'rgba(255,255,255,0.45)', marginTop: 4, fontWeight: '700', textTransform: 'uppercase' },
+  qStatIconCircle: {
+    width: 36, height: 36, borderRadius: 12,
+    justifyContent: 'center', alignItems: 'center', marginBottom: 6,
+  },
+  qStatVal: { fontSize: 18, fontWeight: '800', color: '#FFF' },
+  qStatLbl: { fontSize: 9, color: 'rgba(255,255,255,0.45)', marginTop: 2, fontWeight: '700', textTransform: 'uppercase', textAlign: 'center' },
 
   /* Titles */
   titlesWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: GRID_PAD, marginBottom: 8 },

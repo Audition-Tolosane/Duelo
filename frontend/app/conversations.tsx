@@ -127,7 +127,7 @@ export default function ConversationsScreen() {
 
   const openChat = (conv: Conversation) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push(`/chat?partnerId=${conv.partner_id}&partnerPseudo=${encodeURIComponent(conv.partner_pseudo)}`);
+    router.push(`/chat?partnerId=${conv.partner_id}&partnerPseudo=${encodeURIComponent(conv.partner_pseudo)}&partnerAvatarSeed=${encodeURIComponent(conv.partner_avatar_seed || '')}&partnerAvatarUrl=${encodeURIComponent(conv.partner_avatar_url || '')}`);
   };
 
   const totalUnread = conversations.reduce((sum, c) => sum + c.unread_count, 0);

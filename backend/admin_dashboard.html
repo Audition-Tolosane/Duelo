@@ -476,6 +476,11 @@ let themesData = [];
 let allReports = [];
 let csvParsedRows = [];
 
+function apiFetch(url, options = {}) {
+  const headers = { 'Content-Type': 'application/json', 'X-Admin-Key': adminPassword, ...(options.headers || {}) };
+  return fetch(url, { ...options, headers });
+}
+
 // ── Auth ──
 document.getElementById('passwordInput').addEventListener('keydown', e => { if (e.key === 'Enter') verifyPassword(); });
 
@@ -483,7 +488,7 @@ async function verifyPassword() {
   const pw = document.getElementById('passwordInput').value.trim();
   if (!pw) return;
   try {
-    const r = await fetch(`${API}/admin/verify`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({password: pw}) });
+    const r = await apiFetch(`${API}/admin/verify`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({password: pw}) });
     if (r.ok) {
       adminPassword = pw;
       document.getElementById('loginOverlay').classList.add('hidden');
@@ -532,7 +537,7 @@ function showTab(tabId, group) {
 // ── Themes overview ──
 async function loadThemesOverview() {
   try {
-    const r = await fetch(`${API}/admin/themes-overview`);
+    const r = await apiFetch(`${API}/admin/themes-overview`);
     const data = await r.json();
     themesData = data.super_categories || [];
     const t = data.totals || {};
@@ -553,7 +558,7 @@ async function recountQuestions() {
   const btn = document.getElementById('btnRecount');
   btn.disabled = true; btn.textContent = '⏳ Calcul…';
   try {
-    const r = await fetch(`${API}/admin/recount-questions`, {
+    const r = await apiFetch(`${API}/admin/recount-questions`, {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ password: adminPassword })
     });
@@ -616,7 +621,7 @@ async function importThemesCSV() {
   const btn = document.getElementById('btnImportThemes');
   btn.disabled = true; btn.textContent = 'Import en cours…';
   try {
-    const r = await fetch(`${API}/admin/upload-themes-csv`, {
+    const r = await apiFetch(`${API}/admin/upload-themes-csv`, {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ password: adminPassword, themes_csv: text })
     });
@@ -707,7 +712,7 @@ async function importCSVQuestions() {
   const btn = document.getElementById('btnImportCSV');
   btn.disabled = true; btn.textContent = 'Import en cours…';
   try {
-    const r = await fetch(`${API}/admin/upload-csv`, {
+    const r = await apiFetch(`${API}/admin/upload-csv`, {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ password: adminPassword, questions: rows })
     });
@@ -722,7 +727,7 @@ async function importCSVQuestions() {
 // ── Import JSON questions ──
 async function populateThemeSelect() {
   try {
-    const r = await fetch(`${API}/admin/themes-overview`);
+    const r = await apiFetch(`${API}/admin/themes-overview`);
     const d = await r.json();
     const sel = document.getElementById('jsonCategory');
     sel.innerHTML = '<option value="">— Choisir un thème —</option>';
@@ -752,7 +757,7 @@ async function importJSON() {
   const btn = document.getElementById('btnImportJSON');
   btn.disabled = true; btn.textContent = 'Import en cours…';
   try {
-    const r = await fetch(`${API}/admin/import-questions`, {
+    const r = await apiFetch(`${API}/admin/import-questions`, {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ category: cat, questions: parsed })
     });
@@ -774,7 +779,7 @@ async function loadQStats() {
   const el = document.getElementById('qStatsContent');
   el.innerHTML = '<div style="text-align:center;padding:32px"><div class="loading-spinner"></div></div>';
   try {
-    const r = await fetch(`${API}/admin/questions-stats`);
+    const r = await apiFetch(`${API}/admin/questions-stats`);
     const d = await r.json();
     const cats = (d.categories||[]).slice(0,50);
     const rows = cats.map(c => `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
@@ -788,7 +793,7 @@ async function loadQStats() {
 // ── Avatars ──
 async function loadAvatars() {
   try {
-    const r = await fetch(`${API}/admin/avatars`);
+    const r = await apiFetch(`${API}/admin/avatars`);
     const d = await r.json();
     const avs = d.avatars || [];
     if (!avs.length) {
@@ -807,7 +812,7 @@ async function loadAvatars() {
 
 async function exportAvatarsCSV() {
   try {
-    const r = await fetch(`${API}/admin/avatars`);
+    const r = await apiFetch(`${API}/admin/avatars`);
     const d = await r.json();
     const avs = d.avatars || [];
     if (!avs.length) { toast('Aucun avatar à exporter', true); return; }
@@ -832,7 +837,7 @@ function startRenameAvatar(id, el) {
     const newName = input.value.trim();
     if (!newName || newName === current) { input.replaceWith(el); return; }
     try {
-      const r = await fetch(`${API}/admin/avatars/${id}`, {
+      const r = await apiFetch(`${API}/admin/avatars/${id}`, {
         method: 'PATCH', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ password: adminPassword, name: newName })
       });
@@ -893,7 +898,7 @@ async function uploadAvatar() {
     const { base64, filename } = avatarQueue[i];
     btn.textContent = `Upload ${i+1}/${avatarQueue.length}…`;
     try {
-      const r = await fetch(`${API}/admin/avatars/upload`, {
+      const r = await apiFetch(`${API}/admin/avatars/upload`, {
         method: 'POST', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ password: adminPassword, category: cat, image_base64: base64, filename })
       });
@@ -915,7 +920,7 @@ async function uploadAvatar() {
 async function deleteAvatar(id) {
   if (!confirm('Supprimer cet avatar ?')) return;
   try {
-    const r = await fetch(`${API}/admin/avatars/${id}`, {
+    const r = await apiFetch(`${API}/admin/avatars/${id}`, {
       method: 'DELETE', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ password: adminPassword })
     });
@@ -927,7 +932,7 @@ async function deleteAvatar(id) {
 // ── Reports ──
 async function loadReports(status) {
   try {
-    const r = await fetch(`${API}/admin/reports?limit=100`);
+    const r = await apiFetch(`${API}/admin/reports?limit=100`);
     const d = await r.json();
     allReports = d.reports || [];
     const pending = d.counts?.pending || 0;
@@ -968,7 +973,7 @@ async function loadQBrowse() {
   if (qBrowseData) { renderQBrowse(); return; }
   document.getElementById('qBrowseTree').innerHTML = '<div style="text-align:center;padding:32px"><div class="loading-spinner"></div></div>';
   try {
-    const r = await fetch(`${API}/admin/themes-overview`);
+    const r = await apiFetch(`${API}/admin/themes-overview`);
     const d = await r.json();
     qBrowseData = d.super_categories || [];
     renderQBrowse();
@@ -1039,7 +1044,7 @@ async function toggleTheme(themeId) {
   if (open && !qLoadedThemes[themeId]) {
     body.innerHTML = '<div style="padding:12px;color:#525252;font-size:12px">Chargement…</div>';
     try {
-      const r = await fetch(`${API}/admin/questions-browse?theme_id=${themeId}`);
+      const r = await apiFetch(`${API}/admin/questions-browse?theme_id=${themeId}`);
       const d = await r.json();
       qLoadedThemes[themeId] = d.questions || [];
       renderThemeQuestions(themeId);
@@ -1109,7 +1114,7 @@ async function bulkDeleteQuestions() {
   if (!qSelected.size) return;
   if (!confirm(`Supprimer définitivement ${qSelected.size} question(s) ?`)) return;
   try {
-    const r = await fetch(`${API}/admin/questions/bulk-delete`, {
+    const r = await apiFetch(`${API}/admin/questions/bulk-delete`, {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ password: adminPassword, ids: [...qSelected] })
     });
@@ -1136,7 +1141,7 @@ async function deleteQuestion(questionId, btn) {
   if (!confirm('Supprimer définitivement cette question ?')) return;
   btn.disabled = true; btn.textContent = '…';
   try {
-    const r = await fetch(`${API}/admin/questions/${questionId}`, {
+    const r = await apiFetch(`${API}/admin/questions/${questionId}`, {
       method: 'DELETE', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ password: adminPassword })
     });
@@ -1148,7 +1153,7 @@ async function deleteQuestion(questionId, btn) {
 
 async function setReportStatus(id, status) {
   try {
-    await fetch(`${API}/admin/reports/${id}/status`, {
+    await apiFetch(`${API}/admin/reports/${id}/status`, {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ status })
     });
