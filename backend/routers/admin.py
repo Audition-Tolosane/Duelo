@@ -335,22 +335,6 @@ async def upload_themes_csv(request: Request, _: None = Depends(verify_admin_key
     if not themes_csv_text.strip():
         raise HTTPException(status_code=400, detail="CSV vide")
 
-    # Clean up related records before deleting all themes
-    # Delete UserThemeXP records
-    await db.execute(text("DELETE FROM user_theme_xp"))
-    # Delete wall post likes/comments, then wall posts
-    wall_posts_result = await db.execute(select(WallPost.id))
-    wall_post_ids = [row[0] for row in wall_posts_result.fetchall()]
-    if wall_post_ids:
-        await db.execute(text("DELETE FROM post_likes WHERE post_id IN (SELECT id FROM wall_posts)"))
-        await db.execute(text("DELETE FROM post_comments WHERE post_id IN (SELECT id FROM wall_posts)"))
-        await db.execute(text("DELETE FROM wall_posts"))
-    # Nullify theme references in matches and reports
-    await db.execute(text("UPDATE matches SET category='deleted' WHERE category IN (SELECT id FROM themes)"))
-    await db.execute(text("UPDATE question_reports SET category=NULL WHERE category IN (SELECT id FROM themes)"))
-    # Now delete themes
-    await db.execute(text("DELETE FROM themes"))
-    await db.commit()
 
     # Auto-detect delimiter: try ; then , then \t
     first_line = themes_csv_text.split("\n")[0] if themes_csv_text.strip() else ""
@@ -386,7 +370,10 @@ async def upload_themes_csv(request: Request, _: None = Depends(verify_admin_key
             if not theme_id:
                 errors.append(f"Ligne {i+2}: ID_Theme vide"); continue
             if theme_id in seen_ids:
-                duplicates_skipped += 1; continue
+                duplicates_skipped += 1
+                name = col(row, "Nom_Public", "nom_public", "Name", "name", "Nom")
+                errors.append(f"Doublon ignoré — ligne {i+2}: {name or theme_id} (ID: {theme_id})")
+                continue
             seen_ids.add(theme_id)
 
             theme = Theme(
