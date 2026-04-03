@@ -282,9 +282,13 @@ export default function PlayerProfileScreen() {
           {/* Action Buttons */}
           {!isOwnProfile && (
             <View style={s.actionsRow}>
-              <TouchableOpacity data-testid="play-button" style={s.actionBtn} onPress={handlePlay}>
-                <MaterialCommunityIcons name="lightning-bolt" size={16} color="#FFF" />
-                <Text style={s.actionText}>{t('player.play')}</Text>
+              <TouchableOpacity
+                data-testid="challenge-button"
+                style={[s.actionBtn, s.challengeBtn]}
+                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); setChallengeModalVisible(true); }}
+              >
+                <MaterialCommunityIcons name="sword-cross" size={16} color="#FFF" />
+                <Text style={s.actionText}>{t('challenge.send')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 data-testid="follow-button"
@@ -303,14 +307,6 @@ export default function PlayerProfileScreen() {
               <TouchableOpacity data-testid="chat-button" style={[s.actionBtn, s.chatBtn]} onPress={handleChat}>
                 <MaterialCommunityIcons name="comment-outline" size={16} color="#00BFFF" />
                 <Text style={[s.actionText, { color: '#00BFFF' }]}>{t('player.message')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                data-testid="challenge-button"
-                style={[s.actionBtn, s.challengeBtn]}
-                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); setChallengeModalVisible(true); }}
-              >
-                <MaterialCommunityIcons name="sword-cross" size={16} color="#FFF" />
-                <Text style={s.actionText}>{t('challenge.send')}</Text>
               </TouchableOpacity>
             </View>
           )}
