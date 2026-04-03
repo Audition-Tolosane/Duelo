@@ -422,6 +422,23 @@ async def toggle_player_follow(user_id: str, data: PlayerFollowToggle, current_u
             data={"screen": "player-profile", "params": {"id": data.follower_id}},
         )
         await db.commit()
+
+        # Si le bot suivi est un bot, il peut follow en retour selon son skill
+        bot_res = await db.execute(select(User).where(User.id == user_id))
+        bot_user = bot_res.scalar_one_or_none()
+        if bot_user and bot_user.is_bot:
+            proba = (1.0 - float(bot_user.skill_level or 0.5)) * 0.7
+            if random.random() < proba:
+                already = await db.execute(
+                    select(PlayerFollow).where(
+                        PlayerFollow.follower_id == user_id,
+                        PlayerFollow.followed_id == data.follower_id,
+                    )
+                )
+                if not already.scalar_one_or_none():
+                    db.add(PlayerFollow(follower_id=user_id, followed_id=data.follower_id))
+                    await db.commit()
+
         return {"following": True}
 
 
