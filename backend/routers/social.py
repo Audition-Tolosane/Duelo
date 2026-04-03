@@ -261,12 +261,14 @@ async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, post
     user_xps = xp_res.scalars().all()
     xp_map = {uxp.theme_id: uxp.xp for uxp in user_xps}
 
-    # For bots: also add themes from bot_themes with 0 XP if not already present
+    # For bots: also add themes from bot_themes if not already in XP map
     if user.is_bot:
-        bt_res = await db.execute(select(BotTheme.theme_id).where(BotTheme.bot_pseudo == user.pseudo))
+        bt_res = await db.execute(select(BotTheme.theme_id, BotTheme.games_played_on_theme, BotTheme.win_rate_on_theme).where(BotTheme.bot_pseudo == user.pseudo))
         for row in bt_res.all():
-            if row[0] not in xp_map:
-                xp_map[row[0]] = 0
+            if row[0] not in xp_map and (row[1] or 0) > 0:
+                skill = user.skill_level or 0.5
+                wr = float(row[2] or user.win_rate or 0.5)
+                xp_map[row[0]] = round((row[1] or 0) * (skill * 140 * 2 + wr * 50))
 
     themes_data = {}
     champion_titles = []
