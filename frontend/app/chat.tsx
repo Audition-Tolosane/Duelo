@@ -4,7 +4,7 @@ import {
   ActivityIndicator, KeyboardAvoidingView, Platform, Keyboard, Image,
   Dimensions, Alert
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
@@ -44,6 +44,7 @@ type Message = {
 
 export default function ChatScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { partnerId, partnerPseudo } = useLocalSearchParams<{ partnerId: string; partnerPseudo: string }>();
   const { send: wsSend, on: wsOn, decrementUnread } = useWS();
   const [myId, setMyId] = useState('');
@@ -366,7 +367,7 @@ export default function ChatScreen() {
   if (loading) {
     return (
       <SwipeBackPage>
-      <SafeAreaView style={st.container}>
+      <View style={[st.container, { paddingTop: insets.top }]}>
         <View style={st.header}>
           <TouchableOpacity onPress={() => router.back()} style={st.headerBack}>
             <MaterialCommunityIcons name="chevron-left" size={26} color="#FFF" />
@@ -382,14 +383,14 @@ export default function ChatScreen() {
           <ActivityIndicator size="large" color="#8A2BE2" />
           <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginTop: 12, fontWeight: '600' }}>{t('chat.loading_messages')}</Text>
         </View>
-      </SafeAreaView>
+      </View>
       </SwipeBackPage>
     );
   }
 
   return (
     <SwipeBackPage>
-    <SafeAreaView style={st.container}>
+    <View style={[st.container, { paddingTop: insets.top }]}>
       {/* Premium Header */}
       <View style={st.header}>
         <TouchableOpacity data-testid="chat-back-button" onPress={() => router.back()} style={st.headerBack}>
@@ -448,7 +449,7 @@ export default function ChatScreen() {
         />
 
         {/* Premium Input Bar */}
-        <View style={st.inputWrapper}>
+        <View style={[st.inputWrapper, { paddingBottom: insets.bottom }]}>
           <View style={st.inputRow}>
             {/* Image Picker Button */}
             <TouchableOpacity style={st.attachBtn} onPress={handleSendImage}>
