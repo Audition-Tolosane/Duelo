@@ -375,8 +375,10 @@ export default function CategoryDetailScreen() {
               </LinearGradient>
             </TouchableOpacity>
             {detail.cluster ? (
-              <View style={[styles.clusterBadge, { backgroundColor: meta.color + '18', borderColor: meta.color + '40' }]}>
-                <Text style={[styles.clusterBadgeText, { color: meta.color }]}>{detail.cluster.toUpperCase()}</Text>
+              <View style={styles.clusterBadgeAbsolute}>
+                <View style={[styles.clusterBadge, { backgroundColor: meta.color + '18', borderColor: meta.color + '40' }]}>
+                  <Text style={[styles.clusterBadgeText, { color: meta.color }]}>{detail.cluster.toUpperCase()}</Text>
+                </View>
               </View>
             ) : null}
           </View>
@@ -653,7 +655,8 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 40 },
 
   // Top nav row (back + cluster)
-  topNavRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, gap: 12 },
+  topNavRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 },
+  clusterBadgeAbsolute: { position: 'absolute', left: 0, right: 0, alignItems: 'center', pointerEvents: 'none' },
   backCircle: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
 
   // Header Card
