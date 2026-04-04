@@ -27,35 +27,44 @@ const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 const BADGE_ICON_MAP: Record<string, string> = { fire: 'fire', bolt: 'lightning-bolt', glow: 'shimmer' };
 
-// Pin positions for fake players (in SVG 1000×500 viewBox coords)
+// Pin positions computed from lat/lon via equirectangular:
+// x = (lon + 180) / 360 * 1000  |  y = (90 - lat) / 180 * 500
 const PIN_POSITIONS = [
-  { x: 180, y: 140 },  // USA
-  { x: 280, y: 310 },  // Brazil
-  { x: 470, y: 135 },  // France
-  { x: 490, y: 250 },  // Nigeria
-  { x: 630, y: 95 },   // Russia
-  { x: 610, y: 210 },  // India
-  { x: 720, y: 155 },  // China
-  { x: 775, y: 130 },  // Japan
-  { x: 790, y: 360 },  // Australia
-  { x: 485, y: 75 },   // Scandinavia
-  { x: 155, y: 190 },  // Mexico
-  { x: 545, y: 200 },  // Saudi Arabia
-  { x: 710, y: 215 },  // Thailand
-  { x: 745, y: 252 },  // Indonesia
-  { x: 210, y: 100 },  // Canada
-  { x: 505, y: 290 },  // Congo
+  { x: 225, y: 139 },  // USA (40°N, 99°W)
+  { x: 356, y: 283 },  // Brésil (12°S, 52°W)
+  { x: 508, y: 122 },  // France (46°N, 3°E)
+  { x: 525, y: 222 },  // Nigeria (10°N, 9°E)
+  { x: 603, y: 94  },  // Russie / Moscou (56°N, 37°E)
+  { x: 717, y: 189 },  // Inde (22°N, 78°E)
+  { x: 789, y: 150 },  // Chine (36°N, 104°E)
+  { x: 883, y: 150 },  // Japon (36°N, 138°E)
+  { x: 872, y: 317 },  // Australie (24°S, 134°E)
+  { x: 547, y: 78  },  // Suède (62°N, 17°E)
+  { x: 214, y: 186 },  // Mexique (23°N, 103°W)
+  { x: 625, y: 183 },  // Arabie Saoudite (24°N, 45°E)
+  { x: 781, y: 206 },  // Thaïlande (16°N, 101°E)
+  { x: 817, y: 253 },  // Indonésie/Bornéo (1°S, 114°E)
+  { x: 231, y: 94  },  // Canada (56°N, 97°W)
+  { x: 567, y: 258 },  // RD Congo (3°S, 24°E)
+  { x: 528, y: 108 },  // Allemagne (51°N, 10°E)
+  { x: 322, y: 344 },  // Argentine (34°S, 64°W)
+  { x: 569, y: 330 },  // Afrique du Sud (29°S, 25°E)
+  { x: 583, y: 178 },  // Égypte (26°N, 30°E)
+  { x: 597, y: 142 },  // Turquie (39°N, 35°E)
+  { x: 689, y: 117 },  // Kazakhstan (48°N, 68°E)
 ];
 
 const PLAYER_NAMES = [
   'Alex', 'Mia', 'Lucas', 'Emma', 'Noah', 'Léa', 'Hugo', 'Chloé',
   'Tom', 'Jade', 'Liam', 'Sarah', 'Enzo', 'Luna', 'Adam', 'Zoé',
+  'Max', 'Sofia', 'Ryo', 'Omar', 'Maya', 'Diego',
 ];
 
 const PIN_COLORS = [
   '#FF6B35', '#00D4FF', '#4CAF50', '#FF3B5C', '#FFB800',
   '#00FF9D', '#E53935', '#8A2BE2', '#FF69B4', '#1565C0',
   '#FF9800', '#00BCD4', '#9C27B0', '#CDDC39', '#FF5722', '#3F51B5',
+  '#7C4DFF', '#00E5FF', '#F50057', '#69F0AE', '#FFAB40', '#E040FB',
 ];
 
 // Map sizing
@@ -171,8 +180,8 @@ export default function MatchmakingScreen() {
 
   const playerPins = useMemo(() => {
     return PIN_POSITIONS.map((pos, i) => ({
-      x: pos.x + (Math.random() - 0.5) * 15,
-      y: pos.y + (Math.random() - 0.5) * 15,
+      x: pos.x + (Math.random() - 0.5) * 4,
+      y: pos.y + (Math.random() - 0.5) * 4,
       name: PLAYER_NAMES[i % PLAYER_NAMES.length],
       color: PIN_COLORS[i % PIN_COLORS.length],
     }));
