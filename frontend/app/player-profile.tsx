@@ -235,7 +235,6 @@ export default function PlayerProfileScreen() {
           >
             <MaterialCommunityIcons name="chevron-left" size={22} color="#A3A3A3" />
           </LinearGradient>
-          <Text style={s.backText}>{t('player.back')}</Text>
         </TouchableOpacity>
 
         {/* ── Hero Header ── */}

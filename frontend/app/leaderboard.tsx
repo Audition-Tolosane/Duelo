@@ -207,8 +207,12 @@ export default function LeaderboardScreen() {
 
         {/* Back button */}
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <MaterialCommunityIcons name="chevron-left" size={28} color="#A3A3A3" />
-          <Text style={styles.backBtnText}>{t('leaderboard.back')}</Text>
+          <LinearGradient
+            colors={['rgba(255,255,255,0.10)', 'rgba(255,255,255,0.04)']}
+            style={styles.backCircle}
+          >
+            <MaterialCommunityIcons name="chevron-left" size={22} color="#A3A3A3" />
+          </LinearGradient>
         </TouchableOpacity>
 
         <Text style={styles.title}>{headerTitle}</Text>
@@ -322,8 +326,8 @@ const styles = StyleSheet.create({
   title: { fontSize: 28, fontWeight: '800', color: '#FFF', paddingHorizontal: 20, paddingTop: 4, paddingBottom: 8 },
 
   // Back
-  backBtn: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10 },
-  backBtnText: { color: '#A3A3A3', fontSize: 15, fontWeight: '600', marginLeft: 2 },
+  backBtn: { paddingHorizontal: 16, paddingVertical: 12 },
+  backCircle: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
 
   // View Toggle
   viewToggle: {

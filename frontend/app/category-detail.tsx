@@ -344,7 +344,12 @@ export default function CategoryDetailScreen() {
         >
           {/* Back button */}
           <TouchableOpacity data-testid="back-button" style={styles.backBtn} onPress={() => router.back()}>
-            <Text style={styles.backBtnText}>{t('category.back')}</Text>
+            <LinearGradient
+              colors={['rgba(255,255,255,0.10)', 'rgba(255,255,255,0.04)']}
+              style={styles.backCircle}
+            >
+              <MaterialCommunityIcons name="chevron-left" size={22} color="#A3A3A3" />
+            </LinearGradient>
           </TouchableOpacity>
 
           {/* Cluster label */}
@@ -557,6 +562,12 @@ export default function CategoryDetailScreen() {
       <Modal visible={showCreatePost} transparent animationType="slide" onRequestClose={() => setShowCreatePost(false)}>
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <View style={styles.modalOverlay}>
+            <ScrollView
+              keyboardDismissMode="on-drag"
+              keyboardShouldPersistTaps="handled"
+              style={{ width: '100%' }}
+              contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}
+            >
             <View style={styles.createModalContent}>
               <View style={styles.createModalHeader}>
                 <TouchableOpacity onPress={() => { setShowCreatePost(false); setNewPostImage(null); setNewPostText(''); }}>
@@ -600,6 +611,7 @@ export default function CategoryDetailScreen() {
                 <Text style={styles.charCount}>{newPostText.length}/500</Text>
               </View>
             </View>
+            </ScrollView>
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -621,8 +633,8 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 40 },
 
   // Back
-  backBtn: { paddingHorizontal: 20, paddingVertical: 12 },
-  backBtnText: { color: '#A3A3A3', fontSize: 15, fontWeight: '600' },
+  backBtn: { paddingHorizontal: 16, paddingVertical: 12 },
+  backCircle: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
 
   // Header Card
   headerCard: {
@@ -692,8 +704,8 @@ const styles = StyleSheet.create({
   emptySub: { fontSize: 14, color: '#525252', textAlign: 'center' },
 
   // Cluster badge
-  clusterBadgeRow: { paddingHorizontal: 16, marginBottom: 8 },
-  clusterBadge: { alignSelf: 'flex-start', borderWidth: 1, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4 },
+  clusterBadgeRow: { paddingHorizontal: 16, marginBottom: 8, alignItems: 'center' },
+  clusterBadge: { borderWidth: 1, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 5 },
   clusterBadgeText: { fontSize: 11, fontWeight: '800', letterSpacing: 1.5 },
 
   // Post Card
