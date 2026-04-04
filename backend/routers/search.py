@@ -10,6 +10,137 @@ from services.xp import get_level, get_theme_title, get_theme_unlocked_titles, g
 
 router = APIRouter(prefix="/search", tags=["search"])
 
+# Common aliases: abbreviation → list of words that must appear in the name
+SEARCH_ALIASES: dict[str, list[str]] = {
+    # Séries TV
+    "got": ["game", "thrones"],
+    "tlou": ["last", "us"],
+    "bb": ["breaking", "bad"],
+    "bcs": ["better", "call", "saul"],
+    "himym": ["how", "met", "mother"],
+    "satc": ["sex", "city"],
+    "twd": ["walking", "dead"],
+    "aot": ["attack", "titan"],
+    "mha": ["hero", "academia"],
+    "fma": ["fullmetal", "alchemist"],
+    "fmab": ["fullmetal", "alchemist"],
+    "hxh": ["hunter"],
+    "jjk": ["jujutsu"],
+    "s&tc": ["sex", "city"],
+    "b99": ["brooklyn"],
+    # Cinéma
+    "hp": ["harry", "potter"],
+    "hpot": ["harry", "potter"],
+    "sw": ["star", "wars"],
+    "lotr": ["seigneur", "anneaux"],
+    "ldr": ["seigneur", "anneaux"],
+    "potc": ["pirates", "caribbean"],
+    "mib": ["men", "black"],
+    "f&f": ["fast", "furious"],
+    "fnf": ["fast", "furious"],
+    "topg": ["top", "gun"],
+    "2001": ["odyssée"],
+    # Jeux vidéo
+    "ac": ["assassin"],
+    "ac ": ["assassin"],
+    "bg3": ["baldur"],
+    "bg": ["baldur"],
+    "gta": ["grand", "theft"],
+    "gtav": ["grand", "theft"],
+    "rdr": ["red", "dead"],
+    "rdr2": ["red", "dead"],
+    "rdrd": ["red", "dead"],
+    "re": ["resident", "evil"],
+    "ds": ["dark", "souls"],
+    "er": ["elden", "ring"],
+    "mgs": ["metal", "gear"],
+    "cod": ["call", "duty"],
+    "botw": ["zelda"],
+    "totk": ["zelda"],
+    "zelda": ["zelda"],
+    "wow": ["warcraft"],
+    "mc": ["minecraft"],
+    "lol": ["league", "legends"],
+    "csgo": ["counter"],
+    "cs2": ["counter"],
+    "among": ["among"],
+    "pkmn": ["pokemon"],
+    "pk": ["pokemon"],
+    # Littérature / BD
+    "1984": ["orwell"],
+    "hg": ["hunger", "games"],
+    "hs": ["hunger", "games"],
+    "sherlock": ["holmes"],
+    "poirot": ["christie"],
+    "jrr": ["tolkien"],
+    "rr": ["tolkien"],
+    "asm": ["spider"],
+    "spidey": ["spider"],
+    "bats": ["batman"],
+    "supes": ["superman"],
+    # Musique
+    "mj": ["jackson"],
+    "acdc": ["ac/dc"],
+    "rhcp": ["chili"],
+    "zep": ["zeppelin"],
+    "led": ["zeppelin"],
+    "pf": ["pink", "floyd"],
+    "floyd": ["pink", "floyd"],
+    "taylor": ["swift"],
+    "ts": ["swift"],
+}
+
+# Stop words to ignore when splitting query into words
+_STOP = {"de", "du", "des", "le", "la", "les", "l", "d", "et", "en",
+         "the", "of", "a", "an", "and", "in", "to"}
+
+
+def _acronym(name: str) -> str:
+    """Return lowercase acronym of significant words in name."""
+    words = [w for w in name.lower().split() if w not in _STOP and w.isalpha()]
+    return "".join(w[0] for w in words if w)
+
+
+def _theme_score(query: str, theme_name: str, cluster: str, super_cat: str, description: str) -> int:
+    name_l = theme_name.lower()
+    cluster_l = (cluster or "").lower()
+    super_l = (super_cat or "").lower()
+    desc_l = (description or "").lower()
+    score = 0
+
+    # 1. Exact substring matches (original logic)
+    if query in name_l:
+        score += 100
+    if query in cluster_l:
+        score += 50
+    if query in super_l:
+        score += 30
+    if query in desc_l:
+        score += 20
+
+    # 2. Acronym match: "got" matches "Game Of Thrones"
+    if _acronym(theme_name) == query:
+        score += 90
+
+    # 3. Alias match
+    alias_words = SEARCH_ALIASES.get(query)
+    if alias_words:
+        if all(w in name_l or w in desc_l or w in cluster_l for w in alias_words):
+            score += 85
+
+    # 4. All query words appear individually in the name/description
+    words = [w for w in query.split() if w not in _STOP and len(w) >= 2]
+    if words and all(w in name_l or w in desc_l for w in words):
+        score += 60
+
+    # 5. Any significant query word appears in name (partial relevance)
+    if not score and words:
+        matched = sum(1 for w in words if w in name_l or w in cluster_l)
+        if matched:
+            score += 15 * matched
+
+    return score
+
 
 @router.get("/themes")
 async def search_themes(
@@ -32,16 +163,11 @@ async def search_themes(
 
     results = []
     for theme in all_themes:
-        score = 0
         if query_lower:
-            if query_lower in theme.name.lower():
-                score += 100
-            if query_lower in (theme.cluster or "").lower():
-                score += 50
-            if query_lower in (theme.super_category or "").lower():
-                score += 30
-            if query_lower in (theme.description or "").lower():
-                score += 20
+            score = _theme_score(
+                query_lower, theme.name,
+                theme.cluster or "", theme.super_category or "", theme.description or ""
+            )
         else:
             score = 50
 
