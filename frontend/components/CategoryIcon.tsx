@@ -669,7 +669,6 @@ const THEME_ICON_MAP: Record<string, IconDef> = {
   STV_24HR: { set: 'mci', name: 'clock-fast' },
   STV_3BOD: { set: 'mci', name: 'atom' },
   STV_BH90: { set: 'mci', name: 'palm-tree' },
-  STV_FGuy: { set: 'mci', name: 'dog' },
   STV_WIRE: { set: 'mci', name: 'city' },
   STV_SOPR: { set: 'mci', name: 'silverware-fork-knife' },
   STV_MADM: { set: 'mci', name: 'briefcase' },
