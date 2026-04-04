@@ -9,6 +9,8 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { GLASS } from '../theme/glassTheme';
 import { authFetch } from '../utils/api';
 import { t } from '../utils/i18n';
@@ -29,7 +31,7 @@ type CategoryDetail = {
   xp_progress: { current: number; needed: number; progress: number };
   is_following: boolean; completion_pct: number;
   color_hex?: string; icon_url?: string; question_count?: number;
-  super_category?: string;
+  super_category?: string; cluster?: string;
 };
 
 type WallPostData = {
@@ -124,6 +126,7 @@ export default function CategoryDetailScreen() {
         icon_url: data.icon_url,
         question_count: data.question_count,
         super_category: data.super_category,
+        cluster: data.cluster,
       });
       setMeta({
         icon: data.name?.[0]?.toUpperCase() || '?',
@@ -344,6 +347,15 @@ export default function CategoryDetailScreen() {
             <Text style={styles.backBtnText}>{t('category.back')}</Text>
           </TouchableOpacity>
 
+          {/* Cluster label */}
+          {detail.cluster ? (
+            <View style={styles.clusterBadgeRow}>
+              <View style={[styles.clusterBadge, { backgroundColor: meta.color + '18', borderColor: meta.color + '40' }]}>
+                <Text style={[styles.clusterBadgeText, { color: meta.color }]}>{detail.cluster.toUpperCase()}</Text>
+              </View>
+            </View>
+          ) : null}
+
           {/* Category Header */}
           <View style={[styles.headerCard, { borderColor: meta.color + '30' }]}>
             <View style={styles.headerTop}>
@@ -449,7 +461,12 @@ export default function CategoryDetailScreen() {
           {/* Wall Posts */}
           {posts.length === 0 ? (
             <View style={styles.emptyWall}>
-              <Text style={styles.emptyIcon}>💬</Text>
+              <LinearGradient
+                colors={[meta.color, meta.color + '80']}
+                style={styles.emptyIconCircle}
+              >
+                <MaterialCommunityIcons name="chat-outline" size={36} color="#FFF" />
+              </LinearGradient>
               <Text style={styles.emptyText}>{t('category.be_first_to_post')}</Text>
               <Text style={styles.emptySub}>{t('category.share_opinions')}</Text>
             </View>
@@ -577,7 +594,8 @@ export default function CategoryDetailScreen() {
 
               <View style={styles.createModalActions}>
                 <TouchableOpacity style={styles.mediaBtn} onPress={pickImage}>
-                  <Text style={styles.mediaBtnText}>📷 {t('category.photo')}</Text>
+                  <MaterialCommunityIcons name="camera-outline" size={20} color={meta.color} />
+                  <Text style={[styles.mediaBtnText, { color: meta.color }]}>{t('category.photo')}</Text>
                 </TouchableOpacity>
                 <Text style={styles.charCount}>{newPostText.length}/500</Text>
               </View>
@@ -669,9 +687,14 @@ const styles = StyleSheet.create({
   createPostText: { fontSize: 13, fontWeight: '700' },
 
   emptyWall: { alignItems: 'center', paddingVertical: 48, paddingHorizontal: 40 },
-  emptyIcon: { fontSize: 48, marginBottom: 12 },
+  emptyIconCircle: { width: 80, height: 80, borderRadius: 40, justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
   emptyText: { fontSize: 18, fontWeight: '700', color: '#FFF', marginBottom: 4 },
   emptySub: { fontSize: 14, color: '#525252', textAlign: 'center' },
+
+  // Cluster badge
+  clusterBadgeRow: { paddingHorizontal: 16, marginBottom: 8 },
+  clusterBadge: { alignSelf: 'flex-start', borderWidth: 1, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4 },
+  clusterBadgeText: { fontSize: 11, fontWeight: '800', letterSpacing: 1.5 },
 
   // Post Card
   postCard: {
@@ -745,8 +768,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.08)', paddingTop: 12,
   },
-  mediaBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.06)' },
-  mediaBtnText: { color: '#A3A3A3', fontSize: 14 },
+  mediaBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 12, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.06)' },
+  mediaBtnText: { fontSize: 14, fontWeight: '600' },
   charCount: { color: '#525252', fontSize: 13, fontWeight: '500' },
 
   // VO Toggle
