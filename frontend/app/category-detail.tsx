@@ -364,24 +364,22 @@ export default function CategoryDetailScreen() {
           showsVerticalScrollIndicator={false}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={meta.color} />}
         >
-          {/* Back button */}
-          <TouchableOpacity data-testid="back-button" style={styles.backBtn} onPress={() => router.back()}>
-            <LinearGradient
-              colors={['rgba(255,255,255,0.10)', 'rgba(255,255,255,0.04)']}
-              style={styles.backCircle}
-            >
-              <MaterialCommunityIcons name="chevron-left" size={22} color="#A3A3A3" />
-            </LinearGradient>
-          </TouchableOpacity>
-
-          {/* Cluster label */}
-          {detail.cluster ? (
-            <View style={styles.clusterBadgeRow}>
+          {/* Back button + Cluster label on same row */}
+          <View style={styles.topNavRow}>
+            <TouchableOpacity data-testid="back-button" onPress={() => router.back()}>
+              <LinearGradient
+                colors={['rgba(255,255,255,0.10)', 'rgba(255,255,255,0.04)']}
+                style={styles.backCircle}
+              >
+                <MaterialCommunityIcons name="chevron-left" size={22} color="#A3A3A3" />
+              </LinearGradient>
+            </TouchableOpacity>
+            {detail.cluster ? (
               <View style={[styles.clusterBadge, { backgroundColor: meta.color + '18', borderColor: meta.color + '40' }]}>
                 <Text style={[styles.clusterBadgeText, { color: meta.color }]}>{detail.cluster.toUpperCase()}</Text>
               </View>
-            </View>
-          ) : null}
+            ) : null}
+          </View>
 
           {/* Category Header */}
           <View style={[styles.headerCard, { borderColor: meta.color + '30' }]}>
@@ -654,8 +652,8 @@ const styles = StyleSheet.create({
   successToastText: { color: '#00FF9D', fontWeight: '700', fontSize: 14 },
   scrollContent: { paddingBottom: 40 },
 
-  // Back
-  backBtn: { paddingHorizontal: 16, paddingVertical: 12 },
+  // Top nav row (back + cluster)
+  topNavRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, gap: 12 },
   backCircle: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
 
   // Header Card
@@ -726,9 +724,8 @@ const styles = StyleSheet.create({
   emptySub: { fontSize: 14, color: '#525252', textAlign: 'center' },
 
   // Cluster badge
-  clusterBadgeRow: { paddingHorizontal: 16, marginBottom: 8, alignItems: 'center' },
-  clusterBadge: { borderWidth: 1, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 5 },
-  clusterBadgeText: { fontSize: 11, fontWeight: '800', letterSpacing: 1.5 },
+  clusterBadge: { height: 36, borderWidth: 1, borderRadius: 18, paddingHorizontal: 14, justifyContent: 'center' },
+  clusterBadgeText: { fontSize: 12, fontWeight: '800', letterSpacing: 1.5 },
 
   // Post Card
   postCard: {
