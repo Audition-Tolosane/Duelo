@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  View, Text, StyleSheet, Dimensions,
+  View, Text, StyleSheet, Dimensions, TouchableOpacity,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -371,6 +371,12 @@ export default function MatchmakingScreen() {
     transform: [{ translateX: opponentSlideX.value }],
   }));
 
+  const handleCancel = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    if (!isRematch && !isChallengeMode) wsSend({ action: 'matchmaking_leave' });
+    router.back();
+  };
+
   const getCategoryLabel = () => {
     const name = themeName ? decodeURIComponent(themeName) : category;
     return name || 'Quiz';
@@ -478,6 +484,15 @@ export default function MatchmakingScreen() {
                 </View>
               </LinearGradient>
             </View>
+            <TouchableOpacity style={styles.cancelBtn} onPress={handleCancel} activeOpacity={0.8}>
+              <LinearGradient
+                colors={['rgba(255,255,255,0.10)', 'rgba(255,255,255,0.04)']}
+                style={styles.cancelCircle}
+              >
+                <MaterialCommunityIcons name="close" size={20} color="#A3A3A3" />
+              </LinearGradient>
+              <Text style={styles.cancelText}>{t('common.cancel')}</Text>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -628,6 +643,9 @@ const styles = StyleSheet.create({
   searchMessage: { fontSize: 15, fontWeight: '600', color: '#FFF' },
   hintRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   hint: { fontSize: 12, color: '#525252' },
+  cancelBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 16, paddingHorizontal: 8, paddingVertical: 6 },
+  cancelCircle: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
+  cancelText: { fontSize: 14, fontWeight: '600', color: '#525252' },
 
   foundOverlay: { position: 'absolute', bottom: 60, left: 0, right: 0, alignItems: 'center' },
   foundCard: { borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(0,255,157,0.3)' },
