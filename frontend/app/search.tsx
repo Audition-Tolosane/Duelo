@@ -22,6 +22,30 @@ import { t } from '../utils/i18n';
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
+function hslToHex(h: number, s: number, l: number): string {
+  s /= 100; l /= 100;
+  const hue2rgb = (p: number, q: number, t: number) => {
+    if (t < 0) t += 1; if (t > 1) t -= 1;
+    if (t < 1/6) return p + (q - p) * 6 * t;
+    if (t < 1/2) return q;
+    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    return p;
+  };
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  const toHex = (v: number) => Math.round(v * 255).toString(16).padStart(2, '0');
+  return `#${toHex(hue2rgb(p, q, h/360 + 1/3))}${toHex(hue2rgb(p, q, h/360))}${toHex(hue2rgb(p, q, h/360 - 1/3))}`;
+}
+
+function hashColor(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    hash |= 0;
+  }
+  return hslToHex(Math.abs(hash) % 360, 65, 55);
+}
+
 const CATEGORY_META: Record<string, { color: string; bg: string }> = {
   series_tv: { color: '#E040FB', bg: '#2D1B4E' },
   geographie: { color: '#00FFFF', bg: '#0D2B2B' },
@@ -245,7 +269,7 @@ export default function SearchScreen() {
   // ── Renders ──
 
   const renderThemeItem = ({ item, index = 0 }: { item: ThemeResult; index?: number }) => {
-    const color = item.color_hex || '#8A2BE2';
+    const color = hashColor(item.id);
     return (
       <ReAnimated.View entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
       <ScalePressable
@@ -280,7 +304,7 @@ export default function SearchScreen() {
               </View>
             ) : (
               <View style={[st.themeNewBadge, { backgroundColor: color + '15', borderColor: color + '40' }]}>
-                <Text style={[st.themeNewText, { color }]}>{item.super_category || t('search.new_badge')}</Text>
+                <Text style={[st.themeNewText, { color }]}>{item.cluster || t('search.new_badge')}</Text>
               </View>
             )}
           </View>
