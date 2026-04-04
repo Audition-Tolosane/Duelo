@@ -68,6 +68,8 @@ async def search_themes(
             "description": theme.description or "",
             "total_questions": theme.question_count or 0,
             "color_hex": theme.color_hex or "#8A2BE2",
+            "cluster": theme.cluster or "",
+            "super_category": theme.super_category or "",
             "user_level": user_level, "user_title": user_title,
             "difficulty_label": difficulty_label, "relevance_score": score,
         })

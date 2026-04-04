@@ -46,6 +46,7 @@ type ThemeResult = {
   total_questions: number; player_count: number; followers_count: number;
   user_level: number; user_title: string; is_following: boolean;
   difficulty_label: string; relevance_score: number;
+  color_hex?: string; cluster?: string; super_category?: string;
 };
 
 type PlayerResult = {
@@ -244,7 +245,7 @@ export default function SearchScreen() {
   // ── Renders ──
 
   const renderThemeItem = ({ item, index = 0 }: { item: ThemeResult; index?: number }) => {
-    const meta = CATEGORY_META[item.id] || { color: '#8A2BE2', bg: '#1A1A2E' };
+    const color = item.color_hex || '#8A2BE2';
     return (
       <ReAnimated.View entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
       <ScalePressable
@@ -254,31 +255,32 @@ export default function SearchScreen() {
           router.push(`/category-detail?id=${item.id}`);
         }}
       >
-        <View style={[st.themeCardInner, { borderLeftColor: meta.color, borderLeftWidth: 3 }]}>
+        <View style={[st.themeCardInner, { borderLeftColor: color, borderLeftWidth: 3 }]}>
           <View style={st.themeCardLeft}>
-            <View style={[st.themeIconBox, { backgroundColor: meta.color + '20' }]}>
-              <CategoryIcon themeId={item.id} size={24} color={meta.color} type="theme" />
+            <View style={[st.themeIconBox, { backgroundColor: color + '20' }]}>
+              <CategoryIcon themeId={item.id} emoji={item.cluster || item.super_category} size={24} color={color} type="cluster" />
             </View>
           </View>
           <View style={st.themeCardCenter}>
-            <Text style={[st.themeName, { color: meta.color }]}>{item.name}</Text>
+            {item.cluster ? (
+              <Text style={st.themeCluster}>{item.cluster}</Text>
+            ) : null}
+            <Text style={[st.themeName, { color }]}>{item.name}</Text>
             <Text style={st.themeDesc} numberOfLines={1}>{item.description}</Text>
             <View style={st.themeMetaRow}>
               <Text style={st.themeMeta}>{item.total_questions} {t('search.questions')}</Text>
               <Text style={st.themeMetaDot}>·</Text>
               <Text style={st.themeMeta}>{item.player_count} {t('search.players_count')}</Text>
-              <Text style={st.themeMetaDot}>·</Text>
-              <Text style={st.themeMeta}>{item.followers_count} {t('search.followers')}</Text>
             </View>
           </View>
           <View style={st.themeCardRight}>
             {item.user_level > 0 ? (
-              <View style={[st.themeLevelBadge, { backgroundColor: meta.color + '20' }]}>
-                <Text style={[st.themeLevelText, { color: meta.color }]}>{t('search.level_short')} {item.user_level}</Text>
+              <View style={[st.themeLevelBadge, { backgroundColor: color + '20' }]}>
+                <Text style={[st.themeLevelText, { color }]}>{t('search.level_short')} {item.user_level}</Text>
               </View>
             ) : (
-              <View style={st.themeNewBadge}>
-                <Text style={st.themeNewText}>{t('search.new_badge')}</Text>
+              <View style={[st.themeNewBadge, { backgroundColor: color + '15', borderColor: color + '40' }]}>
+                <Text style={[st.themeNewText, { color }]}>{item.super_category || t('search.new_badge')}</Text>
               </View>
             )}
           </View>
@@ -806,6 +808,7 @@ const st = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center',
   },
   themeCardCenter: { flex: 1 },
+  themeCluster: { fontSize: 10, fontWeight: '700', color: 'rgba(255,255,255,0.4)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 2 },
   themeName: { fontSize: 16, fontWeight: '800', marginBottom: 2 },
   themeDesc: { color: '#A3A3A3', fontSize: 12, marginBottom: 4 },
   themeMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
