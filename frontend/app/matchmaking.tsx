@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, StyleSheet, Dimensions, TouchableOpacity,
 } from 'react-native';
@@ -27,37 +27,30 @@ const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 const BADGE_ICON_MAP: Record<string, string> = { fire: 'fire', bolt: 'lightning-bolt', glow: 'shimmer' };
 
-// Pin positions computed from lat/lon via equirectangular:
-// x = (lon + 180) / 360 * 1000  |  y = (90 - lat) / 180 * 500
-const PIN_POSITIONS = [
-  { x: 225, y: 139 },  // USA (40°N, 99°W)
-  { x: 356, y: 283 },  // Brésil (12°S, 52°W)
-  { x: 508, y: 122 },  // France (46°N, 3°E)
-  { x: 525, y: 222 },  // Nigeria (10°N, 9°E)
-  { x: 603, y: 94  },  // Russie / Moscou (56°N, 37°E)
-  { x: 717, y: 189 },  // Inde (22°N, 78°E)
-  { x: 789, y: 150 },  // Chine (36°N, 104°E)
-  { x: 883, y: 150 },  // Japon (36°N, 138°E)
-  { x: 872, y: 317 },  // Australie (24°S, 134°E)
-  { x: 547, y: 78  },  // Suède (62°N, 17°E)
-  { x: 214, y: 186 },  // Mexique (23°N, 103°W)
-  { x: 625, y: 183 },  // Arabie Saoudite (24°N, 45°E)
-  { x: 781, y: 206 },  // Thaïlande (16°N, 101°E)
-  { x: 817, y: 253 },  // Indonésie/Bornéo (1°S, 114°E)
-  { x: 231, y: 94  },  // Canada (56°N, 97°W)
-  { x: 567, y: 258 },  // RD Congo (3°S, 24°E)
-  { x: 528, y: 108 },  // Allemagne (51°N, 10°E)
-  { x: 322, y: 344 },  // Argentine (34°S, 64°W)
-  { x: 569, y: 330 },  // Afrique du Sud (29°S, 25°E)
-  { x: 583, y: 178 },  // Égypte (26°N, 30°E)
-  { x: 597, y: 142 },  // Turquie (39°N, 35°E)
-  { x: 689, y: 117 },  // Kazakhstan (48°N, 68°E)
-];
-
-const PLAYER_NAMES = [
-  'Alex', 'Mia', 'Lucas', 'Emma', 'Noah', 'Léa', 'Hugo', 'Chloé',
-  'Tom', 'Jade', 'Liam', 'Sarah', 'Enzo', 'Luna', 'Adam', 'Zoé',
-  'Max', 'Sofia', 'Ryo', 'Omar', 'Maya', 'Diego',
+// Villes réelles (lat/lon) pour les dots joueurs
+const CITY_PINS = [
+  { lat: 40,  lon: -99,  name: 'Alex'  }, // USA
+  { lat: -12, lon: -52,  name: 'Mia'   }, // Brésil
+  { lat: 46,  lon: 2,    name: 'Lucas' }, // France
+  { lat: 10,  lon: 9,    name: 'Emma'  }, // Nigeria
+  { lat: 56,  lon: 37,   name: 'Noah'  }, // Russie
+  { lat: 22,  lon: 78,   name: 'Léa'   }, // Inde
+  { lat: 36,  lon: 104,  name: 'Hugo'  }, // Chine
+  { lat: 36,  lon: 138,  name: 'Chloé' }, // Japon
+  { lat: -24, lon: 134,  name: 'Tom'   }, // Australie
+  { lat: 62,  lon: 17,   name: 'Jade'  }, // Suède
+  { lat: 23,  lon: -103, name: 'Liam'  }, // Mexique
+  { lat: 24,  lon: 45,   name: 'Sarah' }, // Arabie Saoudite
+  { lat: 16,  lon: 101,  name: 'Enzo'  }, // Thaïlande
+  { lat: -1,  lon: 114,  name: 'Luna'  }, // Indonésie
+  { lat: 56,  lon: -97,  name: 'Adam'  }, // Canada
+  { lat: -3,  lon: 24,   name: 'Zoé'   }, // RD Congo
+  { lat: 51,  lon: 10,   name: 'Max'   }, // Allemagne
+  { lat: -34, lon: -64,  name: 'Sofia' }, // Argentine
+  { lat: -29, lon: 25,   name: 'Ryo'   }, // Afrique du Sud
+  { lat: 26,  lon: 30,   name: 'Omar'  }, // Égypte
+  { lat: 39,  lon: 35,   name: 'Maya'  }, // Turquie
+  { lat: 48,  lon: 68,   name: 'Diego' }, // Kazakhstan
 ];
 
 const PIN_COLORS = [
@@ -67,16 +60,52 @@ const PIN_COLORS = [
   '#7C4DFF', '#00E5FF', '#F50057', '#69F0AE', '#FFAB40', '#E040FB',
 ];
 
+// Centres des pays pour le départ (code ISO → lat/lon)
+const COUNTRY_START: Record<string, { lat: number; lon: number }> = {
+  FR: { lat: 46,  lon: 2   }, BE: { lat: 50,  lon: 4   }, CH: { lat: 47,  lon: 8   },
+  LU: { lat: 50,  lon: 6   }, MC: { lat: 44,  lon: 7   }, IT: { lat: 42,  lon: 12  },
+  ES: { lat: 40,  lon: -4  }, PT: { lat: 39,  lon: -8  }, DE: { lat: 51,  lon: 10  },
+  GB: { lat: 52,  lon: -1  }, IE: { lat: 53,  lon: -8  }, NL: { lat: 52,  lon: 5   },
+  SE: { lat: 62,  lon: 17  }, NO: { lat: 62,  lon: 10  }, DK: { lat: 56,  lon: 10  },
+  FI: { lat: 62,  lon: 26  }, PL: { lat: 52,  lon: 20  }, RO: { lat: 46,  lon: 25  },
+  US: { lat: 38,  lon: -97 }, CA: { lat: 56,  lon: -97 }, MX: { lat: 23,  lon: -103},
+  BR: { lat: -12, lon: -52 }, AR: { lat: -34, lon: -64 }, CO: { lat: 4,   lon: -74 },
+  RU: { lat: 56,  lon: 37  }, UA: { lat: 49,  lon: 32  }, TR: { lat: 39,  lon: 35  },
+  MA: { lat: 32,  lon: -6  }, DZ: { lat: 28,  lon: 3   }, TN: { lat: 34,  lon: 9   },
+  EG: { lat: 26,  lon: 30  }, SN: { lat: 14,  lon: -14 }, CI: { lat: 7,   lon: -6  },
+  NG: { lat: 10,  lon: 9   }, CM: { lat: 5,   lon: 12  }, CD: { lat: -3,  lon: 24  },
+  ZA: { lat: -29, lon: 25  }, KE: { lat: -1,  lon: 38  }, ET: { lat: 9,   lon: 40  },
+  IN: { lat: 22,  lon: 78  }, CN: { lat: 36,  lon: 104 }, JP: { lat: 36,  lon: 138 },
+  KR: { lat: 36,  lon: 128 }, SA: { lat: 24,  lon: 45  }, AE: { lat: 24,  lon: 54  },
+  TH: { lat: 16,  lon: 101 }, ID: { lat: -1,  lon: 114 }, AU: { lat: -24, lon: 134 },
+  NZ: { lat: -42, lon: 173 }, PK: { lat: 30,  lon: 70  }, BD: { lat: 23,  lon: 90  },
+};
+
+// Equirectangulaire : lon/lat → coordonnées SVG 1000×500
+function latLonToSvg(lat: number, lon: number) {
+  return {
+    x: (lon + 180) / 360 * SVG_W,
+    y: (90 - lat)  / 180 * SVG_H,
+  };
+}
+
+// Coordonnées SVG → offset de translation pour centrer ce point à l'écran
+function svgToOffset(svgX: number, svgY: number) {
+  return {
+    x: -(svgX * SCALE - SW / 2),
+    y: -(svgY * SCALE - SH / 2),
+  };
+}
+
+// Par défaut : centré sur Europe occidentale (lon=10, lat=48)
+const DEFAULT_START = svgToOffset(...Object.values(latLonToSvg(48, 10)) as [number, number]);
+
 // Map sizing
 const SVG_W = 1000;
 const SVG_H = 500;
 const SCALE = Math.max(SW / SVG_W, SH / SVG_H) * 1.9;
 const REAL_W = SVG_W * SCALE;
 const REAL_H = SVG_H * SCALE;
-
-// Start centered on Atlantic
-const INIT_X = -(REAL_W * 0.38 - SW / 2);
-const INIT_Y = -(REAL_H * 0.3 - SH / 2);
 
 type OpponentData = {
   id: string;
@@ -166,8 +195,8 @@ export default function MatchmakingScreen() {
   const [roomId, setRoomId] = useState<string | null>(null);
   const [showTimeoutModal, setShowTimeoutModal] = useState(false);
 
-  const mapX = useSharedValue(INIT_X);
-  const mapY = useSharedValue(INIT_Y);
+  const mapX = useSharedValue(DEFAULT_START.x);
+  const mapY = useSharedValue(DEFAULT_START.y);
   const mapScaleAnim = useSharedValue(1);
   const overlayOpacity = useSharedValue(0);
 
@@ -178,14 +207,21 @@ export default function MatchmakingScreen() {
 
   const [targetPin, setTargetPin] = useState<{ x: number; y: number } | null>(null);
 
-  const playerPins = useMemo(() => {
-    return PIN_POSITIONS.map((pos, i) => ({
-      x: pos.x + (Math.random() - 0.5) * 4,
-      y: pos.y + (Math.random() - 0.5) * 4,
-      name: PLAYER_NAMES[i % PLAYER_NAMES.length],
-      color: PIN_COLORS[i % PIN_COLORS.length],
-    }));
-  }, []);
+  // Pins régénérés à chaque mount (shuffle + lat/lon réels)
+  const playerPinsRef = useRef<Array<{ x: number; y: number; name: string; color: string }> | null>(null);
+  if (!playerPinsRef.current) {
+    const shuffledCities = [...CITY_PINS].sort(() => Math.random() - 0.5);
+    playerPinsRef.current = shuffledCities.map((city, i) => {
+      const svg = latLonToSvg(city.lat, city.lon);
+      return {
+        x: svg.x,
+        y: svg.y,
+        name: city.name,
+        color: PIN_COLORS[i % PIN_COLORS.length],
+      };
+    });
+  }
+  const playerPins = playerPinsRef.current;
 
   const SEARCH_MESSAGES = [
     t('matchmaking.searching_opponent'),
@@ -199,7 +235,7 @@ export default function MatchmakingScreen() {
       router.replace('/(tabs)/play');
       return;
     }
-    loadPseudo();
+    loadPlayerInfo();
     if (isRematch) {
       fetchBotOpponent();
     } else if (isChallengeMode) {
@@ -256,21 +292,26 @@ export default function MatchmakingScreen() {
     return () => unsubs.forEach((u) => u());
   }, []);
 
-  const loadPseudo = async () => {
+  const loadPlayerInfo = async () => {
     const p = await AsyncStorage.getItem('duelo_pseudo');
     if (p) setPseudo(p);
+    // Centre la carte sur le pays du joueur
+    const country = await AsyncStorage.getItem('duelo_country');
+    const center = (country && COUNTRY_START[country.toUpperCase()]) || COUNTRY_START['FR'];
+    const svg = latLonToSvg(center.lat, center.lon);
+    const off = svgToOffset(svg.x, svg.y);
+    mapX.value = withTiming(off.x, { duration: 1200, easing: Easing.inOut(Easing.ease) });
+    mapY.value = withTiming(off.y, { duration: 1200, easing: Easing.inOut(Easing.ease) });
   };
 
   useEffect(() => {
     if (phase !== 'searching') return;
 
-    const targets = [
-      { x: -(REAL_W * 0.38 - SW / 2), y: -(REAL_H * 0.25 - SH / 2) },
-      { x: -(REAL_W * 0.55 - SW / 2), y: -(REAL_H * 0.28 - SH / 2) },
-      { x: -(REAL_W * 0.15 - SW / 2), y: -(REAL_H * 0.22 - SH / 2) },
-      { x: -(REAL_W * 0.45 - SW / 2), y: -(REAL_H * 0.45 - SH / 2) },
-      { x: -(REAL_W * 0.62 - SW / 2), y: -(REAL_H * 0.32 - SH / 2) },
-    ];
+    // Pan qui visite les vrais dots adverses (6 au hasard, shufflés)
+    const targets = [...playerPins]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 6)
+      .map(pin => svgToOffset(pin.x, pin.y));
     let i = 0;
     const next = () => {
       const t = targets[i % targets.length];
@@ -316,7 +357,8 @@ export default function MatchmakingScreen() {
   };
 
   const handleMatchFound = (opp: OpponentData, matchRoomId?: string) => {
-    const pin = PIN_POSITIONS[Math.floor(Math.random() * PIN_POSITIONS.length)];
+    const randomCity = CITY_PINS[Math.floor(Math.random() * CITY_PINS.length)];
+    const pin = latLonToSvg(randomCity.lat, randomCity.lon);
     setTargetPin(pin);
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
