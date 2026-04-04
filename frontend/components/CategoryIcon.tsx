@@ -665,6 +665,11 @@ const THEME_ICON_MAP: Record<string, IconDef> = {
   MIN_STOI: { set: 'mci', name: 'pillar' },
 
   // ── Séries TV (SCREEN) ──
+  STV_1899: { set: 'mci', name: 'anchor' },
+  STV_24HR: { set: 'mci', name: 'clock-fast' },
+  STV_3BOD: { set: 'mci', name: 'atom' },
+  STV_BH90: { set: 'mci', name: 'palm-tree' },
+  STV_FGuy: { set: 'mci', name: 'dog' },
   STV_WIRE: { set: 'mci', name: 'city' },
   STV_SOPR: { set: 'mci', name: 'silverware-fork-knife' },
   STV_MADM: { set: 'mci', name: 'briefcase' },
@@ -827,6 +832,7 @@ const THEME_ICON_MAP: Record<string, IconDef> = {
   CIN_BRAV: { set: 'mci', name: 'sword' },
   CIN_SCAR: { set: 'mci', name: 'pistol' },
   CIN_DEPA: { set: 'mci', name: 'incognito' },
+  CIN_2001: { set: 'mci', name: 'telescope' },
 
   // ── Animé & Animation (SCREEN) ──
   ANI_HUNT: { set: 'mci', name: 'sword' },
