@@ -570,14 +570,15 @@ const SlotMachineOverlay = React.memo(function SlotMachineOverlay({
 
     const spinTimer = setTimeout(() => {
       const targetOffset = -(chosenIndex - 1) * SLOT_ITEM_W;
-      offset.value = withTiming(targetOffset, { duration: 1800, easing: Easing.out(Easing.cubic) });
+      // Reste rapide longtemps puis décélère doucement sur la fin
+      offset.value = withTiming(targetOffset, { duration: 3200, easing: Easing.bezier(0.05, 0.6, 0.1, 1.0) });
     }, 300);
 
     const fadeTimer = setTimeout(() => {
       opacity.value = withTiming(0, { duration: 400 });
-    }, 2700);
+    }, 4200);
 
-    const doneTimer = setTimeout(onDone, 3100);
+    const doneTimer = setTimeout(onDone, 4600);
 
     return () => {
       clearTimeout(spinTimer);
@@ -620,7 +621,6 @@ const SlotMachineOverlay = React.memo(function SlotMachineOverlay({
             <LinearGradient colors={['transparent', '#080810']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={slotS.fadeRight} pointerEvents="none" />
             <View style={slotS.centerMark} pointerEvents="none" />
           </View>
-          <Text style={slotS.subtitle}>{chosen.name}</Text>
         </View>
       </Animated.View>
     </Modal>
@@ -633,7 +633,7 @@ const slotS = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center',
   },
   box: { alignItems: 'center', gap: 18, width: '100%' },
-  title: { fontSize: 11, fontWeight: '800', color: '#555', letterSpacing: 3, textTransform: 'uppercase' },
+  title: { fontSize: 15, fontWeight: '900', color: '#FFF', letterSpacing: 3, textTransform: 'uppercase' },
   viewport: { width: SLOT_ITEM_W * 3, height: 108, overflow: 'hidden' },
   row: { flexDirection: 'row', alignItems: 'center', height: 108, gap: SLOT_GAP },
   card: {

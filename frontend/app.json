@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Duelo",
-    "slug": "duelo",
+    "slug": "duelo-v7sn6v",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon-v2.png",
@@ -18,7 +18,18 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Partage des photos dans le mur communautaire",
-        "CFBundleLocalizations": ["fr", "en", "es", "de", "pt", "it", "ar", "ja", "ko", "zh-Hans"],
+        "CFBundleLocalizations": [
+          "fr",
+          "en",
+          "es",
+          "de",
+          "pt",
+          "it",
+          "ar",
+          "ja",
+          "ko",
+          "zh-Hans"
+        ],
         "CFBundleDevelopmentRegion": "fr"
       }
     },
@@ -28,7 +39,10 @@
         "backgroundColor": "#000"
       },
       "edgeToEdgeEnabled": true,
-      "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -49,6 +63,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "373a1773-3a32-42d5-a5b9-f80e4e070ebc"
+      }
+    },
+    "owner": "daud31s-organization"
   }
 }

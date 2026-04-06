@@ -123,6 +123,8 @@ async def get_profile(user_id: str, pseudo: Optional[str] = None, db: AsyncSessi
             "best_streak": user.best_streak, "current_streak": user.current_streak,
             "streak_badge": get_streak_badge(user.current_streak),
             "win_rate": round(user.matches_won / max(user.matches_played, 1) * 100),
+            "login_streak": getattr(user, 'login_streak', 0) or 0,
+            "best_login_streak": getattr(user, 'best_login_streak', 0) or 0,
             "followers_count": followers_count,
             "following_count": following_count,
         },

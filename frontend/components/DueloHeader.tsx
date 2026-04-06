@@ -30,6 +30,19 @@ function MessageIcon({ color = '#BF5FFF', size = 22 }) {
   );
 }
 
+function ShopIcon({ color = '#FFB800', size = 22 }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"
+        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      />
+      <Line x1="3" y1="6" x2="21" y2="6" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <Path d="M16 10a4 4 0 0 1-8 0" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
+
 function BellIcon({ color = '#FF6B35', size = 22 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
@@ -51,7 +64,7 @@ export default function DueloHeader() {
   return (
     <View style={styles.header}>
 
-      {/* Search */}
+      {/* Search + Shop */}
       <View style={styles.leftSection}>
         <TouchableOpacity
           style={[styles.iconBtn, styles.iconBtnCyan]}
@@ -59,6 +72,13 @@ export default function DueloHeader() {
           activeOpacity={0.7}
         >
           <SearchIcon color="#00E5FF" size={22} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.iconBtn, styles.iconBtnGold]}
+          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push('/shop'); }}
+          activeOpacity={0.7}
+        >
+          <ShopIcon color="#FFB800" size={22} />
         </TouchableOpacity>
       </View>
 
@@ -116,13 +136,14 @@ const styles = StyleSheet.create({
     }),
   },
   leftSection: {
-    width: 84,
+    width: 90,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
+    gap: 6,
   },
   rightIcons: {
-    width: 84,
+    width: 90,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -159,6 +180,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,107,53,0.08)',
     borderColor: 'rgba(255,107,53,0.3)',
     shadowColor: '#FF6B35',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+  },
+  iconBtnGold: {
+    backgroundColor: 'rgba(255,184,0,0.08)',
+    borderColor: 'rgba(255,184,0,0.3)',
+    shadowColor: '#FFB800',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.35,
     shadowRadius: 8,
