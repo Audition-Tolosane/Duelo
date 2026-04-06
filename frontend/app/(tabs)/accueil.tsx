@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, FlatList,
-  ActivityIndicator, RefreshControl, Dimensions, Platform,
+  ActivityIndicator, RefreshControl, Dimensions, Platform, Modal,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -83,6 +83,8 @@ interface FeedItem {
   likes_count?: number;
   comments_count?: number;
   is_liked?: boolean;
+  is_active?: boolean;
+  expires_at?: string | null;
   created_at: string;
 }
 
@@ -98,7 +100,180 @@ interface UserData {
   selected_title: string;
   last_played_at: string | null;
   best_streak: number;
+  login_streak: number;
+  best_login_streak: number;
 }
+
+interface DailyMission {
+  id: string;
+  type: string;
+  label: string;
+  target: number;
+  progress: number;
+  completed: boolean;
+  xp: number;
+  cat?: string;
+  rerolled?: boolean;
+}
+
+interface DailyMissionsState {
+  missions: DailyMission[];
+  multiplier: number;
+  xp_earned: number;
+  reward_claimed: boolean;
+  target_theme_id: string | null;
+  all_completed: boolean;
+  any_completed: boolean;
+  rerolls_used: number;
+  user_themes: { id: string; name: string; color: string }[];
+}
+
+// ── Missions Widget Styles ──
+const mStyles = StyleSheet.create({
+  container: {
+    marginHorizontal: 16, marginBottom: 8, marginTop: 4,
+    backgroundColor: '#1A1A2E', borderRadius: 16,
+    borderWidth: 1, borderColor: '#FFB80030',
+    padding: 14,
+  },
+  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 12, gap: 8 },
+  headerIcon: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+  title: { flex: 1, fontSize: 14, fontWeight: '800', color: '#FFF' },
+  countdown: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  countdownText: { fontSize: 11, color: '#888' },
+  missionRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, gap: 10 },
+  missionTop: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
+  missionLabel: { fontSize: 12, color: '#CCC', flex: 1 },
+  progressBg: { height: 4, backgroundColor: '#2A2A3E', borderRadius: 2 },
+  progressFill: { height: 4, backgroundColor: '#FFB800', borderRadius: 2 },
+  progressText: { fontSize: 10, color: '#666', marginTop: 2 },
+  missionRight: { alignItems: 'center', gap: 4 },
+  xpBadge: { backgroundColor: '#FFB80020', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 },
+  xpBadgeText: { fontSize: 10, color: '#FFB800', fontWeight: '700' },
+  rerollBtn: { padding: 4 },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
+  doubleBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    borderWidth: 1, borderColor: '#FFB80050',
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8,
+  },
+  doubleBtnText: { fontSize: 11, color: '#FFB800', fontWeight: '700' },
+  activeDouble: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  activeDoubleText: { fontSize: 11, color: '#FFB800', fontWeight: '700' },
+  claimBtn: { flex: 1 },
+  claimGradient: { paddingVertical: 7, borderRadius: 8, alignItems: 'center' },
+  claimText: { fontSize: 12, fontWeight: '900', color: '#000' },
+  claimedBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
+  claimedText: { fontSize: 11, color: '#00FF9D' },
+});
+
+// ── Missions Widget ──
+const MissionsWidget = React.memo(function MissionsWidget({
+  data,
+  onDouble,
+  onReroll,
+  onClaim,
+}: {
+  data: DailyMissionsState;
+  onDouble: () => void;
+  onReroll: (id: string) => void;
+  onClaim: () => void;
+}) {
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  const secsLeft = Math.floor((midnight.getTime() - now.getTime()) / 1000);
+  const hh = String(Math.floor(secsLeft / 3600)).padStart(2, '0');
+  const mm = String(Math.floor((secsLeft % 3600) / 60)).padStart(2, '0');
+  const countdown = `${hh}h${mm}`;
+
+  const totalXP = data.missions.reduce((s, m) => s + (m.completed ? m.xp : 0), 0) * data.multiplier;
+  const canClaim = data.any_completed && !data.reward_claimed;
+
+  return (
+    <View style={mStyles.container}>
+      {/* Header */}
+      <View style={mStyles.header}>
+        <LinearGradient colors={['#FFB800', '#FF6B35']} style={mStyles.headerIcon}>
+          <MaterialCommunityIcons name="flag-checkered" size={12} color="#FFF" />
+        </LinearGradient>
+        <Text style={mStyles.title}>Missions du jour</Text>
+        <View style={mStyles.countdown}>
+          <MaterialCommunityIcons name="clock-outline" size={11} color="#888" />
+          <Text style={mStyles.countdownText}>{countdown}</Text>
+        </View>
+      </View>
+
+      {/* Mission rows */}
+      {data.missions.map((m) => {
+        const pct = Math.min(m.progress / m.target, 1);
+        return (
+          <View key={m.id} style={mStyles.missionRow}>
+            <View style={{ flex: 1 }}>
+              <View style={mStyles.missionTop}>
+                <MaterialCommunityIcons
+                  name={m.completed ? 'check-circle' : 'circle-outline'}
+                  size={15}
+                  color={m.completed ? '#00FF9D' : '#555'}
+                  style={{ marginRight: 6 }}
+                />
+                <Text style={[mStyles.missionLabel, m.completed && { color: '#00FF9D' }]} numberOfLines={1}>
+                  {m.label}
+                </Text>
+              </View>
+              <View style={mStyles.progressBg}>
+                <View style={[mStyles.progressFill, { width: `${pct * 100}%` as any }]} />
+              </View>
+              <Text style={mStyles.progressText}>{m.progress}/{m.target}</Text>
+            </View>
+            <View style={mStyles.missionRight}>
+              <View style={mStyles.xpBadge}>
+                <Text style={mStyles.xpBadgeText}>+{m.xp * data.multiplier} XP</Text>
+              </View>
+              {!m.completed && !m.rerolled && !data.reward_claimed && (
+                <TouchableOpacity style={mStyles.rerollBtn} onPress={() => onReroll(m.id)}>
+                  <MaterialCommunityIcons name="refresh" size={13} color="#888" />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        );
+      })}
+
+      {/* Bottom actions */}
+      {!data.reward_claimed && (
+        <View style={mStyles.actions}>
+          {data.multiplier < 2 && (
+            <TouchableOpacity style={mStyles.doubleBtn} onPress={onDouble} activeOpacity={0.8}>
+              <MaterialCommunityIcons name="television-play" size={13} color="#FFB800" />
+              <Text style={mStyles.doubleBtnText}>×2 toutes (pub)</Text>
+            </TouchableOpacity>
+          )}
+          {data.multiplier >= 2 && (
+            <View style={mStyles.activeDouble}>
+              <MaterialCommunityIcons name="lightning-bolt" size={13} color="#FFB800" />
+              <Text style={mStyles.activeDoubleText}>×2 actif</Text>
+            </View>
+          )}
+          {canClaim && (
+            <TouchableOpacity style={mStyles.claimBtn} onPress={onClaim} activeOpacity={0.8}>
+              <LinearGradient colors={['#00FF9D', '#00D4FF']} style={mStyles.claimGradient}>
+                <Text style={mStyles.claimText}>Réclamer {totalXP} XP</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
+
+      {data.reward_claimed && (
+        <View style={mStyles.claimedBadge}>
+          <MaterialCommunityIcons name="check-circle" size={14} color="#00FF9D" />
+          <Text style={mStyles.claimedText}>Récompenses réclamées aujourd'hui</Text>
+        </View>
+      )}
+    </View>
+  );
+});
 
 // Type icon mapping
 const TYPE_ICON_MAP: Record<string, React.ComponentProps<typeof MaterialCommunityIcons>['name']> = {
@@ -359,43 +534,98 @@ const CommunityCard = React.memo(function CommunityCard({ item, index, userId, o
 });
 
 // ── Event Card ──
-const EventCard = React.memo(function EventCard({ item, index }: { item: FeedItem; index: number }) {
+const EventCard = React.memo(function EventCard({ item, index, onActivate }: {
+  item: FeedItem; index: number; onActivate: (themeId: string) => Promise<string | null>;
+}) {
   const pulse = useSharedValue(0);
+  const [countdown, setCountdown] = React.useState('');
+  const [expiresAt, setExpiresAt] = React.useState<string | null>(item.expires_at || null);
+  const [isActive, setIsActive] = React.useState(item.is_active || false);
+  const [loading, setLoading] = React.useState(false);
+
   useEffect(() => {
     pulse.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 1200 }),
-        withTiming(0, { duration: 1200 }),
-      ),
+      withSequence(withTiming(1, { duration: 1200 }), withTiming(0, { duration: 1200 })),
       -1, true
     );
   }, []);
+
+  useEffect(() => {
+    if (!expiresAt) { setCountdown(''); return; }
+    const update = () => {
+      const diff = Math.max(0, new Date(expiresAt).getTime() - Date.now());
+      if (diff === 0) { setIsActive(false); setCountdown(''); return; }
+      const m = Math.floor(diff / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      setCountdown(`${m}:${s.toString().padStart(2, '0')}`);
+    };
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, [expiresAt]);
+
   const pulseStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(pulse.value, [0, 1], [0.6, 1]),
+    opacity: interpolate(pulse.value, [0, 1], [isActive ? 0.8 : 0.5, 1]),
   }));
 
-  const mciName = FEED_ICON_MAP[item.icon || ''] || 'lightning-bolt';
+  const handleWatchAd = async () => {
+    if (loading || isActive) return;
+    setLoading(true);
+    // TODO: afficher vraie pub ici (AdMob rewarded)
+    // Simulation : délai de 1s représentant la pub
+    await new Promise(r => setTimeout(r, 1000));
+    const newExpiry = await onActivate(item.theme_id || item.category);
+    if (newExpiry) {
+      setExpiresAt(newExpiry);
+      setIsActive(true);
+    }
+    setLoading(false);
+  };
+
+  const color = item.category_color;
 
   return (
     <Animated.View entering={FadeInDown.delay(index * 80).duration(400)}>
       <Animated.View style={pulseStyle}>
         <LinearGradient
-          colors={[item.category_color + '15', 'transparent']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.eventCard, { borderColor: item.category_color + '30' }]}
+          colors={[color + (isActive ? '25' : '15'), 'transparent']}
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+          style={[styles.eventCard, { borderColor: color + (isActive ? '60' : '30') }]}
         >
-          <LinearGradient colors={[item.category_color, item.category_color + '80']} style={styles.eventIconWrap}>
-            <MaterialCommunityIcons name={mciName} size={20} color="#FFF" />
+          <LinearGradient colors={[color, color + '80']} style={styles.eventIconWrap}>
+            <MaterialCommunityIcons name="lightning-bolt" size={20} color="#FFF" />
           </LinearGradient>
           <View style={styles.eventContent}>
-            <Text style={[styles.eventTitle, { color: item.category_color }]}>{`${t('home.xp_double_title')} ${item.category_name}`}</Text>
-            <Text style={styles.eventBody}>{`${t('home.xp_double_body')} ${item.category_name} ${t('home.xp_double_duration')}`}</Text>
+            <Text style={[styles.eventTitle, { color }]}>{`XP ×2 — ${item.category_name}`}</Text>
+            {isActive && countdown ? (
+              <Text style={[styles.eventBody, { color: '#00FF9D', fontWeight: '700' }]}>
+                ⏱ {countdown}
+              </Text>
+            ) : (
+              <Text style={styles.eventBody}>Regarde une pub pour activer</Text>
+            )}
           </View>
-          <View style={[styles.eventLiveBadge, { backgroundColor: item.category_color }]}>
-            <View style={styles.liveDot} />
-            <Text style={styles.eventLiveText}>{t('home.live')}</Text>
-          </View>
+          {isActive ? (
+            <View style={[styles.eventLiveBadge, { backgroundColor: '#00FF9D' }]}>
+              <View style={[styles.liveDot, { backgroundColor: '#FFF' }]} />
+              <Text style={[styles.eventLiveText, { color: '#000' }]}>ACTIF</Text>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={[styles.adBtn, { borderColor: color }]}
+              onPress={handleWatchAd}
+              disabled={loading}
+              activeOpacity={0.7}
+            >
+              <MaterialCommunityIcons
+                name={loading ? 'loading' : 'play-circle-outline'}
+                size={14} color={color}
+              />
+              <Text style={[styles.adBtnText, { color }]}>
+                {loading ? '...' : 'Pub'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </LinearGradient>
       </Animated.View>
     </Animated.View>
@@ -462,6 +692,10 @@ export default function AccueilScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [feedError, setFeedError] = useState(false);
+  const [dailyMissions, setDailyMissions] = useState<DailyMissionsState | null>(null);
+  const [showThemePicker, setShowThemePicker] = useState(false);
+  const [offerSlotExpiresAt, setOfferSlotExpiresAt] = useState<string | null>(null);
+  const [offerCountdown, setOfferCountdown] = useState('');
 
   const hasPlayedToday = React.useMemo(() => {
     if (!userData?.last_played_at) return false;
@@ -472,6 +706,69 @@ export default function AccueilScreen() {
 
   useEffect(() => {
     loadFeed();
+    loadMissions();
+    loadDailyQuestion();
+  }, []);
+
+  const [dailyQuestion, setDailyQuestion] = useState<any>(null);
+  const [dqAnswer, setDqAnswer] = useState<number | null>(null);
+  const [dqResult, setDqResult] = useState<any>(null);
+
+  const loadDailyQuestion = useCallback(async () => {
+    try {
+      const res = await authFetch(`${API_URL}/api/daily-question/today`);
+      if (res.ok) setDailyQuestion(await res.json());
+    } catch {}
+  }, []);
+
+  const handleDqAnswer = useCallback(async (idx: number) => {
+    if (!dailyQuestion || dqAnswer !== null) return;
+    setDqAnswer(idx);
+    try {
+      const res = await authFetch(`${API_URL}/api/daily-question/answer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question_id: dailyQuestion.question_id, theme_id: dailyQuestion.theme_id, answer_index: idx }),
+      });
+      if (res.ok) setDqResult(await res.json());
+    } catch {}
+  }, [dailyQuestion, dqAnswer]);
+
+  const loadMissions = useCallback(async () => {
+    try {
+      const res = await authFetch(`${API_URL}/api/missions/today`);
+      if (res.ok) setDailyMissions(await res.json());
+    } catch {}
+  }, []);
+
+  const handleDoubleReward = useCallback(async () => {
+    // TODO: show rewarded ad before calling API
+    const res = await authFetch(`${API_URL}/api/missions/double`, { method: 'POST' });
+    if (res.ok) {
+      const d = await res.json();
+      setDailyMissions(prev => prev ? { ...prev, multiplier: d.multiplier, xp_earned: d.xp_earned } : prev);
+    }
+  }, []);
+
+  const handleRerollMission = useCallback(async (missionId: string) => {
+    // TODO: show rewarded ad before calling API
+    const res = await authFetch(`${API_URL}/api/missions/reroll/${missionId}`, { method: 'POST' });
+    if (res.ok) {
+      const d = await res.json();
+      setDailyMissions(prev => prev ? { ...prev, missions: d.missions } : prev);
+    }
+  }, []);
+
+  const handleClaimRewards = useCallback(async (themeId: string) => {
+    const res = await authFetch(`${API_URL}/api/missions/claim`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ theme_id: themeId }),
+    });
+    if (res.ok) {
+      setDailyMissions(prev => prev ? { ...prev, reward_claimed: true, target_theme_id: themeId } : prev);
+      setShowThemePicker(false);
+    }
   }, []);
 
   // Register Expo push token + flush any offline-queued score saves
@@ -528,7 +825,7 @@ export default function AccueilScreen() {
         await Notifications.scheduleNotificationAsync({
           content: {
             title: t('home.streak_danger_title'),
-            body: `${t('home.streak_danger_body')} ${userData?.current_streak || 0} ${t('home.streak_danger_days')}`,
+            body: `${t('home.streak_danger_body')} ${userData?.login_streak || 0} ${t('home.streak_danger_days')}`,
             data: { type: 'streak_reminder' },
           },
           trigger: {
@@ -540,7 +837,7 @@ export default function AccueilScreen() {
       } catch (e) { console.error(e); }
     };
 
-    if (userData && !hasPlayedToday && (userData.current_streak || 0) > 0) {
+    if (userData && !hasPlayedToday && (userData.login_streak || 0) > 0) {
       scheduleStreakReminder();
     }
 
@@ -548,6 +845,41 @@ export default function AccueilScreen() {
       cancelled = true;
     };
   }, [userData, hasPlayedToday]);
+
+  const handleActivateBoost = useCallback(async (themeId: string): Promise<string | null> => {
+    try {
+      const res = await authFetch(`${API_URL}/api/boosts/activate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ theme_id: themeId }),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.expires_at;
+    } catch { return null; }
+  }, []);
+
+  // Countdown toward next 30-min slot for x2 offers
+  useEffect(() => {
+    if (!offerSlotExpiresAt) return;
+    const tick = () => {
+      const secs = Math.max(0, Math.floor((new Date(offerSlotExpiresAt).getTime() - Date.now()) / 1000));
+      const mm = String(Math.floor(secs / 60)).padStart(2, '0');
+      const ss = String(secs % 60).padStart(2, '0');
+      setOfferCountdown(`${mm}:${ss}`);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [offerSlotExpiresAt]);
+
+  const handleRefreshOffers = useCallback(async () => {
+    // TODO: show rewarded ad before calling API
+    try {
+      const res = await authFetch(`${API_URL}/api/boosts/refresh-offers`, { method: 'POST' });
+      if (res.ok) await loadFeed();
+    } catch {}
+  }, []);
 
   const loadFeed = async () => {
     try {
@@ -563,6 +895,7 @@ export default function AccueilScreen() {
         setPendingDuels(data.pending_duels || []);
         setIncomingChallenges(data.incoming_challenges || []);
         setSocialFeed(data.social_feed || []);
+        if (data.offer_slot_expires_at) setOfferSlotExpiresAt(data.offer_slot_expires_at);
       }
     } catch {
       setFeedError(true);
@@ -751,14 +1084,14 @@ export default function AccueilScreen() {
                 </View>
                 <View style={styles.streakCardInfo}>
                   <Text style={styles.streakCardTitle}>
-                    {(userData?.current_streak || 0) > 0
-                      ? `${userData?.current_streak} ${t('home.streak_days')}`
+                    {(userData?.login_streak || 0) > 0
+                      ? `${userData?.login_streak} ${t('home.streak_days')}`
                       : t('home.no_streak')}
                   </Text>
                   <Text style={styles.streakCardSub}>
                     {hasPlayedToday
                       ? t('home.streak_maintained')
-                      : (userData?.current_streak || 0) > 0
+                      : (userData?.login_streak || 0) > 0
                         ? t('home.play_to_keep_streak')
                         : t('home.play_to_start_streak')}
                   </Text>
@@ -766,16 +1099,16 @@ export default function AccueilScreen() {
               </View>
               <View style={styles.streakCardRight}>
                 <Text style={[styles.streakNum, { color: hasPlayedToday ? '#00FF9D' : '#FF6B35' }]}>
-                  {userData?.current_streak || 0}
+                  {userData?.login_streak || 0}
                 </Text>
                 <Text style={styles.streakFire}>🔥</Text>
               </View>
             </LinearGradient>
-            {/* Best streak badge */}
-            {(userData?.best_streak || 0) > 0 && (
+            {/* Best login streak badge */}
+            {(userData?.best_login_streak || 0) > 0 && (
               <View style={styles.bestStreakBadge}>
                 <MaterialCommunityIcons name="trophy" size={10} color="#FFD700" />
-                <Text style={styles.bestStreakText}>{t('home.best_streak_record')} {userData?.best_streak}{t('home.days_short')}</Text>
+                <Text style={styles.bestStreakText}>{t('home.best_streak_record')} {userData?.best_login_streak}{t('home.days_short')}</Text>
               </View>
             )}
           </TouchableOpacity>
@@ -867,6 +1200,99 @@ export default function AccueilScreen() {
           </Animated.View>
         )}
 
+        {/* ── Daily Missions ── */}
+        {dailyMissions && (
+          <Animated.View entering={FadeInDown.delay(350).duration(500)}>
+            <MissionsWidget
+              data={dailyMissions}
+              onDouble={handleDoubleReward}
+              onReroll={handleRerollMission}
+              onClaim={() => setShowThemePicker(true)}
+            />
+          </Animated.View>
+        )}
+
+        {/* ── Question du jour ── */}
+        {dailyQuestion && !dailyQuestion.already_answered && (
+          <Animated.View entering={FadeInDown.delay(370).duration(500)}>
+            <View style={styles.dqCard}>
+              <View style={styles.dqHeader}>
+                <LinearGradient colors={['#A855F7', '#8B5CF6']} style={styles.dqIcon}>
+                  <MaterialCommunityIcons name="help-circle" size={13} color="#FFF" />
+                </LinearGradient>
+                <Text style={styles.dqTitle}>Question du jour</Text>
+                <View style={[styles.dqThemeBadge, { backgroundColor: (dailyQuestion.theme_color || '#8B5CF6') + '25' }]}>
+                  <Text style={[styles.dqThemeName, { color: dailyQuestion.theme_color || '#A855F7' }]} numberOfLines={1}>
+                    {dailyQuestion.theme_name}
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.dqQuestion}>{dailyQuestion.question_text}</Text>
+              <View style={styles.dqOptions}>
+                {(dailyQuestion.options || []).map((opt: string, idx: number) => {
+                  const isChosen = dqAnswer === idx;
+                  const isCorrect = dqResult && idx === dqResult.correct_option;
+                  const isWrong = dqResult && isChosen && !dqResult.correct;
+                  let bg = '#1A1A2E';
+                  if (isCorrect) bg = '#00FF9D20';
+                  if (isWrong) bg = '#FF3B5C20';
+                  return (
+                    <TouchableOpacity
+                      key={idx}
+                      style={[styles.dqOpt, { borderColor: isCorrect ? '#00FF9D' : isWrong ? '#FF3B5C' : '#333', backgroundColor: bg }]}
+                      onPress={() => handleDqAnswer(idx)}
+                      disabled={dqAnswer !== null}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={styles.dqOptText}>{opt}</Text>
+                      {isCorrect && <MaterialCommunityIcons name="check-circle" size={14} color="#00FF9D" />}
+                      {isWrong && <MaterialCommunityIcons name="close-circle" size={14} color="#FF3B5C" />}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+              {dqResult && (
+                <Text style={[styles.dqFeedback, { color: dqResult.correct ? '#00FF9D' : '#FF6B35' }]}>
+                  {dqResult.correct ? `Bravo ! +${dqResult.xp_earned} XP` : `Raté — +${dqResult.xp_earned} XP quand même`}
+                </Text>
+              )}
+            </View>
+          </Animated.View>
+        )}
+        {dailyQuestion?.already_answered && (
+          <View style={styles.dqDoneCard}>
+            <MaterialCommunityIcons name="check-circle" size={16} color="#00FF9D" />
+            <Text style={styles.dqDoneText}>Question du jour répondue · +{dailyQuestion.xp_earned} XP</Text>
+          </View>
+        )}
+
+        {/* Theme Picker Modal */}
+        <Modal visible={showThemePicker} transparent animationType="slide" onRequestClose={() => setShowThemePicker(false)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalSheet}>
+              <Text style={styles.modalTitle}>Où envoyer les XP ?</Text>
+              <Text style={styles.modalSubtitle}>Choisissez un thème pour recevoir vos récompenses</Text>
+              <ScrollView style={{ maxHeight: 320 }}>
+                {(dailyMissions?.user_themes ?? []).map((theme) => (
+                  <TouchableOpacity
+                    key={theme.id}
+                    style={styles.themePickerRow}
+                    onPress={() => handleClaimRewards(theme.id)}
+                    activeOpacity={0.8}
+                  >
+                    <View style={[styles.themePickerDot, { backgroundColor: theme.color }]} />
+                    <Text style={styles.themePickerName}>{theme.name}</Text>
+                    <MaterialCommunityIcons name="chevron-right" size={18} color="#555" />
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+              <TouchableOpacity style={styles.modalCancelBtn} onPress={() => setShowThemePicker(false)}>
+                <Text style={styles.modalCancelText}>Annuler</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
         {/* ── Social Wall ── */}
         <Animated.View entering={FadeInDown.delay(400).duration(500)}>
           <View style={styles.sectionHeader}>
@@ -892,13 +1318,27 @@ export default function AccueilScreen() {
             </Text>
           </Animated.View>
         ) : (
+          <>
+            {socialFeed.some(i => i.type === 'event') && (
+              <View style={styles.offerHeader}>
+                <MaterialCommunityIcons name="lightning-bolt" size={13} color="#FFD700" />
+                <Text style={styles.offerHeaderText}>Offres x2 XP</Text>
+                {offerCountdown ? (
+                  <Text style={styles.offerHeaderCountdown}>dans {offerCountdown}</Text>
+                ) : null}
+                <TouchableOpacity style={styles.offerRefreshBtn} onPress={handleRefreshOffers} activeOpacity={0.8}>
+                  <MaterialCommunityIcons name="television-play" size={12} color="#888" />
+                  <Text style={styles.offerRefreshText}>Changer (pub)</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           <FlatList
             data={socialFeed}
             keyExtractor={(item) => item.id}
             scrollEnabled={false}
             renderItem={({ item, index: idx }) => {
               if (item.type === 'event') {
-                return <EventCard item={item} index={idx} />;
+                return <EventCard item={item} index={idx} onActivate={handleActivateBoost} />;
               }
               if (item.type === 'record') {
                 return <RecordCard item={item} index={idx} />;
@@ -920,6 +1360,7 @@ export default function AccueilScreen() {
             maxToRenderPerBatch={5}
             windowSize={3}
           />
+          </>
         )}
 
         <View style={{ height: 32 }} />
@@ -1313,6 +1754,72 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
   },
   eventLiveText: { fontSize: 9, fontWeight: '900', color: '#FFF', letterSpacing: 1 },
+  adBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+    borderWidth: 1.5,
+  },
+  adBtnText: { fontSize: 11, fontWeight: '800' },
+
+  // ── Daily Question ──
+  dqCard: {
+    marginHorizontal: 16, marginBottom: 8,
+    backgroundColor: '#1A1A2E', borderRadius: 16,
+    borderWidth: 1, borderColor: '#A855F730', padding: 14,
+  },
+  dqHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
+  dqIcon: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+  dqTitle: { fontSize: 13, fontWeight: '800', color: '#FFF', flex: 1 },
+  dqThemeBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
+  dqThemeName: { fontSize: 10, fontWeight: '700' },
+  dqQuestion: { fontSize: 14, color: '#EEE', fontWeight: '600', marginBottom: 12, lineHeight: 20 },
+  dqOptions: { gap: 6 },
+  dqOpt: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9,
+  },
+  dqOptText: { fontSize: 13, color: '#DDD', flex: 1 },
+  dqFeedback: { marginTop: 10, fontSize: 13, fontWeight: '700', textAlign: 'center' },
+  dqDoneCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    marginHorizontal: 16, marginBottom: 8, paddingVertical: 10, paddingHorizontal: 14,
+    backgroundColor: '#00FF9D10', borderRadius: 12, borderWidth: 1, borderColor: '#00FF9D30',
+  },
+  dqDoneText: { fontSize: 12, color: '#00FF9D', fontWeight: '600' },
+
+  // ── Offer header ──
+  offerHeader: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 16, paddingVertical: 6,
+  },
+  offerHeaderText: { fontSize: 12, color: '#FFD700', fontWeight: '700' },
+  offerHeaderCountdown: { fontSize: 11, color: '#888', flex: 1 },
+  offerRefreshBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  offerRefreshText: { fontSize: 11, color: '#888' },
+
+  // ── Theme Picker Modal ──
+  modalOverlay: {
+    flex: 1, backgroundColor: '#000000AA',
+    justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    backgroundColor: '#1A1A2E', borderTopLeftRadius: 20, borderTopRightRadius: 20,
+    padding: 20, paddingBottom: 36,
+  },
+  modalTitle: { fontSize: 17, fontWeight: '800', color: '#FFF', marginBottom: 4 },
+  modalSubtitle: { fontSize: 13, color: '#888', marginBottom: 16 },
+  themePickerRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#2A2A3E',
+  },
+  themePickerDot: { width: 10, height: 10, borderRadius: 5 },
+  themePickerName: { flex: 1, fontSize: 14, color: '#FFF', fontWeight: '600' },
+  modalCancelBtn: { marginTop: 16, alignItems: 'center', paddingVertical: 10 },
+  modalCancelText: { fontSize: 14, color: '#888' },
 
   // ── Empty Feed ──
   emptyFeed: {

@@ -91,6 +91,10 @@ async def send_challenge(request: Request, data: dict, current_user: str = Depen
         },
     })
 
+    # Update daily mission: "envoyer un défi"
+    from services.missions import update_progress as _update_missions
+    await _update_missions(challenger_id, {"type": "challenge_sent"}, db)
+
     return {"challenge_id": challenge.id, "status": "pending"}
 
 
@@ -375,6 +379,10 @@ async def save_async_score(challenge_id: str, data: dict, current_user: str = De
                     "theme_name": theme_label,
                 },
             })
+
+        # Update daily mission: "terminer un défi"
+        from services.missions import update_progress as _update_missions
+        await _update_missions(user_id, {"type": "challenge_completed"}, db)
 
         return {"status": "completed", "p1_score": p1_score, "p2_score": p2_score, "p1_won": p1_won}
 

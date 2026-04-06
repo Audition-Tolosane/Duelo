@@ -17,6 +17,7 @@ from helpers import shuffle_question_options
 from services.xp import (
     get_level, get_streak_bonus, get_streak_badge,
     get_theme_title, check_new_title_theme, MAX_LEVEL, TITLE_THRESHOLDS,
+    get_daily_streak_bonus, update_login_streak,
 )
 from services.notifications import create_notification
 from auth_middleware import get_current_user_id
@@ -305,17 +306,35 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
             else:
                 opponent_level = 0
 
+        now = datetime.now(timezone.utc)
+        streak_before = user.current_streak
         new_streak = (user.current_streak + 1) if won else 0
         streak_bonus = get_streak_bonus(new_streak) if won else 0
         base_xp = player_score * 2
         victory_bonus = 50 if won else 0
         perfection_bonus = 50 if perfect else 0
         giant_slayer_bonus = 100 if (won and opponent_level - level_before >= 15) else 0
-        total_xp = base_xp + victory_bonus + perfection_bonus + giant_slayer_bonus + streak_bonus
+
+        # Bonus journalier (login streak)
+        new_login_streak = update_login_streak(user, now)
+        daily_bonus = get_daily_streak_bonus(new_login_streak)
+
+        # Boost x2 XP (rewarded ad, 6 min)
+        from services.boosts import get_active_boost
+        game_xp = base_xp + victory_bonus + perfection_bonus + giant_slayer_bonus + streak_bonus
+        x2_bonus = game_xp if await get_active_boost(player_id, theme.id, db) else 0
+
+        # Multiplicateur XP achetable (x1.2 / x1.5 / Pro)
+        from routers.xp_multiplier import get_active_multiplier
+        xp_mult = await get_active_multiplier(player_id, db)
+        mult_bonus = round(game_xp * (xp_mult - 1.0)) if xp_mult > 1.0 else 0
+
+        total_xp = game_xp + x2_bonus + mult_bonus + daily_bonus
 
         xp_breakdown = {
             "base": base_xp, "victory": victory_bonus, "perfection": perfection_bonus,
-            "giant_slayer": giant_slayer_bonus, "streak": streak_bonus, "total": total_xp,
+            "giant_slayer": giant_slayer_bonus, "streak": streak_bonus,
+            "daily": daily_bonus, "x2": x2_bonus, "mult": mult_bonus, "total": total_xp,
         }
 
         match = Match(
@@ -323,6 +342,7 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
             player2_is_bot=opponent_is_bot, category=theme.id,
             player1_score=player_score, player2_score=opponent_score,
             player1_correct=correct_count,
+            player1_streak_before=streak_before,
             winner_id=player_id if won else None,
             xp_earned=total_xp, xp_breakdown=xp_breakdown,
             questions_data=questions_data,
@@ -336,6 +356,7 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
         new_level = level_after if level_after > level_before else None
 
         user.matches_played += 1
+        user.last_played_at = now
         if won:
             user.matches_won += 1
             user.current_streak += 1
@@ -343,6 +364,15 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
                 user.best_streak = user.current_streak
         else:
             user.current_streak = 0
+
+        # Update daily missions progress
+        from services.missions import update_progress as _update_missions
+        await _update_missions(player_id, {
+            "type": "game_played",
+            "theme_id": theme.id,
+            "won": won,
+            "correct": correct_count,
+        }, db)
 
         all_xp_res = await db.execute(
             select(func.sum(UserThemeXP.xp)).where(UserThemeXP.user_id == player_id)
@@ -378,6 +408,60 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
                 )
                 bot.total_xp = bot_all_xp_res.scalar() or 0
 
+        # Achievements
+        from services.achievements import check_achievements as _check_ach
+        from sqlalchemy import func as _func
+        themes_count_res = await db.execute(
+            select(_func.count(_func.distinct(Match.category))).where(Match.player1_id == player_id)
+        )
+        perfect_res = await db.execute(
+            select(_func.count(Match.id)).where(Match.player1_id == player_id, Match.player1_correct == 7)
+        )
+        new_achievements = await _check_ach(player_id, {
+            "games_played": user.matches_played,
+            "wins": user.matches_won,
+            "win_streak": user.current_streak,
+            "perfect_scores": perfect_res.scalar() or 0,
+            "login_streak": user.login_streak or 0,
+            "themes_played": themes_count_res.scalar() or 0,
+        }, db)
+
+        # Lives count for response (lets frontend show "use a life?" after loss)
+        from routers.streak_shield import get_lives
+        lives_remaining = await get_lives(player_id, db)
+
+        # Tournament submission if active theme matches
+        tournament_result = None
+        try:
+            from routers.tournaments import _get_or_create_current
+            active_t = await _get_or_create_current(db)
+            if active_t and active_t.theme_id == theme.id:
+                from models import TournamentEntry
+                t_entry_res = await db.execute(
+                    select(TournamentEntry).where(
+                        TournamentEntry.tournament_id == active_t.id,
+                        TournamentEntry.user_id == player_id,
+                    )
+                )
+                t_entry = t_entry_res.scalar_one_or_none()
+                from constants import TOTAL_QUESTIONS
+                if not t_entry or t_entry.games_played < 3:
+                    if t_entry:
+                        t_entry.score += player_score
+                        t_entry.games_played += 1
+                    else:
+                        t_entry = TournamentEntry(
+                            id=str(__import__('uuid').uuid4()),
+                            tournament_id=active_t.id,
+                            user_id=player_id,
+                            score=player_score,
+                            games_played=1,
+                        )
+                        db.add(t_entry)
+                    tournament_result = {"tournament_id": active_t.id, "theme_name": active_t.theme_name}
+        except Exception:
+            pass
+
         if won:
             notif_body = f"Victoire en {theme.name} ! +{total_xp} XP"
         else:
@@ -403,6 +487,10 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
             "player1_correct": match.player1_correct, "winner_id": match.winner_id,
             "xp_earned": match.xp_earned, "xp_breakdown": match.xp_breakdown,
             "new_title": new_title_info, "new_level": new_level,
+            "new_achievements": new_achievements,
+            "lives_remaining": lives_remaining,
+            "streak_before": streak_before,
+            "tournament": tournament_result,
             "created_at": match.created_at.isoformat(),
         }
 

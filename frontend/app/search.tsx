@@ -143,14 +143,15 @@ export default function SearchScreen() {
   const loadInit = async () => {
     const uid = await AsyncStorage.getItem('duelo_user_id');
     if (uid) setMyId(uid);
-    fetchTrending();
+    fetchTrending(uid || '');
     // Load initial themes
     fetchThemes('', 'all', uid || '');
   };
 
-  const fetchTrending = async () => {
+  const fetchTrending = async (uid?: string) => {
     try {
-      const res = await fetch(`${API_URL}/api/search/trending`);
+      const uidParam = uid ? `?user_id=${uid}` : '';
+      const res = await fetch(`${API_URL}/api/search/trending${uidParam}`);
       const data = await res.json();
       setTrendingTags(data.trending_tags || []);
       setTopPlayers(data.top_players || []);

@@ -31,7 +31,7 @@ export default function FollowersScreen() {
 
   useEffect(() => {
     if (!userId) return;
-    authFetch(`${API_URL}/api/social/player/${userId}/followers?type=${type || 'followers'}`)
+    authFetch(`${API_URL}/api/player/${userId}/followers?type=${type || 'followers'}`)
       .then(r => r.json())
       .then(data => { setPlayers(Array.isArray(data) ? data : []); setLoading(false); })
       .catch(() => setLoading(false));

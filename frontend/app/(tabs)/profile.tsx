@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
-  Modal, Image, Alert, TextInput,
+  Modal, Image, Alert, TextInput, FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -40,6 +40,51 @@ const COUNTRIES: { name: string; flag: string }[] = [
 ];
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+
+// ── Achievements Carousel ──
+function AchievementsCarousel({ userId }: { userId: string }) {
+  const [achievements, setAchievements] = useState<any[]>([]);
+  useEffect(() => {
+    if (!userId) return;
+    fetch(`${API_URL}/api/achievements/player/${userId}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setAchievements(d.unlocked || []); })
+      .catch(() => {});
+  }, [userId]);
+
+  if (achievements.length === 0) return null;
+
+  return (
+    <View style={{ marginBottom: 8 }}>
+      <Text style={achS.title}>Succès</Text>
+      <FlatList
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        data={achievements}
+        keyExtractor={item => item.id}
+        contentContainerStyle={{ paddingHorizontal: 16, gap: 10 }}
+        renderItem={({ item }) => (
+          <View style={achS.badge}>
+            <Text style={achS.icon}>{item.icon}</Text>
+            <Text style={achS.name} numberOfLines={1}>{item.name}</Text>
+          </View>
+        )}
+      />
+    </View>
+  );
+}
+
+const achS = StyleSheet.create({
+  title: { fontSize: 13, fontWeight: '800', color: '#FFF', marginBottom: 10, paddingHorizontal: 16 },
+  badge: {
+    alignItems: 'center', justifyContent: 'center',
+    width: 72, backgroundColor: '#1A1A2E',
+    borderRadius: 14, borderWidth: 1, borderColor: '#FFD70040',
+    paddingVertical: 10, paddingHorizontal: 8, gap: 4,
+  },
+  icon: { fontSize: 24 },
+  name: { fontSize: 9, color: '#FFD700', fontWeight: '700', textAlign: 'center' },
+});
 const GRID_PAD = 16;
 
 type ThemeData = {
@@ -69,6 +114,7 @@ type ProfileData = {
     country: string | null; city: string | null; country_flag: string;
     matches_played: number; matches_won: number;
     best_streak: number; current_streak: number; streak_badge: string;
+    login_streak: number; best_login_streak: number;
     win_rate: number;
     followers_count: number; following_count: number;
   };
@@ -120,7 +166,7 @@ export default function ProfileScreen() {
             is_guest: true, total_xp: 0, selected_title: null,
             country: null, city: null, country_flag: '',
             matches_played: 0, matches_won: 0,
-            best_streak: 0, current_streak: 0, streak_badge: '',
+            best_streak: 0, current_streak: 0, streak_badge: '', login_streak: 0, best_login_streak: 0,
             win_rate: 0, followers_count: 0, following_count: 0,
           },
           themes: [], all_unlocked_titles: [], match_history: [],
@@ -430,6 +476,9 @@ export default function ProfileScreen() {
             <Text style={s.noHistory}>{t('profile.play_to_progress')}</Text>
           </>
         )}
+
+        {/* ── Succès ── */}
+        <AchievementsCarousel userId={user?.id || ''} />
 
         {/* ── Titles ── */}
         {all_unlocked_titles && all_unlocked_titles.length > 0 && (

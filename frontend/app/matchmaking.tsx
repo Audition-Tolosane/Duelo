@@ -81,6 +81,56 @@ const COUNTRY_START: Record<string, { lat: number; lon: number }> = {
   NZ: { lat: -42, lon: 173 }, PK: { lat: 30,  lon: 70  }, BD: { lat: 23,  lon: 90  },
 };
 
+// Noms de pays en français (utilisés par les bots) → lat/lon
+const COUNTRY_NAME_FR: Record<string, { lat: number; lon: number }> = {
+  'france':           COUNTRY_START.FR, 'belgique':         COUNTRY_START.BE,
+  'suisse':           COUNTRY_START.CH, 'luxembourg':       COUNTRY_START.LU,
+  'italie':           COUNTRY_START.IT, 'espagne':          COUNTRY_START.ES,
+  'portugal':         COUNTRY_START.PT, 'allemagne':        COUNTRY_START.DE,
+  'royaume-uni':      COUNTRY_START.GB, 'angleterre':       COUNTRY_START.GB,
+  'irlande':          COUNTRY_START.IE, 'pays-bas':         COUNTRY_START.NL,
+  'suède':            COUNTRY_START.SE, 'norvège':          COUNTRY_START.NO,
+  'danemark':         COUNTRY_START.DK, 'finlande':         COUNTRY_START.FI,
+  'pologne':          COUNTRY_START.PL, 'roumanie':         COUNTRY_START.RO,
+  'états-unis':       COUNTRY_START.US, 'etats-unis':       COUNTRY_START.US,
+  'canada':           COUNTRY_START.CA, 'mexique':          COUNTRY_START.MX,
+  'brésil':           COUNTRY_START.BR, 'bresil':           COUNTRY_START.BR,
+  'argentine':        COUNTRY_START.AR, 'colombie':         COUNTRY_START.CO,
+  'pérou':            COUNTRY_START.PE || { lat: -10, lon: -76 },
+  'russie':           COUNTRY_START.RU, 'ukraine':          COUNTRY_START.UA,
+  'turquie':          COUNTRY_START.TR, 'maroc':            COUNTRY_START.MA,
+  'algérie':          COUNTRY_START.DZ, 'algerie':          COUNTRY_START.DZ,
+  'tunisie':          COUNTRY_START.TN, 'égypte':           COUNTRY_START.EG,
+  'egypte':           COUNTRY_START.EG, 'sénégal':          COUNTRY_START.SN,
+  'senegal':          COUNTRY_START.SN, "côte d'ivoire":    COUNTRY_START.CI,
+  'nigeria':          COUNTRY_START.NG, 'cameroun':         COUNTRY_START.CM,
+  'congo':            COUNTRY_START.CD, 'afrique du sud':   COUNTRY_START.ZA,
+  'kenya':            COUNTRY_START.KE, 'éthiopie':         COUNTRY_START.ET,
+  'inde':             COUNTRY_START.IN, 'chine':            COUNTRY_START.CN,
+  'japon':            COUNTRY_START.JP, 'corée du sud':     COUNTRY_START.KR,
+  'arabie saoudite':  COUNTRY_START.SA, 'émirats arabes unis': COUNTRY_START.AE,
+  'thaïlande':        COUNTRY_START.TH, 'thaïlande':        COUNTRY_START.TH,
+  'indonésie':        COUNTRY_START.ID, 'australie':        COUNTRY_START.AU,
+  'nouvelle-zélande': COUNTRY_START.NZ, 'pakistan':         COUNTRY_START.PK,
+  'bangladesh':       COUNTRY_START.BD,
+};
+
+function lookupCountry(country: string): { lat: number; lon: number } | undefined {
+  if (!country) return undefined;
+  // Try ISO code first (2-3 letters, e.g. "US", "FR")
+  const iso = COUNTRY_START[country.toUpperCase()];
+  if (iso) return iso;
+  // Try French name
+  return COUNTRY_NAME_FR[country.toLowerCase()];
+}
+
+// Map sizing — déclaré avant les fonctions qui en dépendent
+const SVG_W = 1000;
+const SVG_H = 500;
+const SCALE = Math.max(SW / SVG_W, SH / SVG_H) * 1.9;
+const REAL_W = SVG_W * SCALE;
+const REAL_H = SVG_H * SCALE;
+
 // Equirectangulaire : lon/lat → coordonnées SVG 1000×500
 function latLonToSvg(lat: number, lon: number) {
   return {
@@ -89,23 +139,16 @@ function latLonToSvg(lat: number, lon: number) {
   };
 }
 
-// Coordonnées SVG → offset de translation pour centrer ce point à l'écran
-function svgToOffset(svgX: number, svgY: number) {
+// Coordonnées SVG → offset de translation pour centrer ce point à l'écran (scale additionnel s)
+function svgToOffset(svgX: number, svgY: number, s: number = 1) {
   return {
-    x: -(svgX * SCALE - SW / 2),
-    y: -(svgY * SCALE - SH / 2),
+    x: (SW - REAL_W) / (2 * s) + REAL_W / 2 - svgX * SCALE,
+    y: (SH - REAL_H) / (2 * s) + REAL_H / 2 - svgY * SCALE,
   };
 }
 
-// Par défaut : centré sur Europe occidentale (lon=10, lat=48)
+// Par défaut : centré sur Europe occidentale
 const DEFAULT_START = svgToOffset(...Object.values(latLonToSvg(48, 10)) as [number, number]);
-
-// Map sizing
-const SVG_W = 1000;
-const SVG_H = 500;
-const SCALE = Math.max(SW / SVG_W, SH / SVG_H) * 1.9;
-const REAL_W = SVG_W * SCALE;
-const REAL_H = SVG_H * SCALE;
 
 type OpponentData = {
   id: string;
@@ -116,6 +159,7 @@ type OpponentData = {
   title: string;
   streak: number;
   streak_badge: string;
+  country?: string;
 };
 
 type PlayerData = { level: number; title: string };
@@ -265,6 +309,7 @@ export default function MatchmakingScreen() {
           title: opp.selected_title || '',
           streak: opp.streak || 0,
           streak_badge: opp.streak_badge || '',
+          country: opp.country || '',
         };
         setOpponent(oppData);
         setPlayerInfo({ level: 1, title: '' });
@@ -292,26 +337,40 @@ export default function MatchmakingScreen() {
     return () => unsubs.forEach((u) => u());
   }, []);
 
+  const DEZOOM_INITIAL = 3;   // zoom de départ
+  const DEZOOM_PAUSE   = 500; // pause avant dezoom (ms)
+  const DEZOOM_DUR     = 2000; // durée du dezoom (ms)
+
   const loadPlayerInfo = async () => {
     const p = await AsyncStorage.getItem('duelo_pseudo');
     if (p) setPseudo(p);
-    // Centre la carte sur le pays du joueur
+    // Démarrer zoomé sur le pays du joueur
     const country = await AsyncStorage.getItem('duelo_country');
-    const center = (country && COUNTRY_START[country.toUpperCase()]) || COUNTRY_START['FR'];
+    const center = (country && lookupCountry(country)) || COUNTRY_START['FR'];
     const svg = latLonToSvg(center.lat, center.lon);
-    const off = svgToOffset(svg.x, svg.y);
-    mapX.value = withTiming(off.x, { duration: 1200, easing: Easing.inOut(Easing.ease) });
-    mapY.value = withTiming(off.y, { duration: 1200, easing: Easing.inOut(Easing.ease) });
+
+    const zoomedOff = svgToOffset(svg.x, svg.y, DEZOOM_INITIAL);
+    mapScaleAnim.value = DEZOOM_INITIAL;
+    mapX.value = zoomedOff.x;
+    mapY.value = zoomedOff.y;
+
+    // Dezoom progressif vers scale 1
+    const normalOff = svgToOffset(svg.x, svg.y, 1);
+    setTimeout(() => {
+      mapScaleAnim.value = withTiming(1, { duration: DEZOOM_DUR, easing: Easing.inOut(Easing.ease) });
+      mapX.value = withTiming(normalOff.x, { duration: DEZOOM_DUR, easing: Easing.inOut(Easing.ease) });
+      mapY.value = withTiming(normalOff.y, { duration: DEZOOM_DUR, easing: Easing.inOut(Easing.ease) });
+    }, DEZOOM_PAUSE);
   };
 
   useEffect(() => {
     if (phase !== 'searching') return;
 
-    // Pan qui visite les vrais dots adverses (6 au hasard, shufflés)
+    // Pan qui visite les vrais dots adverses (6 au hasard, shufflés) — démarre après le dezoom
     const targets = [...playerPins]
       .sort(() => Math.random() - 0.5)
       .slice(0, 6)
-      .map(pin => svgToOffset(pin.x, pin.y));
+      .map(pin => svgToOffset(pin.x, pin.y, 1));
     let i = 0;
     const next = () => {
       const t = targets[i % targets.length];
@@ -319,8 +378,13 @@ export default function MatchmakingScreen() {
       mapY.value = withTiming(t.y, { duration: 5000, easing: Easing.inOut(Easing.ease) });
       i++;
     };
-    next();
-    const panInterval = setInterval(next, 5500);
+
+    let panInterval: ReturnType<typeof setInterval>;
+    const panDelay = DEZOOM_PAUSE + DEZOOM_DUR + 300; // attend la fin du dezoom
+    const panStart = setTimeout(() => {
+      next();
+      panInterval = setInterval(next, 5500);
+    }, panDelay);
 
     const dotsInterval = setInterval(() => {
       setDots(prev => prev.length >= 3 ? '' : prev + '.');
@@ -333,6 +397,7 @@ export default function MatchmakingScreen() {
     }, 3000);
 
     return () => {
+      clearTimeout(panStart);
       clearInterval(panInterval);
       clearInterval(dotsInterval);
       clearInterval(msgInterval);
@@ -357,26 +422,26 @@ export default function MatchmakingScreen() {
   };
 
   const handleMatchFound = (opp: OpponentData, matchRoomId?: string) => {
-    const randomCity = CITY_PINS[Math.floor(Math.random() * CITY_PINS.length)];
-    const pin = latLonToSvg(randomCity.lat, randomCity.lon);
+    const oppCenter = lookupCountry(opp.country || '')
+      || CITY_PINS[Math.floor(Math.random() * CITY_PINS.length)];
+    const pin = latLonToSvg(oppCenter.lat, oppCenter.lon);
     setTargetPin(pin);
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 
     const isBotMatch = !matchRoomId;
-    // Rematch: skip map zoom, go straight to VS
-    const zoomDuration = isRematch ? 400 : 1500;
-    const vsDelay = isRematch ? 500 : 1800;
-    const navDelay = isRematch ? 2800 : 4500;
+    // Rematch: skip map pan, go straight to VS
+    const panDuration = isRematch ? 400 : 2200;
+    const vsDelay = isRematch ? 500 : 2500;
+    const navDelay = isRematch ? 2800 : 5200;
 
     setPhase('found');
 
-    const targetX = -(pin.x * SCALE - SW / 2);
-    const targetY = -(pin.y * SCALE - SH / 2);
-
-    mapX.value = withTiming(targetX, { duration: zoomDuration, easing: Easing.inOut(Easing.cubic) });
-    mapY.value = withTiming(targetY, { duration: zoomDuration, easing: Easing.inOut(Easing.cubic) });
-    mapScaleAnim.value = withTiming(2, { duration: zoomDuration, easing: Easing.inOut(Easing.cubic) });
+    // Pan vers le pays de l'adversaire à scale=1 (formule garantie correcte)
+    const targetOff = svgToOffset(pin.x, pin.y, 1);
+    mapScaleAnim.value = withTiming(1, { duration: 600, easing: Easing.inOut(Easing.ease) });
+    mapX.value = withTiming(targetOff.x, { duration: panDuration, easing: Easing.inOut(Easing.cubic) });
+    mapY.value = withTiming(targetOff.y, { duration: panDuration, easing: Easing.inOut(Easing.cubic) });
 
     setTimeout(() => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);

@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 from database import get_db
 
-from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge, challenges
+from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge, challenges, boosts, missions, daily_question, achievements, streak_shield, xp_multiplier, tournaments
 from schemas import QuestionReportRequest
 from models import QuestionReport
 from sqlalchemy import select
@@ -112,6 +112,13 @@ api_router.include_router(themes.router)
 api_router.include_router(admin.router)
 api_router.include_router(forge.router)
 api_router.include_router(challenges.router)
+api_router.include_router(boosts.router)
+api_router.include_router(missions.router)
+api_router.include_router(daily_question.router)
+api_router.include_router(achievements.router)
+api_router.include_router(streak_shield.router)
+api_router.include_router(xp_multiplier.router)
+api_router.include_router(tournaments.router)
 
 # Serve avatar static files
 avatars_dir = ROOT_DIR / "static" / "avatars"
@@ -162,6 +169,70 @@ async def _ensure_columns():
             "ALTER TABLE notifications ADD COLUMN IF NOT EXISTS actor_avatar_url TEXT",
             "CREATE TABLE IF NOT EXISTS avatars (id VARCHAR(36) PRIMARY KEY, name VARCHAR(100), image_url TEXT NOT NULL, category VARCHAR(50) DEFAULT 'default', created_at TIMESTAMPTZ DEFAULT NOW())",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS last_played_at TIMESTAMPTZ",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS login_streak INTEGER DEFAULT 0",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS best_login_streak INTEGER DEFAULT 0",
+            "CREATE TABLE IF NOT EXISTS boost_activations (id VARCHAR(36) PRIMARY KEY, user_id VARCHAR(36) NOT NULL, theme_id VARCHAR(20) NOT NULL, activated_at TIMESTAMPTZ DEFAULT NOW(), expires_at TIMESTAMPTZ NOT NULL)",
+            "CREATE INDEX IF NOT EXISTS ix_boost_activations_user_id ON boost_activations(user_id)",
+            """CREATE TABLE IF NOT EXISTS boost_offer_refreshes (
+                id VARCHAR(36) PRIMARY KEY,
+                user_id VARCHAR(36) NOT NULL,
+                slot_key VARCHAR(20) NOT NULL,
+                count INTEGER DEFAULT 1,
+                UNIQUE(user_id, slot_key)
+            )""",
+            "CREATE INDEX IF NOT EXISTS ix_boost_offer_refreshes_user ON boost_offer_refreshes(user_id)",
+            # Daily question
+            """CREATE TABLE IF NOT EXISTS daily_question_answers (
+                id VARCHAR(36) PRIMARY KEY, user_id VARCHAR(36) NOT NULL,
+                date VARCHAR(10) NOT NULL, question_id VARCHAR(100) NOT NULL,
+                theme_id VARCHAR(20) NOT NULL, correct BOOLEAN NOT NULL,
+                xp_earned INTEGER DEFAULT 25, answered_at TIMESTAMPTZ DEFAULT NOW(),
+                UNIQUE(user_id, date)
+            )""",
+            "CREATE INDEX IF NOT EXISTS ix_daily_q_user ON daily_question_answers(user_id)",
+            # Achievements
+            """CREATE TABLE IF NOT EXISTS user_achievements (
+                id VARCHAR(36) PRIMARY KEY, user_id VARCHAR(36) NOT NULL,
+                achievement_id VARCHAR(50) NOT NULL, progress INTEGER DEFAULT 0,
+                unlocked BOOLEAN DEFAULT FALSE, unlocked_at TIMESTAMPTZ,
+                UNIQUE(user_id, achievement_id)
+            )""",
+            "CREATE INDEX IF NOT EXISTS ix_achievements_user ON user_achievements(user_id)",
+            # Streak shields
+            """CREATE TABLE IF NOT EXISTS streak_shields (
+                id VARCHAR(36) PRIMARY KEY, user_id VARCHAR(36) NOT NULL,
+                shield_type VARCHAR(10) NOT NULL, activated_at TIMESTAMPTZ DEFAULT NOW(),
+                expires_at TIMESTAMPTZ NOT NULL, used BOOLEAN DEFAULT FALSE
+            )""",
+            "CREATE INDEX IF NOT EXISTS ix_shields_user ON streak_shields(user_id)",
+            # Lives
+            """CREATE TABLE IF NOT EXISTS user_lives (
+                id VARCHAR(36) PRIMARY KEY, user_id VARCHAR(36) NOT NULL UNIQUE,
+                lives INTEGER DEFAULT 0
+            )""",
+            # Tournaments
+            """CREATE TABLE IF NOT EXISTS tournaments (
+                id VARCHAR(36) PRIMARY KEY, theme_id VARCHAR(20) NOT NULL,
+                theme_name VARCHAR(200) DEFAULT '', start_at TIMESTAMPTZ NOT NULL,
+                end_at TIMESTAMPTZ NOT NULL, status VARCHAR(20) DEFAULT 'upcoming',
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            )""",
+            """CREATE TABLE IF NOT EXISTS tournament_entries (
+                id VARCHAR(36) PRIMARY KEY, tournament_id VARCHAR(36) NOT NULL,
+                user_id VARCHAR(36) NOT NULL, score INTEGER DEFAULT 0,
+                games_played INTEGER DEFAULT 0, created_at TIMESTAMPTZ DEFAULT NOW(),
+                UNIQUE(tournament_id, user_id)
+            )""",
+            "CREATE INDEX IF NOT EXISTS ix_t_entries_tournament ON tournament_entries(tournament_id)",
+            # XP multiplier
+            """CREATE TABLE IF NOT EXISTS xp_multiplier_activations (
+                id VARCHAR(36) PRIMARY KEY, user_id VARCHAR(36) NOT NULL,
+                multiplier FLOAT NOT NULL, source VARCHAR(20) DEFAULT 'purchase',
+                activated_at TIMESTAMPTZ DEFAULT NOW(), expires_at TIMESTAMPTZ
+            )""",
+            "CREATE INDEX IF NOT EXISTS ix_xp_mult_user ON xp_multiplier_activations(user_id)",
+            # player1_streak_before on matches
+            "ALTER TABLE matches ADD COLUMN IF NOT EXISTS player1_streak_before INTEGER",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_done BOOLEAN DEFAULT FALSE",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS privacy_accepted_at TIMESTAMPTZ",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS lat FLOAT",
@@ -194,6 +265,19 @@ async def _ensure_columns():
             "ALTER TABLE challenges ADD COLUMN IF NOT EXISTS p1_answers TEXT",
             "ALTER TABLE challenges ADD COLUMN IF NOT EXISTS p2_answers TEXT",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS push_token VARCHAR(200)",
+            """CREATE TABLE IF NOT EXISTS daily_missions (
+                id VARCHAR(36) PRIMARY KEY,
+                user_id VARCHAR(36) NOT NULL,
+                date VARCHAR(10) NOT NULL,
+                missions TEXT NOT NULL,
+                multiplier INTEGER DEFAULT 1,
+                xp_earned INTEGER DEFAULT 0,
+                reward_claimed BOOLEAN DEFAULT FALSE,
+                target_theme_id VARCHAR(20),
+                rerolls_used INTEGER DEFAULT 0,
+                UNIQUE(user_id, date)
+            )""",
+            "CREATE INDEX IF NOT EXISTS ix_daily_missions_user_id ON daily_missions(user_id)",
         ]:
             try:
                 await conn.execute(text(stmt))

@@ -460,7 +460,7 @@ async def get_followers(user_id: str, type: str = "followers", db: AsyncSession 
     avatars = {}
     if avatar_ids:
         av_res = await db.execute(select(Avatar).where(Avatar.id.in_(avatar_ids)))
-        avatars = {a.id: a.file_path for a in av_res.scalars().all()}
+        avatars = {a.id: a.image_url for a in av_res.scalars().all()}
     return [
         {
             "id": u.id,
@@ -891,17 +891,25 @@ async def get_home_feed(user_id: str, limit: int = 20, offset: int = 0, db: Asyn
                 "is_liked": p.id in user_liked_set, "created_at": p.created_at.isoformat(),
             })
 
-    # Random theme events
-    themes_res = await db.execute(select(Theme).order_by(func.random()).limit(2))
-    event_themes = themes_res.scalars().all()
-    for et in event_themes:
+    # Offres x2 XP personnalisées (stables 30 min, refresh par pub)
+    from services.boosts import get_daily_offers, get_any_active_boost, get_slot_expires_at
+    offer_themes = await get_daily_offers(user_id, db)
+    active_boost = await get_any_active_boost(user_id, db)
+    slot_expires_at = get_slot_expires_at()
+    for et in offer_themes:
+        is_active = active_boost and active_boost.theme_id == et.id
         social_feed.append({
             "type": "event", "id": f"event_{et.id}",
             "theme_id": et.id,
             "category": et.id, "category_name": et.name,
             "category_color": et.color_hex or "#8A2BE2",
-            "title": f"XP x2 en {et.name}", "body": f"Double XP sur le thème {et.name} pendant 1h !",
-            "icon": "⚡", "created_at": datetime.now(timezone.utc).isoformat(),
+            "title": f"XP x2 en {et.name}",
+            "body": f"Double XP sur le thème {et.name} !",
+            "icon": "⚡",
+            "is_active": is_active,
+            "expires_at": active_boost.expires_at.isoformat() if is_active else None,
+            "slot_expires_at": slot_expires_at,
+            "created_at": datetime.now(timezone.utc).isoformat(),
         })
 
     social_feed.sort(key=lambda x: x.get("created_at", ""), reverse=True)
@@ -914,6 +922,8 @@ async def get_home_feed(user_id: str, limit: int = 20, offset: int = 0, db: Asyn
             "total_xp": user.total_xp, "current_streak": user.current_streak,
             "last_played_at": user.last_played_at.isoformat() if user.last_played_at else None,
             "best_streak": user.best_streak,
+            "login_streak": getattr(user, 'login_streak', 0) or 0,
+            "best_login_streak": getattr(user, 'best_login_streak', 0) or 0,
             "streak_badge": get_streak_badge(user.current_streak),
             "matches_played": user.matches_played, "matches_won": user.matches_won,
             "country_flag": country_flag,
@@ -922,4 +932,5 @@ async def get_home_feed(user_id: str, limit: int = 20, offset: int = 0, db: Asyn
         "pending_duels": pending_duels[:5],
         "incoming_challenges": incoming_challenges,
         "social_feed": social_feed[offset:offset + limit],
+        "offer_slot_expires_at": slot_expires_at,
     }

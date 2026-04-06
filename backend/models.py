@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, Integer, Boolean, Float, DateTime, JSON, Text, UniqueConstraint, func, ForeignKey
+from sqlalchemy import Column, String, Integer, Boolean, Float, DateTime, JSON, Text, UniqueConstraint, func, ForeignKey, Date
 from database import Base
 
 
@@ -37,8 +37,10 @@ class User(Base):
     # Stats
     matches_played = Column(Integer, default=0)
     matches_won = Column(Integer, default=0)
-    best_streak = Column(Integer, default=0)
-    current_streak = Column(Integer, default=0)
+    best_streak = Column(Integer, default=0)      # meilleure série de victoires
+    current_streak = Column(Integer, default=0)   # série de victoires consécutives
+    login_streak = Column(Integer, default=0)     # jours de connexion consécutifs
+    best_login_streak = Column(Integer, default=0)
 
     # MMR (hidden matchmaking rating)
     mmr = Column(Float, default=1000.0)
@@ -116,6 +118,7 @@ class Match(Base):
     player1_score = Column(Integer, default=0)
     player2_score = Column(Integer, default=0)
     player1_correct = Column(Integer, default=0)
+    player1_streak_before = Column(Integer, nullable=True)  # win streak before this match
     winner_id = Column(String(36), nullable=True)
     xp_earned = Column(Integer, default=0)
     xp_breakdown = Column(JSON, nullable=True)  # {base, victory, perfection, giant_slayer, streak}
@@ -222,6 +225,45 @@ class NotificationSettings(Base):
 
 # ── New Hierarchical Theme System ──
 
+class DailyMissions(Base):
+    __tablename__ = 'daily_missions'
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), nullable=False, index=True)
+    date = Column(String(10), nullable=False)          # YYYY-MM-DD
+    missions = Column(Text, nullable=False)            # JSON array
+    multiplier = Column(Integer, default=1)            # 1 or 2 (rewarded ad)
+    xp_earned = Column(Integer, default=0)
+    reward_claimed = Column(Boolean, default=False)
+    target_theme_id = Column(String(20), nullable=True)
+    rerolls_used = Column(Integer, default=0)
+
+    __table_args__ = (
+        UniqueConstraint('user_id', 'date', name='uq_daily_missions_user_date'),
+    )
+
+
+class BoostActivation(Base):
+    __tablename__ = 'boost_activations'
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), nullable=False, index=True)
+    theme_id = Column(String(20), nullable=False)
+    activated_at = Column(DateTime(timezone=True), default=utc_now)
+    expires_at = Column(DateTime(timezone=True), nullable=False)
+
+
+class BoostOfferRefresh(Base):
+    __tablename__ = 'boost_offer_refreshes'
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), nullable=False, index=True)
+    slot_key = Column(String(20), nullable=False)  # "YYYY-MM-DD:HH:MM"
+    count = Column(Integer, default=1)
+
+    __table_args__ = (
+        UniqueConstraint('user_id', 'slot_key', name='uq_boost_offer_refresh'),
+    )
+
+
 class Theme(Base):
     __tablename__ = 'themes'
 
@@ -320,3 +362,88 @@ class Challenge(Base):
     p2_correct = Column(Integer, nullable=True)
     p2_played_at = Column(DateTime, nullable=True)
     p2_answers = Column(Text, nullable=True)  # JSON: [{answer, is_correct, points, time_ms}, ...]
+
+
+# ── Daily Question ────────────────────────────────────────────────────────────
+
+class DailyQuestionAnswer(Base):
+    __tablename__ = 'daily_question_answers'
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), nullable=False, index=True)
+    date = Column(String(10), nullable=False)           # YYYY-MM-DD
+    question_id = Column(String(100), nullable=False)
+    theme_id = Column(String(20), nullable=False)
+    correct = Column(Boolean, nullable=False)
+    xp_earned = Column(Integer, default=25)
+    answered_at = Column(DateTime(timezone=True), default=utc_now)
+    __table_args__ = (UniqueConstraint('user_id', 'date', name='uq_daily_q_user_date'),)
+
+
+# ── Achievements ──────────────────────────────────────────────────────────────
+
+class UserAchievement(Base):
+    __tablename__ = 'user_achievements'
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), nullable=False, index=True)
+    achievement_id = Column(String(50), nullable=False)
+    progress = Column(Integer, default=0)
+    unlocked = Column(Boolean, default=False)
+    unlocked_at = Column(DateTime(timezone=True), nullable=True)
+    __table_args__ = (UniqueConstraint('user_id', 'achievement_id', name='uq_user_achievement'),)
+
+
+# ── Streak Shield ─────────────────────────────────────────────────────────────
+
+class StreakShield(Base):
+    __tablename__ = 'streak_shields'
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), nullable=False, index=True)
+    shield_type = Column(String(10), nullable=False)    # 'login' or 'win'
+    activated_at = Column(DateTime(timezone=True), default=utc_now)
+    expires_at = Column(DateTime(timezone=True), nullable=False)
+    used = Column(Boolean, default=False)
+
+
+# ── Lives ─────────────────────────────────────────────────────────────────────
+
+class UserLives(Base):
+    __tablename__ = 'user_lives'
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), nullable=False, unique=True, index=True)
+    lives = Column(Integer, default=0)
+
+
+# ── Tournament ────────────────────────────────────────────────────────────────
+
+class Tournament(Base):
+    __tablename__ = 'tournaments'
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    theme_id = Column(String(20), nullable=False)
+    theme_name = Column(String(200), default='')
+    start_at = Column(DateTime(timezone=True), nullable=False)
+    end_at = Column(DateTime(timezone=True), nullable=False)
+    status = Column(String(20), default='upcoming')     # upcoming, active, finished
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+
+
+class TournamentEntry(Base):
+    __tablename__ = 'tournament_entries'
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    tournament_id = Column(String(36), nullable=False, index=True)
+    user_id = Column(String(36), nullable=False, index=True)
+    score = Column(Integer, default=0)
+    games_played = Column(Integer, default=0)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+    __table_args__ = (UniqueConstraint('tournament_id', 'user_id', name='uq_tournament_entry'),)
+
+
+# ── XP Multiplier (purchasable) ───────────────────────────────────────────────
+
+class XPMultiplierActivation(Base):
+    __tablename__ = 'xp_multiplier_activations'
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), nullable=False, index=True)
+    multiplier = Column(Float, nullable=False)          # 1.2 or 1.5
+    source = Column(String(20), default='purchase')     # 'purchase' or 'pro'
+    activated_at = Column(DateTime(timezone=True), default=utc_now)
+    expires_at = Column(DateTime(timezone=True), nullable=True)  # None = permanent (pro)

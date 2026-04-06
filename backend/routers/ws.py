@@ -13,6 +13,7 @@ from services.ws_manager import manager
 from services.xp import (
     get_level, get_streak_bonus, get_streak_badge,
     get_theme_title, check_new_title_theme, MAX_LEVEL, TITLE_THRESHOLDS,
+    get_daily_streak_bonus, update_login_streak,
 )
 from services.notifications import create_notification
 from config import JWT_SECRET, JWT_ALGORITHM
@@ -430,11 +431,20 @@ async def save_game_results(room):
             giant_slayer_bonus = 100 if (won and opponent_level - level_before >= 15) else 0
             new_streak = (user.current_streak + 1) if won else 0
             streak_bonus = get_streak_bonus(new_streak) if won else 0
-            total_xp = base_xp + victory_bonus + perfection_bonus + giant_slayer_bonus + streak_bonus
+            now_utc = datetime.now(timezone.utc)
+            new_login_streak = update_login_streak(user, now_utc)
+            daily_bonus = get_daily_streak_bonus(new_login_streak)
+
+            from services.boosts import get_active_boost
+            game_xp = base_xp + victory_bonus + perfection_bonus + giant_slayer_bonus + streak_bonus
+            theme_id_for_boost = room.theme_id if room else None
+            x2_bonus = game_xp if (theme_id_for_boost and await get_active_boost(player_id, theme_id_for_boost, db)) else 0
+            total_xp = game_xp + x2_bonus + daily_bonus
 
             xp_breakdown = {
                 "base": base_xp, "victory": victory_bonus, "perfection": perfection_bonus,
-                "giant_slayer": giant_slayer_bonus, "streak": streak_bonus, "total": total_xp,
+                "giant_slayer": giant_slayer_bonus, "streak": streak_bonus,
+                "daily": daily_bonus, "x2": x2_bonus, "total": total_xp,
             }
 
             match = Match(
@@ -450,7 +460,7 @@ async def save_game_results(room):
             db.add(match)
 
             user.matches_played += 1
-            user.last_played_at = datetime.now(timezone.utc)
+            user.last_played_at = now_utc
             if won:
                 user.matches_won += 1
                 # Atomic increment to avoid race condition with concurrent matches

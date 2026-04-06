@@ -402,30 +402,20 @@ async def search_content(
 
 
 @router.get("/trending")
-async def get_trending(db: AsyncSession = Depends(get_db)):
-    # Popular themes by match count
-    popular_themes = []
-    themes_res = await db.execute(select(Theme).order_by(Theme.name))
-    all_themes = themes_res.scalars().all()
-    for t in all_themes:
-        m_count = await db.execute(select(func.count(Match.id)).where(Match.category == t.id))
-        count = m_count.scalar() or 0
-        if count > 0:
-            popular_themes.append({"id": t.id, "name": t.name, "match_count": count})
-    popular_themes.sort(key=lambda x: x["match_count"], reverse=True)
+async def get_trending(user_id: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+    from services.recommendations import get_trending_themes_scored, theme_to_tag
 
-    trending_tags = [
-        {"tag": "Squid Game 3", "icon": "🦑", "type": "hot"},
-        {"tag": "Champions League", "icon": "⚽", "type": "hot"},
-        {"tag": "IA & Robots", "icon": "🤖", "type": "trend"},
-        {"tag": "Star Wars", "icon": "⭐", "type": "classic"},
-        {"tag": "Gastronomie française", "icon": "🥐", "type": "trend"},
-        {"tag": "Histoire de France", "icon": "🏰", "type": "classic"},
-        {"tag": "K-Pop", "icon": "🎤", "type": "trend"},
-        {"tag": "Astronomie", "icon": "🔭", "type": "hot"},
+    # Thèmes tendance scorés par affinité joueur (1 seule requête agrégée)
+    scored = await get_trending_themes_scored(db, user_id=user_id, limit=8, days=7)
+    trending_tags = [theme_to_tag(entry, rank) for rank, entry in enumerate(scored)]
+    popular_categories = [
+        {"id": e["theme"].id, "name": e["theme"].name, "match_count": e["match_count"]}
+        for e in scored[:5]
     ]
 
-    top_players_res = await db.execute(select(User).where(User.is_bot == False).order_by(User.total_xp.desc()).limit(5))
+    top_players_res = await db.execute(
+        select(User).where(User.is_bot == False).order_by(User.total_xp.desc()).limit(5)
+    )
     top_players = top_players_res.scalars().all()
     top_players_data = [{
         "id": u.id, "pseudo": u.pseudo, "avatar_seed": u.avatar_seed,
@@ -434,7 +424,7 @@ async def get_trending(db: AsyncSession = Depends(get_db)):
     } for u in top_players]
 
     return {
-        "popular_categories": popular_themes[:5],
+        "popular_categories": popular_categories,
         "trending_tags": trending_tags,
         "top_players": top_players_data,
     }

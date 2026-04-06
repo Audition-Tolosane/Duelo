@@ -15,48 +15,38 @@ router = APIRouter(tags=["themes"])
 
 
 @router.get("/themes/trending")
-async def get_trending_themes(db: AsyncSession = Depends(get_db)):
-    """Return top 6 most played themes in the last 7 days."""
-    from datetime import datetime, timezone, timedelta
-    cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+async def get_trending_themes(user_id: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+    """Top 6 thèmes scorés par tendance × affinité joueur."""
+    from services.recommendations import get_trending_themes_scored
 
-    result = await db.execute(
-        select(Match.category, func.count(Match.id).label("match_count"))
-        .where(Match.created_at >= cutoff)
-        .group_by(Match.category)
-        .order_by(func.count(Match.id).desc())
-        .limit(6)
-    )
-    rows = result.all()
+    scored = await get_trending_themes_scored(db, user_id=user_id, limit=6, days=7)
+    trending = [
+        {
+            "id": e["theme"].id,
+            "name": e["theme"].name,
+            "color_hex": e["theme"].color_hex or "#8A2BE2",
+            "description": e["theme"].description or "",
+            "match_count": e["match_count"],
+            "icon_url": getattr(e["theme"], "icon_url", "") or "",
+            "affinity_label": e["affinity_label"],
+        }
+        for e in scored
+    ]
 
-    trending = []
-    for cat_id, count in rows:
-        theme_res = await db.execute(select(Theme).where(Theme.id == cat_id))
-        theme = theme_res.scalar_one_or_none()
-        if theme:
-            trending.append({
-                "id": theme.id,
-                "name": theme.name,
-                "color_hex": theme.color_hex or "#8A2BE2",
-                "description": theme.description or "",
-                "match_count": count,
-                "icon_url": theme.icon_url or "",
-            })
-
-    # If fewer than 6, fill with random themes
+    # Compléter à 6 si pas assez de données
     if len(trending) < 6:
-        existing_ids = [t["id"] for t in trending]
+        existing_ids = {t["id"] for t in trending}
         filler_res = await db.execute(
             select(Theme).where(Theme.id.notin_(existing_ids)).order_by(func.random()).limit(6 - len(trending))
         )
         for theme in filler_res.scalars().all():
             trending.append({
-                "id": theme.id,
-                "name": theme.name,
+                "id": theme.id, "name": theme.name,
                 "color_hex": theme.color_hex or "#8A2BE2",
                 "description": theme.description or "",
                 "match_count": 0,
-                "icon_url": theme.icon_url or "",
+                "icon_url": getattr(theme, "icon_url", "") or "",
+                "affinity_label": "global",
             })
 
     return {"trending": trending}

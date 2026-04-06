@@ -109,6 +109,49 @@ def get_streak_bonus(streak: int) -> int:
         return 10
     return 0
 
+def get_daily_streak_bonus(login_streak: int) -> int:
+    """Bonus XP accordé en fonction des jours de connexion consécutifs (max 50)."""
+    if login_streak >= 30:
+        return 50
+    if login_streak >= 14:
+        return 40
+    if login_streak >= 7:
+        return 30
+    if login_streak >= 4:
+        return 20
+    if login_streak >= 2:
+        return 10
+    return 0
+
+
+def update_login_streak(user, now) -> int:
+    """
+    Met à jour login_streak selon last_played_at.
+    Retourne le nouveau login_streak.
+    Ne modifie pas last_played_at (fait côté appelant après).
+    """
+    today = now.date()
+    last = user.last_played_at
+    if last is not None:
+        last_date = last.date() if hasattr(last, 'date') else last
+        if last_date == today:
+            # Déjà joué aujourd'hui — pas de changement
+            return user.login_streak or 0
+        elif last_date == today - __import__('datetime').timedelta(days=1):
+            # Joué hier — on continue la série
+            new_streak = (user.login_streak or 0) + 1
+        else:
+            # Rupture — on repart à 1
+            new_streak = 1
+    else:
+        new_streak = 1
+
+    user.login_streak = new_streak
+    if new_streak > (user.best_login_streak or 0):
+        user.best_login_streak = new_streak
+    return new_streak
+
+
 def get_streak_badge(streak: int) -> str:
     """Returns badge emoji based on streak."""
     if streak >= 10:

@@ -3,8 +3,9 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from database import get_db
-from models import User
+from models import User, Match, PlayerFollow
 from services.xp import get_streak_badge, get_level
+from datetime import datetime, timezone, timedelta
 from services.geo import haversine, CITY_MIN_PLAYERS
 from auth_middleware import get_optional_user_id
 
@@ -178,3 +179,52 @@ async def get_leaderboard(
         }
 
     return {"entries": [], "meta": {"scope_used": scope}}
+
+
+@router.get("/leaderboard/friends-weekly")
+async def friends_weekly_leaderboard(
+    user_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """XP gagné cette semaine (lundi 00h → maintenant) parmi les joueurs suivis."""
+    now = datetime.now(timezone.utc)
+    days_since_monday = now.weekday()
+    monday = (now - timedelta(days=days_since_monday)).replace(hour=0, minute=0, second=0, microsecond=0)
+
+    # Get followed user IDs
+    follows_res = await db.execute(
+        select(PlayerFollow.followed_id).where(PlayerFollow.follower_id == user_id)
+    )
+    followed_ids = [r[0] for r in follows_res] + [user_id]  # include self
+
+    # XP this week per user (from matches)
+    xp_res = await db.execute(
+        select(Match.player1_id, func.sum(Match.xp_earned).label("weekly_xp"))
+        .where(Match.player1_id.in_(followed_ids))
+        .where(Match.created_at >= monday)
+        .group_by(Match.player1_id)
+    )
+    xp_map = {r.player1_id: r.weekly_xp for r in xp_res}
+
+    # Fetch user info
+    users_res = await db.execute(select(User).where(User.id.in_(followed_ids), User.is_bot == False))
+    users = users_res.scalars().all()
+
+    entries = sorted([
+        {
+            "id": u.id,
+            "pseudo": u.pseudo,
+            "avatar_seed": u.avatar_seed,
+            "avatar_url": getattr(u, "avatar_url", None),
+            "weekly_xp": xp_map.get(u.id, 0),
+            "total_xp": u.total_xp,
+            "is_me": u.id == user_id,
+        }
+        for u in users
+    ], key=lambda x: x["weekly_xp"], reverse=True)
+
+    for i, e in enumerate(entries):
+        e["rank"] = i + 1
+
+    reset_at = (monday + timedelta(days=7)).isoformat()
+    return {"entries": entries, "week_start": monday.isoformat(), "resets_at": reset_at}
