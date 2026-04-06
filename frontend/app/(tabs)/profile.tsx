@@ -41,49 +41,178 @@ const COUNTRIES: { name: string; flag: string }[] = [
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
+// ── Achievement icon mapping ──
+const ACH_ICONS: Record<string, React.ComponentProps<typeof MaterialCommunityIcons>['name']> = {
+  first_game: 'gamepad-variant',
+  games_10: 'target',
+  games_50: 'sword-cross',
+  games_100: 'check-decagram',
+  win_first: 'trophy',
+  wins_10: 'dumbbell',
+  wins_50: 'crown',
+  streak_3: 'fire',
+  streak_7: 'lightning-bolt',
+  streak_15: 'star-four-points',
+  perfect_1: 'star',
+  perfect_5: 'diamond',
+  perfect_20: 'auto-fix',
+  login_7: 'calendar-check',
+  login_30: 'calendar-month',
+  challenge_first: 'sword-cross',
+  challenges_10: 'shield-star',
+  themes_3: 'map-outline',
+  themes_10: 'earth',
+  daily_q_7: 'help-circle',
+  daily_q_30: 'book-open-variant',
+  missions_7: 'clipboard-check',
+  missions_30: 'medal',
+};
+
 // ── Achievements Carousel ──
 function AchievementsCarousel({ userId }: { userId: string }) {
-  const [achievements, setAchievements] = useState<any[]>([]);
+  const [unlocked, setUnlocked] = useState<any[]>([]);
+  const [inProgress, setInProgress] = useState<any[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const [selectedAch, setSelectedAch] = useState<any | null>(null);
+
   useEffect(() => {
     if (!userId) return;
-    fetch(`${API_URL}/api/achievements/player/${userId}`)
+    authFetch(`${API_URL}/api/achievements/mine`)
       .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d) setAchievements(d.unlocked || []); })
-      .catch(() => {});
+      .then(d => {
+        if (d) {
+          setUnlocked(d.unlocked || []);
+          setInProgress(d.in_progress || []);
+        }
+        setLoaded(true);
+      })
+      .catch(() => setLoaded(true));
   }, [userId]);
 
-  if (achievements.length === 0) return null;
+  if (!loaded) return null;
+
+  const all = [...unlocked, ...inProgress];
 
   return (
-    <View style={{ marginBottom: 8 }}>
-      <Text style={achS.title}>Succès</Text>
+    <View>
+      <View style={achS.header}>
+        <Text style={achS.title}>SUCCÈS</Text>
+        <Text style={achS.counter}>{unlocked.length} / {all.length}</Text>
+      </View>
       <FlatList
         horizontal
         showsHorizontalScrollIndicator={false}
-        data={achievements}
+        data={all}
         keyExtractor={item => item.id}
-        contentContainerStyle={{ paddingHorizontal: 16, gap: 10 }}
-        renderItem={({ item }) => (
-          <View style={achS.badge}>
-            <Text style={achS.icon}>{item.icon}</Text>
-            <Text style={achS.name} numberOfLines={1}>{item.name}</Text>
-          </View>
-        )}
+        contentContainerStyle={{ paddingHorizontal: 16, gap: 10, paddingBottom: 4 }}
+        renderItem={({ item }) => {
+          const done = item.unlocked;
+          const pct = done ? 1 : Math.min(1, (item.progress || 0) / (item.target || 1));
+          const iconName = ACH_ICONS[item.id] ?? 'star-outline';
+          return (
+            <TouchableOpacity
+              style={[achS.badge, done ? achS.badgeDone : achS.badgeLocked]}
+              onPress={() => setSelectedAch(item)}
+              activeOpacity={0.75}
+            >
+              <MaterialCommunityIcons
+                name={iconName}
+                size={24}
+                color={done ? '#FFD700' : '#444'}
+              />
+              <Text style={[achS.name, { color: done ? '#FFD700' : '#555' }]} numberOfLines={1}>
+                {item.name}
+              </Text>
+              <View style={achS.progressBar}>
+                <View style={[achS.progressFill, { width: `${Math.round(pct * 100)}%` as any, backgroundColor: done ? '#FFD700' : '#333' }]} />
+              </View>
+              <Text style={achS.progressText}>
+                {done ? '✓' : `${item.progress || 0}/${item.target}`}
+              </Text>
+            </TouchableOpacity>
+          );
+        }}
       />
+
+      {/* Detail Modal */}
+      <Modal visible={!!selectedAch} transparent animationType="fade" onRequestClose={() => setSelectedAch(null)}>
+        <TouchableOpacity style={achS.modalOverlay} activeOpacity={1} onPress={() => setSelectedAch(null)}>
+          <TouchableOpacity activeOpacity={1} onPress={() => {}}>
+            <View style={achS.modalCard}>
+              {selectedAch && (() => {
+                const done = selectedAch.unlocked;
+                const pct = done ? 1 : Math.min(1, (selectedAch.progress || 0) / (selectedAch.target || 1));
+                const iconName = ACH_ICONS[selectedAch.id] ?? 'star-outline';
+                return (
+                  <>
+                    <View style={[achS.modalIconCircle, { backgroundColor: done ? '#FFD70020' : '#FFFFFF08', borderColor: done ? '#FFD70050' : '#FFFFFF10' }]}>
+                      <MaterialCommunityIcons name={iconName} size={36} color={done ? '#FFD700' : '#555'} />
+                    </View>
+                    <Text style={[achS.modalName, { color: done ? '#FFD700' : '#FFF' }]}>{selectedAch.name}</Text>
+                    <Text style={achS.modalDesc}>{selectedAch.desc}</Text>
+                    <View style={achS.modalProgressWrap}>
+                      <View style={achS.modalProgressBar}>
+                        <View style={[achS.modalProgressFill, { width: `${Math.round(pct * 100)}%` as any, backgroundColor: done ? '#FFD700' : '#555' }]} />
+                      </View>
+                      <Text style={[achS.modalProgressLabel, { color: done ? '#FFD700' : '#888' }]}>
+                        {done
+                          ? `Débloqué${selectedAch.unlocked_at ? ' le ' + new Date(selectedAch.unlocked_at).toLocaleDateString('fr-FR') : ''}`
+                          : `${selectedAch.progress || 0} / ${selectedAch.target}`}
+                      </Text>
+                    </View>
+                    {!done && (
+                      <Text style={achS.modalHint}>+{selectedAch.xp} XP à débloquer</Text>
+                    )}
+                  </>
+                );
+              })()}
+            </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
 
 const achS = StyleSheet.create({
-  title: { fontSize: 13, fontWeight: '800', color: '#FFF', marginBottom: 10, paddingHorizontal: 16 },
+  header: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 16, marginBottom: 14, marginTop: 24,
+  },
+  title: { fontSize: 12, fontWeight: '800', color: '#525252', letterSpacing: 3 },
+  counter: { fontSize: 11, color: '#525252', fontWeight: '700', letterSpacing: 1 },
   badge: {
     alignItems: 'center', justifyContent: 'center',
-    width: 72, backgroundColor: '#1A1A2E',
-    borderRadius: 14, borderWidth: 1, borderColor: '#FFD70040',
-    paddingVertical: 10, paddingHorizontal: 8, gap: 4,
+    width: 76, borderRadius: 14, borderWidth: 1,
+    paddingVertical: 10, paddingHorizontal: 8, gap: 3,
   },
-  icon: { fontSize: 24 },
-  name: { fontSize: 9, color: '#FFD700', fontWeight: '700', textAlign: 'center' },
+  badgeDone: { backgroundColor: '#1A1200', borderColor: '#FFD70060' },
+  badgeLocked: { backgroundColor: '#111118', borderColor: '#FFFFFF08' },
+  name: { fontSize: 9, fontWeight: '700', textAlign: 'center' },
+  progressBar: { width: '100%', height: 3, backgroundColor: '#1A1A1A', borderRadius: 2, overflow: 'hidden', marginTop: 2 },
+  progressFill: { height: 3, borderRadius: 2 },
+  progressText: { fontSize: 8, color: '#444', fontWeight: '600' },
+  // Modal
+  modalOverlay: {
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.75)',
+    justifyContent: 'center', alignItems: 'center', padding: 32,
+  },
+  modalCard: {
+    backgroundColor: '#12121E', borderRadius: 20, padding: 24,
+    alignItems: 'center', gap: 12, borderWidth: 1, borderColor: '#FFFFFF12',
+    minWidth: 260,
+  },
+  modalIconCircle: {
+    width: 72, height: 72, borderRadius: 36,
+    justifyContent: 'center', alignItems: 'center', borderWidth: 1,
+  },
+  modalName: { fontSize: 16, fontWeight: '900' },
+  modalDesc: { fontSize: 13, color: '#888', textAlign: 'center', lineHeight: 18 },
+  modalProgressWrap: { width: '100%', gap: 6, alignItems: 'center' },
+  modalProgressBar: { width: '100%', height: 6, backgroundColor: '#1A1A2E', borderRadius: 3, overflow: 'hidden' },
+  modalProgressFill: { height: 6, borderRadius: 3 },
+  modalProgressLabel: { fontSize: 12, fontWeight: '700' },
+  modalHint: { fontSize: 11, color: '#444', fontWeight: '600' },
 });
 const GRID_PAD = 16;
 

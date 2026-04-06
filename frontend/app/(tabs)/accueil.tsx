@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, FlatList,
-  ActivityIndicator, RefreshControl, Dimensions, Platform, Modal,
+  ActivityIndicator, RefreshControl, Dimensions, Platform, Modal, Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,7 +11,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, {
   useSharedValue, useAnimatedStyle, withRepeat, withTiming,
   withSequence, FadeInDown, FadeInRight,
-  Easing, interpolate,
+  Easing, interpolate, runOnJS,
 } from 'react-native-reanimated';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
@@ -533,9 +533,129 @@ const CommunityCard = React.memo(function CommunityCard({ item, index, userId, o
   );
 });
 
+// ── Slot Machine ──
+const SLOT_CARD_W = 84;
+const SLOT_GAP = 10;
+const SLOT_ITEM_W = SLOT_CARD_W + SLOT_GAP;
+
+type SlotTheme = { id: string; name: string; color: string };
+
+const SlotMachineOverlay = React.memo(function SlotMachineOverlay({
+  visible, themes, chosen, onDone,
+}: {
+  visible: boolean;
+  themes: SlotTheme[];
+  chosen: SlotTheme | null;
+  onDone: () => void;
+}) {
+  const offset = useSharedValue(0);
+  const opacity = useSharedValue(0);
+
+  const { list, chosenIndex } = useMemo(() => {
+    if (!themes.length || !chosen) return { list: [], chosenIndex: 0 };
+    let base = [...themes];
+    while (base.length < 5) base = [...base, ...themes];
+    const repeated = [...base, ...base, ...base, ...base];
+    const ci = repeated.length;
+    return {
+      list: [...repeated, { ...chosen }, ...base.slice(0, 3)],
+      chosenIndex: ci,
+    };
+  }, [chosen?.id]);
+
+  useEffect(() => {
+    if (!visible || !list.length || !chosen) return;
+    offset.value = -(2 * SLOT_ITEM_W);
+    opacity.value = withTiming(1, { duration: 200 });
+
+    const spinTimer = setTimeout(() => {
+      const targetOffset = -(chosenIndex - 1) * SLOT_ITEM_W;
+      offset.value = withTiming(targetOffset, { duration: 1800, easing: Easing.out(Easing.cubic) });
+    }, 300);
+
+    const fadeTimer = setTimeout(() => {
+      opacity.value = withTiming(0, { duration: 400 });
+    }, 2700);
+
+    const doneTimer = setTimeout(onDone, 3100);
+
+    return () => {
+      clearTimeout(spinTimer);
+      clearTimeout(fadeTimer);
+      clearTimeout(doneTimer);
+    };
+  }, [visible]);
+
+  const overlayStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  const rowStyle = useAnimatedStyle(() => ({ transform: [{ translateX: offset.value }] }));
+
+  if (!visible || !chosen) return null;
+
+  return (
+    <Modal visible transparent animationType="none" statusBarTranslucent>
+      <Animated.View style={[slotS.overlay, overlayStyle]}>
+        <View style={slotS.box}>
+          <Text style={slotS.title}>Sélection du thème</Text>
+          <View style={slotS.viewport}>
+            <Animated.View style={[slotS.row, rowStyle]}>
+              {list.map((theme, idx) => {
+                const isChosen = idx === chosenIndex;
+                const c = theme.color || '#8A2BE2';
+                return (
+                  <View
+                    key={`${theme.id}-${idx}`}
+                    style={[slotS.card, {
+                      backgroundColor: c + '22',
+                      borderColor: c + (isChosen ? 'CC' : '35'),
+                      borderWidth: isChosen ? 2 : 1,
+                    }]}
+                  >
+                    <MaterialCommunityIcons name="lightning-bolt" size={22} color={c} />
+                    <Text style={[slotS.cardName, { color: c }]} numberOfLines={2}>{theme.name}</Text>
+                  </View>
+                );
+              })}
+            </Animated.View>
+            <LinearGradient colors={['#080810', 'transparent']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={slotS.fadeLeft} pointerEvents="none" />
+            <LinearGradient colors={['transparent', '#080810']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={slotS.fadeRight} pointerEvents="none" />
+            <View style={slotS.centerMark} pointerEvents="none" />
+          </View>
+          <Text style={slotS.subtitle}>{chosen.name}</Text>
+        </View>
+      </Animated.View>
+    </Modal>
+  );
+});
+
+const slotS = StyleSheet.create({
+  overlay: {
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.88)',
+    justifyContent: 'center', alignItems: 'center',
+  },
+  box: { alignItems: 'center', gap: 18, width: '100%' },
+  title: { fontSize: 11, fontWeight: '800', color: '#555', letterSpacing: 3, textTransform: 'uppercase' },
+  viewport: { width: SLOT_ITEM_W * 3, height: 108, overflow: 'hidden' },
+  row: { flexDirection: 'row', alignItems: 'center', height: 108, gap: SLOT_GAP },
+  card: {
+    width: SLOT_CARD_W, height: 100, borderRadius: 16,
+    alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 6,
+  },
+  cardName: { fontSize: 10, fontWeight: '800', textAlign: 'center' },
+  fadeLeft: { position: 'absolute', top: 0, bottom: 0, left: 0, width: SLOT_ITEM_W },
+  fadeRight: { position: 'absolute', top: 0, bottom: 0, right: 0, width: SLOT_ITEM_W },
+  centerMark: {
+    position: 'absolute', top: 4, bottom: 4,
+    left: SLOT_ITEM_W, width: SLOT_CARD_W,
+    borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.14)',
+  },
+  subtitle: { fontSize: 18, fontWeight: '900', color: '#FFF', letterSpacing: 1 },
+});
+
 // ── Event Card ──
-const EventCard = React.memo(function EventCard({ item, index, onActivate }: {
-  item: FeedItem; index: number; onActivate: (themeId: string) => Promise<string | null>;
+const EventCard = React.memo(function EventCard({ item, index, onActivate, onLaunch }: {
+  item: FeedItem; index: number;
+  onActivate: (themeId: string) => Promise<string | null>;
+  onLaunch: (themeId: string, themeName: string) => void;
 }) {
   const pulse = useSharedValue(0);
   const [countdown, setCountdown] = React.useState('');
@@ -568,18 +688,35 @@ const EventCard = React.memo(function EventCard({ item, index, onActivate }: {
     opacity: interpolate(pulse.value, [0, 1], [isActive ? 0.8 : 0.5, 1]),
   }));
 
-  const handleWatchAd = async () => {
-    if (loading || isActive) return;
+  const themeId = item.theme_id || item.category;
+
+  const watchAdAndActivate = async () => {
+    if (loading) return;
     setLoading(true);
     // TODO: afficher vraie pub ici (AdMob rewarded)
-    // Simulation : délai de 1s représentant la pub
     await new Promise(r => setTimeout(r, 1000));
-    const newExpiry = await onActivate(item.theme_id || item.category);
+    const newExpiry = await onActivate(themeId);
     if (newExpiry) {
       setExpiresAt(newExpiry);
       setIsActive(true);
+      onLaunch(themeId, item.category_name);
     }
     setLoading(false);
+  };
+
+  const handleCardPress = () => {
+    if (isActive) {
+      onLaunch(themeId, item.category_name);
+      return;
+    }
+    Alert.alert(
+      'Bonus XP ×2',
+      `Regarde une pub pour activer le bonus sur "${item.category_name}" et lancer une partie.`,
+      [
+        { text: 'Pas maintenant', style: 'cancel' },
+        { text: 'Regarder la pub', onPress: watchAdAndActivate },
+      ],
+    );
   };
 
   const color = item.category_color;
@@ -587,46 +724,46 @@ const EventCard = React.memo(function EventCard({ item, index, onActivate }: {
   return (
     <Animated.View entering={FadeInDown.delay(index * 80).duration(400)}>
       <Animated.View style={pulseStyle}>
-        <LinearGradient
-          colors={[color + (isActive ? '25' : '15'), 'transparent']}
-          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-          style={[styles.eventCard, { borderColor: color + (isActive ? '60' : '30') }]}
-        >
-          <LinearGradient colors={[color, color + '80']} style={styles.eventIconWrap}>
-            <MaterialCommunityIcons name="lightning-bolt" size={20} color="#FFF" />
-          </LinearGradient>
-          <View style={styles.eventContent}>
-            <Text style={[styles.eventTitle, { color }]}>{`XP ×2 — ${item.category_name}`}</Text>
-            {isActive && countdown ? (
-              <Text style={[styles.eventBody, { color: '#00FF9D', fontWeight: '700' }]}>
-                ⏱ {countdown}
-              </Text>
-            ) : (
-              <Text style={styles.eventBody}>Regarde une pub pour activer</Text>
-            )}
-          </View>
-          {isActive ? (
-            <View style={[styles.eventLiveBadge, { backgroundColor: '#00FF9D' }]}>
-              <View style={[styles.liveDot, { backgroundColor: '#FFF' }]} />
-              <Text style={[styles.eventLiveText, { color: '#000' }]}>ACTIF</Text>
+        <TouchableOpacity onPress={handleCardPress} activeOpacity={0.85}>
+          <LinearGradient
+            colors={[color + (isActive ? '25' : '15'), 'transparent']}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+            style={[styles.eventCard, { borderColor: color + (isActive ? '60' : '30') }]}
+          >
+            <LinearGradient colors={[color, color + '80']} style={styles.eventIconWrap}>
+              <MaterialCommunityIcons name="lightning-bolt" size={20} color="#FFF" />
+            </LinearGradient>
+            <View style={styles.eventContent}>
+              <Text style={[styles.eventTitle, { color }]}>{`XP ×2 — ${item.category_name}`}</Text>
+              {isActive && countdown ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <MaterialCommunityIcons name="timer-outline" size={13} color="#00FF9D" />
+                  <Text style={[styles.eventBody, { color: '#00FF9D', fontWeight: '700' }]}>{countdown}</Text>
+                </View>
+              ) : (
+                <Text style={styles.eventBody}>
+                  {isActive ? 'Actif — Jouer maintenant' : 'Regarde une pub pour activer'}
+                </Text>
+              )}
             </View>
-          ) : (
-            <TouchableOpacity
-              style={[styles.adBtn, { borderColor: color }]}
-              onPress={handleWatchAd}
-              disabled={loading}
-              activeOpacity={0.7}
-            >
-              <MaterialCommunityIcons
-                name={loading ? 'loading' : 'play-circle-outline'}
-                size={14} color={color}
-              />
-              <Text style={[styles.adBtnText, { color }]}>
-                {loading ? '...' : 'Pub'}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </LinearGradient>
+            {isActive ? (
+              <View style={[styles.eventLiveBadge, { backgroundColor: '#00FF9D' }]}>
+                <View style={[styles.liveDot, { backgroundColor: '#FFF' }]} />
+                <Text style={[styles.eventLiveText, { color: '#000' }]}>ACTIF</Text>
+              </View>
+            ) : (
+              <View style={[styles.adBtn, { borderColor: color, opacity: loading ? 0.5 : 1 }]}>
+                <MaterialCommunityIcons
+                  name={loading ? 'loading' : 'play-circle-outline'}
+                  size={14} color={color}
+                />
+                <Text style={[styles.adBtnText, { color }]}>
+                  {loading ? '...' : 'Pub'}
+                </Text>
+              </View>
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
       </Animated.View>
     </Animated.View>
   );
@@ -710,9 +847,13 @@ export default function AccueilScreen() {
     loadDailyQuestion();
   }, []);
 
+
   const [dailyQuestion, setDailyQuestion] = useState<any>(null);
   const [dqAnswer, setDqAnswer] = useState<number | null>(null);
   const [dqResult, setDqResult] = useState<any>(null);
+  const [slotVisible, setSlotVisible] = useState(false);
+  const [slotChosen, setSlotChosen] = useState<SlotTheme | null>(null);
+  const [slotThemes, setSlotThemes] = useState<SlotTheme[]>([]);
 
   const loadDailyQuestion = useCallback(async () => {
     try {
@@ -720,6 +861,7 @@ export default function AccueilScreen() {
       if (res.ok) setDailyQuestion(await res.json());
     } catch {}
   }, []);
+
 
   const handleDqAnswer = useCallback(async (idx: number) => {
     if (!dailyQuestion || dqAnswer !== null) return;
@@ -858,6 +1000,11 @@ export default function AccueilScreen() {
       return data.expires_at;
     } catch { return null; }
   }, []);
+
+  const handleLaunchBoost = useCallback((themeId: string, themeName: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    router.push(`/matchmaking?category=${themeId}&themeName=${encodeURIComponent(themeName)}`);
+  }, [router]);
 
   // Countdown toward next 30-min slot for x2 offers
   useEffect(() => {
@@ -1101,7 +1248,6 @@ export default function AccueilScreen() {
                 <Text style={[styles.streakNum, { color: hasPlayedToday ? '#00FF9D' : '#FF6B35' }]}>
                   {userData?.login_streak || 0}
                 </Text>
-                <Text style={styles.streakFire}>🔥</Text>
               </View>
             </LinearGradient>
             {/* Best login streak badge */}
@@ -1121,12 +1267,30 @@ export default function AccueilScreen() {
             activeOpacity={0.85}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-              const last = pendingDuels[0];
-              if (last?.category) {
-                router.push(`/matchmaking?category=${last.category}&themeName=${encodeURIComponent(last.category_name)}`);
-              } else {
-                router.push('/(tabs)/play');
+              const playedThemes: SlotTheme[] = (dailyMissions?.user_themes ?? []).map(t => ({ id: t.id, name: t.name, color: t.color }));
+              const eventThemes: SlotTheme[] = socialFeedRef.current
+                .filter(i => i.type === 'event' && i.theme_id && i.category_name)
+                .map(i => ({ id: i.theme_id!, name: i.category_name, color: i.category_color }));
+              // Deduplicated combined list for the carousel
+              const allThemes = [...playedThemes];
+              eventThemes.forEach(et => { if (!allThemes.find(t => t.id === et.id)) allThemes.push(et); });
+
+              let chosen: SlotTheme | null = null;
+              if (Math.random() < 0.5 && playedThemes.length > 0) {
+                chosen = playedThemes[Math.floor(Math.random() * playedThemes.length)];
+              } else if (eventThemes.length > 0) {
+                chosen = eventThemes[Math.floor(Math.random() * eventThemes.length)];
+              } else if (playedThemes.length > 0) {
+                chosen = playedThemes[Math.floor(Math.random() * playedThemes.length)];
               }
+
+              if (!chosen || allThemes.length === 0) {
+                router.push('/matchmaking');
+                return;
+              }
+              setSlotThemes(allThemes);
+              setSlotChosen(chosen);
+              setSlotVisible(true);
             }}
           >
             <LinearGradient
@@ -1135,16 +1299,9 @@ export default function AccueilScreen() {
               end={{ x: 1, y: 0 }}
               style={styles.quickPlayGradient}
             >
-              <View style={{ alignItems: 'center' }}>
-                {pendingDuels[0]?.category_name ? (
-                  <Text style={styles.quickPlaySub}>
-                    {t('home.last_theme_played')} {pendingDuels[0].category_name}
-                  </Text>
-                ) : null}
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                  <MaterialCommunityIcons name="lightning-bolt" size={20} color="#FFF" />
-                  <Text style={styles.quickPlayText}>{t('home.start_duel')}</Text>
-                </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <MaterialCommunityIcons name="lightning-bolt" size={20} color="#FFF" />
+                <Text style={styles.quickPlayText}>{t('home.start_duel')}</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
@@ -1266,6 +1423,19 @@ export default function AccueilScreen() {
           </View>
         )}
 
+        {/* Slot Machine */}
+        <SlotMachineOverlay
+          visible={slotVisible}
+          themes={slotThemes}
+          chosen={slotChosen}
+          onDone={() => {
+            setSlotVisible(false);
+            if (slotChosen) {
+              router.push(`/matchmaking?category=${slotChosen.id}&themeName=${encodeURIComponent(slotChosen.name)}`);
+            }
+          }}
+        />
+
         {/* Theme Picker Modal */}
         <Modal visible={showThemePicker} transparent animationType="slide" onRequestClose={() => setShowThemePicker(false)}>
           <View style={styles.modalOverlay}>
@@ -1338,7 +1508,7 @@ export default function AccueilScreen() {
             scrollEnabled={false}
             renderItem={({ item, index: idx }) => {
               if (item.type === 'event') {
-                return <EventCard item={item} index={idx} onActivate={handleActivateBoost} />;
+                return <EventCard item={item} index={idx} onActivate={handleActivateBoost} onLaunch={handleLaunchBoost} />;
               }
               if (item.type === 'record') {
                 return <RecordCard item={item} index={idx} />;
@@ -1886,10 +2056,6 @@ const styles = StyleSheet.create({
   streakNum: {
     fontSize: 28,
     fontWeight: '900',
-  },
-  streakFire: {
-    fontSize: 16,
-    marginTop: -2,
   },
   bestStreakBadge: {
     flexDirection: 'row',
