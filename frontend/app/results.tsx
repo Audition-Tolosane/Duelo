@@ -171,7 +171,7 @@ export default function ResultsScreen() {
       setTimeout(() => {
         if (hasNavigatedRef.current) return;
         hasNavigatedRef.current = true;
-        router.push(`/matchmaking?category=${category}`);
+        router.replace(`/matchmaking?category=${category}`); // #37 — replace not push
       }, 1500);
     }, 20000);
     return () => clearTimeout(timeout);
@@ -283,6 +283,9 @@ export default function ResultsScreen() {
     Keyboard.dismiss();
     setReportSubmitting(true);
     setReportError(null);
+    // #43 — 10s timeout so the modal never stays frozen
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
     try {
       const userId = params.userId || await AsyncStorage.getItem('duelo_user_id');
       const res = await authFetch(`${API_URL}/api/questions/report`, {
@@ -296,6 +299,7 @@ export default function ResultsScreen() {
           reason_type: selectedReason,
           description: reportDescription.trim() || undefined,
         }),
+        signal: controller.signal,
       });
       if (res.status === 409) {
         setReportError(t('report.already_reported'));
@@ -305,10 +309,12 @@ export default function ResultsScreen() {
         setReportSuccess(true);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
-    } catch {
-      setReportError(t('report.network_error'));
+    } catch (e: any) {
+      setReportError(e?.name === 'AbortError' ? t('report.network_error') : t('report.network_error'));
+    } finally {
+      clearTimeout(timeoutId);
+      setReportSubmitting(false);
     }
-    setReportSubmitting(false);
   };
 
   const botTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);

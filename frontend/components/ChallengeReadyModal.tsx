@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, Modal, Animated,
+  View, Text, TouchableOpacity, StyleSheet, Modal, Animated, ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -178,8 +178,11 @@ export default function ChallengeReadyModal() {
                 end={{ x: 1, y: 0 }}
                 style={styles.acceptGradient}
               >
-                <MaterialCommunityIcons name="sword-cross" size={18} color="#FFF" />
-                <Text style={styles.acceptText}>{t('challenge.accept')}</Text>
+                {/* #42 — spinner while accept API call is in flight */}
+                {accepting
+                  ? <ActivityIndicator size="small" color="#FFF" />
+                  : <MaterialCommunityIcons name="sword-cross" size={18} color="#FFF" />}
+                <Text style={styles.acceptText}>{accepting ? '...' : t('challenge.accept')}</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>

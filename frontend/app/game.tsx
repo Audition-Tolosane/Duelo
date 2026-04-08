@@ -325,7 +325,8 @@ export default function GameScreen() {
     ];
 
     return () => unsubs.forEach((u) => u());
-  }, [isLive]);
+  // #38 — isLive is derived from URL params (never changes), use [] to prevent listener leak on re-render
+  }, []);
 
   const loadPseudo = async () => {
     const p = await AsyncStorage.getItem('duelo_pseudo');

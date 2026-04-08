@@ -44,22 +44,32 @@ export async function saveScoreWithRetry(
 async function enqueuePendingScore(entry: PendingScore) {
   try {
     const raw = await AsyncStorage.getItem(PENDING_KEY);
-    const queue: PendingScore[] = raw ? JSON.parse(raw) : [];
-    // Avoid duplicate entries for the same challenge
+    // #35 — safe JSON.parse: reset to empty on corruption
+    let queue: PendingScore[] = [];
+    if (raw) {
+      try { queue = JSON.parse(raw); } catch { queue = []; }
+    }
     const deduped = queue.filter(q => q.challenge_id !== entry.challenge_id);
     deduped.push(entry);
     await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(deduped));
   } catch {}
 }
 
+// #36 — module-level guard against concurrent flush (double-upload)
+let _flushing = false;
+
 /**
  * Call this on app startup (e.g. in accueil.tsx useEffect) to retry failed saves.
  */
 export async function flushPendingScores(): Promise<void> {
+  if (_flushing) return;
+  _flushing = true;
   try {
     const raw = await AsyncStorage.getItem(PENDING_KEY);
     if (!raw) return;
-    const queue: PendingScore[] = JSON.parse(raw);
+    // #35 — safe JSON.parse
+    let queue: PendingScore[];
+    try { queue = JSON.parse(raw); } catch { await AsyncStorage.removeItem(PENDING_KEY); return; }
     if (!queue.length) return;
     const remaining: PendingScore[] = [];
     for (const entry of queue) {
@@ -86,4 +96,5 @@ export async function flushPendingScores(): Promise<void> {
       await AsyncStorage.removeItem(PENDING_KEY);
     }
   } catch {}
+  finally { _flushing = false; }
 }

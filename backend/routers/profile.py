@@ -216,27 +216,36 @@ async def update_location(
     db: AsyncSession = Depends(get_db),
 ):
     body = await request.json()
+
+    # #34 — Use direct UPDATE to avoid read-modify-write race condition
+    from sqlalchemy import update as _update
+    updates: dict = {}
+    if "city" in body:
+        updates["city"] = body["city"].strip() or None
+    if "country" in body:
+        updates["country"] = body["country"].strip() or None
+    if "continent" in body:
+        updates["continent"] = body["continent"].strip() or None
+    if "region" in body:
+        updates["region"] = body["region"].strip() or None
+
+    if updates:
+        await db.execute(_update(User).where(User.id == current_user_id).values(**updates))
+        await db.commit()
+
+    # Re-fetch for geocoding and response
     result = await db.execute(select(User).where(User.id == current_user_id))
     user = result.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
 
-    if "city" in body:
-        user.city = body["city"].strip() or None
-    if "country" in body:
-        user.country = body["country"].strip() or None
-    if "continent" in body:
-        user.continent = body["continent"].strip() or None
-    if "region" in body:
-        user.region = body["region"].strip() or None
-
-    # Geocode to get coordinates whenever city or country changes
+    # Geocode after atomic write
     if ("city" in body or "country" in body) and user.city and user.country:
         lat, lng = await geocode_city(user.city, user.country)
+        await db.execute(_update(User).where(User.id == current_user_id).values(lat=lat, lng=lng))
+        await db.commit()
         user.lat = lat
         user.lng = lng
-
-    await db.commit()
     return {
         "success": True,
         "city": user.city,

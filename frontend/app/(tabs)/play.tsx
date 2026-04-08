@@ -124,7 +124,12 @@ export default function PlayScreen() {
 
     try {
       setLoadError(false);
-      const res = await fetch(`${API_URL}/api/explore/super-categories`);
+      const uid = await AsyncStorage.getItem('duelo_user_id');
+      // #44 — pass userId so the API can personalise results (e.g. followed themes)
+      const url = uid
+        ? `${API_URL}/api/explore/super-categories?user_id=${uid}`
+        : `${API_URL}/api/explore/super-categories`;
+      const res = await fetch(url);
       const data = await res.json();
       setSuperCategories(data);
     } catch {

@@ -88,6 +88,8 @@ async def create_wall_post(category_id: str, data: WallPostCreate, request: Requ
         raise HTTPException(status_code=403, detail="Non autorisé")
     if not data.content.strip():
         raise HTTPException(status_code=400, detail="Le contenu ne peut pas être vide")
+    if len(data.content) > 1000:
+        raise HTTPException(status_code=400, detail="Le contenu ne peut pas dépasser 1000 caractères")
     if data.image_base64 and len(data.image_base64) > 700000:
         raise HTTPException(status_code=400, detail="Image trop volumineuse (max 500KB)")
 

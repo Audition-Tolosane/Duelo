@@ -69,7 +69,8 @@ export default function ChatScreen() {
       // Incoming message from this conversation partner
       wsOn('chat_message', (msg) => {
         if (msg.data?.sender_id === partnerId) {
-          setMessages((prev) => [...prev, msg.data]);
+          // #39 — dedup by message ID (message may already be in list from initial fetch)
+          setMessages((prev) => prev.some(m => m.id === msg.data.id) ? prev : [...prev, msg.data]);
           setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
           decrementUnread(1); // We're reading it right now
         }

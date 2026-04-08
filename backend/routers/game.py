@@ -427,14 +427,18 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
         perfect_res = await db.execute(
             select(_func.count(Match.id)).where(Match.player1_id == player_id, Match.player1_correct == 7)
         )
-        new_achievements = await _check_ach(player_id, {
-            "games_played": user.matches_played,
-            "wins": user.matches_won,
-            "win_streak": user.current_streak,
-            "perfect_scores": perfect_res.scalar() or 0,
-            "login_streak": user.login_streak or 0,
-            "themes_played": themes_count_res.scalar() or 0,
-        }, db)
+        try:  # #30 — achievements must not block match submission if they fail
+            new_achievements = await _check_ach(player_id, {
+                "games_played": user.matches_played,
+                "wins": user.matches_won,
+                "win_streak": user.current_streak,
+                "perfect_scores": perfect_res.scalar() or 0,
+                "login_streak": user.login_streak or 0,
+                "themes_played": themes_count_res.scalar() or 0,
+            }, db)
+        except Exception as _ach_err:
+            logger.warning(f"[submit] Achievement check failed (non-blocking): {_ach_err}")
+            new_achievements = []
 
         # Lives count for response (lets frontend show "use a life?" after loss)
         from routers.streak_shield import get_lives

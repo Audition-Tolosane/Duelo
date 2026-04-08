@@ -9,29 +9,29 @@ logger = logging.getLogger(__name__)
 
 
 async def _send_expo_push(token: str, title: str, body: str, data: dict = None):
-    """Send a push notification via Expo Push Service (fire-and-forget)."""
+    """Send a push notification via Expo Push Service. Retries once on failure."""
     if not token or not token.startswith("ExponentPushToken["):
         return
-    try:
-        async with httpx.AsyncClient(timeout=8.0) as client:
-            await client.post(
-                "https://exp.host/--/api/v2/push/send",
-                json={
-                    "to": token,
-                    "title": title,
-                    "body": body,
-                    "data": data or {},
-                    "sound": "default",
-                    "priority": "high",
-                },
-                headers={
-                    "Accept": "application/json",
-                    "Accept-encoding": "gzip, deflate",
-                    "Content-Type": "application/json",
-                },
-            )
-    except Exception as e:
-        logger.warning(f"[push] Failed to send Expo push: {e}")
+    payload = {
+        "to": token, "title": title, "body": body,
+        "data": data or {}, "sound": "default", "priority": "high",
+    }
+    headers = {
+        "Accept": "application/json",
+        "Accept-encoding": "gzip, deflate",
+        "Content-Type": "application/json",
+    }
+    for attempt in range(2):  # #33 — retry once on failure
+        try:
+            async with httpx.AsyncClient(timeout=8.0) as client:
+                resp = await client.post("https://exp.host/--/api/v2/push/send",
+                                         json=payload, headers=headers)
+            if resp.status_code < 500:
+                return  # success or client error (no retry)
+            logger.warning(f"[push] Expo returned {resp.status_code} (attempt {attempt+1})")
+        except Exception as e:
+            logger.warning(f"[push] Failed to send Expo push (attempt {attempt+1}): {e}")
+    logger.error(f"[push] All attempts failed for token {token[:30]}...")
 
 
 async def create_notification(

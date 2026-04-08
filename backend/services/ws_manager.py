@@ -54,6 +54,14 @@ class ConnectionManager:
             timer.cancel()
         # Remove from matchmaking queue
         self.matchmaking_queue = [e for e in self.matchmaking_queue if e["user_id"] != user_id]
+        # #26 — Clean up pending challenge rooms the user was part of
+        for room_id in [rid for rid, r in list(self.pending_challenge_rooms.items())
+                        if user_id in (r.get("acceptor_id"), r.get("challenger_id"))]:
+            room = self.pending_challenge_rooms.pop(room_id, None)
+            if room:
+                t = room.get("timer")
+                if t:
+                    t.cancel()
         # Handle game room disconnect — schedule async cleanup
         for room_id, room in list(self.game_rooms.items()):
             if user_id in (room.player1_id, room.player2_id):
@@ -73,8 +81,9 @@ class ConnectionManager:
         remaining = room.total_questions - answered_count
 
         # Average points per question for the opponent (if they answered at least 1)
+        MAX_PTS_PER_Q = 20
         if answered_count > 0:
-            avg_pts = opponent_score / answered_count
+            avg_pts = min(opponent_score / answered_count, MAX_PTS_PER_Q)  # #27 — cap to prevent over-compensation
         else:
             avg_pts = 10  # Default: base points for a correct answer
 

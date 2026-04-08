@@ -195,7 +195,9 @@ async def decline_challenge(challenge_id: str, data: dict, current_user: str = D
 
 
 @router.get("/vs-stats")
-async def vs_stats(user_id: str, opponent_id: str, db: AsyncSession = Depends(get_db)):
+async def vs_stats(user_id: str, opponent_id: str, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    if current_user != user_id:
+        raise HTTPException(status_code=403, detail="Non autorisé")
     """Head-to-head challenge stats between two players."""
     res = await db.execute(
         select(Challenge).where(

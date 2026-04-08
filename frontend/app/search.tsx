@@ -155,7 +155,12 @@ export default function SearchScreen() {
       const data = await res.json();
       setTrendingTags(data.trending_tags || []);
       setTopPlayers(data.top_players || []);
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error('[search] Trending fetch failed:', e);
+      // #41 — reset to empty so stale data isn't shown and section stays hidden
+      setTrendingTags([]);
+      setTopPlayers([]);
+    }
   };
 
   const fetchThemes = async (q: string, diff: string, userId: string) => {
