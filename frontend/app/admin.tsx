@@ -529,7 +529,7 @@ export default function AdminScreen() {
         body: JSON.stringify({ themes_csv: themesCSVText }),
       });
       const data = await res.json();
-      console.log('Upload themes response:', JSON.stringify(data));
+      // dev-only log removed from prod build
       if (res.ok) {
         setThemesUploadResult(data);
         loadThemesOverview();

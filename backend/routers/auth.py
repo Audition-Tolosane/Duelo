@@ -101,6 +101,8 @@ async def login(data: LoginRequest, request: Request, db: AsyncSession = Depends
     if not user or not user.password_hash or not verify_password(data.password, user.password_hash):
         # Record failed attempt
         _limiter.requests[email_key].append(__import__('time').time())
+        client_ip = request.client.host if request.client else "unknown"
+        logger.warning(f"[login] Failed attempt for '{normalized_email}' from {client_ip}")
         raise HTTPException(status_code=401, detail="Email ou mot de passe incorrect")
 
     # Migrate legacy SHA256 hash to bcrypt on successful login

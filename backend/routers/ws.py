@@ -180,7 +180,7 @@ async def handle_chat_send(sender_id: str, data: dict):
     if not manager.is_online(receiver_id):
         async with AsyncSessionLocal() as db:
             if message_type == "text":
-                notif_body = f"{sender_pseudo}: {content[:80]}{'...' if len(content) > 80 else ''}"
+                notif_body = f"{sender_pseudo}: {content[:100]}{'...' if len(content) > 100 else ''}"
             elif message_type == "image":
                 notif_body = f"{sender_pseudo} t'a envoyé une image"
             else:

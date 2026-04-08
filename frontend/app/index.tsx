@@ -180,18 +180,24 @@ export default function WelcomeScreen() {
     }).start();
 
     // Logo float — démarre avec un léger délai pour ne pas cumuler avec l'entrée
+    // #animations — save refs so loops can be stopped on unmount
+    let floatLoop: Animated.CompositeAnimation | null = null;
+    let ringLoop: Animated.CompositeAnimation | null = null;
+
     const floatTimer = setTimeout(() => {
-      Animated.loop(Animated.sequence([
+      floatLoop = Animated.loop(Animated.sequence([
         Animated.timing(logoFloat, { toValue: -8, duration: 2500, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
         Animated.timing(logoFloat, { toValue: 8, duration: 2500, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-      ])).start();
+      ]));
+      floatLoop.start();
     }, 700);
 
     // Halo ring
     Animated.timing(ringOpacity, { toValue: 0.5, duration: 1000, delay: 500, useNativeDriver: true }).start();
-    Animated.loop(
+    ringLoop = Animated.loop(
       Animated.timing(ringRotate, { toValue: 1, duration: 16000, easing: Easing.linear, useNativeDriver: true })
-    ).start();
+    );
+    ringLoop.start();
 
     // Form — léger délai pour ne pas tout charger en même temps
     const formTimer = setTimeout(() => {
@@ -202,7 +208,12 @@ export default function WelcomeScreen() {
       ]).start();
     }, 200);
 
-    return () => { clearTimeout(floatTimer); clearTimeout(formTimer); };
+    return () => {
+      clearTimeout(floatTimer);
+      clearTimeout(formTimer);
+      floatLoop?.stop();
+      ringLoop?.stop();
+    };
   }, []);
 
   useEffect(() => {

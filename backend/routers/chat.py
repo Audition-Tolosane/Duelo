@@ -40,7 +40,7 @@ async def send_message(data: ChatSend, current_user: str = Depends(get_current_u
 
     sender_name = sender.pseudo if sender else "Quelqu'un"
     if data.message_type == "text":
-        notif_body = f"{sender_name}: {data.content[:80]}{'...' if len(data.content) > 80 else ''}"
+        notif_body = f"{sender_name}: {data.content[:100]}{'...' if len(data.content) > 100 else ''}"
     elif data.message_type == "image":
         notif_body = f"{sender_name} t'a envoyé une image"
     elif data.message_type == "game_card":
