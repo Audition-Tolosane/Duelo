@@ -6,6 +6,7 @@ import re
 import uuid
 from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException, Request, Header
+from rate_limit import rate_limit
 from fastapi.responses import HTMLResponse
 from sqlalchemy import select, func, text, delete, update, or_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -29,7 +30,7 @@ async def verify_admin_key(x_admin_key: str = Header(default="", alias="X-Admin-
 
 
 @router.post("/verify")
-async def verify_admin(data: AdminVerify):
+async def verify_admin(data: AdminVerify, request: Request, _rl=Depends(rate_limit(limit=5, window=60))):
     if data.password == ADMIN_PASSWORD:
         return {"verified": True}
     raise HTTPException(status_code=403, detail="Mot de passe incorrect")
@@ -84,6 +85,10 @@ async def import_csv_data(request: Request, _: None = Depends(verify_admin_key),
 
     if not themes_csv_text or not questions_csv_text:
         raise HTTPException(status_code=400, detail="Both themes_csv and questions_csv required")
+
+    MAX_CSV_BYTES = 5 * 1024 * 1024  # 5 MB
+    if len(themes_csv_text.encode()) + len(questions_csv_text.encode()) > MAX_CSV_BYTES:
+        raise HTTPException(status_code=413, detail="CSV trop volumineux (max 5 Mo)")
 
     themes_reader = csv.DictReader(io.StringIO(themes_csv_text))
     themes_imported = 0

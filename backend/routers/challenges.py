@@ -99,8 +99,8 @@ async def send_challenge(request: Request, data: dict, current_user: str = Depen
 
 
 @router.post("/{challenge_id}/accept")
-async def accept_challenge(challenge_id: str, data: dict, db: AsyncSession = Depends(get_db)):
-    user_id = data.get("user_id")
+async def accept_challenge(challenge_id: str, data: dict, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    user_id = current_user
     res = await db.execute(select(Challenge).where(Challenge.id == challenge_id))
     challenge = res.scalar_one_or_none()
     if not challenge:
@@ -152,8 +152,8 @@ async def accept_challenge(challenge_id: str, data: dict, db: AsyncSession = Dep
 
 
 @router.post("/{challenge_id}/decline")
-async def decline_challenge(challenge_id: str, data: dict, db: AsyncSession = Depends(get_db)):
-    user_id = data.get("user_id")
+async def decline_challenge(challenge_id: str, data: dict, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    user_id = current_user
     res = await db.execute(select(Challenge).where(Challenge.id == challenge_id))
     challenge = res.scalar_one_or_none()
     if not challenge:

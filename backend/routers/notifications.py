@@ -92,10 +92,11 @@ async def get_notification_settings(user_id: str, db: AsyncSession = Depends(get
 
 @router.post("/{user_id}/settings")
 async def update_notification_settings(user_id: str, data: NotifSettingsUpdate, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
-    if data.user_id != current_user:
+    # Enforce that the URL param matches the authenticated user — ignore any user_id in the body
+    if current_user != user_id:
         raise HTTPException(status_code=403, detail="Non autorisé")
     result = await db.execute(
-        select(NotificationSettings).where(NotificationSettings.user_id == user_id)
+        select(NotificationSettings).where(NotificationSettings.user_id == current_user)
     )
     settings = result.scalar_one_or_none()
 

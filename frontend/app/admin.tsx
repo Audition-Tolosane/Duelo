@@ -267,9 +267,8 @@ export default function AdminScreen() {
     if (!password.trim()) return;
     setAuthLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/admin/verify`, {
+      const res = await adminFetch(`${API_URL}/api/admin/verify`, password.trim(), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: password.trim() }),
       });
       if (res.ok) {

@@ -1,5 +1,6 @@
 from fastapi import Request, HTTPException
 from collections import defaultdict
+import ipaddress
 import time
 
 
@@ -21,13 +22,26 @@ class RateLimiter:
 _limiter = RateLimiter()
 
 
+def _is_trusted_proxy(ip: str) -> bool:
+    """Return True only for loopback/private IPs (i.e. our own reverse proxy)."""
+    try:
+        addr = ipaddress.ip_address(ip)
+        return addr.is_loopback or addr.is_private
+    except ValueError:
+        return False
+
+
 def _get_client_ip(request: Request) -> str:
-    """Return the real client IP, honouring X-Forwarded-For from trusted proxies."""
-    forwarded = request.headers.get("X-Forwarded-For")
-    if forwarded:
-        # Take the leftmost IP (client), strip whitespace
-        return forwarded.split(",")[0].strip()
-    return request.client.host if request.client else "unknown"
+    """Return the real client IP.
+    X-Forwarded-For is only trusted when the direct connection comes from a
+    known internal proxy, preventing header-spoofing from external clients.
+    """
+    client_host = request.client.host if request.client else None
+    if client_host and _is_trusted_proxy(client_host):
+        forwarded = request.headers.get("X-Forwarded-For")
+        if forwarded:
+            return forwarded.split(",")[0].strip()
+    return client_host or "unknown"
 
 
 def rate_limit(limit: int = 60, window: int = 60):

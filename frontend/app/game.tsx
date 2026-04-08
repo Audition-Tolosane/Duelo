@@ -488,24 +488,25 @@ export default function GameScreen() {
       wsSend({
         action: 'game_answer',
         room_id: params.roomId,
-        question_index: currentIndex,
+        question_index: currentIndexRef.current,  // #8 — use ref, not stale state
         answer: optionIndex,
         time_ms: timeMs,
       });
 
-      // #17 — If server hangs, auto-advance after 8s to avoid infinite freeze
+      // #7 — If server hangs, show result then auto-advance to avoid infinite freeze
       if (wsAnswerTimeoutRef.current) clearTimeout(wsAnswerTimeoutRef.current);
       wsAnswerTimeoutRef.current = setTimeout(() => {
         setShowResult(true);
         setShowPending(false);
         isSubmittingRef.current = false;
+        // Server never replied — advance after 2s so the game isn't stuck forever
+        setTimeout(() => nextQuestion(), 2000);
       }, 8000);
       // Don't show result locally — wait for server response
     } else {
       // Bot mode: resolve locally
       setShowResult(true);
-
-      isSubmittingRef.current = false; // reset guard for local (bot/async) path
+      // #9 — keep guard locked until nextQuestion() so rapid double-taps are blocked
       const question = questions[currentIndex];
       const isCorrect = optionIndex === question.correct_option;
       const pPts = isCorrect ? Math.max(MAX_PTS_PER_Q - timeTaken, 10) : 0;
@@ -537,6 +538,7 @@ export default function GameScreen() {
   }, [selectedOption, showResult, currentIndex, questions, isLive, isAsync, isAsyncReveal]);
 
   const nextQuestion = () => {
+    isSubmittingRef.current = false; // #9 — reset double-tap guard here, not earlier
     if (currentIndexRef.current + 1 >= questionsRef.current.length) {
       endGame();
       return;
