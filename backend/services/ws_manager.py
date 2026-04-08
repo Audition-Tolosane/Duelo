@@ -72,6 +72,9 @@ class ConnectionManager:
 
     async def _handle_game_disconnect(self, room: "GameRoom", disconnected_id: str):
         """Handle a player disconnecting mid-game. Give opponent auto-win with score compensation."""
+        if room.finished:
+            return  # Both players disconnected simultaneously — only handle once
+        room.finished = True
         opponent_id = room.get_opponent_id(disconnected_id)
 
         # Calculate score compensation for remaining questions
@@ -112,6 +115,9 @@ class ConnectionManager:
                     "points": round(avg_pts),
                     "time_ms": 5000,
                 }
+
+        # Store compensation on room so _finish_game can include it in xp_breakdown
+        room.disconnect_compensation = {opponent_id: compensation}
 
         # Notify opponent of disconnect + auto victory
         await self.send_to_user(opponent_id, {
@@ -567,20 +573,24 @@ class ConnectionManager:
     async def _finish_game(self, room: "GameRoom"):
         """End the game and send results to both players."""
         results = room.get_final_results()
+        compensations = room.disconnect_compensation
 
         for player_id in (room.player1_id, room.player2_id):
             opponent_id = room.get_opponent_id(player_id)
+            payload: dict = {
+                "room_id": room.room_id,
+                "your_score": room.get_score(player_id),
+                "opponent_score": room.get_score(opponent_id),
+                "your_correct": room.get_correct_count(player_id),
+                "opponent_correct": room.get_correct_count(opponent_id),
+                "won": room.get_score(player_id) > room.get_score(opponent_id),
+                "questions_data": results["questions_data"],
+            }
+            if player_id in compensations:
+                payload["disconnect_compensation"] = compensations[player_id]
             await self.send_to_user(player_id, {
                 "type": "game_over",
-                "data": {
-                    "room_id": room.room_id,
-                    "your_score": room.get_score(player_id),
-                    "opponent_score": room.get_score(opponent_id),
-                    "your_correct": room.get_correct_count(player_id),
-                    "opponent_correct": room.get_correct_count(opponent_id),
-                    "won": room.get_score(player_id) > room.get_score(opponent_id),
-                    "questions_data": results["questions_data"],
-                },
+                "data": payload,
             })
 
         # Clean up room after a delay
@@ -628,6 +638,8 @@ class GameRoom:
         self.scores: dict[str, int] = {player1_id: 0, player2_id: 0}
         self.correct_counts: dict[str, int] = {player1_id: 0, player2_id: 0}
         self.disconnected: set[str] = set()
+        self.finished: bool = False
+        self.disconnect_compensation: dict[str, int] = {}
         self.created_at = datetime.now(timezone.utc)
 
     def set_questions(self, questions: list[dict]):

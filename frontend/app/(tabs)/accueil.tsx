@@ -859,7 +859,7 @@ export default function AccueilScreen() {
     try {
       const res = await authFetch(`${API_URL}/api/daily-question/today`);
       if (res.ok) setDailyQuestion(await res.json());
-    } catch {}
+    } catch (e) { console.warn('[accueil] loadDailyQuestion:', e); }
   }, []);
 
 
@@ -873,14 +873,14 @@ export default function AccueilScreen() {
         body: JSON.stringify({ question_id: dailyQuestion.question_id, theme_id: dailyQuestion.theme_id, answer_index: idx }),
       });
       if (res.ok) setDqResult(await res.json());
-    } catch {}
+    } catch (e) { console.warn('[accueil] handleDqAnswer:', e); }
   }, [dailyQuestion, dqAnswer]);
 
   const loadMissions = useCallback(async () => {
     try {
       const res = await authFetch(`${API_URL}/api/missions/today`);
       if (res.ok) setDailyMissions(await res.json());
-    } catch {}
+    } catch (e) { console.warn('[accueil] loadMissions:', e); }
   }, []);
 
   const handleDoubleReward = useCallback(async () => {

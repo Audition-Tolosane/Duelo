@@ -13,6 +13,7 @@ router = APIRouter(prefix="/notifications", tags=["notifications"])
 async def get_notifications(user_id: str, limit: int = 50, offset: int = 0, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     if current_user != user_id:
         raise HTTPException(status_code=403, detail="Non autorisé")
+    limit = min(max(1, limit), 200)
     result = await db.execute(
         select(Notification).where(Notification.user_id == user_id)
         .order_by(Notification.created_at.desc()).limit(limit).offset(offset)

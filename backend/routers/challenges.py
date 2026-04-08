@@ -230,8 +230,11 @@ async def vs_stats(user_id: str, opponent_id: str, current_user: str = Depends(g
 
 
 @router.get("/history")
-async def challenge_history(user_id: str, limit: int = 20, db: AsyncSession = Depends(get_db)):
+async def challenge_history(user_id: str, limit: int = 20, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     """List completed challenges for a user, most recent first."""
+    if current_user != user_id:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+    limit = min(max(1, limit), 100)
     res = await db.execute(
         select(Challenge).where(
             and_(
@@ -241,14 +244,25 @@ async def challenge_history(user_id: str, limit: int = 20, db: AsyncSession = De
         ).order_by(Challenge.created_at.desc()).limit(limit)
     )
     challenges = res.scalars().all()
+
+    # Batch-load all opponent users to avoid N+1
+    opponent_ids = {
+        (c.challenged_id if c.challenger_id == user_id else c.challenger_id)
+        for c in challenges
+    }
+    opp_map: dict[str, User] = {}
+    if opponent_ids:
+        opp_res = await db.execute(select(User).where(User.id.in_(opponent_ids)))
+        for u in opp_res.scalars().all():
+            opp_map[u.id] = u
+
     items = []
     for c in challenges:
         is_p1 = c.challenger_id == user_id
         opponent_id_val = c.challenged_id if is_p1 else c.challenger_id
         my_score = c.p1_score if is_p1 else c.p2_score
         opp_score = c.p2_score if is_p1 else c.p1_score
-        opp_res = await db.execute(select(User).where(User.id == opponent_id_val))
-        opp = opp_res.scalar_one_or_none()
+        opp = opp_map.get(opponent_id_val)
         played_at = (c.p1_played_at if is_p1 else c.p2_played_at) or c.created_at
         items.append({
             "challenge_id": c.id,
@@ -266,13 +280,13 @@ async def challenge_history(user_id: str, limit: int = 20, db: AsyncSession = De
 
 
 @router.get("/{challenge_id}/p1-answers")
-async def get_p1_answers(challenge_id: str, user_id: str, db: AsyncSession = Depends(get_db)):
+async def get_p1_answers(challenge_id: str, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     """Return challenger (p1) per-question answers so the challenged player can see them during reveal mode."""
     res = await db.execute(select(Challenge).where(Challenge.id == challenge_id))
     challenge = res.scalar_one_or_none()
     if not challenge:
         raise HTTPException(status_code=404, detail="Défi introuvable")
-    if challenge.challenged_id != user_id:
+    if challenge.challenged_id != current_user:
         raise HTTPException(status_code=403, detail="Non autorisé")
     answers = []
     if challenge.p1_answers:

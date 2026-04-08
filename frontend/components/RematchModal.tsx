@@ -60,7 +60,7 @@ export default function RematchModal() {
           t -= 1;
           setCountdown(t);
           if (t <= 0) {
-            clearTimer();
+            dismiss();
           }
         }, 1000);
       }),

@@ -12,8 +12,11 @@ from config import GOOGLE_CLIENT_IDS, APPLE_BUNDLE_ID
 
 import re
 import json
+import logging
 import httpx
 import jwt as pyjwt
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -87,6 +90,14 @@ async def register_email(data: EmailRegister, request: Request, db: AsyncSession
 
 @router.post("/login", response_model=UserResponse)
 async def login(data: LoginRequest, request: Request, db: AsyncSession = Depends(get_db), _rate=Depends(rate_limit_auth)):
+    # Per-IP lockout: 20 failed attempts per 15 min (brute-force across accounts)
+    client_ip = request.client.host if request.client else "unknown"
+    ip_key = f"login_fail_ip:{client_ip}"
+    try:
+        _limiter.check(ip_key, 20, 900)
+    except HTTPException:
+        raise HTTPException(status_code=429, detail="Trop de tentatives, réessayez dans 15 minutes")
+
     # Per-email lockout: 5 failed attempts per 15 min
     email_key = f"login_fail:{data.email.lower()}"
     try:
@@ -99,9 +110,11 @@ async def login(data: LoginRequest, request: Request, db: AsyncSession = Depends
     result = await db.execute(select(User).where(User.email == normalized_email))
     user = result.scalar_one_or_none()
     if not user or not user.password_hash or not verify_password(data.password, user.password_hash):
-        # Record failed attempt
-        _limiter.requests[email_key].append(__import__('time').time())
-        client_ip = request.client.host if request.client else "unknown"
+        # Record failed attempt against both buckets
+        import time as _time
+        _now = _time.time()
+        _limiter.requests[email_key].append(_now)
+        _limiter.requests[ip_key].append(_now)
         logger.warning(f"[login] Failed attempt for '{normalized_email}' from {client_ip}")
         raise HTTPException(status_code=401, detail="Email ou mot de passe incorrect")
 

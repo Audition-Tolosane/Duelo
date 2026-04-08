@@ -425,7 +425,7 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
             select(_func.count(_func.distinct(Match.category))).where(Match.player1_id == player_id)
         )
         perfect_res = await db.execute(
-            select(_func.count(Match.id)).where(Match.player1_id == player_id, Match.player1_correct == 7)
+            select(_func.count(Match.id)).where(Match.player1_id == player_id, Match.player1_correct == TOTAL_QUESTIONS)
         )
         try:  # #30 — achievements must not block match submission if they fail
             new_achievements = await _check_ach(player_id, {

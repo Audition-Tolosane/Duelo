@@ -100,7 +100,7 @@ export default function ChallengeWaitingScreen() {
   const goPlayNow = () => {
     // #23 — Guard against navigating with an empty theme_id which would break the game
     if (!theme_id) {
-      Alert.alert('Erreur', 'Thème introuvable. Impossible de lancer la partie.');
+      Alert.alert(t('common.error'), t('common.error_loading'));
       return;
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);

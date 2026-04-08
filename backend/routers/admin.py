@@ -30,7 +30,7 @@ async def verify_admin_key(x_admin_key: str = Header(default="", alias="X-Admin-
 
 
 @router.post("/verify")
-async def verify_admin(data: AdminVerify, request: Request, _rl=Depends(rate_limit(limit=5, window=60))):
+async def verify_admin(data: AdminVerify, request: Request, _rl=Depends(rate_limit(limit=5, window=300))):
     if data.password == ADMIN_PASSWORD:
         return {"verified": True}
     raise HTTPException(status_code=403, detail="Mot de passe incorrect")
@@ -699,8 +699,8 @@ async def upload_avatar(request: Request, _: None = Depends(verify_admin_key), d
     # Validate MIME type via magic bytes before writing
     try:
         image_data = validate_image_base64(image_b64)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Format d'image invalide ou non supporté")
 
     if len(image_data) > 5 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="Image trop volumineuse (max 5 MB)")

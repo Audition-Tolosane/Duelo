@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, Modal, Animated, ActivityIndicator,
+  View, Text, TouchableOpacity, StyleSheet, Modal, Animated, ActivityIndicator, Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -105,8 +105,11 @@ export default function ChallengeReadyModal() {
           router.push('/(tabs)/play');
         }
       }
-    } catch {}
-    setAccepting(false);
+    } catch {
+      Alert.alert(t('common.error'), t('common.error_loading'));
+    } finally {
+      setAccepting(false);
+    }
   };
 
   const handleDecline = async () => {
@@ -119,7 +122,10 @@ export default function ChallengeReadyModal() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId }),
       });
-    } catch {}
+    } catch {
+      // Decline failure is non-critical: the challenge will expire on its own
+      console.warn('[ChallengeReadyModal] decline failed silently');
+    }
   };
 
   if (!visible) return null;
