@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, Animated,
+  View, Text, TouchableOpacity, StyleSheet, Animated, Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -98,10 +98,14 @@ export default function ChallengeWaitingScreen() {
   };
 
   const goPlayNow = () => {
+    // #23 — Guard against navigating with an empty theme_id which would break the game
+    if (!theme_id) {
+      Alert.alert('Erreur', 'Thème introuvable. Impossible de lancer la partie.');
+      return;
+    }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    // Player A plays solo — answers recorded, Player B will play later in reveal mode.
     router.replace(
-      `/game?category=${theme_id || ''}&asyncMode=solo` +
+      `/game?category=${theme_id}&asyncMode=solo` +
       `&opponentPseudo=${encodeURIComponent(opponentName)}` +
       `&opponentSeed=${encodeURIComponent(opponent_seed || '')}` +
       `&challenge_id=${challenge_id || ''}`

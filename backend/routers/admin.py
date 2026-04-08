@@ -163,27 +163,34 @@ async def import_csv_data(request: Request, _: None = Depends(verify_admin_key),
 
     await db.commit()
 
+    # #19 — Batch question counts in one query instead of N+1
     result = await db.execute(select(Theme))
     themes_list = result.scalars().all()
+    count_res = await db.execute(
+        select(Question.category, func.count(Question.id)).group_by(Question.category)
+    )
+    count_map = {row[0]: row[1] for row in count_res}
     for t in themes_list:
-        count_res = await db.execute(select(func.count(Question.id)).where(Question.category == t.id))
-        t.question_count = count_res.scalar() or 0
+        t.question_count = count_map.get(t.id, 0)
     await db.commit()
 
+    # #19 — Batch angle updates with executemany instead of one execute per row
     questions_reader2 = csv.DictReader(io.StringIO(questions_csv_text))
+    angle_updates = []
     for row in questions_reader2:
         q_id = row.get("ID", "").strip()
         angle = row.get("Angle", "").strip()
         angle_num_str = row.get("Angle Num", "").strip()
         if q_id and angle:
             try:
-                angle_num = int(angle_num_str) if angle_num_str else 0
-                await db.execute(
-                    text("UPDATE questions SET angle=:angle, angle_num=:anum WHERE id=:qid"),
-                    {"angle": angle, "anum": angle_num, "qid": q_id}
-                )
-            except:
+                angle_updates.append({"angle": angle, "anum": int(angle_num_str) if angle_num_str else 0, "qid": q_id})
+            except Exception:
                 pass
+    if angle_updates:
+        await db.execute(
+            text("UPDATE questions SET angle=:angle, angle_num=:anum WHERE id=:qid"),
+            angle_updates,
+        )
     await db.commit()
 
     return {"success": True, "themes_imported": themes_imported, "questions_imported": questions_imported}
@@ -578,6 +585,13 @@ async def admin_update_report_status(report_id: str, request: Request, _: None =
 async def delete_themes(data: DeleteThemesRequest, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
     if not data.theme_ids:
         raise HTTPException(status_code=400, detail="Aucun theme selectionne")
+
+    # #20 — Validate themes exist before cascading deletes
+    existing_res = await db.execute(select(Theme.id).where(Theme.id.in_(data.theme_ids)))
+    found_ids = {row[0] for row in existing_res}
+    missing = [tid for tid in data.theme_ids if tid not in found_ids]
+    if missing:
+        raise HTTPException(status_code=404, detail=f"Thèmes introuvables : {', '.join(missing)}")
 
     deleted_questions = 0
     if data.delete_questions:

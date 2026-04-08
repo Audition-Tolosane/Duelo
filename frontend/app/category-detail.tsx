@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Image,
   ActivityIndicator, KeyboardAvoidingView, Platform, Keyboard, RefreshControl,
@@ -91,6 +91,7 @@ export default function CategoryDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const followInFlightRef = useRef(false); // #21 — ref-based guard prevents race before state re-render
   const [fetchError, setFetchError] = useState(false);
   const [postSuccess, setPostSuccess] = useState(false);
 
@@ -173,7 +174,8 @@ export default function CategoryDetailScreen() {
   };
 
   const handleFollow = async () => {
-    if (!userId || !detail || followLoading) return;
+    if (!userId || !detail || followInFlightRef.current) return;
+    followInFlightRef.current = true;
     setFollowLoading(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const wasFollowing = detail.is_following;
@@ -188,10 +190,13 @@ export default function CategoryDetailScreen() {
         // Rollback
         setDetail(prev => prev ? { ...prev, is_following: wasFollowing, followers_count: prev.followers_count + (wasFollowing ? 1 : -1) } : null);
       }
-    } catch {
+    } catch (e) {
+      console.error('Follow toggle error:', e);
       setDetail(prev => prev ? { ...prev, is_following: wasFollowing, followers_count: prev.followers_count + (wasFollowing ? 1 : -1) } : null);
+    } finally {
+      followInFlightRef.current = false;
+      setFollowLoading(false);
     }
-    setFollowLoading(false);
   };
 
   const handlePlay = () => {

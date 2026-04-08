@@ -71,7 +71,9 @@ async def mark_all_notifications_read(data: NotifReadRequest, current_user: str 
 
 
 @router.get("/{user_id}/settings")
-async def get_notification_settings(user_id: str, db: AsyncSession = Depends(get_db)):
+async def get_notification_settings(user_id: str, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    if current_user != user_id:
+        raise HTTPException(status_code=403, detail="Non autorisé")
     result = await db.execute(
         select(NotificationSettings).where(NotificationSettings.user_id == user_id)
     )

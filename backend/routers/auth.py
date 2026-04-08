@@ -57,15 +57,21 @@ async def register_email(data: EmailRegister, request: Request, db: AsyncSession
     if result.scalar_one_or_none():
         raise HTTPException(status_code=409, detail="Ce pseudo est déjà pris")
 
-    result = await db.execute(select(User).where(User.email == data.email))
+    normalized_email = data.email.lower().strip()
+    result = await db.execute(select(User).where(User.email == normalized_email))
     if result.scalar_one_or_none():
         raise HTTPException(status_code=409, detail="Cet email est déjà utilisé")
 
-    if len(data.password) < 8:
+    # #17 — Password complexity: ≥8 chars + at least one digit or special char
+    import re as _re
+    pw = data.password
+    if len(pw) < 8:
         raise HTTPException(status_code=400, detail="Le mot de passe doit contenir au moins 8 caractères")
+    if not _re.search(r'[0-9]', pw) and not _re.search(r'[^a-zA-Z0-9]', pw):
+        raise HTTPException(status_code=400, detail="Le mot de passe doit contenir au moins un chiffre ou un caractère spécial")
 
     user = User(
-        pseudo=pseudo, email=data.email,
+        pseudo=pseudo, email=normalized_email,
         password_hash=hash_password(data.password), is_guest=False
     )
     db.add(user)
@@ -88,7 +94,9 @@ async def login(data: LoginRequest, request: Request, db: AsyncSession = Depends
     except HTTPException:
         raise HTTPException(status_code=429, detail="Trop de tentatives, réessayez dans 15 minutes")
 
-    result = await db.execute(select(User).where(User.email == data.email))
+    # #16 — Normalise email to lowercase so case variants hit the same account + rate-limit bucket
+    normalized_email = data.email.lower().strip()
+    result = await db.execute(select(User).where(User.email == normalized_email))
     user = result.scalar_one_or_none()
     if not user or not user.password_hash or not verify_password(data.password, user.password_hash):
         # Record failed attempt
@@ -194,6 +202,9 @@ async def _verify_google_token(id_token: str) -> dict:
     data = resp.json()
     if GOOGLE_CLIENT_IDS and data.get("aud") not in GOOGLE_CLIENT_IDS:
         raise HTTPException(status_code=401, detail="Token Google: audience incorrecte")
+    # #24 — Reject tokens with unverified email
+    if data.get("email_verified") not in (True, "true"):
+        raise HTTPException(status_code=401, detail="Email Google non vérifié")
     return data  # contains: sub, email, name, picture, …
 
 

@@ -33,6 +33,12 @@ async def send_challenge(request: Request, data: dict, current_user: str = Depen
     if challenger_id == challenged_id:
         raise HTTPException(status_code=400, detail="Impossible de se défier soi-même")
 
+    # #18 — Validate theme exists when provided
+    if theme_id:
+        theme_res = await db.execute(select(Theme).where(Theme.id == theme_id))
+        if not theme_res.scalar_one_or_none():
+            raise HTTPException(status_code=404, detail="Thème introuvable")
+
     # Check no pending challenge already exists between these two players
     existing = await db.execute(
         select(Challenge).where(
@@ -282,6 +288,22 @@ async def save_async_score(challenge_id: str, data: dict, current_user: str = De
     score = max(0, min(140, int(data.get("score", 0))))    # clamp to valid range
     correct = max(0, min(7, int(data.get("correct", 0))))  # clamp to valid range
     answers = data.get("answers", [])
+
+    # #13 — Validate answers structure and cross-check score vs correct count
+    MAX_PTS_PER_Q = 20
+    MIN_PTS_PER_Q = 10
+    if not isinstance(answers, list):
+        answers = []
+    # Strip to only safe fields, reject fabricated data
+    answers = [
+        {"answer": int(a.get("answer", -1)), "is_correct": bool(a.get("is_correct")),
+         "points": max(0, min(MAX_PTS_PER_Q, int(a.get("points", 0)))),
+         "time_ms": max(0, int(a.get("time_ms", 0)))}
+        for a in answers if isinstance(a, dict)
+    ][:7]  # at most 7 questions
+    # Sanity-check: score must be consistent with correct count
+    if correct > 0 and not (correct * MIN_PTS_PER_Q <= score <= correct * MAX_PTS_PER_Q):
+        score = min(score, correct * MAX_PTS_PER_Q)  # clamp silently rather than reject
 
     res = await db.execute(select(Challenge).where(Challenge.id == challenge_id))
     challenge = res.scalar_one_or_none()

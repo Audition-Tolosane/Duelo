@@ -77,6 +77,8 @@ export default function ResultsScreen() {
   // Rematch states: idle | waiting | declined | accepted
   const [rematchState, setRematchState] = useState<'idle' | 'waiting' | 'declined' | 'accepted'>('idle');
   const rematchStateRef = useRef(rematchState);
+  // #22 — Guard against double navigation from concurrent WS events + safety timeout
+  const hasNavigatedRef = useRef(false);
   const [xpBreakdown, setXpBreakdown] = useState<XpBreakdown | null>(null);
   const [newTitle, setNewTitle] = useState<NewTitle | null>(null);
   const [newLevel, setNewLevel] = useState<number | null>(null);
@@ -132,6 +134,8 @@ export default function ResultsScreen() {
         setRematchState('accepted');
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         setTimeout(() => {
+          if (hasNavigatedRef.current) return;
+          hasNavigatedRef.current = true;
           router.replace(`/matchmaking?category=${category}&rematch=true`);
         }, 600);
       }),
@@ -139,6 +143,8 @@ export default function ResultsScreen() {
         setRematchState('declined');
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         setTimeout(() => {
+          if (hasNavigatedRef.current) return;
+          hasNavigatedRef.current = true;
           router.replace(`/matchmaking?category=${category}`);
         }, 2000);
       }),
@@ -147,6 +153,8 @@ export default function ResultsScreen() {
           setRematchState('declined');
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
           setTimeout(() => {
+            if (hasNavigatedRef.current) return;
+            hasNavigatedRef.current = true;
             router.replace(`/matchmaking?category=${category}`);
           }, 2000);
         }
@@ -160,8 +168,9 @@ export default function ResultsScreen() {
     if (rematchState !== 'waiting') return;
     const timeout = setTimeout(() => {
       setRematchState('declined');
-      // After showing "declined", launch matchmaking search
       setTimeout(() => {
+        if (hasNavigatedRef.current) return;
+        hasNavigatedRef.current = true;
         router.push(`/matchmaking?category=${category}`);
       }, 1500);
     }, 20000);

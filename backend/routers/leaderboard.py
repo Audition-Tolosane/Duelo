@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
@@ -7,7 +7,7 @@ from models import User, Match, PlayerFollow
 from services.xp import get_streak_badge, get_level
 from datetime import datetime, timezone, timedelta
 from services.geo import haversine, CITY_MIN_PLAYERS
-from auth_middleware import get_optional_user_id
+from auth_middleware import get_optional_user_id, get_current_user_id
 
 router = APIRouter(tags=["leaderboard"])
 
@@ -184,8 +184,11 @@ async def get_leaderboard(
 @router.get("/leaderboard/friends-weekly")
 async def friends_weekly_leaderboard(
     user_id: str,
+    current_user: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ):
+    if current_user != user_id:
+        raise HTTPException(status_code=403, detail="Non autorisé")
     """XP gagné cette semaine (lundi 00h → maintenant) parmi les joueurs suivis."""
     now = datetime.now(timezone.utc)
     days_since_monday = now.weekday()
