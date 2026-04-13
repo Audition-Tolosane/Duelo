@@ -88,6 +88,12 @@ export default function ResultsScreen() {
   const [newAchievements, setNewAchievements] = useState<{ name: string; description: string; icon: string }[]>([]);
   const [showAchievModal, setShowAchievModal] = useState(false);
   const [submitting, setSubmitting] = useState(true);
+  const [matchId, setMatchId] = useState<string | null>(null);
+  const [showShieldModal, setShowShieldModal] = useState(false);
+  const [streakBefore, setStreakBefore] = useState(0);
+  const [adWatching, setAdWatching] = useState(false);
+  const [adCountdown, setAdCountdown] = useState(3);
+  const [streakRestored, setStreakRestored] = useState(false);
 
   const confettiRef = useRef<any>(null);
   const achievScale = useRef(new Animated.Value(0)).current;
@@ -210,8 +216,13 @@ export default function ResultsScreen() {
         return;
       }
       const data = await res.json();
+      if (data.id) setMatchId(data.id);
       if (data.xp_breakdown) {
         setXpBreakdown(data.xp_breakdown);
+      }
+      if (data.streak_broken && data.streak_before > 0) {
+        setStreakBefore(data.streak_before);
+        setTimeout(() => setShowShieldModal(true), 800);
       }
       if (data.new_title) {
         setNewTitle(data.new_title);
@@ -255,12 +266,36 @@ export default function ResultsScreen() {
     ).start();
   };
 
+  const watchAdAndRestoreStreak = async () => {
+    if (!matchId) return;
+    setAdWatching(true);
+    setAdCountdown(3);
+    // Fake ad countdown
+    for (let i = 3; i > 0; i--) {
+      setAdCountdown(i);
+      await new Promise(r => setTimeout(r, 1000));
+    }
+    setAdWatching(false);
+    try {
+      const res = await authFetch(`${API_URL}/api/game/restore-streak`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ match_id: matchId }),
+      });
+      if (res.ok) {
+        setStreakRestored(true);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        setTimeout(() => setShowShieldModal(false), 1500);
+      }
+    } catch {}
+  };
+
   const shareResult = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const categoryName = CATEGORY_NAMES[category || ''] || category;
     const text = won
-      ? `${t('results.share_victory')} ${pScore}-${oScore} en ${categoryName} (${correctCount}/7). ${t('results.share_challenge')}`
-      : `${t('results.share_intense')} ${pScore}-${oScore} en ${categoryName}. ${t('results.share_beat_me')}`;
+      ? `🏆 ${t('results.share_victory')} ${pScore}-${oScore} en ${categoryName} (${correctCount}/7 correctes). ${t('results.share_challenge')} #Duelo`
+      : `⚔️ ${t('results.share_intense')} ${pScore}-${oScore} en ${categoryName}. ${t('results.share_beat_me')} #Duelo`;
     try { await Share.share({ message: text }); } catch (e) { console.error(e); }
   };
 
@@ -629,6 +664,44 @@ export default function ResultsScreen() {
         </Animated.View>
       </ScrollView>
 
+      {/* Streak Shield Modal */}
+      <Modal visible={showShieldModal} transparent animationType="fade" onRequestClose={() => setShowShieldModal(false)}>
+        <View style={shieldStyles.overlay}>
+          <View style={shieldStyles.card}>
+            {streakRestored ? (
+              <>
+                <Text style={shieldStyles.emoji}>🔥</Text>
+                <Text style={shieldStyles.title}>{t('results.streak_restored')}</Text>
+                <Text style={shieldStyles.sub}>{t('results.streak_restored_sub', { n: String(streakBefore) })}</Text>
+              </>
+            ) : adWatching ? (
+              <>
+                <Text style={shieldStyles.emoji}>📺</Text>
+                <Text style={shieldStyles.title}>{t('results.ad_watching')}</Text>
+                <View style={shieldStyles.countdown}>
+                  <Text style={shieldStyles.countdownText}>{adCountdown}</Text>
+                </View>
+              </>
+            ) : (
+              <>
+                <Text style={shieldStyles.emoji}>🛡️</Text>
+                <Text style={shieldStyles.title}>{t('results.shield_title', { n: String(streakBefore) })}</Text>
+                <Text style={shieldStyles.sub}>{t('results.shield_sub')}</Text>
+                <TouchableOpacity style={shieldStyles.adBtn} onPress={watchAdAndRestoreStreak} activeOpacity={0.8}>
+                  <LinearGradient colors={['#FFD700', '#FF9F0A']} style={shieldStyles.adBtnGrad}>
+                    <MaterialCommunityIcons name="play-circle" size={20} color="#000" />
+                    <Text style={shieldStyles.adBtnText}>{t('results.watch_ad')}</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setShowShieldModal(false)} style={shieldStyles.skipBtn}>
+                  <Text style={shieldStyles.skipText}>{t('results.shield_skip')}</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
+
       {/* Report Question Modal */}
       <Modal visible={reportModalVisible} transparent animationType="slide" onRequestClose={() => setReportModalVisible(false)}>
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -864,6 +937,21 @@ export default function ResultsScreen() {
     </SwipeBackPage>
   );
 }
+
+const shieldStyles = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'center', alignItems: 'center', padding: 24 },
+  card: { backgroundColor: '#10102A', borderRadius: 20, padding: 28, alignItems: 'center', width: '100%', borderWidth: 1, borderColor: 'rgba(138,43,226,0.3)' },
+  emoji: { fontSize: 48, marginBottom: 12 },
+  title: { color: '#FFF', fontSize: 18, fontWeight: '700', textAlign: 'center', marginBottom: 8 },
+  sub: { color: '#A3A3A3', fontSize: 14, textAlign: 'center', marginBottom: 20 },
+  adBtn: { width: '100%', borderRadius: 14, overflow: 'hidden', marginBottom: 12 },
+  adBtnGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 14, gap: 8 },
+  adBtnText: { color: '#000', fontSize: 15, fontWeight: '800' },
+  skipBtn: { paddingVertical: 8 },
+  skipText: { color: '#525252', fontSize: 13 },
+  countdown: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(138,43,226,0.3)', alignItems: 'center', justifyContent: 'center', marginVertical: 16 },
+  countdownText: { color: '#8A2BE2', fontSize: 28, fontWeight: '800' },
+});
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#050510' },

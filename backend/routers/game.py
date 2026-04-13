@@ -508,6 +508,7 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
             "new_achievements": new_achievements,
             "lives_remaining": lives_remaining,
             "streak_before": streak_before,
+            "streak_broken": not won and streak_before > 0,
             "tournament": tournament_result,
             "created_at": match.created_at.isoformat(),
         }
@@ -517,6 +518,44 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
 @router.post("/submit-v2")
 async def submit_match_v2(request: Request, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     return await submit_match(request, current_user, db)
+
+
+@router.post("/restore-streak")
+async def restore_streak(request: Request, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    """Restore a win streak broken on the last match (ad shield — no real ad check for now)."""
+    body = await request.json()
+    match_id = body.get("match_id")
+    if not match_id:
+        raise HTTPException(status_code=400, detail="match_id requis")
+
+    match_res = await db.execute(select(Match).where(Match.id == match_id))
+    match = match_res.scalar_one_or_none()
+    if not match or match.player1_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+
+    # Only within 10 minutes of match creation
+    created = match.created_at
+    if created.tzinfo is None:
+        created = created.replace(tzinfo=timezone.utc)
+    if (datetime.now(timezone.utc) - created).total_seconds() > 600:
+        raise HTTPException(status_code=400, detail="Délai dépassé (>10 min)")
+
+    # Must have lost this match
+    if match.winner_id == current_user:
+        raise HTTPException(status_code=400, detail="Le streak n'a pas été interrompu")
+
+    streak_before = match.player1_streak_before or 0
+    if streak_before == 0:
+        raise HTTPException(status_code=400, detail="Aucun streak à restaurer")
+
+    user_res = await db.execute(select(User).where(User.id == current_user))
+    user = user_res.scalar_one_or_none()
+    user.current_streak = streak_before
+    if user.current_streak > (user.best_streak or 0):
+        user.best_streak = user.current_streak
+    await db.commit()
+    logger.info(f"[restore-streak] user={current_user} streak restored to {streak_before}")
+    return {"success": True, "current_streak": user.current_streak}
 
 
 @router.get("/weekly-summary")

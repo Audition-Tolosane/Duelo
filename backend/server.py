@@ -312,9 +312,11 @@ async def _ensure_columns():
             except Exception as e:
                 logger.warning(f"[startup] skip index: {e}")
 
-    # Start weekly summary cron in background
+    # Start background crons
     import asyncio as _asyncio
     _asyncio.create_task(_weekly_summary_cron())
+    _asyncio.create_task(_streak_danger_cron())
+    _asyncio.create_task(_challenge_expiry_cron())
 
 
 async def _weekly_summary_cron():
@@ -369,3 +371,91 @@ async def _weekly_summary_cron():
                         logger.warning(f"[cron] weekly push failed for {u.id}: {e}")
         except Exception as e:
             logger.error(f"[cron] weekly summary cron error: {e}")
+
+
+async def _streak_danger_cron():
+    """Daily at 18:00 UTC — push users whose win streak is about to reset (no game today)."""
+    import asyncio
+    from datetime import datetime, timezone, timedelta
+    from database import AsyncSessionLocal
+    from sqlalchemy import select as _sel, or_
+    from models import User as _U
+    from services.notifications import _send_expo_push
+
+    while True:
+        now = datetime.now(timezone.utc)
+        target = now.replace(hour=18, minute=0, second=0, microsecond=0)
+        if target <= now:
+            target += timedelta(days=1)
+        await asyncio.sleep((target - now).total_seconds())
+
+        try:
+            today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+            async with AsyncSessionLocal() as db:
+                res = await db.execute(
+                    _sel(_U).where(
+                        _U.push_token.isnot(None),
+                        _U.current_streak > 0,
+                        or_(_U.last_played_at.is_(None), _U.last_played_at < today_start),
+                    )
+                )
+                users = res.scalars().all()
+                for u in users:
+                    try:
+                        s = u.current_streak
+                        await _send_expo_push(
+                            u.push_token,
+                            "⚡ Ton streak est en danger !",
+                            f"Ton streak de {s} {'jour' if s == 1 else 'jours'} se réinitialise à minuit. Joue une partie !",
+                            {"type": "streak_danger"},
+                        )
+                    except Exception as e:
+                        logger.warning(f"[cron] streak_danger push failed for {u.id}: {e}")
+        except Exception as e:
+            logger.error(f"[cron] streak_danger cron error: {e}")
+
+
+async def _challenge_expiry_cron():
+    """Every 30 min — push challenged user if challenge expires in ~1h."""
+    import asyncio
+    from datetime import datetime, timezone, timedelta
+    from database import AsyncSessionLocal
+    from sqlalchemy import select as _sel
+    from models import User as _U, Challenge as _C
+    from services.notifications import _send_expo_push
+
+    while True:
+        await asyncio.sleep(1800)  # every 30 min
+        try:
+            now = datetime.now(timezone.utc)
+            window_start = now + timedelta(minutes=55)
+            window_end = now + timedelta(minutes=65)
+            async with AsyncSessionLocal() as db:
+                res = await db.execute(
+                    _sel(_C).where(
+                        _C.status == "pending",
+                        _C.expires_at >= window_start,
+                        _C.expires_at <= window_end,
+                    )
+                )
+                challenges = res.scalars().all()
+                for c in challenges:
+                    try:
+                        user_res = await db.execute(_sel(_U).where(_U.id == c.challenged_id))
+                        user = user_res.scalar_one_or_none()
+                        if not user or not user.push_token:
+                            continue
+                        challenger_res = await db.execute(_sel(_U).where(_U.id == c.challenger_id))
+                        challenger = challenger_res.scalar_one_or_none()
+                        name = challenger.pseudo if challenger else "Quelqu'un"
+                        theme = c.theme_name or "un thème"
+                        await _send_expo_push(
+                            user.push_token,
+                            "⏰ Défi qui expire bientôt !",
+                            f"{name} t'a défié en {theme}. Il reste 1h pour jouer !",
+                            {"type": "challenge_expiry", "challenge_id": c.id},
+                        )
+                    except Exception as e:
+                        logger.warning(f"[cron] challenge_expiry push failed for {c.id}: {e}")
+        except Exception as e:
+            logger.error(f"[cron] challenge_expiry cron error: {e}")

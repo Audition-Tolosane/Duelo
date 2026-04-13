@@ -178,6 +178,20 @@ async def get_leaderboard(
             },
         }
 
+    # ── Friends ────────────────────────────────────────────────────────────────
+    if scope == "friends":
+        if not current_user:
+            return {"entries": [], "meta": {"scope_used": "friends", "missing": True}}
+        follows_res = await db.execute(
+            select(PlayerFollow.followed_id).where(PlayerFollow.follower_id == current_user.id)
+        )
+        friend_ids = [r[0] for r in follows_res] + [current_user.id]
+        result = await db.execute(
+            select(User).where(User.id.in_(friend_ids), User.is_bot == False)
+            .order_by(User.total_xp.desc()).limit(limit)
+        )
+        return {"entries": _serialize_users(result.scalars().all()), "meta": {"scope_used": "friends"}}
+
     return {"entries": [], "meta": {"scope_used": scope}}
 
 

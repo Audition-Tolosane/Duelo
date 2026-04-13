@@ -19,6 +19,7 @@ const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 const SCOPES = [
   { id: 'world', labelKey: 'leaderboard.scope_world', icon: 'earth' as const },
+  { id: 'friends', labelKey: 'leaderboard.scope_friends', icon: 'account-group' as const },
   { id: 'continent', labelKey: 'leaderboard.scope_continent', icon: 'map' as const },
   { id: 'country', labelKey: 'leaderboard.scope_country', icon: 'flag' as const },
   { id: 'region', labelKey: 'leaderboard.scope_region', icon: 'map-marker' as const },
@@ -275,6 +276,12 @@ export default function LeaderboardScreen() {
 
         {loading ? (
           <View style={styles.loadingContainer}><ActivityIndicator size="large" color="#8A2BE2" /></View>
+        ) : scope === 'friends' && entries.length <= 1 ? (
+          <View style={styles.emptyContainer}>
+            <MaterialCommunityIcons name="account-group-outline" size={56} color="#525252" />
+            <Text style={styles.emptyText}>{t('leaderboard.friends_empty')}</Text>
+            <Text style={styles.emptySubtext}>{t('leaderboard.friends_empty_hint')}</Text>
+          </View>
         ) : noLocation ? (
           <View style={styles.emptyContainer}>
             <MaterialCommunityIcons name="map-marker-off" size={56} color="#525252" />
