@@ -24,6 +24,8 @@ class DueloWebSocket {
   private maxReconnectDelay = 30000;
   private intentionalClose = false;
   private pingInterval: ReturnType<typeof setInterval> | null = null;
+  /** Messages queued while the socket is not yet OPEN */
+  private sendQueue: Record<string, any>[] = [];
 
   /**
    * Connect to the WebSocket server.
@@ -43,6 +45,12 @@ class DueloWebSocket {
     this.ws.onopen = () => {
       this.reconnectDelay = 1000;
       this.emit({ type: 'ws_connected' });
+
+      // Flush any messages queued while the socket was connecting
+      while (this.sendQueue.length > 0) {
+        const msg = this.sendQueue.shift()!;
+        try { this.ws?.send(JSON.stringify(msg)); } catch {}
+      }
 
       // Keep-alive ping every 25s
       this.pingInterval = setInterval(() => {
@@ -89,7 +97,17 @@ class DueloWebSocket {
   send(data: Record<string, any>) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(data));
+    } else {
+      // Queue non-ping messages to send once connected
+      if (data.action !== 'ping') {
+        this.sendQueue.push(data);
+      }
     }
+  }
+
+  /** Clear the send queue (e.g. when leaving matchmaking before connection) */
+  clearQueue() {
+    this.sendQueue = [];
   }
 
   /**

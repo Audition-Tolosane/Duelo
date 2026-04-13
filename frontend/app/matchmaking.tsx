@@ -16,6 +16,7 @@ import Svg, { Path } from 'react-native-svg';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
 import { useWS } from '../contexts/WebSocketContext';
+import { dueloWS } from '../services/websocket';
 import { authFetch } from '../utils/api';
 import { t } from '../utils/i18n';
 
@@ -301,7 +302,10 @@ export default function MatchmakingScreen() {
       wsSend({ action: 'matchmaking_join', theme_id: category });
     }
     return () => {
-      if (!isRematch && !isChallengeMode) wsSend({ action: 'matchmaking_leave' });
+      if (!isRematch && !isChallengeMode) {
+        wsSend({ action: 'matchmaking_leave' });
+        dueloWS.clearQueue();
+      }
     };
   }, []);
 
@@ -418,6 +422,11 @@ export default function MatchmakingScreen() {
     };
   }, [phase]);
 
+  const FALLBACK_BOT: OpponentData = {
+    id: '', pseudo: 'Bot', avatar_seed: 'bot01', is_bot: true,
+    level: 1, title: '', streak: 0, streak_badge: '', country: 'FR',
+  };
+
   const fetchBotOpponent = async () => {
     matchFoundRef.current = true;
     try {
@@ -427,12 +436,21 @@ export default function MatchmakingScreen() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ theme_id: category, player_id: userId }),
       });
+      if (!res.ok) {
+        const opp = FALLBACK_BOT;
+        setOpponent(opp);
+        handleMatchFound(opp);
+        return;
+      }
       const data = await res.json();
-      setOpponent(data.opponent);
-      setPlayerInfo(data.player);
-      handleMatchFound(data.opponent);
+      const opp: OpponentData = data.opponent ?? FALLBACK_BOT;
+      setOpponent(opp);
+      setPlayerInfo(data.player ?? { level: 1, title: '' });
+      handleMatchFound(opp);
     } catch {
-      router.back();
+      // Network error — use local fallback bot so user isn't stranded
+      setOpponent(FALLBACK_BOT);
+      handleMatchFound(FALLBACK_BOT);
     }
   };
 
