@@ -267,6 +267,7 @@ async def _ensure_columns():
             "ALTER TABLE challenges ADD COLUMN IF NOT EXISTS p1_answers TEXT",
             "ALTER TABLE challenges ADD COLUMN IF NOT EXISTS p2_answers TEXT",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS push_token VARCHAR(200)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS mmr FLOAT DEFAULT 1000.0",
             """CREATE TABLE IF NOT EXISTS daily_missions (
                 id VARCHAR(36) PRIMARY KEY,
                 user_id VARCHAR(36) NOT NULL,

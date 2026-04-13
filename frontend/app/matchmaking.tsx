@@ -274,6 +274,18 @@ export default function MatchmakingScreen() {
     t('matchmaking.connecting_network'),
   ];
 
+  // Hard fallback: if no match found after 30s regardless of WS state, launch bot
+  const matchFoundRef = useRef(false);
+  useEffect(() => {
+    if (isRematch || isChallengeMode) return;
+    const hardTimeout = setTimeout(() => {
+      if (!matchFoundRef.current) {
+        fetchBotOpponent();
+      }
+    }, 30000);
+    return () => clearTimeout(hardTimeout);
+  }, []);
+
   useEffect(() => {
     if (!category && !isChallengeMode) {
       router.replace('/(tabs)/play');
@@ -296,6 +308,7 @@ export default function MatchmakingScreen() {
   useEffect(() => {
     const unsubs = [
       wsOn('match_found', (msg) => {
+        matchFoundRef.current = true;
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         const opp = msg.data?.opponent;
         const rid = msg.data?.room_id;
@@ -316,6 +329,7 @@ export default function MatchmakingScreen() {
         handleMatchFound(oppData, rid);
       }),
       wsOn('matchmaking_timeout', () => {
+        matchFoundRef.current = true;
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         fetchBotOpponent();
       }),
@@ -405,6 +419,7 @@ export default function MatchmakingScreen() {
   }, [phase]);
 
   const fetchBotOpponent = async () => {
+    matchFoundRef.current = true;
     try {
       const userId = await AsyncStorage.getItem('duelo_user_id');
       const res = await authFetch(`${API_URL}/api/game/matchmaking-v2`, {
