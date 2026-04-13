@@ -1,5 +1,7 @@
 import json
 import logging
+import time
+from collections import defaultdict
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 import jwt as pyjwt
@@ -20,6 +22,21 @@ from config import JWT_SECRET, JWT_ALGORITHM
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["websocket"])
+
+# In-memory rate limiter for WS chat (per sender): max 30 messages/minute
+_ws_chat_timestamps: dict = defaultdict(list)
+_WS_CHAT_LIMIT = 30
+_WS_CHAT_WINDOW = 60  # seconds
+
+
+def _ws_chat_allowed(sender_id: str) -> bool:
+    now = time.time()
+    ts = _ws_chat_timestamps[sender_id]
+    _ws_chat_timestamps[sender_id] = [t for t in ts if now - t < _WS_CHAT_WINDOW]
+    if len(_ws_chat_timestamps[sender_id]) >= _WS_CHAT_LIMIT:
+        return False
+    _ws_chat_timestamps[sender_id].append(now)
+    return True
 
 
 async def get_session():
@@ -143,6 +160,9 @@ async def handle_chat_send(sender_id: str, data: dict):
     if message_type == "text" and not content:
         return
     if sender_id == receiver_id:
+        return
+    if not _ws_chat_allowed(sender_id):
+        await manager.send_to_user(sender_id, {"type": "error", "data": {"message": "Trop de messages, ralentis !"}})
         return
 
     async with AsyncSessionLocal() as db:

@@ -117,7 +117,12 @@ async def find_bot_opponent(
 
 def _bot_to_dict(bot: User, player_level: int) -> dict:
     """Sérialise un bot User en dict d'affichage (sans exposer is_bot)."""
-    bot_level = max(0, min(MAX_LEVEL, player_level + random.randint(-5, 5)))
+    # Wider, non-uniform spread: most matches near player level, occasional wider gap
+    spread = random.choices(
+        [random.randint(-3, 3), random.randint(-8, 8), random.randint(-15, 15)],
+        weights=[60, 30, 10],
+    )[0]
+    bot_level = max(0, min(MAX_LEVEL, player_level + spread))
     return {
         "id":           bot.id,
         "pseudo":       bot.pseudo,
@@ -159,12 +164,27 @@ def simulate_bot_answer(
     p_correct = max(0.05, min(0.99, skill_level + difficulty_modifier))
     is_correct = random.random() < p_correct
 
-    # Temps de réponse : centré sur avg_speed avec variance ±30%, clamped
-    raw_speed_s = avg_speed * random.uniform(0.70, 1.30)
-    time_ms = int(max(800, min(time_limit_ms - 200, raw_speed_s * 1000)))
+    # Realistic time distribution with wide variance and occasional outliers
+    r = random.random()
+    if r < 0.08:
+        # ~8%: very fast snap answer
+        raw_speed_s = avg_speed * random.uniform(0.20, 0.40)
+    elif r < 0.15:
+        # ~7%: slow / hesitant
+        raw_speed_s = avg_speed * random.uniform(1.40, 2.00)
+    else:
+        # Normal: wide ±55% variance (more realistic than ±30%)
+        raw_speed_s = avg_speed * random.uniform(0.50, 1.55)
+    time_ms = int(max(600, min(time_limit_ms - 200, raw_speed_s * 1000)))
 
-    # Si incorrect, choisir un mauvais index aléatoire parmi 0–3
-    answer_index = 0 if is_correct else random.randint(1, 3)
+    if is_correct:
+        answer_index = 0
+    else:
+        # Positional bias: humans don't pick uniformly from wrong answers —
+        # slight tendency toward first non-correct option seen
+        wrong_indices = [i for i in range(4) if i != 0]  # 0 is correct in server model
+        weights = [0.45, 0.30, 0.25]
+        answer_index = random.choices(wrong_indices, weights=weights[:len(wrong_indices)])[0]
 
     return {
         "is_correct":   is_correct,

@@ -15,6 +15,7 @@ import { useWS } from '../contexts/WebSocketContext';
 import { authFetch } from '../utils/api';
 import { saveScoreWithRetry } from '../utils/pendingScores';
 import { t } from '../utils/i18n';
+import { preloadSounds, playSound } from '../utils/sounds';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -149,6 +150,7 @@ export default function GameScreen() {
   const currentIndexRef = useRef(0);
   const timerAnim = useRef(new Animated.Value(1)).current;
   const questionFade = useRef(new Animated.Value(0)).current;
+  const questionSlide = useRef(new Animated.Value(24)).current;
   const userIdRef = useRef<string | null>(null);
   const lastAnswerCorrectRef = useRef(false);
 
@@ -166,6 +168,7 @@ export default function GameScreen() {
   const progressPendingOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
+    preloadSounds();
     loadPseudo();
 
     if (isLive) {
@@ -270,6 +273,7 @@ export default function GameScreen() {
         Haptics.notificationAsync(
           is_correct ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Error
         );
+        playSound(is_correct ? 'correct' : 'wrong');
       }),
       // Opponent answered (update their score)
       wsOn('opponent_answered', (msg) => {
@@ -303,6 +307,7 @@ export default function GameScreen() {
         if (timerRef.current) clearInterval(timerRef.current);
         const { your_score, opponent_score, your_correct } = msg.data || {};
         const userId = userIdRef.current;
+        playSound(your_score >= opponent_score ? 'victory' : 'defeat');
         router.replace(
           `/results?playerScore=${your_score}&opponentScore=${opponent_score}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=false&correctCount=${your_correct || correctCountRef.current}&opponentLevel=${params.opponentLevel || 1}&opponentId=${params.opponentId || ''}`
         );
@@ -365,7 +370,11 @@ export default function GameScreen() {
 
   const animateQuestion = () => {
     questionFade.setValue(0);
-    Animated.timing(questionFade, { toValue: 1, duration: 250, useNativeDriver: true }).start();
+    questionSlide.setValue(24);
+    Animated.parallel([
+      Animated.timing(questionFade, { toValue: 1, duration: 280, useNativeDriver: true }),
+      Animated.timing(questionSlide, { toValue: 0, duration: 280, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
   };
 
   const startTimer = () => {
@@ -381,6 +390,7 @@ export default function GameScreen() {
       timeLeftRef.current -= 1;
       const remaining = timeLeftRef.current;
       setTimeLeft(remaining);
+      if (remaining <= 3 && remaining > 0) playSound('tick');
       if (remaining <= 0) {
         if (timerRef.current) clearInterval(timerRef.current);
         timerRef.current = null;
@@ -391,30 +401,46 @@ export default function GameScreen() {
 
   const resolveBotAnswer = (question: Question) => {
     // Use real bot stats from DB if available, otherwise fall back to defaults
-    const skillLevel = parseFloat(params.botSkill || '') || 0.55;  // probability of correct answer
-    const avgSpeed   = parseFloat(params.botSpeed || '') || 5.0;   // avg response time in seconds
+    const skillLevel = parseFloat(params.botSkill || '') || 0.55;
+    const avgSpeed   = parseFloat(params.botSpeed || '') || 5.0;
 
     const botCorrect = Math.random() < skillLevel;
-    // Response time: avg_speed ± 30% variance, clamped 0.8s–14s
-    const botTimeSec = Math.max(0.8, Math.min(14, avgSpeed * (0.7 + Math.random() * 0.6)));
-    const botTimeMs  = Math.round(botTimeSec * 1000);
+
+    // Realistic time distribution: base ± wide variance, occasional outliers
+    const r = Math.random();
+    let botTimeSec: number;
+    if (r < 0.08) {
+      // ~8%: very fast (snap answer)
+      botTimeSec = avgSpeed * (0.25 + Math.random() * 0.20);
+    } else if (r < 0.15) {
+      // ~7%: slow / hesitant
+      botTimeSec = avgSpeed * (1.4 + Math.random() * 0.8);
+    } else {
+      // Normal range with ±50% variance (wider than before)
+      botTimeSec = avgSpeed * (0.55 + Math.random() * 0.90);
+    }
+    botTimeSec = Math.max(0.6, Math.min(14, botTimeSec));
+    const botTimeMs = Math.round(botTimeSec * 1000);
 
     if (botCorrect) {
       const speedBonus = Math.max(0, Math.round(10 * (1 - botTimeMs / 10000)));
-      return { botPick: question.correct_option, botPts: Math.max(10 + speedBonus, 10) };
+      return { botPick: question.correct_option, botPts: Math.max(10 + speedBonus, 10), botTimeMs };
     }
+    // Wrong answer: slight positional bias (humans don't pick uniformly)
     const wrongOpts = [0, 1, 2, 3].filter(i => i !== question.correct_option);
-    return { botPick: wrongOpts[Math.floor(Math.random() * wrongOpts.length)], botPts: 0 };
+    // Weight first wrong option slightly higher (~45%), others equal
+    const rw = Math.random();
+    const botPick = rw < 0.45 ? wrongOpts[0] : wrongOpts[1 + Math.floor(Math.random() * (wrongOpts.length - 1))];
+    return { botPick, botPts: 0, botTimeMs };
   };
 
-  const handleAnswer = (pPts: number, bPts: number, botPick: number) => {
+  const handleAnswer = (pPts: number, bPts: number, botPick: number, botRevealDelay?: number) => {
     const newP = playerScoreRef.current + pPts;
     const newB = botScoreRef.current + bPts;
     playerScoreRef.current = newP;
     botScoreRef.current = newB;
     setPlayerScore(newP);
     setBotScore(newB);
-    setBotAnswer(botPick);
 
     // Hide pending on bars (answered)
     setShowPending(false);
@@ -433,6 +459,11 @@ export default function GameScreen() {
       toValue: 0, duration: 300, useNativeDriver: false,
     }).start();
 
+    // Reveal bot answer with a small independent delay (simulates opponent responding
+    // at their own pace rather than instantly when the player answers)
+    const delay = botRevealDelay ?? 0;
+    setTimeout(() => setBotAnswer(botPick), delay);
+
     setTimeout(nextQuestion, 2000);
   };
 
@@ -450,6 +481,7 @@ export default function GameScreen() {
     } else {
       setShowResult(true);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      playSound('wrong');
       const question = questionsRef.current[currentIndexRef.current];
       if (!question) return;
 
@@ -467,8 +499,11 @@ export default function GameScreen() {
         const p1 = p1AnswersRef.current[currentIndexRef.current];
         handleAnswer(0, p1?.points ?? 0, p1?.answer ?? -1);
       } else {
-        const { botPick, botPts } = resolveBotAnswer(question);
-        handleAnswer(0, botPts, botPick);
+        const { botPick, botPts, botTimeMs } = resolveBotAnswer(question);
+        // Simulate bot answering independently: reveal after a natural-looking delay
+        const playerTimeMs = TIMER_DURATION * 1000;
+        const revealDelay = botTimeMs < playerTimeMs ? 0 : Math.min(botTimeMs - playerTimeMs, 1400);
+        handleAnswer(0, botPts, botPick, revealDelay);
       }
     }
   };
@@ -515,6 +550,7 @@ export default function GameScreen() {
       Haptics.notificationAsync(
         isCorrect ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Error
       );
+      playSound(isCorrect ? 'correct' : 'wrong');
 
       if (isCorrect) correctCountRef.current += 1;
 
@@ -532,8 +568,10 @@ export default function GameScreen() {
         const p1 = p1AnswersRef.current[currentIndex];
         handleAnswer(pPts, p1?.points ?? 0, p1?.answer ?? -1);
       } else {
-        const { botPick, botPts } = resolveBotAnswer(question);
-        handleAnswer(pPts, botPts, botPick);
+        const { botPick, botPts, botTimeMs } = resolveBotAnswer(question);
+        // If the bot would have answered after the player, reveal its answer with a delay
+        const revealDelay = botTimeMs > timeMs ? Math.min(botTimeMs - timeMs, 1400) : 0;
+        handleAnswer(pPts, botPts, botPick, revealDelay);
       }
     }
   }, [selectedOption, showResult, currentIndex, questions, isLive, isAsync, isAsyncReveal]);
@@ -565,6 +603,7 @@ export default function GameScreen() {
     const userId = await AsyncStorage.getItem('duelo_user_id');
     const ps = playerScoreRef.current;
     const bs = botScoreRef.current;
+    playSound(ps >= bs ? 'victory' : 'defeat');
     const cc = correctCountRef.current;
     const ol = parseInt(params.opponentLevel || '1') || 1;
     // Save questions for the report feature on results screen
@@ -788,7 +827,7 @@ export default function GameScreen() {
                 {params.opponentPseudo?.slice(0, 10)}
               </Text>
               <Text style={[styles.playerTitle, { textAlign: 'right' }]}>
-                {isLive ? t('game.online') : isAsyncSolo ? t('game.async_will_play') : isAsyncReveal ? t('game.already_played') : t('game.bot')}
+                {isLive || (!isAsyncSolo && !isAsyncReveal) ? t('game.online') : isAsyncSolo ? t('game.async_will_play') : t('game.already_played')}
               </Text>
               <View style={[styles.scoreRow, { justifyContent: 'flex-end' }]}>
                 <MaterialCommunityIcons name="star" size={14} color="#FFD700" />
@@ -818,7 +857,7 @@ export default function GameScreen() {
 
           {/* CENTER CONTENT */}
           <View style={styles.centerContent}>
-            <Animated.View style={[styles.questionBox, { opacity: questionFade }]}>
+            <Animated.View style={[styles.questionBox, { opacity: questionFade, transform: [{ translateX: questionSlide }] }]}>
               <View style={styles.questionInner}>
                 <MaterialCommunityIcons name="help-circle-outline" size={20} color="rgba(138,43,226,0.5)" style={{ marginBottom: 8 }} />
                 <Text style={styles.questionText}>{question.question_text}</Text>

@@ -189,7 +189,11 @@ async def start_matchmaking(request: Request, current_user: str = Depends(get_cu
         # Fallback si aucun bot en DB (ne devrait pas arriver en prod)
         bot_name  = f"Bot_{secrets.token_hex(3)}"
         bot_seed  = secrets.token_hex(4)
-        bot_level = max(0, min(MAX_LEVEL, player_level + random.randint(-5, 5)))
+        _spread = random.choices(
+            [random.randint(-3, 3), random.randint(-8, 8)],
+            weights=[70, 30],
+        )[0]
+        bot_level = max(0, min(MAX_LEVEL, player_level + _spread))
 
     bot_title  = get_theme_title(theme, bot_level)
     bot_streak = random.choice([0, 0, 0, 1, 2, 3, 4, 5])
@@ -251,7 +255,7 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
     logger.info(f"[submit] theme_id='{theme_id}', player_id='{player_id}', score={player_score}-{opponent_score}")
 
     if not player_id or not theme_id:
-        raise HTTPException(status_code=400, detail="player_id and theme_id required")
+        raise HTTPException(status_code=400, detail="player_id et theme_id requis")
     if player_id != current_user:
         raise HTTPException(status_code=403, detail="Non autorisé")
 
@@ -473,8 +477,8 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
                         )
                         db.add(t_entry)
                     tournament_result = {"tournament_id": active_t.id, "theme_name": active_t.theme_name}
-        except Exception:
-            pass
+        except Exception as _tournament_err:
+            logger.warning(f"Tournament update failed (non-critical): {_tournament_err}")
 
         if won:
             notif_body = f"Victoire en {theme.name} ! +{total_xp} XP"
@@ -513,6 +517,54 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
 @router.post("/submit-v2")
 async def submit_match_v2(request: Request, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     return await submit_match(request, current_user, db)
+
+
+@router.get("/weekly-summary")
+async def get_weekly_summary(
+    user_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    """Return the current user's game stats for the past 7 days."""
+    from collections import Counter
+
+    seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+
+    matches_res = await db.execute(
+        select(Match).where(
+            Match.player1_id == user_id,
+            Match.created_at > seven_days_ago,
+        )
+    )
+    matches = matches_res.scalars().all()
+
+    games_played = len(matches)
+    games_won = sum(1 for m in matches if m.winner_id == user_id)
+    xp_earned = sum(m.xp_earned or 0 for m in matches)
+    perfect_scores = sum(1 for m in matches if m.player1_correct == TOTAL_QUESTIONS)
+
+    theme_counter: Counter = Counter(m.category for m in matches)
+    best_theme_id = theme_counter.most_common(1)[0][0] if theme_counter else None
+    best_theme_name = ""
+    if best_theme_id:
+        theme_res = await db.execute(select(Theme).where(Theme.id == best_theme_id))
+        th = theme_res.scalar_one_or_none()
+        if th:
+            best_theme_name = th.name
+
+    user_res = await db.execute(select(User).where(User.id == user_id))
+    user = user_res.scalar_one_or_none()
+
+    return {
+        "games_played": games_played,
+        "games_won": games_won,
+        "xp_earned": xp_earned,
+        "win_rate": round(games_won / games_played * 100) if games_played > 0 else 0,
+        "perfect_scores": perfect_scores,
+        "best_theme_id": best_theme_id,
+        "best_theme_name": best_theme_name,
+        "current_streak": user.current_streak if user else 0,
+        "total_xp": user.total_xp if user else 0,
+    }
 
 
 VO_GENERATION_PROMPT = """Generate exactly 21 quiz questions in ENGLISH about "{theme_name}".

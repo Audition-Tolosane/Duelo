@@ -94,7 +94,7 @@ async def claim_rewards(data: dict, current_user: str = Depends(get_current_user
     """Claim XP for all completed missions into the chosen theme."""
     theme_id = data.get("theme_id")
     if not theme_id:
-        raise HTTPException(status_code=400, detail="theme_id requis")
+        raise HTTPException(status_code=400, detail="theme_id est requis")
 
     theme_res = await db.execute(select(Theme).where(Theme.id == theme_id))
     theme = theme_res.scalar_one_or_none()

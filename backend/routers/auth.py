@@ -193,16 +193,23 @@ async def mark_onboarding_done(request: Request, current_user: str = Depends(get
     body = await request.json()
     user_id = body.get("user_id", "")
     if not user_id:
-        raise HTTPException(status_code=400, detail="user_id required")
+        raise HTTPException(status_code=400, detail="user_id requis")
     if user_id != current_user:
         raise HTTPException(status_code=403, detail="Non autorisé")
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    user.onboarding_done = True
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
+    xp_bonus = 0
+    if not user.onboarding_done:
+        # Grant 50 XP welcome bonus (only once)
+        user.onboarding_done = True
+        user.total_xp = (user.total_xp or 0) + 50
+        xp_bonus = 50
+    else:
+        user.onboarding_done = True
     await db.commit()
-    return {"success": True}
+    return {"success": True, "xp_bonus": xp_bonus}
 
 
 async def _verify_google_token(id_token: str) -> dict:
@@ -236,7 +243,7 @@ async def _verify_apple_token(identity_token: str) -> dict:
     try:
         header = pyjwt.get_unverified_header(identity_token)
     except Exception:
-        raise HTTPException(status_code=401, detail="Token Apple malformé")
+        raise HTTPException(status_code=401, detail="Jeton Apple malformé")
 
     key_data = next((k for k in keys if k["kid"] == header.get("kid")), None)
     if not key_data:
@@ -254,9 +261,9 @@ async def _verify_apple_token(identity_token: str) -> dict:
             issuer="https://appleid.apple.com",
         )
     except pyjwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token Apple expiré")
+        raise HTTPException(status_code=401, detail="Jeton Apple expiré")
     except pyjwt.InvalidTokenError as e:
-        raise HTTPException(status_code=401, detail=f"Token Apple invalide: {e}")
+        raise HTTPException(status_code=401, detail=f"Jeton Apple invalide : {e}")
 
     return payload  # contains: sub (stable apple user ID), email (may be nil after first login)
 

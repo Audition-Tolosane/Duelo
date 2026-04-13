@@ -1,5 +1,6 @@
 import logging
 from fastapi import APIRouter, Depends, HTTPException, Request
+from rate_limit import rate_limit
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
@@ -189,14 +190,14 @@ async def select_avatar(request: Request, current_user: str = Depends(get_curren
     avatar_id = body.get("avatar_id", "")
 
     if not user_id or not avatar_id:
-        raise HTTPException(status_code=400, detail="user_id and avatar_id required")
+        raise HTTPException(status_code=400, detail="user_id et avatar_id requis")
     if user_id != current_user:
         raise HTTPException(status_code=403, detail="Non autorisé")
 
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
     if not user:
-        raise HTTPException(status_code=404, detail="Utilisateur non trouve")
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
 
     avatar_res = await db.execute(select(Avatar).where(Avatar.id == avatar_id))
     avatar = avatar_res.scalar_one_or_none()
@@ -257,20 +258,20 @@ async def update_location(
 
 
 @router.post("/user/upload-avatar")
-async def upload_user_avatar(request: Request, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+async def upload_user_avatar(request: Request, current_user: str = Depends(get_current_user_id), _rl=Depends(rate_limit(limit=10, window=3600)), db: AsyncSession = Depends(get_db)):
     body = await request.json()
     user_id = body.get("user_id", "")
     image_b64 = body.get("image_base64", "")
 
     if not user_id or not image_b64:
-        raise HTTPException(status_code=400, detail="user_id and image_base64 required")
+        raise HTTPException(status_code=400, detail="user_id et image_base64 requis")
     if user_id != current_user:
         raise HTTPException(status_code=403, detail="Non autorisé")
 
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
     if not user:
-        raise HTTPException(status_code=404, detail="Utilisateur non trouve")
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
 
     # Validate MIME type via magic bytes before writing
     try:

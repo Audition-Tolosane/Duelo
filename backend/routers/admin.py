@@ -30,14 +30,14 @@ async def verify_admin_key(x_admin_key: str = Header(default="", alias="X-Admin-
 
 
 @router.post("/verify")
-async def verify_admin(data: AdminVerify, request: Request, _rl=Depends(rate_limit(limit=5, window=300))):
+async def verify_admin(data: AdminVerify, request: Request, _rl=Depends(rate_limit(limit=3, window=3600))):
     if data.password == ADMIN_PASSWORD:
         return {"verified": True}
     raise HTTPException(status_code=403, detail="Mot de passe incorrect")
 
 
 @router.post("/import-questions")
-async def import_questions(data: BulkImportRequest, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
+async def import_questions(data: BulkImportRequest, request: Request, _: None = Depends(verify_admin_key), _rl=Depends(rate_limit(limit=10, window=3600)), db: AsyncSession = Depends(get_db)):
     imported = 0
     duplicates = 0
     errors = []
@@ -78,13 +78,13 @@ async def admin_dashboard():
 
 
 @router.post("/import-csv")
-async def import_csv_data(request: Request, _: None = Depends(verify_admin_key), db: AsyncSession = Depends(get_db)):
+async def import_csv_data(request: Request, _: None = Depends(verify_admin_key), _rl=Depends(rate_limit(limit=10, window=3600)), db: AsyncSession = Depends(get_db)):
     body = await request.json()
     themes_csv_text = body.get("themes_csv", "")
     questions_csv_text = body.get("questions_csv", "")
 
     if not themes_csv_text or not questions_csv_text:
-        raise HTTPException(status_code=400, detail="Both themes_csv and questions_csv required")
+        raise HTTPException(status_code=400, detail="themes_csv et questions_csv sont requis")
 
     MAX_CSV_BYTES = 5 * 1024 * 1024  # 5 MB
     if len(themes_csv_text.encode()) + len(questions_csv_text.encode()) > MAX_CSV_BYTES:
@@ -694,7 +694,7 @@ async def upload_avatar(request: Request, _: None = Depends(verify_admin_key), d
     original_filename = body.get("filename", "").strip()
 
     if not image_b64:
-        raise HTTPException(status_code=400, detail="image_base64 required")
+        raise HTTPException(status_code=400, detail="image_base64 requis")
 
     # Validate MIME type via magic bytes before writing
     try:
@@ -739,7 +739,7 @@ async def rename_avatar(avatar_id: str, request: Request, _: None = Depends(veri
     body = await request.json()
     new_name = body.get("name", "").strip()
     if not new_name:
-        raise HTTPException(status_code=400, detail="name requis")
+        raise HTTPException(status_code=400, detail="Le nom est requis")
     result = await db.execute(select(Avatar).where(Avatar.id == avatar_id))
     avatar = result.scalar_one_or_none()
     if not avatar:

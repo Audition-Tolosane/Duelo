@@ -14,6 +14,7 @@ import { GLASS } from '../../theme/glassTheme';
 import DueloHeader from '../../components/DueloHeader';
 import { useSwipeBackProgress } from '../../components/SwipeBackContext';
 import { t } from '../../utils/i18n';
+import { useWS } from '../../contexts/WebSocketContext';
 
 // Import screen components directly for the pager
 import AccueilScreen from './accueil';
@@ -99,14 +100,31 @@ function TabIcon({ name, color, size }: { name: string; color: string; size?: nu
   return null;
 }
 
+function TabBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+  return (
+    <View style={styles.badge}>
+      <Text style={styles.badgeText}>{count > 99 ? '99' : String(count)}</Text>
+    </View>
+  );
+}
+
 function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTabPress: (index: number) => void }) {
   const insets = useSafeAreaInsets();
+  const { unreadNotifs, unreadMessages } = useWS();
+
+  const badgeForTab = (name: string) => {
+    if (name === 'accueil') return unreadNotifs;
+    if (name === 'players') return unreadMessages;
+    return 0;
+  };
 
   return (
     <View style={[styles.tabBar, { paddingBottom: insets.bottom > 0 ? insets.bottom : 8 }]}>
       {TAB_CONFIG.map((tab, index) => {
         const isFocused = currentIndex === index;
         const color = TAB_COLORS[tab.name as keyof typeof TAB_COLORS];
+        const badgeCount = badgeForTab(tab.name);
 
         if (tab.isCenter) {
           return (
@@ -130,6 +148,7 @@ function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTa
             )}
             <View style={{ opacity: isFocused ? 1 : 0.38 }}>
               <TabIcon name={tab.name} color={color} size={26} />
+              <TabBadge count={badgeCount} />
             </View>
             <Text style={[styles.tabLabel, isFocused && { color }]}>{t(tab.labelKey)}</Text>
             {isFocused && (
@@ -366,6 +385,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: -14,
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -6,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#FF3B30',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 3,
+    borderWidth: 1.5,
+    borderColor: '#050510',
+  },
+  badgeText: {
+    color: '#FFF',
+    fontSize: 9,
+    fontWeight: '900',
+    lineHeight: 12,
   },
   playTabCircle: {
     width: 56, height: 56, borderRadius: 28,

@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, Animated, Share, Modal, ActivityIndicator,
-  ScrollView, TextInput, KeyboardAvoidingView, Platform, Keyboard,
+  ScrollView, TextInput, KeyboardAvoidingView, Platform, Keyboard, Dimensions,
 } from 'react-native';
+import ConfettiCannon from 'react-native-confetti-cannon';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,6 +18,7 @@ import { useWS } from '../contexts/WebSocketContext';
 import { t } from '../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const CATEGORY_NAMES: Record<string, string> = {};
 
@@ -83,7 +85,13 @@ export default function ResultsScreen() {
   const [newTitle, setNewTitle] = useState<NewTitle | null>(null);
   const [newLevel, setNewLevel] = useState<number | null>(null);
   const [showTitleModal, setShowTitleModal] = useState(false);
+  const [newAchievements, setNewAchievements] = useState<{ name: string; description: string; icon: string }[]>([]);
+  const [showAchievModal, setShowAchievModal] = useState(false);
   const [submitting, setSubmitting] = useState(true);
+
+  const confettiRef = useRef<any>(null);
+  const achievScale = useRef(new Animated.Value(0)).current;
+  const achievOpacity = useRef(new Animated.Value(0)).current;
   const [playerPseudo, setPlayerPseudo] = useState(t('game.player'));
 
   // Report question states
@@ -126,7 +134,9 @@ export default function ResultsScreen() {
         Animated.timing(cardSlide, { toValue: 0, duration: 300, useNativeDriver: true }),
         Animated.timing(xpSlide, { toValue: 0, duration: 400, useNativeDriver: true }),
       ]),
-    ]).start();
+    ]).start(() => {
+      if (won) setTimeout(() => confettiRef.current?.start(), 100);
+    });
 
     // Rematch WS listeners
     const unsubs = [
@@ -205,7 +215,6 @@ export default function ResultsScreen() {
       }
       if (data.new_title) {
         setNewTitle(data.new_title);
-        // Show title celebration after a short delay
         setTimeout(() => {
           setShowTitleModal(true);
           animateTitleCelebration();
@@ -213,6 +222,18 @@ export default function ResultsScreen() {
       }
       if (data.new_level) {
         setNewLevel(data.new_level);
+      }
+      if (data.new_achievements?.length > 0) {
+        setNewAchievements(data.new_achievements);
+        // Show after title modal (or 2.5s if no title)
+        const delay = data.new_title ? 4000 : 2500;
+        setTimeout(() => {
+          setShowAchievModal(true);
+          Animated.parallel([
+            Animated.spring(achievScale, { toValue: 1, tension: 60, friction: 7, useNativeDriver: true }),
+            Animated.timing(achievOpacity, { toValue: 1, duration: 350, useNativeDriver: true }),
+          ]).start();
+        }, delay);
       }
     } catch (e) { console.error(e); }
     setSubmitting(false);
@@ -753,6 +774,48 @@ export default function ResultsScreen() {
         </KeyboardAvoidingView>
       </Modal>
 
+      {/* Confetti — victoire */}
+      {won && (
+        <ConfettiCannon
+          ref={confettiRef}
+          count={140}
+          origin={{ x: SCREEN_WIDTH / 2, y: -10 }}
+          autoStart={false}
+          fadeOut={true}
+          explosionSpeed={350}
+          fallSpeed={2800}
+          colors={['#FFD700', '#00FF9D', '#8A2BE2', '#00E5FF', '#FF3E9D']}
+        />
+      )}
+
+      {/* Achievement Modal */}
+      {newAchievements.length > 0 && (
+        <Modal visible={showAchievModal} transparent animationType="none" onRequestClose={() => setShowAchievModal(false)}>
+          <View style={styles.celebrationOverlay}>
+            <Animated.View style={[styles.celebrationContent, { opacity: achievOpacity, transform: [{ scale: achievScale }] }]}>
+              <LinearGradient colors={['#BF5FFF', '#8A2BE2']} style={styles.celebrationStarCircle}>
+                <MaterialCommunityIcons name="trophy-award" size={48} color="#FFF" />
+              </LinearGradient>
+              <Text style={styles.celebrationHeader}>{t('results.achievement_unlocked')}</Text>
+              {newAchievements.map((ach, i) => (
+                <View key={i} style={styles.achievRow}>
+                  <Text style={styles.achievIcon}>{ach.icon || '🏅'}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.achievName}>{ach.name}</Text>
+                    <Text style={styles.achievDesc}>{ach.description}</Text>
+                  </View>
+                </View>
+              ))}
+              <TouchableOpacity onPress={() => setShowAchievModal(false)} activeOpacity={0.8} style={styles.celebrationBtnTouchable}>
+                <LinearGradient colors={['#8A2BE2', '#6A1FB0']} style={styles.celebrationBtn}>
+                  <Text style={styles.celebrationBtnText}>{t('results.continue')}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+        </Modal>
+      )}
+
       {/* Title Celebration Modal */}
       {newTitle && (
         <Modal visible={showTitleModal} transparent animationType="none" onRequestClose={() => setShowTitleModal(false)}>
@@ -956,6 +1019,10 @@ const styles = StyleSheet.create({
     shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.6, shadowRadius: 16,
   },
   celebrationBtnText: { color: '#FFF', fontSize: 16, fontWeight: '900', letterSpacing: 3 },
+  achievRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 6, paddingHorizontal: 4, width: '100%' },
+  achievIcon: { fontSize: 28 },
+  achievName: { color: '#FFF', fontSize: 15, fontWeight: '800' },
+  achievDesc: { color: '#A3A3A3', fontSize: 12, fontWeight: '500', marginTop: 2 },
   // Report Modal
   reportOverlay: {
     flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end',

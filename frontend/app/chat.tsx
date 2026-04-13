@@ -450,6 +450,25 @@ export default function ChatScreen() {
           }
         />
 
+        {/* Quick Replies */}
+        {!text.trim() && (
+          <View style={st.quickRepliesRow}>
+            {(['GG ! 🏆', 'Bien joué ! 👏', 'Revanche ? ⚔️', 'Trop fort ! 🔥', '😂'] as const).map((reply) => (
+              <TouchableOpacity
+                key={reply}
+                style={st.quickReplyChip}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  wsSend({ action: 'chat_send', receiver_id: partnerId, content: reply, message_type: 'text' });
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={st.quickReplyText}>{reply}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         {/* Premium Input Bar */}
         <View style={[st.inputWrapper, { paddingBottom: insets.bottom }]}>
           <View style={st.inputRow}>
@@ -642,6 +661,30 @@ const st = StyleSheet.create({
   },
   emptyChatTtl: {
     color: '#525252', fontSize: 12, fontWeight: '600',
+  },
+
+  // Quick Replies
+  quickRepliesRow: {
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    gap: 8,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(138,43,226,0.08)',
+  },
+  quickReplyChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 18,
+    backgroundColor: 'rgba(138,43,226,0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(138,43,226,0.3)',
+  },
+  quickReplyText: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 13,
+    fontWeight: '600',
   },
 
   // Premium Input Bar

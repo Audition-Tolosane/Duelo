@@ -85,7 +85,7 @@ export default function RematchModal() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     send({ action: 'rematch_accept' });
     dismiss();
-    router.push(`/matchmaking?category=${themeId}`);
+    router.replace(`/matchmaking?category=${themeId}`);
   };
 
   const handleDecline = () => {

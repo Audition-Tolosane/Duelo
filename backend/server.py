@@ -310,3 +310,61 @@ async def _ensure_columns():
                 logger.info(f"[startup] OK: {idx_stmt}")
             except Exception as e:
                 logger.warning(f"[startup] skip index: {e}")
+
+    # Start weekly summary cron in background
+    import asyncio as _asyncio
+    _asyncio.create_task(_weekly_summary_cron())
+
+
+async def _weekly_summary_cron():
+    """Send weekly summary push notifications every Monday at 08:00 UTC."""
+    import asyncio
+    from datetime import datetime, timezone, timedelta
+    from database import AsyncSessionLocal
+    from sqlalchemy import select as _select
+    from models import User as _User, Match as _Match
+    from services.notifications import _send_expo_push
+    from constants import TOTAL_QUESTIONS as _TQ
+
+    while True:
+        now = datetime.now(timezone.utc)
+        # Calculate next Monday 08:00 UTC
+        days_until_monday = (7 - now.weekday()) % 7
+        if days_until_monday == 0 and now.hour >= 8:
+            days_until_monday = 7
+        next_run = now.replace(hour=8, minute=0, second=0, microsecond=0) + timedelta(days=days_until_monday)
+        sleep_secs = (next_run - now).total_seconds()
+        logger.info(f"[cron] weekly summary in {sleep_secs:.0f}s at {next_run.isoformat()}")
+        await asyncio.sleep(sleep_secs)
+
+        try:
+            seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+            async with AsyncSessionLocal() as db:
+                # Fetch users with push tokens
+                users_res = await db.execute(
+                    _select(_User).where(_User.push_token.isnot(None))
+                )
+                users = users_res.scalars().all()
+
+                for u in users:
+                    try:
+                        matches_res = await db.execute(
+                            _select(_Match).where(
+                                _Match.player1_id == u.id,
+                                _Match.created_at > seven_days_ago,
+                            )
+                        )
+                        matches = matches_res.scalars().all()
+                        if not matches:
+                            continue
+                        games = len(matches)
+                        wins = sum(1 for m in matches if m.winner_id == u.id)
+                        xp = sum(m.xp_earned or 0 for m in matches)
+                        win_pct = round(wins / games * 100)
+                        title = "📊 Ton résumé de la semaine"
+                        body = f"{games} duels · {wins} victoires ({win_pct}%) · +{xp} XP"
+                        await _send_expo_push(u.push_token, title, body, {"type": "weekly_summary"})
+                    except Exception as e:
+                        logger.warning(f"[cron] weekly push failed for {u.id}: {e}")
+        except Exception as e:
+            logger.error(f"[cron] weekly summary cron error: {e}")

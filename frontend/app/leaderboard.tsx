@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, FlatList
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -87,10 +88,16 @@ export default function LeaderboardScreen() {
   const [meta, setMeta] = useState<LeaderMeta | null>(null);
   const [loading, setLoading] = useState(true);
   const [noLocation, setNoLocation] = useState(false);
+  const [myUserId, setMyUserId] = useState('');
+
+  useEffect(() => {
+    AsyncStorage.getItem('duelo_user_id').then(id => { if (id) setMyUserId(id); });
+  }, []);
 
   useEffect(() => {
     fetchLeaderboard();
   }, [scope, view, themeId]);
+
 
   const fetchLeaderboard = async () => {
     setLoading(true);
@@ -131,6 +138,11 @@ export default function LeaderboardScreen() {
   };
 
   const getXp = (item: LeaderEntry) => item.total_xp ?? item.xp ?? 0;
+
+  // Rival: joueur juste au-dessus dans le classement actuel
+  const myEntry = myUserId ? entries.find(e => e.id === myUserId) : undefined;
+  const rivalEntry = myEntry ? entries.find(e => e.rank === myEntry.rank - 1) : undefined;
+  const xpGap = (myEntry && rivalEntry) ? (getXp(rivalEntry) - getXp(myEntry)) : 0;
 
   const renderEntry = useCallback(({ item, index }: { item: LeaderEntry; index: number }) => {
     const isTop3 = item.rank <= 3 && item.rank >= 1;
@@ -299,6 +311,44 @@ export default function LeaderboardScreen() {
           </View>
         ) : null}
 
+        {/* Rival card */}
+        {!loading && rivalEntry && myEntry && xpGap > 0 && (
+          <View style={styles.rivalCard}>
+            <View style={styles.rivalHeader}>
+              <MaterialCommunityIcons name="sword-cross" size={16} color="#FF9F0A" />
+              <Text style={styles.rivalTitle}>{t('leaderboard.your_rival')}</Text>
+            </View>
+            <View style={styles.rivalBody}>
+              <View style={styles.rivalAvatarWrap}>
+                <UserAvatar avatarUrl={rivalEntry.avatar_url} avatarSeed={rivalEntry.avatar_seed} pseudo={rivalEntry.pseudo} size={40} />
+                <View style={styles.rivalRankBadge}>
+                  <Text style={styles.rivalRankText}>#{rivalEntry.rank}</Text>
+                </View>
+              </View>
+              <View style={styles.rivalInfo}>
+                <Text style={styles.rivalPseudo}>{rivalEntry.pseudo}</Text>
+                <Text style={styles.rivalLevel}>{t('leaderboard.level_short')} {rivalEntry.level}</Text>
+                <View style={styles.rivalGapRow}>
+                  <MaterialCommunityIcons name="arrow-up" size={13} color="#FF9F0A" />
+                  <Text style={styles.rivalGap}>
+                    {xpGap.toLocaleString()} XP {t('leaderboard.to_overtake')}
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                style={styles.rivalDefiBtn}
+                onPress={() => router.push(`/matchmaking?opponentId=${rivalEntry.id}&opponentPseudo=${encodeURIComponent(rivalEntry.pseudo)}`)}
+                activeOpacity={0.8}
+              >
+                <LinearGradient colors={['#FF9F0A', '#FF6B00']} style={styles.rivalDefiBtnGrad}>
+                  <MaterialCommunityIcons name="sword" size={15} color="#FFF" />
+                  <Text style={styles.rivalDefiText}>{t('leaderboard.challenge')}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
         {!loading && entries.length > 0 && (
           <FlatList
             data={entries}
@@ -342,6 +392,30 @@ const styles = StyleSheet.create({
   // Season info
   seasonInfo: { paddingHorizontal: 20, paddingTop: 8 },
   seasonText: { color: '#525252', fontSize: 11, fontWeight: '600', fontStyle: 'italic' },
+
+  // Rival Card
+  rivalCard: {
+    marginHorizontal: 16, marginBottom: 16, borderRadius: 16,
+    backgroundColor: 'rgba(255,159,10,0.07)', borderWidth: 1, borderColor: 'rgba(255,159,10,0.25)',
+    padding: 14,
+  },
+  rivalHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
+  rivalTitle: { fontSize: 11, fontWeight: '800', color: '#FF9F0A', letterSpacing: 1.5, textTransform: 'uppercase' },
+  rivalBody: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  rivalAvatarWrap: { position: 'relative' },
+  rivalRankBadge: {
+    position: 'absolute', bottom: -4, right: -6,
+    backgroundColor: '#FF9F0A', borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1,
+  },
+  rivalRankText: { fontSize: 9, fontWeight: '900', color: '#FFF' },
+  rivalInfo: { flex: 1, gap: 2 },
+  rivalPseudo: { fontSize: 15, fontWeight: '800', color: '#FFF' },
+  rivalLevel: { fontSize: 11, color: '#A3A3A3', fontWeight: '600' },
+  rivalGapRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 },
+  rivalGap: { fontSize: 11, color: '#FF9F0A', fontWeight: '700' },
+  rivalDefiBtn: { borderRadius: 12, overflow: 'hidden' },
+  rivalDefiBtnGrad: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 10 },
+  rivalDefiText: { color: '#FFF', fontSize: 13, fontWeight: '900' },
 
   // Scope
   scopeScroll: { maxHeight: 50, marginVertical: 12 },

@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_
 from database import get_db
 from models import Challenge, User, Theme
+from constants import TOTAL_QUESTIONS
 from services.notifications import create_notification
 from services.ws_manager import manager
 from auth_middleware import get_current_user_id
@@ -302,7 +303,7 @@ async def save_async_score(challenge_id: str, data: dict, current_user: str = De
     """Save a player's score + per-question answers. When both have played, send result notifications."""
     user_id = current_user  # always use authenticated user
     score = max(0, min(140, int(data.get("score", 0))))    # clamp to valid range
-    correct = max(0, min(7, int(data.get("correct", 0))))  # clamp to valid range
+    correct = max(0, min(TOTAL_QUESTIONS, int(data.get("correct", 0))))  # clamp to valid range
     answers = data.get("answers", [])
 
     # #13 — Validate answers structure and cross-check score vs correct count
@@ -316,7 +317,7 @@ async def save_async_score(challenge_id: str, data: dict, current_user: str = De
          "points": max(0, min(MAX_PTS_PER_Q, int(a.get("points", 0)))),
          "time_ms": max(0, int(a.get("time_ms", 0)))}
         for a in answers if isinstance(a, dict)
-    ][:7]  # at most 7 questions
+    ][:TOTAL_QUESTIONS]  # at most TOTAL_QUESTIONS questions
     # Sanity-check: score must be consistent with correct count
     if correct > 0 and not (correct * MIN_PTS_PER_Q <= score <= correct * MAX_PTS_PER_Q):
         score = min(score, correct * MAX_PTS_PER_Q)  # clamp silently rather than reject

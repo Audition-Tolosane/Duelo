@@ -8,7 +8,7 @@ from typing import Optional
 from database import get_db
 from models import User, Match, WallPost, PostLike, PostComment, PlayerFollow, Theme, UserThemeXP, BotTheme, Avatar
 from schemas import WallPostCreate, CommentCreate, FollowToggle, PlayerFollowToggle
-from constants import COUNTRY_FLAGS, SUPER_CATEGORY_META
+from constants import COUNTRY_FLAGS, SUPER_CATEGORY_META, TOTAL_QUESTIONS
 from services.xp import get_level, get_theme_title, get_streak_badge
 from services.notifications import create_notification
 from auth_middleware import get_current_user_id
@@ -543,7 +543,7 @@ async def social_pulse(user_id: str, db: AsyncSession = Depends(get_db)):
     u_res = await db.execute(select(User).where(User.id == user_id))
     user = u_res.scalar_one_or_none()
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
 
     feed = []
 
@@ -575,7 +575,7 @@ async def social_pulse(user_id: str, db: AsyncSession = Depends(get_db)):
         theme_obj = themes_map.get(m.category)
         theme_name = theme_obj.name if theme_obj else m.category
         theme_color = (theme_obj.color_hex if theme_obj else None) or "#8A2BE2"
-        is_perfect = m.player1_correct == 7
+        is_perfect = m.player1_correct == TOTAL_QUESTIONS
         is_self = u.id == user_id
 
         exploit_type = "victory" if m.winner_id == m.player1_id else "defeat"
@@ -700,7 +700,7 @@ async def social_coach(user_id: str, db: AsyncSession = Depends(get_db)):
     u_res = await db.execute(select(User).where(User.id == user_id))
     user = u_res.scalar_one_or_none()
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
 
     suggestions = []
 
@@ -824,7 +824,7 @@ async def get_home_feed(user_id: str, limit: int = 20, offset: int = 0, db: Asyn
 
     perfect_matches = await db.execute(
         select(Match, User).join(User, User.id == Match.player1_id)
-        .where(Match.player1_correct == 7).order_by(Match.created_at.desc()).limit(5)
+        .where(Match.player1_correct == TOTAL_QUESTIONS).order_by(Match.created_at.desc()).limit(5)
     )
     for match_row in perfect_matches:
         m = match_row[0]
@@ -917,6 +917,7 @@ async def get_home_feed(user_id: str, limit: int = 20, offset: int = 0, db: Asyn
     social_feed.sort(key=lambda x: x.get("created_at", ""), reverse=True)
     country_flag = COUNTRY_FLAGS.get(user.country or "", "")
 
+
     return {
         "user": {
             "pseudo": user.pseudo, "avatar_seed": user.avatar_seed,
@@ -936,3 +937,111 @@ async def get_home_feed(user_id: str, limit: int = 20, offset: int = 0, db: Asyn
         "social_feed": social_feed[offset:offset + limit],
         "offer_slot_expires_at": slot_expires_at,
     }
+
+
+# ── Challenge Suggestions ──
+
+@router.get("/social/challenge-suggestions")
+async def get_challenge_suggestions(
+    request: Request,
+    user_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    """Return up to 5 players with similar XP, common themes, not recently played against."""
+    from datetime import timedelta
+    from collections import defaultdict
+
+    user_res = await db.execute(select(User).where(User.id == user_id))
+    user = user_res.scalar_one_or_none()
+    if not user:
+        raise HTTPException(404, "User not found")
+
+    my_xp = user.total_xp or 0
+
+    # My top themes by XP
+    my_themes_res = await db.execute(
+        select(UserThemeXP).where(UserThemeXP.user_id == user_id)
+        .order_by(UserThemeXP.xp.desc()).limit(5)
+    )
+    my_top_themes = [row.theme_id for row in my_themes_res.scalars().all()]
+
+    # Recent opponents (7 days) — exclude them
+    seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    p1_res = await db.execute(
+        select(Match.player2_id).where(
+            Match.player1_id == user_id,
+            Match.created_at > seven_days_ago,
+            Match.player2_id.isnot(None),
+            Match.player2_is_bot == False,
+        )
+    )
+    p2_res = await db.execute(
+        select(Match.player1_id).where(
+            Match.player2_id == user_id,
+            Match.created_at > seven_days_ago,
+        )
+    )
+    excluded = {row[0] for row in p1_res} | {row[0] for row in p2_res} | {user_id}
+
+    # Candidates with similar XP (±40%)
+    xp_min = max(0, int(my_xp * 0.6))
+    xp_max = int(my_xp * 1.4) + 200
+
+    cands_res = await db.execute(
+        select(User).where(
+            User.total_xp.between(xp_min, xp_max),
+            User.id.notin_(excluded),
+        ).order_by(func.random()).limit(50)
+    )
+    candidates = cands_res.scalars().all()
+
+    if not candidates:
+        return []
+
+    candidate_ids = [c.id for c in candidates]
+
+    # Shared themes
+    theme_by_cand: dict[str, list[str]] = defaultdict(list)
+    if my_top_themes:
+        shared_res = await db.execute(
+            select(UserThemeXP).where(
+                UserThemeXP.user_id.in_(candidate_ids),
+                UserThemeXP.theme_id.in_(my_top_themes),
+                UserThemeXP.xp > 0,
+            )
+        )
+        for row in shared_res.scalars().all():
+            theme_by_cand[row.user_id].append(row.theme_id)
+
+    # Score: most shared themes first, then closest XP
+    scored = sorted(
+        candidates,
+        key=lambda c: (-len(theme_by_cand.get(c.id, [])), abs((c.total_xp or 0) - my_xp)),
+    )[:5]
+
+    # Resolve theme names
+    all_theme_ids = {tid for c in scored for tid in theme_by_cand.get(c.id, [])}
+    theme_names: dict[str, str] = {}
+    if all_theme_ids:
+        th_res = await db.execute(select(Theme).where(Theme.id.in_(all_theme_ids)))
+        for th in th_res.scalars().all():
+            theme_names[th.id] = th.name
+
+    result = []
+    for c in scored:
+        shared = theme_by_cand.get(c.id, [])
+        common_tid = shared[0] if shared else (my_top_themes[0] if my_top_themes else "")
+        result.append({
+            "user_id": c.id,
+            "pseudo": c.pseudo,
+            "avatar_seed": c.avatar_seed or "",
+            "avatar_url": getattr(c, "avatar_url", None),
+            "level": get_level(c.total_xp or 0),
+            "total_xp": c.total_xp or 0,
+            "xp_gap": abs((c.total_xp or 0) - my_xp),
+            "common_theme_id": common_tid,
+            "common_theme_name": theme_names.get(common_tid, ""),
+            "shared_themes_count": len(shared),
+        })
+
+    return result

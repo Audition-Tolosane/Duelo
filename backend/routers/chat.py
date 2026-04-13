@@ -1,7 +1,7 @@
 import random
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, func, text, or_, and_
+from sqlalchemy import select, func, delete, or_, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import User, ChatMessage
@@ -65,15 +65,17 @@ async def send_message(data: ChatSend, current_user: str = Depends(get_current_u
 
 
 @router.get("/conversations/{user_id}")
-async def get_conversations(user_id: str, db: AsyncSession = Depends(get_db)):
+async def get_conversations(user_id: str, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    if current_user != user_id:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+
     # Only purge old messages ~10% of the time to avoid overhead on every request
     if random.random() < 0.1:
         cutoff = datetime.now(timezone.utc) - timedelta(days=7)
-        await db.execute(
-            text("DELETE FROM chat_messages WHERE created_at < :cutoff"), {"cutoff": cutoff}
-        )
+        await db.execute(delete(ChatMessage).where(ChatMessage.created_at < cutoff))
         await db.commit()
 
+    # Collect distinct partner IDs in one query using UNION
     sent_result = await db.execute(
         select(ChatMessage.receiver_id).where(ChatMessage.sender_id == user_id).distinct()
     )
@@ -87,31 +89,46 @@ async def get_conversations(user_id: str, db: AsyncSession = Depends(get_db)):
     for row in received_result:
         partner_ids.add(row[0])
 
-    conversations = []
-    for pid in partner_ids:
-        last_msg_res = await db.execute(
-            select(ChatMessage).where(
-                or_(
-                    and_(ChatMessage.sender_id == user_id, ChatMessage.receiver_id == pid),
-                    and_(ChatMessage.sender_id == pid, ChatMessage.receiver_id == user_id),
-                )
-            ).order_by(ChatMessage.created_at.desc()).limit(1)
-        )
-        last_msg = last_msg_res.scalar_one_or_none()
-        if not last_msg:
-            continue
+    if not partner_ids:
+        return []
 
-        unread_res = await db.execute(
-            select(func.count(ChatMessage.id)).where(
-                ChatMessage.sender_id == pid, ChatMessage.receiver_id == user_id,
-                ChatMessage.read == False,
+    # Batch-load all partners in one query
+    partners_result = await db.execute(select(User).where(User.id.in_(partner_ids)))
+    partners_by_id = {u.id: u for u in partners_result.scalars().all()}
+
+    # Batch-load last message per conversation using a subquery (one query for all)
+    # For each pair, find the most recent message
+    last_msgs_result = await db.execute(
+        select(ChatMessage).where(
+            or_(
+                and_(ChatMessage.sender_id == user_id, ChatMessage.receiver_id.in_(partner_ids)),
+                and_(ChatMessage.sender_id.in_(partner_ids), ChatMessage.receiver_id == user_id),
             )
-        )
-        unread = unread_res.scalar() or 0
+        ).order_by(ChatMessage.created_at.desc())
+    )
+    all_msgs = last_msgs_result.scalars().all()
 
-        p_res = await db.execute(select(User).where(User.id == pid))
-        partner = p_res.scalar_one_or_none()
-        if not partner:
+    # Group messages by partner and keep only the last one per partner
+    last_msg_by_partner: dict = {}
+    for msg in all_msgs:
+        pid = msg.receiver_id if msg.sender_id == user_id else msg.sender_id
+        if pid not in last_msg_by_partner:
+            last_msg_by_partner[pid] = msg
+
+    # Batch-load unread counts in one query per direction
+    unread_result = await db.execute(
+        select(ChatMessage.sender_id, func.count(ChatMessage.id)).where(
+            ChatMessage.receiver_id == user_id,
+            ChatMessage.sender_id.in_(partner_ids),
+            ChatMessage.read == False,
+        ).group_by(ChatMessage.sender_id)
+    )
+    unread_by_sender = {row[0]: row[1] for row in unread_result}
+
+    conversations = []
+    for pid, partner in partners_by_id.items():
+        last_msg = last_msg_by_partner.get(pid)
+        if not last_msg:
             continue
 
         last_msg_preview = last_msg.content[:100]
@@ -127,7 +144,8 @@ async def get_conversations(user_id: str, db: AsyncSession = Depends(get_db)):
             "last_message": last_msg_preview,
             "last_message_type": last_msg.message_type or "text",
             "last_message_time": last_msg.created_at.isoformat(),
-            "is_sender": last_msg.sender_id == user_id, "unread_count": unread,
+            "is_sender": last_msg.sender_id == user_id,
+            "unread_count": unread_by_sender.get(pid, 0),
         })
 
     conversations.sort(key=lambda x: x["last_message_time"], reverse=True)

@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 class ConnectionManager:
     """Manages all WebSocket connections: chat, notifications, game."""
 
-    MATCHMAKING_TIMEOUT = 15  # seconds before falling back to bot
+    MATCHMAKING_TIMEOUT_MIN = 7   # minimum wait before bot fallback
+    MATCHMAKING_TIMEOUT_MAX = 22  # maximum wait before bot fallback
     CHALLENGE_ROOM_TIMEOUT = 30  # seconds for challenger to join after accept
 
     def __init__(self):
@@ -204,9 +205,10 @@ class ConnectionManager:
             )
 
     async def _matchmaking_timeout(self, entry: dict):
-        """After MATCHMAKING_TIMEOUT seconds, create a bot match if still waiting."""
+        """After a random wait, create a bot match if still waiting."""
+        wait = random.uniform(self.MATCHMAKING_TIMEOUT_MIN, self.MATCHMAKING_TIMEOUT_MAX)
         try:
-            await asyncio.sleep(self.MATCHMAKING_TIMEOUT)
+            await asyncio.sleep(wait)
         except asyncio.CancelledError:
             return
 

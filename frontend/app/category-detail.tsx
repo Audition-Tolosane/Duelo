@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Image,
   ActivityIndicator, KeyboardAvoidingView, Platform, Keyboard, RefreshControl,
-  Modal, Dimensions, Alert
+  Modal, Dimensions, Alert, Animated
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -54,6 +54,8 @@ type CategoryDetail = {
   is_following: boolean; completion_pct: number;
   color_hex?: string; icon_url?: string; question_count?: number;
   super_category?: string; cluster?: string;
+  all_titles?: Record<string, string>;
+  unlocked_titles?: { level: number; title: string }[];
 };
 
 type WallPostData = {
@@ -111,6 +113,8 @@ export default function CategoryDetailScreen() {
   const [voMode, setVoMode] = useState(false);
   const [voGenerating, setVoGenerating] = useState(false);
 
+  const xpBarAnim = useRef(new Animated.Value(0)).current;
+
   // Leaderboard (navigates to separate screen)
 
   useEffect(() => {
@@ -133,6 +137,7 @@ export default function CategoryDetailScreen() {
       if (!res.ok) { setFetchError(true); return; }
       const data = await res.json();
       setFetchError(false);
+      const xpProg = data.xp_progress || { current: 0, needed: 500, progress: 0 };
       setDetail({
         id: data.id,
         name: data.name,
@@ -142,7 +147,7 @@ export default function CategoryDetailScreen() {
         user_level: data.user_level || 0,
         user_title: data.user_title || '',
         user_xp: data.user_xp || 0,
-        xp_progress: data.xp_progress || { current: 0, needed: 500, progress: 0 },
+        xp_progress: xpProg,
         is_following: data.is_following || false,
         completion_pct: 0,
         color_hex: data.color_hex,
@@ -150,7 +155,14 @@ export default function CategoryDetailScreen() {
         question_count: data.question_count,
         super_category: data.super_category,
         cluster: data.cluster,
+        all_titles: data.all_titles || {},
+        unlocked_titles: data.unlocked_titles || [],
       });
+      Animated.timing(xpBarAnim, {
+        toValue: xpProg.progress,
+        duration: 900,
+        useNativeDriver: false,
+      }).start();
       setMeta({
         icon: data.name?.[0]?.toUpperCase() || '?',
         color: hashColor(data.id),
@@ -449,23 +461,105 @@ export default function CategoryDetailScreen() {
               </TouchableOpacity>
             )}
 
-            {/* Progress Bar */}
-            <View style={styles.progressSection}>
-              <Text style={styles.progressLabel}>{t('category.questions_completed')}</Text>
-              <View style={styles.progressBar}>
-                <View style={[styles.progressFill, { width: `${detail.completion_pct}%`, backgroundColor: meta.color }]} />
-                <Text style={styles.progressPct}>{detail.completion_pct}%</Text>
+            {/* XP Progression Section */}
+            <View style={styles.xpSection}>
+              {/* Level header */}
+              <View style={styles.xpHeader}>
+                <View style={[styles.xpLevelBadge, { backgroundColor: meta.color + '20', borderColor: meta.color + '50' }]}>
+                  <Text style={[styles.xpLevelNum, { color: meta.color }]}>{detail.user_level}</Text>
+                  <Text style={styles.xpLevelLabel}>LVL</Text>
+                </View>
+                <View style={styles.xpHeaderInfo}>
+                  {detail.user_title ? (
+                    <Text style={[styles.xpTitle, { color: meta.color }]}>{detail.user_title}</Text>
+                  ) : (
+                    <Text style={styles.xpNoTitle}>{t('category.no_title_yet')}</Text>
+                  )}
+                  <Text style={styles.xpXpLabel}>
+                    {detail.user_level >= 50
+                      ? t('category.max_level')
+                      : `${detail.xp_progress.current.toLocaleString()} / ${detail.xp_progress.needed.toLocaleString()} XP`}
+                  </Text>
+                </View>
+                {detail.user_level < 50 && (
+                  <View style={[styles.xpNextBadge, { borderColor: meta.color + '30' }]}>
+                    <Text style={styles.xpNextLabel}>{t('category.next')}</Text>
+                    <Text style={[styles.xpNextNum, { color: meta.color }]}>{detail.user_level + 1}</Text>
+                  </View>
+                )}
               </View>
+
+              {/* Animated XP bar */}
+              <View style={styles.xpBarTrack}>
+                <Animated.View style={[
+                  styles.xpBarFill,
+                  {
+                    backgroundColor: meta.color,
+                    width: xpBarAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
+                  }
+                ]} />
+                {/* Milestone dots */}
+                {([1, 10, 20, 35, 50] as const).map((lvl) => {
+                  const reached = detail.user_level >= lvl;
+                  const title = detail.all_titles?.[String(lvl)];
+                  if (!title) return null;
+                  // Distribute milestones evenly 0→100% across levels 1→50
+                  const pct = ((lvl - 1) / 49) * 100;
+                  return (
+                    <View key={lvl} style={[styles.milestoneDot, { left: `${pct}%`, backgroundColor: reached ? meta.color : 'rgba(255,255,255,0.2)', borderColor: reached ? meta.color : 'rgba(255,255,255,0.1)' }]} />
+                  );
+                })}
+              </View>
+
+              {/* Milestone labels */}
+              <View style={styles.milestoneLabels}>
+                {([1, 10, 20, 35, 50] as const).map((lvl) => {
+                  const title = detail.all_titles?.[String(lvl)];
+                  if (!title) return null;
+                  const reached = detail.user_level >= lvl;
+                  const pct = ((lvl - 1) / 49) * 100;
+                  return (
+                    <View key={lvl} style={[styles.milestoneLabelItem, { left: `${pct}%` }]}>
+                      <Text style={[styles.milestoneLvl, { color: reached ? meta.color : '#525252' }]}>
+                        {lvl === 1 ? '' : `${lvl}`}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
+
+              {/* Next title hint */}
+              {(() => {
+                const nextMilestone = [1, 10, 20, 35, 50].find(
+                  lvl => detail.user_level < lvl && detail.all_titles?.[String(lvl)]
+                );
+                if (!nextMilestone) return null;
+                return (
+                  <View style={styles.nextTitleHint}>
+                    <MaterialCommunityIcons name="chevron-double-up" size={13} color={meta.color} />
+                    <Text style={styles.nextTitleText}>
+                      <Text style={{ color: meta.color }}>{detail.all_titles![String(nextMilestone)]}</Text>
+                      {` ${t('category.at_level')} ${nextMilestone}`}
+                    </Text>
+                  </View>
+                );
+              })()}
+
+              {/* Unlocked titles chips */}
+              {detail.unlocked_titles && detail.unlocked_titles.length > 0 && (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.titlesScroll} contentContainerStyle={styles.titlesScrollContent}>
+                  {detail.unlocked_titles.map((ut) => (
+                    <View key={ut.level} style={[styles.titleChip, { borderColor: meta.color + '40', backgroundColor: meta.color + '12' }]}>
+                      <MaterialCommunityIcons name="star" size={11} color={meta.color} />
+                      <Text style={[styles.titleChipText, { color: meta.color }]}>{ut.title}</Text>
+                    </View>
+                  ))}
+                </ScrollView>
+              )}
             </View>
 
             {/* Stats Row */}
             <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <Text style={styles.statLabel}>{t('category.your_level')}</Text>
-                <Text style={[styles.statValue, { color: meta.color }]}>{detail.user_level}</Text>
-                <Text style={styles.statSub}>{detail.user_title}</Text>
-              </View>
-              <View style={[styles.statDivider, { backgroundColor: meta.color + '30' }]} />
               <View style={styles.statItem}>
                 <Text style={styles.statLabel}>{t('category.followers')}</Text>
                 <Text style={styles.statValue}>{detail.followers_count.toLocaleString()}</Text>
@@ -474,6 +568,11 @@ export default function CategoryDetailScreen() {
               <View style={styles.statItem}>
                 <Text style={styles.statLabel}>{t('category.questions')}</Text>
                 <Text style={styles.statValue}>{detail.total_questions}</Text>
+              </View>
+              <View style={[styles.statDivider, { backgroundColor: meta.color + '30' }]} />
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>{t('category.total_xp')}</Text>
+                <Text style={[styles.statValue, { color: meta.color, fontSize: 18 }]}>{detail.user_xp.toLocaleString()}</Text>
               </View>
             </View>
           </View>
@@ -699,15 +798,52 @@ const styles = StyleSheet.create({
   leaderIcon: { fontSize: 14 },
   leaderText: { color: '#FFD700', fontSize: 12, fontWeight: '700' },
 
-  // Progress
-  progressSection: { marginBottom: 20 },
-  progressLabel: { fontSize: 11, fontWeight: '800', color: '#525252', letterSpacing: 2, marginBottom: 8 },
-  progressBar: {
-    height: 28, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 14,
-    overflow: 'hidden', justifyContent: 'center',
+  // XP Section
+  xpSection: { marginBottom: 20 },
+  xpHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12, gap: 12 },
+  xpLevelBadge: {
+    width: 52, height: 52, borderRadius: 14, borderWidth: 1,
+    justifyContent: 'center', alignItems: 'center',
   },
-  progressFill: { position: 'absolute', height: 28, borderRadius: 14 },
-  progressPct: { color: '#FFF', fontSize: 12, fontWeight: '800', textAlign: 'center', zIndex: 1 },
+  xpLevelNum: { fontSize: 22, fontWeight: '900', lineHeight: 26 },
+  xpLevelLabel: { fontSize: 8, fontWeight: '800', color: '#525252', letterSpacing: 1 },
+  xpHeaderInfo: { flex: 1 },
+  xpTitle: { fontSize: 15, fontWeight: '800', marginBottom: 2 },
+  xpNoTitle: { fontSize: 13, color: '#525252', fontWeight: '600', marginBottom: 2 },
+  xpXpLabel: { fontSize: 11, color: '#A3A3A3', fontWeight: '600' },
+  xpNextBadge: {
+    borderWidth: 1, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6,
+    alignItems: 'center',
+  },
+  xpNextLabel: { fontSize: 8, color: '#525252', fontWeight: '800', letterSpacing: 1 },
+  xpNextNum: { fontSize: 16, fontWeight: '900' },
+
+  xpBarTrack: {
+    height: 8, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 4,
+    overflow: 'visible', marginBottom: 4, position: 'relative',
+  },
+  xpBarFill: { height: 8, borderRadius: 4, position: 'absolute', left: 0, top: 0 },
+  milestoneDot: {
+    position: 'absolute', top: -3, width: 14, height: 14, borderRadius: 7,
+    borderWidth: 2, marginLeft: -7, zIndex: 2,
+  },
+  milestoneLabels: { flexDirection: 'row', height: 16, position: 'relative', marginBottom: 8 },
+  milestoneLabelItem: { position: 'absolute', alignItems: 'center' },
+  milestoneLvl: { fontSize: 9, fontWeight: '800', marginLeft: -6 },
+
+  nextTitleHint: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    marginBottom: 10,
+  },
+  nextTitleText: { fontSize: 11, color: '#A3A3A3', fontWeight: '600' },
+
+  titlesScroll: { marginTop: 4 },
+  titlesScrollContent: { gap: 6 },
+  titleChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, borderWidth: 1,
+  },
+  titleChipText: { fontSize: 11, fontWeight: '700' },
 
   // Stats Row
   statsRow: { flexDirection: 'row', alignItems: 'flex-start' },

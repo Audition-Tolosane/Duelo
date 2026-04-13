@@ -115,7 +115,7 @@ async def use_life(
     """
     match_id = data.get("match_id")
     if not match_id:
-        raise HTTPException(status_code=400, detail="match_id requis")
+        raise HTTPException(status_code=400, detail="match_id est requis")
 
     # Verify the match
     m_res = await db.execute(select(Match).where(Match.id == match_id, Match.player1_id == current_user))

@@ -167,6 +167,102 @@ const mStyles = StyleSheet.create({
   claimedText: { fontSize: 11, color: '#00FF9D' },
 });
 
+// ── Tournament Banner ──
+const TournamentBanner = React.memo(function TournamentBanner({ router }: { router: any }) {
+  const [info, setInfo] = React.useState<{
+    active: boolean; id?: string; theme_id?: string; theme_name?: string;
+    end_at?: string; rank?: number | null; score?: number;
+    games_remaining?: number; total_players?: number;
+  } | null>(null);
+  const [countdown, setCountdown] = React.useState('');
+
+  React.useEffect(() => {
+    authFetch(`${API_URL}/api/tournaments/current`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => d && setInfo(d))
+      .catch(() => {});
+  }, []);
+
+  React.useEffect(() => {
+    if (!info?.end_at) return;
+    const fmt = (end: string) => {
+      const diff = new Date(end).getTime() - Date.now();
+      if (diff <= 0) return '00:00';
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      return h > 0 ? `${h}h ${m.toString().padStart(2, '0')}m` : `${m}m`;
+    };
+    setCountdown(fmt(info.end_at));
+    const iv = setInterval(() => setCountdown(fmt(info!.end_at!)), 30000);
+    return () => clearInterval(iv);
+  }, [info?.end_at]);
+
+  if (!info?.active) return null;
+
+  return (
+    <LinearGradient
+      colors={['rgba(255,215,0,0.12)', 'rgba(255,159,10,0.05)']}
+      style={tStyles.container}
+    >
+      <TouchableOpacity
+        style={tStyles.inner}
+        onPress={() => router.push(`/tournament?tournamentId=${info.id}`)}
+        activeOpacity={0.8}
+      >
+        <View style={tStyles.iconBox}>
+          <MaterialCommunityIcons name="trophy" size={24} color="#FFD700" />
+        </View>
+        <View style={tStyles.info}>
+          <View style={tStyles.topRow}>
+            <Text style={tStyles.label}>{t('tournament.weekend_title')}</Text>
+            <View style={tStyles.clockRow}>
+              <MaterialCommunityIcons name="clock-outline" size={11} color="#FFD700" />
+              <Text style={tStyles.countdown}>{countdown}</Text>
+            </View>
+          </View>
+          <Text style={tStyles.themeName} numberOfLines={1}>{info.theme_name}</Text>
+          {info.rank != null && (
+            <Text style={tStyles.rank}>
+              #{info.rank} · {info.score} pts · {info.total_players} {t('tournament.players')}
+            </Text>
+          )}
+        </View>
+        {(info.games_remaining ?? 0) > 0 && (
+          <TouchableOpacity
+            style={tStyles.playBtn}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+              router.push(`/matchmaking?category=${info.theme_id}&themeName=${encodeURIComponent(info.theme_name || '')}`);
+            }}
+            activeOpacity={0.8}
+          >
+            <LinearGradient colors={['#FFD700', '#FF9F0A']} style={tStyles.playGrad}>
+              <MaterialCommunityIcons name="play" size={14} color="#000" />
+              <Text style={tStyles.playText}>{info.games_remaining}x</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
+      </TouchableOpacity>
+    </LinearGradient>
+  );
+});
+
+const tStyles = StyleSheet.create({
+  container: { marginHorizontal: 16, marginBottom: 10, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,215,0,0.25)' },
+  inner: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 12 },
+  iconBox: { width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,215,0,0.15)', justifyContent: 'center', alignItems: 'center' },
+  info: { flex: 1 },
+  topRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 3 },
+  label: { fontSize: 9, fontWeight: '800', color: '#FFD700', letterSpacing: 1.5, textTransform: 'uppercase' },
+  clockRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  countdown: { color: '#FFD700', fontSize: 10, fontWeight: '700' },
+  themeName: { color: '#FFF', fontSize: 14, fontWeight: '800', marginBottom: 2 },
+  rank: { color: '#A3A3A3', fontSize: 11, fontWeight: '600' },
+  playBtn: { borderRadius: 10, overflow: 'hidden' },
+  playGrad: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 8 },
+  playText: { color: '#000', fontSize: 12, fontWeight: '900' },
+});
+
 // ── Missions Widget ──
 const MissionsWidget = React.memo(function MissionsWidget({
   data,
@@ -197,7 +293,7 @@ const MissionsWidget = React.memo(function MissionsWidget({
         <LinearGradient colors={['#FFB800', '#FF6B35']} style={mStyles.headerIcon}>
           <MaterialCommunityIcons name="flag-checkered" size={12} color="#FFF" />
         </LinearGradient>
-        <Text style={mStyles.title}>Missions du jour</Text>
+        <Text style={mStyles.title}>{t('missions.day_title')}</Text>
         <View style={mStyles.countdown}>
           <MaterialCommunityIcons name="clock-outline" size={11} color="#888" />
           <Text style={mStyles.countdownText}>{countdown}</Text>
@@ -258,7 +354,7 @@ const MissionsWidget = React.memo(function MissionsWidget({
           {canClaim && (
             <TouchableOpacity style={mStyles.claimBtn} onPress={onClaim} activeOpacity={0.8}>
               <LinearGradient colors={['#00FF9D', '#00D4FF']} style={mStyles.claimGradient}>
-                <Text style={mStyles.claimText}>Réclamer {totalXP} XP</Text>
+                <Text style={mStyles.claimText}>{t('missions.claim_xp').replace('{xp}', String(totalXP))}</Text>
               </LinearGradient>
             </TouchableOpacity>
           )}
@@ -268,7 +364,7 @@ const MissionsWidget = React.memo(function MissionsWidget({
       {data.reward_claimed && (
         <View style={mStyles.claimedBadge}>
           <MaterialCommunityIcons name="check-circle" size={14} color="#00FF9D" />
-          <Text style={mStyles.claimedText}>Récompenses réclamées aujourd'hui</Text>
+          <Text style={mStyles.claimedText}>{t('missions.claimed')}</Text>
         </View>
       )}
     </View>
@@ -770,6 +866,182 @@ const EventCard = React.memo(function EventCard({ item, index, onActivate, onLau
 });
 
 
+// ── Weekly Summary ──
+interface WeeklySummaryData {
+  games_played: number;
+  games_won: number;
+  xp_earned: number;
+  win_rate: number;
+  best_theme_name: string;
+  perfect_scores: number;
+}
+
+const WeeklySummaryWidget = React.memo(function WeeklySummaryWidget() {
+  const [summary, setSummary] = useState<WeeklySummaryData | null>(null);
+
+  useEffect(() => {
+    authFetch(`${API_URL}/api/game/weekly-summary`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && data.games_played > 0) setSummary(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  if (!summary) return null;
+
+  return (
+    <Animated.View entering={FadeInDown.delay(260).duration(500)}>
+      <LinearGradient
+        colors={['rgba(138,43,226,0.10)', 'rgba(0,191,255,0.05)']}
+        style={wkStyles.card}
+      >
+        <View style={wkStyles.headerRow}>
+          <LinearGradient colors={['#8A2BE2', '#A855F7']} style={wkStyles.iconCircle}>
+            <MaterialCommunityIcons name="chart-line" size={13} color="#FFF" />
+          </LinearGradient>
+          <Text style={wkStyles.title}>Cette semaine</Text>
+        </View>
+        <View style={wkStyles.statsRow}>
+          <View style={wkStyles.statItem}>
+            <Text style={wkStyles.statVal}>{summary.games_played}</Text>
+            <Text style={wkStyles.statLabel}>DUELS</Text>
+          </View>
+          <View style={wkStyles.divider} />
+          <View style={wkStyles.statItem}>
+            <Text style={[wkStyles.statVal, { color: '#00FF9D' }]}>{summary.win_rate}%</Text>
+            <Text style={wkStyles.statLabel}>VICTOIRES</Text>
+          </View>
+          <View style={wkStyles.divider} />
+          <View style={wkStyles.statItem}>
+            <Text style={[wkStyles.statVal, { color: '#FFD700' }]}>+{summary.xp_earned}</Text>
+            <Text style={wkStyles.statLabel}>XP</Text>
+          </View>
+          {summary.perfect_scores > 0 && (
+            <>
+              <View style={wkStyles.divider} />
+              <View style={wkStyles.statItem}>
+                <Text style={[wkStyles.statVal, { color: '#FF6B35' }]}>{summary.perfect_scores}</Text>
+                <Text style={wkStyles.statLabel}>PARFAITS</Text>
+              </View>
+            </>
+          )}
+        </View>
+        {summary.best_theme_name ? (
+          <View style={wkStyles.bestThemeRow}>
+            <MaterialCommunityIcons name="fire" size={11} color="#FF6B35" />
+            <Text style={wkStyles.bestThemeText}>Thème favori : <Text style={{ color: '#FFF', fontWeight: '700' }}>{summary.best_theme_name}</Text></Text>
+          </View>
+        ) : null}
+      </LinearGradient>
+    </Animated.View>
+  );
+});
+
+const wkStyles = StyleSheet.create({
+  card: {
+    marginHorizontal: 16, marginBottom: 8, borderRadius: 16,
+    borderWidth: 1, borderColor: 'rgba(138,43,226,0.2)', padding: 14,
+  },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
+  iconCircle: { width: 24, height: 24, borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
+  title: { color: '#A855F7', fontSize: 11, fontWeight: '800', letterSpacing: 1.5, textTransform: 'uppercase' },
+  statsRow: { flexDirection: 'row', alignItems: 'center' },
+  statItem: { flex: 1, alignItems: 'center' },
+  statVal: { color: '#FFF', fontSize: 18, fontWeight: '900' },
+  statLabel: { color: '#555', fontSize: 8, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', marginTop: 2 },
+  divider: { width: 1, height: 30, backgroundColor: 'rgba(255,255,255,0.07)' },
+  bestThemeRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)' },
+  bestThemeText: { color: '#888', fontSize: 11, fontWeight: '600' },
+});
+
+// ── Challenge Suggestions ──
+interface SuggestedPlayer {
+  user_id: string;
+  pseudo: string;
+  avatar_seed: string;
+  avatar_url?: string;
+  level: number;
+  total_xp: number;
+  xp_gap: number;
+  common_theme_id: string;
+  common_theme_name: string;
+  shared_themes_count: number;
+}
+
+const ChallengeSuggestions = React.memo(function ChallengeSuggestions({ router }: { router: ReturnType<typeof useRouter> }) {
+  const [suggestions, setSuggestions] = useState<SuggestedPlayer[]>([]);
+
+  useEffect(() => {
+    authFetch(`${API_URL}/api/social/challenge-suggestions`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setSuggestions(Array.isArray(data) ? data.slice(0, 5) : []))
+      .catch(() => {});
+  }, []);
+
+  if (suggestions.length === 0) return null;
+
+  return (
+    <Animated.View entering={FadeInDown.delay(320).duration(500)}>
+      <View style={styles.sectionHeader}>
+        <LinearGradient colors={['#FF6B35', '#FF9F0A']} style={styles.sectionIconCircle}>
+          <MaterialCommunityIcons name="sword-cross" size={12} color="#FFF" />
+        </LinearGradient>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.sectionTitle}>{t('home.suggestions_title')}</Text>
+        </View>
+      </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.duelsScroll, { gap: 10 }]}>
+        {suggestions.map((s, i) => (
+          <Animated.View key={s.user_id} entering={FadeInRight.delay(i * 60).duration(350)}>
+            <View style={sugStyles.card}>
+              <UserAvatar avatarUrl={s.avatar_url} avatarSeed={s.avatar_seed} pseudo={s.pseudo} size={44} />
+              <Text style={sugStyles.pseudo} numberOfLines={1}>{s.pseudo}</Text>
+              <Text style={sugStyles.level}>Niv. {s.level}</Text>
+              {s.common_theme_name ? (
+                <View style={sugStyles.themeBadge}>
+                  <Text style={sugStyles.themeName} numberOfLines={1}>{s.common_theme_name}</Text>
+                </View>
+              ) : null}
+              <TouchableOpacity
+                style={sugStyles.challengeBtn}
+                activeOpacity={0.8}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  const path = s.common_theme_id
+                    ? `/matchmaking?category=${s.common_theme_id}&opponentId=${s.user_id}`
+                    : `/matchmaking?opponentId=${s.user_id}`;
+                  router.push(path as any);
+                }}
+              >
+                <LinearGradient colors={['#FF6B35', '#FF9F0A']} style={sugStyles.challengeGrad}>
+                  <MaterialCommunityIcons name="sword-cross" size={12} color="#000" />
+                  <Text style={sugStyles.challengeText}>{t('home.challenge_btn')}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        ))}
+      </ScrollView>
+    </Animated.View>
+  );
+});
+
+const sugStyles = StyleSheet.create({
+  card: {
+    width: 110, backgroundColor: 'rgba(255,107,53,0.07)',
+    borderRadius: 16, padding: 12, alignItems: 'center', gap: 4,
+    borderWidth: 1, borderColor: 'rgba(255,107,53,0.2)',
+  },
+  pseudo: { color: '#FFF', fontSize: 12, fontWeight: '700', textAlign: 'center', marginTop: 6 },
+  level: { color: '#888', fontSize: 10, fontWeight: '600' },
+  themeBadge: { backgroundColor: 'rgba(255,159,10,0.15)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, marginTop: 2, maxWidth: 90 },
+  themeName: { color: '#FF9F0A', fontSize: 9, fontWeight: '700', textAlign: 'center' },
+  challengeBtn: { marginTop: 6, borderRadius: 8, overflow: 'hidden', width: '100%' },
+  challengeGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingVertical: 7 },
+  challengeText: { color: '#000', fontSize: 11, fontWeight: '900' },
+});
+
 // ── Challenge Card ──
 const ChallengeCard = React.memo(function ChallengeCard({ challenge, onAccept, onDecline }: {
   challenge: IncomingChallenge; onAccept: () => void; onDecline: () => void;
@@ -1025,7 +1297,7 @@ export default function AccueilScreen() {
     try {
       const res = await authFetch(`${API_URL}/api/boosts/refresh-offers`, { method: 'POST' });
       if (res.ok) await loadFeed();
-    } catch {}
+    } catch (e) { console.warn('[accueil] refresh offers failed:', e); }
   }, []);
 
   const loadFeed = async () => {
@@ -1260,6 +1532,9 @@ export default function AccueilScreen() {
           </TouchableOpacity>
         </Animated.View>
 
+        {/* ── Weekly Summary ── */}
+        <WeeklySummaryWidget />
+
         {/* ── Quick Play Button ── */}
         <Animated.View entering={FadeInDown.delay(200).duration(500)}>
           <TouchableOpacity
@@ -1356,6 +1631,12 @@ export default function AccueilScreen() {
             )}
           </Animated.View>
         )}
+
+        {/* ── Tournament Banner ── */}
+        <TournamentBanner router={router} />
+
+        {/* ── Challenge Suggestions ── */}
+        <ChallengeSuggestions router={router} />
 
         {/* ── Daily Missions ── */}
         {dailyMissions && (
