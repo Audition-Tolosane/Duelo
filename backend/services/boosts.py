@@ -88,13 +88,13 @@ async def get_used_theme_ids_today(user_id: str, db: AsyncSession) -> set:
 
 
 async def get_active_boost(user_id: str, theme_id: str, db: AsyncSession) -> bool:
-    """Vérifie si l'utilisateur a un boost actif sur ce thème."""
+    """Vérifie si l'utilisateur a un boost actif sur ce thème (ou boost global __spin__)."""
     from models import BoostActivation
     now = datetime.now(timezone.utc)
     res = await db.execute(
         select(BoostActivation)
         .where(BoostActivation.user_id == user_id)
-        .where(BoostActivation.theme_id == theme_id)
+        .where(BoostActivation.theme_id.in_([theme_id, "__spin__"]))
         .where(BoostActivation.expires_at > now)
     )
     return res.scalar_one_or_none() is not None

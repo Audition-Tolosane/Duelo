@@ -437,6 +437,17 @@ class TournamentEntry(Base):
     __table_args__ = (UniqueConstraint('tournament_id', 'user_id', name='uq_tournament_entry'),)
 
 
+# ── Daily Spin ────────────────────────────────────────────────────────────────
+
+class SpinThemeUnlock(Base):
+    """Temporary theme XP-boost granted by the daily spin wheel."""
+    __tablename__ = 'spin_theme_unlocks'
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), nullable=False, index=True)
+    theme_id = Column(String(20), nullable=False)
+    expires_at = Column(DateTime(timezone=True), nullable=False)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+
 # ── XP Multiplier (purchasable) ───────────────────────────────────────────────
 
 class XPMultiplierActivation(Base):

@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 from database import get_db
 
-from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge, challenges, boosts, missions, daily_question, achievements, streak_shield, xp_multiplier, tournaments
+from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge, challenges, boosts, missions, daily_question, achievements, streak_shield, xp_multiplier, tournaments, spin
 from schemas import QuestionReportRequest
 from models import QuestionReport
 from sqlalchemy import select
@@ -121,6 +121,7 @@ api_router.include_router(achievements.router)
 api_router.include_router(streak_shield.router)
 api_router.include_router(xp_multiplier.router)
 api_router.include_router(tournaments.router)
+api_router.include_router(spin.router)
 
 # Serve avatar static files
 avatars_dir = ROOT_DIR / "static" / "avatars"
@@ -268,6 +269,13 @@ async def _ensure_columns():
             "ALTER TABLE challenges ADD COLUMN IF NOT EXISTS p2_answers TEXT",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS push_token VARCHAR(200)",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS mmr FLOAT DEFAULT 1000.0",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS last_spin_at TIMESTAMPTZ",
+            """CREATE TABLE IF NOT EXISTS spin_theme_unlocks (
+                id VARCHAR(36) PRIMARY KEY, user_id VARCHAR(36) NOT NULL,
+                theme_id VARCHAR(20) NOT NULL, expires_at TIMESTAMPTZ NOT NULL,
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            )""",
+            "CREATE INDEX IF NOT EXISTS ix_spin_theme_unlocks_user ON spin_theme_unlocks(user_id)",
             """CREATE TABLE IF NOT EXISTS daily_missions (
                 id VARCHAR(36) PRIMARY KEY,
                 user_id VARCHAR(36) NOT NULL,

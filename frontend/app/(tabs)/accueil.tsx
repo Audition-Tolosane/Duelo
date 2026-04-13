@@ -18,6 +18,7 @@ import Constants from 'expo-constants';
 import CosmicBackground from '../../components/CosmicBackground';
 import CategoryIcon from '../../components/CategoryIcon';
 import UserAvatar from '../../components/UserAvatar';
+import SpinWheelModal from '../../components/SpinWheelModal';
 import { GLASS } from '../../theme/glassTheme';
 import { authFetch } from '../../utils/api';
 import { t } from '../../utils/i18n';
@@ -1103,6 +1104,8 @@ export default function AccueilScreen() {
   const [feedError, setFeedError] = useState(false);
   const [dailyMissions, setDailyMissions] = useState<DailyMissionsState | null>(null);
   const [showThemePicker, setShowThemePicker] = useState(false);
+  const [spinAvailable, setSpinAvailable] = useState(false);
+  const [showSpin, setShowSpin] = useState(false);
   const [offerSlotExpiresAt, setOfferSlotExpiresAt] = useState<string | null>(null);
   const [offerCountdown, setOfferCountdown] = useState('');
 
@@ -1117,6 +1120,25 @@ export default function AccueilScreen() {
     loadFeed();
     loadMissions();
     loadDailyQuestion();
+    checkSpinStatus();
+  }, []);
+
+  const checkSpinStatus = useCallback(async () => {
+    try {
+      const res = await authFetch(`${API_URL}/api/spin/status`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setSpinAvailable(data.available);
+      if (data.available) {
+        // Auto-open once per day — guard with AsyncStorage
+        const lastAutoShown = await AsyncStorage.getItem('duelo_spin_auto_shown');
+        const today = new Date().toDateString();
+        if (lastAutoShown !== today) {
+          await AsyncStorage.setItem('duelo_spin_auto_shown', today);
+          setTimeout(() => setShowSpin(true), 1200);
+        }
+      }
+    } catch {}
   }, []);
 
 
@@ -1535,6 +1557,33 @@ export default function AccueilScreen() {
         {/* ── Weekly Summary ── */}
         <WeeklySummaryWidget />
 
+        {/* ── Daily Spin ── */}
+        <Animated.View entering={FadeInDown.delay(100).duration(450)} style={spinStyles.row}>
+          <TouchableOpacity
+            style={spinStyles.btn}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setShowSpin(true); }}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={spinAvailable ? ['rgba(138,43,226,0.25)', 'rgba(138,43,226,0.08)'] : ['rgba(30,30,50,0.6)', 'rgba(20,20,40,0.4)']}
+              style={spinStyles.btnGrad}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+            >
+              <Text style={spinStyles.wheelEmoji}>🎡</Text>
+              <View>
+                <Text style={spinStyles.btnTitle}>{t('spin.btn_title')}</Text>
+                <Text style={spinStyles.btnSub}>{spinAvailable ? t('spin.available') : t('spin.used')}</Text>
+              </View>
+              {spinAvailable && (
+                <View style={spinStyles.badge}>
+                  <Text style={spinStyles.badgeText}>1</Text>
+                </View>
+              )}
+              <MaterialCommunityIcons name="chevron-right" size={18} color="#525252" style={{ marginLeft: 'auto' }} />
+            </LinearGradient>
+          </TouchableOpacity>
+        </Animated.View>
+
         {/* ── Quick Play Button ── */}
         <Animated.View entering={FadeInDown.delay(200).duration(500)}>
           <TouchableOpacity
@@ -1717,6 +1766,15 @@ export default function AccueilScreen() {
           }}
         />
 
+        {/* Spin Wheel */}
+        <SpinWheelModal
+          visible={showSpin}
+          onClose={(done) => {
+            setShowSpin(false);
+            if (done) setSpinAvailable(false);
+          }}
+        />
+
         {/* Theme Picker Modal */}
         <Modal visible={showThemePicker} transparent animationType="slide" onRequestClose={() => setShowThemePicker(false)}>
           <View style={styles.modalOverlay}>
@@ -1820,6 +1878,25 @@ export default function AccueilScreen() {
     </CosmicBackground>
   );
 }
+
+const spinStyles = StyleSheet.create({
+  row: { marginHorizontal: 16, marginBottom: 12 },
+  btn: { borderRadius: 14, overflow: 'hidden' },
+  btnGrad: {
+    flexDirection: 'row', alignItems: 'center', paddingVertical: 12,
+    paddingHorizontal: 14, gap: 10,
+    borderWidth: 1, borderColor: 'rgba(138,43,226,0.2)', borderRadius: 14,
+  },
+  wheelEmoji: { fontSize: 24 },
+  btnTitle: { color: '#FFF', fontSize: 14, fontWeight: '700' },
+  btnSub: { color: '#A3A3A3', fontSize: 11 },
+  badge: {
+    backgroundColor: '#FF3B30', width: 18, height: 18,
+    borderRadius: 9, alignItems: 'center', justifyContent: 'center',
+    marginLeft: 4,
+  },
+  badgeText: { color: '#FFF', fontSize: 11, fontWeight: '800' },
+});
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
