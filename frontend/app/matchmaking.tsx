@@ -437,18 +437,26 @@ export default function MatchmakingScreen() {
         body: JSON.stringify({ theme_id: category, player_id: userId }),
       });
       if (!res.ok) {
-        const opp = FALLBACK_BOT;
-        setOpponent(opp);
-        handleMatchFound(opp);
+        if (res.status === 401) {
+          // Token expiré — forcer reconnexion
+          await AsyncStorage.multiRemove(['duelo_token', 'duelo_user_id']);
+          router.replace('/login' as any);
+          return;
+        }
+        const errText = await res.text().catch(() => '');
+        console.warn(`[fetchBotOpponent] API error ${res.status}: ${errText} | category="${category}"`);
+        setOpponent(FALLBACK_BOT);
+        handleMatchFound(FALLBACK_BOT);
         return;
       }
       const data = await res.json();
+      console.log('[fetchBotOpponent] opponent:', data.opponent?.pseudo, '| category:', category);
       const opp: OpponentData = data.opponent ?? FALLBACK_BOT;
       setOpponent(opp);
       setPlayerInfo(data.player ?? { level: 1, title: '' });
       handleMatchFound(opp);
-    } catch {
-      // Network error — use local fallback bot so user isn't stranded
+    } catch (e) {
+      console.warn('[fetchBotOpponent] catch:', e);
       setOpponent(FALLBACK_BOT);
       handleMatchFound(FALLBACK_BOT);
     }
