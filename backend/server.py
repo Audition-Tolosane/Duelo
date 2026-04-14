@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 from database import get_db
 
-from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge, challenges, boosts, missions, daily_question, achievements, streak_shield, xp_multiplier, tournaments, spin
+from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge, challenges, boosts, missions, daily_question, achievements, streak_shield, xp_multiplier, tournaments, spin, referral
 from schemas import QuestionReportRequest
 from models import QuestionReport
 from sqlalchemy import select
@@ -122,6 +122,7 @@ api_router.include_router(streak_shield.router)
 api_router.include_router(xp_multiplier.router)
 api_router.include_router(tournaments.router)
 api_router.include_router(spin.router)
+api_router.include_router(referral.router)
 
 # Serve avatar static files
 avatars_dir = ROOT_DIR / "static" / "avatars"
@@ -270,6 +271,10 @@ async def _ensure_columns():
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS push_token VARCHAR(200)",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS mmr FLOAT DEFAULT 1000.0",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS last_spin_at TIMESTAMPTZ",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_frame VARCHAR(30)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_code VARCHAR(12)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by VARCHAR(36)",
+            "CREATE UNIQUE INDEX IF NOT EXISTS ix_users_referral_code ON users(referral_code) WHERE referral_code IS NOT NULL",
             """CREATE TABLE IF NOT EXISTS spin_theme_unlocks (
                 id VARCHAR(36) PRIMARY KEY, user_id VARCHAR(36) NOT NULL,
                 theme_id VARCHAR(20) NOT NULL, expires_at TIMESTAMPTZ NOT NULL,
@@ -325,6 +330,7 @@ async def _ensure_columns():
     _asyncio.create_task(_weekly_summary_cron())
     _asyncio.create_task(_streak_danger_cron())
     _asyncio.create_task(_challenge_expiry_cron())
+    _asyncio.create_task(_tournament_end_cron())
 
 
 async def _weekly_summary_cron():
@@ -467,3 +473,59 @@ async def _challenge_expiry_cron():
                         logger.warning(f"[cron] challenge_expiry push failed for {c.id}: {e}")
         except Exception as e:
             logger.error(f"[cron] challenge_expiry cron error: {e}")
+
+
+async def _tournament_end_cron():
+    """Every 30 min: push final rank to tournament participants when tournament ends."""
+    import asyncio
+    from datetime import datetime, timezone, timedelta
+    from database import AsyncSessionLocal
+    from sqlalchemy import select as _sel
+    from models import User as _U, Tournament as _T, TournamentEntry as _TE
+    from services.notifications import _send_expo_push
+
+    notified_tournaments: set[str] = set()
+
+    while True:
+        await asyncio.sleep(1800)  # 30 min
+        try:
+            now = datetime.now(timezone.utc)
+            window_start = now - timedelta(minutes=35)
+            async with AsyncSessionLocal() as db:
+                # Tournaments that ended in the last 30-35 min window
+                res = await db.execute(
+                    _sel(_T).where(
+                        _T.end_at >= window_start,
+                        _T.end_at < now,
+                        _T.status == "active",
+                    )
+                )
+                ended = res.scalars().all()
+                for t in ended:
+                    if t.id in notified_tournaments:
+                        continue
+                    notified_tournaments.add(t.id)
+                    t.status = "finished"
+                    await db.commit()
+
+                    # Fetch all entries sorted by score
+                    entries_res = await db.execute(
+                        _sel(_TE).where(_TE.tournament_id == t.id)
+                        .order_by(_TE.score.desc())
+                    )
+                    entries = entries_res.scalars().all()
+                    total = len(entries)
+                    for rank, entry in enumerate(entries, 1):
+                        user_res = await db.execute(_sel(_U).where(_U.id == entry.user_id))
+                        user = user_res.scalar_one_or_none()
+                        if not user or not user.push_token:
+                            continue
+                        medal = "🥇" if rank == 1 else "🥈" if rank == 2 else "🥉" if rank == 3 else f"#{rank}"
+                        await _send_expo_push(
+                            user.push_token,
+                            f"🏆 Tournoi terminé — {t.theme_name}",
+                            f"{medal} sur {total} joueurs · {entry.score} pts",
+                            {"type": "tournament_end", "tournament_id": t.id},
+                        )
+        except Exception as e:
+            logger.error(f"[cron] tournament_end cron error: {e}")

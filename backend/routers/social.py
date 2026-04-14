@@ -922,6 +922,7 @@ async def get_home_feed(user_id: str, limit: int = 20, offset: int = 0, db: Asyn
         "user": {
             "pseudo": user.pseudo, "avatar_seed": user.avatar_seed,
             "avatar_url": getattr(user, 'avatar_url', None),
+            "avatar_frame": getattr(user, 'avatar_frame', None),
             "total_xp": user.total_xp, "current_streak": user.current_streak,
             "last_played_at": user.last_played_at.isoformat() if user.last_played_at else None,
             "best_streak": user.best_streak,
@@ -1045,3 +1046,48 @@ async def get_challenge_suggestions(
         })
 
     return result
+
+
+# ── Rival ──────────────────────────────────────────────────────────────────────
+
+@router.get("/social/my-rival")
+async def my_rival(
+    current_user: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Returns the player just above current_user in total_xp ranking.
+    That player is the user's 'rival' to catch.
+    """
+    me_res = await db.execute(select(User).where(User.id == current_user))
+    me = me_res.scalar_one_or_none()
+    if not me:
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
+
+    my_xp = me.total_xp or 0
+
+    # Player just above: minimum XP greater than mine, closest
+    rival_res = await db.execute(
+        select(User)
+        .where(User.total_xp > my_xp, User.is_bot == False, User.id != current_user)
+        .order_by(User.total_xp.asc())
+        .limit(1)
+    )
+    rival = rival_res.scalar_one_or_none()
+
+    if not rival:
+        return {"rival": None}
+
+    return {
+        "rival": {
+            "user_id": rival.id,
+            "pseudo": rival.pseudo,
+            "avatar_seed": rival.avatar_seed or "",
+            "avatar_url": getattr(rival, "avatar_url", None),
+            "avatar_frame": getattr(rival, "avatar_frame", None),
+            "total_xp": rival.total_xp or 0,
+            "xp_gap": (rival.total_xp or 0) - my_xp,
+            "level": get_level(rival.total_xp or 0),
+        }
+    }
+

@@ -719,6 +719,24 @@ const translations: Translations = {
   'spin.btn_title': { fr: 'Roue Quotidienne', en: 'Daily Wheel', es: 'Ruleta Diaria', de: 'Tägliches Rad', pt: 'Roda Diária', it: 'Ruota Giornaliera', ar: 'العجلة اليومية', ja: 'デイリーホイール', ko: '일일 룰렛', zh: '每日转盘' },
   'spin.available': { fr: 'Spin disponible !', en: 'Spin available!', es: '¡Giro disponible!', de: 'Spin verfügbar!', pt: 'Giro disponível!', it: 'Giro disponibile!', ar: 'التدوير متاح!', ja: 'スピン可能！', ko: '스핀 가능!', zh: '可以转动！' },
   'spin.used': { fr: 'Reviens demain', en: 'Come back tomorrow', es: 'Vuelve mañana', de: 'Komm morgen wieder', pt: 'Volte amanhã', it: 'Torna domani', ar: 'عد غداً', ja: '明日また来てね', ko: '내일 다시 오세요', zh: '明天再来' },
+
+  // Rival
+  'rival.label': { fr: 'RIVAL', en: 'RIVAL', es: 'RIVAL', de: 'RIVALE', pt: 'RIVAL', it: 'RIVALE', ar: 'المنافس', ja: 'ライバル', ko: '라이벌', zh: '对手' },
+  'rival.xp_behind': { fr: 'XP derrière', en: 'XP behind', es: 'XP detrás', de: 'XP dahinter', pt: 'XP atrás', it: 'XP dietro', ar: 'نقطة خلفه', ja: 'XP差', ko: 'XP 뒤처짐', zh: 'XP落后' },
+  'rival.challenge': { fr: 'Défier', en: 'Challenge', es: 'Desafiar', de: 'Herausfordern', pt: 'Desafiar', it: 'Sfida', ar: 'تحدي', ja: '挑む', ko: '도전', zh: '挑战' },
+
+  // Parrainage
+  'referral.title': { fr: 'Parrainage', en: 'Referral', es: 'Referido', de: 'Empfehlung', pt: 'Indicação', it: 'Referral', ar: 'الإحالة', ja: '招待', ko: '추천', zh: '推荐' },
+  'referral.your_code': { fr: 'Ton code', en: 'Your code', es: 'Tu código', de: 'Dein Code', pt: 'Seu código', it: 'Il tuo codice', ar: 'رمزك', ja: 'あなたのコード', ko: '내 코드', zh: '你的码' },
+  'referral.share': { fr: 'Partager', en: 'Share', es: 'Compartir', de: 'Teilen', pt: 'Compartilhar', it: 'Condividi', ar: 'مشاركة', ja: 'シェア', ko: '공유', zh: '分享' },
+  'referral.friends': { fr: 'amis parrainés', en: 'friends referred', es: 'amigos referidos', de: 'geworbene Freunde', pt: 'amigos indicados', it: 'amici invitati', ar: 'أصدقاء مُحالون', ja: '招待した友達', ko: '추천한 친구', zh: '已推荐朋友' },
+  'referral.milestone': { fr: 'Atteins 3 filleuls pour débloquer un bonus !', en: 'Reach 3 referrals for a bonus!', es: '¡Llega a 3 referidos para un bono!', de: '3 Geworbene für einen Bonus!', pt: 'Alcance 3 indicações para um bônus!', it: 'Raggiungi 3 referral per un bonus!', ar: 'احصل على 3 إحالات للحصول على مكافأة!', ja: '3人招待でボーナス！', ko: '3명 추천으로 보너스!', zh: '达到3次推荐获得奖励！' },
+
+  // Cosmétiques frames
+  'frame.gold_frame': { fr: 'Cadre Or', en: 'Gold Frame', es: 'Marco Dorado', de: 'Goldrahmen', pt: 'Moldura Dourada', it: 'Cornice Oro', ar: 'إطار ذهبي', ja: 'ゴールドフレーム', ko: '골드 프레임', zh: '金色边框' },
+  'frame.fire_frame': { fr: 'Cadre Feu', en: 'Fire Frame', es: 'Marco Fuego', de: 'Feuerrahmen', pt: 'Moldura Fogo', it: 'Cornice Fuoco', ar: 'إطار ناري', ja: 'ファイアフレーム', ko: '파이어 프레임', zh: '火焰边框' },
+  'frame.diamond_frame': { fr: 'Cadre Diamant', en: 'Diamond Frame', es: 'Marco Diamante', de: 'Diamantrahmen', pt: 'Moldura Diamante', it: 'Cornice Diamante', ar: 'إطار ألماسي', ja: 'ダイヤモンドフレーム', ko: '다이아몬드 프레임', zh: '钻石边框' },
+  'frame.champion_frame': { fr: 'Cadre Champion', en: 'Champion Frame', es: 'Marco Campeón', de: 'Meisterrahmen', pt: 'Moldura Campeão', it: 'Cornice Campione', ar: 'إطار البطل', ja: 'チャンピオンフレーム', ko: '챔피언 프레임', zh: '冠军边框' },
 };
 
 let currentLanguage: Language = 'fr';

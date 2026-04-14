@@ -39,6 +39,11 @@ ACHIEVEMENTS: list[dict] = [
     # ── Missions ──────────────────────────────────────────────────────────────
     {"id": "missions_7",      "name": "Discipliné",       "icon": "📋", "desc": "Compléter 7 séries de missions", "type": "mission_days",    "target": 7,   "xp": 150},
     {"id": "missions_30",     "name": "Inébranlable",     "icon": "🏅", "desc": "Compléter 30 séries de missions","type": "mission_days",    "target": 30,  "xp": 600},
+    # ── Cosmétiques ───────────────────────────────────────────────────────────
+    {"id": "wins_100",        "name": "Centenaire",       "icon": "👑", "desc": "Gagner 100 parties",              "type": "wins",            "target": 100, "xp": 1000, "frame": "gold_frame"},
+    {"id": "streak_30",       "name": "Invincible",       "icon": "🔥", "desc": "Série de 30 victoires",           "type": "win_streak",      "target": 30,  "xp": 1000, "frame": "fire_frame"},
+    {"id": "login_60",        "name": "Fidèle",           "icon": "🗓️", "desc": "60 jours de connexion consécutifs","type": "login_streak",   "target": 60,  "xp": 1000, "frame": "diamond_frame"},
+    {"id": "perfect_50",      "name": "Légende",          "icon": "✨", "desc": "50 scores parfaits",              "type": "perfect_scores",  "target": 50,  "xp": 1500, "frame": "champion_frame"},
 ]
 
 ACHIEVEMENT_MAP = {a["id"]: a for a in ACHIEVEMENTS}
@@ -73,6 +78,10 @@ async def _unlock(row, definition: dict, user_id: str, db: AsyncSession) -> dict
     user = user_res.scalar_one_or_none()
     if user:
         user.total_xp = (user.total_xp or 0) + definition["xp"]
+        # Grant cosmetic frame if this achievement has one
+        frame = definition.get("frame")
+        if frame and not user.avatar_frame:
+            user.avatar_frame = frame
     await db.flush()
     return {**definition, "unlocked_at": row.unlocked_at.isoformat()}
 

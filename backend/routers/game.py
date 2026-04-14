@@ -489,6 +489,27 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
             data={"screen": "results", "params": {"matchId": match.id}},
         )
 
+        # ── Rival push : notify the player just above us that we are catching up ──
+        try:
+            rival_res = await db.execute(
+                select(User)
+                .where(User.total_xp > user.total_xp, User.is_bot == False, User.id != player_id)
+                .order_by(User.total_xp.asc())
+                .limit(1)
+            )
+            rival = rival_res.scalar_one_or_none()
+            if rival and rival.push_token:
+                xp_gap = (rival.total_xp or 0) - (user.total_xp or 0)
+                from services.notifications import _send_expo_push
+                await _send_expo_push(
+                    rival.push_token,
+                    "⚔️ Ton rival se rapproche !",
+                    f"{user.pseudo} n'est plus qu'à {xp_gap} XP derrière toi !",
+                    {"type": "rival_alert", "rival_id": player_id},
+                )
+        except Exception as _rival_err:
+            logger.warning(f"Rival push failed (non-critical): {_rival_err}")
+
         try:
             await db.commit()
         except Exception:

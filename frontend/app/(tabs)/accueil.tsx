@@ -168,6 +168,84 @@ const mStyles = StyleSheet.create({
   claimedText: { fontSize: 11, color: '#00FF9D' },
 });
 
+// ── Rival Banner ──
+const RivalBanner = React.memo(function RivalBanner({ router }: { router: any }) {
+  const [rival, setRival] = React.useState<{
+    user_id: string; pseudo: string; avatar_seed: string; avatar_url?: string;
+    avatar_frame?: string; total_xp: number; xp_gap: number; level: number;
+  } | null>(null);
+
+  React.useEffect(() => {
+    authFetch(`${API_URL}/api/social/my-rival`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => d?.rival && setRival(d.rival))
+      .catch(() => {});
+  }, []);
+
+  if (!rival) return null;
+
+  return (
+    <LinearGradient
+      colors={['rgba(255,107,53,0.12)', 'rgba(255,59,92,0.05)']}
+      style={rivalStyles.container}
+    >
+      <View style={rivalStyles.inner}>
+        <View style={rivalStyles.left}>
+          <View style={rivalStyles.labelRow}>
+            <MaterialCommunityIcons name="sword-cross" size={11} color="#FF6B35" />
+            <Text style={rivalStyles.label}>{t('rival.label')}</Text>
+          </View>
+          <View style={rivalStyles.playerRow}>
+            <UserAvatar
+              avatarUrl={rival.avatar_url}
+              avatarSeed={rival.avatar_seed}
+              pseudo={rival.pseudo}
+              size={32}
+              frame={rival.avatar_frame}
+            />
+            <View style={rivalStyles.playerInfo}>
+              <Text style={rivalStyles.pseudo} numberOfLines={1}>{rival.pseudo}</Text>
+              <Text style={rivalStyles.xpGap}>
+                <Text style={rivalStyles.xpNum}>{rival.xp_gap.toLocaleString()}</Text>
+                {' '}{t('rival.xp_behind')}
+              </Text>
+            </View>
+          </View>
+        </View>
+        <TouchableOpacity
+          style={rivalStyles.challengeBtn}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            router.push(`/matchmaking?opponentId=${rival.user_id}`);
+          }}
+          activeOpacity={0.8}
+        >
+          <LinearGradient colors={['#FF6B35', '#FF3B5C']} style={rivalStyles.challengeGrad}>
+            <MaterialCommunityIcons name="sword-cross" size={12} color="#FFF" />
+            <Text style={rivalStyles.challengeText}>{t('rival.challenge')}</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+    </LinearGradient>
+  );
+});
+
+const rivalStyles = StyleSheet.create({
+  container: { marginHorizontal: 16, marginBottom: 10, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,107,53,0.25)' },
+  inner: { flexDirection: 'row', alignItems: 'center', padding: 12, gap: 12 },
+  left: { flex: 1 },
+  labelRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6 },
+  label: { fontSize: 9, fontWeight: '800', color: '#FF6B35', letterSpacing: 1.5, textTransform: 'uppercase' },
+  playerRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  playerInfo: { flex: 1 },
+  pseudo: { color: '#FFF', fontSize: 13, fontWeight: '800' },
+  xpGap: { color: '#888', fontSize: 11 },
+  xpNum: { color: '#FF6B35', fontWeight: '700' },
+  challengeBtn: { borderRadius: 10, overflow: 'hidden' },
+  challengeGrad: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 8 },
+  challengeText: { color: '#FFF', fontSize: 12, fontWeight: '800' },
+});
+
 // ── Tournament Banner ──
 const TournamentBanner = React.memo(function TournamentBanner({ router }: { router: any }) {
   const [info, setInfo] = React.useState<{
@@ -1680,6 +1758,9 @@ export default function AccueilScreen() {
             )}
           </Animated.View>
         )}
+
+        {/* ── Rival Banner ── */}
+        <RivalBanner router={router} />
 
         {/* ── Tournament Banner ── */}
         <TournamentBanner router={router} />

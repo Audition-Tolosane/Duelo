@@ -272,8 +272,27 @@ export default function ProfileScreen() {
   const [countrySearch, setCountrySearch] = useState('');
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [savingLocation, setSavingLocation] = useState(false);
+  const [referralData, setReferralData] = useState<{
+    code: string; referral_count: number; milestone_count: number;
+    milestone_reached: boolean; xp_per_friend: number; milestone_bonus_xp: number;
+  } | null>(null);
 
-  useEffect(() => { loadProfile(); }, []);
+  useEffect(() => { loadProfile(); loadReferral(); }, []);
+
+  const loadReferral = async () => {
+    try {
+      const res = await authFetch(`${API_URL}/api/referral/my-code`);
+      if (res.ok) setReferralData(await res.json());
+    } catch {}
+  };
+
+  const handleShareReferral = () => {
+    if (!referralData) return;
+    const msg = `Rejoins-moi sur Duelo, le jeu de culture générale ! 🎮\nUtilise mon code : ${referralData.code}\nhttps://duelo.app`;
+    import('react-native').then(({ Share }) =>
+      Share.share({ message: msg }).catch(() => {})
+    );
+  };
 
   const loadProfile = async () => {
     setProfileError(false);
@@ -669,6 +688,40 @@ export default function ProfileScreen() {
           ))
         )}
 
+        {/* ── Parrainage ── */}
+        {referralData && (
+          <View style={s.referralCard}>
+            <View style={s.referralHeader}>
+              <LinearGradient colors={['#00FF9D20', '#00D4FF10']} style={s.referralIconCircle}>
+                <MaterialCommunityIcons name="account-plus" size={18} color="#00FF9D" />
+              </LinearGradient>
+              <Text style={s.referralTitle}>{t('referral.title')}</Text>
+              {referralData.referral_count > 0 && (
+                <View style={s.referralCountBadge}>
+                  <Text style={s.referralCountText}>
+                    {referralData.referral_count} {t('referral.friends')}
+                  </Text>
+                </View>
+              )}
+            </View>
+            <View style={s.referralCodeRow}>
+              <Text style={s.referralCodeLabel}>{t('referral.your_code')}</Text>
+              <View style={s.referralCodeBox}>
+                <Text style={s.referralCode}>{referralData.code}</Text>
+              </View>
+            </View>
+            {!referralData.milestone_reached && (
+              <Text style={s.referralMilestone}>{t('referral.milestone')}</Text>
+            )}
+            <TouchableOpacity style={s.referralShareBtn} onPress={handleShareReferral} activeOpacity={0.8}>
+              <LinearGradient colors={['#00FF9D', '#00D4FF']} style={s.referralShareGrad}>
+                <MaterialCommunityIcons name="share-variant" size={14} color="#000" />
+                <Text style={s.referralShareText}>{t('referral.share')}</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* ── Paramètres ── */}
         <Text style={s.sectionTitle}>{t('profile.settings')}</Text>
         <View style={s.settingsWrap}>
@@ -1052,6 +1105,27 @@ const s = StyleSheet.create({
   },
   settingsText: { flex: 1, color: '#E0E0E0', fontSize: 15, fontWeight: '600' },
   settingsDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.04)', marginLeft: 66 },
+
+  // Parrainage
+  referralCard: {
+    marginHorizontal: GRID_PAD, marginBottom: 16, borderRadius: 18,
+    backgroundColor: 'rgba(0,255,157,0.05)', borderWidth: 1, borderColor: 'rgba(0,255,157,0.15)',
+    padding: 16,
+  },
+  referralHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 },
+  referralIconCircle: { width: 36, height: 36, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  referralTitle: { flex: 1, color: '#FFF', fontSize: 14, fontWeight: '800' },
+  referralCountBadge: { backgroundColor: 'rgba(0,255,157,0.15)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
+  referralCountText: { color: '#00FF9D', fontSize: 11, fontWeight: '700' },
+  referralCodeRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
+  referralCodeLabel: { color: '#888', fontSize: 12 },
+  referralCodeBox: { backgroundColor: 'rgba(0,255,157,0.1)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(0,255,157,0.2)' },
+  referralCode: { color: '#00FF9D', fontSize: 16, fontWeight: '900', letterSpacing: 2 },
+  referralMilestone: { color: '#666', fontSize: 11, marginBottom: 12 },
+  referralShareBtn: { borderRadius: 10, overflow: 'hidden' },
+  referralShareGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10 },
+  referralShareText: { color: '#000', fontSize: 13, fontWeight: '900' },
+
   logoutRow: {
     flexDirection: 'row', alignItems: 'center',
     marginHorizontal: GRID_PAD, paddingVertical: 12, paddingHorizontal: 14,

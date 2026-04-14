@@ -49,6 +49,9 @@ class User(Base):
     selected_title = Column(String(100), nullable=True)
 
     push_token = Column(String(200), nullable=True)  # Expo push token for remote notifications
+    avatar_frame = Column(String(30), nullable=True)   # cosmetic frame unlocked by achievements
+    referral_code = Column(String(12), nullable=True, unique=True, index=True)
+    referred_by = Column(String(36), nullable=True)    # user_id of referrer
 
     google_id = Column(String(255), unique=True, nullable=True, index=True)
     apple_id = Column(String(255), unique=True, nullable=True, index=True)
