@@ -23,6 +23,28 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 RESERVED_NAMES = {"admin", "root", "system", "duelo", "bot", "moderator", "mod", "support"}
 PSEUDO_REGEX = re.compile(r'^[a-zA-Z0-9_\-àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ]+$')
 
+# Providers qui ignorent les points dans la partie locale (a.b@gmail.com == ab@gmail.com)
+_DOT_INSENSITIVE_DOMAINS = {"gmail.com", "googlemail.com"}
+
+
+def normalize_email(raw: str) -> str:
+    """
+    Canonicalise an email address to block +alias tricks and dot tricks.
+    - Lowercase + strip
+    - Remove +alias from local part  (user+foo@x.com → user@x.com)
+    - Remove dots from local part for Gmail/Googlemail  (a.b@gmail.com → ab@gmail.com)
+    """
+    email = raw.lower().strip()
+    if "@" not in email:
+        return email
+    local, domain = email.rsplit("@", 1)
+    # Strip +alias
+    local = local.split("+")[0]
+    # Strip dots for dot-insensitive providers
+    if domain in _DOT_INSENSITIVE_DOMAINS:
+        local = local.replace(".", "")
+    return f"{local}@{domain}"
+
 
 def _validate_pseudo(pseudo: str):
     if len(pseudo) < 3 or len(pseudo) > 20:
@@ -60,7 +82,7 @@ async def register_email(data: EmailRegister, request: Request, db: AsyncSession
     if result.scalar_one_or_none():
         raise HTTPException(status_code=409, detail="Ce pseudo est déjà pris")
 
-    normalized_email = data.email.lower().strip()
+    normalized_email = normalize_email(data.email)
     result = await db.execute(select(User).where(User.email == normalized_email))
     if result.scalar_one_or_none():
         raise HTTPException(status_code=409, detail="Cet email est déjà utilisé")
@@ -99,14 +121,14 @@ async def login(data: LoginRequest, request: Request, db: AsyncSession = Depends
         raise HTTPException(status_code=429, detail="Trop de tentatives, réessayez dans 15 minutes")
 
     # Per-email lockout: 5 failed attempts per 15 min
-    email_key = f"login_fail:{data.email.lower()}"
+    normalized_email = normalize_email(data.email)
+    email_key = f"login_fail:{normalized_email}"
     try:
         _limiter.check(email_key, 5, 900)
     except HTTPException:
         raise HTTPException(status_code=429, detail="Trop de tentatives, réessayez dans 15 minutes")
 
-    # #16 — Normalise email to lowercase so case variants hit the same account + rate-limit bucket
-    normalized_email = data.email.lower().strip()
+    # Normalise email (strips +alias, dots for gmail)
     result = await db.execute(select(User).where(User.email == normalized_email))
     user = result.scalar_one_or_none()
     if not user or not user.password_hash or not verify_password(data.password, user.password_hash):
@@ -324,6 +346,7 @@ async def social_login(
 
     # 2. Existing account with same email → link
     if email:
+        email = normalize_email(email)
         result = await db.execute(select(User).where(User.email == email))
         user = result.scalar_one_or_none()
         if user:
@@ -347,7 +370,7 @@ async def social_login(
     country = await detect_country_from_ip(request)
     user = User(
         pseudo=pseudo,
-        email=email,
+        email=normalize_email(email) if email else None,
         is_guest=False,
         country=country,
         **{id_field: provider_id},
