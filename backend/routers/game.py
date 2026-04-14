@@ -489,6 +489,13 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
             data={"screen": "results", "params": {"matchId": match.id}},
         )
 
+        # ── Referral qualification check (deferred reward) ──
+        try:
+            from routers.referral import check_referral_qualification
+            await check_referral_qualification(player_id, db)
+        except Exception as _ref_err:
+            logger.warning(f"Referral check failed (non-critical): {_ref_err}")
+
         # ── Rival push : notify the player just above us that we are catching up ──
         try:
             rival_res = await db.execute(

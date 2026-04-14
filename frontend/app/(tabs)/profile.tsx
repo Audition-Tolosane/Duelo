@@ -273,8 +273,15 @@ export default function ProfileScreen() {
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [savingLocation, setSavingLocation] = useState(false);
   const [referralData, setReferralData] = useState<{
-    code: string; referral_count: number; milestone_count: number;
-    milestone_reached: boolean; xp_per_friend: number; milestone_bonus_xp: number;
+    code: string;
+    total_referrals: number;
+    confirmed_referrals: number;
+    milestones: { count: number; delta_days: number }[];
+    total_pro_days_earned: number;
+    pro_active: boolean;
+    pro_expires_at: string | null;
+    min_matches_required: number;
+    min_age_hours: number;
   } | null>(null);
 
   useEffect(() => { loadProfile(); loadReferral(); }, []);
@@ -288,7 +295,7 @@ export default function ProfileScreen() {
 
   const handleShareReferral = () => {
     if (!referralData) return;
-    const msg = `Rejoins-moi sur Duelo, le jeu de culture générale ! 🎮\nUtilise mon code : ${referralData.code}\nhttps://duelo.app`;
+    const msg = `Rejoins-moi sur Duelo ! 🎮 Utilise mon code de parrainage : ${referralData.code}\nJoue 3 parties pour valider et me faire gagner du Pro !`;
     import('react-native').then(({ Share }) =>
       Share.share({ message: msg }).catch(() => {})
     );
@@ -691,28 +698,74 @@ export default function ProfileScreen() {
         {/* ── Parrainage ── */}
         {referralData && (
           <View style={s.referralCard}>
+            {/* Header */}
             <View style={s.referralHeader}>
               <LinearGradient colors={['#00FF9D20', '#00D4FF10']} style={s.referralIconCircle}>
                 <MaterialCommunityIcons name="account-plus" size={18} color="#00FF9D" />
               </LinearGradient>
               <Text style={s.referralTitle}>{t('referral.title')}</Text>
-              {referralData.referral_count > 0 && (
-                <View style={s.referralCountBadge}>
-                  <Text style={s.referralCountText}>
-                    {referralData.referral_count} {t('referral.friends')}
-                  </Text>
+              {referralData.pro_active && referralData.pro_expires_at && (
+                <View style={s.referralProBadge}>
+                  <MaterialCommunityIcons name="crown" size={11} color="#FFD700" />
+                  <Text style={s.referralProBadgeText}>PRO</Text>
                 </View>
               )}
             </View>
+
+            {/* Code */}
             <View style={s.referralCodeRow}>
               <Text style={s.referralCodeLabel}>{t('referral.your_code')}</Text>
               <View style={s.referralCodeBox}>
                 <Text style={s.referralCode}>{referralData.code}</Text>
               </View>
             </View>
-            {!referralData.milestone_reached && (
-              <Text style={s.referralMilestone}>{t('referral.milestone')}</Text>
+
+            {/* Paliers visuels */}
+            <View style={s.referralMilestones}>
+              {[
+                { count: 1, label: '1 j Pro',   total: 1 },
+                { count: 2, label: '3 j Pro',   total: 3 },
+                { count: 3, label: '7 j Pro',   total: 7 },
+              ].map((m) => {
+                const done = referralData.confirmed_referrals >= m.count;
+                return (
+                  <View key={m.count} style={[s.referralMilestoneItem, done && s.referralMilestoneDone]}>
+                    <MaterialCommunityIcons
+                      name={done ? 'check-circle' : 'circle-outline'}
+                      size={16} color={done ? '#00FF9D' : '#444'}
+                    />
+                    <Text style={[s.referralMilestoneLabel, done && { color: '#00FF9D' }]}>
+                      {m.count} filleul{m.count > 1 ? 's' : ''} → {m.label}
+                    </Text>
+                  </View>
+                );
+              })}
+            </View>
+
+            {/* Progression filleuls */}
+            <Text style={s.referralProgress}>
+              {referralData.confirmed_referrals}/{3} filleuls confirmés
+              {referralData.total_referrals > referralData.confirmed_referrals && (
+                ` · ${referralData.total_referrals - referralData.confirmed_referrals} en attente`
+              )}
+            </Text>
+
+            {/* Info anti-abus */}
+            <Text style={s.referralAntiAbuse}>
+              Un filleul est confirmé après {referralData.min_matches_required} parties + compte lié + 24h
+            </Text>
+
+            {/* Pro expiry */}
+            {referralData.pro_active && referralData.pro_expires_at && (
+              <View style={s.referralProRow}>
+                <MaterialCommunityIcons name="crown" size={13} color="#FFD700" />
+                <Text style={s.referralProText}>
+                  Pro jusqu'au {new Date(referralData.pro_expires_at).toLocaleDateString()}
+                </Text>
+              </View>
             )}
+
+            {/* Partager */}
             <TouchableOpacity style={s.referralShareBtn} onPress={handleShareReferral} activeOpacity={0.8}>
               <LinearGradient colors={['#00FF9D', '#00D4FF']} style={s.referralShareGrad}>
                 <MaterialCommunityIcons name="share-variant" size={14} color="#000" />
@@ -1115,13 +1168,20 @@ const s = StyleSheet.create({
   referralHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 },
   referralIconCircle: { width: 36, height: 36, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
   referralTitle: { flex: 1, color: '#FFF', fontSize: 14, fontWeight: '800' },
-  referralCountBadge: { backgroundColor: 'rgba(0,255,157,0.15)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
-  referralCountText: { color: '#00FF9D', fontSize: 11, fontWeight: '700' },
-  referralCodeRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
+  referralProBadge: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: 'rgba(255,215,0,0.15)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
+  referralProBadgeText: { color: '#FFD700', fontSize: 10, fontWeight: '900' },
+  referralCodeRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 },
   referralCodeLabel: { color: '#888', fontSize: 12 },
   referralCodeBox: { backgroundColor: 'rgba(0,255,157,0.1)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(0,255,157,0.2)' },
   referralCode: { color: '#00FF9D', fontSize: 16, fontWeight: '900', letterSpacing: 2 },
-  referralMilestone: { color: '#666', fontSize: 11, marginBottom: 12 },
+  referralMilestones: { gap: 8, marginBottom: 12 },
+  referralMilestoneItem: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  referralMilestoneDone: {},
+  referralMilestoneLabel: { color: '#666', fontSize: 12, fontWeight: '600' },
+  referralProgress: { color: '#888', fontSize: 12, marginBottom: 4 },
+  referralAntiAbuse: { color: '#444', fontSize: 10, fontStyle: 'italic', marginBottom: 12 },
+  referralProRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
+  referralProText: { color: '#FFD700', fontSize: 12, fontWeight: '700' },
   referralShareBtn: { borderRadius: 10, overflow: 'hidden' },
   referralShareGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10 },
   referralShareText: { color: '#000', fontSize: 13, fontWeight: '900' },

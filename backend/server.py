@@ -274,6 +274,8 @@ async def _ensure_columns():
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_frame VARCHAR(30)",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_code VARCHAR(12)",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by VARCHAR(36)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_confirmed BOOLEAN DEFAULT FALSE",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS pro_expires_at TIMESTAMPTZ",
             "CREATE UNIQUE INDEX IF NOT EXISTS ix_users_referral_code ON users(referral_code) WHERE referral_code IS NOT NULL",
             """CREATE TABLE IF NOT EXISTS spin_theme_unlocks (
                 id VARCHAR(36) PRIMARY KEY, user_id VARCHAR(36) NOT NULL,

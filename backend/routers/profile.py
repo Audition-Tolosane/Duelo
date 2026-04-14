@@ -119,6 +119,7 @@ async def get_profile(user_id: str, pseudo: Optional[str] = None, db: AsyncSessi
             "avatar_url": user.avatar_url,
             "avatar_frame": getattr(user, "avatar_frame", None),
             "is_guest": user.is_guest, "total_xp": user.total_xp,
+            "pro_expires_at": user.pro_expires_at.isoformat() if getattr(user, "pro_expires_at", None) else None,
             "selected_title": user.selected_title,
             "country": user.country, "city": user.city, "country_flag": country_flag,
             "matches_played": user.matches_played, "matches_won": user.matches_won,

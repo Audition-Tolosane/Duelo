@@ -52,6 +52,8 @@ class User(Base):
     avatar_frame = Column(String(30), nullable=True)   # cosmetic frame unlocked by achievements
     referral_code = Column(String(12), nullable=True, unique=True, index=True)
     referred_by = Column(String(36), nullable=True)    # user_id of referrer
+    referral_confirmed = Column(Boolean, default=False) # True once filleul has met qualification
+    pro_expires_at = Column(DateTime(timezone=True), nullable=True)  # Pro subscription expiry
 
     google_id = Column(String(255), unique=True, nullable=True, index=True)
     apple_id = Column(String(255), unique=True, nullable=True, index=True)
