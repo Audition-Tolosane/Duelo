@@ -83,6 +83,10 @@ async def register_email(data: EmailRegister, request: Request, db: AsyncSession
         raise HTTPException(status_code=409, detail="Ce pseudo est déjà pris")
 
     normalized_email = normalize_email(data.email)
+    # Block disposable/temporary email providers
+    from routers.referral import _is_disposable_email
+    if _is_disposable_email(normalized_email):
+        raise HTTPException(status_code=400, detail="Les adresses email temporaires ne sont pas acceptées")
     result = await db.execute(select(User).where(User.email == normalized_email))
     if result.scalar_one_or_none():
         raise HTTPException(status_code=409, detail="Cet email est déjà utilisé")

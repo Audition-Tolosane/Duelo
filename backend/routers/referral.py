@@ -6,25 +6,37 @@ Paliers (filleuls CONFIRMÉS) :
   2 filleuls → +2 jours Pro supplémentaires (total 3 j)
   3 filleuls → +4 jours Pro supplémentaires (total 7 j)
 
-Anti-abus : un filleul n'est confirmé que si :
-  1. Son compte est lié (non-guest : email, Google ou Apple)
-  2. Il a joué au moins 3 parties
-  3. Son compte a au moins 24h d'ancienneté
-
-Ainsi, se déconnecter pour créer de faux comptes ne suffit pas :
-chaque compte bidoune doit jouer 3 vraies parties ET attendre 24h
-avant de rapporter quoi que ce soit.
+Anti-abus (couches cumulées) :
+  1. Compte non-guest (email/Google/Apple) + email normalisé (pas de +alias)
+  2. Email non jetable (domaine blacklisté)
+  3. ≥ 3 parties jouées
+  4. Compte ≥ 24h d'ancienneté
+  5. Plafond dur : max MAX_REFERRALS_PER_REFERRER filleuls confirmés par parrain
+  6. Cooldown IP : un même IP ne peut confirmer qu'1 filleul par parrain sur 30 jours
 """
 import secrets
 import string
 from datetime import datetime, timezone, timedelta
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import User
 from auth_middleware import get_current_user_id
 from services.notifications import create_notification
+
+# ── Domaines email jetables connus ────────────────────────────────────────────
+DISPOSABLE_EMAIL_DOMAINS = {
+    "mailinator.com", "guerrillamail.com", "10minutemail.com", "tempmail.com",
+    "throwaway.email", "yopmail.com", "sharklasers.com", "guerrillamailblock.com",
+    "grr.la", "guerrillamail.info", "guerrillamail.biz", "guerrillamail.de",
+    "guerrillamail.net", "guerrillamail.org", "spam4.me", "trashmail.com",
+    "trashmail.me", "trashmail.net", "trashmail.org", "trashmail.io",
+    "dispostable.com", "mailnull.com", "spamgourmet.com", "maildrop.cc",
+    "mailnesia.com", "discard.email", "spamhereplease.com", "fakeinbox.com",
+    "tempr.email", "tempinbox.com", "mailtemp.net", "getnada.com",
+    "anonaddy.com", "tmail.com", "mailsac.com", "33mail.com",
+}
 
 router = APIRouter(prefix="/referral", tags=["referral"])
 
@@ -38,6 +50,12 @@ PRO_MILESTONES = [
 # Conditions de qualification d'un filleul
 MIN_MATCHES = 3
 MIN_ACCOUNT_AGE_HOURS = 24
+MAX_REFERRALS_PER_REFERRER = 3          # plafond dur : jamais plus de 3 filleuls récompensés
+IP_COOLDOWN_DAYS = 30                   # un IP ne peut confirmer qu'1 filleul/parrain/30j
+
+# Cache mémoire IP→{referrer_id: last_confirmation_ts}
+# (suffisant pour Railway single-instance ; remplacer par Redis si multi-instance)
+_ip_referral_log: dict[str, dict[str, datetime]] = {}
 
 ALPHABET = string.ascii_uppercase + string.digits
 
@@ -72,7 +90,14 @@ def _count_confirmed_referrals(referrals: list[User]) -> int:
     return sum(1 for u in referrals if u.referral_confirmed)
 
 
-async def check_referral_qualification(user_id: str, db: AsyncSession) -> bool:
+def _is_disposable_email(email: str | None) -> bool:
+    if not email:
+        return False
+    domain = email.lower().split("@")[-1]
+    return domain in DISPOSABLE_EMAIL_DOMAINS
+
+
+async def check_referral_qualification(user_id: str, db: AsyncSession, client_ip: str = "") -> bool:
     """
     Called after each match (from game.py).
     If the user is a filleul (has referred_by) and meets all criteria,
@@ -92,6 +117,10 @@ async def check_referral_qualification(user_id: str, db: AsyncSession) -> bool:
     if user.is_guest:
         return False
 
+    # Email must not be from a disposable provider
+    if _is_disposable_email(user.email):
+        return False
+
     # Must have played enough matches
     if (user.matches_played or 0) < MIN_MATCHES:
         return False
@@ -104,26 +133,45 @@ async def check_referral_qualification(user_id: str, db: AsyncSession) -> bool:
     if age_hours < MIN_ACCOUNT_AGE_HOURS:
         return False
 
-    # Qualify!
-    user.referral_confirmed = True
-
     # Fetch referrer
     ref_res = await db.execute(select(User).where(User.id == user.referred_by))
     referrer = ref_res.scalar_one_or_none()
     if not referrer:
+        user.referral_confirmed = True
         await db.commit()
         return True
 
-    # Count confirmed referrals for referrer (including this one)
+    # Hard cap: referrer cannot get rewards beyond MAX_REFERRALS_PER_REFERRER
     count_res = await db.execute(
         select(func.count(User.id)).where(
             User.referred_by == referrer.id,
             User.referral_confirmed == True,
         )
     )
-    confirmed_count = (count_res.scalar() or 0) + 1  # +1 for this user (not committed yet)
+    confirmed_so_far = count_res.scalar() or 0
+    if confirmed_so_far >= MAX_REFERRALS_PER_REFERRER:
+        # Mark confirmed (user did the work) but grant no more rewards
+        user.referral_confirmed = True
+        await db.commit()
+        return True
 
+    # IP cooldown: one confirmation per IP per referrer per 30 days
     now = datetime.now(timezone.utc)
+    if client_ip:
+        ip_log = _ip_referral_log.get(client_ip, {})
+        last_for_referrer = ip_log.get(referrer.id)
+        if last_for_referrer and (now - last_for_referrer).days < IP_COOLDOWN_DAYS:
+            return False  # same IP confirmed too recently for this referrer
+
+    # All checks passed — confirm!
+    user.referral_confirmed = True
+
+    # Update IP log
+    if client_ip:
+        if client_ip not in _ip_referral_log:
+            _ip_referral_log[client_ip] = {}
+        _ip_referral_log[client_ip][referrer.id] = now
+
     days_to_grant = 0
     for m in PRO_MILESTONES:
         if confirmed_count == m["count"]:
