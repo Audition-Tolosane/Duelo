@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 from database import get_db
 
-from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge, challenges, boosts, missions, daily_question, achievements, streak_shield, xp_multiplier, tournaments, spin, referral
+from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge, challenges, boosts, missions, daily_question, achievements, streak_shield, xp_multiplier, tournaments, spin, referral, league
 from schemas import QuestionReportRequest
 from models import QuestionReport
 from sqlalchemy import select
@@ -123,6 +123,7 @@ api_router.include_router(xp_multiplier.router)
 api_router.include_router(tournaments.router)
 api_router.include_router(spin.router)
 api_router.include_router(referral.router)
+api_router.include_router(league.router)
 
 # Serve avatar static files
 avatars_dir = ROOT_DIR / "static" / "avatars"

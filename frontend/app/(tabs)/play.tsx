@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, {
   useSharedValue, useAnimatedStyle, withTiming, withSpring,
   withRepeat, withSequence, withDelay, FadeInDown, Easing,
@@ -13,6 +14,9 @@ import Animated, {
 import CosmicBackground from '../../components/CosmicBackground';
 import CategoryIcon from '../../components/CategoryIcon';
 import { t } from '../../utils/i18n';
+
+const CYAN = '#00E5FF';
+const VIOLET = '#B366FF';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -147,7 +151,7 @@ export default function PlayScreen() {
     return (
       <CosmicBackground>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#8A2BE2" />
+          <ActivityIndicator size="large" color={CYAN} />
         </View>
       </CosmicBackground>
     );
@@ -158,7 +162,8 @@ export default function PlayScreen() {
       <CosmicBackground>
         <View style={styles.loadingContainer}>
           <TouchableOpacity onPress={() => { setLoadError(false); setLoading(true); loadData(); }} style={{ padding: 20, alignItems: 'center' }}>
-            <Text style={{ color: '#aaa', fontSize: 14 }}>{t('play.load_error')}</Text>
+            <MaterialCommunityIcons name="refresh" size={32} color={CYAN} style={{ marginBottom: 10 }} />
+            <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14 }}>{t('play.load_error')}</Text>
           </TouchableOpacity>
         </View>
       </CosmicBackground>
@@ -172,12 +177,45 @@ export default function PlayScreen() {
     <CosmicBackground>
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <Text style={styles.greeting}>{t('play.greeting')} {pseudo || t('play.default_player')} 👋</Text>
-          <Text style={styles.sectionTitle}>{t('play.super_categories')}</Text>
+
+          {/* Header */}
+          <View style={styles.pageHeader}>
+            <View>
+              <Text style={styles.greeting}>{t('play.greeting')} {pseudo || t('play.default_player')}</Text>
+              <Text style={styles.greetingSub}>{t('play.super_categories')}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.searchBtn}
+              onPress={() => router.push('/search')}
+              activeOpacity={0.8}
+            >
+              <MaterialCommunityIcons name="magnify" size={20} color={CYAN} />
+            </TouchableOpacity>
+          </View>
 
           {superCategories.map((cat, index) => (
             <SuperCard key={cat.id} cat={cat} index={index} onPress={() => handlePress(cat)} />
           ))}
+
+          {upcomingFiltered.length > 0 && (
+            <>
+              <Text style={styles.comingSoonTitle}>BIENTÔT</Text>
+              <View style={styles.upcomingGrid}>
+                {upcomingFiltered.map((c) => (
+                  <View key={c.id} style={styles.upcomingCard}>
+                    <View style={styles.upcomingInner}>
+                      <LinearGradient colors={[c.color + '25', 'transparent']} style={styles.upcomingGlow} />
+                      <View style={[styles.upcomingIconCircle, { backgroundColor: c.color + '18' }]}>
+                        <Text style={styles.upcomingIcon}>{c.icon}</Text>
+                      </View>
+                      <Text style={[styles.upcomingLabel, { color: c.color }]}>{c.label.toUpperCase()}</Text>
+                      <MaterialCommunityIcons name="lock-outline" size={11} color="rgba(255,255,255,0.3)" />
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
 
           <View style={{ height: 30 }} />
         </ScrollView>
@@ -191,13 +229,26 @@ const styles = StyleSheet.create({
   loadingContainer: { flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' },
   scroll: { paddingBottom: 30 },
 
-  greeting: {
-    fontSize: 24, fontWeight: '800', color: '#FFF',
-    marginTop: 20, marginBottom: 28, paddingHorizontal: 20,
+  pageHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 20, paddingTop: 16, paddingBottom: 20,
   },
-  sectionTitle: {
-    fontSize: 11, fontWeight: '800', color: 'rgba(255,255,255,0.5)', letterSpacing: 3,
-    marginBottom: 16, paddingHorizontal: 20,
+  greeting: {
+    fontSize: 22, fontWeight: '900', color: '#FFF', letterSpacing: 0.3,
+  },
+  greetingSub: {
+    fontSize: 11, fontWeight: '700', color: 'rgba(255,255,255,0.4)',
+    letterSpacing: 2.5, marginTop: 3, textTransform: 'uppercase',
+  },
+  searchBtn: {
+    width: 42, height: 42, borderRadius: 21,
+    backgroundColor: 'rgba(0,229,255,0.08)',
+    borderWidth: 1, borderColor: 'rgba(0,229,255,0.25)',
+    justifyContent: 'center', alignItems: 'center',
+  },
+  comingSoonTitle: {
+    fontSize: 11, fontWeight: '800', color: 'rgba(255,255,255,0.3)', letterSpacing: 3,
+    marginBottom: 12, paddingHorizontal: 20, marginTop: 8,
   },
 
   // Super Category Card

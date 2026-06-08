@@ -216,6 +216,30 @@ async def get_theme_detail(theme_id: str, user_id: Optional[str] = None, db: Asy
     xp_progress = get_xp_progress(user_xp, user_level)
     unlocked_titles = get_theme_unlocked_titles(theme, user_level)
 
+    # Top player by theme XP (excluding bots)
+    top_res = await db.execute(
+        select(UserThemeXP, User)
+        .join(User, User.id == UserThemeXP.user_id)
+        .where(UserThemeXP.theme_id == theme_id, User.is_bot == False)
+        .order_by(UserThemeXP.xp.desc())
+        .limit(1)
+    )
+    top_row = top_res.first()
+    top_player = None
+    if top_row:
+        top_uxp, top_user = top_row
+        top_lvl = get_level(top_uxp.xp)
+        top_player = {
+            "id": top_user.id,
+            "pseudo": top_user.pseudo,
+            "avatar_seed": top_user.avatar_seed,
+            "avatar_url": getattr(top_user, "avatar_url", None),
+            "avatar_frame": getattr(top_user, "avatar_frame", None),
+            "xp": top_uxp.xp,
+            "level": top_lvl,
+            "title": get_theme_title(theme, top_lvl),
+        }
+
     return {
         "id": theme.id, "name": theme.name, "description": theme.description or "",
         "super_category": theme.super_category, "cluster": theme.cluster,
@@ -230,6 +254,7 @@ async def get_theme_detail(theme_id: str, user_id: Optional[str] = None, db: Asy
             20: theme.title_lv20 or "", 35: theme.title_lv35 or "",
             50: theme.title_lv50 or "",
         },
+        "top_player": top_player,
     }
 
 

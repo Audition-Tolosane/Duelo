@@ -172,9 +172,10 @@ async def check_referral_qualification(user_id: str, db: AsyncSession, client_ip
             _ip_referral_log[client_ip] = {}
         _ip_referral_log[client_ip][referrer.id] = now
 
+    new_confirmed_count = confirmed_so_far + 1
     days_to_grant = 0
     for m in PRO_MILESTONES:
-        if confirmed_count == m["count"]:
+        if new_confirmed_count == m["count"]:
             days_to_grant = m["delta_days"]
             break
 
@@ -184,9 +185,9 @@ async def check_referral_qualification(user_id: str, db: AsyncSession, client_ip
     await db.commit()
 
     # Notify referrer
-    milestone = next((m for m in PRO_MILESTONES if m["count"] == confirmed_count), None)
+    milestone = next((m for m in PRO_MILESTONES if m["count"] == new_confirmed_count), None)
     if milestone:
-        total_days = sum(m["delta_days"] for m in PRO_MILESTONES if m["count"] <= confirmed_count)
+        total_days = sum(m["delta_days"] for m in PRO_MILESTONES if m["count"] <= new_confirmed_count)
         body = (
             f"{user.pseudo} est qualifié ! +{days_to_grant} jour{'s' if days_to_grant > 1 else ''} Pro "
             f"· Total : {total_days} j Pro cumulés"

@@ -22,6 +22,12 @@ import UserAvatar from '../components/UserAvatar';
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
+const CYAN   = '#00E5FF';
+const VIOLET = '#B366FF';
+const GOLD   = '#FFB547';
+const MINT   = '#32E7A3';
+const RED    = '#FF3D5E';
+
 function hslToHex(h: number, s: number, l: number): string {
   s /= 100; l /= 100;
   const hue2rgb = (p: number, q: number, t: number) => {
@@ -46,6 +52,12 @@ function hashColor(str: string): string {
   return hslToHex(Math.abs(hash) % 360, 65, 55);
 }
 
+type TopPlayer = {
+  id: string; pseudo: string; avatar_seed: string;
+  avatar_url?: string; avatar_frame?: string;
+  xp: number; level: number; title: string;
+};
+
 type CategoryDetail = {
   id: string; name: string; description: string;
   total_questions: number; followers_count: number;
@@ -56,6 +68,7 @@ type CategoryDetail = {
   super_category?: string; cluster?: string;
   all_titles?: Record<string, string>;
   unlocked_titles?: { level: number; title: string }[];
+  top_player?: TopPlayer;
 };
 
 type WallPostData = {
@@ -84,7 +97,7 @@ export default function CategoryDetailScreen() {
     return null;
   }
 
-  const oldMeta = { icon: '❓', color: '#8A2BE2', bgPattern: '' };
+  const oldMeta = { icon: '❓', color: '#B366FF', bgPattern: '' };
 
   const [userId, setUserId] = useState('');
   const [detail, setDetail] = useState<CategoryDetail | null>(null);
@@ -157,6 +170,7 @@ export default function CategoryDetailScreen() {
         cluster: data.cluster,
         all_titles: data.all_titles || {},
         unlocked_titles: data.unlocked_titles || [],
+        top_player: data.top_player || undefined,
       });
       Animated.timing(xpBarAnim, {
         toValue: xpProg.progress,
@@ -347,15 +361,15 @@ export default function CategoryDetailScreen() {
   };
 
   if (loading) {
-    return <View style={styles.loadingContainer}><ActivityIndicator size="large" color={meta.color} /></View>;
+    return <View style={styles.loadingContainer}><ActivityIndicator size="large" color={CYAN} /></View>;
   }
 
   if (fetchError && !detail) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={{ color: '#FF3B30', fontSize: 16, fontWeight: '700' }}>{t('common.error_loading')}</Text>
+        <Text style={{ color: '#FF3D5E', fontSize: 16, fontWeight: '700' }}>{t('common.error_loading')}</Text>
         <TouchableOpacity onPress={() => { setFetchError(false); setLoading(true); init(); }} style={{ marginTop: 16, padding: 12, backgroundColor: 'rgba(255,59,48,0.12)', borderRadius: 12 }}>
-          <Text style={{ color: '#FF3B30', fontWeight: '600' }}>{t('common.retry')}</Text>
+          <Text style={{ color: '#FF3D5E', fontWeight: '600' }}>{t('common.retry')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -424,7 +438,7 @@ export default function CategoryDetailScreen() {
                 onPress={handleFollow} activeOpacity={0.8} disabled={followLoading}
               >
                 <Text style={styles.followIcon}>{detail.is_following ? '✓' : '+'}</Text>
-                <Text style={[styles.followText, detail.is_following && { color: '#00FF9D' }]}>
+                <Text style={[styles.followText, detail.is_following && { color: '#32E7A3' }]}>
                   {detail.is_following ? t('category.following') : t('category.follow')}
                 </Text>
               </TouchableOpacity>
@@ -489,73 +503,74 @@ export default function CategoryDetailScreen() {
                 )}
               </View>
 
-              {/* Animated XP bar */}
-              <View style={styles.xpBarTrack}>
-                <Animated.View style={[
-                  styles.xpBarFill,
-                  {
-                    backgroundColor: meta.color,
-                    width: xpBarAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
-                  }
-                ]} />
-                {/* Milestone dots */}
-                {([1, 10, 20, 35, 50] as const).map((lvl) => {
-                  const reached = detail.user_level >= lvl;
-                  const title = detail.all_titles?.[String(lvl)];
-                  if (!title) return null;
-                  // Distribute milestones evenly 0→100% across levels 1→50
-                  const pct = ((lvl - 1) / 49) * 100;
-                  return (
-                    <View key={lvl} style={[styles.milestoneDot, { left: `${pct}%`, backgroundColor: reached ? meta.color : 'rgba(255,255,255,0.2)', borderColor: reached ? meta.color : 'rgba(255,255,255,0.1)' }]} />
-                  );
-                })}
-              </View>
-
-              {/* Milestone labels */}
-              <View style={styles.milestoneLabels}>
-                {([1, 10, 20, 35, 50] as const).map((lvl) => {
-                  const title = detail.all_titles?.[String(lvl)];
-                  if (!title) return null;
-                  const reached = detail.user_level >= lvl;
-                  const pct = ((lvl - 1) / 49) * 100;
-                  return (
-                    <View key={lvl} style={[styles.milestoneLabelItem, { left: `${pct}%` }]}>
-                      <Text style={[styles.milestoneLvl, { color: reached ? meta.color : '#525252' }]}>
-                        {lvl === 1 ? '' : `${lvl}`}
-                      </Text>
+              {/* ── Zone 1 : XP dans le niveau actuel ── */}
+              {detail.user_level < 50 ? (
+                <>
+                  <View style={styles.xpLevelRow}>
+                    <Text style={[styles.xpLevelFrom, { color: meta.color }]}>Niv. {detail.user_level}</Text>
+                    <View style={styles.xpBarTrack}>
+                      <Animated.View style={[
+                        styles.xpBarFill,
+                        {
+                          backgroundColor: meta.color,
+                          width: xpBarAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
+                        }
+                      ]} />
                     </View>
-                  );
-                })}
-              </View>
-
-              {/* Next title hint */}
-              {(() => {
-                const nextMilestone = [1, 10, 20, 35, 50].find(
-                  lvl => detail.user_level < lvl && detail.all_titles?.[String(lvl)]
-                );
-                if (!nextMilestone) return null;
-                return (
-                  <View style={styles.nextTitleHint}>
-                    <MaterialCommunityIcons name="chevron-double-up" size={13} color={meta.color} />
-                    <Text style={styles.nextTitleText}>
-                      <Text style={{ color: meta.color }}>{detail.all_titles![String(nextMilestone)]}</Text>
-                      {` ${t('category.at_level')} ${nextMilestone}`}
-                    </Text>
+                    <Text style={styles.xpLevelTo}>Niv. {detail.user_level + 1}</Text>
                   </View>
-                );
-              })()}
-
-              {/* Unlocked titles chips */}
-              {detail.unlocked_titles && detail.unlocked_titles.length > 0 && (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.titlesScroll} contentContainerStyle={styles.titlesScrollContent}>
-                  {detail.unlocked_titles.map((ut) => (
-                    <View key={ut.level} style={[styles.titleChip, { borderColor: meta.color + '40', backgroundColor: meta.color + '12' }]}>
-                      <MaterialCommunityIcons name="star" size={11} color={meta.color} />
-                      <Text style={[styles.titleChipText, { color: meta.color }]}>{ut.title}</Text>
-                    </View>
-                  ))}
-                </ScrollView>
+                  <Text style={styles.xpXpHint}>
+                    {detail.xp_progress.current.toLocaleString()} / {detail.xp_progress.needed.toLocaleString()} XP
+                  </Text>
+                </>
+              ) : (
+                <Text style={[styles.xpXpLabel, { color: meta.color, fontWeight: '800' }]}>{t('category.max_level')}</Text>
               )}
+
+              {/* ── Zone 2 : Roadmap des paliers de titres ── */}
+              {detail.all_titles && Object.keys(detail.all_titles).length > 0 && (
+                <View style={styles.roadmapContainer}>
+                  {/* Ligne de fond */}
+                  <View style={[styles.roadmapTrack, { backgroundColor: 'rgba(255,255,255,0.08)' }]} />
+                  {/* Portion complétée jusqu'au niveau actuel */}
+                  <View style={[styles.roadmapTrack, styles.roadmapTrackDone, {
+                    width: `${Math.min((detail.user_level - 1) / 49, 1) * 100}%`,
+                    backgroundColor: meta.color,
+                    opacity: 0.4,
+                  }]} />
+                  {/* Curseur niveau actuel */}
+                  <View style={[styles.roadmapCursor, {
+                    left: `${Math.min((detail.user_level - 1) / 49, 1) * 100}%`,
+                    backgroundColor: meta.color,
+                    borderColor: '#050510',
+                  }]} />
+
+                  {/* Paliers */}
+                  {([1, 10, 20, 35, 50] as const).map((lvl) => {
+                    const title = detail.all_titles?.[String(lvl)];
+                    if (!title) return null;
+                    const reached = detail.user_level >= lvl;
+                    const pct = ((lvl - 1) / 49) * 100;
+                    return (
+                      <View key={lvl} style={[styles.roadmapMilestone, { left: `${pct}%` }]}>
+                        <View style={[styles.roadmapDot, {
+                          backgroundColor: reached ? meta.color : '#1A1A2E',
+                          borderColor: reached ? meta.color : 'rgba(255,255,255,0.15)',
+                        }]}>
+                          {reached && <MaterialCommunityIcons name="check" size={9} color="#FFF" />}
+                        </View>
+                        <Text style={[styles.roadmapLvl, { color: reached ? meta.color : '#444' }]}>
+                          {lvl === 1 ? 'Dép.' : lvl}
+                        </Text>
+                        <Text style={[styles.roadmapTitle, { color: reached ? '#FFF' : '#444' }]} numberOfLines={2}>
+                          {title}
+                        </Text>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
+
             </View>
 
             {/* Stats Row */}
@@ -571,8 +586,27 @@ export default function CategoryDetailScreen() {
               </View>
               <View style={[styles.statDivider, { backgroundColor: meta.color + '30' }]} />
               <View style={styles.statItem}>
-                <Text style={styles.statLabel}>{t('category.total_xp')}</Text>
-                <Text style={[styles.statValue, { color: meta.color, fontSize: 18 }]}>{detail.user_xp.toLocaleString()}</Text>
+                <Text style={styles.statLabel}>{t('category.top_master')}</Text>
+                {detail.top_player ? (
+                  <TouchableOpacity
+                    onPress={() => router.push(`/player-profile?id=${detail.top_player!.id}`)}
+                    activeOpacity={0.75}
+                    style={styles.topPlayerBtn}
+                  >
+                    <UserAvatar
+                      avatarUrl={detail.top_player.avatar_url}
+                      avatarSeed={detail.top_player.avatar_seed}
+                      pseudo={detail.top_player.pseudo}
+                      size={32}
+                    />
+                    <View style={styles.topPlayerInfo}>
+                      <Text style={styles.topPlayerPseudo} numberOfLines={1}>{detail.top_player.pseudo}</Text>
+                      <Text style={[styles.topPlayerTitle, { color: meta.color }]} numberOfLines={1}>{detail.top_player.title}</Text>
+                    </View>
+                  </TouchableOpacity>
+                ) : (
+                  <Text style={styles.topPlayerNone}>—</Text>
+                )}
               </View>
             </View>
           </View>
@@ -630,10 +664,10 @@ export default function CategoryDetailScreen() {
                 {/* Post Actions */}
                 <View style={styles.postActions}>
                   <TouchableOpacity style={styles.postActionBtn} onPress={() => handleLike(post.id)}>
-                    <Text style={[styles.postActionIcon, post.is_liked && { color: '#FF3B30' }]}>
+                    <Text style={[styles.postActionIcon, post.is_liked && { color: '#FF3D5E' }]}>
                       {post.is_liked ? '❤️' : '🤍'}
                     </Text>
-                    <Text style={[styles.postActionCount, post.is_liked && { color: '#FF3B30' }]}>
+                    <Text style={[styles.postActionCount, post.is_liked && { color: '#FF3D5E' }]}>
                       {post.likes_count}
                     </Text>
                   </TouchableOpacity>
@@ -752,10 +786,10 @@ const styles = StyleSheet.create({
   loadingContainer: { flex: 1, backgroundColor: '#050510', justifyContent: 'center', alignItems: 'center' },
   successToast: {
     position: 'absolute', top: 60, alignSelf: 'center', zIndex: 999,
-    backgroundColor: 'rgba(0,255,157,0.15)', borderWidth: 1, borderColor: 'rgba(0,255,157,0.4)',
+    backgroundColor: 'rgba(50,231,163,0.15)', borderWidth: 1, borderColor: 'rgba(50,231,163,0.4)',
     borderRadius: 20, paddingHorizontal: 20, paddingVertical: 10,
   },
-  successToastText: { color: '#00FF9D', fontWeight: '700', fontSize: 14 },
+  successToastText: { color: '#32E7A3', fontWeight: '700', fontSize: 14 },
   scrollContent: { paddingBottom: 40 },
 
   // Top nav row (back + cluster)
@@ -781,22 +815,22 @@ const styles = StyleSheet.create({
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     paddingVertical: 12, borderRadius: 14, gap: 6,
   },
-  playBtn: { backgroundColor: '#8A2BE2' },
+  playBtn: { backgroundColor: '#B366FF' },
   playBtnIcon: { fontSize: 16 },
   playBtnText: { color: '#FFF', fontSize: 14, fontWeight: '800' },
   followBtn: {
     backgroundColor: GLASS.bgLight, borderWidth: 1, borderColor: GLASS.borderSubtle,
   },
   followingBtn: {
-    backgroundColor: 'rgba(0,255,157,0.1)', borderWidth: 1, borderColor: 'rgba(0,255,157,0.3)',
+    backgroundColor: 'rgba(50,231,163,0.1)', borderWidth: 1, borderColor: 'rgba(50,231,163,0.3)',
   },
   followIcon: { fontSize: 14, color: '#FFF', fontWeight: '800' },
   followText: { color: '#FFF', fontSize: 13, fontWeight: '700' },
   leaderBtn: {
-    backgroundColor: 'rgba(255,215,0,0.1)', borderWidth: 1, borderColor: 'rgba(255,215,0,0.3)',
+    backgroundColor: 'rgba(255,181,71,0.1)', borderWidth: 1, borderColor: 'rgba(255,181,71,0.3)',
   },
   leaderIcon: { fontSize: 14 },
-  leaderText: { color: '#FFD700', fontSize: 12, fontWeight: '700' },
+  leaderText: { color: '#FFB547', fontSize: 12, fontWeight: '700' },
 
   // XP Section
   xpSection: { marginBottom: 20 },
@@ -818,24 +852,42 @@ const styles = StyleSheet.create({
   xpNextLabel: { fontSize: 8, color: '#525252', fontWeight: '800', letterSpacing: 1 },
   xpNextNum: { fontSize: 16, fontWeight: '900' },
 
+  // Zone 1 — XP dans le niveau actuel
+  xpLevelRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 5,
+  },
+  xpLevelFrom: { fontSize: 10, fontWeight: '800', minWidth: 42, textAlign: 'right' },
+  xpLevelTo: { fontSize: 10, fontWeight: '600', color: '#525252', minWidth: 42 },
   xpBarTrack: {
-    height: 8, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 4,
-    overflow: 'visible', marginBottom: 4, position: 'relative',
+    flex: 1, height: 7, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 4,
+    overflow: 'hidden',
   },
-  xpBarFill: { height: 8, borderRadius: 4, position: 'absolute', left: 0, top: 0 },
-  milestoneDot: {
-    position: 'absolute', top: -3, width: 14, height: 14, borderRadius: 7,
-    borderWidth: 2, marginLeft: -7, zIndex: 2,
-  },
-  milestoneLabels: { flexDirection: 'row', height: 16, position: 'relative', marginBottom: 8 },
-  milestoneLabelItem: { position: 'absolute', alignItems: 'center' },
-  milestoneLvl: { fontSize: 9, fontWeight: '800', marginLeft: -6 },
+  xpBarFill: { height: 7, borderRadius: 4, position: 'absolute', left: 0, top: 0 },
+  xpXpHint: { fontSize: 10, color: '#525252', fontWeight: '600', textAlign: 'center', marginBottom: 16 },
 
-  nextTitleHint: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    marginBottom: 10,
+  // Zone 2 — Roadmap des paliers
+  roadmapContainer: {
+    position: 'relative', height: 84, marginTop: 8, marginBottom: 4,
   },
-  nextTitleText: { fontSize: 11, color: '#A3A3A3', fontWeight: '600' },
+  roadmapTrack: {
+    position: 'absolute', top: 10, left: 0, right: 0, height: 3, borderRadius: 2,
+  },
+  roadmapTrackDone: {
+    position: 'absolute', top: 10, left: 0, height: 3, borderRadius: 2,
+  },
+  roadmapCursor: {
+    position: 'absolute', top: 4, width: 14, height: 14, borderRadius: 7,
+    borderWidth: 2, marginLeft: -7, zIndex: 3,
+  },
+  roadmapMilestone: {
+    position: 'absolute', top: 0, alignItems: 'center', width: 55, marginLeft: -27,
+  },
+  roadmapDot: {
+    width: 22, height: 22, borderRadius: 11, borderWidth: 2,
+    justifyContent: 'center', alignItems: 'center', marginBottom: 3,
+  },
+  roadmapLvl: { fontSize: 9, fontWeight: '800', marginBottom: 1 },
+  roadmapTitle: { fontSize: 10, fontWeight: '600', textAlign: 'center', lineHeight: 13 },
 
   titlesScroll: { marginTop: 4 },
   titlesScrollContent: { gap: 6 },
@@ -852,6 +904,11 @@ const styles = StyleSheet.create({
   statValue: { fontSize: 28, fontWeight: '900', color: '#FFF' },
   statSub: { fontSize: 11, color: '#A3A3A3', fontWeight: '600', marginTop: 2 },
   statDivider: { width: 1, height: 40 },
+  topPlayerBtn: { alignItems: 'center', gap: 4 },
+  topPlayerInfo: { alignItems: 'center' },
+  topPlayerPseudo: { fontSize: 11, fontWeight: '800', color: '#FFF', maxWidth: 80, textAlign: 'center' },
+  topPlayerTitle: { fontSize: 9, fontWeight: '600', maxWidth: 80, textAlign: 'center' },
+  topPlayerNone: { fontSize: 22, color: '#525252', fontWeight: '700' },
 
   // Wall
   wallHeader: {
@@ -879,7 +936,7 @@ const styles = StyleSheet.create({
   },
   postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   postAvatar: {
-    width: 40, height: 40, borderRadius: 20, backgroundColor: '#8A2BE2',
+    width: 40, height: 40, borderRadius: 20, backgroundColor: '#B366FF',
     justifyContent: 'center', alignItems: 'center', marginRight: 10,
   },
   postAvatarText: { color: '#FFF', fontSize: 18, fontWeight: '800' },

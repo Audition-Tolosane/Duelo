@@ -18,6 +18,29 @@ import CosmicBackground from '../../components/CosmicBackground';
 import { t } from '../../utils/i18n';
 import CategoryIcon from '../../components/CategoryIcon';
 
+// ── XP/Level helpers ──
+function xpForNextLevel(level: number) { return 500 + Math.pow(level - 1, 2) * 10; }
+function getXpLevel(xp: number) {
+  if (xp <= 0) return 0;
+  let level = 1, cum = 0;
+  while (level < 50) { const n = xpForNextLevel(level); if (cum + n > xp) break; cum += n; level++; }
+  return level;
+}
+function getXpInLevel(xp: number, level: number) {
+  let cum = 0;
+  for (let l = 1; l < (level || 1); l++) cum += xpForNextLevel(l);
+  const needed = xpForNextLevel(level || 1);
+  const current = Math.max(0, xp - cum);
+  return { current, needed, progress: Math.min(current / Math.max(needed, 1), 1) };
+}
+
+const TIER_COLORS: Record<string, string> = {
+  diamond: '#00D4FF', gold: '#FFD700', silver: '#C0C0C0', bronze: '#CD7F32',
+};
+const TIER_ICONS: Record<string, string> = {
+  diamond: 'diamond-stone', gold: 'trophy', silver: 'shield-half-full', bronze: 'shield',
+};
+
 const COUNTRIES: { name: string; flag: string }[] = [
   { name: 'France', flag: '🇫🇷' }, { name: 'Germany', flag: '🇩🇪' }, { name: 'Spain', flag: '🇪🇸' },
   { name: 'Italy', flag: '🇮🇹' }, { name: 'United Kingdom', flag: '🇬🇧' }, { name: 'United States', flag: '🇺🇸' },
@@ -40,6 +63,12 @@ const COUNTRIES: { name: string; flag: string }[] = [
 ];
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+
+const CYAN = '#00E5FF';
+const VIOLET = '#B366FF';
+const GOLD = '#FFB547';
+const MINT = '#32E7A3';
+const RED = '#FF3D5E';
 
 // ── Achievement icon mapping ──
 const ACH_ICONS: Record<string, React.ComponentProps<typeof MaterialCommunityIcons>['name']> = {
@@ -118,13 +147,13 @@ function AchievementsCarousel({ userId }: { userId: string }) {
               <MaterialCommunityIcons
                 name={iconName}
                 size={24}
-                color={done ? '#FFD700' : '#444'}
+                color={done ? '#FFB547' : '#444'}
               />
-              <Text style={[achS.name, { color: done ? '#FFD700' : '#555' }]} numberOfLines={1}>
+              <Text style={[achS.name, { color: done ? '#FFB547' : '#555' }]} numberOfLines={1}>
                 {item.name}
               </Text>
               <View style={achS.progressBar}>
-                <View style={[achS.progressFill, { width: `${Math.round(pct * 100)}%` as any, backgroundColor: done ? '#FFD700' : '#333' }]} />
+                <View style={[achS.progressFill, { width: `${Math.round(pct * 100)}%` as any, backgroundColor: done ? '#FFB547' : '#333' }]} />
               </View>
               <Text style={achS.progressText}>
                 {done ? '✓' : `${item.progress || 0}/${item.target}`}
@@ -145,16 +174,16 @@ function AchievementsCarousel({ userId }: { userId: string }) {
                 const iconName = ACH_ICONS[selectedAch.id] ?? 'star-outline';
                 return (
                   <>
-                    <View style={[achS.modalIconCircle, { backgroundColor: done ? '#FFD70020' : '#FFFFFF08', borderColor: done ? '#FFD70050' : '#FFFFFF10' }]}>
-                      <MaterialCommunityIcons name={iconName} size={36} color={done ? '#FFD700' : '#555'} />
+                    <View style={[achS.modalIconCircle, { backgroundColor: done ? '#FFB54720' : '#FFFFFF08', borderColor: done ? '#FFB54750' : '#FFFFFF10' }]}>
+                      <MaterialCommunityIcons name={iconName} size={36} color={done ? '#FFB547' : '#555'} />
                     </View>
-                    <Text style={[achS.modalName, { color: done ? '#FFD700' : '#FFF' }]}>{selectedAch.name}</Text>
+                    <Text style={[achS.modalName, { color: done ? '#FFB547' : '#FFF' }]}>{selectedAch.name}</Text>
                     <Text style={achS.modalDesc}>{selectedAch.desc}</Text>
                     <View style={achS.modalProgressWrap}>
                       <View style={achS.modalProgressBar}>
-                        <View style={[achS.modalProgressFill, { width: `${Math.round(pct * 100)}%` as any, backgroundColor: done ? '#FFD700' : '#555' }]} />
+                        <View style={[achS.modalProgressFill, { width: `${Math.round(pct * 100)}%` as any, backgroundColor: done ? '#FFB547' : '#555' }]} />
                       </View>
-                      <Text style={[achS.modalProgressLabel, { color: done ? '#FFD700' : '#888' }]}>
+                      <Text style={[achS.modalProgressLabel, { color: done ? '#FFB547' : '#888' }]}>
                         {done
                           ? `Débloqué${selectedAch.unlocked_at ? ' le ' + new Date(selectedAch.unlocked_at).toLocaleDateString('fr-FR') : ''}`
                           : `${selectedAch.progress || 0} / ${selectedAch.target}`}
@@ -186,7 +215,7 @@ const achS = StyleSheet.create({
     width: 76, borderRadius: 14, borderWidth: 1,
     paddingVertical: 10, paddingHorizontal: 8, gap: 3,
   },
-  badgeDone: { backgroundColor: '#1A1200', borderColor: '#FFD70060' },
+  badgeDone: { backgroundColor: '#1A1200', borderColor: '#FFB54760' },
   badgeLocked: { backgroundColor: '#111118', borderColor: '#FFFFFF08' },
   name: { fontSize: 9, fontWeight: '700', textAlign: 'center' },
   progressBar: { width: '100%', height: 3, backgroundColor: '#1A1A1A', borderRadius: 2, overflow: 'hidden', marginTop: 2 },
@@ -283,13 +312,25 @@ export default function ProfileScreen() {
     min_matches_required: number;
     min_age_hours: number;
   } | null>(null);
+  const [leagueData, setLeagueData] = useState<{
+    mmr: number; tier: string; tier_label: string; tier_color: string;
+    tier_progress: number; global_rank: number; season: { name: string };
+    next_tier_label: string | null; next_tier_mmr: number | null;
+  } | null>(null);
 
-  useEffect(() => { loadProfile(); loadReferral(); }, []);
+  useEffect(() => { loadProfile(); loadReferral(); loadLeague(); }, []);
 
   const loadReferral = async () => {
     try {
       const res = await authFetch(`${API_URL}/api/referral/my-code`);
       if (res.ok) setReferralData(await res.json());
+    } catch {}
+  };
+
+  const loadLeague = async () => {
+    try {
+      const res = await authFetch(`${API_URL}/api/league/status`);
+      if (res.ok) setLeagueData(await res.json());
     } catch {}
   };
 
@@ -486,7 +527,7 @@ export default function ProfileScreen() {
   };
 
   if (loading) {
-    return <CosmicBackground><View style={s.loadingContainer}><ActivityIndicator size="large" color="#8A2BE2" /></View></CosmicBackground>;
+    return <CosmicBackground><View style={s.loadingContainer}><ActivityIndicator size="large" color="#00E5FF" /></View></CosmicBackground>;
   }
   if (!profile || !profile.user) {
     return (
@@ -512,8 +553,8 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
 
         {profileError && (
-          <TouchableOpacity onPress={() => { setProfileError(false); setLoading(true); loadProfile(); }} style={{ padding: 12, alignItems: 'center', backgroundColor: 'rgba(255,59,48,0.08)', marginHorizontal: 16, borderRadius: 12, marginBottom: 8 }}>
-            <Text style={{ color: '#FF3B30', fontSize: 13, fontWeight: '600' }}>{t('profile.offline_error')}</Text>
+          <TouchableOpacity onPress={() => { setProfileError(false); setLoading(true); loadProfile(); }} style={{ padding: 12, alignItems: 'center', backgroundColor: 'rgba(255,61,94,0.08)', marginHorizontal: 16, borderRadius: 12, marginBottom: 8 }}>
+            <Text style={{ color: '#FF3D5E', fontSize: 13, fontWeight: '600' }}>{t('profile.offline_error')}</Text>
           </TouchableOpacity>
         )}
 
@@ -525,7 +566,7 @@ export default function ProfileScreen() {
               avatarSeed={user?.avatar_seed}
               pseudo={user?.pseudo}
               size={72}
-              borderColor="#8A2BE2"
+              borderColor="#B366FF"
               borderWidth={3}
             />
             <View style={s.avatarEditBadge}>
@@ -575,12 +616,63 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* ── Level XP Progress ── */}
+        {user && (() => {
+          const lvl = getXpLevel(user.total_xp || 0);
+          const { current, needed, progress } = getXpInLevel(user.total_xp || 0, lvl);
+          return (
+            <View style={s.xpProgressCard}>
+              <View style={s.xpProgressRow}>
+                <View style={s.xpLevelBadge}>
+                  <MaterialCommunityIcons name="lightning-bolt" size={12} color="#00E5FF" />
+                  <Text style={s.xpLevelText}>Niv. {lvl}</Text>
+                </View>
+                <Text style={s.xpTotalText}>{(user.total_xp || 0).toLocaleString()} XP total</Text>
+                <Text style={s.xpNextText}>→ Niv. {Math.min(lvl + 1, 50)}</Text>
+              </View>
+              <View style={s.xpBarBg}>
+                <LinearGradient
+                  colors={['#00E5FF', '#B366FF']}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                  style={[s.xpBarFill, { width: `${Math.round(progress * 100)}%` as any }]}
+                />
+              </View>
+              <Text style={s.xpBarHint}>{current.toLocaleString()} / {needed.toLocaleString()} XP</Text>
+            </View>
+          );
+        })()}
+
+        {/* ── League Badge ── */}
+        {leagueData && (() => {
+          const color = TIER_COLORS[leagueData.tier] || '#CD7F32';
+          const icon = TIER_ICONS[leagueData.tier] || 'shield';
+          return (
+            <LinearGradient
+              colors={[`${color}1E`, `${color}08`]}
+              style={[s.leagueCard, { borderColor: `${color}40` }]}
+            >
+              <MaterialCommunityIcons name={icon as any} size={24} color={color} />
+              <View style={s.leagueInfo}>
+                <Text style={[s.leagueTier, { color }]}>{leagueData.tier_label}</Text>
+                <Text style={s.leagueMMR}>{leagueData.mmr} MMR · {leagueData.season.name}</Text>
+                <View style={s.leagueBarBg}>
+                  <View style={[s.leagueBarFill, { width: `${Math.round(leagueData.tier_progress * 100)}%` as any, backgroundColor: color }]} />
+                </View>
+              </View>
+              <View style={s.leagueRankBox}>
+                <Text style={s.leagueRankNum}>#{leagueData.global_rank}</Text>
+                <Text style={s.leagueRankLabel}>rang</Text>
+              </View>
+            </LinearGradient>
+          );
+        })()}
+
         {/* ── Quick Stats ── */}
         <Text style={s.sectionTitle}>{t('profile.statistics')}</Text>
         <View style={s.quickStats}>
           {[
-            { icon: 'trophy' as const, label: t('profile.wins'), value: user?.matches_won || 0, color: '#FFD700' },
-            { icon: 'chart-line' as const, label: t('profile.win_rate'), value: `${user?.win_rate || 0}%`, color: '#00FFFF' },
+            { icon: 'trophy' as const, label: t('profile.wins'), value: user?.matches_won || 0, color: '#FFB547' },
+            { icon: 'chart-line' as const, label: t('profile.win_rate'), value: `${user?.win_rate || 0}%`, color: '#00E5FF' },
             { icon: 'fire' as const, label: t('player.streak'), value: user?.current_streak || 0, color: '#FF6B35' },
             { icon: 'star' as const, label: t('profile.best_streak'), value: user?.best_streak || 0, color: '#E040FB' },
           ].map((stat, i) => (
@@ -645,7 +737,7 @@ export default function ProfileScreen() {
                 return (
                   <TouchableOpacity
                     key={`${ttl.theme_id}-${ttl.level}`}
-                    style={[s.titleChip, isSelected && { borderColor: '#8A2BE2', backgroundColor: 'rgba(138,43,226,0.15)' }]}
+                    style={[s.titleChip, isSelected && { borderColor: '#B366FF', backgroundColor: 'rgba(179,102,255,0.15)' }]}
                     onPress={() => handleSelectTitle(ttl.title)}
                   >
                     <Text style={s.titleChipText}>{ttl.theme_name}</Text>
@@ -700,13 +792,13 @@ export default function ProfileScreen() {
           <View style={s.referralCard}>
             {/* Header */}
             <View style={s.referralHeader}>
-              <LinearGradient colors={['#00FF9D20', '#00D4FF10']} style={s.referralIconCircle}>
-                <MaterialCommunityIcons name="account-plus" size={18} color="#00FF9D" />
+              <LinearGradient colors={['#32E7A320', '#00E5FF10']} style={s.referralIconCircle}>
+                <MaterialCommunityIcons name="account-plus" size={18} color="#32E7A3" />
               </LinearGradient>
               <Text style={s.referralTitle}>{t('referral.title')}</Text>
               {referralData.pro_active && referralData.pro_expires_at && (
                 <View style={s.referralProBadge}>
-                  <MaterialCommunityIcons name="crown" size={11} color="#FFD700" />
+                  <MaterialCommunityIcons name="crown" size={11} color="#FFB547" />
                   <Text style={s.referralProBadgeText}>PRO</Text>
                 </View>
               )}
@@ -732,9 +824,9 @@ export default function ProfileScreen() {
                   <View key={m.count} style={[s.referralMilestoneItem, done && s.referralMilestoneDone]}>
                     <MaterialCommunityIcons
                       name={done ? 'check-circle' : 'circle-outline'}
-                      size={16} color={done ? '#00FF9D' : '#444'}
+                      size={16} color={done ? '#32E7A3' : '#444'}
                     />
-                    <Text style={[s.referralMilestoneLabel, done && { color: '#00FF9D' }]}>
+                    <Text style={[s.referralMilestoneLabel, done && { color: '#32E7A3' }]}>
                       {m.count} filleul{m.count > 1 ? 's' : ''} → {m.label}
                     </Text>
                   </View>
@@ -758,7 +850,7 @@ export default function ProfileScreen() {
             {/* Pro expiry */}
             {referralData.pro_active && referralData.pro_expires_at && (
               <View style={s.referralProRow}>
-                <MaterialCommunityIcons name="crown" size={13} color="#FFD700" />
+                <MaterialCommunityIcons name="crown" size={13} color="#FFB547" />
                 <Text style={s.referralProText}>
                   Pro jusqu'au {new Date(referralData.pro_expires_at).toLocaleDateString()}
                 </Text>
@@ -767,7 +859,7 @@ export default function ProfileScreen() {
 
             {/* Partager */}
             <TouchableOpacity style={s.referralShareBtn} onPress={handleShareReferral} activeOpacity={0.8}>
-              <LinearGradient colors={['#00FF9D', '#00D4FF']} style={s.referralShareGrad}>
+              <LinearGradient colors={['#32E7A3', '#00E5FF']} style={s.referralShareGrad}>
                 <MaterialCommunityIcons name="share-variant" size={14} color="#000" />
                 <Text style={s.referralShareText}>{t('referral.share')}</Text>
               </LinearGradient>
@@ -780,8 +872,8 @@ export default function ProfileScreen() {
         <View style={s.settingsWrap}>
           {[
             { icon: 'account-circle-outline' as const, label: t('profile.change_avatar'), color: '#00BFFF', onPress: openAvatarModal },
-            { icon: 'tag-outline' as const, label: t('profile.change_title'), color: '#8A2BE2', onPress: () => setShowTitleModal(true) },
-            { icon: 'bell-outline' as const, label: t('settings.notifications'), color: '#FFD700', onPress: () => router.push('/notification-settings') },
+            { icon: 'tag-outline' as const, label: t('profile.change_title'), color: '#B366FF', onPress: () => setShowTitleModal(true) },
+            { icon: 'bell-outline' as const, label: t('settings.notifications'), color: '#FFB547', onPress: () => router.push('/notification-settings') },
             { icon: 'translate' as const, label: t('settings.language'), color: '#4ECDC4', onPress: () => router.push('/language-settings') },
             { icon: 'file-document-outline' as const, label: t('settings.terms'), color: '#A3A3A3', onPress: () => router.push('/terms') },
             { icon: 'headset' as const, label: t('settings.support'), color: '#FF6B35', onPress: () => router.push('/support') },
@@ -805,13 +897,13 @@ export default function ProfileScreen() {
         {/* Déconnexion */}
         <TouchableOpacity style={s.logoutRow} onPress={handleLogout} activeOpacity={0.7}>
           <LinearGradient
-            colors={['rgba(255,59,48,0.15)', 'rgba(255,59,48,0.05)']}
+            colors={['rgba(255,61,94,0.15)', 'rgba(255,61,94,0.05)']}
             style={s.settingsIconCircle}
           >
-            <MaterialCommunityIcons name="logout" size={20} color="#FF3B30" />
+            <MaterialCommunityIcons name="logout" size={20} color="#FF3D5E" />
           </LinearGradient>
-          <Text style={[s.settingsText, { color: '#FF3B30' }]}>{t('settings.logout')}</Text>
-          <MaterialCommunityIcons name="chevron-right" size={20} color="#FF3B3040" />
+          <Text style={[s.settingsText, { color: '#FF3D5E' }]}>{t('settings.logout')}</Text>
+          <MaterialCommunityIcons name="chevron-right" size={20} color="#FF3D5E40" />
         </TouchableOpacity>
 
         {/* Suppression de compte */}
@@ -898,7 +990,7 @@ export default function ProfileScreen() {
                         <Text style={s.avatarGridName} numberOfLines={1}>{a.name}</Text>
                         {isSelected && (
                           <View style={s.avatarGridCheck}>
-                            <MaterialCommunityIcons name="check-circle" size={18} color="#00FF9D" />
+                            <MaterialCommunityIcons name="check-circle" size={18} color="#32E7A3" />
                           </View>
                         )}
                       </TouchableOpacity>
@@ -908,7 +1000,7 @@ export default function ProfileScreen() {
               </ScrollView>
             )}
 
-            {savingAvatar && <ActivityIndicator color="#8A2BE2" style={{ marginVertical: 12 }} />}
+            {savingAvatar && <ActivityIndicator color="#00E5FF" style={{ marginVertical: 12 }} />}
 
             <TouchableOpacity style={s.modalClose} onPress={() => setShowAvatarModal(false)}>
               <Text style={s.modalCloseText}>{t('profile.close')}</Text>
@@ -967,7 +1059,7 @@ export default function ProfileScreen() {
               </View>
             )}
             <TouchableOpacity
-              style={[s.modalClose, { backgroundColor: '#8A2BE2' }]}
+              style={[s.modalClose, { backgroundColor: '#B366FF' }]}
               onPress={handleSaveLocation}
               disabled={savingLocation}
             >
@@ -1000,7 +1092,7 @@ export default function ProfileScreen() {
                   return (
                     <TouchableOpacity
                       key={`${ttl.theme_id}-${ttl.level}`}
-                      style={[s.modalItem, isSelected && { borderColor: '#8A2BE2', backgroundColor: 'rgba(138,43,226,0.1)' }]}
+                      style={[s.modalItem, isSelected && { borderColor: '#B366FF', backgroundColor: 'rgba(179,102,255,0.10)' }]}
                       onPress={() => handleSelectTitle(ttl.title)}
                       disabled={savingTitle}
                     >
@@ -1030,7 +1122,7 @@ const s = StyleSheet.create({
   loadingContainer: { flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   emptyText: { color: '#A3A3A3', fontSize: 16, marginBottom: 16 },
-  loginBtn: { backgroundColor: '#8A2BE2', borderRadius: 12, paddingHorizontal: 24, paddingVertical: 12 },
+  loginBtn: { backgroundColor: '#B366FF', borderRadius: 12, paddingHorizontal: 24, paddingVertical: 12 },
   loginBtnText: { color: '#FFF', fontWeight: '700', fontSize: 16 },
   scroll: { paddingBottom: 40 },
 
@@ -1043,7 +1135,7 @@ const s = StyleSheet.create({
   avatarEditBadge: {
     position: 'absolute' as const, bottom: 0, right: -2,
     width: 24, height: 24, borderRadius: 12,
-    backgroundColor: '#8A2BE2', justifyContent: 'center' as const, alignItems: 'center' as const,
+    backgroundColor: '#B366FF', justifyContent: 'center' as const, alignItems: 'center' as const,
     borderWidth: 2, borderColor: '#050510',
   },
   profileInfo: { flex: 1 },
@@ -1067,6 +1159,43 @@ const s = StyleSheet.create({
   statValue: { fontSize: 22, fontWeight: '900', color: '#FFF' },
   statLabel: { fontSize: 9, fontWeight: '800', color: 'rgba(255,255,255,0.45)', letterSpacing: 1.5, marginTop: 4 },
   statDivider: { width: 1, height: 36, backgroundColor: GLASS.borderSubtle },
+
+  /* ── Level XP Progress ── */
+  xpProgressCard: {
+    marginHorizontal: 16, marginTop: 16, marginBottom: 4,
+  },
+  xpProgressRow: {
+    flexDirection: 'row', alignItems: 'center', marginBottom: 6, gap: 8,
+  },
+  xpLevelBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 3,
+    backgroundColor: 'rgba(179,102,255,0.12)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8,
+  },
+  xpLevelText: { fontSize: 11, fontWeight: '800', color: '#00E5FF' },
+  xpTotalText: { flex: 1, fontSize: 10, color: '#555', fontWeight: '600' },
+  xpNextText: { fontSize: 10, color: '#00E5FF', fontWeight: '700' },
+  xpBarBg: {
+    height: 5, backgroundColor: 'rgba(0,229,255,0.12)', borderRadius: 3, overflow: 'hidden',
+  },
+  xpBarFill: { height: 5, borderRadius: 3 },
+  xpBarHint: { fontSize: 9, color: '#444', marginTop: 4, textAlign: 'right' },
+
+  /* ── League Card ── */
+  leagueCard: {
+    marginHorizontal: 16, marginTop: 12, borderRadius: 14,
+    borderWidth: 1, flexDirection: 'row', alignItems: 'center',
+    padding: 14, gap: 12,
+  },
+  leagueInfo: { flex: 1 },
+  leagueTier: { fontSize: 15, fontWeight: '900', marginBottom: 2 },
+  leagueMMR: { fontSize: 10, color: '#555', fontWeight: '600', marginBottom: 6 },
+  leagueBarBg: {
+    height: 4, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 2, overflow: 'hidden',
+  },
+  leagueBarFill: { height: 4, borderRadius: 2 },
+  leagueRankBox: { alignItems: 'center' },
+  leagueRankNum: { fontSize: 18, fontWeight: '900', color: '#FFF' },
+  leagueRankLabel: { fontSize: 9, color: '#555', fontWeight: '600' },
 
   /* Section Title */
   sectionTitle: {
@@ -1114,7 +1243,7 @@ const s = StyleSheet.create({
   },
   titleChipText: { color: '#666', fontSize: 10, fontWeight: '600' },
   titleChipTitle: { color: '#A3A3A3', fontSize: 13, fontWeight: '600' },
-  titleChipCheck: { fontSize: 14, fontWeight: '800', color: '#8A2BE2' },
+  titleChipCheck: { fontSize: 14, fontWeight: '800', color: '#B366FF' },
 
   /* Match History */
   noHistory: { color: '#525252', fontSize: 14, textAlign: 'center', paddingVertical: 20, paddingHorizontal: GRID_PAD },
@@ -1123,10 +1252,10 @@ const s = StyleSheet.create({
     backgroundColor: GLASS.bg, borderRadius: GLASS.radius, padding: 14,
     marginBottom: 8, marginHorizontal: GRID_PAD, borderWidth: 1, borderColor: GLASS.borderCyan,
   },
-  matchCardWon: { borderColor: 'rgba(0,255,157,0.15)', backgroundColor: 'rgba(0,255,157,0.04)' },
+  matchCardWon: { borderColor: 'rgba(50,231,163,0.15)', backgroundColor: 'rgba(50,231,163,0.04)' },
   matchLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   matchCatBadge: {
-    backgroundColor: 'rgba(138,43,226,0.15)', borderRadius: 8,
+    backgroundColor: 'rgba(179,102,255,0.15)', borderRadius: 8,
     paddingHorizontal: 8, paddingVertical: 4,
   },
   matchCatText: { color: '#B57EDC', fontSize: 10, fontWeight: '700' },
@@ -1134,13 +1263,13 @@ const s = StyleSheet.create({
   matchDate: { color: '#525252', fontSize: 11, marginTop: 2 },
   matchRight: { alignItems: 'flex-end' },
   matchScore: { fontSize: 16, fontWeight: '800' },
-  scoreWin: { color: '#00FF9D' },
-  scoreLoss: { color: '#FF3B30' },
+  scoreWin: { color: '#32E7A3' },
+  scoreLoss: { color: '#FF3D5E' },
   matchXpRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
   matchResult: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
-  resultWin: { color: '#00FF9D' },
-  resultLoss: { color: '#FF3B30' },
-  matchXp: { color: '#00FFFF', fontSize: 10, fontWeight: '700' },
+  resultWin: { color: '#32E7A3' },
+  resultLoss: { color: '#FF3D5E' },
+  matchXp: { color: '#00E5FF', fontSize: 10, fontWeight: '700' },
 
   /* Settings */
   settingsWrap: {
@@ -1162,18 +1291,18 @@ const s = StyleSheet.create({
   // Parrainage
   referralCard: {
     marginHorizontal: GRID_PAD, marginBottom: 16, borderRadius: 18,
-    backgroundColor: 'rgba(0,255,157,0.05)', borderWidth: 1, borderColor: 'rgba(0,255,157,0.15)',
+    backgroundColor: 'rgba(50,231,163,0.05)', borderWidth: 1, borderColor: 'rgba(50,231,163,0.15)',
     padding: 16,
   },
   referralHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 },
   referralIconCircle: { width: 36, height: 36, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
   referralTitle: { flex: 1, color: '#FFF', fontSize: 14, fontWeight: '800' },
-  referralProBadge: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: 'rgba(255,215,0,0.15)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
-  referralProBadgeText: { color: '#FFD700', fontSize: 10, fontWeight: '900' },
+  referralProBadge: { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: 'rgba(255,181,71,0.15)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
+  referralProBadgeText: { color: '#FFB547', fontSize: 10, fontWeight: '900' },
   referralCodeRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 },
   referralCodeLabel: { color: '#888', fontSize: 12 },
-  referralCodeBox: { backgroundColor: 'rgba(0,255,157,0.1)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(0,255,157,0.2)' },
-  referralCode: { color: '#00FF9D', fontSize: 16, fontWeight: '900', letterSpacing: 2 },
+  referralCodeBox: { backgroundColor: 'rgba(50,231,163,0.1)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(50,231,163,0.2)' },
+  referralCode: { color: '#32E7A3', fontSize: 16, fontWeight: '900', letterSpacing: 2 },
   referralMilestones: { gap: 8, marginBottom: 12 },
   referralMilestoneItem: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   referralMilestoneDone: {},
@@ -1181,7 +1310,7 @@ const s = StyleSheet.create({
   referralProgress: { color: '#888', fontSize: 12, marginBottom: 4 },
   referralAntiAbuse: { color: '#444', fontSize: 10, fontStyle: 'italic', marginBottom: 12 },
   referralProRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
-  referralProText: { color: '#FFD700', fontSize: 12, fontWeight: '700' },
+  referralProText: { color: '#FFB547', fontSize: 12, fontWeight: '700' },
   referralShareBtn: { borderRadius: 10, overflow: 'hidden' },
   referralShareGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10 },
   referralShareText: { color: '#000', fontSize: 13, fontWeight: '900' },
@@ -1189,15 +1318,15 @@ const s = StyleSheet.create({
   logoutRow: {
     flexDirection: 'row', alignItems: 'center',
     marginHorizontal: GRID_PAD, paddingVertical: 12, paddingHorizontal: 14,
-    borderRadius: 20, backgroundColor: 'rgba(255,59,48,0.06)',
-    borderWidth: 1, borderColor: 'rgba(255,59,48,0.12)', marginBottom: 12,
+    borderRadius: 20, backgroundColor: 'rgba(255,61,94,0.06)',
+    borderWidth: 1, borderColor: 'rgba(255,61,94,0.12)', marginBottom: 12,
   },
   deleteAccountRow: {
     marginHorizontal: GRID_PAD, marginBottom: 32,
     paddingVertical: 10, alignItems: 'center',
   },
   deleteAccountText: {
-    color: 'rgba(255,59,48,0.45)', fontSize: 12, fontWeight: '600',
+    color: 'rgba(255,61,94,0.45)', fontSize: 12, fontWeight: '600',
     textDecorationLine: 'underline',
   },
 
@@ -1214,7 +1343,7 @@ const s = StyleSheet.create({
     width: 72, alignItems: 'center' as const, padding: 6, borderRadius: 14,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)', backgroundColor: 'rgba(255,255,255,0.03)',
   },
-  avatarGridItemSelected: { borderColor: '#00FF9D', backgroundColor: 'rgba(0,255,157,0.08)' },
+  avatarGridItemSelected: { borderColor: '#32E7A3', backgroundColor: 'rgba(50,231,163,0.08)' },
   avatarGridImage: { width: 52, height: 52, borderRadius: 26, marginBottom: 4 },
   avatarGridName: { color: '#A3A3A3', fontSize: 9, fontWeight: '600', textAlign: 'center' as const },
   avatarGridCheck: { position: 'absolute' as const, top: 4, right: 4 },
@@ -1238,7 +1367,7 @@ const s = StyleSheet.create({
   modalItemInfo: { flex: 1 },
   modalItemTitle: { color: '#FFF', fontSize: 16, fontWeight: '700' },
   modalItemSub: { color: '#525252', fontSize: 11, marginTop: 2 },
-  modalItemCheck: { fontSize: 18, fontWeight: '800', color: '#8A2BE2' },
+  modalItemCheck: { fontSize: 18, fontWeight: '800', color: '#B366FF' },
   modalClose: {
     marginTop: 16, padding: 14, borderRadius: 12, alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.06)',

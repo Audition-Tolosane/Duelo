@@ -24,6 +24,12 @@ import { authFetch } from '../../utils/api';
 import { t } from '../../utils/i18n';
 import { flushPendingScores } from '../../utils/pendingScores';
 
+const CYAN = '#00E5FF';
+const VIOLET = '#B366FF';
+const GOLD = '#FFB547';
+const MINT = '#32E7A3';
+const RED = '#FF3D5E';
+
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const DUEL_CARD_WIDTH = SCREEN_WIDTH * 0.72;
@@ -165,7 +171,100 @@ const mStyles = StyleSheet.create({
   claimGradient: { paddingVertical: 7, borderRadius: 8, alignItems: 'center' },
   claimText: { fontSize: 12, fontWeight: '900', color: '#000' },
   claimedBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
-  claimedText: { fontSize: 11, color: '#00FF9D' },
+  claimedText: { fontSize: 11, color: '#32E7A3' },
+});
+
+// ── XP/Level helpers (mirrors backend xp.py) ──
+function xpForNextLevel(level: number): number { return 500 + Math.pow(level - 1, 2) * 10; }
+function getXpLevel(xp: number): number {
+  if (xp <= 0) return 0;
+  let level = 1, cum = 0;
+  while (level < 50) { const n = xpForNextLevel(level); if (cum + n > xp) break; cum += n; level++; }
+  return level;
+}
+function getXpInLevel(xp: number, level: number): { current: number; needed: number; progress: number } {
+  let cum = 0;
+  for (let l = 1; l < (level || 1); l++) cum += xpForNextLevel(l);
+  const needed = xpForNextLevel(level || 1);
+  const current = Math.max(0, xp - cum);
+  return { current, needed, progress: Math.min(current / Math.max(needed, 1), 1) };
+}
+
+// ── League Banner ──
+const TIER_COLORS: Record<string, string> = {
+  diamond: '#00D4FF', gold: '#FFB547', silver: '#C0C0C0', bronze: '#CD7F32',
+};
+const TIER_ICONS: Record<string, string> = {
+  diamond: 'diamond-stone', gold: 'trophy', silver: 'shield-half-full', bronze: 'shield',
+};
+
+const LeagueBanner = React.memo(function LeagueBanner({ router }: { router: any }) {
+  const [league, setLeague] = React.useState<{
+    mmr: number; tier: string; tier_label: string; tier_color: string;
+    tier_progress: number; global_rank: number;
+    next_tier_label: string | null; next_tier_mmr: number | null;
+    season: { name: string };
+  } | null>(null);
+
+  React.useEffect(() => {
+    authFetch(`${API_URL}/api/league/status`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => d && setLeague(d))
+      .catch(() => {});
+  }, []);
+
+  if (!league) return null;
+
+  const color = TIER_COLORS[league.tier] || '#CD7F32';
+  const icon = TIER_ICONS[league.tier] || 'shield';
+
+  return (
+    <LinearGradient
+      colors={[`${color}1E`, `${color}0A`]}
+      style={[leagueStyles.container, { borderColor: `${color}40` }]}
+    >
+      <View style={leagueStyles.inner}>
+        <View style={leagueStyles.iconBox}>
+          <MaterialCommunityIcons name={icon as any} size={22} color={color} />
+        </View>
+        <View style={leagueStyles.info}>
+          <View style={leagueStyles.topRow}>
+            <Text style={[leagueStyles.label, { color }]}>{t('league.title')}</Text>
+            <Text style={leagueStyles.season}>{league.season.name}</Text>
+          </View>
+          <Text style={[leagueStyles.tierName, { color }]}>{league.tier_label}</Text>
+          <View style={leagueStyles.progressRow}>
+            <View style={leagueStyles.progressBg}>
+              <View style={[leagueStyles.progressFill, { width: `${Math.round(league.tier_progress * 100)}%`, backgroundColor: color }]} />
+            </View>
+            <Text style={leagueStyles.mmrText}>{league.mmr} MMR</Text>
+          </View>
+        </View>
+        <View style={leagueStyles.rankBox}>
+          <Text style={leagueStyles.rankNum}>#{league.global_rank}</Text>
+          <Text style={leagueStyles.rankLabel}>rang</Text>
+        </View>
+      </View>
+    </LinearGradient>
+  );
+});
+
+const leagueStyles = StyleSheet.create({
+  container: { marginHorizontal: 16, marginBottom: 10, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(200,200,200,0.15)' },
+  inner: { flexDirection: 'row', alignItems: 'center', padding: 12, gap: 10 },
+  iconBox: { width: 40, height: 40, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.06)', justifyContent: 'center', alignItems: 'center' },
+  info: { flex: 1 },
+  topRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2 },
+  label: { fontSize: 9, fontWeight: '800', letterSpacing: 1.5, textTransform: 'uppercase' },
+  season: { fontSize: 9, color: '#555', fontWeight: '600' },
+  tierName: { fontSize: 15, fontWeight: '900', marginBottom: 4 },
+  progressRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  progressBg: { flex: 1, height: 4, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 2, overflow: 'hidden' },
+  progressFill: { height: 4, borderRadius: 2 },
+  mmrText: { fontSize: 10, color: '#666', fontWeight: '600', minWidth: 54 },
+  rankBox: { alignItems: 'center' },
+  rankNum: { fontSize: 16, fontWeight: '900', color: '#FFF' },
+  rankLabel: { fontSize: 9, color: '#555', fontWeight: '600' },
 });
 
 // ── Rival Banner ──
@@ -220,7 +319,7 @@ const RivalBanner = React.memo(function RivalBanner({ router }: { router: any })
           }}
           activeOpacity={0.8}
         >
-          <LinearGradient colors={['#FF6B35', '#FF3B5C']} style={rivalStyles.challengeGrad}>
+          <LinearGradient colors={['#FF6B35', '#FF3D5E']} style={rivalStyles.challengeGrad}>
             <MaterialCommunityIcons name="sword-cross" size={12} color="#FFF" />
             <Text style={rivalStyles.challengeText}>{t('rival.challenge')}</Text>
           </LinearGradient>
@@ -289,13 +388,13 @@ const TournamentBanner = React.memo(function TournamentBanner({ router }: { rout
         activeOpacity={0.8}
       >
         <View style={tStyles.iconBox}>
-          <MaterialCommunityIcons name="trophy" size={24} color="#FFD700" />
+          <MaterialCommunityIcons name="trophy" size={24} color="#FFB547" />
         </View>
         <View style={tStyles.info}>
           <View style={tStyles.topRow}>
             <Text style={tStyles.label}>{t('tournament.weekend_title')}</Text>
             <View style={tStyles.clockRow}>
-              <MaterialCommunityIcons name="clock-outline" size={11} color="#FFD700" />
+              <MaterialCommunityIcons name="clock-outline" size={11} color="#FFB547" />
               <Text style={tStyles.countdown}>{countdown}</Text>
             </View>
           </View>
@@ -315,7 +414,7 @@ const TournamentBanner = React.memo(function TournamentBanner({ router }: { rout
             }}
             activeOpacity={0.8}
           >
-            <LinearGradient colors={['#FFD700', '#FF9F0A']} style={tStyles.playGrad}>
+            <LinearGradient colors={['#FFB547', '#FF9F0A']} style={tStyles.playGrad}>
               <MaterialCommunityIcons name="play" size={14} color="#000" />
               <Text style={tStyles.playText}>{info.games_remaining}x</Text>
             </LinearGradient>
@@ -332,9 +431,9 @@ const tStyles = StyleSheet.create({
   iconBox: { width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,215,0,0.15)', justifyContent: 'center', alignItems: 'center' },
   info: { flex: 1 },
   topRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 3 },
-  label: { fontSize: 9, fontWeight: '800', color: '#FFD700', letterSpacing: 1.5, textTransform: 'uppercase' },
+  label: { fontSize: 9, fontWeight: '800', color: '#FFB547', letterSpacing: 1.5, textTransform: 'uppercase' },
   clockRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  countdown: { color: '#FFD700', fontSize: 10, fontWeight: '700' },
+  countdown: { color: '#FFB547', fontSize: 10, fontWeight: '700' },
   themeName: { color: '#FFF', fontSize: 14, fontWeight: '800', marginBottom: 2 },
   rank: { color: '#A3A3A3', fontSize: 11, fontWeight: '600' },
   playBtn: { borderRadius: 10, overflow: 'hidden' },
@@ -389,10 +488,10 @@ const MissionsWidget = React.memo(function MissionsWidget({
                 <MaterialCommunityIcons
                   name={m.completed ? 'check-circle' : 'circle-outline'}
                   size={15}
-                  color={m.completed ? '#00FF9D' : '#555'}
+                  color={m.completed ? '#32E7A3' : '#555'}
                   style={{ marginRight: 6 }}
                 />
-                <Text style={[mStyles.missionLabel, m.completed && { color: '#00FF9D' }]} numberOfLines={1}>
+                <Text style={[mStyles.missionLabel, m.completed && { color: '#32E7A3' }]} numberOfLines={1}>
                   {m.label}
                 </Text>
               </View>
@@ -432,7 +531,7 @@ const MissionsWidget = React.memo(function MissionsWidget({
           )}
           {canClaim && (
             <TouchableOpacity style={mStyles.claimBtn} onPress={onClaim} activeOpacity={0.8}>
-              <LinearGradient colors={['#00FF9D', '#00D4FF']} style={mStyles.claimGradient}>
+              <LinearGradient colors={['#32E7A3', '#00D4FF']} style={mStyles.claimGradient}>
                 <Text style={mStyles.claimText}>{t('missions.claim_xp').replace('{xp}', String(totalXP))}</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -442,7 +541,7 @@ const MissionsWidget = React.memo(function MissionsWidget({
 
       {data.reward_claimed && (
         <View style={mStyles.claimedBadge}>
-          <MaterialCommunityIcons name="check-circle" size={14} color="#00FF9D" />
+          <MaterialCommunityIcons name="check-circle" size={14} color="#32E7A3" />
           <Text style={mStyles.claimedText}>{t('missions.claimed')}</Text>
         </View>
       )}
@@ -473,7 +572,7 @@ function getInitial(pseudo: string): string {
 }
 
 function getAvatarColor(seed: string): string {
-  const palette = ['#FF6B35', '#8A2BE2', '#00D4FF', '#4CAF50', '#FF3B5C', '#FFB800', '#00FF9D', '#E53935'];
+  const palette = ['#FF6B35', '#B366FF', '#00D4FF', '#4CAF50', '#FF3D5E', '#FFB800', '#32E7A3', '#E53935'];
   let hash = 0;
   for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
   return palette[Math.abs(hash) % palette.length];
@@ -548,13 +647,13 @@ const DuelCard = React.memo(function DuelCard({ duel, index, onRematch }: { duel
 
             {/* Score */}
             <View style={styles.duelScoreWrap}>
-              <Text style={[styles.duelScoreNum, duel.won && { color: '#00FF9D' }]}>
+              <Text style={[styles.duelScoreNum, duel.won && { color: '#32E7A3' }]}>
                 {duel.player_score}
               </Text>
               <View style={styles.vsCircle}>
                 <Text style={styles.duelVsText}>{t('home.vs')}</Text>
               </View>
-              <Text style={[styles.duelScoreNum, !duel.won && { color: '#FF3B5C' }]}>
+              <Text style={[styles.duelScoreNum, !duel.won && { color: '#FF3D5E' }]}>
                 {duel.opponent_score}
               </Text>
             </View>
@@ -569,13 +668,13 @@ const DuelCard = React.memo(function DuelCard({ duel, index, onRematch }: { duel
           </View>
 
           {/* Result badge */}
-          <View style={[styles.duelResultBadge, { backgroundColor: duel.won ? '#00FF9D15' : '#FF3B5C15' }]}>
+          <View style={[styles.duelResultBadge, { backgroundColor: duel.won ? '#32E7A315' : '#FF3D5E15' }]}>
             <MaterialCommunityIcons
               name={duel.won ? 'check-circle' : 'close-circle'}
               size={12}
-              color={duel.won ? '#00FF9D' : '#FF3B5C'}
+              color={duel.won ? '#32E7A3' : '#FF3D5E'}
             />
-            <Text style={[styles.duelResultText, { color: duel.won ? '#00FF9D' : '#FF3B5C' }]}>
+            <Text style={[styles.duelResultText, { color: duel.won ? '#32E7A3' : '#FF3D5E' }]}>
               {duel.won ? t('home.victory_label') : t('home.defeat_label')}
             </Text>
           </View>
@@ -583,7 +682,7 @@ const DuelCard = React.memo(function DuelCard({ duel, index, onRematch }: { duel
           {/* Rematch button */}
           <TouchableOpacity style={styles.rematchBtn} onPress={onRematch} activeOpacity={0.8}>
             <LinearGradient
-              colors={[duel.category_color, '#8A2BE2']}
+              colors={[duel.category_color, '#B366FF']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.rematchGradient}
@@ -626,7 +725,7 @@ const RecordCard = React.memo(function RecordCard({ item, index }: { item: FeedI
         <Text style={styles.feedCardBody}>{`@${item.user_pseudo} ${t('home.perfect_score_body')} ${item.category_name} !`}</Text>
         {item.xp_earned ? (
           <View style={styles.xpBadge}>
-            <MaterialCommunityIcons name="lightning-bolt" size={12} color="#8A2BE2" />
+            <MaterialCommunityIcons name="lightning-bolt" size={12} color="#B366FF" />
             <Text style={styles.xpBadgeText}>+{item.xp_earned} XP</Text>
           </View>
         ) : null}
@@ -674,9 +773,9 @@ const CommunityCard = React.memo(function CommunityCard({ item, index, userId, o
             <MaterialCommunityIcons
               name={item.is_liked ? 'heart' : 'heart-outline'}
               size={16}
-              color={item.is_liked ? '#FF3B5C' : '#666'}
+              color={item.is_liked ? '#FF3D5E' : '#666'}
             />
-            <Text style={[styles.communityActionCount, item.is_liked && { color: '#FF3B5C' }]}>
+            <Text style={[styles.communityActionCount, item.is_liked && { color: '#FF3D5E' }]}>
               {item.likes_count || 0}
             </Text>
           </TouchableOpacity>
@@ -776,7 +875,7 @@ const SlotMachineOverlay = React.memo(function SlotMachineOverlay({
             <Animated.View style={[slotS.row, rowStyle]}>
               {list.map((theme, idx) => {
                 const isChosen = idx === chosenIndex;
-                const c = theme.color || '#8A2BE2';
+                const c = theme.color || '#B366FF';
                 return (
                   <View
                     key={`${theme.id}-${idx}`}
@@ -912,8 +1011,8 @@ const EventCard = React.memo(function EventCard({ item, index, onActivate, onLau
               <Text style={[styles.eventTitle, { color }]}>{`XP ×2 — ${item.category_name}`}</Text>
               {isActive && countdown ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <MaterialCommunityIcons name="timer-outline" size={13} color="#00FF9D" />
-                  <Text style={[styles.eventBody, { color: '#00FF9D', fontWeight: '700' }]}>{countdown}</Text>
+                  <MaterialCommunityIcons name="timer-outline" size={13} color="#32E7A3" />
+                  <Text style={[styles.eventBody, { color: '#32E7A3', fontWeight: '700' }]}>{countdown}</Text>
                 </View>
               ) : (
                 <Text style={styles.eventBody}>
@@ -922,7 +1021,7 @@ const EventCard = React.memo(function EventCard({ item, index, onActivate, onLau
               )}
             </View>
             {isActive ? (
-              <View style={[styles.eventLiveBadge, { backgroundColor: '#00FF9D' }]}>
+              <View style={[styles.eventLiveBadge, { backgroundColor: '#32E7A3' }]}>
                 <View style={[styles.liveDot, { backgroundColor: '#FFF' }]} />
                 <Text style={[styles.eventLiveText, { color: '#000' }]}>ACTIF</Text>
               </View>
@@ -972,11 +1071,11 @@ const WeeklySummaryWidget = React.memo(function WeeklySummaryWidget() {
   return (
     <Animated.View entering={FadeInDown.delay(260).duration(500)}>
       <LinearGradient
-        colors={['rgba(138,43,226,0.10)', 'rgba(0,191,255,0.05)']}
+        colors={['rgba(179,102,255,0.10)', 'rgba(0,191,255,0.05)']}
         style={wkStyles.card}
       >
         <View style={wkStyles.headerRow}>
-          <LinearGradient colors={['#8A2BE2', '#A855F7']} style={wkStyles.iconCircle}>
+          <LinearGradient colors={['#B366FF', '#A855F7']} style={wkStyles.iconCircle}>
             <MaterialCommunityIcons name="chart-line" size={13} color="#FFF" />
           </LinearGradient>
           <Text style={wkStyles.title}>Cette semaine</Text>
@@ -988,12 +1087,12 @@ const WeeklySummaryWidget = React.memo(function WeeklySummaryWidget() {
           </View>
           <View style={wkStyles.divider} />
           <View style={wkStyles.statItem}>
-            <Text style={[wkStyles.statVal, { color: '#00FF9D' }]}>{summary.win_rate}%</Text>
+            <Text style={[wkStyles.statVal, { color: '#32E7A3' }]}>{summary.win_rate}%</Text>
             <Text style={wkStyles.statLabel}>VICTOIRES</Text>
           </View>
           <View style={wkStyles.divider} />
           <View style={wkStyles.statItem}>
-            <Text style={[wkStyles.statVal, { color: '#FFD700' }]}>+{summary.xp_earned}</Text>
+            <Text style={[wkStyles.statVal, { color: '#FFB547' }]}>+{summary.xp_earned}</Text>
             <Text style={wkStyles.statLabel}>XP</Text>
           </View>
           {summary.perfect_scores > 0 && (
@@ -1020,7 +1119,7 @@ const WeeklySummaryWidget = React.memo(function WeeklySummaryWidget() {
 const wkStyles = StyleSheet.create({
   card: {
     marginHorizontal: 16, marginBottom: 8, borderRadius: 16,
-    borderWidth: 1, borderColor: 'rgba(138,43,226,0.2)', padding: 14,
+    borderWidth: 1, borderColor: 'rgba(179,102,255,0.2)', padding: 14,
   },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
   iconCircle: { width: 24, height: 24, borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
@@ -1517,7 +1616,7 @@ export default function AccueilScreen() {
       <CosmicBackground>
       <View style={styles.container}>
         <View style={styles.loadingWrap}>
-          <ActivityIndicator size="large" color="#8A2BE2" />
+          <ActivityIndicator size="large" color="#00E5FF" />
         </View>
       </View>
       </CosmicBackground>
@@ -1536,8 +1635,8 @@ export default function AccueilScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#8A2BE2"
-            colors={['#8A2BE2']}
+            tintColor="#00E5FF"
+            colors={['#00E5FF']}
           />
         }
       >
@@ -1549,7 +1648,7 @@ export default function AccueilScreen() {
                 {t('home.greeting')} {userData?.pseudo || t('home.player')} {userData?.country_flag || ''}
               </Text>
               <View style={styles.titleRow}>
-                <MaterialCommunityIcons name="shield-star" size={13} color="#8A2BE2" />
+                <MaterialCommunityIcons name="shield-star" size={13} color="#B366FF" />
                 <Text style={styles.greetingTitle}>{userData?.selected_title || t('home.novice')}</Text>
               </View>
             </View>
@@ -1558,14 +1657,14 @@ export default function AccueilScreen() {
           {/* Stats pills */}
           <View style={styles.statsRow}>
             <View style={styles.statPill}>
-              <LinearGradient colors={['#8A2BE2', '#A855F7']} style={styles.statPillIcon}>
+              <LinearGradient colors={['#B366FF', '#A855F7']} style={styles.statPillIcon}>
                 <MaterialCommunityIcons name="lightning-bolt" size={12} color="#FFF" />
               </LinearGradient>
               <Text style={styles.statPillNum}>{(userData?.total_xp || 0).toLocaleString()}</Text>
               <Text style={styles.statPillLabel}>XP</Text>
             </View>
             <View style={styles.statPill}>
-              <LinearGradient colors={['#00FF9D', '#38BDF8']} style={styles.statPillIcon}>
+              <LinearGradient colors={['#32E7A3', '#38BDF8']} style={styles.statPillIcon}>
                 <MaterialCommunityIcons name="trophy" size={11} color="#FFF" />
               </LinearGradient>
               <Text style={styles.statPillNum}>{winRate}%</Text>
@@ -1580,6 +1679,28 @@ export default function AccueilScreen() {
             </View>
           </View>
 
+          {/* XP Progress Bar */}
+          {userData && (() => {
+            const lvl = getXpLevel(userData.total_xp);
+            const { current, needed, progress } = getXpInLevel(userData.total_xp, lvl);
+            return (
+              <View style={styles.xpProgressContainer}>
+                <View style={styles.xpProgressHeader}>
+                  <Text style={styles.xpProgressLevel}>Niv. {lvl}</Text>
+                  <Text style={styles.xpProgressInfo}>{current.toLocaleString()} / {needed.toLocaleString()} XP</Text>
+                  <Text style={styles.xpProgressLevel}>Niv. {Math.min(lvl + 1, 50)}</Text>
+                </View>
+                <View style={styles.xpProgressBg}>
+                  <LinearGradient
+                    colors={['#B366FF', '#00D4FF']}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                    style={[styles.xpProgressFill, { width: `${Math.round(progress * 100)}%` as any }]}
+                  />
+                </View>
+              </View>
+            );
+          })()}
+
           {/* Streak Widget */}
           <TouchableOpacity
             style={styles.streakCard}
@@ -1590,15 +1711,15 @@ export default function AccueilScreen() {
             }}
           >
             <LinearGradient
-              colors={hasPlayedToday ? ['rgba(0,255,157,0.08)', 'rgba(0,191,255,0.04)'] : ['rgba(255,107,53,0.12)', 'rgba(255,59,48,0.06)']}
+              colors={hasPlayedToday ? ['rgba(50,231,163,0.08)', 'rgba(0,191,255,0.04)'] : ['rgba(255,107,53,0.12)', 'rgba(255,61,94,0.06)']}
               style={styles.streakCardGradient}
             >
               <View style={styles.streakCardLeft}>
-                <View style={[styles.streakFireCircle, { backgroundColor: hasPlayedToday ? 'rgba(0,255,157,0.15)' : 'rgba(255,107,53,0.2)' }]}>
+                <View style={[styles.streakFireCircle, { backgroundColor: hasPlayedToday ? 'rgba(50,231,163,0.15)' : 'rgba(255,107,53,0.2)' }]}>
                   <MaterialCommunityIcons
                     name={hasPlayedToday ? 'check-circle' : 'fire'}
                     size={24}
-                    color={hasPlayedToday ? '#00FF9D' : '#FF6B35'}
+                    color={hasPlayedToday ? '#32E7A3' : '#FF6B35'}
                   />
                 </View>
                 <View style={styles.streakCardInfo}>
@@ -1617,7 +1738,7 @@ export default function AccueilScreen() {
                 </View>
               </View>
               <View style={styles.streakCardRight}>
-                <Text style={[styles.streakNum, { color: hasPlayedToday ? '#00FF9D' : '#FF6B35' }]}>
+                <Text style={[styles.streakNum, { color: hasPlayedToday ? '#32E7A3' : '#FF6B35' }]}>
                   {userData?.login_streak || 0}
                 </Text>
               </View>
@@ -1625,7 +1746,7 @@ export default function AccueilScreen() {
             {/* Best login streak badge */}
             {(userData?.best_login_streak || 0) > 0 && (
               <View style={styles.bestStreakBadge}>
-                <MaterialCommunityIcons name="trophy" size={10} color="#FFD700" />
+                <MaterialCommunityIcons name="trophy" size={10} color="#FFB547" />
                 <Text style={styles.bestStreakText}>{t('home.best_streak_record')} {userData?.best_login_streak}{t('home.days_short')}</Text>
               </View>
             )}
@@ -1643,7 +1764,7 @@ export default function AccueilScreen() {
             activeOpacity={0.8}
           >
             <LinearGradient
-              colors={spinAvailable ? ['rgba(138,43,226,0.25)', 'rgba(138,43,226,0.08)'] : ['rgba(30,30,50,0.6)', 'rgba(20,20,40,0.4)']}
+              colors={spinAvailable ? ['rgba(179,102,255,0.25)', 'rgba(179,102,255,0.08)'] : ['rgba(30,30,50,0.6)', 'rgba(20,20,40,0.4)']}
               style={spinStyles.btnGrad}
               start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
             >
@@ -1696,7 +1817,7 @@ export default function AccueilScreen() {
             }}
           >
             <LinearGradient
-              colors={['#8A2BE2', '#00FFFF']}
+              colors={['#B366FF', '#00E5FF']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.quickPlayGradient}
@@ -1716,7 +1837,7 @@ export default function AccueilScreen() {
             {incomingChallenges.length > 0 && (
               <>
                 <View style={styles.sectionHeader}>
-                  <LinearGradient colors={['#BF5FFF', '#8A2BE2']} style={styles.sectionIconCircle}>
+                  <LinearGradient colors={['#BF5FFF', '#B366FF']} style={styles.sectionIconCircle}>
                     <MaterialCommunityIcons name="sword-cross" size={12} color="#FFF" />
                   </LinearGradient>
                   <Text style={styles.sectionTitle}>{t('challenge.incoming_title')}</Text>
@@ -1758,6 +1879,9 @@ export default function AccueilScreen() {
             )}
           </Animated.View>
         )}
+
+        {/* ── League Banner ── */}
+        <LeagueBanner router={router} />
 
         {/* ── Rival Banner ── */}
         <RivalBanner router={router} />
@@ -1802,25 +1926,25 @@ export default function AccueilScreen() {
                   const isCorrect = dqResult && idx === dqResult.correct_option;
                   const isWrong = dqResult && isChosen && !dqResult.correct;
                   let bg = '#1A1A2E';
-                  if (isCorrect) bg = '#00FF9D20';
-                  if (isWrong) bg = '#FF3B5C20';
+                  if (isCorrect) bg = '#32E7A320';
+                  if (isWrong) bg = '#FF3D5E20';
                   return (
                     <TouchableOpacity
                       key={idx}
-                      style={[styles.dqOpt, { borderColor: isCorrect ? '#00FF9D' : isWrong ? '#FF3B5C' : '#333', backgroundColor: bg }]}
+                      style={[styles.dqOpt, { borderColor: isCorrect ? '#32E7A3' : isWrong ? '#FF3D5E' : '#333', backgroundColor: bg }]}
                       onPress={() => handleDqAnswer(idx)}
                       disabled={dqAnswer !== null}
                       activeOpacity={0.8}
                     >
                       <Text style={styles.dqOptText}>{opt}</Text>
-                      {isCorrect && <MaterialCommunityIcons name="check-circle" size={14} color="#00FF9D" />}
-                      {isWrong && <MaterialCommunityIcons name="close-circle" size={14} color="#FF3B5C" />}
+                      {isCorrect && <MaterialCommunityIcons name="check-circle" size={14} color="#32E7A3" />}
+                      {isWrong && <MaterialCommunityIcons name="close-circle" size={14} color="#FF3D5E" />}
                     </TouchableOpacity>
                   );
                 })}
               </View>
               {dqResult && (
-                <Text style={[styles.dqFeedback, { color: dqResult.correct ? '#00FF9D' : '#FF6B35' }]}>
+                <Text style={[styles.dqFeedback, { color: dqResult.correct ? '#32E7A3' : '#FF6B35' }]}>
                   {dqResult.correct ? `Bravo ! +${dqResult.xp_earned} XP` : `Raté — +${dqResult.xp_earned} XP quand même`}
                 </Text>
               )}
@@ -1829,7 +1953,7 @@ export default function AccueilScreen() {
         )}
         {dailyQuestion?.already_answered && (
           <View style={styles.dqDoneCard}>
-            <MaterialCommunityIcons name="check-circle" size={16} color="#00FF9D" />
+            <MaterialCommunityIcons name="check-circle" size={16} color="#32E7A3" />
             <Text style={styles.dqDoneText}>Question du jour répondue · +{dailyQuestion.xp_earned} XP</Text>
           </View>
         )}
@@ -1899,7 +2023,7 @@ export default function AccueilScreen() {
           </TouchableOpacity>
         ) : socialFeed.length === 0 ? (
           <Animated.View entering={FadeInDown.delay(500).duration(400)} style={styles.emptyFeed}>
-            <LinearGradient colors={['#8A2BE2', '#A855F7']} style={styles.emptyFeedCircle}>
+            <LinearGradient colors={['#B366FF', '#A855F7']} style={styles.emptyFeedCircle}>
               <MaterialCommunityIcons name="weather-night" size={28} color="#FFF" />
             </LinearGradient>
             <Text style={styles.emptyFeedTitle}>{t('home.empty_title')}</Text>
@@ -1911,7 +2035,7 @@ export default function AccueilScreen() {
           <>
             {socialFeed.some(i => i.type === 'event') && (
               <View style={styles.offerHeader}>
-                <MaterialCommunityIcons name="lightning-bolt" size={13} color="#FFD700" />
+                <MaterialCommunityIcons name="lightning-bolt" size={13} color="#FFB547" />
                 <Text style={styles.offerHeaderText}>Offres x2 XP</Text>
                 {offerCountdown ? (
                   <Text style={styles.offerHeaderCountdown}>dans {offerCountdown}</Text>
@@ -1966,13 +2090,13 @@ const spinStyles = StyleSheet.create({
   btnGrad: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: 12,
     paddingHorizontal: 14, gap: 10,
-    borderWidth: 1, borderColor: 'rgba(138,43,226,0.2)', borderRadius: 14,
+    borderWidth: 1, borderColor: 'rgba(179,102,255,0.2)', borderRadius: 14,
   },
   wheelEmoji: { fontSize: 24 },
   btnTitle: { color: '#FFF', fontSize: 14, fontWeight: '700' },
   btnSub: { color: '#A3A3A3', fontSize: 11 },
   badge: {
-    backgroundColor: '#FF3B30', width: 18, height: 18,
+    backgroundColor: '#FF3D5E', width: 18, height: 18,
     borderRadius: 9, alignItems: 'center', justifyContent: 'center',
     marginLeft: 4,
   },
@@ -2013,7 +2137,7 @@ const styles = StyleSheet.create({
   greetingTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#8A2BE2',
+    color: '#B366FF',
   },
   statsRow: {
     flexDirection: 'row',
@@ -2050,6 +2174,26 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.4)',
   },
 
+  // ── XP Progress Bar ──
+  xpProgressContainer: {
+    marginTop: 12, paddingHorizontal: 4,
+  },
+  xpProgressHeader: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5,
+  },
+  xpProgressLevel: {
+    fontSize: 10, fontWeight: '800', color: '#B366FF',
+  },
+  xpProgressInfo: {
+    fontSize: 10, fontWeight: '600', color: '#555',
+  },
+  xpProgressBg: {
+    height: 5, backgroundColor: 'rgba(179,102,255,0.15)', borderRadius: 3, overflow: 'hidden',
+  },
+  xpProgressFill: {
+    height: 5, borderRadius: 3,
+  },
+
   // ── Section Headers ──
   sectionHeader: {
     flexDirection: 'row',
@@ -2076,7 +2220,7 @@ const styles = StyleSheet.create({
     minWidth: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#8A2BE2',
+    backgroundColor: '#B366FF',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 6,
@@ -2286,10 +2430,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 10,
-    backgroundColor: 'rgba(138, 43, 226, 0.15)',
+    backgroundColor: 'rgba(179, 102, 255, 0.15)',
     gap: 4,
   },
-  xpBadgeText: { fontSize: 12, fontWeight: '800', color: '#8A2BE2' },
+  xpBadgeText: { fontSize: 12, fontWeight: '800', color: '#B366FF' },
 
   // ── Community Card ──
   communityHeader: {
@@ -2396,16 +2540,16 @@ const styles = StyleSheet.create({
   dqDoneCard: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     marginHorizontal: 16, marginBottom: 8, paddingVertical: 10, paddingHorizontal: 14,
-    backgroundColor: '#00FF9D10', borderRadius: 12, borderWidth: 1, borderColor: '#00FF9D30',
+    backgroundColor: '#32E7A310', borderRadius: 12, borderWidth: 1, borderColor: '#32E7A330',
   },
-  dqDoneText: { fontSize: 12, color: '#00FF9D', fontWeight: '600' },
+  dqDoneText: { fontSize: 12, color: '#32E7A3', fontWeight: '600' },
 
   // ── Offer header ──
   offerHeader: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     paddingHorizontal: 16, paddingVertical: 6,
   },
-  offerHeaderText: { fontSize: 12, color: '#FFD700', fontWeight: '700' },
+  offerHeaderText: { fontSize: 12, color: '#FFB547', fontWeight: '700' },
   offerHeaderCountdown: { fontSize: 11, color: '#888', flex: 1 },
   offerRefreshBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   offerRefreshText: { fontSize: 11, color: '#888' },
@@ -2509,7 +2653,7 @@ const styles = StyleSheet.create({
   bestStreakText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#FFD700',
+    color: '#FFB547',
   },
 
   // ── Challenge Card ──

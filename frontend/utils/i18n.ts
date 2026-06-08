@@ -309,9 +309,24 @@ const translations: Translations = {
   'report.reason_other': { fr: 'Autre', en: 'Other', es: 'Otro', de: 'Sonstiges', pt: 'Outro', it: 'Altro', ar: 'أخرى', ja: 'その他', ko: '기타', zh: '其他' },
 
   // Results celebration
+  'results.rewards_title': { fr: 'RÉCOMPENSES', en: 'REWARDS', es: 'RECOMPENSAS', de: 'BELOHNUNGEN', pt: 'RECOMPENSAS', it: 'RICOMPENSE', ar: 'المكافآت', ja: '報酬', ko: '보상', zh: '奖励' },
+  'results.near_miss': { fr: 'Une bonne réponse de plus aurait tout changé !', en: 'One more right answer would have changed everything!', es: '¡Una respuesta más habría cambiado todo!', de: 'Eine richtige Antwort mehr hätte alles verändert!', pt: 'Mais uma resposta certa teria mudado tudo!', it: 'Una risposta giusta in più avrebbe cambiato tutto!', ar: 'إجابة صحيحة واحدة أخرى كانت ستغير كل شيء!', ja: 'あと1問正解で勝てた！', ko: '한 문제만 더 맞혔다면 모든 게 달라졌을 텐데!', zh: '再答对一题就能赢！' },
+  'results.review_title': { fr: 'RÉVISEZ VOS ERREURS', en: 'REVIEW YOUR MISTAKES', es: 'REVISA TUS ERRORES', de: 'FEHLER ÜBERPRÜFEN', pt: 'REVEJA SEUS ERROS', it: 'RIVEDI I TUOI ERRORI', ar: 'راجع أخطاءك', ja: '間違いを見直す', ko: '실수 복습하기', zh: '复习错题' },
+  'results.review_sub': { fr: '{n} question(s) à revoir', en: '{n} question(s) to review', es: '{n} pregunta(s) por revisar', de: '{n} Frage(n) zu überprüfen', pt: '{n} pergunta(s) para rever', it: '{n} domanda/e da rivedere', ar: '{n} سؤال/أسئلة للمراجعة', ja: '{n}問を復習', ko: '{n}문제 복습', zh: '{n} 题待复习' },
+  'results.review_timeout': { fr: 'Temps écoulé — pas de réponse', en: 'Time out — no answer', es: 'Tiempo agotado — sin respuesta', de: 'Zeit abgelaufen — keine Antwort', pt: 'Tempo esgotado — sem resposta', it: 'Tempo scaduto — nessuna risposta', ar: 'انتهى الوقت — لا إجابة', ja: '時間切れ — 未回答', ko: '시간 초과 — 미응답', zh: '超时 — 未作答' },
   'results.new_title_unlocked': { fr: 'NOUVEAU TITRE DEBLOQUE', en: 'NEW TITLE UNLOCKED', es: 'NUEVO TÍTULO DESBLOQUEADO', de: 'NEUER TITEL FREIGESCHALTET', pt: 'NOVO TÍTULO DESBLOQUEADO', it: 'NUOVO TITOLO SBLOCCATO', ar: 'لقب جديد مفتوح', ja: '新しい称号を獲得', ko: '새 칭호 해제', zh: '新称号已解锁' },
   'results.achievement_unlocked': { fr: 'SUCCÈS DÉBLOQUÉ !', en: 'ACHIEVEMENT UNLOCKED!', es: '¡LOGRO DESBLOQUEADO!', de: 'ERFOLG FREIGESCHALTET!', pt: 'CONQUISTA DESBLOQUEADA!', it: 'OBIETTIVO SBLOCCATO!', ar: 'إنجاز مفتوح!', ja: '実績を解除！', ko: '업적 달성!', zh: '成就解锁！' },
   'results.continue': { fr: 'CONTINUER', en: 'CONTINUE', es: 'CONTINUAR', de: 'WEITER', pt: 'CONTINUAR', it: 'CONTINUA', ar: 'متابعة', ja: '続ける', ko: '계속', zh: '继续' },
+  'results.new_level_reached': { fr: 'NIVEAU ATTEINT !', en: 'LEVEL UP!', es: '¡NIVEL ALCANZADO!', de: 'LEVEL ERREICHT!', pt: 'NÍVEL ALCANÇADO!', it: 'LIVELLO RAGGIUNTO!', ar: 'وصلت مستوى!', ja: 'レベルアップ！', ko: '레벨 업!', zh: '升级！' },
+  'home.xp_to_level': { fr: 'XP vers Niv.', en: 'XP to Lv.', es: 'XP al Niv.', de: 'XP bis Stufe', pt: 'XP ao Nív.', it: 'XP al Liv.', ar: 'نقاط للمستوى', ja: 'XP→Lv.', ko: 'XP→레벨', zh: 'XP→等级' },
+  'league.title': { fr: 'LIGUE', en: 'LEAGUE', es: 'LIGA', de: 'LIGA', pt: 'LIGA', it: 'LEGA', ar: 'الدوري', ja: 'リーグ', ko: '리그', zh: '联赛' },
+  'league.bronze': { fr: 'Bronze', en: 'Bronze', es: 'Bronce', de: 'Bronze', pt: 'Bronze', it: 'Bronzo', ar: 'برونز', ja: 'ブロンズ', ko: '브론즈', zh: '青铜' },
+  'league.silver': { fr: 'Argent', en: 'Silver', es: 'Plata', de: 'Silber', pt: 'Prata', it: 'Argento', ar: 'فضة', ja: 'シルバー', ko: '실버', zh: '白银' },
+  'league.gold': { fr: 'Or', en: 'Gold', es: 'Oro', de: 'Gold', pt: 'Ouro', it: 'Oro', ar: 'ذهب', ja: 'ゴールド', ko: '골드', zh: '黄金' },
+  'league.diamond': { fr: 'Diamant', en: 'Diamond', es: 'Diamante', de: 'Diamant', pt: 'Diamante', it: 'Diamante', ar: 'ماس', ja: 'ダイヤモンド', ko: '다이아몬드', zh: '钻石' },
+  'league.mmr': { fr: 'MMR', en: 'MMR', es: 'MMR', de: 'MMR', pt: 'MMR', it: 'MMR', ar: 'MMR', ja: 'MMR', ko: 'MMR', zh: 'MMR' },
+  'league.rank': { fr: 'Rang #{n}', en: 'Rank #{n}', es: 'Rango #{n}', de: 'Rang #{n}', pt: 'Rank #{n}', it: 'Rango #{n}', ar: 'المرتبة #{n}', ja: 'ランク#{n}', ko: '순위 #{n}', zh: '排名#{n}' },
+  'league.season': { fr: 'Saison', en: 'Season', es: 'Temporada', de: 'Saison', pt: 'Temporada', it: 'Stagione', ar: 'موسم', ja: 'シーズン', ko: '시즌', zh: '赛季' },
 
   // Chat
   'chat.type_message': { fr: 'Écris un message...', en: 'Type a message...', es: 'Escribe un mensaje...', de: 'Nachricht schreiben...', pt: 'Digite uma mensagem...', it: 'Scrivi un messaggio...', ar: 'اكتب رسالة...', ja: 'メッセージを入力...', ko: '메시지 입력...', zh: '输入消息...' },
@@ -561,6 +576,7 @@ const translations: Translations = {
   'category.at_level': { fr: 'au niveau', en: 'at level', es: 'en nivel', de: 'bei Level', pt: 'no nível', it: 'al livello', ar: 'في المستوى', ja: 'レベル', ko: '레벨', zh: '等级' },
   'category.max_level': { fr: 'Niveau maximum atteint !', en: 'Maximum level reached!', es: '¡Nivel máximo alcanzado!', de: 'Maximales Level erreicht!', pt: 'Nível máximo atingido!', it: 'Livello massimo raggiunto!', ar: 'تم الوصول للمستوى الأقصى!', ja: '最高レベル達成！', ko: '최대 레벨 달성!', zh: '已达最高级！' },
   'category.total_xp': { fr: 'XP TOTAL', en: 'TOTAL XP', es: 'XP TOTAL', de: 'GESAMT-XP', pt: 'XP TOTAL', it: 'XP TOTALE', ar: 'إجمالي XP', ja: '合計XP', ko: '총 XP', zh: '总XP' },
+  'category.top_master': { fr: 'MAÎTRE', en: 'MASTER', es: 'MAESTRO', de: 'MEISTER', pt: 'MESTRE', it: 'MAESTRO', ar: 'بطل', ja: 'マスター', ko: '마스터', zh: '大师' },
   'category.followers': { fr: 'FOLLOWERS', en: 'FOLLOWERS', es: 'SEGUIDORES', de: 'FOLLOWER', pt: 'SEGUIDORES', it: 'FOLLOWER', ar: 'المتابعون', ja: 'フォロワー', ko: '팔로워', zh: '关注者' },
   'category.questions': { fr: 'QUESTIONS', en: 'QUESTIONS', es: 'PREGUNTAS', de: 'FRAGEN', pt: 'PERGUNTAS', it: 'DOMANDE', ar: 'الأسئلة', ja: '問題', ko: '문제', zh: '问题' },
   'category.community_wall': { fr: 'MUR DE LA COMMUNAUTÉ', en: 'COMMUNITY WALL', es: 'MURO DE LA COMUNIDAD', de: 'COMMUNITY-PINNWAND', pt: 'MURAL DA COMUNIDADE', it: 'MURO DELLA COMUNITÀ', ar: 'جدار المجتمع', ja: 'コミュニティウォール', ko: '커뮤니티 게시판', zh: '社区墙' },

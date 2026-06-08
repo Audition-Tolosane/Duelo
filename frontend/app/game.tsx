@@ -3,6 +3,7 @@ import {
   View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions,
   Platform, UIManager, ActivityIndicator, Easing, Alert
 } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -34,70 +35,34 @@ type Question = {
   correct_option: number;
 };
 
-// ── Animated Score Bar component ──
-function AnimatedBar({ score, showPending, isPlayer }: { score: number; showPending: boolean; isPlayer?: boolean }) {
-  const [trackHeight, setTrackHeight] = useState(0);
-  const barHeightAnim = useRef(new Animated.Value(0)).current;
-  const pendingOpacity = useRef(new Animated.Value(1)).current;
-  const prevScore = useRef(0);
+// ── Design tokens ──
+const CYAN = '#00E5FF';
+const VIOLET = '#B366FF';
+const GOLD = '#FFB547';
+const MINT = '#32E7A3';
+const RED = '#FF3D5E';
+const OPTION_COLORS = [CYAN, MINT, VIOLET, GOLD];
 
-  useEffect(() => {
-    if (trackHeight <= 0) return;
-
-    const targetH = (score / MAX_TOTAL) * trackHeight;
-
-    // Animate the bar growing smoothly
-    Animated.timing(barHeightAnim, {
-      toValue: targetH,
-      duration: 500,
-      useNativeDriver: false,
-    }).start();
-
-    prevScore.current = score;
-  }, [score, trackHeight]);
-
-  useEffect(() => {
-    // Fade pending in/out
-    Animated.timing(pendingOpacity, {
-      toValue: showPending ? 1 : 0,
-      duration: 300,
-      useNativeDriver: false,
-    }).start();
-  }, [showPending]);
-
-  const pendingHeight = trackHeight > 0 ? (MAX_PTS_PER_Q / MAX_TOTAL) * trackHeight : 0;
-  const barColor = isPlayer ? '#8A2BE2' : '#2196F3';
-  const pendingColor = isPlayer ? 'rgba(138,43,226,0.30)' : 'rgba(33,150,243,0.30)';
-
+// ── Round SVG Timer ──
+function RoundTimer({ timeLeft, total = TIMER_DURATION }: { timeLeft: number; total?: number }) {
+  const R = 34;
+  const circumference = 2 * Math.PI * R;
+  const offset = circumference * (1 - timeLeft / total);
+  const urgent = timeLeft <= 3;
+  const color = urgent ? RED : CYAN;
   return (
-    <View style={styles.barColumn}>
-      <View
-        style={styles.barTrack}
-        onLayout={(e) => setTrackHeight(e.nativeEvent.layout.height)}
-      >
-        {/* Pending area — sits on top of earned */}
-        <Animated.View style={{
-          position: 'absolute',
-          left: 0, right: 0,
-          bottom: barHeightAnim,
-          height: pendingHeight,
-          backgroundColor: pendingColor,
-          borderRadius: 7,
-          opacity: pendingOpacity,
-        }} />
-
-        {/* Earned (solid, grows from bottom) */}
-        <Animated.View style={{
-          position: 'absolute',
-          left: 0, right: 0, bottom: 0,
-          height: barHeightAnim,
-          backgroundColor: barColor,
-          borderRadius: 7,
-        }} />
+    <View style={{ width: 86, height: 86 }}>
+      <View style={{ position: 'absolute', top: 0, left: 0, width: 86, height: 86, transform: [{ rotate: '-90deg' }] }}>
+        <Svg width="86" height="86" viewBox="0 0 86 86">
+          <Circle cx="43" cy="43" r={R} stroke="rgba(255,255,255,0.08)" strokeWidth="4" fill="none" />
+          <Circle cx="43" cy="43" r={R} stroke={color} strokeWidth="4" fill="none"
+            strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" />
+        </Svg>
       </View>
-      <View style={styles.barScoreLabel}>
-        <MaterialCommunityIcons name="star" size={10} color={barColor} />
-        <Text style={[styles.barScoreText, { color: barColor }]}>{score}</Text>
+      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                     alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={{ fontWeight: '900', fontSize: 28, color, lineHeight: 32 }}>{timeLeft}</Text>
+        <Text style={{ fontSize: 8, color: 'rgba(255,255,255,0.4)', letterSpacing: 1 }}>SEC</Text>
       </View>
     </View>
   );
@@ -159,6 +124,9 @@ export default function GameScreen() {
   const playerAnswersHistoryRef = useRef<AnswerRecord[]>([]);
   const p1AnswersRef = useRef<{ answer: number; is_correct: boolean; points: number }[]>([]);
 
+  // Per-question player selections for the results "review missed" feature (all modes)
+  const playerSelectionsRef = useRef<Record<number, number>>({});
+
   // Guards
   const isSubmittingRef = useRef(false);               // #18 double-tap prevention
   const wsAnswerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // #17 WS hang timeout
@@ -166,6 +134,16 @@ export default function GameScreen() {
   // Progress bar animation
   const progressAnim = useRef(new Animated.Value(0)).current;
   const progressPendingOpacity = useRef(new Animated.Value(1)).current;
+
+  // Question slide scale animation
+  const questionScaleAnim = useRef(new Animated.Value(0.96)).current;
+
+  // Correct streak streak toast
+  const [correctStreak, setCorrectStreak] = useState(0);
+  const correctStreakRef = useRef(0);
+  const [streakToastVisible, setStreakToastVisible] = useState(false);
+  const [streakToastCount, setStreakToastCount] = useState(0);
+  const streakToastAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     preloadSounds();
@@ -370,11 +348,24 @@ export default function GameScreen() {
 
   const animateQuestion = () => {
     questionFade.setValue(0);
-    questionSlide.setValue(24);
+    questionSlide.setValue(40);
+    questionScaleAnim.setValue(0.95);
     Animated.parallel([
-      Animated.timing(questionFade, { toValue: 1, duration: 280, useNativeDriver: true }),
-      Animated.timing(questionSlide, { toValue: 0, duration: 280, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.timing(questionFade, { toValue: 1, duration: 300, useNativeDriver: true }),
+      Animated.timing(questionSlide, { toValue: 0, duration: 300, easing: Easing.out(Easing.back(1.2)), useNativeDriver: true }),
+      Animated.timing(questionScaleAnim, { toValue: 1, duration: 300, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
     ]).start();
+  };
+
+  const triggerStreakToast = (streak: number) => {
+    setStreakToastCount(streak);
+    setStreakToastVisible(true);
+    streakToastAnim.setValue(0);
+    Animated.sequence([
+      Animated.spring(streakToastAnim, { toValue: 1, tension: 80, friction: 7, useNativeDriver: true }),
+      Animated.delay(1000),
+      Animated.timing(streakToastAnim, { toValue: 0, duration: 250, useNativeDriver: true }),
+    ]).start(() => setStreakToastVisible(false));
   };
 
   const startTimer = () => {
@@ -468,6 +459,7 @@ export default function GameScreen() {
   };
 
   const handleTimeout = () => {
+    playerSelectionsRef.current[currentIndexRef.current] = -1;
     if (isLive) {
       // Send a "no answer" to the server (answer -1 = timeout)
       wsSend({
@@ -515,6 +507,7 @@ export default function GameScreen() {
     if (timerRef.current) clearInterval(timerRef.current);
 
     setSelectedOption(optionIndex);
+    playerSelectionsRef.current[currentIndexRef.current] = optionIndex;
 
     const timeTaken = TIMER_DURATION - timeLeftRef.current;
     const timeMs = timeTaken * 1000;
@@ -552,6 +545,19 @@ export default function GameScreen() {
       );
       playSound(isCorrect ? 'correct' : 'wrong');
 
+      // Track correct streak
+      if (isCorrect) {
+        const newStreak = correctStreakRef.current + 1;
+        correctStreakRef.current = newStreak;
+        setCorrectStreak(newStreak);
+        if (newStreak === 3 || newStreak === 5 || newStreak === 7) {
+          triggerStreakToast(newStreak);
+        }
+      } else {
+        correctStreakRef.current = 0;
+        setCorrectStreak(0);
+      }
+
       if (isCorrect) correctCountRef.current += 1;
 
       // Record answer history for async modes
@@ -588,6 +594,8 @@ export default function GameScreen() {
     setBotAnswer(null);
     setShowResult(false);
     setShowPending(true);
+    // Reset timer anim for new question
+    timerAnim.setValue(1);
 
     // Show progress pending for new question
     Animated.timing(progressPendingOpacity, {
@@ -609,6 +617,10 @@ export default function GameScreen() {
     // Save questions for the report feature on results screen
     try {
       await AsyncStorage.setItem('duelo_last_quiz_questions', JSON.stringify(questions));
+      const selections = questions.map((_, i) =>
+        playerSelectionsRef.current[i] !== undefined ? playerSelectionsRef.current[i] : -1
+      );
+      await AsyncStorage.setItem('duelo_last_player_answers', JSON.stringify(selections));
     } catch (e) { console.error(e); }
     // Async challenge mode: save score + per-question answers (with retry + offline queue)
     if (params.challenge_id && isAsync) {
@@ -709,204 +721,192 @@ export default function GameScreen() {
   }
 
   const question = questions[currentIndex];
+  const optionRows: Array<[number, number]> = [[0, 1], [2, 3]];
 
-  const getOptionBorderStyle = (index: number) => {
-    if (!showResult) return {};
-    if (isLive) {
-      // Live mode: only highlight selected answer based on server result
-      if (index === selectedOption) {
-        const wasCorrect = lastAnswerCorrectRef.current;
-        return { borderColor: wasCorrect ? '#00C853' : '#FF3B30', borderWidth: 2.5 };
-      }
-      return {};
-    }
-    if (index === question.correct_option) return { borderColor: '#00C853', borderWidth: 2.5 };
-    if (index === selectedOption) return { borderColor: '#FF3B30', borderWidth: 2.5 };
-    return {};
+  const getOptionFill = (index: number): [string, string] => {
+    if (!showResult) return [`${OPTION_COLORS[index]}18`, `${OPTION_COLORS[index]}08`];
+    const isCorrect = isLive
+      ? (index === selectedOption && lastAnswerCorrectRef.current)
+      : index === question.correct_option;
+    const isWrong = isLive
+      ? (index === selectedOption && !lastAnswerCorrectRef.current)
+      : (index === selectedOption && index !== question.correct_option);
+    if (isCorrect) return ['rgba(50,231,163,0.22)', 'rgba(50,231,163,0.06)'];
+    if (isWrong) return ['rgba(255,61,94,0.22)', 'rgba(255,61,94,0.06)'];
+    return ['rgba(255,255,255,0.02)', 'rgba(255,255,255,0.02)'];
   };
 
-  const getOptionTextColor = (index: number) => {
+  const getOptionBorderCol = (index: number): string => {
+    if (!showResult) return `${OPTION_COLORS[index]}55`;
+    const isCorrect = isLive
+      ? (index === selectedOption && lastAnswerCorrectRef.current)
+      : index === question.correct_option;
+    const isWrong = isLive
+      ? (index === selectedOption && !lastAnswerCorrectRef.current)
+      : (index === selectedOption && index !== question.correct_option);
+    if (isCorrect) return MINT;
+    if (isWrong) return RED;
+    return 'rgba(255,255,255,0.06)';
+  };
+
+  const getOptionTxtCol = (index: number): string => {
     if (!showResult) return '#FFF';
-    if (isLive) {
-      if (index === selectedOption) {
-        return lastAnswerCorrectRef.current ? '#00C853' : '#FF3B30';
-      }
-      return '#666';
-    }
-    if (index === question.correct_option) return '#00C853';
-    if (index === selectedOption) return '#FF3B30';
-    return '#666';
+    const isCorrect = isLive
+      ? (index === selectedOption && lastAnswerCorrectRef.current)
+      : index === question.correct_option;
+    const isWrong = isLive
+      ? (index === selectedOption && !lastAnswerCorrectRef.current)
+      : (index === selectedOption && index !== question.correct_option);
+    if (isCorrect) return MINT;
+    if (isWrong) return RED;
+    return 'rgba(255,255,255,0.28)';
   };
-
-  const getOptionIcon = (index: number) => {
-    if (!showResult) return null;
-    if (isLive) {
-      if (index === selectedOption) {
-        return lastAnswerCorrectRef.current
-          ? <MaterialCommunityIcons name="check-circle" size={20} color="#00C853" />
-          : <MaterialCommunityIcons name="close-circle" size={20} color="#FF3B30" />;
-      }
-      return null;
-    }
-    if (index === question.correct_option) return <MaterialCommunityIcons name="check-circle" size={20} color="#00C853" />;
-    if (index === selectedOption) return <MaterialCommunityIcons name="close-circle" size={20} color="#FF3B30" />;
-    return null;
-  };
-
-  const oneQPct = (1 / TOTAL_QUESTIONS) * 100; // ~14.3%
-
-  const timerColor = timeLeft <= 3 ? '#FF3B30' : '#00BFFF';
 
   return (
     <SwipeBackPage>
     <View style={styles.container}>
-      {/* ── Progress Bar (Question advancement, not timer) ── */}
+
+      {/* Progress bar */}
       <View style={styles.progressBarBg}>
-        {/* Solid completed portion */}
         <Animated.View style={[styles.progressBarSolid, {
-          width: progressAnim.interpolate({
-            inputRange: [0, 1],
-            outputRange: ['0%', '100%'],
-          }),
+          width: progressAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
         }]}>
-          <LinearGradient
-            colors={['#8A2BE2', '#B24BF3']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={StyleSheet.absoluteFill}
-          />
+          <LinearGradient colors={[CYAN, '#00A8CC']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} />
         </Animated.View>
-        {/* Pending portion for current question */}
-        <Animated.View style={[styles.progressBarPending, {
-          width: `${oneQPct}%`,
-          left: progressAnim.interpolate({
-            inputRange: [0, 1],
-            outputRange: ['0%', '100%'],
-          }),
-          opacity: progressPendingOpacity,
-        }]} />
       </View>
 
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        {/* ── Header ── */}
-        <View style={styles.headerRow}>
-          <View style={styles.playerInfo}>
-            <LinearGradient
-              colors={['#8A2BE2', '#6A1FBF']}
-              style={styles.avatarCircle}
-            >
-              <Text style={styles.avatarLetter}>{pseudo[0]?.toUpperCase()}</Text>
-            </LinearGradient>
-            <View style={styles.playerMeta}>
-              <Text style={styles.playerName} numberOfLines={1}>{pseudo}</Text>
-              <Text style={styles.playerTitle}>{t('game.challenger')}</Text>
-              <View style={styles.scoreRow}>
-                <MaterialCommunityIcons name="star" size={14} color="#FFD700" />
-                <Text style={styles.playerScoreNum}>{playerScore}</Text>
-              </View>
+
+        {/* Score boxes + Round Timer */}
+        <View style={styles.scoreTimerRow}>
+          <View style={[styles.scoreBox, styles.scoreBoxPlayer]}>
+            <LinearGradient colors={['rgba(0,229,255,0.12)', 'rgba(0,229,255,0.03)']} style={StyleSheet.absoluteFill} />
+            <View style={[styles.scoreAvatar, { borderColor: 'rgba(0,229,255,0.5)' }]}>
+              <Text style={styles.scoreAvatarLetter}>{pseudo[0]?.toUpperCase()}</Text>
             </View>
+            <Text style={styles.scoreBoxName} numberOfLines={1}>{pseudo}</Text>
+            <Text style={[styles.scoreBoxScore, { color: CYAN }]}>{playerScore}</Text>
           </View>
 
-          <View style={styles.timerCenter}>
-            <View style={styles.timerLabelRow}>
-              <MaterialCommunityIcons name="timer-outline" size={10} color="#888" />
-              <Text style={styles.timerLabel}>{t('game.time')}</Text>
-            </View>
-            <View style={[styles.timerCircle, timeLeft <= 3 && styles.timerDanger]}>
-              <LinearGradient
-                colors={timeLeft <= 3 ? ['rgba(255,59,48,0.15)', 'rgba(255,59,48,0.05)'] : ['rgba(0,191,255,0.15)', 'rgba(0,191,255,0.05)']}
-                style={StyleSheet.absoluteFill}
-              />
-              <Text style={[styles.timerNum, { color: timerColor }]}>{timeLeft}</Text>
-            </View>
+          <View style={styles.timerSection}>
+            <RoundTimer timeLeft={timeLeft} />
           </View>
 
-          <View style={styles.opponentInfo}>
-            <View style={styles.playerMeta}>
-              <Text style={[styles.playerName, { textAlign: 'right' }]} numberOfLines={1}>
-                {params.opponentPseudo?.slice(0, 10)}
-              </Text>
-              <Text style={[styles.playerTitle, { textAlign: 'right' }]}>
-                {isLive || (!isAsyncSolo && !isAsyncReveal) ? t('game.online') : isAsyncSolo ? t('game.async_will_play') : t('game.already_played')}
-              </Text>
-              <View style={[styles.scoreRow, { justifyContent: 'flex-end' }]}>
-                <MaterialCommunityIcons name="star" size={14} color="#FFD700" />
-                <Text style={[styles.playerScoreNum, { textAlign: 'right' }]}>
-                  {isAsyncSolo ? '—' : botScore}
-                </Text>
-              </View>
+          <View style={[styles.scoreBox, styles.scoreBoxOpponent]}>
+            <LinearGradient colors={['rgba(179,102,255,0.12)', 'rgba(179,102,255,0.03)']} style={StyleSheet.absoluteFill} />
+            <View style={[styles.scoreAvatar, { borderColor: 'rgba(179,102,255,0.5)' }]}>
+              <Text style={styles.scoreAvatarLetter}>{(params.opponentPseudo || 'B')[0]?.toUpperCase()}</Text>
             </View>
-            <LinearGradient
-              colors={['#2196F3', '#1976D2']}
-              style={styles.avatarCircle}
-            >
-              <Text style={styles.avatarLetter}>{(params.opponentPseudo || 'B')[0]?.toUpperCase()}</Text>
-            </LinearGradient>
+            <Text style={[styles.scoreBoxName, { textAlign: 'right' }]} numberOfLines={1}>
+              {params.opponentPseudo?.slice(0, 10)}
+            </Text>
+            <Text style={[styles.scoreBoxScore, { color: VIOLET, textAlign: 'right' }]}>
+              {isAsyncSolo ? '—' : botScore}
+            </Text>
           </View>
         </View>
 
-        <View style={styles.questionCounterRow}>
-          <MaterialCommunityIcons name="progress-check" size={14} color="#666" />
-          <Text style={styles.questionCounter}>{t('game.question')} {currentIndex + 1}/{questions.length}</Text>
+        {/* Dots progression */}
+        <View style={styles.dotsProgressRow}>
+          {Array.from({ length: TOTAL_QUESTIONS }).map((_, i) => (
+            <View key={i} style={[
+              styles.dot,
+              i < completedQuestions ? styles.dotDone :
+              i === completedQuestions ? styles.dotCurrent : styles.dotPending,
+            ]} />
+          ))}
         </View>
 
-        {/* ── Main Area ── */}
-        <View style={styles.gameArea}>
-          {/* LEFT BAR (Player) */}
-          <AnimatedBar score={playerScore} showPending={showPending} isPlayer={true} />
+        {/* Question + 2×2 Options */}
+        <View style={styles.centerContent}>
+          <Animated.View style={[styles.questionBox, {
+            opacity: questionFade,
+            transform: [{ translateX: questionSlide }, { scale: questionScaleAnim }],
+          }]}>
+            <Text style={styles.questionEyebrow}>Q {currentIndex + 1} / {questions.length}</Text>
+            <Text style={styles.questionText}>{question.question_text}</Text>
+          </Animated.View>
 
-          {/* CENTER CONTENT */}
-          <View style={styles.centerContent}>
-            <Animated.View style={[styles.questionBox, { opacity: questionFade, transform: [{ translateX: questionSlide }] }]}>
-              <View style={styles.questionInner}>
-                <MaterialCommunityIcons name="help-circle-outline" size={20} color="rgba(138,43,226,0.5)" style={{ marginBottom: 8 }} />
-                <Text style={styles.questionText}>{question.question_text}</Text>
-              </View>
-            </Animated.View>
-
-            <View style={styles.optionsBox}>
-              {question.options.map((option, index) => {
-                const isPlayerPick = selectedOption === index;
-                const isBotPick = botAnswer === index;
-                const icon = getOptionIcon(index);
-
-                return (
-                  <TouchableOpacity
-                    testID={`option-${index}`}
-                    key={index}
-                    style={[styles.optionCard, getOptionBorderStyle(index)]}
-                    onPress={() => selectAnswer(index)}
-                    disabled={showResult}
-                    activeOpacity={0.85}
-                  >
-                    {showResult && isPlayerPick && (
-                      <View style={styles.triLeftAnchor}>
-                        <View style={styles.triLeft} />
+          <View style={styles.optionsGrid}>
+            {optionRows.map((row, rowIdx) => (
+              <View key={rowIdx} style={styles.optionsRow}>
+                {row.map((index) => {
+                  const optColor = OPTION_COLORS[index];
+                  const fillColors = getOptionFill(index);
+                  const borderColor = getOptionBorderCol(index);
+                  const textColor = getOptionTxtCol(index);
+                  const isPlayerPick = selectedOption === index;
+                  const isBotPick = botAnswer === index;
+                  return (
+                    <TouchableOpacity
+                      key={index}
+                      testID={`option-${index}`}
+                      style={[styles.optionCard2x2, { borderColor }]}
+                      onPress={() => selectAnswer(index)}
+                      disabled={showResult}
+                      activeOpacity={0.85}
+                    >
+                      <LinearGradient colors={fillColors} style={StyleSheet.absoluteFill} />
+                      <View style={[styles.optionLetterBadge, {
+                        backgroundColor: showResult ? 'rgba(255,255,255,0.05)' : `${optColor}22`,
+                      }]}>
+                        <Text style={[styles.optionLetterText, {
+                          color: showResult ? 'rgba(255,255,255,0.25)' : optColor,
+                        }]}>
+                          {['A', 'B', 'C', 'D'][index]}
+                        </Text>
                       </View>
-                    )}
-
-                    <View style={styles.optionContent}>
-                      {icon && <View style={styles.optionIcon}>{icon}</View>}
-                      <Text style={[styles.optionText, { color: getOptionTextColor(index) }]} numberOfLines={2}>
-                        {option}
+                      <Text style={[styles.optionText2x2, { color: textColor }]} numberOfLines={3}>
+                        {question.options[index]}
                       </Text>
-                    </View>
-
-                    {showResult && isBotPick && (
-                      <View style={styles.triRightAnchor}>
-                        <View style={styles.triRight} />
-                      </View>
-                    )}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+                      {showResult && isPlayerPick && (
+                        <View style={styles.optionIndicatorPlayer}>
+                          <MaterialCommunityIcons
+                            name={isLive
+                              ? (lastAnswerCorrectRef.current ? 'check-circle' : 'close-circle')
+                              : (index === question.correct_option ? 'check-circle' : 'close-circle')}
+                            size={16}
+                            color={isLive
+                              ? (lastAnswerCorrectRef.current ? MINT : RED)
+                              : (index === question.correct_option ? MINT : RED)}
+                          />
+                        </View>
+                      )}
+                      {showResult && isBotPick && !isPlayerPick && (
+                        <View style={styles.optionIndicatorBot} />
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            ))}
           </View>
-
-          {/* RIGHT BAR (Bot) */}
-          <AnimatedBar score={botScore} showPending={showPending} isPlayer={false} />
         </View>
+
       </SafeAreaView>
+
+      {/* Streak Toast */}
+      {streakToastVisible && (
+        <View style={styles.streakToastWrapper} pointerEvents="none">
+        <Animated.View style={[styles.streakToast, {
+          opacity: streakToastAnim,
+          transform: [{ scale: streakToastAnim.interpolate({ inputRange: [0, 1], outputRange: [0.7, 1] }) }],
+        }]}>
+          <LinearGradient
+            colors={streakToastCount === 7 ? ['#FFD700', '#FF9F0A'] : ['#8A2BE2', '#A855F7']}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+            style={styles.streakToastGrad}
+          >
+            <Text style={styles.streakToastEmoji}>
+              {streakToastCount === 7 ? '🏆' : streakToastCount === 5 ? '⚡' : '🔥'}
+            </Text>
+            <Text style={styles.streakToastText}>
+              {streakToastCount === 7 ? 'PARFAIT !' : `${streakToastCount}x EN SÉRIE !`}
+            </Text>
+          </LinearGradient>
+        </Animated.View>
+        </View>
+      )}
     </View>
     </SwipeBackPage>
   );
@@ -1001,6 +1001,24 @@ const styles = StyleSheet.create({
   timerDanger: { borderColor: '#FF3B30' },
   timerNum: { color: '#00BFFF', fontSize: 22, fontWeight: '900' },
   timerNumDanger: { color: '#FF3B30' },
+  timerSweep: {
+    position: 'absolute', bottom: 0, left: 0, height: 3,
+  },
+  // Streak toast
+  streakToastWrapper: {
+    position: 'absolute', top: '38%', left: 0, right: 0,
+    alignItems: 'center',
+  },
+  streakToast: {
+    borderRadius: 20, overflow: 'hidden', elevation: 10,
+    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 12,
+  },
+  streakToastGrad: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    paddingHorizontal: 20, paddingVertical: 12,
+  },
+  streakToastEmoji: { fontSize: 22 },
+  streakToastText: { color: '#FFF', fontSize: 18, fontWeight: '900', letterSpacing: 1.5 },
 
   questionCounterRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
@@ -1023,47 +1041,76 @@ const styles = StyleSheet.create({
   barScoreLabel: { flexDirection: 'column', alignItems: 'center', marginTop: 4 },
   barScoreText: { fontSize: 9, fontWeight: '800' },
 
-  // Center
-  centerContent: { flex: 1, paddingHorizontal: 4 },
+  // Center (full-width, no side bars)
+  centerContent: { flex: 1 },
   questionBox: {
-    paddingHorizontal: 16, paddingVertical: 16,
-    justifyContent: 'center', alignItems: 'center', minHeight: 80,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 20, marginHorizontal: 12, marginVertical: 8,
+    paddingHorizontal: 20, paddingVertical: 18,
+    alignItems: 'center',
   },
-  questionInner: { alignItems: 'center' },
+  questionEyebrow: {
+    color: GOLD, fontSize: 11, fontWeight: '700',
+    letterSpacing: 2, marginBottom: 8,
+  },
   questionText: { color: '#FFF', fontSize: 20, fontWeight: '800', textAlign: 'center', lineHeight: 28 },
 
-  // Options
-  optionsBox: { flex: 1, justifyContent: 'center', gap: 10, paddingBottom: 16, paddingHorizontal: 8 },
-  optionCard: {
-    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: GLASS.radius,
-    paddingVertical: 16, paddingHorizontal: 20,
+  // 2×2 Options grid
+  optionsGrid: { flex: 1, paddingHorizontal: 12, paddingBottom: 12, paddingTop: 4, gap: 10 },
+  optionsRow: { flex: 1, flexDirection: 'row', gap: 10 },
+  optionCard2x2: {
+    flex: 1, borderRadius: 16, borderWidth: 1.5, overflow: 'hidden',
+    padding: 12, justifyContent: 'space-between',
+  },
+  optionLetterBadge: {
+    width: 28, height: 28, borderRadius: 8,
     justifyContent: 'center', alignItems: 'center',
-    minHeight: 56, borderWidth: 1, borderColor: GLASS.borderSubtle,
-    position: 'relative', overflow: 'visible',
+    marginBottom: 6, alignSelf: 'flex-start',
   },
-  optionContent: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  optionIcon: { marginRight: 4 },
-  optionText: { fontSize: 17, fontWeight: '800', textAlign: 'center', color: '#FFF', flexShrink: 1 },
+  optionLetterText: { fontSize: 13, fontWeight: '900' },
+  optionText2x2: { fontSize: 15, fontWeight: '700', lineHeight: 20, flex: 1 },
+  optionIndicatorPlayer: { alignSelf: 'flex-end', marginTop: 4 },
+  optionIndicatorBot: {
+    width: 8, height: 8, borderRadius: 4,
+    backgroundColor: VIOLET, alignSelf: 'flex-end', marginTop: 4,
+  },
 
-  // Triangles
-  triLeftAnchor: {
-    position: 'absolute', left: -16, top: 0, bottom: 0,
-    width: 16, justifyContent: 'center', alignItems: 'flex-end',
+  // Score boxes + timer row
+  scoreTimerRow: {
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: 10, paddingVertical: 8, gap: 6,
   },
-  triLeft: {
-    width: 0, height: 0,
-    borderTopWidth: 14, borderTopColor: 'transparent',
-    borderBottomWidth: 14, borderBottomColor: 'transparent',
-    borderLeftWidth: 16, borderLeftColor: '#8A2BE2',
+  scoreBox: {
+    flex: 1, borderRadius: 12, overflow: 'hidden',
+    padding: 10, borderWidth: 1,
   },
-  triRightAnchor: {
-    position: 'absolute', right: -16, top: 0, bottom: 0,
-    width: 16, justifyContent: 'center', alignItems: 'flex-start',
+  scoreBoxPlayer: { borderColor: 'rgba(0,229,255,0.22)' },
+  scoreBoxOpponent: { borderColor: 'rgba(179,102,255,0.22)', alignItems: 'flex-end' },
+  scoreAvatar: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    justifyContent: 'center', alignItems: 'center',
+    borderWidth: 1.5, marginBottom: 4,
   },
-  triRight: {
-    width: 0, height: 0,
-    borderTopWidth: 14, borderTopColor: 'transparent',
-    borderBottomWidth: 14, borderBottomColor: 'transparent',
-    borderRightWidth: 16, borderRightColor: '#2196F3',
+  scoreAvatarLetter: { color: '#FFF', fontSize: 15, fontWeight: '800' },
+  scoreBoxName: {
+    color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: '600',
+    maxWidth: 90, marginBottom: 2,
   },
+  scoreBoxScore: { fontSize: 26, fontWeight: '900', lineHeight: 30 },
+  timerSection: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
+
+  // Dots progression
+  dotsProgressRow: {
+    flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
+    gap: 6, paddingVertical: 4,
+  },
+  dot: { width: 8, height: 8, borderRadius: 4 },
+  dotDone: { backgroundColor: MINT },
+  dotCurrent: {
+    backgroundColor: GOLD, width: 10, height: 10, borderRadius: 5,
+    shadowColor: GOLD, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.8, shadowRadius: 4,
+  },
+  dotPending: { backgroundColor: 'rgba(255,255,255,0.18)' },
 });

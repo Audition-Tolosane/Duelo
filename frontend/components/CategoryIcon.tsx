@@ -146,7 +146,7 @@ const THEME_ICON_MAP: Record<string, IconDef> = {
   ARE_RESV: { set: 'mci', name: 'biohazard' },
   ARE_SBSR: { set: 'mci', name: 'train' },
   ARE_SIMS: { set: 'mci', name: 'home-heart' },
-  ARE_SKRM: { set: 'mci', name: 'dragon' },
+  ARE_SKRM: { set: 'mci', name: 'fire' },
   ARE_SLEN: { set: 'mci', name: 'ghost' },
   ARE_SMAR: { set: 'mci', name: 'mushroom-outline' },
   ARE_SONC: { set: 'mci', name: 'lightning-bolt' },
@@ -155,7 +155,7 @@ const THEME_ICON_MAP: Record<string, IconDef> = {
   ARE_TLOU: { set: 'mci', name: 'leaf' },
   ARE_TPRL: { set: 'mci', name: 'run' },
   ARE_UNCH: { set: 'mci', name: 'map-search' },
-  ARE_WITC: { set: 'mci', name: 'wolf-howl' },
+  ARE_WITC: { set: 'mci', name: 'star-four-points' },
   ARE_WOWP: { set: 'mci', name: 'castle' },
   ARE_ZELD: { set: 'mci', name: 'triangle-outline' },
   // Sports de Balle

@@ -19,6 +19,12 @@ import UserAvatar from '../components/UserAvatar';
 import ScalePressable from '../components/ScalePressable';
 import { t } from '../utils/i18n';
 
+const CYAN = '#00E5FF';
+const VIOLET = '#B366FF';
+const GOLD = '#FFB547';
+const MINT = '#32E7A3';
+const RED = '#FF3D5E';
+
 const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -48,10 +54,10 @@ function hashColor(str: string): string {
 
 const CATEGORY_META: Record<string, { color: string; bg: string }> = {
   series_tv: { color: '#E040FB', bg: '#2D1B4E' },
-  geographie: { color: '#00FFFF', bg: '#0D2B2B' },
-  histoire: { color: '#FFD700', bg: '#2B2510' },
+  geographie: { color: CYAN, bg: '#0D2B2B' },
+  histoire: { color: GOLD, bg: '#2B2510' },
   cinema: { color: '#FF6B6B', bg: '#2B1515' },
-  sport: { color: '#00FF9D', bg: '#0D2B1A' },
+  sport: { color: MINT, bg: '#0D2B1A' },
   musique: { color: '#FF8C00', bg: '#2B1E0D' },
   sciences: { color: '#7B68EE', bg: '#1A1533' },
   gastronomie: { color: '#FF69B4', bg: '#152B2B' },
@@ -277,7 +283,7 @@ export default function SearchScreen() {
   const renderThemeItem = ({ item, index = 0 }: { item: ThemeResult; index?: number }) => {
     const color = hashColor(item.id);
     return (
-      <ReAnimated.View entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
+      <ReAnimated.View key={item.id} entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
       <ScalePressable
         style={st.themeCard}
         onPress={() => {
@@ -360,7 +366,7 @@ export default function SearchScreen() {
   };
 
   const renderPostItem = ({ item }: { item: PostResult }) => {
-    const meta = CATEGORY_META[item.category_id] || { color: '#8A2BE2', bg: '#1A1A2E' };
+    const meta = CATEGORY_META[item.category_id] || { color: VIOLET, bg: '#1A1A2E' };
     return (
       <TouchableOpacity
         style={st.postCard}
@@ -407,7 +413,7 @@ export default function SearchScreen() {
   };
 
   const renderCommentItem = ({ item }: { item: CommentResult }) => {
-    const meta = CATEGORY_META[item.category_id] || { color: '#8A2BE2', bg: '#1A1A2E' };
+    const meta = CATEGORY_META[item.category_id] || { color: VIOLET, bg: '#1A1A2E' };
     return (
       <View style={st.commentCard}>
         <View style={st.commentHeader}>
@@ -436,7 +442,7 @@ export default function SearchScreen() {
           <MaterialCommunityIcons
             name={d.icon}
             size={14}
-            color={difficultyFilter === d.key ? '#8A2BE2' : '#A3A3A3'}
+            color={difficultyFilter === d.key ? CYAN : '#A3A3A3'}
           />
           <Text style={[st.diffChipText, difficultyFilter === d.key && st.diffChipTextActive]}>
             {t(d.labelKey)}
@@ -509,7 +515,7 @@ export default function SearchScreen() {
               <MaterialCommunityIcons
                 name={TAB_ICONS[tab.key]}
                 size={16}
-                color={activeTab === tab.key ? '#8A2BE2' : '#A3A3A3'}
+                color={activeTab === tab.key ? CYAN : '#A3A3A3'}
               />
               <Text style={[st.tabText, activeTab === tab.key && st.tabTextActive]}>
                 {tab.label}
@@ -606,11 +612,11 @@ export default function SearchScreen() {
             </View>
             {searchError ? (
               <View style={st.emptyState}>
-                <MaterialCommunityIcons name="wifi-off" size={40} color="#FF3B30" style={{ marginBottom: 12 }} />
-                <Text style={[st.emptyTitle, { color: '#FF3B30' }]}>{t('search.error')}</Text>
+                <MaterialCommunityIcons name="wifi-off" size={40} color={RED} style={{ marginBottom: 12 }} />
+                <Text style={[st.emptyTitle, { color: RED }]}>{t('search.error')}</Text>
               </View>
             ) : isSearching ? (
-              <ActivityIndicator size="large" color="#8A2BE2" style={{ marginTop: 40 }} />
+              <ActivityIndicator size="large" color={CYAN} style={{ marginTop: 40 }} />
             ) : (
               <FlatList
                 data={themes}
@@ -650,7 +656,7 @@ export default function SearchScreen() {
               ))}
             </ScrollView>
             {isSearching ? (
-              <ActivityIndicator size="large" color="#8A2BE2" style={{ marginTop: 40 }} />
+              <ActivityIndicator size="large" color={CYAN} style={{ marginTop: 40 }} />
             ) : (
               <FlatList
                 data={players}
@@ -675,7 +681,7 @@ export default function SearchScreen() {
         {activeTab === 'contenu' && (
           <ScrollView style={{ flex: 1 }} contentContainerStyle={st.listContent} showsVerticalScrollIndicator={false}>
             {isSearching ? (
-              <ActivityIndicator size="large" color="#8A2BE2" style={{ marginTop: 40 }} />
+              <ActivityIndicator size="large" color={CYAN} style={{ marginTop: 40 }} />
             ) : !searchQuery.trim() ? (
               <View style={st.emptyState}>
                 <MaterialCommunityIcons name="text-box-outline" size={48} color="#525252" style={{ marginBottom: 12 }} />
@@ -728,7 +734,7 @@ const st = StyleSheet.create({
   // Header
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 12, paddingVertical: 10,
+    paddingHorizontal: 12, paddingVertical: 10, backgroundColor: '#050510',
   },
   backBtnCircle: {
     width: 40, height: 40, borderRadius: 20,
@@ -741,8 +747,8 @@ const st = StyleSheet.create({
   searchBarWrap: { paddingHorizontal: 16, paddingVertical: 12 },
   searchBar: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 16,
-    paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(0,229,255,0.06)', borderRadius: 16,
+    paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(0,229,255,0.2)',
   },
   searchInput: {
     flex: 1, color: '#FFF', fontSize: 15, paddingVertical: 14,
@@ -757,10 +763,10 @@ const st = StyleSheet.create({
     flex: 1, paddingVertical: 10, borderRadius: 14, alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
-  tabBtnActive: { backgroundColor: 'rgba(138,43,226,0.15)', borderColor: 'rgba(138,43,226,0.4)' },
+  tabBtnActive: { backgroundColor: 'rgba(0,229,255,0.12)', borderColor: 'rgba(0,229,255,0.4)' },
   tabInner: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   tabText: { color: '#A3A3A3', fontSize: 13, fontWeight: '600' },
-  tabTextActive: { color: '#8A2BE2' },
+  tabTextActive: { color: CYAN },
 
   // Filter rows
   filterRow: { maxHeight: 52, marginBottom: 4 },
@@ -770,9 +776,9 @@ const st = StyleSheet.create({
     paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
     backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
-  diffChipActive: { backgroundColor: 'rgba(138,43,226,0.2)', borderColor: 'rgba(138,43,226,0.5)' },
+  diffChipActive: { backgroundColor: 'rgba(0,229,255,0.12)', borderColor: 'rgba(0,229,255,0.4)' },
   diffChipText: { color: '#A3A3A3', fontSize: 12, fontWeight: '600' },
-  diffChipTextActive: { color: '#8A2BE2' },
+  diffChipTextActive: { color: CYAN },
 
   catFiltersWrap: { paddingHorizontal: 16, gap: 8, paddingVertical: 8 },
   catChip: {
@@ -802,10 +808,10 @@ const st = StyleSheet.create({
   trendingTag: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     paddingHorizontal: 14, paddingVertical: 10, borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(179,102,255,0.08)', borderWidth: 1, borderColor: 'rgba(179,102,255,0.3)',
   },
   trendingTagHot: { borderColor: 'rgba(255,87,34,0.4)', backgroundColor: 'rgba(255,87,34,0.1)' },
-  trendingTagText: { color: '#E0E0E0', fontSize: 14, fontWeight: '600' },
+  trendingTagText: { color: VIOLET, fontSize: 14, fontWeight: '600' },
   trendingTagTextHot: { color: '#FF5722' },
   hotBadge: {
     backgroundColor: 'rgba(255,87,34,0.2)',
@@ -824,7 +830,7 @@ const st = StyleSheet.create({
   },
   topPlayerAvatarText: { color: '#FFF', fontSize: 18, fontWeight: '800' },
   topPlayerName: { color: '#FFF', fontSize: 11, fontWeight: '700', textAlign: 'center', paddingHorizontal: 4 },
-  topPlayerXp: { color: '#00FFFF', fontSize: 10, fontWeight: '700', marginTop: 2 },
+  topPlayerXp: { color: CYAN, fontSize: 10, fontWeight: '700', marginTop: 2 },
 
   // Theme Card
   themeCard: { marginBottom: 10 },
@@ -856,10 +862,10 @@ const st = StyleSheet.create({
   // Player Card
   playerCard: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: 14,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)',
+    borderBottomWidth: 1, borderBottomColor: 'rgba(0,229,255,0.15)',
   },
   playerAvatar: {
-    width: 48, height: 48, borderRadius: 24, backgroundColor: '#8A2BE2',
+    width: 48, height: 48, borderRadius: 24, backgroundColor: VIOLET,
     justifyContent: 'center', alignItems: 'center', marginRight: 12,
   },
   playerAvatarText: { color: '#FFF', fontSize: 20, fontWeight: '800' },
@@ -867,7 +873,7 @@ const st = StyleSheet.create({
   playerNameRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 },
   playerName: { color: '#FFF', fontSize: 16, fontWeight: '700' },
   playerFlag: { fontSize: 14 },
-  playerTitle: { color: '#B57EDC', fontSize: 13, fontWeight: '600', marginBottom: 4 },
+  playerTitle: { color: VIOLET, fontSize: 13, fontWeight: '600', marginBottom: 4 },
   playerStatsRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   playerStat: { color: '#525252', fontSize: 12, fontWeight: '600' },
   playerStatDot: { color: '#333', fontSize: 12 },
@@ -879,7 +885,7 @@ const st = StyleSheet.create({
   },
   postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
   postAvatarSmall: {
-    width: 36, height: 36, borderRadius: 18, backgroundColor: '#8A2BE2',
+    width: 36, height: 36, borderRadius: 18, backgroundColor: VIOLET,
     justifyContent: 'center', alignItems: 'center', marginRight: 10,
   },
   postAvatarText: { color: '#FFF', fontSize: 14, fontWeight: '800' },

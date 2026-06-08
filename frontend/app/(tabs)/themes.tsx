@@ -18,6 +18,12 @@ import CategoryIcon from '../../components/CategoryIcon';
 import ScalePressable from '../../components/ScalePressable';
 import { t } from '../../utils/i18n';
 
+const CYAN = '#00E5FF';
+const VIOLET = '#B366FF';
+const GOLD = '#FFB547';
+const MINT = '#32E7A3';
+const RED = '#FF3D5E';
+
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const { width: SCREEN_W } = Dimensions.get('window');
 const GRID_GAP = 10;
@@ -113,7 +119,7 @@ export default function ThemesScreen() {
   const [activePillar, setActivePillar] = useState<string>('');
   const [expandedCluster, setExpandedCluster] = useState<string | null>(null);
   const [previewTheme, setPreviewTheme] = useState<ThemeData | null>(null);
-  const [previewColor, setPreviewColor] = useState('#8A2BE2');
+  const [previewColor, setPreviewColor] = useState(VIOLET);
   const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => { loadThemes(); }, []);
@@ -150,13 +156,13 @@ export default function ThemesScreen() {
   };
 
   const currentPillar = pillars.find(p => p.id === activePillar);
-  const accent = currentPillar?.color || '#8A2BE2';
+  const accent = currentPillar?.color || VIOLET;
 
   if (loading) {
     return (
       <View style={s.container}>
         <View style={s.loadCenter}>
-          <ActivityIndicator size="large" color="#8A2BE2" />
+          <ActivityIndicator size="large" color={VIOLET} />
         </View>
       </View>
     );
@@ -186,7 +192,7 @@ export default function ThemesScreen() {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
           router.push('/create-theme');
         }}>
-          <LinearGradient colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']}
+          <LinearGradient colors={['rgba(179,102,255,0.15)', 'rgba(0,229,255,0.08)']}
             start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.forgeBg} />
           <View style={s.forgeIconWrap}>
             <MaterialCommunityIcons name="hammer-wrench" size={26} color="#FFF" />
@@ -210,18 +216,18 @@ export default function ThemesScreen() {
               <TouchableOpacity
                 key={pillar.id}
                 style={[s.pillarChip, isActive && {
-                  backgroundColor: pillar.color + '18',
-                  borderColor: pillar.color + '50',
+                  backgroundColor: CYAN + '18',
+                  borderColor: CYAN + '50',
                 }]}
                 onPress={() => handlePillarSelect(pillar.id)}
                 activeOpacity={0.7}
               >
-                <CategoryIcon emoji={pillar.icon} size={16} color={isActive ? pillar.color : '#666'} type="super" />
-                <Text style={[s.pillarChipText, { color: isActive ? pillar.color : '#666' }]}>
+                <CategoryIcon emoji={pillar.icon} size={16} color={isActive ? CYAN : '#666'} type="super" />
+                <Text style={[s.pillarChipText, { color: isActive ? CYAN : '#666' }]}>
                   {pillar.name}
                 </Text>
-                <View style={[s.pillarChipCount, { backgroundColor: isActive ? pillar.color + '25' : 'rgba(255,255,255,0.06)' }]}>
-                  <Text style={[s.pillarChipCountText, { color: isActive ? pillar.color : '#555' }]}>
+                <View style={[s.pillarChipCount, { backgroundColor: isActive ? CYAN + '25' : 'rgba(255,255,255,0.06)' }]}>
+                  <Text style={[s.pillarChipCountText, { color: isActive ? CYAN : '#555' }]}>
                     {pillar.themes.reduce((sum, t) => sum + (t.topics?.length || 0), 0)}
                   </Text>
                 </View>
@@ -476,7 +482,7 @@ const s = StyleSheet.create({
     marginHorizontal: 16, marginTop: 16, marginBottom: 20,
     borderRadius: 18, padding: 16, overflow: 'hidden',
     backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1, borderColor: 'rgba(179,102,255,0.3)',
   },
   forgeBg: { ...StyleSheet.absoluteFillObject, borderRadius: 18 },
   forgeIconWrap: {
@@ -637,7 +643,7 @@ const s = StyleSheet.create({
   },
   previewCard: {
     width: SCREEN_W * 0.82, maxWidth: 340,
-    borderRadius: 24, backgroundColor: '#0a0a1a',
+    borderRadius: 24, backgroundColor: '#050510',
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
     alignItems: 'center', paddingVertical: 28, paddingHorizontal: 20,
     overflow: 'hidden',

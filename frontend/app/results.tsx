@@ -12,6 +12,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GLASS } from '../theme/glassTheme';
 import { authFetch } from '../utils/api';
+import { playSound } from '../utils/sounds';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
 import { useWS } from '../contexts/WebSocketContext';
@@ -33,18 +34,18 @@ type XpBreakdown = {
   total: number;
 };
 
-type NewTitle = {
-  level: number;
-  title: string;
-  category: string;
-};
-
 type QuizQuestion = {
   id: string;
   question_text: string;
   options: string[];
   correct_option: number;
 };
+
+type Reward =
+  | { type: 'shield'; streakBefore: number }
+  | { type: 'level'; level: number }
+  | { type: 'title'; title: string; category: string; level: number }
+  | { type: 'achievement'; name: string; description: string; icon: string };
 
 const REPORT_REASONS = [
   { id: 'wrong_answer', labelKey: 'report.reason_wrong_answer', icon: 'close-circle' as const },
@@ -82,26 +83,25 @@ export default function ResultsScreen() {
   // #22 — Guard against double navigation from concurrent WS events + safety timeout
   const hasNavigatedRef = useRef(false);
   const [xpBreakdown, setXpBreakdown] = useState<XpBreakdown | null>(null);
-  const [newTitle, setNewTitle] = useState<NewTitle | null>(null);
   const [newLevel, setNewLevel] = useState<number | null>(null);
-  const [showTitleModal, setShowTitleModal] = useState(false);
-  const [newAchievements, setNewAchievements] = useState<{ name: string; description: string; icon: string }[]>([]);
-  const [showAchievModal, setShowAchievModal] = useState(false);
   const [submitting, setSubmitting] = useState(true);
   const [matchId, setMatchId] = useState<string | null>(null);
-  const [showShieldModal, setShowShieldModal] = useState(false);
   const [streakBefore, setStreakBefore] = useState(0);
   const [adWatching, setAdWatching] = useState(false);
   const [adCountdown, setAdCountdown] = useState(3);
   const [streakRestored, setStreakRestored] = useState(false);
 
+  // Unified rewards modal
+  const [rewards, setRewards] = useState<Reward[]>([]);
+  const [showRewardsModal, setShowRewardsModal] = useState(false);
+
   const confettiRef = useRef<any>(null);
-  const achievScale = useRef(new Animated.Value(0)).current;
-  const achievOpacity = useRef(new Animated.Value(0)).current;
   const [playerPseudo, setPlayerPseudo] = useState(t('game.player'));
 
   // Report question states
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
+  const [playerAnswers, setPlayerAnswers] = useState<number[]>([]);
+  const [reviewExpanded, setReviewExpanded] = useState(false);
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [reportStep, setReportStep] = useState<'select' | 'reason'>('select');
   const [selectedQuestion, setSelectedQuestion] = useState<QuizQuestion | null>(null);
@@ -115,11 +115,6 @@ export default function ResultsScreen() {
   const scaleAnim = useRef(new Animated.Value(0.5)).current;
   const cardSlide = useRef(new Animated.Value(60)).current;
   const xpSlide = useRef(new Animated.Value(40)).current;
-
-  // Title celebration anims
-  const titleScale = useRef(new Animated.Value(0)).current;
-  const titleOpacity = useRef(new Animated.Value(0)).current;
-  const titleGlow = useRef(new Animated.Value(0)).current;
 
   // Keep ref in sync to avoid stale closures in WS listeners
   useEffect(() => { rematchStateRef.current = rematchState; }, [rematchState]);
@@ -220,50 +215,45 @@ export default function ResultsScreen() {
       if (data.xp_breakdown) {
         setXpBreakdown(data.xp_breakdown);
       }
+      const collected: Reward[] = [];
       if (data.streak_broken && data.streak_before > 0) {
         setStreakBefore(data.streak_before);
-        setTimeout(() => setShowShieldModal(true), 800);
-      }
-      if (data.new_title) {
-        setNewTitle(data.new_title);
-        setTimeout(() => {
-          setShowTitleModal(true);
-          animateTitleCelebration();
-        }, 1200);
+        collected.push({ type: 'shield', streakBefore: data.streak_before });
       }
       if (data.new_level) {
         setNewLevel(data.new_level);
+        collected.push({ type: 'level', level: data.new_level });
+      }
+      if (data.new_title) {
+        collected.push({
+          type: 'title',
+          title: data.new_title.title,
+          category: data.new_title.category,
+          level: data.new_title.level,
+        });
       }
       if (data.new_achievements?.length > 0) {
-        setNewAchievements(data.new_achievements);
-        // Show after title modal (or 2.5s if no title)
-        const delay = data.new_title ? 4000 : 2500;
+        data.new_achievements.forEach((ach: { name: string; description: string; icon: string }) => {
+          collected.push({ type: 'achievement', name: ach.name, description: ach.description, icon: ach.icon });
+        });
+      }
+      if (collected.length > 0) {
+        setRewards(collected);
         setTimeout(() => {
-          setShowAchievModal(true);
-          Animated.parallel([
-            Animated.spring(achievScale, { toValue: 1, tension: 60, friction: 7, useNativeDriver: true }),
-            Animated.timing(achievOpacity, { toValue: 1, duration: 350, useNativeDriver: true }),
-          ]).start();
-        }, delay);
+          setShowRewardsModal(true);
+          if (collected.some(r => r.type === 'level' || r.type === 'title')) {
+            playSound('victory');
+          }
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }, 900);
       }
     } catch (e) { console.error(e); }
     setSubmitting(false);
   };
 
-  const animateTitleCelebration = () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    Animated.parallel([
-      Animated.spring(titleScale, { toValue: 1, tension: 60, friction: 6, useNativeDriver: true }),
-      Animated.timing(titleOpacity, { toValue: 1, duration: 400, useNativeDriver: true }),
-    ]).start();
-
-    // Glow loop
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(titleGlow, { toValue: 1, duration: 1000, useNativeDriver: true }),
-        Animated.timing(titleGlow, { toValue: 0.4, duration: 1000, useNativeDriver: true }),
-      ])
-    ).start();
+  const closeRewardsModal = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setShowRewardsModal(false);
   };
 
   const watchAdAndRestoreStreak = async () => {
@@ -285,7 +275,6 @@ export default function ResultsScreen() {
       if (res.ok) {
         setStreakRestored(true);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        setTimeout(() => setShowShieldModal(false), 1500);
       }
     } catch {}
   };
@@ -293,9 +282,11 @@ export default function ResultsScreen() {
   const shareResult = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const categoryName = CATEGORY_NAMES[category || ''] || category;
+    const xpPart = xpBreakdown ? ` · +${xpBreakdown.total} XP` : '';
+    const levelPart = newLevel ? ` · ${t('results.level_up')} ${newLevel} ↑` : '';
     const text = won
-      ? `🏆 ${t('results.share_victory')} ${pScore}-${oScore} en ${categoryName} (${correctCount}/7 correctes). ${t('results.share_challenge')} #Duelo`
-      : `⚔️ ${t('results.share_intense')} ${pScore}-${oScore} en ${categoryName}. ${t('results.share_beat_me')} #Duelo`;
+      ? `🏆 ${t('results.share_victory')} ${pScore}-${oScore} en ${categoryName} (${correctCount}/7)${xpPart}${levelPart}. ${t('results.share_challenge')} #Duelo`
+      : `⚔️ ${t('results.share_intense')} ${pScore}-${oScore} en ${categoryName}${xpPart}. ${t('results.share_beat_me')} #Duelo`;
     try { await Share.share({ message: text }); } catch (e) { console.error(e); }
   };
 
@@ -305,6 +296,11 @@ export default function ResultsScreen() {
       if (raw) {
         const parsed = JSON.parse(raw);
         setQuizQuestions(parsed);
+      }
+      const ansRaw = await AsyncStorage.getItem('duelo_last_player_answers');
+      if (ansRaw) {
+        const parsed = JSON.parse(ansRaw);
+        if (Array.isArray(parsed)) setPlayerAnswers(parsed);
       }
     } catch (e) { console.error(e); }
   };
@@ -425,6 +421,15 @@ export default function ResultsScreen() {
 
   const resultIcon = won ? 'trophy' : draw ? 'handshake' : 'arm-flex';
 
+  // Near-miss: lost (or drew) by 1 point and has at least one missed question
+  const scoreGap = oScore - pScore;
+  const isNearMiss = !won && scoreGap >= 0 && scoreGap <= 1 && playerAnswers.length > 0;
+
+  // Missed questions (player's selected answer differs from correct_option)
+  const missedQuestions = quizQuestions
+    .map((q, i) => ({ q, i, playerAnswer: playerAnswers[i] ?? -1 }))
+    .filter(({ q, playerAnswer }) => playerAnswer !== q.correct_option);
+
   return (
     <SwipeBackPage>
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -461,7 +466,8 @@ export default function ResultsScreen() {
           >
             <MaterialCommunityIcons name={resultIcon} size={40} color="#FFF" />
           </LinearGradient>
-          <Text style={[styles.resultTitle, won ? styles.winText : draw ? styles.drawText : styles.lossText]}>
+          <Text style={[styles.resultTitle, won ? styles.winText : draw ? styles.drawText : styles.lossText]}
+                adjustsFontSizeToFit numberOfLines={1}>
             {won ? t('results.victory') : draw ? t('results.draw') : t('results.defeat')}
           </Text>
           <LinearGradient
@@ -484,6 +490,17 @@ export default function ResultsScreen() {
               <Text style={styles.levelUpText}>{t('results.level_up')} {newLevel} !</Text>
             </LinearGradient>
           )}
+          {isNearMiss && (
+            <LinearGradient
+              colors={['rgba(255,159,10,0.28)', 'rgba(255,107,53,0.12)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.nearMissBadge}
+            >
+              <MaterialCommunityIcons name="flame" size={16} color="#FF9F0A" />
+              <Text style={styles.nearMissText}>{t('results.near_miss')}</Text>
+            </LinearGradient>
+          )}
         </Animated.View>
 
         {/* Score Card */}
@@ -494,36 +511,41 @@ export default function ResultsScreen() {
             end={{ x: 1, y: 1 }}
             style={styles.scoreCardGradient}
           >
-            <View style={styles.scoreCardInner}>
-              <View style={styles.playerColumn}>
+            <View style={styles.scoreCardDuo}>
+              {/* Player half */}
+              <View style={[styles.scoreHalfCard, won ? styles.scoreHalfWinner : draw ? styles.scoreHalfDraw : styles.scoreHalfLoser]}>
                 <LinearGradient
-                  colors={['#8A2BE2', '#6A1FB0']}
-                  style={styles.avatarCircle}
-                >
-                  <Text style={styles.avatarText}>{playerPseudo[0]?.toUpperCase()}</Text>
-                </LinearGradient>
-                <Text style={styles.playerName}>{playerPseudo}</Text>
-                <Text style={[styles.playerScore, won && styles.winScore]}>{pScore}</Text>
+                  colors={won ? ['rgba(0,229,255,0.18)', 'rgba(0,229,255,0.04)'] : draw ? ['rgba(255,181,71,0.14)', 'rgba(255,181,71,0.04)'] : ['rgba(0,229,255,0.06)', 'rgba(0,229,255,0.02)']}
+                  style={StyleSheet.absoluteFill}
+                />
+                <View style={[styles.scoreHalfAvatar, { borderColor: won ? 'rgba(0,229,255,0.55)' : 'rgba(0,229,255,0.2)' }]}>
+                  <Text style={styles.scoreHalfAvatarText}>{playerPseudo[0]?.toUpperCase()}</Text>
+                </View>
+                <Text style={styles.scoreHalfName} numberOfLines={1}>{playerPseudo}</Text>
+                <Text style={[styles.scoreHalfScore, { color: won ? '#32E7A3' : '#FFF' }]}>{pScore}</Text>
+                {won && <Text style={styles.scoreHalfBadge}>VAINQUEUR</Text>}
               </View>
-              <View style={styles.vsContainer}>
-                <Text style={styles.vsText}>VS</Text>
-                <Text style={styles.categoryBadge}>{CATEGORY_NAMES[category || '']}</Text>
-              </View>
-              <View style={styles.playerColumn}>
+
+              {/* Opponent half */}
+              <View style={[styles.scoreHalfCard, !won && !draw ? styles.scoreHalfWinner : draw ? styles.scoreHalfDraw : styles.scoreHalfLoser]}>
                 <LinearGradient
-                  colors={['#FF3B30', '#CC2D26']}
-                  style={styles.avatarCircle}
-                >
-                  <Text style={styles.avatarText}>{(params.opponentPseudo || 'B')[0].toUpperCase()}</Text>
-                </LinearGradient>
+                  colors={!won && !draw ? ['rgba(179,102,255,0.18)', 'rgba(179,102,255,0.04)'] : draw ? ['rgba(255,181,71,0.14)', 'rgba(255,181,71,0.04)'] : ['rgba(179,102,255,0.06)', 'rgba(179,102,255,0.02)']}
+                  style={StyleSheet.absoluteFill}
+                />
+                <View style={[styles.scoreHalfAvatar, { borderColor: !won && !draw ? 'rgba(179,102,255,0.55)' : 'rgba(179,102,255,0.2)' }]}>
+                  <Text style={styles.scoreHalfAvatarText}>{(params.opponentPseudo || 'B')[0].toUpperCase()}</Text>
+                </View>
                 {params.opponentId ? (
                   <TouchableOpacity onPress={() => router.push(`/player-profile?id=${params.opponentId}`)}>
-                    <Text style={[styles.playerName, { textDecorationLine: 'underline' }]}>{params.opponentPseudo?.slice(0, 12)}</Text>
+                    <Text style={[styles.scoreHalfName, { textDecorationLine: 'underline' }]} numberOfLines={1}>
+                      {params.opponentPseudo?.slice(0, 12)}
+                    </Text>
                   </TouchableOpacity>
                 ) : (
-                  <Text style={styles.playerName}>{params.opponentPseudo?.slice(0, 12)}</Text>
+                  <Text style={styles.scoreHalfName} numberOfLines={1}>{params.opponentPseudo?.slice(0, 12)}</Text>
                 )}
-                <Text style={[styles.playerScore, !won && !draw && styles.winScore]}>{oScore}</Text>
+                <Text style={[styles.scoreHalfScore, { color: !won && !draw ? '#B366FF' : '#FFF' }]}>{oScore}</Text>
+                {!won && !draw && <Text style={styles.scoreHalfBadge}>VAINQUEUR</Text>}
               </View>
             </View>
           </LinearGradient>
@@ -595,6 +617,62 @@ export default function ResultsScreen() {
           ) : null}
         </Animated.View>
 
+        {/* Review missed questions */}
+        {missedQuestions.length > 0 && (
+          <Animated.View style={[styles.reviewCard, { opacity: fadeAnim }]}>
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setReviewExpanded(v => !v);
+              }}
+              activeOpacity={0.7}
+              style={styles.reviewHeader}
+            >
+              <MaterialCommunityIcons name="book-open-variant" size={18} color="#00FFFF" />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.reviewTitle}>{t('results.review_title')}</Text>
+                <Text style={styles.reviewSub}>
+                  {t('results.review_sub', { n: String(missedQuestions.length) })}
+                </Text>
+              </View>
+              <MaterialCommunityIcons
+                name={reviewExpanded ? 'chevron-up' : 'chevron-down'}
+                size={20}
+                color="#A3A3A3"
+              />
+            </TouchableOpacity>
+            {reviewExpanded && (
+              <View style={styles.reviewList}>
+                {missedQuestions.map(({ q, i, playerAnswer }) => {
+                  const correctText = q.options[q.correct_option];
+                  const yourText = playerAnswer >= 0 ? q.options[playerAnswer] : null;
+                  return (
+                    <View key={q.id || i} style={styles.reviewItem}>
+                      <Text style={styles.reviewQuestion}>{q.question_text}</Text>
+                      {yourText && (
+                        <View style={styles.reviewAnswerRow}>
+                          <MaterialCommunityIcons name="close-circle" size={14} color="#FF3B30" />
+                          <Text style={styles.reviewWrongText} numberOfLines={2}>{yourText}</Text>
+                        </View>
+                      )}
+                      {!yourText && (
+                        <View style={styles.reviewAnswerRow}>
+                          <MaterialCommunityIcons name="timer-off" size={14} color="#A3A3A3" />
+                          <Text style={styles.reviewTimeoutText}>{t('results.review_timeout')}</Text>
+                        </View>
+                      )}
+                      <View style={styles.reviewAnswerRow}>
+                        <MaterialCommunityIcons name="check-circle" size={14} color="#00FF9D" />
+                        <Text style={styles.reviewCorrectText} numberOfLines={2}>{correctText}</Text>
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
+            )}
+          </Animated.View>
+        )}
+
         {/* Actions */}
         <Animated.View style={[styles.actions, { opacity: fadeAnim }]}>
           <TouchableOpacity testID="share-result-btn" style={styles.shareButton} onPress={shareResult} activeOpacity={0.8}>
@@ -664,41 +742,37 @@ export default function ResultsScreen() {
         </Animated.View>
       </ScrollView>
 
-      {/* Streak Shield Modal */}
-      <Modal visible={showShieldModal} transparent animationType="fade" onRequestClose={() => setShowShieldModal(false)}>
-        <View style={shieldStyles.overlay}>
-          <View style={shieldStyles.card}>
-            {streakRestored ? (
-              <>
-                <Text style={shieldStyles.emoji}>🔥</Text>
-                <Text style={shieldStyles.title}>{t('results.streak_restored')}</Text>
-                <Text style={shieldStyles.sub}>{t('results.streak_restored_sub', { n: String(streakBefore) })}</Text>
-              </>
-            ) : adWatching ? (
-              <>
-                <Text style={shieldStyles.emoji}>📺</Text>
-                <Text style={shieldStyles.title}>{t('results.ad_watching')}</Text>
-                <View style={shieldStyles.countdown}>
-                  <Text style={shieldStyles.countdownText}>{adCountdown}</Text>
-                </View>
-              </>
-            ) : (
-              <>
-                <Text style={shieldStyles.emoji}>🛡️</Text>
-                <Text style={shieldStyles.title}>{t('results.shield_title', { n: String(streakBefore) })}</Text>
-                <Text style={shieldStyles.sub}>{t('results.shield_sub')}</Text>
-                <TouchableOpacity style={shieldStyles.adBtn} onPress={watchAdAndRestoreStreak} activeOpacity={0.8}>
-                  <LinearGradient colors={['#FFD700', '#FF9F0A']} style={shieldStyles.adBtnGrad}>
-                    <MaterialCommunityIcons name="play-circle" size={20} color="#000" />
-                    <Text style={shieldStyles.adBtnText}>{t('results.watch_ad')}</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setShowShieldModal(false)} style={shieldStyles.skipBtn}>
-                  <Text style={shieldStyles.skipText}>{t('results.shield_skip')}</Text>
-                </TouchableOpacity>
-              </>
-            )}
+      {/* Unified Rewards Modal (Duolingo-style) */}
+      <Modal visible={showRewardsModal} transparent animationType="fade" onRequestClose={closeRewardsModal}>
+        <View style={rewardsStyles.overlay}>
+          <View style={rewardsStyles.card}>
+            <Text style={rewardsStyles.header}>{t('results.rewards_title')}</Text>
+            <ScrollView style={{ maxHeight: 420, width: '100%' }} contentContainerStyle={{ paddingVertical: 4 }} showsVerticalScrollIndicator={false}>
+              {rewards.map((r, i) => (
+                <RewardRow
+                  key={`${r.type}-${i}`}
+                  reward={r}
+                  delay={i * 500}
+                  streakRestored={streakRestored}
+                  adWatching={adWatching}
+                  adCountdown={adCountdown}
+                  onWatchAd={watchAdAndRestoreStreak}
+                />
+              ))}
+            </ScrollView>
+            <RewardContinueBtn delay={rewards.length * 500 + 200} onPress={closeRewardsModal} />
           </View>
+          {rewards.some(r => r.type === 'level' || r.type === 'title') && (
+            <ConfettiCannon
+              count={120}
+              origin={{ x: SCREEN_WIDTH / 2, y: -10 }}
+              autoStart
+              fadeOut
+              explosionSpeed={350}
+              fallSpeed={2800}
+              colors={['#FFD700', '#00FF9D', '#8A2BE2', '#00E5FF', '#FF3E9D']}
+            />
+          )}
         </View>
       </Modal>
 
@@ -861,96 +935,174 @@ export default function ResultsScreen() {
         />
       )}
 
-      {/* Achievement Modal */}
-      {newAchievements.length > 0 && (
-        <Modal visible={showAchievModal} transparent animationType="none" onRequestClose={() => setShowAchievModal(false)}>
-          <View style={styles.celebrationOverlay}>
-            <Animated.View style={[styles.celebrationContent, { opacity: achievOpacity, transform: [{ scale: achievScale }] }]}>
-              <LinearGradient colors={['#BF5FFF', '#8A2BE2']} style={styles.celebrationStarCircle}>
-                <MaterialCommunityIcons name="trophy-award" size={48} color="#FFF" />
-              </LinearGradient>
-              <Text style={styles.celebrationHeader}>{t('results.achievement_unlocked')}</Text>
-              {newAchievements.map((ach, i) => (
-                <View key={i} style={styles.achievRow}>
-                  <Text style={styles.achievIcon}>{ach.icon || '🏅'}</Text>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.achievName}>{ach.name}</Text>
-                    <Text style={styles.achievDesc}>{ach.description}</Text>
-                  </View>
-                </View>
-              ))}
-              <TouchableOpacity onPress={() => setShowAchievModal(false)} activeOpacity={0.8} style={styles.celebrationBtnTouchable}>
-                <LinearGradient colors={['#8A2BE2', '#6A1FB0']} style={styles.celebrationBtn}>
-                  <Text style={styles.celebrationBtnText}>{t('results.continue')}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </Animated.View>
-          </View>
-        </Modal>
-      )}
-
-      {/* Title Celebration Modal */}
-      {newTitle && (
-        <Modal visible={showTitleModal} transparent animationType="none" onRequestClose={() => setShowTitleModal(false)}>
-          <View style={styles.celebrationOverlay}>
-            <Animated.View style={[styles.celebrationContent, {
-              opacity: titleOpacity,
-              transform: [{ scale: titleScale }],
-            }]}>
-              <LinearGradient
-                colors={['#FFD700', '#FFA500']}
-                style={styles.celebrationStarCircle}
-              >
-                <MaterialCommunityIcons name="star-four-points" size={48} color="#FFF" />
-              </LinearGradient>
-              <Text style={styles.celebrationHeader}>{t('results.new_title_unlocked')}</Text>
-              <Animated.Text style={[styles.celebrationTitle, { opacity: titleGlow }]}>
-                {newTitle.title}
-              </Animated.Text>
-              <View style={styles.celebrationCategory}>
-                <MaterialCommunityIcons
-                  name="help-circle"
-                  size={18}
-                  color="#A3A3A3"
-                />
-                <Text style={styles.celebrationCatText}>
-                  {CATEGORY_NAMES[newTitle.category]} - {t('results.level_up')} {newTitle.level}
-                </Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => setShowTitleModal(false)}
-                activeOpacity={0.8}
-                style={styles.celebrationBtnTouchable}
-              >
-                <LinearGradient
-                  colors={['#8A2BE2', '#6A1FB0']}
-                  style={styles.celebrationBtn}
-                >
-                  <Text style={styles.celebrationBtnText}>{t('results.continue')}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </Animated.View>
-          </View>
-        </Modal>
-      )}
     </View>
     </SwipeBackPage>
   );
 }
 
-const shieldStyles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'center', alignItems: 'center', padding: 24 },
-  card: { backgroundColor: '#10102A', borderRadius: 20, padding: 28, alignItems: 'center', width: '100%', borderWidth: 1, borderColor: 'rgba(138,43,226,0.3)' },
-  emoji: { fontSize: 48, marginBottom: 12 },
-  title: { color: '#FFF', fontSize: 18, fontWeight: '700', textAlign: 'center', marginBottom: 8 },
-  sub: { color: '#A3A3A3', fontSize: 14, textAlign: 'center', marginBottom: 20 },
-  adBtn: { width: '100%', borderRadius: 14, overflow: 'hidden', marginBottom: 12 },
-  adBtnGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 14, gap: 8 },
-  adBtnText: { color: '#000', fontSize: 15, fontWeight: '800' },
-  skipBtn: { paddingVertical: 8 },
-  skipText: { color: '#525252', fontSize: 13 },
-  countdown: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(138,43,226,0.3)', alignItems: 'center', justifyContent: 'center', marginVertical: 16 },
-  countdownText: { color: '#8A2BE2', fontSize: 28, fontWeight: '800' },
+type RewardRowProps = {
+  reward: Reward;
+  delay: number;
+  streakRestored: boolean;
+  adWatching: boolean;
+  adCountdown: number;
+  onWatchAd: () => void;
+};
+
+function RewardRow({ reward, delay, streakRestored, adWatching, adCountdown, onWatchAd }: RewardRowProps) {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      Animated.parallel([
+        Animated.timing(opacity, { toValue: 1, duration: 380, useNativeDriver: true }),
+        Animated.spring(translateY, { toValue: 0, tension: 80, friction: 9, useNativeDriver: true }),
+      ]).start();
+    }, delay);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const content = (() => {
+    switch (reward.type) {
+      case 'level':
+        return (
+          <>
+            <LinearGradient colors={['#8A2BE2', '#A855F7']} style={rewardsStyles.iconCircle}>
+              <MaterialCommunityIcons name="arrow-up-bold-circle" size={26} color="#FFF" />
+            </LinearGradient>
+            <View style={{ flex: 1 }}>
+              <Text style={rewardsStyles.rowLabel}>{t('results.new_level_reached')}</Text>
+              <Text style={rewardsStyles.rowValueBig}>{t('results.level_up')} {reward.level}</Text>
+            </View>
+          </>
+        );
+      case 'title':
+        return (
+          <>
+            <LinearGradient colors={['#FFD700', '#FFA500']} style={rewardsStyles.iconCircle}>
+              <MaterialCommunityIcons name="star-four-points" size={26} color="#FFF" />
+            </LinearGradient>
+            <View style={{ flex: 1 }}>
+              <Text style={rewardsStyles.rowLabel}>{t('results.new_title_unlocked')}</Text>
+              <Text style={rewardsStyles.rowValueBig}>{reward.title}</Text>
+              <Text style={rewardsStyles.rowSub}>{t('results.level_up')} {reward.level}</Text>
+            </View>
+          </>
+        );
+      case 'achievement':
+        return (
+          <>
+            <View style={[rewardsStyles.iconCircle, { backgroundColor: 'rgba(191,95,255,0.18)' }]}>
+              <Text style={{ fontSize: 24 }}>{reward.icon || '🏅'}</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={rewardsStyles.rowLabel}>{t('results.achievement_unlocked')}</Text>
+              <Text style={rewardsStyles.rowValue}>{reward.name}</Text>
+              <Text style={rewardsStyles.rowSub}>{reward.description}</Text>
+            </View>
+          </>
+        );
+      case 'shield':
+        return (
+          <>
+            <View style={[rewardsStyles.iconCircle, { backgroundColor: 'rgba(255,107,53,0.18)' }]}>
+              <Text style={{ fontSize: 24 }}>{streakRestored ? '🔥' : adWatching ? '📺' : '🛡️'}</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              {streakRestored ? (
+                <>
+                  <Text style={rewardsStyles.rowLabel}>{t('results.streak_restored')}</Text>
+                  <Text style={rewardsStyles.rowValue}>{t('results.streak_restored_sub', { n: String(reward.streakBefore) })}</Text>
+                </>
+              ) : adWatching ? (
+                <>
+                  <Text style={rewardsStyles.rowLabel}>{t('results.ad_watching')}</Text>
+                  <Text style={rewardsStyles.rowValueBig}>{adCountdown}</Text>
+                </>
+              ) : (
+                <>
+                  <Text style={rewardsStyles.rowLabel}>{t('results.shield_title', { n: String(reward.streakBefore) })}</Text>
+                  <Text style={rewardsStyles.rowSub}>{t('results.shield_sub')}</Text>
+                  <TouchableOpacity style={rewardsStyles.adBtn} onPress={onWatchAd} activeOpacity={0.8}>
+                    <LinearGradient colors={['#FFD700', '#FF9F0A']} style={rewardsStyles.adBtnGrad}>
+                      <MaterialCommunityIcons name="play-circle" size={16} color="#000" />
+                      <Text style={rewardsStyles.adBtnText}>{t('results.watch_ad')}</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          </>
+        );
+    }
+  })();
+
+  return (
+    <Animated.View style={[rewardsStyles.row, { opacity, transform: [{ translateY }] }]}>
+      {content}
+    </Animated.View>
+  );
+}
+
+function RewardContinueBtn({ delay, onPress }: { delay: number; onPress: () => void }) {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(12)).current;
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      Animated.parallel([
+        Animated.timing(opacity, { toValue: 1, duration: 320, useNativeDriver: true }),
+        Animated.spring(translateY, { toValue: 0, tension: 80, friction: 9, useNativeDriver: true }),
+      ]).start();
+    }, delay);
+    return () => clearTimeout(timer);
+  }, []);
+  return (
+    <Animated.View style={{ opacity, transform: [{ translateY }], width: '100%', marginTop: 16 }}>
+      <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={rewardsStyles.continueBtnTouchable}>
+        <LinearGradient colors={['#8A2BE2', '#6A1FB0']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={rewardsStyles.continueBtn}>
+          <Text style={rewardsStyles.continueBtnText}>{t('results.continue')}</Text>
+        </LinearGradient>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+}
+
+const rewardsStyles = StyleSheet.create({
+  overlay: {
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.88)', justifyContent: 'center', alignItems: 'center', padding: 24,
+  },
+  card: {
+    backgroundColor: '#10102A', borderRadius: 24, padding: 24, width: '100%',
+    borderWidth: 1, borderColor: 'rgba(138,43,226,0.35)', alignItems: 'center',
+    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.4, shadowRadius: 20,
+  },
+  header: {
+    color: '#FFD700', fontSize: 13, fontWeight: '900', letterSpacing: 4,
+    marginBottom: 18, textAlign: 'center',
+  },
+  row: {
+    flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 10,
+    paddingHorizontal: 4, width: '100%',
+  },
+  iconCircle: {
+    width: 48, height: 48, borderRadius: 24,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  rowLabel: { color: '#A3A3A3', fontSize: 11, fontWeight: '800', letterSpacing: 1.5, marginBottom: 2 },
+  rowValue: { color: '#FFF', fontSize: 15, fontWeight: '800' },
+  rowValueBig: { color: '#FFF', fontSize: 20, fontWeight: '900' },
+  rowSub: { color: '#A3A3A3', fontSize: 12, fontWeight: '500', marginTop: 2 },
+  adBtn: { marginTop: 8, borderRadius: 12, overflow: 'hidden', alignSelf: 'flex-start' },
+  adBtnGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 8, paddingHorizontal: 14, gap: 6 },
+  adBtnText: { color: '#000', fontSize: 13, fontWeight: '800' },
+  continueBtnTouchable: { borderRadius: 14, overflow: 'hidden' },
+  continueBtn: {
+    borderRadius: 14, paddingVertical: 14, alignItems: 'center',
+    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.6, shadowRadius: 12,
+  },
+  continueBtnText: { color: '#FFF', fontSize: 15, fontWeight: '900', letterSpacing: 3 },
 });
 
 const styles = StyleSheet.create({
@@ -995,7 +1147,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center', marginBottom: 12,
     shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 12,
   },
-  resultTitle: { fontSize: 32, fontWeight: '900', letterSpacing: 4 },
+  resultTitle: { fontSize: 56, fontWeight: '900', letterSpacing: 4 },
   winText: { color: '#00FF9D' },
   drawText: { color: '#FFD700' },
   lossText: { color: '#FF3B30' },
@@ -1009,13 +1161,40 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14, paddingVertical: 6, borderWidth: 1, borderColor: 'rgba(138,43,226,0.3)',
   },
   levelUpText: { color: '#8A2BE2', fontSize: 14, fontWeight: '800' },
+  nearMissBadge: {
+    marginTop: 8, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 14, paddingVertical: 6, borderWidth: 1, borderColor: 'rgba(255,159,10,0.35)',
+  },
+  nearMissText: { color: '#FF9F0A', fontSize: 13, fontWeight: '700' },
+  // Review missed questions
+  reviewCard: {
+    backgroundColor: 'rgba(0,255,255,0.04)', borderRadius: 16, marginBottom: 16,
+    borderWidth: 1, borderColor: 'rgba(0,255,255,0.18)', overflow: 'hidden',
+  },
+  reviewHeader: {
+    flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14,
+  },
+  reviewTitle: { color: '#00FFFF', fontSize: 13, fontWeight: '800', letterSpacing: 2 },
+  reviewSub: { color: '#A3A3A3', fontSize: 12, fontWeight: '500', marginTop: 2 },
+  reviewList: {
+    paddingHorizontal: 14, paddingBottom: 14, gap: 10,
+    borderTopWidth: 1, borderTopColor: 'rgba(0,255,255,0.1)', paddingTop: 10,
+  },
+  reviewItem: {
+    backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 12, padding: 12, gap: 6,
+  },
+  reviewQuestion: { color: '#E5E5E5', fontSize: 13, fontWeight: '600', lineHeight: 18, marginBottom: 4 },
+  reviewAnswerRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  reviewWrongText: { color: '#FF3B30', fontSize: 12, fontWeight: '500', flex: 1, textDecorationLine: 'line-through' },
+  reviewTimeoutText: { color: '#A3A3A3', fontSize: 12, fontWeight: '500', fontStyle: 'italic' },
+  reviewCorrectText: { color: '#00FF9D', fontSize: 12, fontWeight: '700', flex: 1 },
   // Score Card
   scoreCard: {
     borderRadius: GLASS.radiusLg, overflow: 'hidden',
     borderWidth: 1, borderColor: GLASS.borderCyan, marginBottom: 16,
   },
   scoreCardGradient: {
-    padding: 20, borderRadius: GLASS.radiusLg,
+    padding: 12, borderRadius: GLASS.radiusLg,
   },
   scoreCardInner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   playerColumn: { alignItems: 'center', flex: 1 },
@@ -1079,38 +1258,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'center', gap: 6,
   },
   reportButtonText: { color: '#FFA500', fontSize: 12, fontWeight: '600' },
-  // Celebration Modal
-  celebrationOverlay: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32,
-  },
-  celebrationContent: { alignItems: 'center', width: '100%' },
-  celebrationStarCircle: {
-    width: 96, height: 96, borderRadius: 48,
-    justifyContent: 'center', alignItems: 'center', marginBottom: 20,
-    shadowColor: '#FFD700', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 16,
-  },
-  celebrationHeader: {
-    fontSize: 14, fontWeight: '800', color: '#FFD700', letterSpacing: 4, marginBottom: 12,
-  },
-  celebrationTitle: {
-    fontSize: 32, fontWeight: '900', color: '#FFF', textAlign: 'center', marginBottom: 16,
-    textShadowColor: '#8A2BE2', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 20,
-  },
-  celebrationCategory: {
-    flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 32,
-    backgroundColor: GLASS.bgLight, borderRadius: GLASS.radiusLg, paddingHorizontal: 16, paddingVertical: 8,
-  },
-  celebrationCatText: { color: '#A3A3A3', fontSize: 14, fontWeight: '600' },
-  celebrationBtnTouchable: { borderRadius: 16, overflow: 'hidden' },
-  celebrationBtn: {
-    borderRadius: 16, paddingHorizontal: 48, paddingVertical: 16,
-    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.6, shadowRadius: 16,
-  },
-  celebrationBtnText: { color: '#FFF', fontSize: 16, fontWeight: '900', letterSpacing: 3 },
-  achievRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginVertical: 6, paddingHorizontal: 4, width: '100%' },
-  achievIcon: { fontSize: 28 },
-  achievName: { color: '#FFF', fontSize: 15, fontWeight: '800' },
-  achievDesc: { color: '#A3A3A3', fontSize: 12, fontWeight: '500', marginTop: 2 },
   // Report Modal
   reportOverlay: {
     flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end',
@@ -1211,4 +1358,30 @@ const styles = StyleSheet.create({
     borderRadius: 14, paddingHorizontal: 40, paddingVertical: 14,
   },
   reportSuccessBtnText: { color: '#FFF', fontSize: 14, fontWeight: '800', letterSpacing: 2 },
+
+  // Redesigned score card — two side-by-side halves
+  scoreCardDuo: { flexDirection: 'row', gap: 10 },
+  scoreHalfCard: {
+    flex: 1, borderRadius: 18, overflow: 'hidden',
+    padding: 16, alignItems: 'center', borderWidth: 1,
+  },
+  scoreHalfWinner: { borderColor: 'rgba(50,231,163,0.30)' },
+  scoreHalfLoser: { borderColor: 'rgba(255,255,255,0.06)' },
+  scoreHalfDraw: { borderColor: 'rgba(255,181,71,0.25)' },
+  scoreHalfAvatar: {
+    width: 52, height: 52, borderRadius: 26,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    justifyContent: 'center', alignItems: 'center',
+    borderWidth: 2, marginBottom: 8,
+  },
+  scoreHalfAvatarText: { color: '#FFF', fontSize: 22, fontWeight: '900' },
+  scoreHalfName: {
+    color: 'rgba(255,255,255,0.65)', fontSize: 12, fontWeight: '700',
+    marginBottom: 4, textAlign: 'center',
+  },
+  scoreHalfScore: { fontSize: 38, fontWeight: '900', lineHeight: 44 },
+  scoreHalfBadge: {
+    color: '#32E7A3', fontSize: 9, fontWeight: '800',
+    letterSpacing: 1.5, marginTop: 4, textAlign: 'center',
+  },
 });
