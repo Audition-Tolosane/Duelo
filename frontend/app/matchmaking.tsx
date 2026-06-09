@@ -19,6 +19,8 @@ import { useWS } from '../contexts/WebSocketContext';
 import { dueloWS } from '../services/websocket';
 import { authFetch } from '../utils/api';
 import { t } from '../utils/i18n';
+import { COLORS } from '../theme/tokens';
+import { FONTS } from '../theme/fonts';
 
 // Real world map paths from Natural Earth data (Mercator projection, 1000×500 viewBox)
 import MAP_PATHS from '../assets/map-paths.json';
@@ -675,7 +677,7 @@ export default function MatchmakingScreen() {
                 </View>
                 <View style={styles.versusPlayers}>
                   <Animated.View style={[styles.versusPlayer, playerStyle]}>
-                    <LinearGradient colors={['#8A2BE2', '#6A1FCE']} style={styles.versusAvatar}>
+                    <LinearGradient colors={[COLORS.violet, '#7B61FF']} style={styles.versusAvatar}>
                       <Text style={styles.versusAvatarText}>{pseudo[0]?.toUpperCase()}</Text>
                     </LinearGradient>
                     <Text style={styles.versusPseudo} numberOfLines={1}>{pseudo}</Text>
@@ -686,14 +688,14 @@ export default function MatchmakingScreen() {
                   </Animated.View>
 
                   <Animated.View style={[styles.vsBadge, vsAnimStyle]}>
-                    <LinearGradient colors={['#8A2BE2', '#B24BF3']} style={styles.vsBadgeInner}>
+                    <LinearGradient colors={[COLORS.gold, '#FF8C00']} style={styles.vsBadgeInner}>
                       <Text style={styles.vsBadgeText}>VS</Text>
                     </LinearGradient>
                   </Animated.View>
 
                   <Animated.View style={[styles.versusPlayer, opponentStyle]}>
                     <LinearGradient
-                      colors={oppIsGlow ? ['#00CCCC', '#00FFFF'] : ['#FF3B30', '#CC2200']}
+                      colors={oppIsGlow ? ['#00CCCC', COLORS.cyan] : [COLORS.red, '#B32240']}
                       style={[styles.versusAvatar, oppIsGlow && styles.versusAvatarGlow]}>
                       <Text style={styles.versusAvatarText}>{opponent.pseudo[0]?.toUpperCase()}</Text>
                     </LinearGradient>
@@ -785,75 +787,75 @@ const styles = StyleSheet.create({
     paddingVertical: 6, borderRadius: 16, marginBottom: 16,
     borderWidth: 1, borderColor: 'rgba(138,43,226,0.25)',
   },
-  categoryLabel: { fontSize: 14, fontWeight: '700', color: '#FFF' },
+  categoryLabel: { fontSize: 14, fontFamily: FONTS.display.bold, color: '#FFF' },
   scannerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
   scannerDot: {
-    width: 8, height: 8, borderRadius: 4, backgroundColor: '#00FF9D',
-    shadowColor: '#00FF9D', shadowOffset: { width: 0, height: 0 },
+    width: 8, height: 8, borderRadius: 4, backgroundColor: COLORS.mint,
+    shadowColor: COLORS.mint, shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8, shadowRadius: 6,
   },
-  searchMessage: { fontSize: 15, fontWeight: '600', color: '#FFF' },
+  searchMessage: { fontSize: 15, fontFamily: FONTS.display.medium, color: '#FFF' },
   hintRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  hint: { fontSize: 12, color: '#525252' },
+  hint: { fontSize: 12, fontFamily: FONTS.mono.regular, color: '#525252' },
   cancelBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 16,
     paddingHorizontal: 20, paddingVertical: 12, borderRadius: 24,
     backgroundColor: 'rgba(255,59,48,0.12)', borderWidth: 1, borderColor: 'rgba(255,59,48,0.35)',
   },
-  cancelText: { fontSize: 15, fontWeight: '700', color: '#FF3B30' },
+  cancelText: { fontSize: 15, fontFamily: FONTS.display.bold, color: COLORS.red },
 
   foundOverlay: { position: 'absolute', bottom: 60, left: 0, right: 0, alignItems: 'center' },
   foundCard: { borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(0,255,157,0.3)' },
   foundCardGradient: { paddingHorizontal: 24, paddingVertical: 20, alignItems: 'center', minWidth: SW * 0.7, gap: 6 },
-  foundText: { fontSize: 16, fontWeight: '800', color: '#00FF9D' },
-  foundName: { fontSize: 20, fontWeight: '900', color: '#FFF' },
+  foundText: { fontSize: 16, fontFamily: FONTS.display.bold, color: COLORS.mint },
+  foundName: { fontSize: 20, fontFamily: FONTS.display.bold, color: '#FFF' },
 
   versusBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(5,5,16,0.85)' },
   versusOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center' },
   versusContent: { alignItems: 'center', paddingHorizontal: 24 },
   versusCategoryRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 48 },
-  versusCategory: { fontSize: 16, fontWeight: '700', color: '#A3A3A3' },
+  versusCategory: { fontSize: 16, fontFamily: FONTS.mono.bold, color: '#A3A3A3' },
   versusPlayers: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', width: '100%' },
   versusPlayer: { alignItems: 'center', flex: 1 },
   versusAvatar: {
     width: 72, height: 72, borderRadius: 24,
     justifyContent: 'center', alignItems: 'center', marginBottom: 10,
-    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 4 },
+    shadowColor: COLORS.violet, shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5, shadowRadius: 12,
   },
   versusAvatarGlow: {
-    shadowColor: '#00FFFF', shadowOpacity: 0.8, shadowRadius: 20,
-    borderWidth: 2, borderColor: 'rgba(0,255,255,0.5)',
+    shadowColor: COLORS.cyan, shadowOpacity: 0.8, shadowRadius: 20,
+    borderWidth: 2, borderColor: 'rgba(0,229,255,0.5)',
   },
-  versusAvatarText: { color: '#FFF', fontSize: 32, fontWeight: '900' },
+  versusAvatarText: { color: '#FFF', fontSize: 32, fontFamily: FONTS.display.bold },
   versusPseudoRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  versusPseudo: { color: '#FFF', fontSize: 16, fontWeight: '800', maxWidth: 120 },
+  versusPseudo: { color: '#FFF', fontSize: 16, fontFamily: FONTS.display.bold, maxWidth: 120 },
   glowPseudo: {
-    color: '#00FFFF', textShadowColor: '#00FFFF',
+    color: COLORS.cyan, textShadowColor: COLORS.cyan,
     textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 10,
   },
   versusLevelRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 },
-  versusLevel: { color: '#525252', fontSize: 12, fontWeight: '600' },
-  versusTitle: { color: '#8A2BE2', fontSize: 11, fontWeight: '700', marginTop: 3 },
+  versusLevel: { color: '#525252', fontSize: 12, fontFamily: FONTS.mono.regular },
+  versusTitle: { color: COLORS.violet, fontSize: 11, fontFamily: FONTS.mono.bold, marginTop: 3 },
   streakTag: {
     marginTop: 8, backgroundColor: 'rgba(255,100,0,0.12)', borderRadius: 10,
     paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1,
     borderColor: 'rgba(255,100,0,0.25)', flexDirection: 'row', alignItems: 'center', gap: 4,
   },
-  streakTagGlow: { backgroundColor: 'rgba(0,255,255,0.1)', borderColor: 'rgba(0,255,255,0.3)' },
-  streakText: { color: '#FFA500', fontSize: 11, fontWeight: '700' },
+  streakTagGlow: { backgroundColor: 'rgba(0,229,255,0.1)', borderColor: 'rgba(0,229,255,0.3)' },
+  streakText: { color: COLORS.gold, fontSize: 11, fontFamily: FONTS.mono.bold },
 
   vsBadge: {
     width: 56, height: 56, borderRadius: 28, overflow: 'hidden',
     marginHorizontal: 12, marginTop: 8,
-    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8, shadowRadius: 20,
-    borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)',
+    shadowColor: COLORS.gold, shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.9, shadowRadius: 24,
+    borderWidth: 2, borderColor: 'rgba(255,181,71,0.35)',
   },
   vsBadgeInner: { width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', borderRadius: 28 },
-  vsBadgeText: { color: '#FFF', fontSize: 20, fontWeight: '900', letterSpacing: 2 },
+  vsBadgeText: { color: '#FFF', fontSize: 20, fontFamily: FONTS.display.bold, letterSpacing: 2 },
   versusHintRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 48 },
-  versusHint: { color: '#525252', fontSize: 14, fontWeight: '600' },
+  versusHint: { color: '#525252', fontSize: 14, fontFamily: FONTS.display.medium },
 
   timeoutOverlay: {
     ...StyleSheet.absoluteFillObject,

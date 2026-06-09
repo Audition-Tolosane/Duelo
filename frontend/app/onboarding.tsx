@@ -3,6 +3,8 @@ import {
   View, Text, TouchableOpacity, StyleSheet, Dimensions,
   ActivityIndicator, Platform,
 } from 'react-native';
+import { COLORS } from '../theme/tokens';
+import { FONTS } from '../theme/fonts';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
@@ -35,19 +37,19 @@ const TUTO_SLIDES = [
     icon: 'magnify' as const,
     titleKey: 'onboarding.tuto_title_1',
     bodyKey: 'onboarding.tuto_body_1',
-    color: '#8A2BE2',
+    color: COLORS.violet,
   },
   {
     icon: 'head-question' as const,
     titleKey: 'onboarding.tuto_title_2',
     bodyKey: 'onboarding.tuto_body_2',
-    color: '#00BFFF',
+    color: COLORS.cyan,
   },
   {
     icon: 'trending-up' as const,
     titleKey: 'onboarding.tuto_title_3',
     bodyKey: 'onboarding.tuto_body_3',
-    color: '#00FF9D',
+    color: COLORS.mint,
   },
 ];
 
@@ -153,12 +155,12 @@ export default function OnboardingScreen() {
     return (
       <View style={styles.container}>
         <LinearGradient
-          colors={['#0A0A1A', '#1A0A2E', '#0A0A1A']}
+          colors={[COLORS.abyss, '#12042A', COLORS.abyss]}
           style={StyleSheet.absoluteFill}
         />
         <Animated.View style={[styles.welcomeCenter, logoStyle]}>
           <LinearGradient
-            colors={['#8A2BE2', '#00FFFF']}
+            colors={[COLORS.violet, COLORS.cyan]}
             style={styles.welcomeLogoCircle}
           >
             <MaterialCommunityIcons name="sword-cross" size={60} color="#FFF" />
@@ -174,7 +176,7 @@ export default function OnboardingScreen() {
         <Animated.View entering={FadeInUp.delay(800).duration(500)} style={styles.bottomArea}>
           <TouchableOpacity onPress={nextStep} activeOpacity={0.85}>
             <LinearGradient
-              colors={['#8A2BE2', '#00BFFF']}
+              colors={[COLORS.violet, COLORS.cyan]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.mainBtn}
@@ -203,12 +205,12 @@ export default function OnboardingScreen() {
     return (
       <View style={styles.container}>
         <LinearGradient
-          colors={['#0A0A1A', '#1A0A2E', '#0A0A1A']}
+          colors={[COLORS.abyss, '#12042A', COLORS.abyss]}
           style={StyleSheet.absoluteFill}
         />
         <Animated.View entering={FadeIn.duration(500)} style={styles.stepContent}>
           <View style={styles.stepHeader}>
-            <LinearGradient colors={['#8A2BE2', '#00BFFF']} style={styles.stepIconCircle}>
+            <LinearGradient colors={[COLORS.violet, COLORS.cyan]} style={styles.stepIconCircle}>
               <MaterialCommunityIcons name="heart" size={24} color="#FFF" />
             </LinearGradient>
             <Text style={styles.stepTitle}>{t('onboarding.pick_favorites')}</Text>
@@ -218,7 +220,7 @@ export default function OnboardingScreen() {
           {/* Selected counter */}
           <View style={styles.selectedCounter}>
             <LinearGradient
-              colors={selectedThemes.length > 0 ? ['#8A2BE2', '#A855F7'] : ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.05)']}
+              colors={selectedThemes.length > 0 ? [COLORS.violet, '#A855F7'] : ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.05)']}
               style={styles.selectedCounterBadge}
             >
               <MaterialCommunityIcons name="check-circle" size={13} color={selectedThemes.length > 0 ? '#FFF' : '#555'} />
@@ -272,7 +274,7 @@ export default function OnboardingScreen() {
         <Animated.View entering={FadeInUp.delay(400).duration(500)} style={styles.bottomArea}>
           <TouchableOpacity onPress={nextStep} activeOpacity={0.85}>
             <LinearGradient
-              colors={selectedThemes.length > 0 ? ['#8A2BE2', '#00BFFF'] : ['#444', '#333']}
+              colors={selectedThemes.length > 0 ? [COLORS.violet, COLORS.cyan] : ['#444', '#333']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.mainBtn}
@@ -301,7 +303,7 @@ export default function OnboardingScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#0A0A1A', '#1A0A2E', '#0A0A1A']}
+        colors={[COLORS.abyss, '#12042A', COLORS.abyss]}
         style={StyleSheet.absoluteFill}
       />
       <Animated.View key={tutoIndex} entering={SlideInRight.duration(400)} style={styles.stepContent}>
@@ -324,7 +326,7 @@ export default function OnboardingScreen() {
       {/* XP Banner — shown when finish is triggered */}
       {showXpBanner && (
         <Animated.View style={[styles.xpBanner, xpBannerStyle]}>
-          <LinearGradient colors={['#8A2BE2', '#00BFFF']} style={styles.xpBannerGrad}>
+          <LinearGradient colors={[COLORS.violet, COLORS.cyan]} style={styles.xpBannerGrad}>
             <MaterialCommunityIcons name="lightning-bolt" size={20} color="#FFF" />
             <Text style={styles.xpBannerText}>{t('onboarding.xp_bonus')}</Text>
           </LinearGradient>
@@ -335,7 +337,7 @@ export default function OnboardingScreen() {
         {!showXpBanner && (
           <TouchableOpacity onPress={nextStep} activeOpacity={0.85}>
             <LinearGradient
-              colors={isLastSlide ? ['#00FF9D', '#00BFFF'] : ['#8A2BE2', '#00BFFF']}
+              colors={isLastSlide ? [COLORS.mint, COLORS.cyan] : [COLORS.violet, COLORS.cyan]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.mainBtn}
@@ -380,7 +382,7 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A1A',
+    backgroundColor: COLORS.abyss,
   },
 
   // Welcome
@@ -399,17 +401,18 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   welcomeTitle: {
-    fontSize: 28,
-    fontWeight: '900',
+    fontSize: 40,
+    fontFamily: FONTS.display.bold,
     color: '#FFF',
     textAlign: 'center',
     marginBottom: 12,
-    letterSpacing: -0.5,
+    letterSpacing: -1,
+    textTransform: 'uppercase',
   },
   welcomeSub: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.6)',
+    fontSize: 15,
+    fontFamily: FONTS.display.regular,
+    color: COLORS.inkSub,
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -434,15 +437,16 @@ const styles = StyleSheet.create({
   },
   stepTitle: {
     fontSize: 24,
-    fontWeight: '900',
+    fontFamily: FONTS.display.bold,
     color: '#FFF',
     marginBottom: 8,
     letterSpacing: -0.3,
+    textTransform: 'uppercase',
   },
   stepSub: {
     fontSize: 14,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
+    fontFamily: FONTS.display.regular,
+    color: COLORS.inkSub,
     textAlign: 'center',
   },
 
@@ -473,7 +477,7 @@ const styles = StyleSheet.create({
   },
   themeName: {
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: FONTS.display.bold,
     color: '#FFF',
     textAlign: 'center',
   },
@@ -500,15 +504,16 @@ const styles = StyleSheet.create({
   },
   tutoTitle: {
     fontSize: 22,
-    fontWeight: '900',
+    fontFamily: FONTS.display.bold,
     color: '#FFF',
     marginBottom: 12,
     textAlign: 'center',
+    textTransform: 'uppercase',
   },
   tutoBody: {
     fontSize: 15,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.6)',
+    fontFamily: FONTS.display.regular,
+    color: COLORS.inkSub,
     textAlign: 'center',
     lineHeight: 22,
   },
@@ -544,17 +549,18 @@ const styles = StyleSheet.create({
   },
   mainBtnText: {
     fontSize: 16,
-    fontWeight: '900',
+    fontFamily: FONTS.display.bold,
     color: '#FFF',
     letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   skipBtn: {
     paddingVertical: 8,
   },
   skipText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
+    fontFamily: FONTS.display.medium,
+    color: COLORS.inkDim,
   },
 
   // Dots
@@ -574,7 +580,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.2)',
   },
   dotActive: {
-    backgroundColor: '#8A2BE2',
+    backgroundColor: COLORS.violet,
     width: 20,
   },
 
@@ -594,8 +600,8 @@ const styles = StyleSheet.create({
   },
   selectedCounterText: {
     fontSize: 13,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.4)',
+    fontFamily: FONTS.mono.bold,
+    color: COLORS.inkDim,
   },
 
   // XP Banner (shown on finish)
@@ -618,7 +624,7 @@ const styles = StyleSheet.create({
   },
   xpBannerText: {
     fontSize: 22,
-    fontWeight: '900',
+    fontFamily: FONTS.display.bold,
     color: '#FFF',
     letterSpacing: -0.3,
   },
