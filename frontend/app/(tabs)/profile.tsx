@@ -375,9 +375,10 @@ export default function ProfileScreen() {
         user: {
           id: userId, pseudo: pseudo || t('profile.player_default'), avatar_seed: avatarSeed || '',
           is_guest: true, total_xp: 0, selected_title: null,
-          country: null, country_flag: '',
+          country: null, city: null, country_flag: '',
           matches_played: 0, matches_won: 0,
           best_streak: 0, current_streak: 0, streak_badge: '',
+          login_streak: 0, best_login_streak: 0,
           win_rate: 0, followers_count: 0, following_count: 0,
         },
         themes: [], all_unlocked_titles: [], match_history: [],
@@ -558,61 +559,73 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         )}
 
-        {/* ── Profile Header: Avatar left + info right ── */}
-        <View style={s.profileHeader}>
+        {/* ── Profile Header: Avatar centered ── */}
+        <View style={s.profileHero}>
           <TouchableOpacity style={s.avatarContainer} onPress={openAvatarModal} activeOpacity={0.8}>
             <UserAvatar
               avatarUrl={user?.avatar_url}
               avatarSeed={user?.avatar_seed}
               pseudo={user?.pseudo}
-              size={72}
-              borderColor="#B366FF"
+              size={96}
+              borderColor={GOLD}
               borderWidth={3}
             />
             <View style={s.avatarEditBadge}>
               <MaterialCommunityIcons name="pencil" size={12} color="#FFF" />
             </View>
           </TouchableOpacity>
-          <View style={s.profileInfo}>
-            <Text style={s.pseudo}>{user?.pseudo || t('profile.player_default')}</Text>
-            {displayTitle ? (
-              <TouchableOpacity style={s.titleBadge} onPress={() => setShowTitleModal(true)}>
-                <Text style={s.titleText}>{displayTitle}</Text>
-                <Text style={s.titleEditIcon}> ✎</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity style={s.titleBadge} onPress={() => setShowTitleModal(true)}>
-                <Text style={s.titleTextEmpty}>{t('profile.no_title')}</Text>
-                <Text style={s.titleEditIcon}> ✎</Text>
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity style={s.locationRow} onPress={openLocationModal} activeOpacity={0.7}>
-              <Text style={s.locationFlag}>{user?.country_flag || '🌍'}</Text>
-              <Text style={s.locationText}>
-                {user?.city && user?.country
-                  ? `${user.city}, ${user.country}`
-                  : user?.country || t('profile.world')}
-              </Text>
-              <MaterialCommunityIcons name="pencil" size={12} color="#525252" style={{ marginLeft: 4 }} />
+          <Text style={s.pseudo}>{(user?.pseudo || t('profile.player_default')).toUpperCase()}</Text>
+          {displayTitle ? (
+            <TouchableOpacity style={s.titleBadge} onPress={() => setShowTitleModal(true)}>
+              <MaterialCommunityIcons name="shield-star" size={12} color={VIOLET} />
+              <Text style={s.titleText}>{displayTitle}</Text>
+              <Text style={s.titleEditIcon}> ✎</Text>
             </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={s.titleBadge} onPress={() => setShowTitleModal(true)}>
+              <Text style={s.titleTextEmpty}>{t('profile.no_title')}</Text>
+              <Text style={s.titleEditIcon}> ✎</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity style={s.locationRow} onPress={openLocationModal} activeOpacity={0.7}>
+            <Text style={s.locationFlag}>{user?.country_flag || '🌍'}</Text>
+            <Text style={s.locationText}>
+              {user?.city && user?.country
+                ? `${user.city}, ${user.country}`
+                : user?.country || t('profile.world')}
+            </Text>
+            <MaterialCommunityIcons name="pencil" size={12} color="#525252" style={{ marginLeft: 4 }} />
+          </TouchableOpacity>
+        </View>
+
+        {/* ── Stats Row: DUELS / VICTOIRES / RATIO ── */}
+        <View style={s.statsRow}>
+          <View style={s.statItem}>
+            <Text style={[s.statValue, { color: CYAN }]}>{user?.matches_played || 0}</Text>
+            <Text style={s.statLabel}>DUELS</Text>
+          </View>
+          <View style={s.statDivider} />
+          <View style={s.statItem}>
+            <Text style={[s.statValue, { color: MINT }]}>{user?.matches_won || 0}</Text>
+            <Text style={s.statLabel}>VICTOIRES</Text>
+          </View>
+          <View style={s.statDivider} />
+          <View style={s.statItem}>
+            <Text style={[s.statValue, { color: GOLD }]}>{user?.win_rate || 0}%</Text>
+            <Text style={s.statLabel}>RATIO</Text>
           </View>
         </View>
 
-        {/* ── Stats Row ── */}
-        <View style={s.statsRow}>
-          <View style={s.statItem}>
-            <Text style={s.statValue}>{user?.matches_played || 0}</Text>
-            <Text style={s.statLabel}>{t('profile.matches_label')}</Text>
-          </View>
-          <View style={s.statDivider} />
-          <TouchableOpacity style={s.statItem} onPress={() => router.push(`/followers?userId=${profile?.user.id}&type=followers`)}>
-            <Text style={s.statValue}>{user?.followers_count || 0}</Text>
-            <Text style={s.statLabel}>{t('profile.followers_label')}</Text>
+        {/* ── Social Stats (followers) ── */}
+        <View style={s.socialRow}>
+          <TouchableOpacity onPress={() => router.push(`/followers?userId=${profile?.user.id}&type=followers`)} style={s.socialItem}>
+            <Text style={s.socialValue}>{user?.followers_count || 0}</Text>
+            <Text style={s.socialLabel}>{t('profile.followers_label')}</Text>
           </TouchableOpacity>
-          <View style={s.statDivider} />
-          <TouchableOpacity style={s.statItem} onPress={() => router.push(`/followers?userId=${profile?.user.id}&type=following`)}>
-            <Text style={s.statValue}>{user?.following_count || 0}</Text>
-            <Text style={s.statLabel}>{t('profile.following_label')}</Text>
+          <View style={s.socialDivider} />
+          <TouchableOpacity onPress={() => router.push(`/followers?userId=${profile?.user.id}&type=following`)} style={s.socialItem}>
+            <Text style={s.socialValue}>{user?.following_count || 0}</Text>
+            <Text style={s.socialLabel}>{t('profile.following_label')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -1131,6 +1144,7 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center',
     paddingHorizontal: GRID_PAD, paddingVertical: 20, gap: 16,
   },
+  // profileHero defined above (near-duplicate kept for safety)
   avatarContainer: { position: 'relative' as const },
   avatarEditBadge: {
     position: 'absolute' as const, bottom: 0, right: -2,
@@ -1138,27 +1152,38 @@ const s = StyleSheet.create({
     backgroundColor: '#B366FF', justifyContent: 'center' as const, alignItems: 'center' as const,
     borderWidth: 2, borderColor: '#050510',
   },
+  profileHero: { alignItems: 'center', paddingTop: 16, paddingBottom: 20, paddingHorizontal: GRID_PAD },
   profileInfo: { flex: 1 },
-  pseudo: { fontSize: 24, fontWeight: '900', color: '#FFF' },
-  titleBadge: { flexDirection: 'row', alignItems: 'center', marginTop: 4, alignSelf: 'flex-start' },
-  titleText: { color: '#B57EDC', fontSize: 14, fontWeight: '700' },
-  titleTextEmpty: { color: '#525252', fontSize: 14, fontWeight: '600', fontStyle: 'italic' },
+  pseudo: { fontSize: 30, fontWeight: '900', color: '#FFF', letterSpacing: 0.5, marginTop: 12 },
+  titleBadge: { flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 4, alignSelf: 'center' },
+  titleText: { color: '#B57EDC', fontSize: 13, fontWeight: '700' },
+  titleTextEmpty: { color: '#525252', fontSize: 13, fontWeight: '600', fontStyle: 'italic' },
   titleEditIcon: { color: '#525252', fontSize: 12 },
-  locationRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 4 },
+  locationRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 8 },
   locationFlag: { fontSize: 14 },
   locationText: { color: '#A3A3A3', fontSize: 13, fontWeight: '600' },
 
   /* Stats Row */
   statsRow: {
     flexDirection: 'row', alignItems: 'center',
-    marginHorizontal: GRID_PAD, paddingVertical: 16,
+    marginHorizontal: GRID_PAD, paddingVertical: 18,
     backgroundColor: GLASS.bg, borderRadius: GLASS.radius,
     borderWidth: 1, borderColor: GLASS.borderCyan,
   },
   statItem: { flex: 1, alignItems: 'center' },
-  statValue: { fontSize: 22, fontWeight: '900', color: '#FFF' },
-  statLabel: { fontSize: 9, fontWeight: '800', color: 'rgba(255,255,255,0.45)', letterSpacing: 1.5, marginTop: 4 },
-  statDivider: { width: 1, height: 36, backgroundColor: GLASS.borderSubtle },
+  statValue: { fontSize: 26, fontWeight: '900', color: '#FFF' },
+  statLabel: { fontSize: 9, fontWeight: '800', color: 'rgba(255,255,255,0.45)', letterSpacing: 2, marginTop: 4 },
+  statDivider: { width: 1, height: 40, backgroundColor: GLASS.borderSubtle },
+
+  /* Social Row (followers / following) */
+  socialRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    marginHorizontal: GRID_PAD, marginTop: 8, gap: 32,
+  },
+  socialItem: { alignItems: 'center' },
+  socialValue: { fontSize: 15, fontWeight: '800', color: '#FFF' },
+  socialLabel: { fontSize: 9, fontWeight: '700', color: 'rgba(255,255,255,0.4)', letterSpacing: 1.5, marginTop: 2 },
+  socialDivider: { width: 1, height: 24, backgroundColor: 'rgba(255,255,255,0.1)' },
 
   /* ── Level XP Progress ── */
   xpProgressCard: {

@@ -479,6 +479,17 @@ export default function ResultsScreen() {
             <MaterialCommunityIcons name="check-circle" size={14} color="#00FF9D" />
             <Text style={styles.correctBadge}>{correctCount}/7 {t('results.correct_answers')}</Text>
           </LinearGradient>
+          {correctCount >= 7 && (
+            <LinearGradient
+              colors={['rgba(255,181,71,0.35)', 'rgba(255,181,71,0.12)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.flawlessBadge}
+            >
+              <MaterialCommunityIcons name="star-four-points" size={14} color="#FFB547" />
+              <Text style={styles.flawlessText}>FLAWLESS</Text>
+            </LinearGradient>
+          )}
           {newLevel && (
             <LinearGradient
               colors={['rgba(138,43,226,0.3)', 'rgba(138,43,226,0.1)']}
@@ -497,7 +508,7 @@ export default function ResultsScreen() {
               end={{ x: 1, y: 0 }}
               style={styles.nearMissBadge}
             >
-              <MaterialCommunityIcons name="flame" size={16} color="#FF9F0A" />
+              <MaterialCommunityIcons name="fire" size={16} color="#FF9F0A" />
               <Text style={styles.nearMissText}>{t('results.near_miss')}</Text>
             </LinearGradient>
           )}
@@ -605,7 +616,7 @@ export default function ResultsScreen() {
               <View style={styles.xpRow}>
                 <Text style={styles.xpTotalLabel}>{t('results.total')}</Text>
                 <LinearGradient
-                  colors={['#00FFFF', '#8A2BE2']}
+                  colors={['#FFB547', '#FF8C00']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.xpTotalBadge}
@@ -1147,10 +1158,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center', marginBottom: 12,
     shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 12,
   },
-  resultTitle: { fontSize: 56, fontWeight: '900', letterSpacing: 4 },
-  winText: { color: '#00FF9D' },
-  drawText: { color: '#FFD700' },
-  lossText: { color: '#FF3B30' },
+  resultTitle: { fontSize: 64, fontWeight: '900', letterSpacing: 4 },
+  winText: { color: '#32E7A3' },
+  drawText: { color: '#FFB547' },
+  lossText: { color: '#FF3D5E' },
+  flawlessBadge: {
+    marginTop: 8, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 14, paddingVertical: 6, borderWidth: 1, borderColor: 'rgba(255,181,71,0.4)',
+  },
+  flawlessText: { color: '#FFB547', fontSize: 13, fontWeight: '900', letterSpacing: 2 },
   correctBadgeGradient: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     marginTop: 8, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 6,
@@ -1219,15 +1235,15 @@ const styles = StyleSheet.create({
   xpRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 },
   xpLabelRow: { flexDirection: 'row', alignItems: 'center' },
   xpLabel: { color: '#A3A3A3', fontSize: 14, fontWeight: '500' },
-  xpValue: { color: '#00FF9D', fontSize: 14, fontWeight: '700' },
-  xpGold: { color: '#FFD700' },
-  xpCyan: { color: '#00FFFF' },
-  xpPurple: { color: '#8A2BE2' },
-  xpOrange: { color: '#FF6B35' },
+  xpValue: { color: '#FFF', fontSize: 14, fontWeight: '700' },
+  xpGold: { color: '#FFB547' },
+  xpCyan: { color: '#32E7A3' },
+  xpPurple: { color: '#B366FF' },
+  xpOrange: { color: '#FF6B2C' },
   xpDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: 8 },
   xpTotalLabel: { color: '#FFF', fontSize: 16, fontWeight: '800' },
   xpTotalBadge: { borderRadius: 10, paddingHorizontal: 12, paddingVertical: 4 },
-  xpTotalValue: { color: '#FFF', fontSize: 16, fontWeight: '900' },
+  xpTotalValue: { color: '#FFF', fontSize: 16, fontWeight: '900', letterSpacing: 0.5 },
   // Actions
   actions: { gap: 10 },
   shareButton: {

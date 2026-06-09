@@ -50,8 +50,25 @@ function RoundTimer({ timeLeft, total = TIMER_DURATION }: { timeLeft: number; to
   const offset = circumference * (1 - timeLeft / total);
   const urgent = timeLeft <= 3;
   const color = urgent ? RED : CYAN;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (urgent) {
+      const loop = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, { toValue: 1.1, duration: 300, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+          Animated.timing(pulseAnim, { toValue: 1, duration: 300, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        ])
+      );
+      loop.start();
+      return () => loop.stop();
+    } else {
+      pulseAnim.setValue(1);
+    }
+  }, [urgent]);
+
   return (
-    <View style={{ width: 86, height: 86 }}>
+    <Animated.View style={{ width: 86, height: 86, transform: [{ scale: pulseAnim }] }}>
       <View style={{ position: 'absolute', top: 0, left: 0, width: 86, height: 86, transform: [{ rotate: '-90deg' }] }}>
         <Svg width="86" height="86" viewBox="0 0 86 86">
           <Circle cx="43" cy="43" r={R} stroke="rgba(255,255,255,0.08)" strokeWidth="4" fill="none" />
@@ -64,7 +81,7 @@ function RoundTimer({ timeLeft, total = TIMER_DURATION }: { timeLeft: number; to
         <Text style={{ fontWeight: '900', fontSize: 28, color, lineHeight: 32 }}>{timeLeft}</Text>
         <Text style={{ fontSize: 8, color: 'rgba(255,255,255,0.4)', letterSpacing: 1 }}>SEC</Text>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 

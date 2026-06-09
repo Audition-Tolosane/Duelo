@@ -1787,14 +1787,13 @@ export default function AccueilScreen() {
         <Animated.View entering={FadeInDown.delay(200).duration(500)}>
           <TouchableOpacity
             style={styles.quickPlayBtn}
-            activeOpacity={0.85}
+            activeOpacity={0.88}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
               const playedThemes: SlotTheme[] = (dailyMissions?.user_themes ?? []).map(t => ({ id: t.id, name: t.name, color: t.color }));
               const eventThemes: SlotTheme[] = socialFeedRef.current
                 .filter(i => i.type === 'event' && i.theme_id && i.category_name)
                 .map(i => ({ id: i.theme_id!, name: i.category_name, color: i.category_color }));
-              // Deduplicated combined list for the carousel
               const allThemes = [...playedThemes];
               eventThemes.forEach(et => { if (!allThemes.find(t => t.id === et.id)) allThemes.push(et); });
 
@@ -1817,14 +1816,17 @@ export default function AccueilScreen() {
             }}
           >
             <LinearGradient
-              colors={['#B366FF', '#00E5FF']}
+              colors={['#B366FF', '#7B61FF', '#00E5FF']}
               start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
+              end={{ x: 1, y: 1 }}
               style={styles.quickPlayGradient}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <MaterialCommunityIcons name="lightning-bolt" size={20} color="#FFF" />
-                <Text style={styles.quickPlayText}>{t('home.start_duel')}</Text>
+              <Text style={styles.quickPlayWatermark}>⚔</Text>
+              <Text style={styles.quickPlaySub}>Quick match</Text>
+              <Text style={styles.quickPlayTitle}>DUEL !</Text>
+              <Text style={styles.quickPlayHint}>Trouve un adversaire en ~8s</Text>
+              <View style={styles.quickPlayCta}>
+                <Text style={styles.quickPlayCtaText}>◆ Trouver un adversaire</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
@@ -2363,30 +2365,62 @@ const styles = StyleSheet.create({
   quickPlayBtn: {
     marginHorizontal: 16,
     marginTop: 8,
-    borderRadius: GLASS.radius,
+    borderRadius: 22,
     overflow: 'hidden',
   },
   quickPlayGradient: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    gap: 10,
-    borderRadius: GLASS.radius,
+    paddingVertical: 28,
+    paddingHorizontal: 16,
+    borderRadius: 22,
+    overflow: 'hidden',
+    gap: 0,
+  },
+  quickPlayWatermark: {
+    position: 'absolute',
+    fontSize: 130,
+    opacity: 0.12,
+    right: 10,
+    top: -20,
+  },
+  quickPlaySub: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: 'rgba(255,255,255,0.7)',
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+    marginBottom: 6,
+  },
+  quickPlayTitle: {
+    fontSize: 42,
+    fontWeight: '900',
+    color: '#FFF',
+    letterSpacing: -1,
+    marginBottom: 6,
+  },
+  quickPlayHint: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.75)',
+    fontWeight: '500',
+    marginBottom: 20,
+  },
+  quickPlayCta: {
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    paddingHorizontal: 28,
+    paddingVertical: 11,
+    borderRadius: 22,
+  },
+  quickPlayCtaText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#FFF',
+    letterSpacing: 1,
   },
   quickPlayText: {
     fontSize: 16,
     fontWeight: '900',
     color: '#FFF',
     letterSpacing: 2,
-  },
-  quickPlaySub: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#FFF',
-    textAlign: 'center',
-    marginBottom: 6,
-    letterSpacing: 0.5,
   },
 
   // ── Feed Cards ──

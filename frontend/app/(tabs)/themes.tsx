@@ -187,6 +187,35 @@ export default function ThemesScreen() {
     <View style={s.container}>
       <ScrollView ref={scrollRef} contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false}>
 
+        {/* ── FEATURED PILLAR HERO CARD ── */}
+        {pillars.length > 0 && (
+          <TouchableOpacity
+            style={s.featuredCard}
+            activeOpacity={0.88}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              setActivePillar(pillars[0].id);
+            }}
+          >
+            <LinearGradient
+              colors={[pillars[0].color || VIOLET, VIOLET, CYAN]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={StyleSheet.absoluteFill}
+            />
+            <Text style={s.featuredWatermark}>{pillars[0].icon}</Text>
+            <View style={s.featuredBadge}>
+              <Text style={s.featuredBadgeText}>POPULAIRE</Text>
+            </View>
+            <Text style={s.featuredTitle}>{pillars[0].name.toUpperCase()}</Text>
+            <Text style={s.featuredSub}>{pillars[0].themes.reduce((n, t) => n + (t.topics?.length || 0), 0)} thèmes disponibles</Text>
+            <View style={s.featuredPlayBtn}>
+              <MaterialCommunityIcons name="play-circle" size={16} color="#FFF" />
+              <Text style={s.featuredPlayText}>Explorer</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+
         {/* ── LA FORGE ── */}
         <TouchableOpacity style={s.forgeCard} activeOpacity={0.8} onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -475,6 +504,39 @@ const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   loadCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   scrollContent: { paddingBottom: 40 },
+
+  // Featured hero card
+  featuredCard: {
+    marginHorizontal: 16, marginTop: 16, marginBottom: 8,
+    borderRadius: 22, height: 180, overflow: 'hidden',
+    justifyContent: 'flex-end', padding: 20,
+  },
+  featuredWatermark: {
+    position: 'absolute', fontSize: 140, opacity: 0.13,
+    right: -10, top: -20,
+  },
+  featuredBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderRadius: 8, paddingHorizontal: 10, paddingVertical: 3,
+    marginBottom: 8,
+  },
+  featuredBadgeText: {
+    fontSize: 9, fontWeight: '900', color: '#FFF', letterSpacing: 2,
+  },
+  featuredTitle: {
+    fontSize: 28, fontWeight: '900', color: '#FFF', letterSpacing: 1, marginBottom: 4,
+  },
+  featuredSub: {
+    fontSize: 13, color: 'rgba(255,255,255,0.75)', fontWeight: '500', marginBottom: 14,
+  },
+  featuredPlayBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    paddingHorizontal: 16, paddingVertical: 8,
+    borderRadius: 16, alignSelf: 'flex-start',
+  },
+  featuredPlayText: { fontSize: 13, fontWeight: '800', color: '#FFF' },
 
   // La Forge
   forgeCard: {
