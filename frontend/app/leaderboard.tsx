@@ -102,7 +102,8 @@ function Podium({ entries, myId, router }: { entries: LeaderEntry[]; myId: strin
 const podiumStyles = StyleSheet.create({
   container: { marginHorizontal: 16, marginBottom: 20, marginTop: 8 },
   eyebrow: {
-    fontSize: 9, fontWeight: '900', color: 'rgba(255,181,71,0.7)',
+    fontSize: 9, fontWeight: '900', fontFamily: 'JetBrainsMono_700Bold',
+    color: 'rgba(255,181,71,0.7)',
     letterSpacing: 3, textAlign: 'center', marginBottom: 16,
   },
   columns: { flexDirection: 'row', alignItems: 'flex-end', gap: 6 },
@@ -118,7 +119,7 @@ const podiumStyles = StyleSheet.create({
     width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10,
     alignItems: 'center', justifyContent: 'center', gap: 2, paddingTop: 12,
   },
-  rankNum: { fontSize: 22, fontWeight: '900', color: '#FFF', opacity: 0.9 },
+  rankNum: { fontSize: 22, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', color: '#FFF', opacity: 0.9 },
   xpVal: { fontSize: 10, fontWeight: '800', color: 'rgba(255,255,255,0.8)' },
   xpLabel: { fontSize: 8, fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: 1 },
 });

@@ -1154,7 +1154,7 @@ const s = StyleSheet.create({
   },
   profileHero: { alignItems: 'center', paddingTop: 16, paddingBottom: 20, paddingHorizontal: GRID_PAD },
   profileInfo: { flex: 1 },
-  pseudo: { fontSize: 30, fontWeight: '900', color: '#FFF', letterSpacing: 0.5, marginTop: 12 },
+  pseudo: { fontSize: 30, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', color: '#FFF', letterSpacing: 0.5, marginTop: 12 },
   titleBadge: { flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 4, alignSelf: 'center' },
   titleText: { color: '#B57EDC', fontSize: 13, fontWeight: '700' },
   titleTextEmpty: { color: '#525252', fontSize: 13, fontWeight: '600', fontStyle: 'italic' },
@@ -1171,8 +1171,8 @@ const s = StyleSheet.create({
     borderWidth: 1, borderColor: GLASS.borderCyan,
   },
   statItem: { flex: 1, alignItems: 'center' },
-  statValue: { fontSize: 26, fontWeight: '900', color: '#FFF' },
-  statLabel: { fontSize: 9, fontWeight: '800', color: 'rgba(255,255,255,0.45)', letterSpacing: 2, marginTop: 4 },
+  statValue: { fontSize: 26, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', color: '#FFF' },
+  statLabel: { fontSize: 9, fontWeight: '800', fontFamily: 'JetBrainsMono_700Bold', color: 'rgba(255,255,255,0.45)', letterSpacing: 2, marginTop: 4 },
   statDivider: { width: 1, height: 40, backgroundColor: GLASS.borderSubtle },
 
   /* Social Row (followers / following) */

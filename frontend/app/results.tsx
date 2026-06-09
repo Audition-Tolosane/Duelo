@@ -1158,7 +1158,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center', marginBottom: 12,
     shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 12,
   },
-  resultTitle: { fontSize: 64, fontWeight: '900', letterSpacing: 4 },
+  resultTitle: { fontSize: 64, fontWeight: '900', letterSpacing: 4, fontFamily: 'SpaceGrotesk_700Bold' },
   winText: { color: '#32E7A3' },
   drawText: { color: '#FFB547' },
   lossText: { color: '#FF3D5E' },

@@ -2386,6 +2386,7 @@ const styles = StyleSheet.create({
   quickPlaySub: {
     fontSize: 11,
     fontWeight: '800',
+    fontFamily: 'JetBrainsMono_700Bold',
     color: 'rgba(255,255,255,0.7)',
     letterSpacing: 3,
     textTransform: 'uppercase',
@@ -2394,12 +2395,14 @@ const styles = StyleSheet.create({
   quickPlayTitle: {
     fontSize: 42,
     fontWeight: '900',
+    fontFamily: 'SpaceGrotesk_700Bold',
     color: '#FFF',
     letterSpacing: -1,
     marginBottom: 6,
   },
   quickPlayHint: {
     fontSize: 13,
+    fontFamily: 'SpaceGrotesk_400Regular',
     color: 'rgba(255,255,255,0.75)',
     fontWeight: '500',
     marginBottom: 20,
@@ -2413,6 +2416,7 @@ const styles = StyleSheet.create({
   quickPlayCtaText: {
     fontSize: 14,
     fontWeight: '800',
+    fontFamily: 'SpaceGrotesk_700Bold',
     color: '#FFF',
     letterSpacing: 1,
   },

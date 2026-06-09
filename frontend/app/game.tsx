@@ -78,8 +78,8 @@ function RoundTimer({ timeLeft, total = TIMER_DURATION }: { timeLeft: number; to
       </View>
       <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
                      alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={{ fontWeight: '900', fontSize: 28, color, lineHeight: 32 }}>{timeLeft}</Text>
-        <Text style={{ fontSize: 8, color: 'rgba(255,255,255,0.4)', letterSpacing: 1 }}>SEC</Text>
+        <Text style={{ fontWeight: '900', fontSize: 28, color, lineHeight: 32, fontFamily: 'SpaceGrotesk_700Bold' }}>{timeLeft}</Text>
+        <Text style={{ fontSize: 8, color: 'rgba(255,255,255,0.4)', letterSpacing: 1, fontFamily: 'JetBrainsMono_400Regular' }}>SEC</Text>
       </View>
     </Animated.View>
   );
@@ -1069,9 +1069,10 @@ const styles = StyleSheet.create({
   },
   questionEyebrow: {
     color: GOLD, fontSize: 11, fontWeight: '700',
+    fontFamily: 'JetBrainsMono_700Bold',
     letterSpacing: 2, marginBottom: 8,
   },
-  questionText: { color: '#FFF', fontSize: 20, fontWeight: '800', textAlign: 'center', lineHeight: 28 },
+  questionText: { color: '#FFF', fontSize: 22, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold', textAlign: 'center', lineHeight: 30 },
 
   // 2×2 Options grid
   optionsGrid: { flex: 1, paddingHorizontal: 12, paddingBottom: 12, paddingTop: 4, gap: 10 },
@@ -1115,7 +1116,7 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: '600',
     maxWidth: 90, marginBottom: 2,
   },
-  scoreBoxScore: { fontSize: 26, fontWeight: '900', lineHeight: 30 },
+  scoreBoxScore: { fontSize: 26, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', lineHeight: 30 },
   timerSection: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
 
   // Dots progression
