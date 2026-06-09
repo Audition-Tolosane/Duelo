@@ -31,12 +31,97 @@ const VIEWS = [
   { id: 'seasonal', labelKey: 'leaderboard.view_seasonal' },
 ];
 
+const CYAN = '#00E5FF';
+const GOLD = '#FFB547';
+
 const RANK_COLORS = ['#FFD700', '#C0C0C0', '#CD7F32'];
 const RANK_GRADIENTS: [string, string][] = [
   ['#FFD700', '#FFA500'],
   ['#C0C0C0', '#8A8A8A'],
   ['#CD7F32', '#8B4513'],
 ];
+
+// ── Podium (top 3) ──
+function Podium({ entries, myId, router }: { entries: LeaderEntry[]; myId: string; router: ReturnType<typeof useRouter> }) {
+  if (entries.length < 2) return null;
+  // Columns: left=2nd, center=1st, right=3rd
+  const slots = [entries[1], entries[0], entries.length > 2 ? entries[2] : null];
+  const blockHeights = [110, 150, 80];
+  const colColors: [string, string][] = [
+    ['#9E9E9E', '#616161'],
+    ['#FFB547', '#FF8C00'],
+    ['#A1724F', '#6D4C41'],
+  ];
+  const rankLabels = ['2', '1', '3'];
+  const avatarSizes = [44, 56, 40];
+
+  return (
+    <View style={podiumStyles.container}>
+      <Text style={podiumStyles.eyebrow}>◆ TOP JOUEURS</Text>
+      <View style={podiumStyles.columns}>
+        {slots.map((entry, colIdx) => {
+          if (!entry) return <View key={colIdx} style={{ flex: 1 }} />;
+          const isCenter = colIdx === 1;
+          const isMe = entry.id === myId;
+          return (
+            <TouchableOpacity
+              key={colIdx}
+              style={podiumStyles.column}
+              onPress={() => entry.id && router.push(`/player-profile?id=${entry.id}` as any)}
+              activeOpacity={0.8}
+            >
+              <UserAvatar
+                avatarUrl={entry.avatar_url}
+                avatarSeed={entry.avatar_seed}
+                pseudo={entry.pseudo}
+                size={avatarSizes[colIdx]}
+                borderColor={isCenter ? GOLD : isMe ? CYAN : 'transparent'}
+                borderWidth={isCenter ? 3 : isMe ? 2 : 0}
+              />
+              <Text style={[podiumStyles.pseudo, isCenter && { fontSize: 13 }]} numberOfLines={1}>
+                {entry.pseudo}
+              </Text>
+              {isMe && <Text style={podiumStyles.youBadge}>TOI</Text>}
+              <LinearGradient
+                colors={colColors[colIdx]}
+                start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+                style={[podiumStyles.block, { height: blockHeights[colIdx] }]}
+              >
+                <Text style={[podiumStyles.rankNum, isCenter && { fontSize: 26 }]}>{rankLabels[colIdx]}</Text>
+                <Text style={podiumStyles.xpVal}>{(entry.total_xp ?? entry.xp ?? 0).toLocaleString()}</Text>
+                <Text style={podiumStyles.xpLabel}>XP</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+const podiumStyles = StyleSheet.create({
+  container: { marginHorizontal: 16, marginBottom: 20, marginTop: 8 },
+  eyebrow: {
+    fontSize: 9, fontWeight: '900', color: 'rgba(255,181,71,0.7)',
+    letterSpacing: 3, textAlign: 'center', marginBottom: 16,
+  },
+  columns: { flexDirection: 'row', alignItems: 'flex-end', gap: 6 },
+  column: { flex: 1, alignItems: 'center', gap: 4 },
+  pseudo: {
+    fontSize: 11, fontWeight: '800', color: '#FFF',
+    textAlign: 'center', marginTop: 4,
+  },
+  youBadge: {
+    fontSize: 8, fontWeight: '900', color: CYAN, letterSpacing: 1,
+  },
+  block: {
+    width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10,
+    alignItems: 'center', justifyContent: 'center', gap: 2, paddingTop: 12,
+  },
+  rankNum: { fontSize: 22, fontWeight: '900', color: '#FFF', opacity: 0.9 },
+  xpVal: { fontSize: 10, fontWeight: '800', color: 'rgba(255,255,255,0.8)' },
+  xpLabel: { fontSize: 8, fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: 1 },
+});
 
 const BADGE_ICON_MAP: Record<string, { name: string; color: string }> = {
   fire: { name: 'fire', color: '#FF6B35' },
@@ -150,12 +235,13 @@ export default function LeaderboardScreen() {
     const top3Index = item.rank - 1;
     const badgeInfo = item.streak_badge ? BADGE_ICON_MAP[item.streak_badge] : null;
     const isGlow = item.streak_badge === 'glow';
+    const isMe = item.id === myUserId;
 
     return (
       <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
       <ScalePressable
         testID={`leaderboard-entry-${index}`}
-        style={[styles.entry, isTop3 && styles.entryTop]}
+        style={[styles.entry, isTop3 && styles.entryTop, isMe && styles.entryMe]}
         onPress={() => {
           if (item.id) router.push(`/player-profile?id=${item.id}`);
         }}
@@ -248,24 +334,34 @@ export default function LeaderboardScreen() {
 
         {/* Scope Filters — always visible */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scopeScroll} contentContainerStyle={styles.scopeContainer}>
-          {SCOPES.map((s) => (
-            <TouchableOpacity
-              testID={`scope-${s.id}`}
-              key={s.id}
-              style={[styles.scopeBtn, scope === s.id && styles.scopeBtnActive]}
-              onPress={() => setScope(s.id)}
-              activeOpacity={0.7}
-            >
-              <View style={styles.scopeInner}>
-                <MaterialCommunityIcons
-                  name={s.icon}
-                  size={16}
-                  color={scope === s.id ? '#FFF' : '#525252'}
-                />
-                <Text style={[styles.scopeText, scope === s.id && styles.scopeTextActive]}>{t(s.labelKey)}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
+          {SCOPES.map((s) => {
+            const isActive = scope === s.id;
+            return (
+              <TouchableOpacity
+                testID={`scope-${s.id}`}
+                key={s.id}
+                style={[styles.scopeBtn, isActive && styles.scopeBtnActive]}
+                onPress={() => setScope(s.id)}
+                activeOpacity={0.7}
+              >
+                {isActive ? (
+                  <LinearGradient
+                    colors={['#00E5FF', '#B366FF']}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                    style={styles.scopeInner}
+                  >
+                    <MaterialCommunityIcons name={s.icon} size={16} color="#FFF" />
+                    <Text style={styles.scopeTextActive}>{t(s.labelKey)}</Text>
+                  </LinearGradient>
+                ) : (
+                  <View style={styles.scopeInner}>
+                    <MaterialCommunityIcons name={s.icon} size={16} color="#525252" />
+                    <Text style={styles.scopeText}>{t(s.labelKey)}</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
 
         {!isThemeMode && view === 'seasonal' && (
@@ -356,9 +452,13 @@ export default function LeaderboardScreen() {
           </View>
         )}
 
+        {!loading && entries.length >= 2 && (
+          <Podium entries={entries} myId={myUserId} router={router} />
+        )}
+
         {!loading && entries.length > 0 && (
           <FlatList
-            data={entries}
+            data={entries.length >= 3 ? entries.slice(3) : entries}
             renderItem={renderEntry}
             keyExtractor={(item) => item.pseudo + item.rank}
             contentContainerStyle={styles.listContent}
@@ -431,10 +531,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20,
     backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
-  scopeBtnActive: { backgroundColor: '#8A2BE2', borderColor: '#8A2BE2' },
+  scopeBtnActive: { borderColor: 'transparent', overflow: 'hidden' },
   scopeInner: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   scopeText: { color: '#525252', fontSize: 13, fontWeight: '600' },
-  scopeTextActive: { color: '#FFF' },
+  scopeTextActive: { color: '#FFF', fontSize: 13, fontWeight: '700' },
 
   // States
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -450,6 +550,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
   },
   entryTop: { borderColor: 'rgba(138,43,226,0.2)', backgroundColor: 'rgba(138,43,226,0.06)' },
+  entryMe: { borderColor: 'rgba(0,229,255,0.5)', backgroundColor: 'rgba(0,229,255,0.06)', borderWidth: 2 },
   rankBadge: {
     width: 36, height: 36, borderRadius: 10, justifyContent: 'center', alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.06)', marginRight: 12, overflow: 'hidden',
