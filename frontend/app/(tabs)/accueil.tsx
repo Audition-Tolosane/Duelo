@@ -18,6 +18,7 @@ import Constants from 'expo-constants';
 import CosmicBackground from '../../components/CosmicBackground';
 import CategoryIcon from '../../components/CategoryIcon';
 import UserAvatar from '../../components/UserAvatar';
+import EmptyState from '../../components/EmptyState';
 import SpinWheelModal from '../../components/SpinWheelModal';
 import { GLASS } from '../../theme/glassTheme';
 import { authFetch } from '../../utils/api';
@@ -1232,8 +1233,9 @@ const ChallengeCard = React.memo(function ChallengeCard({ challenge, onAccept, o
   }
   return (
     <Animated.View entering={FadeInRight.duration(400)}>
-      <View style={[styles.challengeCard, { borderColor: challenge.theme_color + '30' }]}>
-        <LinearGradient colors={[challenge.theme_color + '15', 'transparent']} style={styles.challengeCardGlow} />
+      {/* Bordure cyan 2px = à toi de jouer (YOUR TURN) */}
+      <View style={[styles.challengeCard, { borderColor: '#00E5FF' }]}>
+        <LinearGradient colors={['rgba(0,229,255,0.12)', 'transparent']} style={styles.challengeCardGlow} />
         <View style={styles.challengeTop}>
           <UserAvatar avatarUrl={challenge.challenger_avatar_url} avatarSeed={challenge.challenger_avatar_seed} pseudo={challenge.challenger_pseudo} size={40} />
           <View style={styles.challengeInfo}>
@@ -2025,13 +2027,16 @@ export default function AccueilScreen() {
           </TouchableOpacity>
         ) : socialFeed.length === 0 ? (
           <Animated.View entering={FadeInDown.delay(500).duration(400)} style={styles.emptyFeed}>
-            <LinearGradient colors={['#B366FF', '#A855F7']} style={styles.emptyFeedCircle}>
-              <MaterialCommunityIcons name="weather-night" size={28} color="#FFF" />
-            </LinearGradient>
-            <Text style={styles.emptyFeedTitle}>{t('home.empty_title')}</Text>
-            <Text style={styles.emptyFeedText}>
-              {t('home.empty_text')}
-            </Text>
+            <EmptyState
+              icon="⚔"
+              title={t('home.empty_title')}
+              body={t('home.empty_text')}
+              ctaLabel="Trouver un adversaire"
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                router.push('/matchmaking');
+              }}
+            />
           </Animated.View>
         ) : (
           <>
@@ -2613,21 +2618,7 @@ const styles = StyleSheet.create({
   modalCancelText: { fontSize: 14, color: '#888' },
 
   // ── Empty Feed ──
-  emptyFeed: {
-    alignItems: 'center',
-    paddingVertical: 40,
-    paddingHorizontal: 32,
-  },
-  emptyFeedCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  emptyFeedTitle: { fontSize: 18, fontWeight: '700', color: '#FFF', marginBottom: 6 },
-  emptyFeedText: { fontSize: 13, color: '#666', textAlign: 'center', lineHeight: 18 },
+  emptyFeed: { paddingVertical: 24 },
 
   // ── Streak Widget ──
   streakCard: {
@@ -2698,13 +2689,16 @@ const styles = StyleSheet.create({
   challengeCard: {
     width: DUEL_CARD_WIDTH, borderRadius: 20, padding: 14,
     backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1, overflow: 'hidden', marginRight: 4,
+    borderWidth: 2, overflow: 'hidden', marginRight: 4,
   },
   challengeCardGlow: { position: 'absolute', top: 0, left: 0, right: 0, height: '100%', borderRadius: 20 },
   challengeTop: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
   challengeInfo: { flex: 1 },
   challengePseudo: { color: '#FFF', fontSize: 14, fontWeight: '800', marginBottom: 2 },
-  challengeVs: { color: 'rgba(255,255,255,0.4)', fontSize: 11, marginBottom: 4 },
+  challengeVs: {
+    color: '#00E5FF', fontSize: 9, marginBottom: 4,
+    fontFamily: 'JetBrainsMono_400Regular', letterSpacing: 1, textTransform: 'uppercase',
+  },
   challengeThemeBadge: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
   challengeThemeName: { fontSize: 11, fontWeight: '700' },
   challengeNoTheme: { color: 'rgba(255,255,255,0.3)', fontSize: 11, fontStyle: 'italic' },

@@ -241,6 +241,8 @@ export default function MatchmakingScreen() {
   const [pseudo, setPseudo] = useState(t('matchmaking.player'));
   const [roomId, setRoomId] = useState<string | null>(null);
   const [showTimeoutModal, setShowTimeoutModal] = useState(false);
+  // Décompte purement visuel pendant la phase versus (la navigation reste pilotée par navDelay)
+  const [vsCountdown, setVsCountdown] = useState(3);
 
   const mapX = useSharedValue(DEFAULT_START.x);
   const mapY = useSharedValue(DEFAULT_START.y);
@@ -494,6 +496,10 @@ export default function MatchmakingScreen() {
       vsScale.value = withSpring(1, { damping: 12, stiffness: 100 });
       playerSlideX.value = withSpring(0, { damping: 14, stiffness: 80 });
       opponentSlideX.value = withSpring(0, { damping: 14, stiffness: 80 });
+      // Décompte visuel 3 → 2 → 1 calé sur la fenêtre versus (~2,7s)
+      setVsCountdown(3);
+      setTimeout(() => setVsCountdown(2), 900);
+      setTimeout(() => setVsCountdown(1), 1800);
     }, vsDelay);
 
     setTimeout(() => {
@@ -669,49 +675,79 @@ export default function MatchmakingScreen() {
         {phase === 'versus' && opponent && (
           <>
             <Animated.View style={[styles.versusBackdrop, overlayStyle]} />
+            {/* Reveal : teinte cyan en haut (toi) / violet en bas (adversaire) */}
+            <Animated.View style={[StyleSheet.absoluteFillObject, overlayStyle]} pointerEvents="none">
+              <LinearGradient
+                colors={['rgba(0,229,255,0.20)', 'rgba(5,5,16,0)', 'rgba(5,5,16,0)', 'rgba(179,102,255,0.20)']}
+                locations={[0, 0.38, 0.62, 1]}
+                style={StyleSheet.absoluteFill}
+              />
+            </Animated.View>
             <View style={styles.versusOverlay}>
               <View style={styles.versusContent}>
                 <View style={styles.versusCategoryRow}>
-                  <MaterialCommunityIcons name="sword-cross" size={16} color="#8A2BE2" />
+                  <Text style={styles.versusEyebrow}>◆ {t('matchmaking.opponent_located')} ◆</Text>
                   <Text style={styles.versusCategory}>{getCategoryLabel()}</Text>
                 </View>
-                <View style={styles.versusPlayers}>
-                  <Animated.View style={[styles.versusPlayer, playerStyle]}>
-                    <LinearGradient colors={[COLORS.violet, '#7B61FF']} style={styles.versusAvatar}>
-                      <Text style={styles.versusAvatarText}>{pseudo[0]?.toUpperCase()}</Text>
-                    </LinearGradient>
+
+                {/* Carte joueur — cyan, glisse depuis la gauche */}
+                <Animated.View style={[styles.versusCard, styles.versusCardPlayer, playerStyle]}>
+                  <LinearGradient
+                    colors={['rgba(0,229,255,0.30)', 'rgba(0,229,255,0)']}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                    style={StyleSheet.absoluteFill}
+                  />
+                  <LinearGradient colors={[COLORS.cyan, '#0090B0']} style={styles.versusAvatar}>
+                    <Text style={styles.versusAvatarText}>{pseudo[0]?.toUpperCase()}</Text>
+                  </LinearGradient>
+                  <View style={styles.versusCardInfo}>
                     <Text style={styles.versusPseudo} numberOfLines={1}>{pseudo}</Text>
-                    <View style={styles.versusLevelRow}>
-                      <MaterialCommunityIcons name="star-outline" size={12} color="#525252" />
-                      <Text style={styles.versusLevel}>{t('matchmaking.level_short')} {playerInfo?.level || 1}</Text>
-                    </View>
-                  </Animated.View>
+                    <Text style={[styles.versusLevel, { color: COLORS.cyan }]}>
+                      {t('matchmaking.level_short')} {playerInfo?.level || 1}
+                    </Text>
+                  </View>
+                </Animated.View>
 
-                  <Animated.View style={[styles.vsBadge, vsAnimStyle]}>
-                    <LinearGradient colors={[COLORS.gold, '#FF8C00']} style={styles.vsBadgeInner}>
-                      <Text style={styles.vsBadgeText}>VS</Text>
-                    </LinearGradient>
-                  </Animated.View>
+                {/* VS serif or */}
+                <Animated.View style={[styles.vsRow, vsAnimStyle]}>
+                  <LinearGradient
+                    colors={['rgba(255,181,71,0)', COLORS.gold]}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                    style={styles.vsLine}
+                  />
+                  <Text style={styles.vsSerif}>VS</Text>
+                  <LinearGradient
+                    colors={[COLORS.gold, 'rgba(255,181,71,0)']}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                    style={styles.vsLine}
+                  />
+                </Animated.View>
 
-                  <Animated.View style={[styles.versusPlayer, opponentStyle]}>
-                    <LinearGradient
-                      colors={oppIsGlow ? ['#00CCCC', COLORS.cyan] : [COLORS.red, '#B32240']}
-                      style={[styles.versusAvatar, oppIsGlow && styles.versusAvatarGlow]}>
-                      <Text style={styles.versusAvatarText}>{opponent.pseudo[0]?.toUpperCase()}</Text>
-                    </LinearGradient>
+                {/* Carte adversaire — violet, glisse depuis la droite */}
+                <Animated.View style={[styles.versusCard, styles.versusCardOpponent, opponentStyle]}>
+                  <LinearGradient
+                    colors={['rgba(179,102,255,0)', 'rgba(179,102,255,0.30)']}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                    style={StyleSheet.absoluteFill}
+                  />
+                  <LinearGradient
+                    colors={oppIsGlow ? ['#00CCCC', COLORS.cyan] : [COLORS.violet, '#7B45CC']}
+                    style={[styles.versusAvatar, oppIsGlow && styles.versusAvatarGlow]}>
+                    <Text style={styles.versusAvatarText}>{opponent.pseudo[0]?.toUpperCase()}</Text>
+                  </LinearGradient>
+                  <View style={[styles.versusCardInfo, styles.versusCardInfoRight]}>
                     <View style={styles.versusPseudoRow}>
-                      <Text style={[styles.versusPseudo, oppIsGlow && styles.glowPseudo]} numberOfLines={1}>
-                        {opponent.pseudo}
-                      </Text>
                       {oppBadgeIcon ? (
                         <MaterialCommunityIcons name={oppBadgeIcon as any} size={14}
                           color={oppIsGlow ? '#00FFFF' : '#FFA500'} />
                       ) : null}
+                      <Text style={[styles.versusPseudo, oppIsGlow && styles.glowPseudo]} numberOfLines={1}>
+                        {opponent.pseudo}
+                      </Text>
                     </View>
-                    <View style={styles.versusLevelRow}>
-                      <MaterialCommunityIcons name="star-outline" size={12} color="#525252" />
-                      <Text style={styles.versusLevel}>{t('matchmaking.level_short')} {opponent.level}</Text>
-                    </View>
+                    <Text style={[styles.versusLevel, { color: COLORS.violet }]}>
+                      {t('matchmaking.level_short')} {opponent.level}
+                    </Text>
                     {opponent.title ? <Text style={styles.versusTitle}>{opponent.title}</Text> : null}
                     {opponent.streak >= 3 && (
                       <View style={[styles.streakTag, oppIsGlow && styles.streakTagGlow]}>
@@ -722,12 +758,14 @@ export default function MatchmakingScreen() {
                         </Text>
                       </View>
                     )}
-                  </Animated.View>
-                </View>
-                <View style={styles.versusHintRow}>
-                  <MaterialCommunityIcons name="gamepad-variant" size={16} color="#525252" />
-                  <Text style={styles.versusHint}>{t('matchmaking.duel_starting')}</Text>
-                </View>
+                  </View>
+                </Animated.View>
+
+                {/* Décompte or */}
+                <Animated.View style={[styles.countdownWrap, vsAnimStyle]}>
+                  <Text style={styles.countdownNum}>{vsCountdown}</Text>
+                  <Text style={styles.countdownLabel}>{t('matchmaking.duel_starting')}</Text>
+                </Animated.View>
               </View>
             </View>
           </>
@@ -810,32 +848,50 @@ const styles = StyleSheet.create({
   foundText: { fontSize: 16, fontFamily: FONTS.display.bold, color: COLORS.mint },
   foundName: { fontSize: 20, fontFamily: FONTS.display.bold, color: '#FFF' },
 
-  versusBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(5,5,16,0.85)' },
+  versusBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(5,5,16,0.88)' },
   versusOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center' },
-  versusContent: { alignItems: 'center', paddingHorizontal: 24 },
-  versusCategoryRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 48 },
-  versusCategory: { fontSize: 16, fontFamily: FONTS.mono.bold, color: '#A3A3A3' },
-  versusPlayers: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', width: '100%' },
-  versusPlayer: { alignItems: 'center', flex: 1 },
+  versusContent: { width: '100%', paddingHorizontal: 20 },
+  versusCategoryRow: { alignItems: 'center', gap: 6, marginBottom: 28 },
+  versusEyebrow: {
+    fontSize: 11, fontFamily: FONTS.display.bold, color: COLORS.gold,
+    letterSpacing: 3, textTransform: 'uppercase',
+  },
+  versusCategory: {
+    fontSize: 24, fontFamily: FONTS.display.bold, color: '#FFF',
+    letterSpacing: -0.5, textTransform: 'uppercase', textAlign: 'center',
+  },
+  versusCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 16,
+    padding: 18, borderRadius: 20, borderWidth: 2, overflow: 'hidden',
+  },
+  versusCardPlayer: {
+    borderColor: COLORS.cyan,
+    shadowColor: COLORS.cyan, shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35, shadowRadius: 24, elevation: 8,
+  },
+  versusCardOpponent: {
+    flexDirection: 'row-reverse', borderColor: COLORS.violet,
+    shadowColor: COLORS.violet, shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35, shadowRadius: 24, elevation: 8,
+  },
+  versusCardInfo: { flex: 1 },
+  versusCardInfoRight: { alignItems: 'flex-end' },
   versusAvatar: {
-    width: 72, height: 72, borderRadius: 24,
-    justifyContent: 'center', alignItems: 'center', marginBottom: 10,
-    shadowColor: COLORS.violet, shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5, shadowRadius: 12,
+    width: 64, height: 64, borderRadius: 32,
+    justifyContent: 'center', alignItems: 'center',
   },
   versusAvatarGlow: {
     shadowColor: COLORS.cyan, shadowOpacity: 0.8, shadowRadius: 20,
     borderWidth: 2, borderColor: 'rgba(0,229,255,0.5)',
   },
-  versusAvatarText: { color: '#FFF', fontSize: 32, fontFamily: FONTS.display.bold },
+  versusAvatarText: { color: '#FFF', fontSize: 28, fontFamily: FONTS.display.bold },
   versusPseudoRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  versusPseudo: { color: '#FFF', fontSize: 16, fontFamily: FONTS.display.bold, maxWidth: 120 },
+  versusPseudo: { color: '#FFF', fontSize: 20, fontFamily: FONTS.display.bold, letterSpacing: -0.5, maxWidth: 180 },
   glowPseudo: {
     color: COLORS.cyan, textShadowColor: COLORS.cyan,
     textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 10,
   },
-  versusLevelRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 },
-  versusLevel: { color: '#525252', fontSize: 12, fontFamily: FONTS.mono.regular },
+  versusLevel: { fontSize: 11, fontFamily: FONTS.mono.bold, letterSpacing: 1, marginTop: 2 },
   versusTitle: { color: COLORS.violet, fontSize: 11, fontFamily: FONTS.mono.bold, marginTop: 3 },
   streakTag: {
     marginTop: 8, backgroundColor: 'rgba(255,100,0,0.12)', borderRadius: 10,
@@ -845,17 +901,19 @@ const styles = StyleSheet.create({
   streakTagGlow: { backgroundColor: 'rgba(0,229,255,0.1)', borderColor: 'rgba(0,229,255,0.3)' },
   streakText: { color: COLORS.gold, fontSize: 11, fontFamily: FONTS.mono.bold },
 
-  vsBadge: {
-    width: 56, height: 56, borderRadius: 28, overflow: 'hidden',
-    marginHorizontal: 12, marginTop: 8,
-    shadowColor: COLORS.gold, shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.9, shadowRadius: 24,
-    borderWidth: 2, borderColor: 'rgba(255,181,71,0.35)',
+  vsRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginVertical: 18 },
+  vsLine: { flex: 1, height: 1 },
+  vsSerif: { color: COLORS.gold, fontSize: 38, fontFamily: FONTS.editorial.mediumItalic },
+  countdownWrap: { alignItems: 'center', marginTop: 28 },
+  countdownNum: {
+    color: COLORS.gold, fontSize: 72, fontFamily: FONTS.display.bold,
+    letterSpacing: -4, lineHeight: 76,
+    textShadowColor: 'rgba(255,181,71,0.6)', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 30,
   },
-  vsBadgeInner: { width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', borderRadius: 28 },
-  vsBadgeText: { color: '#FFF', fontSize: 20, fontFamily: FONTS.display.bold, letterSpacing: 2 },
-  versusHintRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 48 },
-  versusHint: { color: '#525252', fontSize: 14, fontFamily: FONTS.display.medium },
+  countdownLabel: {
+    color: 'rgba(255,255,255,0.40)', fontSize: 10, fontFamily: FONTS.mono.regular,
+    letterSpacing: 2, textTransform: 'uppercase', marginTop: 2,
+  },
 
   timeoutOverlay: {
     ...StyleSheet.absoluteFillObject,

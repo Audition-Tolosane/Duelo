@@ -187,6 +187,12 @@ export default function ThemesScreen() {
     <View style={s.container}>
       <ScrollView ref={scrollRef} contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false}>
 
+        {/* ── Header Arène ── */}
+        <View style={s.arenaHeader}>
+          <Text style={s.arenaEyebrow}>◆ {t('themes.arena_eyebrow')}</Text>
+          <Text style={s.arenaTitle}>{t('themes.arena_title')}</Text>
+        </View>
+
         {/* ── FEATURED PILLAR HERO CARD ── */}
         {pillars.length > 0 && (
           <TouchableOpacity
@@ -505,6 +511,17 @@ const s = StyleSheet.create({
   loadCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   scrollContent: { paddingBottom: 40 },
 
+  // Header Arène
+  arenaHeader: { paddingHorizontal: 20, paddingTop: 16 },
+  arenaEyebrow: {
+    fontSize: 11, fontFamily: 'SpaceGrotesk_700Bold', color: '#FFB547',
+    letterSpacing: 2.5, textTransform: 'uppercase',
+  },
+  arenaTitle: {
+    fontSize: 28, fontFamily: 'SpaceGrotesk_700Bold', color: '#FFF',
+    letterSpacing: -1, lineHeight: 30, marginTop: 4, textTransform: 'uppercase',
+  },
+
   // Featured hero card
   featuredCard: {
     marginHorizontal: 16, marginTop: 16, marginBottom: 8,
@@ -525,7 +542,8 @@ const s = StyleSheet.create({
     fontSize: 9, fontWeight: '900', color: '#FFF', letterSpacing: 2,
   },
   featuredTitle: {
-    fontSize: 28, fontWeight: '900', color: '#FFF', letterSpacing: 1, marginBottom: 4,
+    fontSize: 32, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold',
+    color: '#FFF', letterSpacing: -1, marginBottom: 4,
   },
   featuredSub: {
     fontSize: 13, color: 'rgba(255,255,255,0.75)', fontWeight: '500', marginBottom: 14,

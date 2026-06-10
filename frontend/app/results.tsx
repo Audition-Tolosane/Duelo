@@ -413,13 +413,12 @@ export default function ResultsScreen() {
     });
   };
 
-  const resultGradient: [string, string] = won
-    ? ['#00FF9D', '#00C97A']
+  // Fond teinté selon le résultat : or/feu = victoire, violet = défaite, cyan×violet = égalité
+  const bgTint: [string, string, string] = won
+    ? ['rgba(255,181,71,0.26)', 'rgba(255,107,44,0.10)', '#050510']
     : draw
-      ? ['#FFD700', '#FFA500']
-      : ['#FF3B30', '#CC2D26'];
-
-  const resultIcon = won ? 'trophy' : draw ? 'handshake' : 'arm-flex';
+      ? ['rgba(0,229,255,0.16)', 'rgba(179,102,255,0.10)', '#050510']
+      : ['rgba(179,102,255,0.18)', '#151028', '#050510'];
 
   // Near-miss: lost (or drew) by 1 point and has at least one missed question
   const scoreGap = oScore - pScore;
@@ -433,6 +432,7 @@ export default function ResultsScreen() {
   return (
     <SwipeBackPage>
     <View style={[styles.container, { paddingTop: insets.top }]}>
+      <LinearGradient colors={bgTint} locations={[0, 0.32, 0.7]} style={StyleSheet.absoluteFill} />
       <DueloHeader />
       <View style={styles.subHeader}>
         <TouchableOpacity onPress={() => router.replace('/(tabs)/accueil')} style={styles.backCircle} activeOpacity={0.6}>
@@ -458,14 +458,12 @@ export default function ResultsScreen() {
 
         {/* Result Header */}
         <Animated.View style={[styles.resultHeader, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
-          <LinearGradient
-            colors={resultGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.resultIconCircle}
-          >
-            <MaterialCommunityIcons name={resultIcon} size={40} color="#FFF" />
-          </LinearGradient>
+          {correctCount >= 7 && (
+            <View style={styles.flawlessPill}>
+              <MaterialCommunityIcons name="star-four-points" size={12} color="#050510" />
+              <Text style={styles.flawlessPillText}>FLAWLESS</Text>
+            </View>
+          )}
           <Text style={[styles.resultTitle, won ? styles.winText : draw ? styles.drawText : styles.lossText]}
                 adjustsFontSizeToFit numberOfLines={1}>
             {won ? t('results.victory') : draw ? t('results.draw') : t('results.defeat')}
@@ -479,17 +477,6 @@ export default function ResultsScreen() {
             <MaterialCommunityIcons name="check-circle" size={14} color="#00FF9D" />
             <Text style={styles.correctBadge}>{correctCount}/7 {t('results.correct_answers')}</Text>
           </LinearGradient>
-          {correctCount >= 7 && (
-            <LinearGradient
-              colors={['rgba(255,181,71,0.35)', 'rgba(255,181,71,0.12)']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.flawlessBadge}
-            >
-              <MaterialCommunityIcons name="star-four-points" size={14} color="#FFB547" />
-              <Text style={styles.flawlessText}>FLAWLESS</Text>
-            </LinearGradient>
-          )}
           {newLevel && (
             <LinearGradient
               colors={['rgba(138,43,226,0.3)', 'rgba(138,43,226,0.1)']}
@@ -516,54 +503,56 @@ export default function ResultsScreen() {
 
         {/* Score Card */}
         <Animated.View style={[styles.scoreCard, { opacity: fadeAnim, transform: [{ translateY: cardSlide }] }]}>
-          <LinearGradient
-            colors={won ? ['rgba(0,255,157,0.08)', 'rgba(0,255,157,0.02)'] : !draw ? ['rgba(255,59,48,0.08)', 'rgba(255,59,48,0.02)'] : ['rgba(255,215,0,0.08)', 'rgba(255,215,0,0.02)']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.scoreCardGradient}
-          >
-            <View style={styles.scoreCardDuo}>
-              {/* Player half */}
-              <View style={[styles.scoreHalfCard, won ? styles.scoreHalfWinner : draw ? styles.scoreHalfDraw : styles.scoreHalfLoser]}>
-                <LinearGradient
-                  colors={won ? ['rgba(0,229,255,0.18)', 'rgba(0,229,255,0.04)'] : draw ? ['rgba(255,181,71,0.14)', 'rgba(255,181,71,0.04)'] : ['rgba(0,229,255,0.06)', 'rgba(0,229,255,0.02)']}
-                  style={StyleSheet.absoluteFill}
-                />
-                <View style={[styles.scoreHalfAvatar, { borderColor: won ? 'rgba(0,229,255,0.55)' : 'rgba(0,229,255,0.2)' }]}>
-                  <Text style={styles.scoreHalfAvatarText}>{playerPseudo[0]?.toUpperCase()}</Text>
-                </View>
-                <Text style={styles.scoreHalfName} numberOfLines={1}>{playerPseudo}</Text>
-                <Text style={[styles.scoreHalfScore, { color: won ? '#32E7A3' : '#FFF' }]}>{pScore}</Text>
-                {won && <Text style={styles.scoreHalfBadge}>VAINQUEUR</Text>}
+          <View style={styles.scoreCardDuo}>
+            {/* Player half */}
+            <View style={[styles.scoreHalfCard, won || draw ? styles.scoreHalfCyan : styles.scoreHalfDim]}>
+              <LinearGradient
+                colors={won || draw ? ['rgba(0,229,255,0.30)', 'rgba(0,229,255,0.06)'] : ['rgba(255,255,255,0.04)', 'rgba(255,255,255,0.02)']}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFill}
+              />
+              <View style={[styles.scoreHalfAvatar, { borderColor: won || draw ? 'rgba(0,229,255,0.55)' : 'rgba(0,229,255,0.2)' }]}>
+                <Text style={styles.scoreHalfAvatarText}>{playerPseudo[0]?.toUpperCase()}</Text>
               </View>
-
-              {/* Opponent half */}
-              <View style={[styles.scoreHalfCard, !won && !draw ? styles.scoreHalfWinner : draw ? styles.scoreHalfDraw : styles.scoreHalfLoser]}>
-                <LinearGradient
-                  colors={!won && !draw ? ['rgba(179,102,255,0.18)', 'rgba(179,102,255,0.04)'] : draw ? ['rgba(255,181,71,0.14)', 'rgba(255,181,71,0.04)'] : ['rgba(179,102,255,0.06)', 'rgba(179,102,255,0.02)']}
-                  style={StyleSheet.absoluteFill}
-                />
-                <View style={[styles.scoreHalfAvatar, { borderColor: !won && !draw ? 'rgba(179,102,255,0.55)' : 'rgba(179,102,255,0.2)' }]}>
-                  <Text style={styles.scoreHalfAvatarText}>{(params.opponentPseudo || 'B')[0].toUpperCase()}</Text>
-                </View>
-                {params.opponentId ? (
-                  <TouchableOpacity onPress={() => router.push(`/player-profile?id=${params.opponentId}`)}>
-                    <Text style={[styles.scoreHalfName, { textDecorationLine: 'underline' }]} numberOfLines={1}>
-                      {params.opponentPseudo?.slice(0, 12)}
-                    </Text>
-                  </TouchableOpacity>
-                ) : (
-                  <Text style={styles.scoreHalfName} numberOfLines={1}>{params.opponentPseudo?.slice(0, 12)}</Text>
-                )}
-                <Text style={[styles.scoreHalfScore, { color: !won && !draw ? '#B366FF' : '#FFF' }]}>{oScore}</Text>
-                {!won && !draw && <Text style={styles.scoreHalfBadge}>VAINQUEUR</Text>}
-              </View>
+              <Text style={styles.scoreHalfName} numberOfLines={1}>{playerPseudo}</Text>
+              <Text style={styles.scoreHalfScore}>{pScore}</Text>
+              {won && <Text style={[styles.scoreHalfBadge, { color: '#00E5FF' }]}>VAINQUEUR</Text>}
             </View>
-          </LinearGradient>
+
+            {/* Séparateur VS / = */}
+            <View style={styles.scoreVsWrap}>
+              {draw
+                ? <Text style={styles.scoreEq}>=</Text>
+                : <Text style={styles.scoreVs}>VS</Text>}
+            </View>
+
+            {/* Opponent half */}
+            <View style={[styles.scoreHalfCard, !won ? styles.scoreHalfViolet : styles.scoreHalfDim]}>
+              <LinearGradient
+                colors={!won ? ['rgba(179,102,255,0.30)', 'rgba(179,102,255,0.06)'] : ['rgba(255,255,255,0.04)', 'rgba(255,255,255,0.02)']}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFill}
+              />
+              <View style={[styles.scoreHalfAvatar, { borderColor: !won ? 'rgba(179,102,255,0.55)' : 'rgba(179,102,255,0.2)' }]}>
+                <Text style={styles.scoreHalfAvatarText}>{(params.opponentPseudo || 'B')[0].toUpperCase()}</Text>
+              </View>
+              {params.opponentId ? (
+                <TouchableOpacity onPress={() => router.push(`/player-profile?id=${params.opponentId}`)}>
+                  <Text style={[styles.scoreHalfName, { textDecorationLine: 'underline' }]} numberOfLines={1}>
+                    {params.opponentPseudo?.slice(0, 12)}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <Text style={styles.scoreHalfName} numberOfLines={1}>{params.opponentPseudo?.slice(0, 12)}</Text>
+              )}
+              <Text style={styles.scoreHalfScore}>{oScore}</Text>
+              {!won && !draw && <Text style={[styles.scoreHalfBadge, { color: '#B366FF' }]}>VAINQUEUR</Text>}
+            </View>
+          </View>
         </Animated.View>
 
         {/* XP Breakdown */}
-        <Animated.View style={[styles.xpCard, { opacity: fadeAnim, transform: [{ translateY: xpSlide }] }]}>
+        <Animated.View style={[styles.xpCard, won && styles.xpCardWin, { opacity: fadeAnim, transform: [{ translateY: xpSlide }] }]}>
           {submitting ? (
             <ActivityIndicator color="#8A2BE2" />
           ) : xpBreakdown ? (
@@ -615,14 +604,7 @@ export default function ResultsScreen() {
               <View style={styles.xpDivider} />
               <View style={styles.xpRow}>
                 <Text style={styles.xpTotalLabel}>{t('results.total')}</Text>
-                <LinearGradient
-                  colors={['#FFB547', '#FF8C00']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.xpTotalBadge}
-                >
-                  <Text style={styles.xpTotalValue}>+{xpBreakdown.total} XP</Text>
-                </LinearGradient>
+                <Text style={styles.xpTotalValue}>+{xpBreakdown.total} XP</Text>
               </View>
             </>
           ) : null}
@@ -697,52 +679,53 @@ export default function ResultsScreen() {
               <Text style={styles.shareText}>{t('results.challenge_friend')}</Text>
             </LinearGradient>
           </TouchableOpacity>
-          <TouchableOpacity
-            testID="play-again-btn"
-            onPress={playAgain}
-            activeOpacity={0.8}
-            style={styles.playAgainTouchable}
-            disabled={rematchState === 'waiting' || rematchState === 'accepted'}
-          >
-            <LinearGradient
-              colors={
-                rematchState === 'declined'
-                  ? ['#FF3B30', '#CC2D26']
-                  : rematchState === 'accepted'
-                    ? ['#00FF9D', '#00C97A']
-                    : ['#8A2BE2', '#6A1FB0']
-              }
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.playAgainButton}
+          <View style={styles.actionRow}>
+            <TouchableOpacity testID="go-home-btn" style={styles.homeButton} onPress={() => router.replace('/(tabs)/play')}>
+              <Text style={styles.homeText}>{t('results.back_home')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              testID="play-again-btn"
+              onPress={playAgain}
+              activeOpacity={0.8}
+              style={styles.playAgainTouchable}
+              disabled={rematchState === 'waiting' || rematchState === 'accepted'}
             >
-              {rematchState === 'waiting' ? (
-                <>
-                  <ActivityIndicator color="#FFF" size="small" />
-                  <Text style={styles.playAgainText}>{t('results.waiting')}</Text>
-                </>
-              ) : rematchState === 'declined' ? (
-                <>
-                  <MaterialCommunityIcons name="close-circle" size={18} color="#FFF" />
-                  <Text style={styles.playAgainText}>{t('results.declined')}</Text>
-                </>
-              ) : rematchState === 'accepted' ? (
-                <>
-                  <MaterialCommunityIcons name="check-circle" size={18} color="#FFF" />
-                  <Text style={styles.playAgainText}>{t('results.accepted')}</Text>
-                </>
-              ) : (
-                <>
-                  <MaterialCommunityIcons name="sword-cross" size={18} color="#FFF" />
-                  <Text style={styles.playAgainText}>{t('results.rematch')}</Text>
-                </>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
-          <TouchableOpacity testID="go-home-btn" style={styles.homeButton} onPress={() => router.replace('/(tabs)/play')}>
-            <MaterialCommunityIcons name="home" size={18} color="#525252" />
-            <Text style={styles.homeText}>{t('results.back_home')}</Text>
-          </TouchableOpacity>
+              <LinearGradient
+                colors={
+                  rematchState === 'declined'
+                    ? ['#FF3D5E', '#CC2D26']
+                    : rematchState === 'accepted'
+                      ? ['#32E7A3', '#00C97A']
+                      : ['#00E5FF', '#B366FF']
+                }
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.playAgainButton}
+              >
+                {rematchState === 'waiting' ? (
+                  <>
+                    <ActivityIndicator color="#050510" size="small" />
+                    <Text style={styles.playAgainText}>{t('results.waiting')}</Text>
+                  </>
+                ) : rematchState === 'declined' ? (
+                  <>
+                    <MaterialCommunityIcons name="close-circle" size={18} color="#FFF" />
+                    <Text style={[styles.playAgainText, { color: '#FFF' }]}>{t('results.declined')}</Text>
+                  </>
+                ) : rematchState === 'accepted' ? (
+                  <>
+                    <MaterialCommunityIcons name="check-circle" size={18} color="#050510" />
+                    <Text style={styles.playAgainText}>{t('results.accepted')}</Text>
+                  </>
+                ) : (
+                  <>
+                    <MaterialCommunityIcons name="sword-cross" size={18} color="#050510" />
+                    <Text style={styles.playAgainText}>{t('results.rematch')}</Text>
+                  </>
+                )}
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
 
           {quizQuestions.length > 0 && (
             <TouchableOpacity testID="report-error-btn" style={styles.reportButton} onPress={openReportModal} activeOpacity={0.7}>
@@ -1153,20 +1136,19 @@ const styles = StyleSheet.create({
   content: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingBottom: 24 },
   // Result Header
   resultHeader: { alignItems: 'center', marginBottom: 20 },
-  resultIconCircle: {
-    width: 80, height: 80, borderRadius: 40,
-    justifyContent: 'center', alignItems: 'center', marginBottom: 12,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 12,
+  resultTitle: { fontSize: 60, fontWeight: '900', letterSpacing: -2, lineHeight: 66, fontFamily: 'SpaceGrotesk_700Bold' },
+  winText: {
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(255,181,71,0.9)', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 24,
   },
-  resultTitle: { fontSize: 64, fontWeight: '900', letterSpacing: 4, fontFamily: 'SpaceGrotesk_700Bold' },
-  winText: { color: '#32E7A3' },
-  drawText: { color: '#FFB547' },
-  lossText: { color: '#FF3D5E' },
-  flawlessBadge: {
-    marginTop: 8, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 14, paddingVertical: 6, borderWidth: 1, borderColor: 'rgba(255,181,71,0.4)',
+  drawText: { fontFamily: 'Fraunces_500Medium_Italic', color: '#FFFFFF', fontSize: 48, letterSpacing: -1 },
+  lossText: { color: 'rgba(255,255,255,0.85)' },
+  flawlessPill: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    backgroundColor: '#FFB547', borderRadius: 20,
+    paddingHorizontal: 16, paddingVertical: 6, marginBottom: 10,
   },
-  flawlessText: { color: '#FFB547', fontSize: 13, fontWeight: '900', letterSpacing: 2 },
+  flawlessPillText: { color: '#050510', fontSize: 10, fontWeight: '900', letterSpacing: 3, fontFamily: 'SpaceGrotesk_700Bold' },
   correctBadgeGradient: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     marginTop: 8, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 6,
@@ -1205,13 +1187,7 @@ const styles = StyleSheet.create({
   reviewTimeoutText: { color: '#A3A3A3', fontSize: 12, fontWeight: '500', fontStyle: 'italic' },
   reviewCorrectText: { color: '#00FF9D', fontSize: 12, fontWeight: '700', flex: 1 },
   // Score Card
-  scoreCard: {
-    borderRadius: GLASS.radiusLg, overflow: 'hidden',
-    borderWidth: 1, borderColor: GLASS.borderCyan, marginBottom: 16,
-  },
-  scoreCardGradient: {
-    padding: 12, borderRadius: GLASS.radiusLg,
-  },
+  scoreCard: { marginBottom: 16 },
   scoreCardInner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   playerColumn: { alignItems: 'center', flex: 1 },
   avatarCircle: {
@@ -1227,25 +1203,29 @@ const styles = StyleSheet.create({
   categoryBadge: { fontSize: 9, color: '#525252', fontWeight: '600', textAlign: 'center', marginTop: 2 },
   // XP Card
   xpCard: {
-    backgroundColor: GLASS.bg, borderRadius: 16, padding: 18,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', marginBottom: 16,
+    backgroundColor: 'rgba(0,0,0,0.35)', borderRadius: 16, padding: 16,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)', marginBottom: 16,
   },
-  xpTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
-  xpTitle: { fontSize: 11, fontWeight: '800', color: '#525252', letterSpacing: 3 },
-  xpRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 },
+  xpCardWin: { borderColor: 'rgba(255,181,71,0.40)' },
+  xpTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
+  xpTitle: {
+    fontSize: 9, fontWeight: '400', color: 'rgba(255,255,255,0.40)',
+    letterSpacing: 2, fontFamily: 'JetBrainsMono_400Regular', textTransform: 'uppercase',
+  },
+  xpRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 5 },
   xpLabelRow: { flexDirection: 'row', alignItems: 'center' },
-  xpLabel: { color: '#A3A3A3', fontSize: 14, fontWeight: '500' },
-  xpValue: { color: '#FFF', fontSize: 14, fontWeight: '700' },
+  xpLabel: { color: 'rgba(255,255,255,0.60)', fontSize: 13, fontWeight: '500' },
+  xpValue: { color: '#FFF', fontSize: 14, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold' },
   xpGold: { color: '#FFB547' },
   xpCyan: { color: '#32E7A3' },
   xpPurple: { color: '#B366FF' },
   xpOrange: { color: '#FF6B2C' },
-  xpDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: 8 },
-  xpTotalLabel: { color: '#FFF', fontSize: 16, fontWeight: '800' },
-  xpTotalBadge: { borderRadius: 10, paddingHorizontal: 12, paddingVertical: 4 },
-  xpTotalValue: { color: '#FFF', fontSize: 16, fontWeight: '900', letterSpacing: 0.5 },
+  xpDivider: { height: 1, backgroundColor: 'rgba(255,181,71,0.30)', marginVertical: 8 },
+  xpTotalLabel: { color: '#FFF', fontSize: 14, fontWeight: '900', letterSpacing: 0.5, fontFamily: 'SpaceGrotesk_700Bold' },
+  xpTotalValue: { color: '#FFB547', fontSize: 22, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold' },
   // Actions
   actions: { gap: 10 },
+  actionRow: { flexDirection: 'row', gap: 8 },
   shareButton: {
     borderRadius: 14, overflow: 'hidden',
     borderWidth: 1, borderColor: 'rgba(0,255,255,0.2)',
@@ -1255,18 +1235,24 @@ const styles = StyleSheet.create({
     padding: 14, borderRadius: 14,
   },
   shareText: { color: '#00FFFF', fontSize: 14, fontWeight: '800', letterSpacing: 2 },
-  playAgainTouchable: { borderRadius: 14, overflow: 'hidden' },
+  playAgainTouchable: {
+    flex: 2, borderRadius: 16, overflow: 'hidden',
+    shadowColor: '#00E5FF', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.4, shadowRadius: 16, elevation: 8,
+  },
   playAgainButton: {
-    borderRadius: 14, padding: 16, alignItems: 'center',
+    borderRadius: 16, padding: 16, alignItems: 'center',
     flexDirection: 'row', justifyContent: 'center', gap: 8,
-    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 12,
   },
-  playAgainText: { color: '#FFF', fontSize: 15, fontWeight: '800', letterSpacing: 2 },
+  playAgainText: {
+    color: '#050510', fontSize: 14, fontWeight: '900',
+    letterSpacing: 1, textTransform: 'uppercase', fontFamily: 'SpaceGrotesk_700Bold',
+  },
   homeButton: {
-    padding: 12, alignItems: 'center',
-    flexDirection: 'row', justifyContent: 'center', gap: 6,
+    flex: 1, padding: 16, alignItems: 'center', justifyContent: 'center',
+    borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)',
   },
-  homeText: { color: '#525252', fontSize: 14, fontWeight: '600' },
+  homeText: { color: '#FFF', fontSize: 13, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold' },
   // Report Button
   reportButton: {
     marginTop: 6, padding: 12, alignItems: 'center', borderRadius: 12,
@@ -1376,14 +1362,17 @@ const styles = StyleSheet.create({
   reportSuccessBtnText: { color: '#FFF', fontSize: 14, fontWeight: '800', letterSpacing: 2 },
 
   // Redesigned score card — two side-by-side halves
-  scoreCardDuo: { flexDirection: 'row', gap: 10 },
+  scoreCardDuo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   scoreHalfCard: {
-    flex: 1, borderRadius: 18, overflow: 'hidden',
-    padding: 16, alignItems: 'center', borderWidth: 1,
+    flex: 1, borderRadius: 20, overflow: 'hidden',
+    padding: 14, alignItems: 'center', borderWidth: 2,
   },
-  scoreHalfWinner: { borderColor: 'rgba(50,231,163,0.30)' },
-  scoreHalfLoser: { borderColor: 'rgba(255,255,255,0.06)' },
-  scoreHalfDraw: { borderColor: 'rgba(255,181,71,0.25)' },
+  scoreHalfCyan: { borderColor: '#00E5FF' },
+  scoreHalfViolet: { borderColor: '#B366FF' },
+  scoreHalfDim: { borderColor: 'rgba(255,255,255,0.08)', opacity: 0.65 },
+  scoreVsWrap: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 2 },
+  scoreVs: { color: '#FFB547', fontSize: 20, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold' },
+  scoreEq: { color: '#FFB547', fontSize: 26, fontFamily: 'Fraunces_500Medium_Italic' },
   scoreHalfAvatar: {
     width: 52, height: 52, borderRadius: 26,
     backgroundColor: 'rgba(255,255,255,0.08)',
@@ -1395,9 +1384,9 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.65)', fontSize: 12, fontWeight: '700',
     marginBottom: 4, textAlign: 'center',
   },
-  scoreHalfScore: { fontSize: 38, fontWeight: '900', lineHeight: 44 },
+  scoreHalfScore: { color: '#FFF', fontSize: 38, fontWeight: '900', lineHeight: 44, letterSpacing: -2, fontFamily: 'SpaceGrotesk_700Bold' },
   scoreHalfBadge: {
-    color: '#32E7A3', fontSize: 9, fontWeight: '800',
+    fontSize: 9, fontWeight: '700', fontFamily: 'JetBrainsMono_700Bold',
     letterSpacing: 1.5, marginTop: 4, textAlign: 'center',
   },
 });

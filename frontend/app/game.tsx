@@ -3,7 +3,6 @@ import {
   View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions,
   Platform, UIManager, ActivityIndicator, Easing, Alert
 } from 'react-native';
-import Svg, { Circle } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,6 +11,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GLASS } from '../theme/glassTheme';
 import SwipeBackPage from '../components/SwipeBackPage';
+import RoundTimer from '../components/RoundTimer';
 import { useWS } from '../contexts/WebSocketContext';
 import { authFetch } from '../utils/api';
 import { saveScoreWithRetry } from '../utils/pendingScores';
@@ -42,48 +42,6 @@ const GOLD = '#FFB547';
 const MINT = '#32E7A3';
 const RED = '#FF3D5E';
 const OPTION_COLORS = [CYAN, MINT, VIOLET, GOLD];
-
-// ── Round SVG Timer ──
-function RoundTimer({ timeLeft, total = TIMER_DURATION }: { timeLeft: number; total?: number }) {
-  const R = 34;
-  const circumference = 2 * Math.PI * R;
-  const offset = circumference * (1 - timeLeft / total);
-  const urgent = timeLeft <= 3;
-  const color = urgent ? RED : CYAN;
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    if (urgent) {
-      const loop = Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulseAnim, { toValue: 1.1, duration: 300, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-          Animated.timing(pulseAnim, { toValue: 1, duration: 300, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-        ])
-      );
-      loop.start();
-      return () => loop.stop();
-    } else {
-      pulseAnim.setValue(1);
-    }
-  }, [urgent]);
-
-  return (
-    <Animated.View style={{ width: 86, height: 86, transform: [{ scale: pulseAnim }] }}>
-      <View style={{ position: 'absolute', top: 0, left: 0, width: 86, height: 86, transform: [{ rotate: '-90deg' }] }}>
-        <Svg width="86" height="86" viewBox="0 0 86 86">
-          <Circle cx="43" cy="43" r={R} stroke="rgba(255,255,255,0.08)" strokeWidth="4" fill="none" />
-          <Circle cx="43" cy="43" r={R} stroke={color} strokeWidth="4" fill="none"
-            strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" />
-        </Svg>
-      </View>
-      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                     alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={{ fontWeight: '900', fontSize: 28, color, lineHeight: 32, fontFamily: 'SpaceGrotesk_700Bold' }}>{timeLeft}</Text>
-        <Text style={{ fontSize: 8, color: 'rgba(255,255,255,0.4)', letterSpacing: 1, fontFamily: 'JetBrainsMono_400Regular' }}>SEC</Text>
-      </View>
-    </Animated.View>
-  );
-}
 
 export default function GameScreen() {
   const router = useRouter();
@@ -740,41 +698,40 @@ export default function GameScreen() {
   const question = questions[currentIndex];
   const optionRows: Array<[number, number]> = [[0, 1], [2, 3]];
 
-  const getOptionFill = (index: number): [string, string] => {
-    if (!showResult) return [`${OPTION_COLORS[index]}18`, `${OPTION_COLORS[index]}08`];
-    const isCorrect = isLive
+  // La bonne réponse révélée passe en gradient menthe plein (texte sombre)
+  const isOptionCorrectReveal = (index: number): boolean => {
+    if (!showResult) return false;
+    return isLive
       ? (index === selectedOption && lastAnswerCorrectRef.current)
       : index === question.correct_option;
+  };
+
+  const getOptionFill = (index: number): [string, string] => {
+    if (!showResult) return [`${OPTION_COLORS[index]}18`, `${OPTION_COLORS[index]}08`];
     const isWrong = isLive
       ? (index === selectedOption && !lastAnswerCorrectRef.current)
       : (index === selectedOption && index !== question.correct_option);
-    if (isCorrect) return ['rgba(50,231,163,0.22)', 'rgba(50,231,163,0.06)'];
+    if (isOptionCorrectReveal(index)) return [MINT, '#1FA877'];
     if (isWrong) return ['rgba(255,61,94,0.22)', 'rgba(255,61,94,0.06)'];
     return ['rgba(255,255,255,0.02)', 'rgba(255,255,255,0.02)'];
   };
 
   const getOptionBorderCol = (index: number): string => {
     if (!showResult) return `${OPTION_COLORS[index]}55`;
-    const isCorrect = isLive
-      ? (index === selectedOption && lastAnswerCorrectRef.current)
-      : index === question.correct_option;
     const isWrong = isLive
       ? (index === selectedOption && !lastAnswerCorrectRef.current)
       : (index === selectedOption && index !== question.correct_option);
-    if (isCorrect) return MINT;
+    if (isOptionCorrectReveal(index)) return MINT;
     if (isWrong) return RED;
     return 'rgba(255,255,255,0.06)';
   };
 
   const getOptionTxtCol = (index: number): string => {
     if (!showResult) return '#FFF';
-    const isCorrect = isLive
-      ? (index === selectedOption && lastAnswerCorrectRef.current)
-      : index === question.correct_option;
     const isWrong = isLive
       ? (index === selectedOption && !lastAnswerCorrectRef.current)
       : (index === selectedOption && index !== question.correct_option);
-    if (isCorrect) return MINT;
+    if (isOptionCorrectReveal(index)) return '#050510';
     if (isWrong) return RED;
     return 'rgba(255,255,255,0.28)';
   };
@@ -782,6 +739,12 @@ export default function GameScreen() {
   return (
     <SwipeBackPage>
     <View style={styles.container}>
+      {/* Fond : teinte cyan en haut → violet en bas (duel) */}
+      <LinearGradient
+        colors={['rgba(0,229,255,0.10)', '#050510', '#050510', 'rgba(179,102,255,0.10)']}
+        locations={[0, 0.3, 0.7, 1]}
+        style={StyleSheet.absoluteFill}
+      />
 
       {/* Progress bar */}
       <View style={styles.progressBarBg}>
@@ -801,12 +764,14 @@ export default function GameScreen() {
             <View style={[styles.scoreAvatar, { borderColor: 'rgba(0,229,255,0.5)' }]}>
               <Text style={styles.scoreAvatarLetter}>{pseudo[0]?.toUpperCase()}</Text>
             </View>
-            <Text style={styles.scoreBoxName} numberOfLines={1}>{pseudo}</Text>
-            <Text style={[styles.scoreBoxScore, { color: CYAN }]}>{playerScore}</Text>
+            <View style={styles.scoreMeta}>
+              <Text style={[styles.scoreBoxName, { color: CYAN }]} numberOfLines={1}>{pseudo}</Text>
+              <Text style={styles.scoreBoxScore}>{playerScore}</Text>
+            </View>
           </View>
 
           <View style={styles.timerSection}>
-            <RoundTimer timeLeft={timeLeft} />
+            <RoundTimer timeLeft={timeLeft} total={TIMER_DURATION} />
           </View>
 
           <View style={[styles.scoreBox, styles.scoreBoxOpponent]}>
@@ -814,12 +779,14 @@ export default function GameScreen() {
             <View style={[styles.scoreAvatar, { borderColor: 'rgba(179,102,255,0.5)' }]}>
               <Text style={styles.scoreAvatarLetter}>{(params.opponentPseudo || 'B')[0]?.toUpperCase()}</Text>
             </View>
-            <Text style={[styles.scoreBoxName, { textAlign: 'right' }]} numberOfLines={1}>
-              {params.opponentPseudo?.slice(0, 10)}
-            </Text>
-            <Text style={[styles.scoreBoxScore, { color: VIOLET, textAlign: 'right' }]}>
-              {isAsyncSolo ? '—' : botScore}
-            </Text>
+            <View style={[styles.scoreMeta, styles.scoreMetaRight]}>
+              <Text style={[styles.scoreBoxName, { color: VIOLET }]} numberOfLines={1}>
+                {params.opponentPseudo?.slice(0, 10)}
+              </Text>
+              <Text style={styles.scoreBoxScore}>
+                {isAsyncSolo ? '—' : botScore}
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -840,7 +807,7 @@ export default function GameScreen() {
             opacity: questionFade,
             transform: [{ translateX: questionSlide }, { scale: questionScaleAnim }],
           }]}>
-            <Text style={styles.questionEyebrow}>Q {currentIndex + 1} / {questions.length}</Text>
+            <Text style={styles.questionEyebrow}>◆ Q{currentIndex + 1} · {questions.length}</Text>
             <Text style={styles.questionText}>{question.question_text}</Text>
           </Animated.View>
 
@@ -854,21 +821,22 @@ export default function GameScreen() {
                   const textColor = getOptionTxtCol(index);
                   const isPlayerPick = selectedOption === index;
                   const isBotPick = botAnswer === index;
+                  const correctReveal = isOptionCorrectReveal(index);
                   return (
                     <TouchableOpacity
                       key={index}
                       testID={`option-${index}`}
-                      style={[styles.optionCard2x2, { borderColor }]}
+                      style={[styles.optionCard2x2, { borderColor }, correctReveal && styles.optionCardCorrect]}
                       onPress={() => selectAnswer(index)}
                       disabled={showResult}
                       activeOpacity={0.85}
                     >
-                      <LinearGradient colors={fillColors} style={StyleSheet.absoluteFill} />
+                      <LinearGradient colors={fillColors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
                       <View style={[styles.optionLetterBadge, {
-                        backgroundColor: showResult ? 'rgba(255,255,255,0.05)' : `${optColor}22`,
+                        backgroundColor: correctReveal ? 'rgba(5,5,16,0.18)' : showResult ? 'rgba(255,255,255,0.05)' : `${optColor}22`,
                       }]}>
                         <Text style={[styles.optionLetterText, {
-                          color: showResult ? 'rgba(255,255,255,0.25)' : optColor,
+                          color: correctReveal ? '#050510' : showResult ? 'rgba(255,255,255,0.25)' : optColor,
                         }]}>
                           {['A', 'B', 'C', 'D'][index]}
                         </Text>
@@ -879,13 +847,9 @@ export default function GameScreen() {
                       {showResult && isPlayerPick && (
                         <View style={styles.optionIndicatorPlayer}>
                           <MaterialCommunityIcons
-                            name={isLive
-                              ? (lastAnswerCorrectRef.current ? 'check-circle' : 'close-circle')
-                              : (index === question.correct_option ? 'check-circle' : 'close-circle')}
+                            name={correctReveal ? 'check-circle' : 'close-circle'}
                             size={16}
-                            color={isLive
-                              ? (lastAnswerCorrectRef.current ? MINT : RED)
-                              : (index === question.correct_option ? MINT : RED)}
+                            color={correctReveal ? '#050510' : RED}
                           />
                         </View>
                       )}
@@ -1072,14 +1036,18 @@ const styles = StyleSheet.create({
     fontFamily: 'JetBrainsMono_700Bold',
     letterSpacing: 2, marginBottom: 8,
   },
-  questionText: { color: '#FFF', fontSize: 22, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold', textAlign: 'center', lineHeight: 30 },
+  questionText: { color: '#FFF', fontSize: 24, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', textAlign: 'center', lineHeight: 28, letterSpacing: -0.5 },
 
   // 2×2 Options grid
   optionsGrid: { flex: 1, paddingHorizontal: 12, paddingBottom: 12, paddingTop: 4, gap: 10 },
   optionsRow: { flex: 1, flexDirection: 'row', gap: 10 },
   optionCard2x2: {
-    flex: 1, borderRadius: 16, borderWidth: 1.5, overflow: 'hidden',
+    flex: 1, borderRadius: 16, borderWidth: 2, overflow: 'hidden',
     padding: 12, justifyContent: 'space-between',
+  },
+  optionCardCorrect: {
+    shadowColor: MINT, shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5, shadowRadius: 16, elevation: 8,
   },
   optionLetterBadge: {
     width: 28, height: 28, borderRadius: 8,
@@ -1101,22 +1069,25 @@ const styles = StyleSheet.create({
   },
   scoreBox: {
     flex: 1, borderRadius: 12, overflow: 'hidden',
-    padding: 10, borderWidth: 1,
+    paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1,
+    flexDirection: 'row', alignItems: 'center', gap: 10,
   },
-  scoreBoxPlayer: { borderColor: 'rgba(0,229,255,0.22)' },
-  scoreBoxOpponent: { borderColor: 'rgba(179,102,255,0.22)', alignItems: 'flex-end' },
+  scoreBoxPlayer: { borderColor: 'rgba(0,229,255,0.40)' },
+  scoreBoxOpponent: { borderColor: 'rgba(179,102,255,0.40)', flexDirection: 'row-reverse' },
   scoreAvatar: {
-    width: 36, height: 36, borderRadius: 18,
+    width: 32, height: 32, borderRadius: 16,
     backgroundColor: 'rgba(255,255,255,0.08)',
     justifyContent: 'center', alignItems: 'center',
-    borderWidth: 1.5, marginBottom: 4,
+    borderWidth: 1.5,
   },
-  scoreAvatarLetter: { color: '#FFF', fontSize: 15, fontWeight: '800' },
+  scoreAvatarLetter: { color: '#FFF', fontSize: 14, fontWeight: '800' },
+  scoreMeta: { flex: 1 },
+  scoreMetaRight: { alignItems: 'flex-end' },
   scoreBoxName: {
-    color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: '600',
-    maxWidth: 90, marginBottom: 2,
+    fontFamily: 'JetBrainsMono_400Regular', fontSize: 9,
+    letterSpacing: 1, textTransform: 'uppercase', marginBottom: 2,
   },
-  scoreBoxScore: { fontSize: 26, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', lineHeight: 30 },
+  scoreBoxScore: { color: '#FFF', fontSize: 22, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', lineHeight: 24 },
   timerSection: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
 
   // Dots progression
@@ -1124,11 +1095,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
     gap: 6, paddingVertical: 4,
   },
-  dot: { width: 8, height: 8, borderRadius: 4 },
+  dot: { width: 20, height: 5, borderRadius: 3 },
   dotDone: { backgroundColor: MINT },
   dotCurrent: {
-    backgroundColor: GOLD, width: 10, height: 10, borderRadius: 5,
+    backgroundColor: GOLD,
     shadowColor: GOLD, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.8, shadowRadius: 4,
+    elevation: 3,
   },
-  dotPending: { backgroundColor: 'rgba(255,255,255,0.18)' },
+  dotPending: { backgroundColor: 'rgba(255,255,255,0.12)' },
 });
