@@ -320,7 +320,7 @@ export default function ChatScreen() {
               <View style={[st.msgBubbleWrap, isMe ? st.msgBubbleWrapRight : null]}>
                 {isMe ? (
                   <LinearGradient
-                    colors={['#8A2BE2', '#00BFFF']}
+                    colors={['#00E5FF', '#B366FF']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={[st.msgBubble, st.myBubble]}
@@ -340,7 +340,7 @@ export default function ChatScreen() {
               <View style={[st.msgBubbleWrap, isMe ? st.msgBubbleWrapRight : null]}>
                 {isMe ? (
                   <LinearGradient
-                    colors={['#8A2BE2', '#00BFFF']}
+                    colors={['#00E5FF', '#B366FF']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={[st.msgBubble, st.myBubble]}
@@ -348,7 +348,7 @@ export default function ChatScreen() {
                     <Text style={st.myMsgText}>{item.content}</Text>
                     <View style={st.msgFooter}>
                       <Text style={st.msgTimeInner}>{formatTime(item.created_at)}</Text>
-                      {item.read && <MaterialCommunityIcons name="check-all" size={12} color="#00BFFF" />}
+                      {item.read && <MaterialCommunityIcons name="check-all" size={12} color="#050510" />}
                     </View>
                   </LinearGradient>
                 ) : (
@@ -417,6 +417,23 @@ export default function ChatScreen() {
               <Text style={st.headerSub}>{isTyping ? t('chat.typing') : t('chat.online')}</Text>
             </View>
           </View>
+        </TouchableOpacity>
+        {/* DÉFIER — ouvre le profil joueur (choix du thème + envoi du défi) */}
+        <TouchableOpacity
+          style={st.challengeBtn}
+          activeOpacity={0.85}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            router.push(`/player-profile?id=${partnerId}`);
+          }}
+        >
+          <LinearGradient
+            colors={['#00E5FF', '#B366FF']}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+            style={st.challengeBtnGrad}
+          >
+            <Text style={st.challengeBtnText}>⚔ {t('players.challenge')}</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
 
@@ -500,13 +517,14 @@ export default function ChatScreen() {
             >
               {text.trim() ? (
                 <LinearGradient
-                  colors={['#8A2BE2', '#00BFFF']}
+                  colors={['#00E5FF', '#B366FF']}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                   style={st.sendBtn}
                 >
                   {sending ? (
-                    <ActivityIndicator size="small" color="#FFF" />
+                    <ActivityIndicator size="small" color="#050510" />
                   ) : (
-                    <MaterialCommunityIcons name="arrow-up" size={20} color="#FFF" />
+                    <MaterialCommunityIcons name="arrow-up" size={20} color="#050510" />
                   )}
                 </LinearGradient>
               ) : (
@@ -545,10 +563,18 @@ const st = StyleSheet.create({
   },
   headerAvatarText: { color: '#FFF', fontSize: 18, fontWeight: '900' },
   headerInfo: { flex: 1 },
-  headerName: { color: '#FFF', fontSize: 16, fontWeight: '800' },
+  headerName: { color: '#FFF', fontSize: 16, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold' },
   headerOnlineRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 2 },
-  onlineDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#00FF9D' },
-  headerSub: { color: '#00FF9D', fontSize: 11, fontWeight: '600' },
+  onlineDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#32E7A3' },
+  headerSub: {
+    color: '#32E7A3', fontSize: 9, fontFamily: 'JetBrainsMono_400Regular',
+    letterSpacing: 1, textTransform: 'uppercase',
+  },
+  challengeBtn: { borderRadius: 10, overflow: 'hidden', marginLeft: 8 },
+  challengeBtnGrad: { paddingHorizontal: 12, paddingVertical: 7 },
+  challengeBtnText: {
+    color: '#000', fontSize: 11, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold',
+  },
   headerAction: {
     width: 40, height: 40, borderRadius: 20,
     backgroundColor: 'rgba(255,255,255,0.06)',
@@ -594,12 +620,12 @@ const st = StyleSheet.create({
   },
 
   // Text
-  myMsgText: { color: '#FFF', fontSize: 15, lineHeight: 21 },
+  myMsgText: { color: '#050510', fontSize: 15, lineHeight: 21 },
   theirMsgText: { color: '#E0E0E0', fontSize: 15, lineHeight: 21 },
 
   // Time
   msgFooter: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 4, marginTop: 4 },
-  msgTimeInner: { fontSize: 10, color: 'rgba(255,255,255,0.5)', textAlign: 'right', marginTop: 3 },
+  msgTimeInner: { fontSize: 10, color: 'rgba(0,0,0,0.5)', textAlign: 'right', marginTop: 3 },
   theirMsgTime: { fontSize: 10, color: '#525252', marginTop: 3 },
 
   // Image Message

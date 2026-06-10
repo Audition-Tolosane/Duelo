@@ -15,6 +15,7 @@ import DueloHeader from '../components/DueloHeader';
 import ScalePressable from '../components/ScalePressable';
 import { t, getLocale } from '../utils/i18n';
 import UserAvatar from '../components/UserAvatar';
+import EmptyState from '../components/EmptyState';
 import { authFetch } from '../utils/api';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
@@ -280,19 +281,14 @@ export default function NotificationsScreen() {
         </TouchableOpacity>
 
         <View style={styles.headerCenter}>
-          <MaterialCommunityIcons name="bell" size={18} color="#8A2BE2" />
+          <Text style={styles.headerEyebrow}>◆ {unreadCount} {t('notifications.unread_label')}</Text>
           <Text style={styles.headerTitle}>{t('notifications.title')}</Text>
-          {unreadCount > 0 && (
-            <View style={styles.headerBadge}>
-              <Text style={styles.headerBadgeText}>{unreadCount}</Text>
-            </View>
-          )}
         </View>
 
         <View style={styles.headerRight}>
           {unreadCount > 0 && (
             <TouchableOpacity style={styles.readAllBtn} onPress={markAllAsRead}>
-              <MaterialCommunityIcons name="check-all" size={14} color="#8A2BE2" />
+              <MaterialCommunityIcons name="check-all" size={14} color="#00E5FF" />
               <Text style={styles.readAllText}>{t('notifications.read_all')}</Text>
             </TouchableOpacity>
           )}
@@ -314,15 +310,12 @@ export default function NotificationsScreen() {
           <ActivityIndicator size="large" color="#8A2BE2" />
         </View>
       ) : notifications.length === 0 ? (
-        <View style={styles.emptyWrap}>
-          <LinearGradient colors={['#8A2BE2', '#A855F7']} style={styles.emptyIconCircle}>
-            <MaterialCommunityIcons name="bell-outline" size={40} color="#FFF" />
-          </LinearGradient>
-          <Text style={styles.emptyTitle}>{t('notifications.empty_title')}</Text>
-          <Text style={styles.emptyText}>
-            {t('notifications.empty_text')}
-          </Text>
-        </View>
+        <EmptyState
+          icon="🔔"
+          title={t('notifications.empty_title')}
+          body={t('notifications.empty_text')}
+          accent="#B366FF"
+        />
       ) : (
         <FlatList
           data={flatData}
@@ -370,29 +363,22 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.08)',
   },
   headerCenter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    flex: 1,
+    marginLeft: 12,
+  },
+  headerEyebrow: {
+    fontSize: 9,
+    fontFamily: 'JetBrainsMono_400Regular',
+    color: 'rgba(255,255,255,0.40)',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 22,
+    fontWeight: '900',
+    fontFamily: 'SpaceGrotesk_700Bold',
     color: '#FFF',
-    letterSpacing: 0.5,
-  },
-  headerBadge: {
-    minWidth: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#FF3B30',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 6,
-  },
-  headerBadgeText: {
-    color: '#FFF',
-    fontSize: 10,
-    fontWeight: '800',
+    letterSpacing: -0.8,
   },
   headerRight: {
     flexDirection: 'row',
@@ -406,14 +392,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
-    backgroundColor: 'rgba(138, 43, 226, 0.12)',
+    backgroundColor: 'rgba(0,229,255,0.10)',
     borderWidth: 1,
-    borderColor: 'rgba(138, 43, 226, 0.25)',
+    borderColor: 'rgba(0,229,255,0.25)',
   },
   readAllText: {
-    color: '#A855F7',
+    color: '#00E5FF',
     fontSize: 12,
     fontWeight: '700',
+    fontFamily: 'SpaceGrotesk_600SemiBold',
   },
   settingsBtn: {
     width: 36,
@@ -462,10 +449,10 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 10,
+    fontFamily: 'JetBrainsMono_700Bold',
     color: 'rgba(255,255,255,0.4)',
-    letterSpacing: 0.8,
+    letterSpacing: 2,
     textTransform: 'uppercase',
   },
   listContent: {
@@ -484,9 +471,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   notifCardUnread: {
-    backgroundColor: 'rgba(138, 43, 226, 0.06)',
+    backgroundColor: 'rgba(0,229,255,0.06)',
     borderWidth: 1,
-    borderColor: 'rgba(138, 43, 226, 0.12)',
+    borderColor: 'rgba(0,229,255,0.18)',
   },
   unreadLine: {
     position: 'absolute',

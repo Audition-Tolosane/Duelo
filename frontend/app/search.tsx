@@ -17,6 +17,7 @@ import DueloHeader from '../components/DueloHeader';
 import CategoryIcon from '../components/CategoryIcon';
 import UserAvatar from '../components/UserAvatar';
 import ScalePressable from '../components/ScalePressable';
+import EmptyState from '../components/EmptyState';
 import { t } from '../utils/i18n';
 
 const CYAN = '#00E5FF';
@@ -626,11 +627,11 @@ export default function SearchScreen() {
                 keyboardDismissMode="on-drag"
                 keyboardShouldPersistTaps="handled"
                 ListEmptyComponent={
-                  <View style={st.emptyState}>
-                    <MaterialCommunityIcons name="magnify" size={48} color="#525252" style={{ marginBottom: 12 }} />
-                    <Text style={st.emptyTitle}>{t('search.no_theme_found')}</Text>
-                    <Text style={st.emptyDesc}>{t('search.try_other_keywords')}</Text>
-                  </View>
+                  <EmptyState
+                    icon="🔍"
+                    title={t('search.no_theme_found')}
+                    body={searchQuery.trim() ? `« ${searchQuery.trim()} » — ${t('search.try_other_keywords')}` : t('search.try_other_keywords')}
+                  />
                 }
               />
             )}
@@ -666,11 +667,12 @@ export default function SearchScreen() {
                 keyboardDismissMode="on-drag"
                 keyboardShouldPersistTaps="handled"
                 ListEmptyComponent={
-                  <View style={st.emptyState}>
-                    <MaterialCommunityIcons name="account-group" size={48} color="#525252" style={{ marginBottom: 12 }} />
-                    <Text style={st.emptyTitle}>{t('search.no_player_found')}</Text>
-                    <Text style={st.emptyDesc}>{t('search.search_by_pseudo')}</Text>
-                  </View>
+                  <EmptyState
+                    icon="🔍"
+                    title={t('search.no_player_found')}
+                    body={searchQuery.trim() ? `« ${searchQuery.trim()} » — ${t('search.search_by_pseudo')}` : t('search.search_by_pseudo')}
+                    accent="#B366FF"
+                  />
                 }
               />
             )}
@@ -689,11 +691,11 @@ export default function SearchScreen() {
                 <Text style={st.emptyDesc}>{t('search.search_content_desc')}</Text>
               </View>
             ) : posts.length === 0 && comments.length === 0 ? (
-              <View style={st.emptyState}>
-                <MaterialCommunityIcons name="magnify" size={48} color="#525252" style={{ marginBottom: 12 }} />
-                <Text style={st.emptyTitle}>{t('search.no_results')}</Text>
-                <Text style={st.emptyDesc}>{t('search.try_other_terms')}</Text>
-              </View>
+              <EmptyState
+                icon="🔍"
+                title={t('search.no_results')}
+                body={`« ${searchQuery.trim()} » — ${t('search.try_other_terms')}`}
+              />
             ) : (
               <>
                 {posts.length > 0 && (
@@ -769,7 +771,7 @@ const st = StyleSheet.create({
   tabTextActive: { color: CYAN },
 
   // Filter rows
-  filterRow: { maxHeight: 52, marginBottom: 4 },
+  filterRow: { flexGrow: 0, marginBottom: 4 },
   diffFiltersWrap: { paddingHorizontal: 16, gap: 8, paddingVertical: 8 },
   diffChip: {
     flexDirection: 'row', alignItems: 'center', gap: 5,

@@ -47,11 +47,14 @@ export default function EmptyState({
 }
 
 const styles = StyleSheet.create({
+  // flexGrow (et non flex:1) : se centre dans un parent contraint,
+  // garde sa hauteur de contenu dans un ScrollView/ListEmptyComponent
   wrap: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 32,
+    paddingVertical: 32,
   },
   tileWrap: {
     width: TILE,

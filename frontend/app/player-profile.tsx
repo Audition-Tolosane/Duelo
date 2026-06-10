@@ -284,11 +284,18 @@ export default function PlayerProfileScreen() {
             <View style={s.actionsRow}>
               <TouchableOpacity
                 data-testid="challenge-button"
-                style={[s.actionBtn, s.challengeBtn]}
+                style={s.challengeTouchable}
+                activeOpacity={0.85}
                 onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); setChallengeModalVisible(true); }}
               >
-                <MaterialCommunityIcons name="sword-cross" size={16} color="#FFF" />
-                <Text style={s.actionText}>{t('challenge.send')}</Text>
+                <LinearGradient
+                  colors={['#00E5FF', '#B366FF']}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                  style={s.challengeGradient}
+                >
+                  <MaterialCommunityIcons name="sword-cross" size={16} color="#050510" />
+                  <Text style={s.challengeText}>{t('challenge.send')}</Text>
+                </LinearGradient>
               </TouchableOpacity>
               <TouchableOpacity
                 data-testid="follow-button"
@@ -298,15 +305,14 @@ export default function PlayerProfileScreen() {
                 <MaterialCommunityIcons
                   name={profile.is_following ? 'check' : 'plus'}
                   size={16}
-                  color={profile.is_following ? '#00FF9D' : '#FFF'}
+                  color={profile.is_following ? '#32E7A3' : '#FFF'}
                 />
-                <Text style={[s.actionText, profile.is_following && { color: '#00FF9D' }]}>
+                <Text style={[s.actionText, profile.is_following && { color: '#32E7A3' }]}>
                   {profile.is_following ? t('player.following') : t('player.follow')}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity data-testid="chat-button" style={[s.actionBtn, s.chatBtn]} onPress={handleChat}>
-                <MaterialCommunityIcons name="comment-outline" size={16} color="#00BFFF" />
-                <Text style={[s.actionText, { color: '#00BFFF' }]}>{t('player.message')}</Text>
+                <MaterialCommunityIcons name="comment-outline" size={18} color="#FFF" />
               </TouchableOpacity>
             </View>
           )}
@@ -622,8 +628,11 @@ const s = StyleSheet.create({
   },
   avatarText: { fontSize: 40, fontWeight: '900' },
 
-  pseudo: { fontSize: 26, fontWeight: '900', color: '#FFF', marginTop: 12 },
-  title: { fontSize: 14, color: '#B57EDC', fontWeight: '600', marginTop: 4 },
+  pseudo: { fontSize: 28, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.5, color: '#FFF', marginTop: 12 },
+  title: {
+    fontSize: 10, color: '#FFB547', fontFamily: 'JetBrainsMono_700Bold',
+    letterSpacing: 2, textTransform: 'uppercase', marginTop: 4,
+  },
 
   locationRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 },
   locationFlag: { fontSize: 16 },
@@ -645,15 +654,30 @@ const s = StyleSheet.create({
 
   /* Actions */
   actionsRow: { flexDirection: 'row', gap: 8, width: '90%', marginTop: 16 },
+  challengeTouchable: {
+    flex: 2, borderRadius: 14, overflow: 'hidden',
+    shadowColor: '#00E5FF', shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35, shadowRadius: 12, elevation: 6,
+  },
+  challengeGradient: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    paddingVertical: 12, gap: 6,
+  },
+  challengeText: {
+    color: '#050510', fontSize: 13, fontWeight: '900',
+    fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: 0.5, textTransform: 'uppercase',
+  },
   actionBtn: {
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 12, borderRadius: 14, gap: 6, backgroundColor: '#8A2BE2',
+    paddingVertical: 12, borderRadius: 14, gap: 6,
   },
   followBtn: { backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
-  followingBtn: { backgroundColor: 'rgba(0,255,157,0.1)', borderWidth: 1, borderColor: 'rgba(0,255,157,0.3)' },
-  chatBtn: { backgroundColor: 'rgba(0,191,255,0.1)', borderWidth: 1, borderColor: 'rgba(0,191,255,0.3)' },
-  challengeBtn: { backgroundColor: '#8A2BE2' },
-  actionText: { color: '#FFF', fontSize: 13, fontWeight: '700' },
+  followingBtn: { backgroundColor: 'rgba(50,231,163,0.1)', borderWidth: 1, borderColor: 'rgba(50,231,163,0.3)' },
+  chatBtn: {
+    flex: 0, paddingHorizontal: 14,
+    backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)',
+  },
+  actionText: { color: '#FFF', fontSize: 13, fontWeight: '700', fontFamily: 'SpaceGrotesk_600SemiBold' },
 
   /* Stats Row */
   statsRow: {

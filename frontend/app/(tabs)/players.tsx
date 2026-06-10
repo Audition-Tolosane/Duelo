@@ -379,7 +379,7 @@ const coachStyles = StyleSheet.create({
     width: 42, height: 42, borderRadius: 14, justifyContent: 'center', alignItems: 'center',
   },
   textWrap: { flex: 1 },
-  label: { fontSize: 9, fontWeight: '900', color: '#FFD700', letterSpacing: 2, marginBottom: 3 },
+  label: { fontSize: 9, fontFamily: 'JetBrainsMono_700Bold', color: '#FFD700', letterSpacing: 2, marginBottom: 3 },
   message: { color: '#CCC', fontSize: 12, fontWeight: '600', lineHeight: 16 },
   goBtn: {
     paddingHorizontal: 16, paddingVertical: 8, borderRadius: 10,
@@ -526,6 +526,24 @@ export default function PlayersScreen() {
   return (
     <CosmicBackground>
     <View style={s.container}>
+
+      {/* Header */}
+      <View style={s.pageHeader}>
+        <View style={{ flex: 1 }}>
+          <Text style={s.pageEyebrow}>◆ {t('players.header_eyebrow')}</Text>
+          <Text style={s.pageTitle}>{t('players.header_title')}</Text>
+        </View>
+        <TouchableOpacity
+          style={s.searchShortcut}
+          activeOpacity={0.8}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push('/search?tab=joueurs');
+          }}
+        >
+          <MaterialCommunityIcons name="magnify" size={20} color="#00E5FF" />
+        </TouchableOpacity>
+      </View>
 
       {/* Section Navigator */}
       <View style={s.sectionNav}>
@@ -817,6 +835,26 @@ const forgeStyles = StyleSheet.create({
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scrollContent: { paddingBottom: 20 },
+
+  // Page header
+  pageHeader: {
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: 16, paddingTop: 14, paddingBottom: 12,
+  },
+  pageEyebrow: {
+    fontSize: 10, fontFamily: 'JetBrainsMono_700Bold', color: '#00E5FF',
+    letterSpacing: 2.5, textTransform: 'uppercase',
+  },
+  pageTitle: {
+    fontSize: 26, fontFamily: 'SpaceGrotesk_700Bold', color: '#FFF',
+    letterSpacing: -1, marginTop: 2, textTransform: 'uppercase',
+  },
+  searchShortcut: {
+    width: 42, height: 42, borderRadius: 21,
+    backgroundColor: 'rgba(0,229,255,0.08)',
+    borderWidth: 1, borderColor: 'rgba(0,229,255,0.25)',
+    justifyContent: 'center', alignItems: 'center',
+  },
 
   // Section Nav
   sectionNav: {

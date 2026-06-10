@@ -305,17 +305,18 @@ export default function LeaderboardScreen() {
           <DueloHeader />
         </View>
 
-        {/* Back button */}
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <LinearGradient
-            colors={['rgba(255,255,255,0.10)', 'rgba(255,255,255,0.04)']}
-            style={styles.backCircle}
-          >
-            <MaterialCommunityIcons name="chevron-left" size={22} color="#A3A3A3" />
-          </LinearGradient>
-        </TouchableOpacity>
-
-        <Text style={styles.title}>{headerTitle}</Text>
+        {/* Back button + titre sur la même ligne */}
+        <View style={styles.headerRow}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+            <LinearGradient
+              colors={['rgba(255,255,255,0.10)', 'rgba(255,255,255,0.04)']}
+              style={styles.backCircle}
+            >
+              <MaterialCommunityIcons name="chevron-left" size={22} color="#A3A3A3" />
+            </LinearGradient>
+          </TouchableOpacity>
+          <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit>{headerTitle}</Text>
+        </View>
 
         {/* View Toggle — global mode only */}
         {!isThemeMode && (
@@ -324,10 +325,17 @@ export default function LeaderboardScreen() {
               <TouchableOpacity
                 testID={`view-${v.id}`}
                 key={v.id}
-                style={[styles.viewBtn, view === v.id && styles.viewBtnActive]}
+                style={styles.viewBtn}
                 onPress={() => setView(v.id)}
               >
-                <Text style={[styles.viewText, view === v.id && styles.viewTextActive]}>{t(v.labelKey)}</Text>
+                {view === v.id && (
+                  <LinearGradient
+                    colors={['#00E5FF', '#B366FF']}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                    style={StyleSheet.absoluteFill}
+                  />
+                )}
+                <Text style={view === v.id ? styles.viewTextActive : styles.viewText}>{t(v.labelKey)}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -345,21 +353,18 @@ export default function LeaderboardScreen() {
                 onPress={() => setScope(s.id)}
                 activeOpacity={0.7}
               >
-                {isActive ? (
+                {/* Gradient en fond absolu : le layout est porté par scopeInner */}
+                {isActive && (
                   <LinearGradient
                     colors={['#00E5FF', '#B366FF']}
                     start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                    style={styles.scopeInner}
-                  >
-                    <MaterialCommunityIcons name={s.icon} size={16} color="#FFF" />
-                    <Text style={styles.scopeTextActive}>{t(s.labelKey)}</Text>
-                  </LinearGradient>
-                ) : (
-                  <View style={styles.scopeInner}>
-                    <MaterialCommunityIcons name={s.icon} size={16} color="#525252" />
-                    <Text style={styles.scopeText}>{t(s.labelKey)}</Text>
-                  </View>
+                    style={StyleSheet.absoluteFill}
+                  />
                 )}
+                <View style={styles.scopeInner}>
+                  <MaterialCommunityIcons name={s.icon} size={16} color={isActive ? '#000' : '#525252'} />
+                  <Text style={isActive ? styles.scopeTextActive : styles.scopeText}>{t(s.labelKey)}</Text>
+                </View>
               </TouchableOpacity>
             );
           })}
@@ -415,55 +420,58 @@ export default function LeaderboardScreen() {
           </View>
         ) : null}
 
-        {/* Rival card */}
-        {!loading && rivalEntry && myEntry && xpGap > 0 && (
-          <View style={styles.rivalCard}>
-            <View style={styles.rivalHeader}>
-              <MaterialCommunityIcons name="sword-cross" size={16} color="#FF9F0A" />
-              <Text style={styles.rivalTitle}>{t('leaderboard.your_rival')}</Text>
-            </View>
-            <View style={styles.rivalBody}>
-              <View style={styles.rivalAvatarWrap}>
-                <UserAvatar avatarUrl={rivalEntry.avatar_url} avatarSeed={rivalEntry.avatar_seed} pseudo={rivalEntry.pseudo} size={40} />
-                <View style={styles.rivalRankBadge}>
-                  <Text style={styles.rivalRankText}>#{rivalEntry.rank}</Text>
-                </View>
-              </View>
-              <View style={styles.rivalInfo}>
-                <Text style={styles.rivalPseudo}>{rivalEntry.pseudo}</Text>
-                <Text style={styles.rivalLevel}>{t('leaderboard.level_short')} {rivalEntry.level}</Text>
-                <View style={styles.rivalGapRow}>
-                  <MaterialCommunityIcons name="arrow-up" size={13} color="#FF9F0A" />
-                  <Text style={styles.rivalGap}>
-                    {xpGap.toLocaleString()} XP {t('leaderboard.to_overtake')}
-                  </Text>
-                </View>
-              </View>
-              <TouchableOpacity
-                style={styles.rivalDefiBtn}
-                onPress={() => router.push(`/matchmaking?opponentId=${rivalEntry.id}&opponentPseudo=${encodeURIComponent(rivalEntry.pseudo)}`)}
-                activeOpacity={0.8}
-              >
-                <LinearGradient colors={['#FF9F0A', '#FF6B00']} style={styles.rivalDefiBtnGrad}>
-                  <MaterialCommunityIcons name="sword" size={15} color="#FFF" />
-                  <Text style={styles.rivalDefiText}>{t('leaderboard.challenge')}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-
-        {!loading && entries.length >= 2 && (
-          <Podium entries={entries} myId={myUserId} router={router} />
-        )}
-
+        {/* Liste unique scrollable : carte rival + podium en en-tête, joueurs ensuite */}
         {!loading && entries.length > 0 && (
           <FlatList
+            style={{ flex: 1 }}
             data={entries.length >= 3 ? entries.slice(3) : entries}
             renderItem={renderEntry}
             keyExtractor={(item) => item.pseudo + item.rank}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
+            ListHeaderComponent={
+              <>
+                {rivalEntry && myEntry && xpGap > 0 && (
+                  <View style={styles.rivalCard}>
+                    <View style={styles.rivalHeader}>
+                      <MaterialCommunityIcons name="sword-cross" size={16} color="#FF9F0A" />
+                      <Text style={styles.rivalTitle}>{t('leaderboard.your_rival')}</Text>
+                    </View>
+                    <View style={styles.rivalBody}>
+                      <View style={styles.rivalAvatarWrap}>
+                        <UserAvatar avatarUrl={rivalEntry.avatar_url} avatarSeed={rivalEntry.avatar_seed} pseudo={rivalEntry.pseudo} size={40} />
+                        <View style={styles.rivalRankBadge}>
+                          <Text style={styles.rivalRankText}>#{rivalEntry.rank}</Text>
+                        </View>
+                      </View>
+                      <View style={styles.rivalInfo}>
+                        <Text style={styles.rivalPseudo}>{rivalEntry.pseudo}</Text>
+                        <Text style={styles.rivalLevel}>{t('leaderboard.level_short')} {rivalEntry.level}</Text>
+                        <View style={styles.rivalGapRow}>
+                          <MaterialCommunityIcons name="arrow-up" size={13} color="#FF9F0A" />
+                          <Text style={styles.rivalGap}>
+                            {xpGap.toLocaleString()} XP {t('leaderboard.to_overtake')}
+                          </Text>
+                        </View>
+                      </View>
+                      <TouchableOpacity
+                        style={styles.rivalDefiBtn}
+                        onPress={() => router.push(`/matchmaking?opponentId=${rivalEntry.id}&opponentPseudo=${encodeURIComponent(rivalEntry.pseudo)}`)}
+                        activeOpacity={0.8}
+                      >
+                        <LinearGradient colors={['#FF9F0A', '#FF6B00']} style={styles.rivalDefiBtnGrad}>
+                          <MaterialCommunityIcons name="sword" size={15} color="#FFF" />
+                          <Text style={styles.rivalDefiText}>{t('leaderboard.challenge')}</Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+                {entries.length >= 2 && (
+                  <Podium entries={entries} myId={myUserId} router={router} />
+                )}
+              </>
+            }
           />
         )}
 
@@ -481,10 +489,11 @@ export default function LeaderboardScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#050510' },
-  title: { fontSize: 28, fontWeight: '800', color: '#FFF', paddingHorizontal: 20, paddingTop: 4, paddingBottom: 8 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8 },
+  title: { flex: 1, fontSize: 24, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.5, color: '#FFF', paddingRight: 20 },
 
   // Back
-  backBtn: { paddingHorizontal: 16, paddingVertical: 12 },
+  backBtn: { paddingHorizontal: 16, paddingVertical: 4 },
   backCircle: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
 
   // View Toggle
@@ -492,10 +501,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row', marginHorizontal: 20, marginTop: 4,
     backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: 3,
   },
-  viewBtn: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
-  viewBtnActive: { backgroundColor: '#8A2BE2' },
+  viewBtn: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10, overflow: 'hidden' },
   viewText: { color: '#525252', fontSize: 14, fontWeight: '700' },
-  viewTextActive: { color: '#FFF' },
+  viewTextActive: { color: '#000', fontSize: 14, fontWeight: '700', fontFamily: 'SpaceGrotesk_700Bold' },
 
   // Season info
   seasonInfo: { paddingHorizontal: 20, paddingTop: 8 },
@@ -525,17 +533,23 @@ const styles = StyleSheet.create({
   rivalDefiBtnGrad: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 10 },
   rivalDefiText: { color: '#FFF', fontSize: 13, fontWeight: '900' },
 
-  // Scope
-  scopeScroll: { maxHeight: 50, marginVertical: 12 },
+  // Scope — le padding vit dans scopeInner pour que le gradient actif
+  // remplisse toute la pastille (pas seulement le texte)
+  // flexShrink: 0 obligatoire : sinon le ScrollView est le seul enfant
+  // compressible de la colonne et se fait écraser par la liste
+  scopeScroll: { flexGrow: 0, flexShrink: 0, height: 46, marginVertical: 12 },
   scopeContainer: { paddingHorizontal: 16, gap: 8, alignItems: 'center' },
   scopeBtn: {
-    paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20,
+    borderRadius: 20, overflow: 'hidden',
     backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
-  scopeBtnActive: { borderColor: 'transparent', overflow: 'hidden' },
-  scopeInner: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  scopeBtnActive: { borderColor: 'transparent' },
+  scopeInner: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 16, paddingVertical: 10,
+  },
   scopeText: { color: '#525252', fontSize: 13, fontWeight: '600' },
-  scopeTextActive: { color: '#FFF', fontSize: 13, fontWeight: '700' },
+  scopeTextActive: { color: '#000', fontSize: 13, fontWeight: '700', fontFamily: 'SpaceGrotesk_700Bold' },
 
   // States
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },

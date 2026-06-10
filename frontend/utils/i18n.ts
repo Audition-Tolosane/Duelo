@@ -181,6 +181,11 @@ const translations: Translations = {
   'play.challenge_friend_sub': { fr: 'Choisis ton adversaire et le thème', en: 'Pick your opponent and the theme', es: 'Elige rival y tema', de: 'Wähle Gegner und Thema', pt: 'Escolha o oponente e o tema', it: 'Scegli avversario e tema', ar: 'اختر خصمك والموضوع', ja: '相手とテーマを選ぼう', ko: '상대와 테마를 선택', zh: '选择对手和主题' },
   'themes.arena_eyebrow': { fr: 'Arène', en: 'Arena', es: 'Arena', de: 'Arena', pt: 'Arena', it: 'Arena', ar: 'الحلبة', ja: 'アリーナ', ko: '아레나', zh: '竞技场' },
   'themes.arena_title': { fr: 'Choisis ton champ de bataille', en: 'Choose your battlefield', es: 'Elige tu campo de batalla', de: 'Wähle dein Schlachtfeld', pt: 'Escolha seu campo de batalha', it: 'Scegli il tuo campo di battaglia', ar: 'اختر ساحة معركتك', ja: '戦場を選ぼう', ko: '전장을 선택하라', zh: '选择你的战场' },
+  'conversations.count_label': { fr: 'conversations', en: 'conversations', es: 'conversaciones', de: 'Unterhaltungen', pt: 'conversas', it: 'conversazioni', ar: 'محادثات', ja: '件の会話', ko: '개의 대화', zh: '个对话' },
+  'notifications.unread_label': { fr: 'non lues', en: 'unread', es: 'sin leer', de: 'ungelesen', pt: 'não lidas', it: 'non lette', ar: 'غير مقروءة', ja: '件未読', ko: '개 안 읽음', zh: '条未读' },
+  'players.header_eyebrow': { fr: 'Joueurs', en: 'Players', es: 'Jugadores', de: 'Spieler', pt: 'Jogadores', it: 'Giocatori', ar: 'اللاعبون', ja: 'プレイヤー', ko: '플레이어', zh: '玩家' },
+  'players.header_title': { fr: 'Trouve un rival', en: 'Find a rival', es: 'Encuentra un rival', de: 'Finde einen Rivalen', pt: 'Encontre um rival', it: 'Trova un rivale', ar: 'اعثر على منافس', ja: 'ライバルを探そう', ko: '라이벌을 찾아라', zh: '寻找对手' },
+  'followers.community_title': { fr: 'Communauté', en: 'Community', es: 'Comunidad', de: 'Community', pt: 'Comunidade', it: 'Community', ar: 'المجتمع', ja: 'コミュニティ', ko: '커뮤니티', zh: '社区' },
   'play.load_error': { fr: 'Erreur de chargement. Appuyez pour réessayer', en: 'Loading error. Tap to retry', es: 'Error de carga. Toca para reintentar', de: 'Ladefehler. Tippen zum Wiederholen', pt: 'Erro ao carregar. Toque para tentar novamente', it: 'Errore di caricamento. Tocca per riprovare', ar: 'خطأ في التحميل. اضغط لإعادة المحاولة', ja: '読み込みエラー。タップして再試行', ko: '로딩 오류. 탭하여 다시 시도', zh: '加载错误。点击重试' },
 
   // Themes

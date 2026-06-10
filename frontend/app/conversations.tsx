@@ -15,6 +15,7 @@ import { t, getLocale } from '../utils/i18n';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
 import UserAvatar from '../components/UserAvatar';
+import EmptyState from '../components/EmptyState';
 import { useWS } from '../contexts/WebSocketContext';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
@@ -147,7 +148,7 @@ export default function ConversationsScreen() {
         <View style={styles.avatarWrap}>
           {hasUnread && (
             <View style={styles.avatarRing}>
-              <LinearGradient colors={['#8A2BE2', '#00FFFF']} style={styles.avatarRingGradient} />
+              <LinearGradient colors={['#00E5FF', '#B366FF']} style={styles.avatarRingGradient} />
             </View>
           )}
           <View style={styles.avatar}>
@@ -218,15 +219,16 @@ export default function ConversationsScreen() {
             <MaterialCommunityIcons name="chevron-left" size={22} color="#FFF" />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
-            <MaterialCommunityIcons name="chat" size={16} color="#8A2BE2" />
-            <Text style={styles.headerTitle}>{t('conversations.title')}</Text>
-            {totalUnread > 0 && (
-              <View style={styles.headerBadge}>
-                <Text style={styles.headerBadgeText}>{totalUnread > 99 ? '99+' : totalUnread}</Text>
-              </View>
-            )}
+            <Text style={styles.headerEyebrow}>◆ {conversations.length} {t('conversations.count_label')}</Text>
+            <View style={styles.headerTitleRow}>
+              <Text style={styles.headerTitle}>{t('conversations.title')}</Text>
+              {totalUnread > 0 && (
+                <View style={styles.headerBadge}>
+                  <Text style={styles.headerBadgeText}>{totalUnread > 99 ? '99+' : totalUnread}</Text>
+                </View>
+              )}
+            </View>
           </View>
-          <View style={{ width: 36 }} />
         </View>
 
         {/* Search bar */}
@@ -255,35 +257,23 @@ export default function ConversationsScreen() {
             <ActivityIndicator size="large" color="#8A2BE2" />
           </View>
         ) : filtered.length === 0 && !search ? (
-          <View style={styles.emptyWrap}>
-            <LinearGradient colors={['#8A2BE2', '#00BFFF']} style={styles.emptyCircle}>
-              <MaterialCommunityIcons name="chat-outline" size={36} color="#FFF" />
-            </LinearGradient>
-            <Text style={styles.emptyTitle}>{t('conversations.your_messages')}</Text>
-            <Text style={styles.emptyText}>
-              {t('conversations.empty_text')}
-            </Text>
-            <TouchableOpacity
-              data-testid="start-conversation-btn"
-              style={styles.emptyBtn}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                router.push('/search?tab=joueurs');
-              }}
-              activeOpacity={0.8}
-            >
-              <LinearGradient colors={['#8A2BE2', '#00BFFF']} start={{x:0,y:0}} end={{x:1,y:0}} style={styles.emptyBtnGradient}>
-                <MaterialCommunityIcons name="magnify" size={16} color="#FFF" style={{ marginRight: 6 }} />
-                <Text style={styles.emptyBtnText}>{t('conversations.find_player')}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
+          <EmptyState
+            icon="💬"
+            title={t('conversations.your_messages')}
+            body={t('conversations.empty_text')}
+            ctaLabel={t('conversations.find_player')}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              router.push('/search?tab=joueurs');
+            }}
+            accent="#B366FF"
+          />
         ) : filtered.length === 0 && search ? (
-          <View style={styles.emptyWrap}>
-            <MaterialCommunityIcons name="magnify" size={48} color="#525252" style={{ marginBottom: 12 }} />
-            <Text style={styles.emptyTitle}>{t('conversations.no_results')}</Text>
-            <Text style={styles.emptyText}>{t('conversations.no_match')} "{search}"</Text>
-          </View>
+          <EmptyState
+            icon="🔍"
+            title={t('conversations.no_results')}
+            body={`${t('conversations.no_match')} « ${search} »`}
+          />
         ) : (
           <FlatList
             data={filtered}
@@ -329,28 +319,34 @@ const styles = StyleSheet.create({
   },
   headerCenter: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
+    marginLeft: 12,
   },
+  headerEyebrow: {
+    fontSize: 9,
+    fontFamily: 'JetBrainsMono_400Regular',
+    color: 'rgba(255,255,255,0.40)',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+  },
+  headerTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 24,
+    fontWeight: '900',
+    fontFamily: 'SpaceGrotesk_700Bold',
     color: '#FFF',
-    letterSpacing: 0.3,
+    letterSpacing: -0.8,
   },
   headerBadge: {
     minWidth: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#FF3B30',
+    backgroundColor: '#00E5FF',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 6,
   },
   headerBadgeText: {
-    color: '#FFF',
+    color: '#000',
     fontSize: 10,
     fontWeight: '800',
   },
@@ -399,7 +395,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
   },
   convRowUnread: {
-    backgroundColor: 'rgba(138, 43, 226, 0.05)',
+    backgroundColor: 'rgba(0,229,255,0.06)',
   },
 
   // Avatar
@@ -455,20 +451,21 @@ const styles = StyleSheet.create({
   convName: {
     fontSize: 15,
     fontWeight: '600',
+    fontFamily: 'SpaceGrotesk_600SemiBold',
     color: '#FFF',
     flex: 1,
     marginRight: 8,
   },
   convNameUnread: {
-    fontWeight: '800',
+    fontFamily: 'SpaceGrotesk_700Bold',
   },
   convTime: {
-    fontSize: 12,
+    fontSize: 10,
+    fontFamily: 'JetBrainsMono_400Regular',
     color: 'rgba(255,255,255,0.35)',
   },
   convTimeUnread: {
-    color: '#8A2BE2',
-    fontWeight: '700',
+    color: '#00E5FF',
   },
   convBottomRow: {
     flexDirection: 'row',
@@ -494,7 +491,7 @@ const styles = StyleSheet.create({
     minWidth: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#8A2BE2',
+    backgroundColor: '#00E5FF',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 6,
@@ -502,52 +499,6 @@ const styles = StyleSheet.create({
   unreadText: {
     fontSize: 11,
     fontWeight: '800',
-    color: '#FFF',
-  },
-
-  // Empty state
-  emptyWrap: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
-  emptyCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  emptyTitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#FFF',
-    marginBottom: 8,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 24,
-  },
-  emptyBtn: {
-    borderRadius: 22,
-    overflow: 'hidden',
-  },
-  emptyBtnGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 22,
-  },
-  emptyBtnText: {
-    color: '#FFF',
-    fontSize: 15,
-    fontWeight: '700',
+    color: '#000',
   },
 });
