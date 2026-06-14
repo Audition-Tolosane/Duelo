@@ -7,7 +7,7 @@ from models import User
 from schemas import GuestRegister, EmailRegister, LoginRequest, UserResponse, SocialAuthRequest
 from helpers import hash_password, verify_password, detect_country_from_ip
 from auth_middleware import create_access_token, get_current_user_id
-from rate_limit import rate_limit_auth, _limiter
+from rate_limit import rate_limit_auth, _limiter, _get_client_ip
 from config import GOOGLE_CLIENT_IDS, APPLE_BUNDLE_ID
 
 import re
@@ -117,7 +117,7 @@ async def register_email(data: EmailRegister, request: Request, db: AsyncSession
 @router.post("/login", response_model=UserResponse)
 async def login(data: LoginRequest, request: Request, db: AsyncSession = Depends(get_db), _rate=Depends(rate_limit_auth)):
     # Per-IP lockout: 20 failed attempts per 15 min (brute-force across accounts)
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = _get_client_ip(request)
     ip_key = f"login_fail_ip:{client_ip}"
     try:
         _limiter.check(ip_key, 20, 900)
@@ -195,6 +195,22 @@ async def delete_account(
     await db.delete(user)
     await db.commit()
     return {"success": True, "message": "Compte supprimé définitivement"}
+
+
+@router.post("/logout")
+async def logout(
+    current_user_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    """Revoke every token previously issued to this user by bumping token_version."""
+    from sqlalchemy import update as sql_update
+    await db.execute(
+        sql_update(User)
+        .where(User.id == current_user_id)
+        .values(token_version=(User.token_version + 1))
+    )
+    await db.commit()
+    return {"success": True}
 
 
 @router.get("/user/{user_id}", response_model=UserResponse)
@@ -395,5 +411,5 @@ def _user_response(user: User) -> UserResponse:
         matches_played=user.matches_played, matches_won=user.matches_won,
         best_streak=user.best_streak, current_streak=user.current_streak,
         onboarding_done=getattr(user, 'onboarding_done', False),
-        token=create_access_token(user.id),
+        token=create_access_token(user.id, getattr(user, 'token_version', 0) or 0),
     )

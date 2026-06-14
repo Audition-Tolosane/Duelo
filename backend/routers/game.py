@@ -13,6 +13,12 @@ from services.bots import find_bot_opponent
 
 # Per-(player_id, theme_id) lock to prevent race-condition double-submit
 _submit_locks: dict[str, asyncio.Lock] = {}
+
+# Anti-farm: max solo/bot matches that earn XP per rolling hour, per player.
+# Beyond this the match is still recorded but grants 0 XP (the solo path is
+# client-scored, so this caps how much a tampered client can inflate the
+# XP leaderboard). ~40/h is well above normal human play (~1-2 min/match).
+SOLO_XP_HOURLY_CAP = 40
 from helpers import shuffle_question_options
 from services.xp import (
     get_level, get_streak_bonus, get_streak_badge,
@@ -276,6 +282,18 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
             logger.info(f"[submit] Duplicate blocked for player={player_id}, theme={theme_id}")
             return {"status": "already_submitted", "message": "Match déjà enregistré"}
 
+        # Anti-farm: count this player's matches in the last rolling hour.
+        # Past the cap, the match is recorded but earns no XP (see SOLO_XP_HOURLY_CAP).
+        hour_ago = datetime.now(timezone.utc) - timedelta(hours=1)
+        recent_count_res = await db.execute(
+            select(func.count(Match.id)).where(
+                Match.player1_id == player_id,
+                Match.created_at >= hour_ago,
+            )
+        )
+        recent_matches = recent_count_res.scalar() or 0
+        xp_capped = recent_matches >= SOLO_XP_HOURLY_CAP
+
         theme_res = await db.execute(select(Theme).where(Theme.id == theme_id))
         theme = theme_res.scalar_one_or_none()
         if not theme:
@@ -345,10 +363,20 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
 
         total_xp = game_xp + x2_bonus + mult_bonus + daily_bonus
 
+        if xp_capped:
+            logger.warning(
+                f"[submit] XP farm cap hit for player={player_id} "
+                f"({recent_matches} matches in the last hour) — XP zeroed"
+            )
+            base_xp = victory_bonus = perfection_bonus = giant_slayer_bonus = 0
+            streak_bonus = daily_bonus = x2_bonus = mult_bonus = 0
+            total_xp = 0
+
         xp_breakdown = {
             "base": base_xp, "victory": victory_bonus, "perfection": perfection_bonus,
             "giant_slayer": giant_slayer_bonus, "streak": streak_bonus,
             "daily": daily_bonus, "x2": x2_bonus, "mult": mult_bonus, "total": total_xp,
+            "capped": xp_capped,
         }
 
         match = Match(
@@ -551,11 +579,15 @@ async def submit_match_v2(request: Request, current_user: str = Depends(get_curr
 
 @router.post("/restore-streak")
 async def restore_streak(request: Request, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
-    """Restore a win streak broken on the last match (ad shield — no real ad check for now)."""
+    """Restore a win streak broken on the last match (ad shield)."""
     body = await request.json()
     match_id = body.get("match_id")
     if not match_id:
         raise HTTPException(status_code=400, detail="match_id requis")
+
+    # Gated behind the rewarded-ad chokepoint (audit log + anti-spam throttle).
+    from services.ad_rewards import verify_ad_reward
+    verify_ad_reward(current_user, "restore_streak")
 
     match_res = await db.execute(select(Match).where(Match.id == match_id))
     match = match_res.scalar_one_or_none()

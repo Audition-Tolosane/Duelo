@@ -5,6 +5,7 @@ from sqlalchemy import select, func
 from database import get_db
 from models import DailyMissions, UserThemeXP, Theme, User
 from services.missions import get_or_create_today, generate_missions, get_user_top_themes
+from services.ad_rewards import verify_ad_reward
 from auth_middleware import get_current_user_id
 from datetime import date
 
@@ -34,6 +35,7 @@ async def get_today(current_user: str = Depends(get_current_user_id), db: AsyncS
 @router.post("/double")
 async def activate_double(current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     """Called after a rewarded ad — doubles all mission rewards."""
+    verify_ad_reward(current_user, "mission_double")
     record = await get_or_create_today(current_user, db)
     if record.reward_claimed:
         raise HTTPException(status_code=400, detail="Récompenses déjà réclamées")
@@ -50,6 +52,7 @@ async def activate_double(current_user: str = Depends(get_current_user_id), db: 
 @router.post("/reroll/{mission_id}")
 async def reroll_mission(mission_id: str, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     """Called after a rewarded ad — replaces one incomplete mission."""
+    verify_ad_reward(current_user, "mission_reroll")
     record = await get_or_create_today(current_user, db)
     if record.reward_claimed:
         raise HTTPException(status_code=400, detail="Récompenses déjà réclamées")

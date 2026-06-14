@@ -58,6 +58,9 @@ class User(Base):
     google_id = Column(String(255), unique=True, nullable=True, index=True)
     apple_id = Column(String(255), unique=True, nullable=True, index=True)
 
+    # Bumped on logout / account deletion to revoke all previously-issued JWTs
+    token_version = Column(Integer, default=0, nullable=False)
+
     last_played_at = Column(DateTime(timezone=True), nullable=True)
     onboarding_done = Column(Boolean, default=False)
     privacy_accepted_at = Column(DateTime(timezone=True), nullable=True)

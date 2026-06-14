@@ -81,6 +81,14 @@ async def websocket_endpoint(
         await websocket.close(code=1008, reason="Invalid or missing token")
         return
 
+    # Reject revoked tokens (logout / deleted account)
+    async with AsyncSessionLocal() as _db:
+        _res = await _db.execute(select(User.token_version).where(User.id == user_id))
+        _current_tv = _res.scalar_one_or_none()
+    if _current_tv is None or payload.get("tv", 0) != _current_tv:
+        await websocket.close(code=1008, reason="Token revoked")
+        return
+
     await manager.connect(user_id, websocket)
 
     try:

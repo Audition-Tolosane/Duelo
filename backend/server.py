@@ -15,7 +15,7 @@ from schemas import QuestionReportRequest
 from models import QuestionReport
 from sqlalchemy import select
 from auth_middleware import get_current_user_id
-from rate_limit import _limiter
+from rate_limit import _limiter, _get_client_ip
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ async def security_headers(request: Request, call_next):
 
 @app.middleware("http")
 async def global_rate_limit(request: Request, call_next):
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = _get_client_ip(request)
     # Skip rate limit for WebSocket upgrades
     if request.url.path.startswith("/ws"):
         return await call_next(request)
@@ -277,6 +277,7 @@ async def _ensure_columns():
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS referred_by VARCHAR(36)",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_confirmed BOOLEAN DEFAULT FALSE",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS pro_expires_at TIMESTAMPTZ",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS token_version INTEGER DEFAULT 0",
             "CREATE UNIQUE INDEX IF NOT EXISTS ix_users_referral_code ON users(referral_code) WHERE referral_code IS NOT NULL",
             """CREATE TABLE IF NOT EXISTS spin_theme_unlocks (
                 id VARCHAR(36) PRIMARY KEY, user_id VARCHAR(36) NOT NULL,
