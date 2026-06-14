@@ -3,6 +3,7 @@ import io
 import base64
 import os
 import re
+import secrets
 import uuid
 from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException, Request, Header
@@ -25,13 +26,13 @@ CORRECT_OPTION_MAP = {"A": 0, "B": 1, "C": 2, "D": 3}
 
 async def verify_admin_key(x_admin_key: str = Header(default="", alias="X-Admin-Key")):
     """Dependency: validates admin password from X-Admin-Key header."""
-    if x_admin_key != ADMIN_PASSWORD:
+    if not secrets.compare_digest(x_admin_key, ADMIN_PASSWORD):
         raise HTTPException(status_code=403, detail="Accès refusé")
 
 
 @router.post("/verify")
 async def verify_admin(data: AdminVerify, request: Request, _rl=Depends(rate_limit(limit=3, window=3600))):
-    if data.password == ADMIN_PASSWORD:
+    if secrets.compare_digest(data.password, ADMIN_PASSWORD):
         return {"verified": True}
     raise HTTPException(status_code=403, detail="Mot de passe incorrect")
 

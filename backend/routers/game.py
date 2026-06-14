@@ -27,6 +27,7 @@ from services.xp import (
 )
 from services.notifications import create_notification
 from auth_middleware import get_current_user_id
+from rate_limit import rate_limit
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/game", tags=["game"])
@@ -266,6 +267,12 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
         raise HTTPException(status_code=403, detail="Non autorisé")
 
     # ── Atomic duplicate-submission guard with per-player lock ──
+    # Opportunistically evict idle locks so the dict can't grow unbounded.
+    # The DB recent-match check below is the real guard, so dropping an
+    # unlocked entry here is safe even under concurrency.
+    if len(_submit_locks) > 5000:
+        for k in [k for k, lock in list(_submit_locks.items()) if not lock.locked()]:
+            _submit_locks.pop(k, None)
     lock_key = f"{player_id}:{theme_id}"
     if lock_key not in _submit_locks:
         _submit_locks[lock_key] = asyncio.Lock()
@@ -695,6 +702,7 @@ async def generate_vo_questions(
     theme_id: str,
     current_user: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
+    _rl=Depends(rate_limit(limit=3, window=3600)),
 ):
     """Generate English (VO) questions for a SCREEN theme via Claude AI. Idempotent — skips if already generated."""
     import os

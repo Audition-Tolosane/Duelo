@@ -100,9 +100,11 @@ def shuffle_question_options(options: list, correct_option: int) -> tuple:
 async def detect_country_from_ip(request: Request) -> Optional[str]:
     """Detect country from IP using ip-api.com."""
     try:
-        forwarded = request.headers.get("x-forwarded-for", "")
-        client_ip = forwarded.split(",")[0].strip() if forwarded else (request.client.host if request.client else None)
-        if not client_ip or client_ip in ("127.0.0.1", "::1", "localhost"):
+        # Resolve the client IP via the shared helper, which only trusts
+        # X-Forwarded-For when the request comes from a known internal proxy.
+        from rate_limit import _get_client_ip
+        client_ip = _get_client_ip(request)
+        if not client_ip or client_ip in ("127.0.0.1", "::1", "localhost", "unknown"):
             return None
         async with httpx.AsyncClient(timeout=3) as client:
             resp = await client.get(f"http://ip-api.com/json/{client_ip}?fields=status,country,countryCode,city,regionName")

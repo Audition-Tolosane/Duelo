@@ -7,7 +7,7 @@ from models import User
 from schemas import GuestRegister, EmailRegister, LoginRequest, UserResponse, SocialAuthRequest
 from helpers import hash_password, verify_password, detect_country_from_ip
 from auth_middleware import create_access_token, get_current_user_id
-from rate_limit import rate_limit_auth, _limiter, _get_client_ip
+from rate_limit import rate_limit_auth, rate_limit, _limiter, _get_client_ip
 from config import GOOGLE_CLIENT_IDS, APPLE_BUNDLE_ID
 
 import re
@@ -224,7 +224,8 @@ async def get_user(user_id: str, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/check-pseudo")
-async def check_pseudo(data: GuestRegister, db: AsyncSession = Depends(get_db)):
+async def check_pseudo(data: GuestRegister, db: AsyncSession = Depends(get_db), _rl=Depends(rate_limit(limit=30, window=60))):
+    # Rate-limited to curb pseudo enumeration / availability scraping.
     result = await db.execute(select(User).where(User.pseudo == data.pseudo.strip()))
     exists = result.scalar_one_or_none() is not None
     return {"available": not exists}

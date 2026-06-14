@@ -136,9 +136,12 @@ app.include_router(api_router)
 # WebSocket routes (no /api prefix)
 app.include_router(ws.router)
 
+# Auth is carried by the Authorization Bearer header (no cookies), so CORS
+# credentials are not needed. Keeping allow_credentials=False avoids the
+# wildcard-origin + credentials footgun if ALLOWED_ORIGINS is ever set to "*".
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
+    allow_credentials=False,
     allow_origins=ALLOWED_ORIGINS,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],

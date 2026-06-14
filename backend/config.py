@@ -16,7 +16,11 @@ if not JWT_SECRET:
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_MINUTES = 525960  # 1 year (mobile app — users shouldn't need to re-login)
 
-ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', 'http://localhost:8081,http://localhost:19006').split(',')
+ALLOWED_ORIGINS = [
+    o.strip()
+    for o in os.environ.get('ALLOWED_ORIGINS', 'http://localhost:8081,http://localhost:19006').split(',')
+    if o.strip()
+]
 
 # Social auth (optional — leave blank to disable the provider)
 GOOGLE_CLIENT_IDS = [s.strip() for s in os.environ.get('GOOGLE_CLIENT_IDS', '').split(',') if s.strip()]
