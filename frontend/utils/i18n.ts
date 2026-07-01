@@ -226,6 +226,8 @@ const translations: Translations = {
   'themes.universes': { fr: 'UNIVERS', en: 'UNIVERSES', es: 'UNIVERSOS', de: 'UNIVERSEN', pt: 'UNIVERSOS', it: 'UNIVERSI', ar: 'العوالم', ja: 'ユニバース', ko: '유니버스', zh: '宇宙' },
   'themes.other_universes': { fr: 'AUTRES UNIVERS', en: 'OTHER UNIVERSES', es: 'OTROS UNIVERSOS', de: 'ANDERE UNIVERSEN', pt: 'OUTROS UNIVERSOS', it: 'ALTRI UNIVERSI', ar: 'عوالم أخرى', ja: 'その他のユニバース', ko: '다른 유니버스', zh: '其他宇宙' },
   'themes.themes_count': { fr: 'thèmes', en: 'themes', es: 'temas', de: 'Themen', pt: 'temas', it: 'temi', ar: 'مواضيع', ja: 'テーマ', ko: '테마', zh: '主题' },
+  'themes.featured_badge': { fr: 'POPULAIRE', en: 'POPULAR', es: 'POPULAR', de: 'BELIEBT', pt: 'POPULAR', it: 'POPOLARE', ar: 'شائع', ja: '人気', ko: '인기', zh: '热门' },
+  'themes.featured_cta': { fr: 'DUEL', en: 'DUEL', es: 'DUELO', de: 'DUELL', pt: 'DUELO', it: 'DUELLO', ar: 'مبارزة', ja: 'デュエル', ko: '대결', zh: '对决' },
   'themes.level': { fr: 'Niveau', en: 'Level', es: 'Nivel', de: 'Stufe', pt: 'Nível', it: 'Livello', ar: 'المستوى', ja: 'レベル', ko: '레벨', zh: '等级' },
   'themes.questions': { fr: 'Questions', en: 'Questions', es: 'Preguntas', de: 'Fragen', pt: 'Perguntas', it: 'Domande', ar: 'أسئلة', ja: '問題', ko: '문제', zh: '问题' },
   'themes.title_level_50': { fr: 'Titre Niveau 50', en: 'Level 50 Title', es: 'Título Nivel 50', de: 'Titel Stufe 50', pt: 'Título Nível 50', it: 'Titolo Livello 50', ar: 'لقب المستوى 50', ja: 'レベル50称号', ko: '레벨 50 칭호', zh: '50级称号' },

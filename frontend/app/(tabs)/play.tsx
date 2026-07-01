@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Animated, {
-  useSharedValue, useAnimatedStyle, withTiming, withSpring,
-  withRepeat, withSequence, withDelay, FadeInDown, Easing,
-} from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import CosmicBackground from '../../components/CosmicBackground';
 import CategoryIcon from '../../components/CategoryIcon';
+import ScalePressable from '../../components/ScalePressable';
 import { t } from '../../utils/i18n';
 import { FONTS } from '../../theme/fonts';
 
@@ -22,6 +21,11 @@ const GOLD = '#FFB547';
 const FIRE = '#FF6B2C';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+const { width: SCREEN_W } = Dimensions.get('window');
+
+// Grille 2 colonnes de tuiles carrées teintées (pattern écran 6 du handoff)
+const GRID_GAP = 10;
+const TILE_W = (SCREEN_W - 16 * 2 - GRID_GAP) / 2;
 
 type SuperCategory = {
   id: string;
@@ -43,73 +47,27 @@ const UPCOMING_CATS = [
   { id: 'STYLE', label: 'Style', icon: '✨', color: '#E040FB' },
 ];
 
-function SuperCard({ cat, index, onPress }: { cat: SuperCategory; index: number; onPress: () => void }) {
-  const scale = useSharedValue(1);
-  const shimmerX = useSharedValue(-300);
-
-  useEffect(() => {
-    shimmerX.value = withDelay(
-      1000 + index * 400,
-      withRepeat(
-        withSequence(
-          withTiming(550, { duration: 1400, easing: Easing.inOut(Easing.quad) }),
-          withDelay(4500, withTiming(-300, { duration: 0 }))
-        ),
-        -1, false
-      )
-    );
-  }, []);
-
-  const cardStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-  const shimmerStyle = useAnimatedStyle(() => ({ transform: [{ translateX: shimmerX.value }] }));
-
+// Tuile carrée teintée — même pattern que l'écran Thèmes (écran 6 du handoff)
+function UniverseTile({ cat, index, onPress }: { cat: SuperCategory; index: number; onPress: () => void }) {
   return (
-    <Animated.View entering={FadeInDown.delay(index * 90).duration(500)} style={cardStyle}>
-      <TouchableOpacity
-        style={styles.superCard}
-        onPress={onPress}
-        onPressIn={() => { scale.value = withTiming(0.97, { duration: 80 }); }}
-        onPressOut={() => { scale.value = withSpring(1, { damping: 12, stiffness: 180 }); }}
-        activeOpacity={1}
-      >
-        <LinearGradient colors={[cat.color + '30', 'transparent']} style={styles.cardTopGlow} />
-        <LinearGradient colors={[cat.color, cat.color + '40']} style={styles.cardAccent} />
-
-        <View style={styles.superCardContent}>
-          <View style={styles.superCardTop}>
-            <LinearGradient colors={[cat.color + '35', cat.color + '15']} style={styles.superIconCircle}>
-              <CategoryIcon emoji={cat.icon} size={28} color={cat.color} type="super" />
-            </LinearGradient>
-            <View style={styles.superCardInfo}>
-              <Text style={[styles.superLabel, { color: cat.color }]}>{cat.label.toUpperCase()}</Text>
-              <Text style={styles.superMeta}>{cat.total_themes} {t('play.themes_count')}</Text>
-            </View>
-            <View style={[styles.arrowCircle, { backgroundColor: cat.color + '18' }]}>
-              <Text style={[styles.arrowText, { color: cat.color }]}>›</Text>
-            </View>
-          </View>
-          <View style={styles.clustersPreview}>
-            {cat.clusters.map((cluster) => (
-              <View key={cluster.name} style={[styles.clusterPill, { borderColor: cat.color + '20' }]}>
-                <CategoryIcon emoji={cluster.icon} size={13} color="rgba(255,255,255,0.7)" type="cluster" />
-                <Text style={styles.clusterPillText}>{cluster.name}</Text>
-                <View style={[styles.clusterCountBadge, { backgroundColor: cat.color + '25' }]}>
-                  <Text style={[styles.clusterPillCount, { color: cat.color }]}>{cluster.theme_count}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
+    <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 70).duration(450)}>
+      <ScalePressable style={styles.tile} onPress={onPress}>
+        <LinearGradient
+          colors={[cat.color + '25', cat.color + '08']}
+          start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+          style={[StyleSheet.absoluteFill, { borderRadius: 18 }]}
+        />
+        <View style={styles.tileIcon}>
+          <CategoryIcon emoji={cat.icon} size={34} color={cat.color} type="super" />
         </View>
-
-        {/* C — Shimmer diagonal */}
-        <Animated.View pointerEvents="none" style={[styles.shimmerOverlay, shimmerStyle]}>
-          <LinearGradient
-            colors={['transparent', 'rgba(255,255,255,0.07)', 'transparent']}
-            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-            style={{ width: 80, height: '400%', marginTop: '-150%', transform: [{ rotate: '25deg' }] }}
-          />
-        </Animated.View>
-      </TouchableOpacity>
+        <View>
+          <Text style={styles.tileName} numberOfLines={1}>{cat.label}</Text>
+          <Text style={[styles.tileStat, { color: cat.color }]}>
+            {cat.total_themes} {t('play.themes_count').toUpperCase()}
+          </Text>
+        </View>
+        <View style={[styles.tileBorder, { borderColor: cat.color + '40' }]} pointerEvents="none" />
+      </ScalePressable>
     </Animated.View>
   );
 }
@@ -268,12 +226,14 @@ export default function PlayScreen() {
             </TouchableOpacity>
           </Animated.View>
 
-          {/* Univers */}
+          {/* Univers — grille 2 colonnes de tuiles teintées */}
           <Text style={styles.sectionEyebrow}>◆ {t('play.super_categories')}</Text>
 
-          {superCategories.map((cat, index) => (
-            <SuperCard key={cat.id} cat={cat} index={index} onPress={() => handlePress(cat)} />
-          ))}
+          <View style={styles.tileGrid}>
+            {superCategories.map((cat, index) => (
+              <UniverseTile key={cat.id} cat={cat} index={index} onPress={() => handlePress(cat)} />
+            ))}
+          </View>
 
           {upcomingFiltered.length > 0 && (
             <>
@@ -388,62 +348,26 @@ const styles = StyleSheet.create({
     marginBottom: 12, paddingHorizontal: 20, marginTop: 8,
   },
 
-  // Super Category Card
-  superCard: {
-    marginHorizontal: 16, marginBottom: 14,
-    borderRadius: 20, overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+  // Tuiles univers — grille 2 colonnes (pattern écran 6)
+  tileGrid: {
+    flexDirection: 'row', flexWrap: 'wrap',
+    paddingHorizontal: 16, gap: GRID_GAP,
   },
-  cardTopGlow: {
-    position: 'absolute', top: 0, left: 0, right: 0, height: 80,
+  tile: {
+    width: TILE_W, aspectRatio: 1 / 1.05,
+    borderRadius: 18, padding: 16,
+    justifyContent: 'space-between', overflow: 'hidden',
   },
-  cardAccent: {
-    position: 'absolute', top: 12, bottom: 12, left: 0, width: 3,
-    borderTopRightRadius: 3, borderBottomRightRadius: 3,
+  tileBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 18, borderWidth: 1,
   },
-  superCardContent: {
-    padding: 16, paddingLeft: 18,
+  tileIcon: { alignSelf: 'flex-start' },
+  tileName: {
+    color: '#FFF', fontSize: 15, fontFamily: FONTS.display.bold, letterSpacing: -0.3,
   },
-  superCardTop: {
-    flexDirection: 'row', alignItems: 'center',
-  },
-  superIconCircle: {
-    width: 54, height: 54, borderRadius: 27,
-    justifyContent: 'center', alignItems: 'center',
-  },
-  superIcon: { fontSize: 28 },
-  superCardInfo: { flex: 1, marginLeft: 14 },
-  superLabel: { fontSize: 18, fontWeight: '900', letterSpacing: 1.5 },
-  superMeta: { color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: '600', marginTop: 3 },
-  arrowCircle: {
-    width: 36, height: 36, borderRadius: 18,
-    justifyContent: 'center', alignItems: 'center',
-  },
-  arrowText: { fontSize: 22, fontWeight: '600', marginTop: -2 },
-
-  // Clusters preview
-  clustersPreview: {
-    flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 8,
-  },
-  clusterPill: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5,
-    gap: 5,
-    borderWidth: 1,
-  },
-  clusterPillIcon: { fontSize: 13 },
-  clusterPillText: { color: 'rgba(255,255,255,0.8)', fontSize: 11, fontWeight: '600' },
-  clusterCountBadge: {
-    borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1, minWidth: 18, alignItems: 'center',
-  },
-  clusterPillCount: { fontSize: 10, fontWeight: '800' },
-
-  shimmerOverlay: {
-    position: 'absolute', top: 0, bottom: 0, left: 0, right: 0,
-    overflow: 'hidden', borderRadius: 20,
+  tileStat: {
+    fontFamily: FONTS.mono.regular, fontSize: 9, letterSpacing: 1, marginTop: 2,
   },
 
   // Upcoming
