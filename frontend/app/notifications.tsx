@@ -7,7 +7,6 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import SwipeBackPage from '../components/SwipeBackPage';
@@ -35,18 +34,18 @@ interface NotificationItem {
   created_at: string;
 }
 
-// MCI icon + gradient for each notification type
-const TYPE_META: Record<string, { icon: string; colors: [string, string]; color: string }> = {
-  challenge:    { icon: 'sword-cross',    colors: ['#FF6B35', '#FF8F60'], color: '#FF6B35' },
-  match_result: { icon: 'trophy',         colors: ['#8A2BE2', '#A855F7'], color: '#8A2BE2' },
-  follow:       { icon: 'account-plus',   colors: ['#00D4FF', '#38BDF8'], color: '#00D4FF' },
-  message:      { icon: 'chat',           colors: ['#4CAF50', '#66BB6A'], color: '#4CAF50' },
-  like:         { icon: 'heart',          colors: ['#FF3B5C', '#FF6B81'], color: '#FF3B5C' },
-  comment:      { icon: 'comment-text',   colors: ['#FFB800', '#FFC933'], color: '#FFB800' },
-  system:       { icon: 'bell',           colors: ['#6B7280', '#9CA3AF'], color: '#888' },
+// Icône MCI + couleur marque par type (tuile carrée teintée, cf. écran 13 du handoff)
+const TYPE_META: Record<string, { icon: string; color: string }> = {
+  challenge:    { icon: 'sword-cross',  color: '#00E5FF' },
+  match_result: { icon: 'trophy',       color: '#FFB547' },
+  follow:       { icon: 'account-plus', color: '#B366FF' },
+  message:      { icon: 'chat',         color: '#32E7A3' },
+  like:         { icon: 'heart',        color: '#FF3D5E' },
+  comment:      { icon: 'comment-text', color: '#FFB547' },
+  system:       { icon: 'bell',         color: 'rgba(255,255,255,0.5)' },
 };
 
-const DEFAULT_META = { icon: 'bell-outline', colors: ['#6B7280', '#9CA3AF'] as [string, string], color: '#888' };
+const DEFAULT_META = { icon: 'bell-outline', color: 'rgba(255,255,255,0.5)' };
 
 function translateNotif(text: string): string {
   // Format: "notif.key:actorName" or just "notif.key"
@@ -62,22 +61,6 @@ function translateNotif(text: string): string {
   }
   // Fallback for old notifications already stored in French
   return text;
-}
-
-function getInitial(pseudo: string | null, seed: string | null): string {
-  if (pseudo && pseudo.length > 0) return pseudo[0].toUpperCase();
-  if (seed && seed.length > 0) return seed[0].toUpperCase();
-  return '?';
-}
-
-function getAvatarColor(seed: string | null): string {
-  if (!seed) return '#8A2BE2';
-  const palette = ['#FF6B35', '#8A2BE2', '#00D4FF', '#4CAF50', '#FF3B5C', '#FFB800', '#00FF9D', '#E53935'];
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = seed.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return palette[Math.abs(hash) % palette.length];
 }
 
 function getTimeAgo(dateStr: string): string {
@@ -227,22 +210,20 @@ export default function NotificationsScreen() {
         style={[styles.notifCard, !item.read && styles.notifCardUnread]}
         onPress={() => handleNotificationPress(item)}
       >
-        {/* Unread indicator line */}
-        {!item.read && <View style={[styles.unreadLine, { backgroundColor: meta.color }]} />}
-
-        {/* Avatar or type icon */}
+        {/* Avatar ou tuile carrée teintée par type (écran 13) */}
         <View style={styles.avatarWrap}>
           {item.actor_pseudo || item.actor_avatar_seed ? (
-            <UserAvatar avatarUrl={item.actor_avatar_url} avatarSeed={item.actor_avatar_seed || ''} pseudo={item.actor_pseudo || '?'} size={46} />
+            <>
+              <UserAvatar avatarUrl={item.actor_avatar_url} avatarSeed={item.actor_avatar_seed || ''} pseudo={item.actor_pseudo || '?'} size={44} />
+              <View style={[styles.typeBadge, { backgroundColor: '#050510', borderColor: meta.color + '66' }]}>
+                <MaterialCommunityIcons name={meta.icon as any} size={10} color={meta.color} />
+              </View>
+            </>
           ) : (
-            <LinearGradient colors={meta.colors} style={styles.avatarCircle}>
-              <MaterialCommunityIcons name={meta.icon as any} size={22} color="#FFF" />
-            </LinearGradient>
+            <View style={[styles.iconTile, { backgroundColor: meta.color + '20', borderColor: meta.color + '40' }]}>
+              <MaterialCommunityIcons name={meta.icon as any} size={20} color={meta.color} />
+            </View>
           )}
-          {/* Small type badge on avatar */}
-          <LinearGradient colors={meta.colors} style={styles.typeBadge}>
-            <MaterialCommunityIcons name={meta.icon as any} size={10} color="#FFF" />
-          </LinearGradient>
         </View>
 
         {/* Content */}
@@ -250,10 +231,7 @@ export default function NotificationsScreen() {
           <Text style={[styles.notifBody, !item.read && styles.notifBodyUnread]} numberOfLines={2}>
             {translateNotif(item.body)}
           </Text>
-          <View style={styles.notifMeta}>
-            <MaterialCommunityIcons name="clock-outline" size={11} color="#555" />
-            <Text style={styles.notifTime}>{getTimeAgo(item.created_at)}</Text>
-          </View>
+          <Text style={styles.notifTime}>{getTimeAgo(item.created_at)}</Text>
         </View>
 
         {/* Chevron */}
@@ -307,7 +285,7 @@ export default function NotificationsScreen() {
       {/* Content */}
       {loading ? (
         <View style={styles.loadingWrap}>
-          <ActivityIndicator size="large" color="#8A2BE2" />
+          <ActivityIndicator size="large" color="#B366FF" />
         </View>
       ) : notifications.length === 0 ? (
         <EmptyState
@@ -326,8 +304,8 @@ export default function NotificationsScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor="#8A2BE2"
-              colors={['#8A2BE2']}
+              tintColor="#B366FF"
+              colors={['#B366FF']}
             />
           }
           showsVerticalScrollIndicator={false}
@@ -350,7 +328,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(138, 43, 226, 0.15)',
+    borderBottomColor: 'rgba(179,102,255,0.15)',
   },
   backBtn: {
     width: 36,
@@ -475,29 +453,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(0,229,255,0.18)',
   },
-  unreadLine: {
-    position: 'absolute',
-    left: 0,
-    top: 8,
-    bottom: 8,
-    width: 3,
-    borderRadius: 2,
-  },
   avatarWrap: {
     position: 'relative',
     marginRight: 12,
   },
-  avatarCircle: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+  // Tuile carrée teintée par type (écran 13 du handoff)
+  iconTile: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    borderWidth: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  avatarLetter: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#FFF',
   },
   typeBadge: {
     position: 'absolute',
@@ -505,11 +472,10 @@ const styles = StyleSheet.create({
     right: -2,
     width: 20,
     height: 20,
-    borderRadius: 10,
+    borderRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#050510',
+    borderWidth: 1,
   },
   notifContent: {
     flex: 1,
@@ -524,14 +490,11 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: '600',
   },
-  notifMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 4,
-  },
   notifTime: {
-    fontSize: 12,
-    color: '#555',
+    fontSize: 9,
+    fontFamily: 'JetBrainsMono_400Regular',
+    color: 'rgba(255,255,255,0.40)',
+    letterSpacing: 1,
+    marginTop: 4,
   },
 });

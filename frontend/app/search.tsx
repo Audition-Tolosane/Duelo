@@ -11,7 +11,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { GLASS } from '../theme/glassTheme';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
 import CategoryIcon from '../components/CategoryIcon';
@@ -292,35 +291,19 @@ export default function SearchScreen() {
           router.push(`/category-detail?id=${item.id}`);
         }}
       >
-        <View style={[st.themeCardInner, { borderLeftColor: color, borderLeftWidth: 3 }]}>
-          <View style={st.themeCardLeft}>
-            <View style={[st.themeIconBox, { backgroundColor: color + '20' }]}>
-              <CategoryIcon themeId={item.id} emoji={item.cluster || item.super_category} size={24} color={color} type="cluster" />
-            </View>
+        {/* Ligne plate écran 12 : tuile teintée 42 + nom + méta mono */}
+        <View style={st.resultRow}>
+          <View style={[st.themeIconBox, { backgroundColor: color + '25', borderColor: color + '50' }]}>
+            <CategoryIcon themeId={item.id} emoji={item.cluster || item.super_category} size={22} color={color} type="cluster" />
           </View>
-          <View style={st.themeCardCenter}>
-            {item.cluster ? (
-              <Text style={st.themeCluster}>{item.cluster}</Text>
-            ) : null}
-            <Text style={[st.themeName, { color }]}>{item.name}</Text>
-            <Text style={st.themeDesc} numberOfLines={1}>{item.description}</Text>
-            <View style={st.themeMetaRow}>
-              <Text style={st.themeMeta}>{item.total_questions} {t('search.questions')}</Text>
-              <Text style={st.themeMetaDot}>·</Text>
-              <Text style={st.themeMeta}>{item.player_count} {t('search.players_count')}</Text>
-            </View>
+          <View style={st.resultInfo}>
+            <Text style={st.resultName} numberOfLines={1}>{item.name}</Text>
+            <Text style={[st.resultMeta, { color: color + 'CC' }]} numberOfLines={1}>
+              ◆ {t('search.tab_themes').toUpperCase()} · {item.total_questions} QUIZ
+              {item.user_level > 0 ? ` · ${t('search.level_short').toUpperCase()} ${item.user_level}` : ''}
+            </Text>
           </View>
-          <View style={st.themeCardRight}>
-            {item.user_level > 0 ? (
-              <View style={[st.themeLevelBadge, { backgroundColor: color + '20' }]}>
-                <Text style={[st.themeLevelText, { color }]}>{t('search.level_short')} {item.user_level}</Text>
-              </View>
-            ) : (
-              <View style={[st.themeNewBadge, { backgroundColor: color + '15', borderColor: color + '40' }]}>
-                <Text style={[st.themeNewText, { color }]}>{item.cluster || t('search.new_badge')}</Text>
-              </View>
-            )}
-          </View>
+          <MaterialCommunityIcons name="chevron-right" size={18} color="rgba(255,255,255,0.40)" />
         </View>
       </ScalePressable>
       </ReAnimated.View>
@@ -337,30 +320,20 @@ export default function SearchScreen() {
           router.push(`/player-profile?id=${item.id}`);
         }}
       >
-        <View style={st.playerAvatar}>
-          <UserAvatar avatarUrl={item.avatar_url} avatarSeed={item.avatar_seed} pseudo={item.pseudo} size={48} />
-        </View>
-        <View style={st.playerInfo}>
-          <View style={st.playerNameRow}>
-            <Text style={st.playerName}>@{item.pseudo}</Text>
-            <Text style={st.playerFlag}>{item.country_flag}</Text>
+        {/* Ligne plate écran 12 : avatar 42 + nom + méta mono */}
+        <View style={st.resultRow}>
+          <UserAvatar avatarUrl={item.avatar_url} avatarSeed={item.avatar_seed} pseudo={item.pseudo} size={42} />
+          <View style={st.resultInfo}>
+            <View style={st.playerNameRow}>
+              <Text style={st.resultName} numberOfLines={1}>{item.pseudo}</Text>
+              <Text style={st.playerFlag}>{item.country_flag}</Text>
+            </View>
+            <Text style={st.resultMeta} numberOfLines={1}>
+              👤 {t('search.tab_players').toUpperCase()} · {item.total_xp.toLocaleString()} XP · {item.matches_played} {t('search.matches').toUpperCase()}
+            </Text>
           </View>
-          <Text style={st.playerTitle}>{item.selected_title}</Text>
-          <View style={st.playerStatsRow}>
-            <Text style={st.playerStat}>{item.total_xp.toLocaleString()} XP</Text>
-            <Text style={st.playerStatDot}>·</Text>
-            <Text style={st.playerStat}>{item.matches_played} {t('search.matches')}</Text>
-            {item.best_category && (
-              <>
-                <Text style={st.playerStatDot}>·</Text>
-                <Text style={[st.playerStat, { color: CATEGORY_META[item.best_category]?.color || '#A3A3A3' }]}>
-                  {t('search.level_short')}{item.best_level}
-                </Text>
-              </>
-            )}
-          </View>
+          <MaterialCommunityIcons name="chevron-right" size={18} color="rgba(255,255,255,0.40)" />
         </View>
-        <MaterialCommunityIcons name="chevron-right" size={20} color="#525252" />
       </ScalePressable>
       </ReAnimated.View>
     );
@@ -460,23 +433,17 @@ export default function SearchScreen() {
   return (
     <SwipeBackPage>
     <View style={st.container}>
-      <View style={{ paddingTop: insets.top, backgroundColor: GLASS.bgDark }}>
+      <View style={{ paddingTop: insets.top, backgroundColor: '#050510' }}>
         <DueloHeader />
       </View>
 
-      {/* Sub-header */}
-      <View style={st.header}>
+      {/* Back + champ sur une seule ligne (écran 12 du handoff) */}
+      <View style={st.searchBarWrap}>
         <TouchableOpacity onPress={() => router.back()} style={st.backBtnCircle} activeOpacity={0.6}>
           <MaterialCommunityIcons name="chevron-left" size={26} color="#FFF" />
         </TouchableOpacity>
-        <Text style={st.headerTitle}>{t('search.title')}</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
-      {/* Search Bar */}
-      <View style={st.searchBarWrap}>
         <View style={st.searchBar}>
-          <MaterialCommunityIcons name="magnify" size={18} color="rgba(255,255,255,0.3)" style={{ marginRight: 10 }} />
+          <MaterialCommunityIcons name="magnify" size={18} color={CYAN} style={{ marginRight: 10 }} />
           <TextInput
             ref={searchInputRef}
             style={st.searchInput}
@@ -485,7 +452,7 @@ export default function SearchScreen() {
               activeTab === 'joueurs' ? t('search.placeholder_players') :
               t('search.placeholder_content')
             }
-            placeholderTextColor="#525252"
+            placeholderTextColor="rgba(255,255,255,0.30)"
             value={searchQuery}
             onChangeText={handleSearchChange}
             returnKeyType="search"
@@ -494,7 +461,7 @@ export default function SearchScreen() {
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => { setSearchQuery(''); performSearch(''); }} style={st.clearBtn}>
-              <MaterialCommunityIcons name="close-circle" size={18} color="#525252" />
+              <MaterialCommunityIcons name="close-circle" size={18} color="rgba(255,255,255,0.40)" />
             </TouchableOpacity>
           )}
         </View>
@@ -509,14 +476,17 @@ export default function SearchScreen() {
         ]).map((tab) => (
           <TouchableOpacity
             key={tab.key}
-            style={[st.tabBtn, activeTab === tab.key && st.tabBtnActive]}
+            style={st.tabBtn}
             onPress={() => handleTabChange(tab.key)}
           >
+            {activeTab === tab.key && (
+              <LinearGradient colors={[CYAN, VIOLET]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+            )}
             <View style={st.tabInner}>
               <MaterialCommunityIcons
                 name={TAB_ICONS[tab.key]}
                 size={16}
-                color={activeTab === tab.key ? CYAN : '#A3A3A3'}
+                color={activeTab === tab.key ? '#000' : '#A3A3A3'}
               />
               <Text style={[st.tabText, activeTab === tab.key && st.tabTextActive]}>
                 {tab.label}
@@ -533,10 +503,7 @@ export default function SearchScreen() {
             {/* Trending Tags */}
             {trendingTags.length > 0 && (
               <View style={st.trendingSection}>
-                <View style={st.sectionLabelRow}>
-                  <MaterialCommunityIcons name="fire" size={14} color="#525252" />
-                  <Text style={st.sectionLabel}>{t('search.trending')}</Text>
-                </View>
+                <Text style={st.sectionLabel}>{t('search.trending')}</Text>
                 <View style={st.trendingTagsWrap}>
                   {trendingTags.map((tag, idx) => (
                     <TouchableOpacity
@@ -544,19 +511,9 @@ export default function SearchScreen() {
                       style={[st.trendingTag, tag.type === 'hot' && st.trendingTagHot]}
                       onPress={() => handleTrendingTag(tag.tag)}
                     >
-                      <MaterialCommunityIcons
-                        name={tag.type === 'hot' ? 'fire' : 'tag-outline'}
-                        size={16}
-                        color={tag.type === 'hot' ? '#FF5722' : 'rgba(255,255,255,0.5)'}
-                      />
                       <Text style={[st.trendingTagText, tag.type === 'hot' && st.trendingTagTextHot]}>
                         {tag.tag}
                       </Text>
-                      {tag.type === 'hot' && (
-                        <View style={st.hotBadge}>
-                          <MaterialCommunityIcons name="fire" size={10} color="#FF5722" />
-                        </View>
-                      )}
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -566,10 +523,7 @@ export default function SearchScreen() {
             {/* Top Players */}
             {topPlayers.length > 0 && (
               <View style={st.trendingSection}>
-                <View style={st.sectionLabelRow}>
-                  <MaterialCommunityIcons name="trophy" size={14} color="#525252" />
-                  <Text style={st.sectionLabel}>{t('search.top_players')}</Text>
-                </View>
+                <Text style={st.sectionLabel}>{t('search.top_players')}</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.topPlayersScroll}>
                   {topPlayers.map((p: any) => (
                     <TouchableOpacity
@@ -593,10 +547,7 @@ export default function SearchScreen() {
 
             {/* All Themes */}
             <View style={st.trendingSection}>
-              <View style={st.sectionLabelRow}>
-                <MaterialCommunityIcons name="book-open-variant" size={14} color="#525252" />
-                <Text style={st.sectionLabel}>{t('search.all_themes')}</Text>
-              </View>
+              <Text style={st.sectionLabel}>{t('search.all_themes')}</Text>
               {/* Difficulty filter */}
               {renderDifficultyFilters()}
               {themes.map((theme, idx) => renderThemeItem({ item: theme, index: idx }))}
@@ -626,6 +577,9 @@ export default function SearchScreen() {
                 contentContainerStyle={st.listContent}
                 keyboardDismissMode="on-drag"
                 keyboardShouldPersistTaps="handled"
+                ListHeaderComponent={searchQuery.trim() && themes.length > 0 ? (
+                  <Text style={st.resultsCount}>{themes.length} {t('search.results_label')}</Text>
+                ) : null}
                 ListEmptyComponent={
                   <EmptyState
                     icon="🔍"
@@ -666,6 +620,9 @@ export default function SearchScreen() {
                 contentContainerStyle={st.listContent}
                 keyboardDismissMode="on-drag"
                 keyboardShouldPersistTaps="handled"
+                ListHeaderComponent={searchQuery.trim() && players.length > 0 ? (
+                  <Text style={st.resultsCount}>{players.length} {t('search.results_label')}</Text>
+                ) : null}
                 ListEmptyComponent={
                   <EmptyState
                     icon="🔍"
@@ -733,42 +690,38 @@ export default function SearchScreen() {
 const st = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#050510' },
 
-  // Header
-  header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 12, paddingVertical: 10, backgroundColor: '#050510',
+  // Back + champ sur une ligne (écran 12)
+  searchBarWrap: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    paddingHorizontal: 16, paddingVertical: 12,
   },
   backBtnCircle: {
     width: 40, height: 40, borderRadius: 20,
     backgroundColor: 'rgba(255,255,255,0.06)',
     justifyContent: 'center', alignItems: 'center',
   },
-  headerTitle: { fontSize: 18, fontWeight: '800', color: '#FFF' },
-
-  // Search Bar
-  searchBarWrap: { paddingHorizontal: 16, paddingVertical: 12 },
   searchBar: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(0,229,255,0.06)', borderRadius: 16,
-    paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(0,229,255,0.2)',
+    flex: 1, flexDirection: 'row', alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 14,
+    paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(0,229,255,0.31)',
   },
   searchInput: {
-    flex: 1, color: '#FFF', fontSize: 15, paddingVertical: 14,
+    flex: 1, color: '#FFF', fontSize: 14, paddingVertical: 12,
+    fontFamily: 'SpaceGrotesk_400Regular',
   },
   clearBtn: { padding: 8 },
 
-  // Tabs
+  // Tabs — gradient actif en absoluteFill, texte noir
   tabsRow: {
     flexDirection: 'row', paddingHorizontal: 16, gap: 8, marginBottom: 4,
   },
   tabBtn: {
-    flex: 1, paddingVertical: 10, borderRadius: 14, alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    flex: 1, paddingVertical: 10, borderRadius: 12, alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.04)', overflow: 'hidden',
   },
-  tabBtnActive: { backgroundColor: 'rgba(0,229,255,0.12)', borderColor: 'rgba(0,229,255,0.4)' },
   tabInner: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  tabText: { color: '#A3A3A3', fontSize: 13, fontWeight: '600' },
-  tabTextActive: { color: CYAN },
+  tabText: { color: '#A3A3A3', fontSize: 12, fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: 0.5, textTransform: 'uppercase' },
+  tabTextActive: { color: '#000000' },
 
   // Filter rows
   filterRow: { flexGrow: 0, marginBottom: 4 },
@@ -800,24 +753,37 @@ const st = StyleSheet.create({
   emptyTitle: { color: '#FFF', fontSize: 18, fontWeight: '700', marginBottom: 4 },
   emptyDesc: { color: '#525252', fontSize: 13, textAlign: 'center' },
 
-  // Trending
+  // Trending — eyebrow mono + pills simples (écran 12)
   trendingSection: { paddingHorizontal: 16, marginTop: 16 },
-  sectionLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
   sectionLabel: {
-    fontSize: 12, fontWeight: '800', color: '#525252', letterSpacing: 2,
+    fontSize: 9, fontFamily: 'JetBrainsMono_400Regular', color: 'rgba(255,255,255,0.40)',
+    letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10,
   },
   trendingTagsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
   trendingTag: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 14, paddingVertical: 10, borderRadius: 14,
-    backgroundColor: 'rgba(179,102,255,0.08)', borderWidth: 1, borderColor: 'rgba(179,102,255,0.3)',
+    paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)',
   },
-  trendingTagHot: { borderColor: 'rgba(255,87,34,0.4)', backgroundColor: 'rgba(255,87,34,0.1)' },
-  trendingTagText: { color: VIOLET, fontSize: 14, fontWeight: '600' },
-  trendingTagTextHot: { color: '#FF5722' },
-  hotBadge: {
-    backgroundColor: 'rgba(255,87,34,0.2)',
-    paddingHorizontal: 4, paddingVertical: 2, borderRadius: 6, overflow: 'hidden',
+  trendingTagHot: { borderColor: 'rgba(255,107,44,0.4)', backgroundColor: 'rgba(255,107,44,0.10)' },
+  trendingTagText: { color: '#FFF', fontSize: 12, fontFamily: 'SpaceGrotesk_600SemiBold' },
+  trendingTagTextHot: { color: '#FF6B2C' },
+
+  // Lignes de résultats plates (écran 12)
+  resultsCount: {
+    fontSize: 9, fontFamily: 'JetBrainsMono_400Regular', color: 'rgba(255,255,255,0.40)',
+    letterSpacing: 2, textTransform: 'uppercase', marginTop: 10, marginBottom: 8,
+  },
+  resultRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    paddingVertical: 10, paddingHorizontal: 8, borderRadius: 12,
+  },
+  resultInfo: { flex: 1 },
+  resultName: {
+    color: '#FFF', fontSize: 14, fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.2,
+  },
+  resultMeta: {
+    fontSize: 9, fontFamily: 'JetBrainsMono_400Regular', color: 'rgba(255,255,255,0.40)',
+    letterSpacing: 1, marginTop: 3,
   },
 
   // Top Players (horizontal scroll)
@@ -834,51 +800,15 @@ const st = StyleSheet.create({
   topPlayerName: { color: '#FFF', fontSize: 11, fontWeight: '700', textAlign: 'center', paddingHorizontal: 4 },
   topPlayerXp: { color: CYAN, fontSize: 10, fontWeight: '700', marginTop: 2 },
 
-  // Theme Card
-  themeCard: { marginBottom: 10 },
-  themeCardInner: {
-    flexDirection: 'row', alignItems: 'center', padding: 14, borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
-  },
-  themeCardLeft: { marginRight: 12 },
+  // Theme / Player rows
+  themeCard: { marginBottom: 2 },
   themeIconBox: {
-    width: 48, height: 48, borderRadius: 14,
+    width: 42, height: 42, borderRadius: 12, borderWidth: 1,
     justifyContent: 'center', alignItems: 'center',
   },
-  themeCardCenter: { flex: 1 },
-  themeCluster: { fontSize: 10, fontWeight: '700', color: 'rgba(255,255,255,0.4)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 2 },
-  themeName: { fontSize: 16, fontWeight: '800', marginBottom: 2 },
-  themeDesc: { color: '#A3A3A3', fontSize: 12, marginBottom: 4 },
-  themeMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  themeMeta: { color: '#525252', fontSize: 11, fontWeight: '600' },
-  themeMetaDot: { color: '#333', fontSize: 10 },
-  themeCardRight: { marginLeft: 8, alignItems: 'center' },
-  themeLevelBadge: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 },
-  themeLevelText: { fontSize: 11, fontWeight: '800' },
-  themeNewBadge: {
-    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-  },
-  themeNewText: { color: '#525252', fontSize: 11, fontWeight: '700' },
-
-  // Player Card
-  playerCard: {
-    flexDirection: 'row', alignItems: 'center', paddingVertical: 14,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(0,229,255,0.15)',
-  },
-  playerAvatar: {
-    width: 48, height: 48, borderRadius: 24, backgroundColor: VIOLET,
-    justifyContent: 'center', alignItems: 'center', marginRight: 12,
-  },
-  playerAvatarText: { color: '#FFF', fontSize: 20, fontWeight: '800' },
-  playerInfo: { flex: 1 },
-  playerNameRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 },
-  playerName: { color: '#FFF', fontSize: 16, fontWeight: '700' },
-  playerFlag: { fontSize: 14 },
-  playerTitle: { color: VIOLET, fontSize: 13, fontWeight: '600', marginBottom: 4 },
-  playerStatsRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  playerStat: { color: '#525252', fontSize: 12, fontWeight: '600' },
-  playerStatDot: { color: '#333', fontSize: 12 },
+  playerCard: { marginBottom: 2 },
+  playerNameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  playerFlag: { fontSize: 13 },
 
   // Post Card
   postCard: {

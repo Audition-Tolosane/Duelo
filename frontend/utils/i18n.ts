@@ -229,6 +229,7 @@ const translations: Translations = {
   'themes.featured_badge': { fr: 'POPULAIRE', en: 'POPULAR', es: 'POPULAR', de: 'BELIEBT', pt: 'POPULAR', it: 'POPOLARE', ar: 'شائع', ja: '人気', ko: '인기', zh: '热门' },
   'themes.featured_cta': { fr: 'DUEL', en: 'DUEL', es: 'DUELO', de: 'DUELL', pt: 'DUELO', it: 'DUELLO', ar: 'مبارزة', ja: 'デュエル', ko: '대결', zh: '对决' },
   'themes.coming_soon': { fr: 'BIENTÔT', en: 'COMING SOON', es: 'PRÓXIMAMENTE', de: 'DEMNÄCHST', pt: 'EM BREVE', it: 'PROSSIMAMENTE', ar: 'قريبا', ja: '近日公開', ko: '출시 예정', zh: '即将推出' },
+  'search.results_label': { fr: 'résultats', en: 'results', es: 'resultados', de: 'Ergebnisse', pt: 'resultados', it: 'risultati', ar: 'نتائج', ja: '件の結果', ko: '개 결과', zh: '条结果' },
   'play.arena_title': { fr: "L'Arène", en: 'The Arena', es: 'La Arena', de: 'Die Arena', pt: 'A Arena', it: "L'Arena", ar: 'الحلبة', ja: 'アリーナ', ko: '아레나', zh: '竞技场' },
   'play.arena_sub': { fr: 'Choisis un thème et défie sur ton terrain', en: 'Pick a theme and duel on your turf', es: 'Elige un tema y duela en tu terreno', de: 'Wähle ein Thema und duelliere auf deinem Terrain', pt: 'Escolha um tema e duele no seu território', it: 'Scegli un tema e duella sul tuo terreno', ar: 'اختر موضوعًا وبارز في ملعبك', ja: 'テーマを選んで得意分野で対戦', ko: '테마를 골라 자신 있는 분야에서 대결', zh: '选择主题，在你的主场对决' },
   'themes.level': { fr: 'Niveau', en: 'Level', es: 'Nivel', de: 'Stufe', pt: 'Nível', it: 'Livello', ar: 'المستوى', ja: 'レベル', ko: '레벨', zh: '等级' },
