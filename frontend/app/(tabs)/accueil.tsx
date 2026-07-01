@@ -193,7 +193,7 @@ function getXpInLevel(xp: number, level: number): { current: number; needed: num
 
 // ── League Banner ──
 const TIER_COLORS: Record<string, string> = {
-  diamond: '#00D4FF', gold: '#FFB547', silver: '#C0C0C0', bronze: '#CD7F32',
+  diamond: '#00E5FF', gold: '#FFB547', silver: '#C0C0C0', bronze: '#CD7F32',
 };
 const TIER_ICONS: Record<string, string> = {
   diamond: 'diamond-stone', gold: 'trophy', silver: 'shield-half-full', bronze: 'shield',
@@ -292,7 +292,7 @@ const RivalBanner = React.memo(function RivalBanner({ router }: { router: any })
       <View style={rivalStyles.inner}>
         <View style={rivalStyles.left}>
           <View style={rivalStyles.labelRow}>
-            <MaterialCommunityIcons name="sword-cross" size={11} color="#FF6B35" />
+            <MaterialCommunityIcons name="sword-cross" size={11} color="#FF6B2C" />
             <Text style={rivalStyles.label}>{t('rival.label')}</Text>
           </View>
           <View style={rivalStyles.playerRow}>
@@ -320,7 +320,7 @@ const RivalBanner = React.memo(function RivalBanner({ router }: { router: any })
           }}
           activeOpacity={0.8}
         >
-          <LinearGradient colors={['#FF6B35', '#FF3D5E']} style={rivalStyles.challengeGrad}>
+          <LinearGradient colors={['#FF6B2C', '#FF3D5E']} style={rivalStyles.challengeGrad}>
             <MaterialCommunityIcons name="sword-cross" size={12} color="#FFF" />
             <Text style={rivalStyles.challengeText}>{t('rival.challenge')}</Text>
           </LinearGradient>
@@ -335,12 +335,12 @@ const rivalStyles = StyleSheet.create({
   inner: { flexDirection: 'row', alignItems: 'center', padding: 12, gap: 12 },
   left: { flex: 1 },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6 },
-  label: { fontSize: 9, fontWeight: '800', color: '#FF6B35', letterSpacing: 1.5, textTransform: 'uppercase' },
+  label: { fontSize: 9, fontWeight: '800', color: '#FF6B2C', letterSpacing: 1.5, textTransform: 'uppercase' },
   playerRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   playerInfo: { flex: 1 },
   pseudo: { color: '#FFF', fontSize: 13, fontWeight: '800' },
   xpGap: { color: '#888', fontSize: 11 },
-  xpNum: { color: '#FF6B35', fontWeight: '700' },
+  xpNum: { color: '#FF6B2C', fontWeight: '700' },
   challengeBtn: { borderRadius: 10, overflow: 'hidden' },
   challengeGrad: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, paddingVertical: 8 },
   challengeText: { color: '#FFF', fontSize: 12, fontWeight: '800' },
@@ -415,7 +415,7 @@ const TournamentBanner = React.memo(function TournamentBanner({ router }: { rout
             }}
             activeOpacity={0.8}
           >
-            <LinearGradient colors={['#FFB547', '#FF9F0A']} style={tStyles.playGrad}>
+            <LinearGradient colors={['#FFB547', '#FFB547']} style={tStyles.playGrad}>
               <MaterialCommunityIcons name="play" size={14} color="#000" />
               <Text style={tStyles.playText}>{info.games_remaining}x</Text>
             </LinearGradient>
@@ -469,7 +469,7 @@ const MissionsWidget = React.memo(function MissionsWidget({
     <View style={mStyles.container}>
       {/* Header */}
       <View style={mStyles.header}>
-        <LinearGradient colors={['#FFB800', '#FF6B35']} style={mStyles.headerIcon}>
+        <LinearGradient colors={['#FFB800', '#FF6B2C']} style={mStyles.headerIcon}>
           <MaterialCommunityIcons name="flag-checkered" size={12} color="#FFF" />
         </LinearGradient>
         <Text style={mStyles.title}>{t('missions.day_title')}</Text>
@@ -532,7 +532,7 @@ const MissionsWidget = React.memo(function MissionsWidget({
           )}
           {canClaim && (
             <TouchableOpacity style={mStyles.claimBtn} onPress={onClaim} activeOpacity={0.8}>
-              <LinearGradient colors={['#32E7A3', '#00D4FF']} style={mStyles.claimGradient}>
+              <LinearGradient colors={['#32E7A3', '#00E5FF']} style={mStyles.claimGradient}>
                 <Text style={mStyles.claimText}>{t('missions.claim_xp').replace('{xp}', String(totalXP))}</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -573,7 +573,7 @@ function getInitial(pseudo: string): string {
 }
 
 function getAvatarColor(seed: string): string {
-  const palette = ['#FF6B35', '#B366FF', '#00D4FF', '#4CAF50', '#FF3D5E', '#FFB800', '#32E7A3', '#E53935'];
+  const palette = ['#FF6B2C', '#B366FF', '#00E5FF', '#4CAF50', '#FF3D5E', '#FFB800', '#32E7A3', '#E53935'];
   let hash = 0;
   for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
   return palette[Math.abs(hash) % palette.length];
@@ -1076,7 +1076,7 @@ const WeeklySummaryWidget = React.memo(function WeeklySummaryWidget() {
         style={wkStyles.card}
       >
         <View style={wkStyles.headerRow}>
-          <LinearGradient colors={['#B366FF', '#A855F7']} style={wkStyles.iconCircle}>
+          <LinearGradient colors={['#B366FF', '#B366FF']} style={wkStyles.iconCircle}>
             <MaterialCommunityIcons name="chart-line" size={13} color="#FFF" />
           </LinearGradient>
           <Text style={wkStyles.title}>Cette semaine</Text>
@@ -1100,7 +1100,7 @@ const WeeklySummaryWidget = React.memo(function WeeklySummaryWidget() {
             <>
               <View style={wkStyles.divider} />
               <View style={wkStyles.statItem}>
-                <Text style={[wkStyles.statVal, { color: '#FF6B35' }]}>{summary.perfect_scores}</Text>
+                <Text style={[wkStyles.statVal, { color: '#FF6B2C' }]}>{summary.perfect_scores}</Text>
                 <Text style={wkStyles.statLabel}>PARFAITS</Text>
               </View>
             </>
@@ -1108,7 +1108,7 @@ const WeeklySummaryWidget = React.memo(function WeeklySummaryWidget() {
         </View>
         {summary.best_theme_name ? (
           <View style={wkStyles.bestThemeRow}>
-            <MaterialCommunityIcons name="fire" size={11} color="#FF6B35" />
+            <MaterialCommunityIcons name="fire" size={11} color="#FF6B2C" />
             <Text style={wkStyles.bestThemeText}>Thème favori : <Text style={{ color: '#FFF', fontWeight: '700' }}>{summary.best_theme_name}</Text></Text>
           </View>
         ) : null}
@@ -1124,7 +1124,7 @@ const wkStyles = StyleSheet.create({
   },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
   iconCircle: { width: 24, height: 24, borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
-  title: { color: '#A855F7', fontSize: 11, fontWeight: '800', letterSpacing: 1.5, textTransform: 'uppercase' },
+  title: { color: '#B366FF', fontSize: 11, fontWeight: '800', letterSpacing: 1.5, textTransform: 'uppercase' },
   statsRow: { flexDirection: 'row', alignItems: 'center' },
   statItem: { flex: 1, alignItems: 'center' },
   statVal: { color: '#FFF', fontSize: 18, fontWeight: '900' },
@@ -1163,9 +1163,9 @@ const ChallengeSuggestions = React.memo(function ChallengeSuggestions({ router }
   return (
     <Animated.View entering={FadeInDown.delay(320).duration(500)}>
       <View style={styles.sectionHeader}>
-        <LinearGradient colors={['#FF6B35', '#FF9F0A']} style={styles.sectionIconCircle}>
-          <MaterialCommunityIcons name="sword-cross" size={12} color="#FFF" />
-        </LinearGradient>
+        <View style={[styles.sectionIconCircle, { backgroundColor: 'rgba(255,107,44,0.18)' }]}>
+          <MaterialCommunityIcons name="sword-cross" size={12} color="#FF6B2C" />
+        </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.sectionTitle}>{t('home.suggestions_title')}</Text>
         </View>
@@ -1193,7 +1193,7 @@ const ChallengeSuggestions = React.memo(function ChallengeSuggestions({ router }
                   router.push(path as any);
                 }}
               >
-                <LinearGradient colors={['#FF6B35', '#FF9F0A']} style={sugStyles.challengeGrad}>
+                <LinearGradient colors={['#FF6B2C', '#FFB547']} style={sugStyles.challengeGrad}>
                   <MaterialCommunityIcons name="sword-cross" size={12} color="#000" />
                   <Text style={sugStyles.challengeText}>{t('home.challenge_btn')}</Text>
                 </LinearGradient>
@@ -1215,7 +1215,7 @@ const sugStyles = StyleSheet.create({
   pseudo: { color: '#FFF', fontSize: 12, fontWeight: '700', textAlign: 'center', marginTop: 6 },
   level: { color: '#888', fontSize: 10, fontWeight: '600' },
   themeBadge: { backgroundColor: 'rgba(255,159,10,0.15)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, marginTop: 2, maxWidth: 90 },
-  themeName: { color: '#FF9F0A', fontSize: 9, fontWeight: '700', textAlign: 'center' },
+  themeName: { color: '#FFB547', fontSize: 9, fontWeight: '700', textAlign: 'center' },
   challengeBtn: { marginTop: 6, borderRadius: 8, overflow: 'hidden', width: '100%' },
   challengeGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, paddingVertical: 7 },
   challengeText: { color: '#000', fontSize: 11, fontWeight: '900' },
@@ -1629,6 +1629,13 @@ export default function AccueilScreen() {
     <CosmicBackground>
     <View style={styles.container}>
 
+      {/* Halo violet en haut (écran 2 du handoff) */}
+      <LinearGradient
+        colors={['rgba(179,102,255,0.25)', 'transparent']}
+        style={styles.topHalo}
+        pointerEvents="none"
+      />
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -1656,26 +1663,26 @@ export default function AccueilScreen() {
             </View>
           </View>
 
-          {/* Stats pills */}
+          {/* Stats pills — icône colorée sur pastille teintée (convention marque) */}
           <View style={styles.statsRow}>
             <View style={styles.statPill}>
-              <LinearGradient colors={['#B366FF', '#A855F7']} style={styles.statPillIcon}>
-                <MaterialCommunityIcons name="lightning-bolt" size={12} color="#FFF" />
-              </LinearGradient>
+              <View style={[styles.statPillIcon, { backgroundColor: 'rgba(255,181,71,0.18)' }]}>
+                <MaterialCommunityIcons name="lightning-bolt" size={12} color={GOLD} />
+              </View>
               <Text style={styles.statPillNum}>{(userData?.total_xp || 0).toLocaleString()}</Text>
               <Text style={styles.statPillLabel}>XP</Text>
             </View>
             <View style={styles.statPill}>
-              <LinearGradient colors={['#32E7A3', '#38BDF8']} style={styles.statPillIcon}>
-                <MaterialCommunityIcons name="trophy" size={11} color="#FFF" />
-              </LinearGradient>
+              <View style={[styles.statPillIcon, { backgroundColor: 'rgba(50,231,163,0.18)' }]}>
+                <MaterialCommunityIcons name="trophy" size={11} color={MINT} />
+              </View>
               <Text style={styles.statPillNum}>{winRate}%</Text>
               <Text style={styles.statPillLabel}>{t('home.wins_label')}</Text>
             </View>
             <View style={styles.statPill}>
-              <LinearGradient colors={['#00D4FF', '#38BDF8']} style={styles.statPillIcon}>
-                <MaterialCommunityIcons name="sword-cross" size={11} color="#FFF" />
-              </LinearGradient>
+              <View style={[styles.statPillIcon, { backgroundColor: 'rgba(0,229,255,0.18)' }]}>
+                <MaterialCommunityIcons name="sword-cross" size={11} color={CYAN} />
+              </View>
               <Text style={styles.statPillNum}>{userData?.matches_played || 0}</Text>
               <Text style={styles.statPillLabel}>{t('home.duels_label')}</Text>
             </View>
@@ -1688,13 +1695,13 @@ export default function AccueilScreen() {
             return (
               <View style={styles.xpProgressContainer}>
                 <View style={styles.xpProgressHeader}>
-                  <Text style={styles.xpProgressLevel}>Niv. {lvl}</Text>
+                  <Text style={styles.xpProgressLevel}>LV {lvl}</Text>
                   <Text style={styles.xpProgressInfo}>{current.toLocaleString()} / {needed.toLocaleString()} XP</Text>
-                  <Text style={styles.xpProgressLevel}>Niv. {Math.min(lvl + 1, 50)}</Text>
+                  <Text style={styles.xpProgressLevel}>LV {Math.min(lvl + 1, 50)}</Text>
                 </View>
                 <View style={styles.xpProgressBg}>
                   <LinearGradient
-                    colors={['#B366FF', '#00D4FF']}
+                    colors={[CYAN, GOLD]}
                     start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                     style={[styles.xpProgressFill, { width: `${Math.round(progress * 100)}%` as any }]}
                   />
@@ -1705,7 +1712,7 @@ export default function AccueilScreen() {
 
           {/* Streak Widget */}
           <TouchableOpacity
-            style={styles.streakCard}
+            style={[styles.streakCard, { borderColor: hasPlayedToday ? 'rgba(50,231,163,0.25)' : 'rgba(255,107,44,0.25)' }]}
             activeOpacity={0.85}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -1713,7 +1720,8 @@ export default function AccueilScreen() {
             }}
           >
             <LinearGradient
-              colors={hasPlayedToday ? ['rgba(50,231,163,0.08)', 'rgba(0,191,255,0.04)'] : ['rgba(255,107,53,0.12)', 'rgba(255,61,94,0.06)']}
+              colors={hasPlayedToday ? ['rgba(50,231,163,0.12)', 'rgba(0,229,255,0.06)'] : ['rgba(255,107,44,0.19)', 'rgba(255,181,71,0.13)']}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
               style={styles.streakCardGradient}
             >
               <View style={styles.streakCardLeft}>
@@ -1721,7 +1729,7 @@ export default function AccueilScreen() {
                   <MaterialCommunityIcons
                     name={hasPlayedToday ? 'check-circle' : 'fire'}
                     size={24}
-                    color={hasPlayedToday ? '#32E7A3' : '#FF6B35'}
+                    color={hasPlayedToday ? '#32E7A3' : '#FF6B2C'}
                   />
                 </View>
                 <View style={styles.streakCardInfo}>
@@ -1740,7 +1748,7 @@ export default function AccueilScreen() {
                 </View>
               </View>
               <View style={styles.streakCardRight}>
-                <Text style={[styles.streakNum, { color: hasPlayedToday ? '#32E7A3' : '#FF6B35' }]}>
+                <Text style={[styles.streakNum, { color: hasPlayedToday ? '#32E7A3' : '#FF6B2C' }]}>
                   {userData?.login_streak || 0}
                 </Text>
               </View>
@@ -1818,7 +1826,7 @@ export default function AccueilScreen() {
             }}
           >
             <LinearGradient
-              colors={['#B366FF', '#7B61FF', '#00E5FF']}
+              colors={[CYAN, VIOLET]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.quickPlayGradient}
@@ -1841,11 +1849,11 @@ export default function AccueilScreen() {
             {incomingChallenges.length > 0 && (
               <>
                 <View style={styles.sectionHeader}>
-                  <LinearGradient colors={['#BF5FFF', '#B366FF']} style={styles.sectionIconCircle}>
-                    <MaterialCommunityIcons name="sword-cross" size={12} color="#FFF" />
-                  </LinearGradient>
+                  <View style={[styles.sectionIconCircle, { backgroundColor: 'rgba(179,102,255,0.18)' }]}>
+                    <MaterialCommunityIcons name="sword-cross" size={12} color={VIOLET} />
+                  </View>
                   <Text style={styles.sectionTitle}>{t('challenge.incoming_title')}</Text>
-                  <View style={[styles.sectionBadge, { backgroundColor: '#BF5FFF' }]}>
+                  <View style={[styles.sectionBadge, { backgroundColor: '#B366FF' }]}>
                     <Text style={styles.sectionBadgeText}>{incomingChallenges.length}</Text>
                   </View>
                 </View>
@@ -1866,9 +1874,9 @@ export default function AccueilScreen() {
             {pendingDuels.length > 0 && (
               <>
                 <View style={styles.sectionHeader}>
-                  <LinearGradient colors={['#FF6B35', '#FF8F60']} style={styles.sectionIconCircle}>
-                    <MaterialCommunityIcons name="fire" size={12} color="#FFF" />
-                  </LinearGradient>
+                  <View style={[styles.sectionIconCircle, { backgroundColor: 'rgba(255,107,44,0.18)' }]}>
+                    <MaterialCommunityIcons name="fire" size={12} color="#FF6B2C" />
+                  </View>
                   <Text style={styles.sectionTitle}>{t('challenge.revenge_title')}</Text>
                   <View style={styles.sectionBadge}>
                     <Text style={styles.sectionBadgeText}>{pendingDuels.length}</Text>
@@ -1913,12 +1921,12 @@ export default function AccueilScreen() {
           <Animated.View entering={FadeInDown.delay(370).duration(500)}>
             <View style={styles.dqCard}>
               <View style={styles.dqHeader}>
-                <LinearGradient colors={['#A855F7', '#8B5CF6']} style={styles.dqIcon}>
+                <LinearGradient colors={['#B366FF', '#8B5CF6']} style={styles.dqIcon}>
                   <MaterialCommunityIcons name="help-circle" size={13} color="#FFF" />
                 </LinearGradient>
                 <Text style={styles.dqTitle}>Question du jour</Text>
                 <View style={[styles.dqThemeBadge, { backgroundColor: (dailyQuestion.theme_color || '#8B5CF6') + '25' }]}>
-                  <Text style={[styles.dqThemeName, { color: dailyQuestion.theme_color || '#A855F7' }]} numberOfLines={1}>
+                  <Text style={[styles.dqThemeName, { color: dailyQuestion.theme_color || '#B366FF' }]} numberOfLines={1}>
                     {dailyQuestion.theme_name}
                   </Text>
                 </View>
@@ -1948,7 +1956,7 @@ export default function AccueilScreen() {
                 })}
               </View>
               {dqResult && (
-                <Text style={[styles.dqFeedback, { color: dqResult.correct ? '#32E7A3' : '#FF6B35' }]}>
+                <Text style={[styles.dqFeedback, { color: dqResult.correct ? '#32E7A3' : '#FF6B2C' }]}>
                   {dqResult.correct ? `Bravo ! +${dqResult.xp_earned} XP` : `Raté — +${dqResult.xp_earned} XP quand même`}
                 </Text>
               )}
@@ -2014,9 +2022,9 @@ export default function AccueilScreen() {
         {/* ── Social Wall ── */}
         <Animated.View entering={FadeInDown.delay(400).duration(500)}>
           <View style={styles.sectionHeader}>
-            <LinearGradient colors={['#00D4FF', '#38BDF8']} style={styles.sectionIconCircle}>
-              <MaterialCommunityIcons name="earth" size={12} color="#FFF" />
-            </LinearGradient>
+            <View style={[styles.sectionIconCircle, { backgroundColor: 'rgba(0,229,255,0.18)' }]}>
+              <MaterialCommunityIcons name="earth" size={12} color={CYAN} />
+            </View>
             <Text style={styles.sectionTitle}>{t('home.activity')}</Text>
           </View>
         </Animated.View>
@@ -2116,6 +2124,12 @@ const styles = StyleSheet.create({
   scrollView: { flex: 1 },
   scrollContent: { paddingBottom: 20 },
 
+  topHalo: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0,
+    height: 300,
+  },
+
   // ── Greeting ──
   greetingSection: {
     paddingHorizontal: 16,
@@ -2131,7 +2145,7 @@ const styles = StyleSheet.create({
   greetingLeft: {},
   greetingHi: {
     fontSize: 22,
-    fontWeight: '900',
+    fontFamily: 'SpaceGrotesk_700Bold',
     color: '#FFF',
     letterSpacing: -0.5,
   },
@@ -2172,16 +2186,18 @@ const styles = StyleSheet.create({
   },
   statPillNum: {
     fontSize: 13,
-    fontWeight: '800',
+    fontFamily: 'SpaceGrotesk_700Bold',
     color: '#FFF',
   },
   statPillLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.4)',
+    fontSize: 9,
+    fontFamily: 'JetBrainsMono_400Regular',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    color: 'rgba(255,255,255,0.40)',
   },
 
-  // ── XP Progress Bar ──
+  // ── XP Progress Bar — cyan→or avec glow, labels mono (écran 2) ──
   xpProgressContainer: {
     marginTop: 12, paddingHorizontal: 4,
   },
@@ -2189,16 +2205,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5,
   },
   xpProgressLevel: {
-    fontSize: 10, fontWeight: '800', color: '#B366FF',
+    fontSize: 10, fontFamily: 'JetBrainsMono_700Bold', color: GOLD, letterSpacing: 1,
   },
   xpProgressInfo: {
-    fontSize: 10, fontWeight: '600', color: '#555',
+    fontSize: 9, fontFamily: 'JetBrainsMono_400Regular', color: 'rgba(255,255,255,0.40)', letterSpacing: 1,
   },
   xpProgressBg: {
-    height: 5, backgroundColor: 'rgba(179,102,255,0.15)', borderRadius: 3, overflow: 'hidden',
+    height: 6, backgroundColor: 'rgba(255,255,255,0.10)', borderRadius: 3, overflow: 'hidden',
   },
   xpProgressFill: {
-    height: 5, borderRadius: 3,
+    height: 6, borderRadius: 3,
+    shadowColor: GOLD, shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8, shadowRadius: 8,
   },
 
   // ── Section Headers ──
@@ -2218,21 +2236,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sectionTitle: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: 'rgba(255,255,255,0.4)',
-    letterSpacing: 2,
+    fontSize: 13,
+    fontFamily: 'SpaceGrotesk_700Bold',
+    color: 'rgba(255,255,255,0.60)',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
   },
   sectionBadge: {
     minWidth: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#B366FF',
+    backgroundColor: CYAN,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 6,
   },
-  sectionBadgeText: { fontSize: 10, fontWeight: '800', color: '#FFF' },
+  sectionBadgeText: { fontSize: 10, fontFamily: 'SpaceGrotesk_700Bold', color: '#000' },
 
   // ── Duels Scroll ──
   duelsScroll: {
@@ -2372,6 +2391,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
     borderRadius: 22,
     overflow: 'hidden',
+    shadowColor: VIOLET,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.4,
+    shadowRadius: 28,
+    elevation: 10,
   },
   quickPlayGradient: {
     alignItems: 'center',
@@ -2384,7 +2408,8 @@ const styles = StyleSheet.create({
   quickPlayWatermark: {
     position: 'absolute',
     fontSize: 130,
-    opacity: 0.12,
+    opacity: 0.2,
+    color: '#FFF',
     right: 10,
     top: -20,
   },
@@ -2392,7 +2417,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '800',
     fontFamily: 'JetBrainsMono_700Bold',
-    color: 'rgba(255,255,255,0.7)',
+    color: 'rgba(0,0,0,0.70)',
     letterSpacing: 3,
     textTransform: 'uppercase',
     marginBottom: 6,
@@ -2401,29 +2426,28 @@ const styles = StyleSheet.create({
     fontSize: 42,
     fontWeight: '900',
     fontFamily: 'SpaceGrotesk_700Bold',
-    color: '#FFF',
-    letterSpacing: -1,
+    color: '#000',
+    letterSpacing: -2,
     marginBottom: 6,
   },
   quickPlayHint: {
     fontSize: 13,
-    fontFamily: 'SpaceGrotesk_400Regular',
-    color: 'rgba(255,255,255,0.75)',
-    fontWeight: '500',
-    marginBottom: 20,
+    fontFamily: 'SpaceGrotesk_600SemiBold',
+    color: 'rgba(0,0,0,0.65)',
+    marginBottom: 16,
   },
   quickPlayCta: {
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    paddingHorizontal: 28,
-    paddingVertical: 11,
-    borderRadius: 22,
+    backgroundColor: '#000',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 14,
   },
   quickPlayCtaText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '800',
     fontFamily: 'SpaceGrotesk_700Bold',
     color: '#FFF',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   quickPlayText: {
     fontSize: 16,
@@ -2565,7 +2589,7 @@ const styles = StyleSheet.create({
   dqCard: {
     marginHorizontal: 16, marginBottom: 8,
     backgroundColor: '#1A1A2E', borderRadius: 16,
-    borderWidth: 1, borderColor: '#A855F730', padding: 14,
+    borderWidth: 1, borderColor: '#B366FF30', padding: 14,
   },
   dqHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
   dqIcon: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
@@ -2651,23 +2675,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   streakCardTitle: {
-    fontSize: 14,
-    fontWeight: '800',
+    fontSize: 13,
+    fontFamily: 'SpaceGrotesk_700Bold',
     color: '#FFF',
     marginBottom: 2,
   },
   streakCardSub: {
     fontSize: 11,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
+    fontFamily: 'SpaceGrotesk_400Regular',
+    color: 'rgba(255,255,255,0.60)',
   },
   streakCardRight: {
     alignItems: 'center',
     marginLeft: 8,
   },
   streakNum: {
-    fontSize: 28,
-    fontWeight: '900',
+    fontSize: 26,
+    fontFamily: 'SpaceGrotesk_700Bold',
+    letterSpacing: -1,
   },
   bestStreakBadge: {
     flexDirection: 'row',
