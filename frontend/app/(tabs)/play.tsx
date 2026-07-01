@@ -1,17 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
-  Dimensions,
+  View, Text, TouchableOpacity, StyleSheet, ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import CosmicBackground from '../../components/CosmicBackground';
-import CategoryIcon from '../../components/CategoryIcon';
-import ScalePressable from '../../components/ScalePressable';
 import { t } from '../../utils/i18n';
 import { FONTS } from '../../theme/fonts';
 
@@ -20,119 +16,14 @@ const VIOLET = '#B366FF';
 const GOLD = '#FFB547';
 const FIRE = '#FF6B2C';
 
-const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
-const { width: SCREEN_W } = Dimensions.get('window');
-
-// Grille 2 colonnes de tuiles carrées teintées (pattern écran 6 du handoff)
-const GRID_GAP = 10;
-const TILE_W = (SCREEN_W - 16 * 2 - GRID_GAP) / 2;
-
-type SuperCategory = {
-  id: string;
-  label: string;
-  icon: string;
-  color: string;
-  clusters: { name: string; icon: string; theme_count: number }[];
-  total_themes: number;
-};
-
-const UPCOMING_CATS = [
-  { id: 'SOUND', label: 'Sound', icon: '🎵', color: '#FF6B35' },
-  { id: 'ARENA', label: 'Arena', icon: '⚽', color: '#00FF9D' },
-  { id: 'LEGENDS', label: 'Legends', icon: '🏛️', color: '#FFD700' },
-  { id: 'LAB', label: 'Lab', icon: '🔬', color: '#1565C0' },
-  { id: 'TASTE', label: 'Taste', icon: '🍽️', color: '#FF69B4' },
-  { id: 'GLOBE', label: 'Globe', icon: '🌍', color: '#4ECDC4' },
-  { id: 'PIXEL', label: 'Pixel', icon: '🎮', color: '#FF3B5C' },
-  { id: 'STYLE', label: 'Style', icon: '✨', color: '#E040FB' },
-];
-
-// Tuile carrée teintée — même pattern que l'écran Thèmes (écran 6 du handoff)
-function UniverseTile({ cat, index, onPress }: { cat: SuperCategory; index: number; onPress: () => void }) {
-  return (
-    <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 70).duration(450)}>
-      <ScalePressable style={styles.tile} onPress={onPress}>
-        <LinearGradient
-          colors={[cat.color + '25', cat.color + '08']}
-          start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
-          style={[StyleSheet.absoluteFill, { borderRadius: 18 }]}
-        />
-        <View style={styles.tileIcon}>
-          <CategoryIcon emoji={cat.icon} size={34} color={cat.color} type="super" />
-        </View>
-        <View>
-          <Text style={styles.tileName} numberOfLines={1}>{cat.label}</Text>
-          <Text style={[styles.tileStat, { color: cat.color }]}>
-            {cat.total_themes} {t('play.themes_count').toUpperCase()}
-          </Text>
-        </View>
-        <View style={[styles.tileBorder, { borderColor: cat.color + '40' }]} pointerEvents="none" />
-      </ScalePressable>
-    </Animated.View>
-  );
-}
-
+// Écran 18 du handoff — modes de jeu purs. Les univers/thèmes vivent
+// dans l'onglet Thèmes (écran 6) ; pas de section univers ici.
 export default function PlayScreen() {
   const router = useRouter();
-  const [superCategories, setSuperCategories] = useState<SuperCategory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState(false);
 
   // Les tournois ont lieu du vendredi au dimanche (cf. crons backend)
   const day = new Date().getDay();
   const isTournamentLive = day === 5 || day === 6 || day === 0;
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      setLoadError(false);
-      const uid = await AsyncStorage.getItem('duelo_user_id');
-      // #44 — pass userId so the API can personalise results (e.g. followed themes)
-      const url = uid
-        ? `${API_URL}/api/explore/super-categories?user_id=${uid}`
-        : `${API_URL}/api/explore/super-categories`;
-      const res = await fetch(url);
-      const data = await res.json();
-      setSuperCategories(data);
-    } catch {
-      setLoadError(true);
-    }
-    setLoading(false);
-  };
-
-  const handlePress = (cat: SuperCategory) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    router.push(`/super-category?id=${cat.id}`);
-  };
-
-  if (loading) {
-    return (
-      <CosmicBackground>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={CYAN} />
-        </View>
-      </CosmicBackground>
-    );
-  }
-
-  if (loadError) {
-    return (
-      <CosmicBackground>
-        <View style={styles.loadingContainer}>
-          <TouchableOpacity onPress={() => { setLoadError(false); setLoading(true); loadData(); }} style={{ padding: 20, alignItems: 'center' }}>
-            <MaterialCommunityIcons name="refresh" size={32} color={CYAN} style={{ marginBottom: 10 }} />
-            <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14 }}>{t('play.load_error')}</Text>
-          </TouchableOpacity>
-        </View>
-      </CosmicBackground>
-    );
-  }
-
-  const loadedIds = new Set(superCategories.map(sc => sc.id));
-  const upcomingFiltered = UPCOMING_CATS.filter(c => !loadedIds.has(c.id));
 
   return (
     <CosmicBackground>
@@ -224,36 +115,26 @@ export default function PlayScreen() {
               </View>
               <MaterialCommunityIcons name="chevron-right" size={22} color={GOLD} />
             </TouchableOpacity>
-          </Animated.View>
 
-          {/* Univers — grille 2 colonnes de tuiles teintées */}
-          <Text style={styles.sectionEyebrow}>◆ {t('play.super_categories')}</Text>
-
-          <View style={styles.tileGrid}>
-            {superCategories.map((cat, index) => (
-              <UniverseTile key={cat.id} cat={cat} index={index} onPress={() => handlePress(cat)} />
-            ))}
-          </View>
-
-          {upcomingFiltered.length > 0 && (
-            <>
-              <Text style={styles.comingSoonTitle}>BIENTÔT</Text>
-              <View style={styles.upcomingGrid}>
-                {upcomingFiltered.map((c) => (
-                  <View key={c.id} style={styles.upcomingCard}>
-                    <View style={styles.upcomingInner}>
-                      <LinearGradient colors={[c.color + '25', 'transparent']} style={styles.upcomingGlow} />
-                      <View style={[styles.upcomingIconCircle, { backgroundColor: c.color + '18' }]}>
-                        <Text style={styles.upcomingIcon}>{c.icon}</Text>
-                      </View>
-                      <Text style={[styles.upcomingLabel, { color: c.color }]}>{c.label.toUpperCase()}</Text>
-                      <MaterialCommunityIcons name="lock-outline" size={11} color="rgba(255,255,255,0.3)" />
-                    </View>
-                  </View>
-                ))}
+            {/* Arène — renvoi vers l'onglet Thèmes */}
+            <TouchableOpacity
+              style={[styles.modeRow, { backgroundColor: 'rgba(0,229,255,0.07)', borderColor: 'rgba(0,229,255,0.21)' }]}
+              activeOpacity={0.85}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                router.push('/(tabs)/themes');
+              }}
+            >
+              <View style={[styles.modeIconTile, { backgroundColor: 'rgba(0,229,255,0.15)', borderColor: 'rgba(0,229,255,0.31)' }]}>
+                <Text style={styles.modeIcon}>◆</Text>
               </View>
-            </>
-          )}
+              <View style={styles.modeInfo}>
+                <Text style={styles.modeTitle}>{t('play.arena_title')}</Text>
+                <Text style={styles.modeSub}>{t('play.arena_sub')}</Text>
+              </View>
+              <MaterialCommunityIcons name="chevron-right" size={22} color={CYAN} />
+            </TouchableOpacity>
+          </Animated.View>
 
           <View style={{ height: 30 }} />
         </ScrollView>
@@ -264,7 +145,6 @@ export default function PlayScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
-  loadingContainer: { flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' },
   scroll: { paddingBottom: 30 },
 
   pageHeader: {
@@ -332,65 +212,10 @@ const styles = StyleSheet.create({
   liveBadgeText: {
     color: '#FFF', fontSize: 8, fontFamily: FONTS.display.bold, letterSpacing: 1,
   },
-  sectionEyebrow: {
-    fontSize: 10, fontFamily: FONTS.mono.bold, color: 'rgba(255,255,255,0.40)',
-    letterSpacing: 2.5, textTransform: 'uppercase',
-    paddingHorizontal: 20, marginTop: 14, marginBottom: 10,
-  },
   searchBtn: {
     width: 42, height: 42, borderRadius: 21,
     backgroundColor: 'rgba(0,229,255,0.08)',
     borderWidth: 1, borderColor: 'rgba(0,229,255,0.25)',
     justifyContent: 'center', alignItems: 'center',
   },
-  comingSoonTitle: {
-    fontSize: 11, fontWeight: '800', color: 'rgba(255,255,255,0.3)', letterSpacing: 3,
-    marginBottom: 12, paddingHorizontal: 20, marginTop: 8,
-  },
-
-  // Tuiles univers — grille 2 colonnes (pattern écran 6)
-  tileGrid: {
-    flexDirection: 'row', flexWrap: 'wrap',
-    paddingHorizontal: 16, gap: GRID_GAP,
-  },
-  tile: {
-    width: TILE_W, aspectRatio: 1 / 1.05,
-    borderRadius: 18, padding: 16,
-    justifyContent: 'space-between', overflow: 'hidden',
-  },
-  tileBorder: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 18, borderWidth: 1,
-  },
-  tileIcon: { alignSelf: 'flex-start' },
-  tileName: {
-    color: '#FFF', fontSize: 15, fontFamily: FONTS.display.bold, letterSpacing: -0.3,
-  },
-  tileStat: {
-    fontFamily: FONTS.mono.regular, fontSize: 9, letterSpacing: 1, marginTop: 2,
-  },
-
-  // Upcoming
-  upcomingGrid: {
-    flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 14,
-  },
-  upcomingCard: { width: '25%', padding: 4 },
-  upcomingInner: {
-    borderRadius: 16, paddingVertical: 14, paddingHorizontal: 6,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
-  upcomingGlow: {
-    position: 'absolute', top: 0, left: 0, right: 0, height: 40,
-  },
-  upcomingIconCircle: {
-    width: 40, height: 40, borderRadius: 20,
-    justifyContent: 'center', alignItems: 'center', marginBottom: 8,
-  },
-  upcomingIcon: { fontSize: 18 },
-  upcomingLabel: { fontSize: 10, fontWeight: '700', textAlign: 'center', marginBottom: 4 },
-  lockText: { fontSize: 9, opacity: 0.6 },
 });

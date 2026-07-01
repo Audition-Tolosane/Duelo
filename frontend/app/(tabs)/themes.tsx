@@ -30,6 +30,18 @@ type SuperCategory = {
   clusters: ClusterInfo[]; total_themes: number;
 };
 
+// Univers teasés verrouillés (déplacé depuis l'écran Jouer)
+const UPCOMING_CATS = [
+  { id: 'SOUND', label: 'Sound', icon: '🎵', color: '#FF6B35' },
+  { id: 'ARENA', label: 'Arena', icon: '⚽', color: '#00FF9D' },
+  { id: 'LEGENDS', label: 'Legends', icon: '🏛️', color: '#FFD700' },
+  { id: 'LAB', label: 'Lab', icon: '🔬', color: '#1565C0' },
+  { id: 'TASTE', label: 'Taste', icon: '🍽️', color: '#FF69B4' },
+  { id: 'GLOBE', label: 'Globe', icon: '🌍', color: '#4ECDC4' },
+  { id: 'PIXEL', label: 'Pixel', icon: '🎮', color: '#FF3B5C' },
+  { id: 'STYLE', label: 'Style', icon: '✨', color: '#E040FB' },
+];
+
 export default function ThemesScreen() {
   const router = useRouter();
   const [cats, setCats] = useState<SuperCategory[]>([]);
@@ -58,6 +70,9 @@ export default function ThemesScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.push(`/super-category?id=${cat.id}`);
   };
+
+  const loadedIds = new Set(cats.map(c => c.id));
+  const upcomingFiltered = UPCOMING_CATS.filter(c => !loadedIds.has(c.id));
 
   if (loading) {
     return (
@@ -145,6 +160,27 @@ export default function ThemesScreen() {
             </Animated.View>
           ))}
         </View>
+
+        {/* ── BIENTÔT — univers verrouillés ── */}
+        {upcomingFiltered.length > 0 && (
+          <>
+            <Text style={s.comingSoonTitle}>◆ {t('themes.coming_soon')}</Text>
+            <View style={s.upcomingGrid}>
+              {upcomingFiltered.map((c) => (
+                <View key={c.id} style={s.upcomingCard}>
+                  <View style={s.upcomingInner}>
+                    <LinearGradient colors={[c.color + '25', 'transparent']} style={s.upcomingGlow} />
+                    <View style={[s.upcomingIconCircle, { backgroundColor: c.color + '18' }]}>
+                      <Text style={s.upcomingIcon}>{c.icon}</Text>
+                    </View>
+                    <Text style={[s.upcomingLabel, { color: c.color }]}>{c.label.toUpperCase()}</Text>
+                    <MaterialCommunityIcons name="lock-outline" size={11} color="rgba(255,255,255,0.3)" />
+                  </View>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
 
         {/* ── LA FORGE ── */}
         <TouchableOpacity style={s.forgeCard} activeOpacity={0.8} onPress={() => {
@@ -237,6 +273,34 @@ const s = StyleSheet.create({
   },
   tileStat: {
     fontFamily: FONTS.mono.regular, fontSize: 9, letterSpacing: 1, marginTop: 2,
+  },
+
+  // Bientôt (univers verrouillés)
+  comingSoonTitle: {
+    fontSize: 10, fontFamily: FONTS.mono.bold, color: 'rgba(255,255,255,0.40)',
+    letterSpacing: 2.5, textTransform: 'uppercase',
+    paddingHorizontal: 20, marginTop: 20, marginBottom: 10,
+  },
+  upcomingGrid: {
+    flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 14,
+  },
+  upcomingCard: { width: '25%', padding: 4 },
+  upcomingInner: {
+    borderRadius: 16, paddingVertical: 14, paddingHorizontal: 6,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
+    alignItems: 'center', overflow: 'hidden',
+  },
+  upcomingGlow: {
+    position: 'absolute', top: 0, left: 0, right: 0, height: 40,
+  },
+  upcomingIconCircle: {
+    width: 40, height: 40, borderRadius: 20,
+    justifyContent: 'center', alignItems: 'center', marginBottom: 8,
+  },
+  upcomingIcon: { fontSize: 18 },
+  upcomingLabel: {
+    fontSize: 9, fontFamily: FONTS.display.bold, letterSpacing: 1, marginBottom: 4,
   },
 
   // La Forge
