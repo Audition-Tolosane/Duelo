@@ -7,9 +7,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
 import UserAvatar from '../components/UserAvatar';
+import RoundTimer from '../components/RoundTimer';
 import { useWS } from '../contexts/WebSocketContext';
 import { t } from '../utils/i18n';
 
@@ -39,20 +41,34 @@ export default function ChallengeWaitingScreen() {
 
   const [countdown, setCountdown] = useState(WAIT_SECONDS);
   const [phase, setPhase] = useState<'waiting' | 'timeout' | 'declined'>('waiting');
+  const [myPseudo, setMyPseudo] = useState('');
 
-  const progressAnim = useRef(new Animated.Value(1)).current;
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const animRef = useRef<Animated.CompositeAnimation | null>(null);
+
+  // Anneaux ping autour de l'avatar adverse (scale + fade en boucle, décalés)
+  const ping1 = useRef(new Animated.Value(0)).current;
+  const ping2 = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Start progress bar animation
-    animRef.current = Animated.timing(progressAnim, {
-      toValue: 0,
-      duration: WAIT_SECONDS * 1000,
-      useNativeDriver: false,
-    });
-    animRef.current.start();
+    AsyncStorage.getItem('duelo_pseudo').then(p => { if (p) setMyPseudo(p); });
+    const mkPing = (v: Animated.Value, delay: number) =>
+      Animated.loop(Animated.sequence([
+        Animated.delay(delay),
+        Animated.timing(v, { toValue: 1, duration: 1800, useNativeDriver: true }),
+        Animated.timing(v, { toValue: 0, duration: 0, useNativeDriver: true }),
+      ]));
+    const a1 = mkPing(ping1, 0);
+    const a2 = mkPing(ping2, 600);
+    a1.start(); a2.start();
+    return () => { a1.stop(); a2.stop(); };
+  }, []);
 
+  const pingStyle = (v: Animated.Value) => ({
+    opacity: v.interpolate({ inputRange: [0, 0.15, 1], outputRange: [0, 0.7, 0] }),
+    transform: [{ scale: v.interpolate({ inputRange: [0, 1], outputRange: [1, 1.7] }) }],
+  });
+
+  useEffect(() => {
     // Start countdown
     let remaining = WAIT_SECONDS;
     timerRef.current = setInterval(() => {
@@ -85,7 +101,6 @@ export default function ChallengeWaitingScreen() {
 
     return () => {
       clearTimer();
-      animRef.current?.stop();
       unsubs.forEach((u) => u());
     };
   }, []);
@@ -127,52 +142,49 @@ export default function ChallengeWaitingScreen() {
 
         <View style={styles.content}>
 
-          {/* Avatar + name */}
-          <View style={styles.avatarSection}>
-            <View style={styles.avatarGlow}>
-              <UserAvatar
-                avatarUrl={undefined}
-                avatarSeed={opponent_seed || opponentName}
-                pseudo={opponentName}
-                size={80}
-              />
-            </View>
-            <Text style={styles.opponentName}>{opponentName}</Text>
-            {themeTitleStr ? (
-              <View style={styles.themePill}>
-                <MaterialCommunityIcons name="star" size={12} color="#BF5FFF" />
-                <Text style={styles.themeText}>{themeTitleStr}</Text>
-              </View>
-            ) : null}
-          </View>
-
           {phase === 'waiting' && (
             <>
-              {/* Waiting state */}
-              <View style={styles.waitBox}>
-                <View style={styles.pulseRing} />
-                <MaterialCommunityIcons name="clock-outline" size={28} color="#BF5FFF" />
-                <Text style={styles.waitTitle}>{t('challenge.waiting_for')}</Text>
-                <Text style={styles.waitSubtitle}>{opponentName}…</Text>
+              {/* En-tête */}
+              <View style={styles.waitHead}>
+                <Text style={styles.waitEyebrow}>◆ {t('challenge.waiting_for')} ◆</Text>
+                <Text style={styles.waitName}>{opponentName}</Text>
               </View>
 
-              {/* Countdown bar */}
-              <View style={styles.progressWrap}>
-                <View style={styles.progressBg}>
-                  <Animated.View
-                    style={[
-                      styles.progressBar,
-                      {
-                        width: progressAnim.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: ['0%', '100%'],
-                        }),
-                      },
-                    ]}
-                  />
+              {/* Duel : toi VS adversaire (anneaux ping) */}
+              <View style={styles.duelRow}>
+                <View style={styles.duelSide}>
+                  <UserAvatar avatarSeed="me" pseudo={myPseudo || t('home.you')} size={70} />
+                  <Text style={[styles.duelLabel, { color: '#00E5FF' }]} numberOfLines={1}>
+                    {(myPseudo || t('home.you')).toUpperCase()}
+                  </Text>
                 </View>
-                <Text style={styles.countdownText}>{countdown}s</Text>
+                <Text style={styles.duelVs}>VS</Text>
+                <View style={styles.duelSide}>
+                  <View>
+                    <UserAvatar
+                      avatarSeed={opponent_seed || opponentName}
+                      pseudo={opponentName}
+                      size={70}
+                    />
+                    <Animated.View pointerEvents="none" style={[styles.pingRing, pingStyle(ping1)]} />
+                    <Animated.View pointerEvents="none" style={[styles.pingRing, pingStyle(ping2)]} />
+                  </View>
+                  <Text style={[styles.duelLabel, { color: '#B366FF' }]} numberOfLines={1}>
+                    {opponentName.toUpperCase()}
+                  </Text>
+                </View>
               </View>
+
+              {/* Chip thème */}
+              {themeTitleStr ? (
+                <View style={styles.themePill}>
+                  <MaterialCommunityIcons name="star-four-points" size={14} color="#00E5FF" />
+                  <Text style={styles.themeText}>{themeTitleStr}</Text>
+                </View>
+              ) : null}
+
+              {/* Anneau décompte or */}
+              <RoundTimer timeLeft={countdown} total={WAIT_SECONDS} size={96} color="#FFB547" />
 
               {/* Cancel button */}
               <TouchableOpacity style={styles.changeBtn} onPress={goChangeOpponent} activeOpacity={0.8}>
@@ -239,79 +251,46 @@ const styles = StyleSheet.create({
     gap: 28,
   },
 
-  avatarSection: { alignItems: 'center', gap: 10 },
-  avatarGlow: {
-    borderRadius: 48,
-    shadowColor: '#BF5FFF',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
+  waitHead: { alignItems: 'center', gap: 6 },
+  waitEyebrow: {
+    fontSize: 10, fontFamily: 'JetBrainsMono_700Bold', color: '#FFB547',
+    letterSpacing: 3, textTransform: 'uppercase',
   },
-  opponentName: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: '#FFF',
-    letterSpacing: 1,
+  waitName: {
+    fontSize: 26, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold',
+    color: '#FFF', letterSpacing: -0.8, textTransform: 'uppercase',
   },
+
+  duelRow: { flexDirection: 'row', alignItems: 'center', gap: 20 },
+  duelSide: { alignItems: 'center', gap: 8, maxWidth: 110 },
+  duelLabel: {
+    fontSize: 12, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold',
+  },
+  duelVs: {
+    fontSize: 32, color: '#FFB547', fontFamily: 'Fraunces_500Medium_Italic',
+  },
+  pingRing: {
+    position: 'absolute', top: 0, left: 0,
+    width: 70, height: 70, borderRadius: 35,
+    borderWidth: 2, borderColor: '#B366FF',
+  },
+
   themePill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    backgroundColor: 'rgba(191,95,255,0.12)',
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    gap: 8,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
     borderWidth: 1,
-    borderColor: 'rgba(191,95,255,0.25)',
+    borderColor: 'rgba(0,229,255,0.30)',
   },
   themeText: {
-    color: '#BF5FFF',
+    color: '#FFF',
     fontSize: 13,
-    fontWeight: '700',
-  },
-
-  waitBox: {
-    alignItems: 'center',
-    gap: 8,
-    position: 'relative',
-  },
-  pulseRing: {
-    position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 2,
-    borderColor: 'rgba(191,95,255,0.2)',
-  },
-  waitTitle: {
-    fontSize: 15,
-    color: '#A3A3A3',
-    fontWeight: '600',
-    marginTop: 4,
-  },
-  waitSubtitle: {
-    fontSize: 20,
-    color: '#BF5FFF',
     fontWeight: '800',
-  },
-
-  progressWrap: { width: '100%', alignItems: 'center', gap: 6 },
-  progressBg: {
-    width: '100%',
-    height: 5,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  progressBar: {
-    height: '100%',
-    backgroundColor: '#BF5FFF',
-    borderRadius: 3,
-  },
-  countdownText: {
-    fontSize: 13,
-    color: '#525252',
-    fontWeight: '700',
+    fontFamily: 'SpaceGrotesk_600SemiBold',
   },
 
   changeBtn: {

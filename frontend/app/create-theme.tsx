@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView,
-  ActivityIndicator, Animated, Alert, KeyboardAvoidingView, Platform,
+  ActivityIndicator, Animated, Alert, KeyboardAvoidingView, Platform, Dimensions,
 } from 'react-native';
+import ConfettiCannon from 'react-native-confetti-cannon';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -164,11 +165,11 @@ export default function CreateThemeScreen() {
           >
             {/* Header card */}
             <LinearGradient
-              colors={['rgba(138,43,226,0.15)', 'rgba(138,43,226,0.05)']}
+              colors={['rgba(179,102,255,0.15)', 'rgba(0,229,255,0.06)']}
               style={styles.headerCard}
             >
               <View style={styles.headerIconWrap}>
-                <MaterialCommunityIcons name="hammer-wrench" size={28} color="#8A2BE2" />
+                <MaterialCommunityIcons name="hammer-wrench" size={28} color="#B366FF" />
               </View>
               <Text style={styles.headerTitle}>{t('forge.title')}</Text>
               <Text style={styles.headerSub}>{t('forge.subtitle')}</Text>
@@ -259,11 +260,11 @@ export default function CreateThemeScreen() {
         {phase === 'generating' && (
           <View style={styles.generatingWrap}>
             <Animated.View style={[styles.forgeIconBig, { transform: [{ scale: pulseAnim }] }]}>
-              <LinearGradient colors={['#8A2BE2', '#6A1FB0']} style={styles.forgeIconGrad}>
+              <LinearGradient colors={['#B366FF', '#00E5FF']} style={styles.forgeIconGrad}>
                 <MaterialCommunityIcons name="hammer-wrench" size={42} color="#FFF" />
               </LinearGradient>
             </Animated.View>
-            <ActivityIndicator size="large" color="#8A2BE2" style={{ marginBottom: 20 }} />
+            <ActivityIndicator size="large" color="#B366FF" style={{ marginBottom: 20 }} />
             <Text style={styles.generatingTitle}>{t('forge.generating')}</Text>
             <Text style={styles.generatingName}>"{name}"</Text>
             <Text style={styles.generatingDetail}>{t('forge.generating_detail')}</Text>
@@ -272,6 +273,15 @@ export default function CreateThemeScreen() {
 
         {phase === 'done' && result && (
           <Animated.View style={[styles.doneWrap, { opacity: fadeAnim }]}>
+            <ConfettiCannon
+              count={80}
+              origin={{ x: Dimensions.get('window').width / 2, y: -10 }}
+              autoStart
+              fadeOut
+              explosionSpeed={350}
+              fallSpeed={2800}
+              colors={['#00E5FF', '#B366FF', '#FFB547', '#32E7A3', '#FF6B2C']}
+            />
             <LinearGradient
               colors={[result.color_hex + '30', result.color_hex + '08']}
               style={styles.doneCard}
@@ -344,9 +354,11 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: '#FFF',
-    fontSize: 18,
-    fontWeight: '800',
-    letterSpacing: 1,
+    fontSize: 20,
+    fontWeight: '900',
+    fontFamily: 'SpaceGrotesk_700Bold',
+    letterSpacing: -0.5,
+    textTransform: 'uppercase',
   },
   headerSub: {
     color: '#A3A3A3',
@@ -355,10 +367,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   label: {
-    color: '#A3A3A3',
-    fontSize: 12,
-    fontWeight: '600',
-    letterSpacing: 1,
+    color: 'rgba(255,255,255,0.40)',
+    fontSize: 10,
+    fontFamily: 'JetBrainsMono_700Bold',
+    letterSpacing: 2,
     textTransform: 'uppercase',
     marginBottom: 8,
     marginTop: 16,
@@ -475,14 +487,17 @@ const styles = StyleSheet.create({
   },
   generatingTitle: {
     color: '#FFF',
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: 22,
+    fontWeight: '900',
+    fontFamily: 'SpaceGrotesk_700Bold',
+    letterSpacing: -0.5,
     marginBottom: 8,
   },
   generatingName: {
-    color: '#8A2BE2',
+    color: '#B366FF',
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: 'SpaceGrotesk_600SemiBold',
     marginBottom: 16,
   },
   generatingDetail: {
@@ -518,10 +533,11 @@ const styles = StyleSheet.create({
   },
   doneTitle: {
     color: '#FFF',
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '900',
+    fontFamily: 'SpaceGrotesk_700Bold',
+    letterSpacing: -0.5,
     marginBottom: 8,
-    letterSpacing: 0.5,
   },
   doneName: {
     color: '#A3A3A3',

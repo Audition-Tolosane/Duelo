@@ -806,7 +806,7 @@ const styles = StyleSheet.create({
   catImageBox: { width: 80, height: 80, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
   catEmoji: { fontSize: 42 },
   headerInfo: { flex: 1, justifyContent: 'center' },
-  catName: { fontSize: 24, fontWeight: '900', color: '#FFF', marginBottom: 4 },
+  catName: { fontSize: 26, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.8, textTransform: 'uppercase', color: '#FFF', marginBottom: 4 },
   catDescription: { fontSize: 14, color: '#A3A3A3', lineHeight: 20 },
 
   // Action Buttons
@@ -817,7 +817,7 @@ const styles = StyleSheet.create({
   },
   playBtn: { backgroundColor: '#B366FF' },
   playBtnIcon: { fontSize: 16 },
-  playBtnText: { color: '#FFF', fontSize: 14, fontWeight: '800' },
+  playBtnText: { color: '#FFF', fontSize: 14, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold' },
   followBtn: {
     backgroundColor: GLASS.bgLight, borderWidth: 1, borderColor: GLASS.borderSubtle,
   },
@@ -839,7 +839,7 @@ const styles = StyleSheet.create({
     width: 52, height: 52, borderRadius: 14, borderWidth: 1,
     justifyContent: 'center', alignItems: 'center',
   },
-  xpLevelNum: { fontSize: 22, fontWeight: '900', lineHeight: 26 },
+  xpLevelNum: { fontSize: 22, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', lineHeight: 26 },
   xpLevelLabel: { fontSize: 8, fontWeight: '800', color: '#525252', letterSpacing: 1 },
   xpHeaderInfo: { flex: 1 },
   xpTitle: { fontSize: 15, fontWeight: '800', marginBottom: 2 },
@@ -900,8 +900,8 @@ const styles = StyleSheet.create({
   // Stats Row
   statsRow: { flexDirection: 'row', alignItems: 'flex-start' },
   statItem: { flex: 1, alignItems: 'center' },
-  statLabel: { fontSize: 9, fontWeight: '800', color: '#525252', letterSpacing: 1, marginBottom: 6 },
-  statValue: { fontSize: 28, fontWeight: '900', color: '#FFF' },
+  statLabel: { fontSize: 8, fontFamily: 'JetBrainsMono_700Bold', color: 'rgba(255,255,255,0.40)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 6 },
+  statValue: { fontSize: 28, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -1, color: '#FFF' },
   statSub: { fontSize: 11, color: '#A3A3A3', fontWeight: '600', marginTop: 2 },
   statDivider: { width: 1, height: 40 },
   topPlayerBtn: { alignItems: 'center', gap: 4 },

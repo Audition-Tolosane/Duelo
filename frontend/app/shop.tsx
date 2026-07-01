@@ -173,22 +173,27 @@ export default function ShopScreen() {
             <MaterialCommunityIcons name="chevron-left" size={26} color="#FFF" />
           </TouchableOpacity>
           <View style={styles.subHeaderCenter}>
-            <MaterialCommunityIcons name="store" size={18} color="#FFB800" />
-            <Text style={styles.subHeaderTitle}>Magasin</Text>
+            <Text style={styles.subHeaderEyebrow}>◆ SHOP</Text>
+            <Text style={styles.subHeaderTitle}>Boutique</Text>
           </View>
-          <View style={{ width: 40 }} />
         </View>
 
         <ScrollView
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
         >
-          {/* Hero */}
-          <LinearGradient colors={['rgba(255,184,0,0.15)', 'transparent']} style={styles.hero}>
-            <MaterialCommunityIcons name="store-outline" size={48} color="#FFB800" />
-            <Text style={styles.heroTitle}>Boutique Duelo</Text>
-            <Text style={styles.heroSub}>Booste ton expérience de jeu</Text>
-          </LinearGradient>
+          {/* Hero — carte gradient or→feu pleine (style deal de la maquette) */}
+          <View style={styles.hero}>
+            <LinearGradient
+              colors={['#FFB547', '#FF6B2C']}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+              style={StyleSheet.absoluteFill}
+            />
+            <Text style={styles.heroWatermark}>◉</Text>
+            <Text style={styles.heroEyebrow}>◆ BOOSTS · SKINS · PREMIUM</Text>
+            <Text style={styles.heroTitle}>BOOSTE TON JEU</Text>
+            <Text style={styles.heroSub}>XP doublé, séries protégées, missions bonus</Text>
+          </View>
 
           {/* Coins */}
           <SectionTitle title="Pièces" icon="currency-usd-circle" />
@@ -235,27 +240,46 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)',
     justifyContent: 'center', alignItems: 'center',
   },
-  subHeaderCenter: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  subHeaderTitle: { fontSize: 18, fontWeight: '800', color: '#FFF' },
+  subHeaderCenter: { flex: 1, marginLeft: 12 },
+  subHeaderEyebrow: {
+    fontSize: 9, fontFamily: 'JetBrainsMono_700Bold', color: '#FFB547',
+    letterSpacing: 2, textTransform: 'uppercase',
+  },
+  subHeaderTitle: {
+    fontSize: 24, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold',
+    color: '#FFF', letterSpacing: -0.8, textTransform: 'uppercase',
+  },
 
   scroll: { paddingHorizontal: 16, paddingBottom: 40 },
 
   hero: {
-    alignItems: 'center',
-    paddingVertical: 28,
+    padding: 20,
     borderRadius: 20,
     marginVertical: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255,184,0,0.2)',
+    overflow: 'hidden',
   },
-  heroTitle: { fontSize: 22, fontWeight: '900', color: '#FFB800', marginTop: 10 },
-  heroSub: { fontSize: 13, color: 'rgba(255,255,255,0.5)', marginTop: 4 },
+  heroWatermark: {
+    position: 'absolute', top: -22, right: -6,
+    fontSize: 110, color: 'rgba(0,0,0,0.15)',
+  },
+  heroEyebrow: {
+    fontSize: 9, fontFamily: 'JetBrainsMono_700Bold', color: 'rgba(0,0,0,0.70)',
+    letterSpacing: 2,
+  },
+  heroTitle: {
+    fontSize: 28, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold',
+    color: '#000', letterSpacing: -1, marginTop: 4,
+  },
+  heroSub: { fontSize: 12, fontWeight: '700', fontFamily: 'SpaceGrotesk_600SemiBold', color: 'rgba(0,0,0,0.65)', marginTop: 4 },
 
   sectionTitle: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     marginTop: 20, marginBottom: 10,
   },
-  sectionTitleText: { fontSize: 14, fontWeight: '800', color: '#FFB800', letterSpacing: 1, textTransform: 'uppercase' },
+  sectionTitleText: {
+    fontSize: 11, fontFamily: 'JetBrainsMono_700Bold', color: '#FFB547',
+    letterSpacing: 2, textTransform: 'uppercase',
+  },
 
   card: {
     borderRadius: 16,
@@ -273,7 +297,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     marginBottom: 8,
   },
-  badgeText: { fontSize: 9, fontWeight: '900', letterSpacing: 1 },
+  badgeText: { fontSize: 8, fontFamily: 'JetBrainsMono_700Bold', letterSpacing: 1 },
   cardBody: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   iconBox: {
     width: 52, height: 52, borderRadius: 14,
@@ -282,14 +306,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5, shadowRadius: 10,
   },
   cardInfo: { flex: 1 },
-  cardTitle: { fontSize: 15, fontWeight: '800', color: '#FFF' },
+  cardTitle: { fontSize: 15, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold', color: '#FFF' },
   cardDesc: { fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 },
   priceBox: {
     borderRadius: 10, borderWidth: 1,
     paddingHorizontal: 12, paddingVertical: 8,
     alignItems: 'center',
   },
-  priceText: { fontSize: 13, fontWeight: '900' },
+  priceText: { fontSize: 13, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold' },
 
   legal: {
     fontSize: 10, color: 'rgba(255,255,255,0.3)',

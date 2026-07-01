@@ -183,15 +183,14 @@ export default function NotificationSettingsScreen() {
           <MaterialCommunityIcons name="chevron-left" size={22} color="#FFF" />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <MaterialCommunityIcons name="bell-cog-outline" size={18} color="#8A2BE2" />
+          <Text style={styles.headerEyebrow}>◆ DUELO</Text>
           <Text style={styles.headerTitle}>{t('notif_settings.header')}</Text>
         </View>
-        <View style={{ width: 36 }} />
       </View>
 
       {loading ? (
         <View style={styles.loadingWrap}>
-          <ActivityIndicator size="large" color="#8A2BE2" />
+          <ActivityIndicator size="large" color="#00E5FF" />
         </View>
       ) : (
         <ScrollView
@@ -202,11 +201,11 @@ export default function NotificationSettingsScreen() {
           {/* Master Toggle Card */}
           <View style={styles.masterCard}>
             <LinearGradient
-              colors={['rgba(138,43,226,0.15)', 'rgba(138,43,226,0.05)']}
+              colors={['rgba(0,229,255,0.12)', 'rgba(179,102,255,0.06)']}
               style={styles.masterGradient}
             >
               <View style={styles.masterTop}>
-                <LinearGradient colors={['#8A2BE2', '#A855F7']} style={styles.masterIconCircle}>
+                <LinearGradient colors={['#00E5FF', '#B366FF']} style={styles.masterIconCircle}>
                   <MaterialCommunityIcons name="bell-ring" size={24} color="#FFF" />
                 </LinearGradient>
                 <View style={styles.masterTextWrap}>
@@ -222,8 +221,8 @@ export default function NotificationSettingsScreen() {
                 <Switch
                   value={allEnabled}
                   onValueChange={(val) => toggleAll(val)}
-                  trackColor={{ false: '#333', true: 'rgba(138, 43, 226, 0.5)' }}
-                  thumbColor={allEnabled ? '#A855F7' : '#666'}
+                  trackColor={{ false: '#333', true: 'rgba(0,229,255,0.5)' }}
+                  thumbColor={allEnabled ? '#00E5FF' : '#666'}
                   ios_backgroundColor="#333"
                 />
               </View>
@@ -341,15 +340,22 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.08)',
   },
   headerCenter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    flex: 1,
+    marginLeft: 12,
+  },
+  headerEyebrow: {
+    fontSize: 9,
+    fontFamily: 'JetBrainsMono_400Regular',
+    color: 'rgba(255,255,255,0.40)',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 24,
+    fontWeight: '900',
+    fontFamily: 'SpaceGrotesk_700Bold',
     color: '#FFF',
-    letterSpacing: 0.5,
+    letterSpacing: -0.8,
   },
   loadingWrap: {
     flex: 1,
@@ -368,7 +374,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: 'rgba(138, 43, 226, 0.2)',
+    borderColor: 'rgba(0,229,255,0.20)',
   },
   masterGradient: {
     padding: 18,
@@ -391,6 +397,7 @@ const styles = StyleSheet.create({
   masterTitle: {
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: 'SpaceGrotesk_700Bold',
     color: '#FFF',
   },
   masterSubtitle: {
@@ -418,11 +425,11 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.4)',
+    fontSize: 10,
+    fontFamily: 'JetBrainsMono_700Bold',
+    color: '#00E5FF',
     textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: 2,
   },
   settingRow: {
     flexDirection: 'row',

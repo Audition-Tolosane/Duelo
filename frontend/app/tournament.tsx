@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, FlatList, ActivityIndicator,
 } from 'react-native';
@@ -93,7 +93,7 @@ export default function TournamentScreen() {
     router.push(`/matchmaking?category=${info.theme_id}&themeName=${encodeURIComponent(info.theme_name)}`);
   };
 
-  const RANK_GRADIENTS: [string, string][] = [['#FFD700', '#FFA500'], ['#C0C0C0', '#8A8A8A'], ['#CD7F32', '#8B4513']];
+  const RANK_GRADIENTS: [string, string][] = [['#FFB547', '#FFA500'], ['#C0C0C0', '#8A8A8A'], ['#CD7F32', '#8B4513']];
 
   const renderEntry = ({ item, index }: { item: TournamentEntry; index: number }) => {
     const isTop3 = item.rank <= 3;
@@ -136,7 +136,7 @@ export default function TournamentScreen() {
         </TouchableOpacity>
 
         {loading ? (
-          <View style={st.center}><ActivityIndicator size="large" color="#FFD700" /></View>
+          <View style={st.center}><ActivityIndicator size="large" color="#FFB547" /></View>
         ) : !info ? (
           <View style={st.center}>
             <MaterialCommunityIcons name="trophy-outline" size={56} color="#525252" />
@@ -159,14 +159,14 @@ export default function TournamentScreen() {
                 >
                   <View style={st.headerTop}>
                     <View style={st.trophyCircle}>
-                      <MaterialCommunityIcons name="trophy" size={32} color="#FFD700" />
+                      <MaterialCommunityIcons name="trophy" size={32} color="#FFB547" />
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={st.tourneyLabel}>{t('tournament.weekend_title')}</Text>
                       <Text style={st.themeName}>{info.theme_name}</Text>
                     </View>
                     <View style={st.countdownBox}>
-                      <MaterialCommunityIcons name="clock-outline" size={13} color="#FFD700" />
+                      <MaterialCommunityIcons name="clock-outline" size={13} color="#FFB547" />
                       <Text style={st.countdownText}>{countdown}</Text>
                     </View>
                   </View>
@@ -174,12 +174,12 @@ export default function TournamentScreen() {
                   {/* User stats row */}
                   <View style={st.statsRow}>
                     <View style={st.statItem}>
-                      <Text style={st.statVal}>{info.rank ?? '—'}</Text>
+                      <Text style={[st.statVal, { color: '#00E5FF' }]}>{info.rank ?? '—'}</Text>
                       <Text style={st.statLabel}>{t('tournament.rank')}</Text>
                     </View>
                     <View style={st.statDivider} />
                     <View style={st.statItem}>
-                      <Text style={st.statVal}>{info.score}</Text>
+                      <Text style={[st.statVal, { color: '#FFB547' }]}>{info.score}</Text>
                       <Text style={st.statLabel}>{t('tournament.score')}</Text>
                     </View>
                     <View style={st.statDivider} />
@@ -197,7 +197,7 @@ export default function TournamentScreen() {
                   {/* Play button */}
                   {info.games_remaining > 0 ? (
                     <TouchableOpacity style={st.playBtn} onPress={handlePlay} activeOpacity={0.8}>
-                      <LinearGradient colors={['#FFD700', '#FF9F0A']} style={st.playGrad}>
+                      <LinearGradient colors={['#FFB547', '#FF9F0A']} style={st.playGrad}>
                         <MaterialCommunityIcons name="play" size={18} color="#000" />
                         <Text style={st.playText}>{t('tournament.play_now')} ({info.games_remaining} {t('tournament.left')})</Text>
                       </LinearGradient>
@@ -240,24 +240,24 @@ const st = StyleSheet.create({
     width: 52, height: 52, borderRadius: 16,
     backgroundColor: 'rgba(255,215,0,0.15)', justifyContent: 'center', alignItems: 'center',
   },
-  tourneyLabel: { fontSize: 10, color: '#FFD700', fontWeight: '800', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 3 },
-  themeName: { fontSize: 20, fontWeight: '900', color: '#FFF' },
-  countdownBox: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(255,215,0,0.1)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10 },
-  countdownText: { color: '#FFD700', fontSize: 13, fontWeight: '800' },
+  tourneyLabel: { fontSize: 9, color: '#FFB547', fontFamily: 'JetBrainsMono_700Bold', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 3 },
+  themeName: { fontSize: 22, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.8, color: '#FFF' },
+  countdownBox: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(0,0,0,0.4)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10 },
+  countdownText: { color: '#FFB547', fontSize: 13, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold' },
 
   statsRow: { flexDirection: 'row', marginBottom: 16 },
   statItem: { flex: 1, alignItems: 'center' },
-  statVal: { fontSize: 22, fontWeight: '900', color: '#FFF' },
-  statLabel: { fontSize: 9, color: '#525252', fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', marginTop: 2 },
+  statVal: { fontSize: 22, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.5, color: '#FFF' },
+  statLabel: { fontSize: 8, color: 'rgba(255,255,255,0.40)', fontFamily: 'JetBrainsMono_400Regular', letterSpacing: 1, textTransform: 'uppercase', marginTop: 2 },
   statDivider: { width: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: 4 },
 
   playBtn: { borderRadius: 14, overflow: 'hidden' },
   playGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14 },
-  playText: { fontSize: 15, fontWeight: '900', color: '#000' },
+  playText: { fontSize: 14, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: 0.5, textTransform: 'uppercase', color: '#000' },
   doneRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10 },
   doneText: { color: '#00FF9D', fontSize: 14, fontWeight: '700' },
 
-  lbTitle: { fontSize: 14, fontWeight: '800', color: '#525252', letterSpacing: 2, textTransform: 'uppercase', paddingHorizontal: 20, marginBottom: 8 },
+  lbTitle: { fontSize: 11, fontFamily: 'JetBrainsMono_700Bold', color: 'rgba(255,255,255,0.40)', letterSpacing: 2, textTransform: 'uppercase', paddingHorizontal: 20, marginBottom: 8 },
 
   entry: {
     flexDirection: 'row', alignItems: 'center', gap: 12,
@@ -272,9 +272,9 @@ const st = StyleSheet.create({
   },
   rankText: { color: '#A3A3A3', fontSize: 13, fontWeight: '800' },
   entryInfo: { flex: 1 },
-  entryPseudo: { color: '#FFF', fontSize: 14, fontWeight: '700' },
-  entryGames: { color: '#525252', fontSize: 11, fontWeight: '600', marginTop: 2 },
+  entryPseudo: { color: '#FFF', fontSize: 14, fontWeight: '700', fontFamily: 'SpaceGrotesk_600SemiBold' },
+  entryGames: { color: 'rgba(255,255,255,0.35)', fontSize: 9, fontFamily: 'JetBrainsMono_400Regular', marginTop: 2 },
   scoreBox: { alignItems: 'flex-end' },
-  scoreVal: { color: '#FFD700', fontSize: 18, fontWeight: '900' },
+  scoreVal: { color: '#FFB547', fontSize: 18, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold' },
   scoreLabel: { color: '#525252', fontSize: 10, fontWeight: '600' },
 });

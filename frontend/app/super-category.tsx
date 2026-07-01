@@ -166,11 +166,17 @@ export default function SuperCategoryScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backCircle} activeOpacity={0.6}>
           <MaterialCommunityIcons name="chevron-left" size={26} color="#FFF" />
         </TouchableOpacity>
+        <LinearGradient
+          colors={[accent, accent + '70']}
+          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+          style={styles.heroTile}
+        >
+          <CategoryIcon emoji={data.icon} size={26} color="#FFF" type="super" />
+        </LinearGradient>
         <View style={styles.subHeaderCenter}>
-          <CategoryIcon emoji={data.icon} size={22} color={accent} type="super" />
-          <Text style={[styles.subHeaderTitle, { color: accent }]}>{data.label.toUpperCase()}</Text>
+          <Text style={[styles.subHeaderEyebrow, { color: accent }]}>◆ UNIVERS</Text>
+          <Text style={styles.subHeaderTitle}>{data.label.toUpperCase()}</Text>
         </View>
-        <View style={{ width: 40 }} />
       </View>
 
       <Animated.ScrollView
@@ -336,8 +342,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)',
     justifyContent: 'center', alignItems: 'center',
   },
-  subHeaderCenter: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  subHeaderTitle: { fontSize: 17, fontWeight: '900', letterSpacing: 2 },
+  heroTile: {
+    width: 44, height: 44, borderRadius: 14, marginLeft: 4,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  subHeaderCenter: { flex: 1, marginLeft: 12 },
+  subHeaderEyebrow: {
+    fontSize: 9, fontFamily: 'JetBrainsMono_700Bold',
+    letterSpacing: 2, textTransform: 'uppercase',
+  },
+  subHeaderTitle: {
+    fontSize: 24, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold',
+    letterSpacing: -0.8, color: '#FFF',
+  },
 
   scroll: { paddingTop: 4 },
 
@@ -358,8 +375,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center',
   },
   clusterInfo: { flex: 1, marginLeft: 12 },
-  clusterName: { color: '#FFF', fontSize: 16, fontWeight: '800' },
-  clusterCount: { fontSize: 12, fontWeight: '600', marginTop: 2 },
+  clusterName: { color: '#FFF', fontSize: 16, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold' },
+  clusterCount: { fontSize: 10, fontFamily: 'JetBrainsMono_400Regular', letterSpacing: 1, textTransform: 'uppercase', marginTop: 2 },
 
   // Carousel
   carousel: {
@@ -387,7 +404,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center', marginBottom: 8,
   },
   carouselName: {
-    color: '#FFF', fontSize: 11, fontWeight: '700',
+    color: '#FFF', fontSize: 11, fontWeight: '700', fontFamily: 'SpaceGrotesk_600SemiBold',
     textAlign: 'center', lineHeight: 14,
   },
   carouselBadge: {

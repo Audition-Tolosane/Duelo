@@ -10,17 +10,19 @@ type RoundTimerProps = {
   size?: number;
   // En dessous : anneau rouge + pulse
   urgentThreshold?: number;
+  // Couleur de l'anneau hors zone urgente (cyan par défaut, or pour les défis)
+  color?: string;
 };
 
 // Timer rond du quiz : anneau SVG cyan → rouge + pulse en zone urgente
 export default function RoundTimer({
-  timeLeft, total = 10, size = 86, urgentThreshold = 3,
+  timeLeft, total = 10, size = 86, urgentThreshold = 3, color: baseColor = COLORS.cyan,
 }: RoundTimerProps) {
   const r = size / 2 - 9;
   const circumference = 2 * Math.PI * r;
   const offset = circumference * (1 - timeLeft / total);
   const urgent = timeLeft <= urgentThreshold;
-  const color = urgent ? COLORS.red : COLORS.cyan;
+  const color = urgent ? COLORS.red : baseColor;
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {

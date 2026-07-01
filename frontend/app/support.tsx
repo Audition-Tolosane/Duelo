@@ -61,10 +61,9 @@ export default function SupportScreen() {
             <MaterialCommunityIcons name="chevron-left" size={22} color="#FFF" />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
-            <MaterialCommunityIcons name="headset" size={18} color="#6C63FF" />
+            <Text style={styles.headerEyebrow}>◆ DUELO</Text>
             <Text style={styles.headerTitle}>{t('support.title')}</Text>
           </View>
-          <View style={{ width: 36 }} />
         </View>
 
         <KeyboardAvoidingView
@@ -81,10 +80,10 @@ export default function SupportScreen() {
               /* ── Success State ── */
               <View style={styles.successCard}>
                 <LinearGradient
-                  colors={['rgba(108,99,255,0.15)', 'rgba(108,99,255,0.05)']}
+                  colors={['rgba(179,102,255,0.15)', 'rgba(179,102,255,0.05)']}
                   style={styles.successGradient}
                 >
-                  <LinearGradient colors={['#6C63FF', '#8A82FF']} style={styles.successIconCircle}>
+                  <LinearGradient colors={['#00E5FF', '#B366FF']} style={styles.successIconCircle}>
                     <MaterialCommunityIcons name="check-circle" size={32} color="#FFF" />
                   </LinearGradient>
                   <Text style={styles.successTitle}>{t('support.success_title')}</Text>
@@ -163,8 +162,8 @@ export default function SupportScreen() {
                   <LinearGradient
                     colors={
                       message.trim() && selectedCategory
-                        ? ['#6C63FF', '#8A82FF']
-                        : ['rgba(108,99,255,0.3)', 'rgba(108,99,255,0.15)']
+                        ? ['#00E5FF', '#B366FF']
+                        : ['rgba(179,102,255,0.3)', 'rgba(179,102,255,0.15)']
                     }
                     style={styles.sendBtn}
                   >
@@ -177,7 +176,7 @@ export default function SupportScreen() {
 
             {/* ── Contact Email ── */}
             <View style={styles.emailCard}>
-              <LinearGradient colors={['#6C63FF', '#8A82FF']} style={styles.emailIconCircle}>
+              <LinearGradient colors={['#00E5FF', '#B366FF']} style={styles.emailIconCircle}>
                 <MaterialCommunityIcons name="email-outline" size={14} color="#FFF" />
               </LinearGradient>
               <View style={styles.emailTextWrap}>
@@ -212,7 +211,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(108,99,255,0.15)',
+    borderBottomColor: 'rgba(179,102,255,0.15)',
   },
   backBtn: {
     width: 36,
@@ -225,15 +224,22 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.08)',
   },
   headerCenter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    flex: 1,
+    marginLeft: 12,
+  },
+  headerEyebrow: {
+    fontSize: 9,
+    fontFamily: 'JetBrainsMono_400Regular',
+    color: 'rgba(255,255,255,0.40)',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 24,
+    fontWeight: '900',
+    fontFamily: 'SpaceGrotesk_700Bold',
     color: '#FFF',
-    letterSpacing: 0.5,
+    letterSpacing: -0.8,
   },
   scrollView: {
     flex: 1,
@@ -251,11 +257,11 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 10,
+    fontFamily: 'JetBrainsMono_700Bold',
     color: 'rgba(255,255,255,0.4)',
     textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: 2,
   },
 
   /* Categories */
@@ -328,7 +334,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 28,
     borderWidth: 1,
-    borderColor: 'rgba(108,99,255,0.2)',
+    borderColor: 'rgba(179,102,255,0.2)',
   },
   successGradient: {
     padding: 28,
@@ -356,12 +362,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   resetBtn: {
-    backgroundColor: 'rgba(108,99,255,0.2)',
+    backgroundColor: 'rgba(179,102,255,0.2)',
     borderRadius: 12,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: 'rgba(108,99,255,0.3)',
+    borderColor: 'rgba(179,102,255,0.3)',
   },
   resetBtnText: {
     color: '#6C63FF',
