@@ -139,35 +139,35 @@ interface DailyMissionsState {
 // ── Missions Widget Styles ──
 const mStyles = StyleSheet.create({
   container: {
-    marginHorizontal: 16, marginBottom: 8, marginTop: 4,
-    backgroundColor: '#1A1A2E', borderRadius: 16,
-    borderWidth: 1, borderColor: '#FFB80030',
+    marginHorizontal: 16, marginBottom: 10,
+    backgroundColor: '#12122A', borderRadius: 16,
+    borderWidth: 1, borderColor: '#FFB54730',
     padding: 14,
   },
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: 12, gap: 8 },
   headerIcon: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
-  title: { flex: 1, fontSize: 14, fontWeight: '800', color: '#FFF' },
+  title: { flex: 1, fontSize: 13, fontFamily: 'SpaceGrotesk_700Bold', color: '#FFF' },
   countdown: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   countdownText: { fontSize: 11, color: '#888' },
   missionRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, gap: 10 },
   missionTop: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
   missionLabel: { fontSize: 12, color: '#CCC', flex: 1 },
-  progressBg: { height: 4, backgroundColor: '#2A2A3E', borderRadius: 2 },
-  progressFill: { height: 4, backgroundColor: '#FFB800', borderRadius: 2 },
+  progressBg: { height: 4, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 2 },
+  progressFill: { height: 4, backgroundColor: '#FFB547', borderRadius: 2 },
   progressText: { fontSize: 10, color: '#666', marginTop: 2 },
   missionRight: { alignItems: 'center', gap: 4 },
-  xpBadge: { backgroundColor: '#FFB80020', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 },
-  xpBadgeText: { fontSize: 10, color: '#FFB800', fontWeight: '700' },
+  xpBadge: { backgroundColor: '#FFB54720', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 },
+  xpBadgeText: { fontSize: 10, color: '#FFB547', fontWeight: '700' },
   rerollBtn: { padding: 4 },
   actions: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
   doubleBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
-    borderWidth: 1, borderColor: '#FFB80050',
+    borderWidth: 1, borderColor: '#FFB54750',
     paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8,
   },
-  doubleBtnText: { fontSize: 11, color: '#FFB800', fontWeight: '700' },
+  doubleBtnText: { fontSize: 11, color: '#FFB547', fontWeight: '700' },
   activeDouble: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  activeDoubleText: { fontSize: 11, color: '#FFB800', fontWeight: '700' },
+  activeDoubleText: { fontSize: 11, color: '#FFB547', fontWeight: '700' },
   claimBtn: { flex: 1 },
   claimGradient: { paddingVertical: 7, borderRadius: 8, alignItems: 'center' },
   claimText: { fontSize: 12, fontWeight: '900', color: '#000' },
@@ -331,7 +331,7 @@ const RivalBanner = React.memo(function RivalBanner({ router }: { router: any })
 });
 
 const rivalStyles = StyleSheet.create({
-  container: { marginHorizontal: 16, marginBottom: 10, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,107,53,0.25)' },
+  container: { marginHorizontal: 16, marginBottom: 10, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,107,44,0.25)' },
   inner: { flexDirection: 'row', alignItems: 'center', padding: 12, gap: 12 },
   left: { flex: 1 },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6 },
@@ -427,7 +427,7 @@ const TournamentBanner = React.memo(function TournamentBanner({ router }: { rout
 });
 
 const tStyles = StyleSheet.create({
-  container: { marginHorizontal: 16, marginBottom: 10, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,215,0,0.25)' },
+  container: { marginHorizontal: 16, marginBottom: 10, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,181,71,0.25)' },
   inner: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 12 },
   iconBox: { width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,215,0,0.15)', justifyContent: 'center', alignItems: 'center' },
   info: { flex: 1 },
@@ -469,9 +469,9 @@ const MissionsWidget = React.memo(function MissionsWidget({
     <View style={mStyles.container}>
       {/* Header */}
       <View style={mStyles.header}>
-        <LinearGradient colors={['#FFB800', '#FF6B2C']} style={mStyles.headerIcon}>
-          <MaterialCommunityIcons name="flag-checkered" size={12} color="#FFF" />
-        </LinearGradient>
+        <View style={[mStyles.headerIcon, { backgroundColor: 'rgba(255,181,71,0.18)' }]}>
+          <MaterialCommunityIcons name="flag-checkered" size={12} color="#FFB547" />
+        </View>
         <Text style={mStyles.title}>{t('missions.day_title')}</Text>
         <View style={mStyles.countdown}>
           <MaterialCommunityIcons name="clock-outline" size={11} color="#888" />
@@ -520,13 +520,13 @@ const MissionsWidget = React.memo(function MissionsWidget({
         <View style={mStyles.actions}>
           {data.multiplier < 2 && (
             <TouchableOpacity style={mStyles.doubleBtn} onPress={onDouble} activeOpacity={0.8}>
-              <MaterialCommunityIcons name="television-play" size={13} color="#FFB800" />
+              <MaterialCommunityIcons name="television-play" size={13} color="#FFB547" />
               <Text style={mStyles.doubleBtnText}>×2 toutes (pub)</Text>
             </TouchableOpacity>
           )}
           {data.multiplier >= 2 && (
             <View style={mStyles.activeDouble}>
-              <MaterialCommunityIcons name="lightning-bolt" size={13} color="#FFB800" />
+              <MaterialCommunityIcons name="lightning-bolt" size={13} color="#FFB547" />
               <Text style={mStyles.activeDoubleText}>×2 actif</Text>
             </View>
           )}
@@ -573,7 +573,7 @@ function getInitial(pseudo: string): string {
 }
 
 function getAvatarColor(seed: string): string {
-  const palette = ['#FF6B2C', '#B366FF', '#00E5FF', '#4CAF50', '#FF3D5E', '#FFB800', '#32E7A3', '#E53935'];
+  const palette = ['#FF6B2C', '#B366FF', '#00E5FF', '#4CAF50', '#FF3D5E', '#FFB547', '#32E7A3', '#E53935'];
   let hash = 0;
   for (let i = 0; i < seed.length; i++) hash = seed.charCodeAt(i) + ((hash << 5) - hash);
   return palette[Math.abs(hash) % palette.length];
@@ -1710,91 +1710,10 @@ export default function AccueilScreen() {
             );
           })()}
 
-          {/* Streak Widget */}
-          <TouchableOpacity
-            style={[styles.streakCard, { borderColor: hasPlayedToday ? 'rgba(50,231,163,0.25)' : 'rgba(255,107,44,0.25)' }]}
-            activeOpacity={0.85}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              if (!hasPlayedToday) router.push('/(tabs)/play');
-            }}
-          >
-            <LinearGradient
-              colors={hasPlayedToday ? ['rgba(50,231,163,0.12)', 'rgba(0,229,255,0.06)'] : ['rgba(255,107,44,0.19)', 'rgba(255,181,71,0.13)']}
-              start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-              style={styles.streakCardGradient}
-            >
-              <View style={styles.streakCardLeft}>
-                <View style={[styles.streakFireCircle, { backgroundColor: hasPlayedToday ? 'rgba(50,231,163,0.15)' : 'rgba(255,107,53,0.2)' }]}>
-                  <MaterialCommunityIcons
-                    name={hasPlayedToday ? 'check-circle' : 'fire'}
-                    size={24}
-                    color={hasPlayedToday ? '#32E7A3' : '#FF6B2C'}
-                  />
-                </View>
-                <View style={styles.streakCardInfo}>
-                  <Text style={styles.streakCardTitle}>
-                    {(userData?.login_streak || 0) > 0
-                      ? `${userData?.login_streak} ${t('home.streak_days')}`
-                      : t('home.no_streak')}
-                  </Text>
-                  <Text style={styles.streakCardSub}>
-                    {hasPlayedToday
-                      ? t('home.streak_maintained')
-                      : (userData?.login_streak || 0) > 0
-                        ? t('home.play_to_keep_streak')
-                        : t('home.play_to_start_streak')}
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.streakCardRight}>
-                <Text style={[styles.streakNum, { color: hasPlayedToday ? '#32E7A3' : '#FF6B2C' }]}>
-                  {userData?.login_streak || 0}
-                </Text>
-              </View>
-            </LinearGradient>
-            {/* Best login streak badge */}
-            {(userData?.best_login_streak || 0) > 0 && (
-              <View style={styles.bestStreakBadge}>
-                <MaterialCommunityIcons name="trophy" size={10} color="#FFB547" />
-                <Text style={styles.bestStreakText}>{t('home.best_streak_record')} {userData?.best_login_streak}{t('home.days_short')}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
         </Animated.View>
 
-        {/* ── Weekly Summary ── */}
-        <WeeklySummaryWidget />
-
-        {/* ── Daily Spin ── */}
-        <Animated.View entering={FadeInDown.delay(100).duration(450)} style={spinStyles.row}>
-          <TouchableOpacity
-            style={spinStyles.btn}
-            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setShowSpin(true); }}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={spinAvailable ? ['rgba(179,102,255,0.25)', 'rgba(179,102,255,0.08)'] : ['rgba(30,30,50,0.6)', 'rgba(20,20,40,0.4)']}
-              style={spinStyles.btnGrad}
-              start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-            >
-              <Text style={spinStyles.wheelEmoji}>🎡</Text>
-              <View>
-                <Text style={spinStyles.btnTitle}>{t('spin.btn_title')}</Text>
-                <Text style={spinStyles.btnSub}>{spinAvailable ? t('spin.available') : t('spin.used')}</Text>
-              </View>
-              {spinAvailable && (
-                <View style={spinStyles.badge}>
-                  <Text style={spinStyles.badgeText}>1</Text>
-                </View>
-              )}
-              <MaterialCommunityIcons name="chevron-right" size={18} color="#525252" style={{ marginLeft: 'auto' }} />
-            </LinearGradient>
-          </TouchableOpacity>
-        </Animated.View>
-
-        {/* ── Quick Play Button ── */}
-        <Animated.View entering={FadeInDown.delay(200).duration(500)}>
+        {/* ── HERO — DUEL ! (2e élément de la page, cf. écran 2) ── */}
+        <Animated.View entering={FadeInDown.delay(100).duration(500)}>
           <TouchableOpacity
             style={styles.quickPlayBtn}
             activeOpacity={0.88}
@@ -1840,6 +1759,160 @@ export default function AccueilScreen() {
               </View>
             </LinearGradient>
           </TouchableOpacity>
+        </Animated.View>
+
+        {/* ══ ◆ AUJOURD'HUI — les rituels quotidiens ══ */}
+        <Animated.View entering={FadeInDown.delay(150).duration(500)}>
+          <View style={styles.sectionHeader}>
+            <View style={[styles.sectionIconCircle, { backgroundColor: 'rgba(255,181,71,0.18)' }]}>
+              <MaterialCommunityIcons name="calendar-today" size={12} color={GOLD} />
+            </View>
+            <Text style={styles.sectionTitle}>{t('home.today_section')}</Text>
+          </View>
+
+          {/* Streak */}
+          <TouchableOpacity
+            style={[styles.streakCard, { borderColor: hasPlayedToday ? 'rgba(50,231,163,0.25)' : 'rgba(255,107,44,0.25)' }]}
+            activeOpacity={0.85}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              if (!hasPlayedToday) router.push('/(tabs)/play');
+            }}
+          >
+            <LinearGradient
+              colors={hasPlayedToday ? ['rgba(50,231,163,0.12)', 'rgba(0,229,255,0.06)'] : ['rgba(255,107,44,0.19)', 'rgba(255,181,71,0.13)']}
+              start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+              style={styles.streakCardGradient}
+            >
+              <View style={styles.streakCardLeft}>
+                <View style={[styles.streakFireCircle, { backgroundColor: hasPlayedToday ? 'rgba(50,231,163,0.15)' : 'rgba(255,107,44,0.2)' }]}>
+                  <MaterialCommunityIcons
+                    name={hasPlayedToday ? 'check-circle' : 'fire'}
+                    size={24}
+                    color={hasPlayedToday ? '#32E7A3' : '#FF6B2C'}
+                  />
+                </View>
+                <View style={styles.streakCardInfo}>
+                  <Text style={styles.streakCardTitle}>
+                    {(userData?.login_streak || 0) > 0
+                      ? `${userData?.login_streak} ${t('home.streak_days')}`
+                      : t('home.no_streak')}
+                  </Text>
+                  <Text style={styles.streakCardSub}>
+                    {hasPlayedToday
+                      ? t('home.streak_maintained')
+                      : (userData?.login_streak || 0) > 0
+                        ? t('home.play_to_keep_streak')
+                        : t('home.play_to_start_streak')}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.streakCardRight}>
+                <Text style={[styles.streakNum, { color: hasPlayedToday ? '#32E7A3' : '#FF6B2C' }]}>
+                  {userData?.login_streak || 0}
+                </Text>
+              </View>
+            </LinearGradient>
+            {/* Best login streak badge */}
+            {(userData?.best_login_streak || 0) > 0 && (
+              <View style={styles.bestStreakBadge}>
+                <MaterialCommunityIcons name="trophy" size={10} color="#FFB547" />
+                <Text style={styles.bestStreakText}>{t('home.best_streak_record')} {userData?.best_login_streak}{t('home.days_short')}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+
+          {/* Roue quotidienne */}
+          <View style={spinStyles.row}>
+            <TouchableOpacity
+              style={spinStyles.btn}
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setShowSpin(true); }}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={spinAvailable ? ['rgba(179,102,255,0.25)', 'rgba(179,102,255,0.08)'] : ['rgba(30,30,50,0.6)', 'rgba(20,20,40,0.4)']}
+                style={spinStyles.btnGrad}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+              >
+                <Text style={spinStyles.wheelEmoji}>🎡</Text>
+                <View>
+                  <Text style={spinStyles.btnTitle}>{t('spin.btn_title')}</Text>
+                  <Text style={spinStyles.btnSub}>{spinAvailable ? t('spin.available') : t('spin.used')}</Text>
+                </View>
+                {spinAvailable && (
+                  <View style={spinStyles.badge}>
+                    <Text style={spinStyles.badgeText}>1</Text>
+                  </View>
+                )}
+                <MaterialCommunityIcons name="chevron-right" size={18} color="rgba(255,255,255,0.4)" style={{ marginLeft: 'auto' }} />
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+
+          {/* Missions du jour */}
+          {dailyMissions && (
+            <MissionsWidget
+              data={dailyMissions}
+              onDouble={handleDoubleReward}
+              onReroll={handleRerollMission}
+              onClaim={() => setShowThemePicker(true)}
+            />
+          )}
+
+          {/* Question du jour */}
+          {dailyQuestion && !dailyQuestion.already_answered && (
+            <View style={styles.dqCard}>
+              <View style={styles.dqHeader}>
+                <View style={[styles.dqIcon, { backgroundColor: 'rgba(179,102,255,0.18)' }]}>
+                  <MaterialCommunityIcons name="help-circle" size={13} color={VIOLET} />
+                </View>
+                <Text style={styles.dqTitle}>Question du jour</Text>
+                <View style={[styles.dqThemeBadge, { backgroundColor: (dailyQuestion.theme_color || '#B366FF') + '25' }]}>
+                  <Text style={[styles.dqThemeName, { color: dailyQuestion.theme_color || '#B366FF' }]} numberOfLines={1}>
+                    {dailyQuestion.theme_name}
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.dqQuestion}>{dailyQuestion.question_text}</Text>
+              <View style={styles.dqOptions}>
+                {(dailyQuestion.options || []).map((opt: string, idx: number) => {
+                  const isChosen = dqAnswer === idx;
+                  const isCorrect = dqResult && idx === dqResult.correct_option;
+                  const isWrong = dqResult && isChosen && !dqResult.correct;
+                  let bg = 'rgba(255,255,255,0.04)';
+                  if (isCorrect) bg = '#32E7A320';
+                  if (isWrong) bg = '#FF3D5E20';
+                  return (
+                    <TouchableOpacity
+                      key={idx}
+                      style={[styles.dqOpt, { borderColor: isCorrect ? '#32E7A3' : isWrong ? '#FF3D5E' : 'rgba(255,255,255,0.10)', backgroundColor: bg }]}
+                      onPress={() => handleDqAnswer(idx)}
+                      disabled={dqAnswer !== null}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={styles.dqOptText}>{opt}</Text>
+                      {isCorrect && <MaterialCommunityIcons name="check-circle" size={14} color="#32E7A3" />}
+                      {isWrong && <MaterialCommunityIcons name="close-circle" size={14} color="#FF3D5E" />}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+              {dqResult && (
+                <Text style={[styles.dqFeedback, { color: dqResult.correct ? '#32E7A3' : '#FF6B2C' }]}>
+                  {dqResult.correct ? `Bravo ! +${dqResult.xp_earned} XP` : `Raté — +${dqResult.xp_earned} XP quand même`}
+                </Text>
+              )}
+            </View>
+          )}
+          {dailyQuestion?.already_answered && (
+            <View style={styles.dqDoneCard}>
+              <MaterialCommunityIcons name="check-circle" size={16} color="#32E7A3" />
+              <Text style={styles.dqDoneText}>Question du jour répondue · +{dailyQuestion.xp_earned} XP</Text>
+            </View>
+          )}
+
+          {/* Résumé hebdo */}
+          <WeeklySummaryWidget />
         </Animated.View>
 
         {/* ── Incoming Challenges + Revenge Section ── */}
@@ -1892,83 +1965,21 @@ export default function AccueilScreen() {
           </Animated.View>
         )}
 
-        {/* ── League Banner ── */}
-        <LeagueBanner router={router} />
-
-        {/* ── Rival Banner ── */}
-        <RivalBanner router={router} />
-
-        {/* ── Tournament Banner ── */}
-        <TournamentBanner router={router} />
-
-        {/* ── Challenge Suggestions ── */}
+        {/* Suggestions de défis (zone duels) */}
         <ChallengeSuggestions router={router} />
 
-        {/* ── Daily Missions ── */}
-        {dailyMissions && (
-          <Animated.View entering={FadeInDown.delay(350).duration(500)}>
-            <MissionsWidget
-              data={dailyMissions}
-              onDouble={handleDoubleReward}
-              onReroll={handleRerollMission}
-              onClaim={() => setShowThemePicker(true)}
-            />
-          </Animated.View>
-        )}
-
-        {/* ── Question du jour ── */}
-        {dailyQuestion && !dailyQuestion.already_answered && (
-          <Animated.View entering={FadeInDown.delay(370).duration(500)}>
-            <View style={styles.dqCard}>
-              <View style={styles.dqHeader}>
-                <LinearGradient colors={['#B366FF', '#8B5CF6']} style={styles.dqIcon}>
-                  <MaterialCommunityIcons name="help-circle" size={13} color="#FFF" />
-                </LinearGradient>
-                <Text style={styles.dqTitle}>Question du jour</Text>
-                <View style={[styles.dqThemeBadge, { backgroundColor: (dailyQuestion.theme_color || '#8B5CF6') + '25' }]}>
-                  <Text style={[styles.dqThemeName, { color: dailyQuestion.theme_color || '#B366FF' }]} numberOfLines={1}>
-                    {dailyQuestion.theme_name}
-                  </Text>
-                </View>
-              </View>
-              <Text style={styles.dqQuestion}>{dailyQuestion.question_text}</Text>
-              <View style={styles.dqOptions}>
-                {(dailyQuestion.options || []).map((opt: string, idx: number) => {
-                  const isChosen = dqAnswer === idx;
-                  const isCorrect = dqResult && idx === dqResult.correct_option;
-                  const isWrong = dqResult && isChosen && !dqResult.correct;
-                  let bg = '#1A1A2E';
-                  if (isCorrect) bg = '#32E7A320';
-                  if (isWrong) bg = '#FF3D5E20';
-                  return (
-                    <TouchableOpacity
-                      key={idx}
-                      style={[styles.dqOpt, { borderColor: isCorrect ? '#32E7A3' : isWrong ? '#FF3D5E' : '#333', backgroundColor: bg }]}
-                      onPress={() => handleDqAnswer(idx)}
-                      disabled={dqAnswer !== null}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={styles.dqOptText}>{opt}</Text>
-                      {isCorrect && <MaterialCommunityIcons name="check-circle" size={14} color="#32E7A3" />}
-                      {isWrong && <MaterialCommunityIcons name="close-circle" size={14} color="#FF3D5E" />}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-              {dqResult && (
-                <Text style={[styles.dqFeedback, { color: dqResult.correct ? '#32E7A3' : '#FF6B2C' }]}>
-                  {dqResult.correct ? `Bravo ! +${dqResult.xp_earned} XP` : `Raté — +${dqResult.xp_earned} XP quand même`}
-                </Text>
-              )}
+        {/* ══ ◆ COMPÉTITION — ligue, rival, tournoi ══ */}
+        <Animated.View entering={FadeInDown.delay(250).duration(500)}>
+          <View style={styles.sectionHeader}>
+            <View style={[styles.sectionIconCircle, { backgroundColor: 'rgba(255,181,71,0.18)' }]}>
+              <MaterialCommunityIcons name="trophy" size={12} color={GOLD} />
             </View>
-          </Animated.View>
-        )}
-        {dailyQuestion?.already_answered && (
-          <View style={styles.dqDoneCard}>
-            <MaterialCommunityIcons name="check-circle" size={16} color="#32E7A3" />
-            <Text style={styles.dqDoneText}>Question du jour répondue · +{dailyQuestion.xp_earned} XP</Text>
+            <Text style={styles.sectionTitle}>{t('home.competition_section')}</Text>
           </View>
-        )}
+          <LeagueBanner router={router} />
+          <RivalBanner router={router} />
+          <TournamentBanner router={router} />
+        </Animated.View>
 
         {/* Slot Machine */}
         <SlotMachineOverlay
@@ -2588,12 +2599,12 @@ const styles = StyleSheet.create({
   // ── Daily Question ──
   dqCard: {
     marginHorizontal: 16, marginBottom: 8,
-    backgroundColor: '#1A1A2E', borderRadius: 16,
+    backgroundColor: '#12122A', borderRadius: 16,
     borderWidth: 1, borderColor: '#B366FF30', padding: 14,
   },
   dqHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
   dqIcon: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
-  dqTitle: { fontSize: 13, fontWeight: '800', color: '#FFF', flex: 1 },
+  dqTitle: { fontSize: 13, fontFamily: 'SpaceGrotesk_700Bold', color: '#FFF', flex: 1 },
   dqThemeBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
   dqThemeName: { fontSize: 10, fontWeight: '700' },
   dqQuestion: { fontSize: 14, color: '#EEE', fontWeight: '600', marginBottom: 12, lineHeight: 20 },
@@ -2627,14 +2638,14 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalSheet: {
-    backgroundColor: '#1A1A2E', borderTopLeftRadius: 20, borderTopRightRadius: 20,
+    backgroundColor: '#12122A', borderTopLeftRadius: 20, borderTopRightRadius: 20,
     padding: 20, paddingBottom: 36,
   },
   modalTitle: { fontSize: 17, fontWeight: '800', color: '#FFF', marginBottom: 4 },
   modalSubtitle: { fontSize: 13, color: '#888', marginBottom: 16 },
   themePickerRow: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
-    paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#2A2A3E',
+    paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)',
   },
   themePickerDot: { width: 10, height: 10, borderRadius: 5 },
   themePickerName: { flex: 1, fontSize: 14, color: '#FFF', fontWeight: '600' },
@@ -2646,7 +2657,8 @@ const styles = StyleSheet.create({
 
   // ── Streak Widget ──
   streakCard: {
-    marginTop: 14,
+    marginHorizontal: 16,
+    marginBottom: 10,
     borderRadius: 16,
     overflow: 'hidden',
     borderWidth: 1,
