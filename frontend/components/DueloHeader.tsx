@@ -1,100 +1,91 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import Svg, { Path, Circle, Line } from 'react-native-svg';
-import { GLASS } from '../theme/glassTheme';
 import { useWS } from '../contexts/WebSocketContext';
 
 const LOGO = require('../assets/header/duelo_logo.webp');
 
-// ── Neon SVG icons ────────────────────────────────────────────────────────────
+// Icônes monochromes — la couleur est réservée aux badges (convention charte)
+const ICON_COLOR = 'rgba(255,255,255,0.80)';
 
-function SearchIcon({ color = '#00E5FF', size = 22 }) {
+function SearchIcon({ size = 20 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Circle cx="10.5" cy="10.5" r="6.5" stroke={color} strokeWidth="2" />
-      <Line x1="15.5" y1="15.5" x2="21" y2="21" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
+      <Circle cx="10.5" cy="10.5" r="6.5" stroke={ICON_COLOR} strokeWidth="2" />
+      <Line x1="15.5" y1="15.5" x2="21" y2="21" stroke={ICON_COLOR} strokeWidth="2.2" strokeLinecap="round" />
     </Svg>
   );
 }
 
-function MessageIcon({ color = '#BF5FFF', size = 22 }) {
+function MessageIcon({ size = 20 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
         d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-        stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"
+        stroke={ICON_COLOR} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"
       />
     </Svg>
   );
 }
 
-function ShopIcon({ color = '#FFB800', size = 22 }) {
+function ShopIcon({ size = 20 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
         d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"
-        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+        stroke={ICON_COLOR} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
       />
-      <Line x1="3" y1="6" x2="21" y2="6" stroke={color} strokeWidth="2" strokeLinecap="round" />
-      <Path d="M16 10a4 4 0 0 1-8 0" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <Line x1="3" y1="6" x2="21" y2="6" stroke={ICON_COLOR} strokeWidth="2" strokeLinecap="round" />
+      <Path d="M16 10a4 4 0 0 1-8 0" stroke={ICON_COLOR} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
 }
 
-function BellIcon({ color = '#FF6B35', size = 22 }) {
+function BellIcon({ size = 20 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
         d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"
-        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+        stroke={ICON_COLOR} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
       />
-      <Path d="M13.73 21a2 2 0 0 1-3.46 0" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <Path d="M13.73 21a2 2 0 0 1-3.46 0" stroke={ICON_COLOR} strokeWidth="2" strokeLinecap="round" />
     </Svg>
   );
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
+// Header sobre : logo à gauche, actions fantômes à droite, fond transparent
+// (l'écran flotte sur le fond cosmique — pas de bandeau plein ni de bordure).
 
 export default function DueloHeader() {
   const router = useRouter();
   const { unreadMessages: unreadCount, unreadNotifs: notifCount } = useWS();
 
+  const go = (path: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push(path as any);
+  };
+
   return (
     <View style={styles.header}>
 
-      {/* Search + Shop */}
-      <View style={styles.leftSection}>
-        <TouchableOpacity
-          style={[styles.iconBtn, styles.iconBtnCyan]}
-          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push('/search'); }}
-          activeOpacity={0.7}
-        >
-          <SearchIcon color="#00E5FF" size={22} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.iconBtn, styles.iconBtnGold]}
-          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push('/shop'); }}
-          activeOpacity={0.7}
-        >
-          <ShopIcon color="#FFB800" size={22} />
-        </TouchableOpacity>
-      </View>
+      {/* Logo à gauche */}
+      <Image source={LOGO} style={styles.logoImage} resizeMode="contain" />
 
-      {/* Logo */}
-      <View style={styles.logoContainer}>
-        <Image source={LOGO} style={styles.logoImage} resizeMode="contain" />
-      </View>
+      {/* Actions à droite — pastilles glass discrètes, icônes monochromes */}
+      <View style={styles.actions}>
+        <TouchableOpacity style={styles.iconBtn} onPress={() => go('/search')} activeOpacity={0.7}>
+          <SearchIcon />
+        </TouchableOpacity>
 
-      {/* Messages + Notifs */}
-      <View style={styles.rightIcons}>
-        <TouchableOpacity
-          style={[styles.iconBtn, styles.iconBtnViolet]}
-          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push('/conversations'); }}
-          activeOpacity={0.7}
-        >
-          <MessageIcon color="#BF5FFF" size={22} />
+        <TouchableOpacity style={styles.iconBtn} onPress={() => go('/shop')} activeOpacity={0.7}>
+          <ShopIcon />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.iconBtn} onPress={() => go('/conversations')} activeOpacity={0.7}>
+          <MessageIcon />
           {unreadCount > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
@@ -102,14 +93,10 @@ export default function DueloHeader() {
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.iconBtn, styles.iconBtnOrange]}
-          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push('/notifications'); }}
-          activeOpacity={0.7}
-        >
-          <BellIcon color="#FF6B35" size={22} />
+        <TouchableOpacity style={styles.iconBtn} onPress={() => go('/notifications')} activeOpacity={0.7}>
+          <BellIcon />
           {notifCount > 0 && (
-            <View style={styles.notifBadge}>
+            <View style={styles.badge}>
               <Text style={styles.badgeText}>{notifCount > 9 ? '9+' : notifCount}</Text>
             </View>
           )}
@@ -126,86 +113,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: GLASS.bgDark,
-    borderBottomWidth: 1,
-    borderBottomColor: GLASS.borderCyan,
-    ...Platform.select({
-      web: { backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' } as any,
-      default: {},
-    }),
+    paddingVertical: 8,
+    backgroundColor: 'transparent',
   },
-  leftSection: {
-    width: 90,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    gap: 6,
-  },
-  rightIcons: {
-    width: 90,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: 6,
-  },
-  logoContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  logoImage: { width: 140, height: 36 },
+  logoImage: { width: 118, height: 32 },
 
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   iconBtn: {
-    width: 40, height: 40,
-    borderRadius: 12,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
+    backgroundColor: 'rgba(255,255,255,0.06)',
     borderWidth: 1,
-  },
-  iconBtnCyan: {
-    backgroundColor: 'rgba(0,229,255,0.08)',
-    borderColor: 'rgba(0,229,255,0.3)',
-    shadowColor: '#00E5FF',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
-  },
-  iconBtnViolet: {
-    backgroundColor: 'rgba(191,95,255,0.08)',
-    borderColor: 'rgba(191,95,255,0.3)',
-    shadowColor: '#BF5FFF',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
-  },
-  iconBtnOrange: {
-    backgroundColor: 'rgba(255,107,53,0.08)',
-    borderColor: 'rgba(255,107,53,0.3)',
-    shadowColor: '#FF6B35',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
-  },
-  iconBtnGold: {
-    backgroundColor: 'rgba(255,184,0,0.08)',
-    borderColor: 'rgba(255,184,0,0.3)',
-    shadowColor: '#FFB800',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
+    borderColor: 'rgba(255,255,255,0.08)',
   },
 
   badge: {
-    position: 'absolute', top: -4, right: -4,
+    position: 'absolute', top: -3, right: -3,
     minWidth: 16, height: 16, borderRadius: 8,
-    backgroundColor: '#FF3B30',
+    backgroundColor: '#FF3D5E',
     justifyContent: 'center', alignItems: 'center',
     paddingHorizontal: 3,
+    borderWidth: 1.5,
+    borderColor: '#050510',
   },
-  notifBadge: {
-    position: 'absolute', top: -4, right: -4,
-    minWidth: 16, height: 16, borderRadius: 8,
-    backgroundColor: '#FF6B35',
-    justifyContent: 'center', alignItems: 'center',
-    paddingHorizontal: 3,
-  },
-  badgeText: { color: '#FFF', fontSize: 9, fontWeight: '800' },
+  badgeText: { color: '#FFF', fontSize: 9, fontWeight: '800', lineHeight: 12 },
 });

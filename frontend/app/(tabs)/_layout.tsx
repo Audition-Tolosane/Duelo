@@ -121,15 +121,25 @@ function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTa
     return 0;
   };
 
-  // Repli au scroll : glisse sous l'écran + léger rétrécissement
+  // Réduction au scroll : la cartouche se compacte (icônes seules, légèrement plus petite)
   const bottomOffset = (insets.bottom > 0 ? insets.bottom : 12) + 6;
   const hideStyle = useAnimatedStyle(() => {
     const h = hidden ? hidden.value : 0;
     return {
       transform: [
-        { translateY: interpolate(h, [0, 1], [0, 90 + bottomOffset]) },
-        { scale: interpolate(h, [0, 1], [1, 0.9]) },
+        { translateY: interpolate(h, [0, 1], [0, 8]) },
+        { scale: interpolate(h, [0, 1], [1, 0.88]) },
       ],
+    };
+  });
+
+  // Les labels se replient (hauteur + opacité) → pill compacte icônes seules
+  const labelWrapStyle = useAnimatedStyle(() => {
+    const h = hidden ? hidden.value : 0;
+    return {
+      opacity: interpolate(h, [0, 0.6], [1, 0], Extrapolation.CLAMP),
+      height: interpolate(h, [0, 1], [17, 0]),
+      marginTop: interpolate(h, [0, 1], [4, 0]),
     };
   });
 
@@ -149,7 +159,9 @@ function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTa
               ]}>
                 <TabIcon name={tab.name} color="#FFF" size={30} />
               </View>
-              <Text style={[styles.tabLabel, isFocused && { color: '#00FFFF' }]}>{t(tab.labelKey)}</Text>
+              <Animated.View style={[styles.labelWrap, labelWrapStyle]}>
+                <Text style={[styles.tabLabel, isFocused && { color: '#00FFFF' }]}>{t(tab.labelKey)}</Text>
+              </Animated.View>
             </TouchableOpacity>
           );
         }
@@ -164,7 +176,9 @@ function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTa
               <TabIcon name={tab.name} color={color} size={26} />
               <TabBadge count={badgeCount} />
             </View>
-            <Text style={[styles.tabLabel, isFocused && { color }]}>{t(tab.labelKey)}</Text>
+            <Animated.View style={[styles.labelWrap, labelWrapStyle]}>
+              <Text style={[styles.tabLabel, isFocused && { color }]}>{t(tab.labelKey)}</Text>
+            </Animated.View>
             {isFocused && (
               <View style={[styles.activeIndicator, { backgroundColor: color, shadowColor: color }]} />
             )}
@@ -336,7 +350,7 @@ const styles = StyleSheet.create({
     opacity: 0,
   },
   safeTop: {
-    backgroundColor: GLASS.bgDark,
+    backgroundColor: 'transparent',
   },
   pagerContainer: {
     flex: 1,
@@ -396,10 +410,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 10,
   },
+  labelWrap: {
+    overflow: 'hidden',
+    alignItems: 'center',
+  },
   tabLabel: {
     fontSize: 9,
     color: 'rgba(255,255,255,0.38)',
-    marginTop: 4,
     fontWeight: '700',
     letterSpacing: 0.5,
   },
