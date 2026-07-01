@@ -9,10 +9,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { GLASS } from '../theme/glassTheme';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
 import CategoryIcon from '../components/CategoryIcon';
+import { t } from '../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -22,7 +22,7 @@ const SEE_ALL_W = SCREEN_W * 0.25;
 const TOP_COUNT = 7;
 
 const CLUSTER_HUE_SHIFTS = [0, 50, -50];
-const DEFAULT_COLOR = '#8A2BE2';
+const DEFAULT_COLOR = '#B366FF';
 
 function hslToHex(h: number, s: number, l: number): string {
   s /= 100; l /= 100;
@@ -136,7 +136,7 @@ export default function SuperCategoryScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#8A2BE2" />
+        <ActivityIndicator size="large" color="#B366FF" />
       </View>
     );
   }
@@ -144,20 +144,20 @@ export default function SuperCategoryScreen() {
   if (!data) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.errorText}>Catégorie introuvable</Text>
+        <Text style={styles.errorText}>{t('common.error_loading')}</Text>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.backBtnText}>← Retour</Text>
+          <Text style={styles.backBtnText}>← {t('common.back')}</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
-  const accent = data.color || '#8A2BE2';
+  const accent = data.color || DEFAULT_COLOR;
 
   return (
     <SwipeBackPage>
     <View style={styles.container}>
-      <View style={{ paddingTop: insets.top, backgroundColor: GLASS.bgDark }}>
+      <View style={{ paddingTop: insets.top, backgroundColor: '#050510' }}>
         <DueloHeader />
       </View>
 
@@ -193,23 +193,15 @@ export default function SuperCategoryScreen() {
 
           return (
             <View key={cluster.name} style={styles.clusterSection}>
-              {/* Cluster Header */}
+              {/* En-tête de groupe — pastille teintée + label (pattern sections) */}
               <View style={styles.clusterHeader}>
-                <LinearGradient
-                  colors={[clusterColor + '20', 'transparent']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.clusterGradient}
-                />
-                <View style={[styles.clusterIconCircle, { backgroundColor: clusterColor + '25' }]}>
-                  <CategoryIcon emoji={cluster.icon} size={20} color={clusterColor} type="cluster" />
+                <View style={[styles.clusterIconCircle, { backgroundColor: clusterColor + '20' }]}>
+                  <CategoryIcon emoji={cluster.icon} size={16} color={clusterColor} type="cluster" />
                 </View>
-                <View style={styles.clusterInfo}>
-                  <Text style={styles.clusterName}>{cluster.name}</Text>
-                  <Text style={[styles.clusterCount, { color: clusterColor + '90' }]}>
-                    {cluster.themes.length} thèmes
-                  </Text>
-                </View>
+                <Text style={styles.clusterName}>{cluster.name}</Text>
+                <Text style={[styles.clusterCount, { color: clusterColor }]}>
+                  {cluster.themes.length} {t('themes.themes_count').toUpperCase()}
+                </Text>
               </View>
 
               {/* Carousel of top themes */}
@@ -227,34 +219,30 @@ export default function SuperCategoryScreen() {
                       onPress={() => openThemeDetail(theme)}
                       activeOpacity={0.8}
                     >
+                      {/* Tuile carrée teintée (pattern écran 6) */}
                       <LinearGradient
-                        colors={[tColor + '22', tColor + '08', 'transparent']}
-                        style={styles.carouselCardBg}
+                        colors={[tColor + '25', tColor + '08']}
+                        start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+                        style={[StyleSheet.absoluteFill, { borderRadius: 18 }]}
                       />
 
-                      {/* Rank badge */}
-                      <View style={[styles.rankBadge, { backgroundColor: tColor + '30' }]}>
-                        <Text style={[styles.rankText, { color: tColor }]}>#{idx + 1}</Text>
+                      <View style={styles.carouselTop}>
+                        <CategoryIcon themeId={theme.id} size={28} color={tColor} type="theme" />
+                        <Text style={[styles.rankText, { color: tColor + 'B3' }]}>#{idx + 1}</Text>
                       </View>
 
-                      <LinearGradient
-                        colors={[tColor + '35', tColor + '12']}
-                        style={styles.carouselIcon}
-                      >
-                        <CategoryIcon themeId={theme.id} size={26} color={tColor} type="theme" />
-                      </LinearGradient>
+                      <View>
+                        <Text style={styles.carouselName} numberOfLines={2}>{theme.name}</Text>
+                        <Text style={[styles.carouselMeta, { color: tColor }]} numberOfLines={1}>
+                          {theme.user_level > 0
+                            ? `${t('themes.level').toUpperCase()} ${theme.user_level}`
+                            : theme.question_count > 0
+                              ? `${theme.question_count} QUIZ`
+                              : ''}
+                        </Text>
+                      </View>
 
-                      <Text style={styles.carouselName} numberOfLines={2}>{theme.name}</Text>
-
-                      {theme.user_level > 0 ? (
-                        <View style={[styles.carouselBadge, { backgroundColor: tColor + '25' }]}>
-                          <Text style={[styles.carouselBadgeText, { color: tColor }]}>
-                            Niv.{theme.user_level}
-                          </Text>
-                        </View>
-                      ) : theme.question_count > 0 ? (
-                        <Text style={styles.carouselQCount}>{theme.question_count} Q</Text>
-                      ) : null}
+                      <View style={[styles.tileBorder, { borderColor: tColor + '40' }]} pointerEvents="none" />
                     </TouchableOpacity>
                   );
                 })}
@@ -273,9 +261,9 @@ export default function SuperCategoryScreen() {
                     />
                   </View>
                   <Text style={[styles.seeAllText, { color: clusterColor }]}>
-                    {isExpanded ? 'Réduire' : 'Tout voir'}
+                    {isExpanded ? t('themes.collapse') : t('themes.see_all')}
                   </Text>
-                  <Text style={styles.seeAllCount}>{cluster.themes.length} thèmes</Text>
+                  <Text style={styles.seeAllCount}>{cluster.themes.length} {t('themes.themes_count').toUpperCase()}</Text>
                 </TouchableOpacity>
               </ScrollView>
 
@@ -292,23 +280,22 @@ export default function SuperCategoryScreen() {
                         activeOpacity={0.8}
                       >
                         <LinearGradient
-                          colors={[tColor + '18', 'transparent']}
-                          style={styles.gridCardGlow}
+                          colors={[tColor + '25', tColor + '08']}
+                          start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+                          style={[StyleSheet.absoluteFill, { borderRadius: 16 }]}
                         />
-                        <LinearGradient
-                          colors={[tColor + '30', tColor + '10']}
-                          style={styles.gridIcon}
-                        >
-                          <CategoryIcon themeId={theme.id} size={22} color={tColor} type="theme" />
-                        </LinearGradient>
-                        <Text style={styles.gridName} numberOfLines={2}>{theme.name}</Text>
-                        {theme.user_level > 0 && (
-                          <View style={[styles.gridBadge, { backgroundColor: tColor + '25' }]}>
-                            <Text style={[styles.gridBadgeText, { color: tColor }]}>
-                              Niv.{theme.user_level}
+                        <View style={styles.gridIconWrap}>
+                          <CategoryIcon themeId={theme.id} size={24} color={tColor} type="theme" />
+                        </View>
+                        <View>
+                          <Text style={styles.gridName} numberOfLines={2}>{theme.name}</Text>
+                          {theme.user_level > 0 && (
+                            <Text style={[styles.gridMeta, { color: tColor }]}>
+                              {t('themes.level').toUpperCase()} {theme.user_level}
                             </Text>
-                          </View>
-                        )}
+                          )}
+                        </View>
+                        <View style={[styles.tileBorder, { borderColor: tColor + '40', borderRadius: 16 }]} pointerEvents="none" />
                       </TouchableOpacity>
                     );
                   })}
@@ -330,7 +317,7 @@ const styles = StyleSheet.create({
   loadingContainer: { flex: 1, backgroundColor: '#050510', justifyContent: 'center', alignItems: 'center' },
   errorText: { color: '#666', fontSize: 16, marginBottom: 16 },
   backBtn: { paddingVertical: 10, paddingHorizontal: 20 },
-  backBtnText: { color: '#8A2BE2', fontSize: 16, fontWeight: '600' },
+  backBtnText: { color: '#B366FF', fontSize: 16, fontWeight: '600' },
 
   // Sub-header
   subHeader: {
@@ -359,60 +346,45 @@ const styles = StyleSheet.create({
   scroll: { paddingTop: 4 },
 
   // Cluster Section
-  clusterSection: { marginBottom: 24 },
+  clusterSection: { marginBottom: 26 },
   clusterHeader: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 16, padding: 14, marginHorizontal: 16,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
-    overflow: 'hidden',
-  },
-  clusterGradient: {
-    position: 'absolute', top: 0, left: 0, bottom: 0, width: '60%',
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    paddingHorizontal: 16,
   },
   clusterIconCircle: {
-    width: 40, height: 40, borderRadius: 20,
+    width: 28, height: 28, borderRadius: 8,
     justifyContent: 'center', alignItems: 'center',
   },
-  clusterInfo: { flex: 1, marginLeft: 12 },
-  clusterName: { color: '#FFF', fontSize: 16, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold' },
-  clusterCount: { fontSize: 10, fontFamily: 'JetBrainsMono_400Regular', letterSpacing: 1, textTransform: 'uppercase', marginTop: 2 },
+  clusterName: {
+    flex: 1, color: 'rgba(255,255,255,0.60)', fontSize: 13,
+    fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: 1.5, textTransform: 'uppercase',
+  },
+  clusterCount: { fontSize: 9, fontFamily: 'JetBrainsMono_400Regular', letterSpacing: 1 },
 
-  // Carousel
+  // Carousel — tuiles carrées teintées (pattern écran 6)
   carousel: {
     paddingLeft: 16, paddingRight: 8, paddingTop: 12, gap: 10,
   },
   carouselCard: {
     width: CAROUSEL_CARD_W, height: CAROUSEL_CARD_H,
     borderRadius: 18, padding: 12,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
-    alignItems: 'center', justifyContent: 'center',
+    justifyContent: 'space-between',
     overflow: 'hidden',
   },
-  carouselCardBg: {
-    position: 'absolute', top: 0, left: 0, right: 0, height: '100%',
-    borderRadius: 18,
+  tileBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 18, borderWidth: 1,
   },
-  rankBadge: {
-    position: 'absolute', top: 8, left: 8,
-    borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2,
+  carouselTop: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start',
   },
-  rankText: { fontSize: 10, fontWeight: '900' },
-  carouselIcon: {
-    width: 50, height: 50, borderRadius: 25,
-    justifyContent: 'center', alignItems: 'center', marginBottom: 8,
-  },
+  rankText: { fontSize: 9, fontFamily: 'JetBrainsMono_700Bold', letterSpacing: 1 },
   carouselName: {
-    color: '#FFF', fontSize: 11, fontWeight: '700', fontFamily: 'SpaceGrotesk_600SemiBold',
-    textAlign: 'center', lineHeight: 14,
+    color: '#FFF', fontSize: 12, fontFamily: 'SpaceGrotesk_700Bold',
+    letterSpacing: -0.2, lineHeight: 15,
   },
-  carouselBadge: {
-    borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, marginTop: 6,
-  },
-  carouselBadgeText: { fontSize: 9, fontWeight: '800' },
-  carouselQCount: {
-    color: 'rgba(255,255,255,0.3)', fontSize: 9, fontWeight: '600', marginTop: 6,
+  carouselMeta: {
+    fontSize: 8, fontFamily: 'JetBrainsMono_400Regular', letterSpacing: 1, marginTop: 3,
   },
 
   // See All card
@@ -428,34 +400,30 @@ const styles = StyleSheet.create({
     width: 44, height: 44, borderRadius: 22,
     justifyContent: 'center', alignItems: 'center', marginBottom: 8,
   },
-  seeAllText: { fontSize: 12, fontWeight: '800' },
-  seeAllCount: { color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: '600', marginTop: 2 },
+  seeAllText: { fontSize: 12, fontFamily: 'SpaceGrotesk_700Bold' },
+  seeAllCount: {
+    color: 'rgba(255,255,255,0.30)', fontSize: 8,
+    fontFamily: 'JetBrainsMono_400Regular', letterSpacing: 1, marginTop: 3,
+  },
 
-  // Full grid (expanded)
+  // Full grid (expanded) — mêmes tuiles teintées
   fullGrid: {
     flexDirection: 'row', flexWrap: 'wrap',
     paddingTop: 12, paddingHorizontal: 16,
     gap: GRID_GAP,
   },
   gridCard: {
-    borderRadius: 16, padding: 12,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
-    alignItems: 'center', overflow: 'hidden',
+    borderRadius: 16, padding: 10,
+    aspectRatio: 1 / 1.1,
+    justifyContent: 'space-between',
+    overflow: 'hidden',
   },
-  gridCardGlow: {
-    position: 'absolute', top: 0, left: 0, right: 0, height: 50,
-  },
-  gridIcon: {
-    width: 44, height: 44, borderRadius: 22,
-    justifyContent: 'center', alignItems: 'center', marginBottom: 8,
-  },
+  gridIconWrap: { alignSelf: 'flex-start' },
   gridName: {
-    color: '#FFF', fontSize: 11, fontWeight: '700',
-    textAlign: 'center', lineHeight: 14, minHeight: 28,
+    color: '#FFF', fontSize: 11, fontFamily: 'SpaceGrotesk_700Bold',
+    letterSpacing: -0.2, lineHeight: 14,
   },
-  gridBadge: {
-    borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3, marginTop: 6,
+  gridMeta: {
+    fontSize: 8, fontFamily: 'JetBrainsMono_400Regular', letterSpacing: 1, marginTop: 2,
   },
-  gridBadgeText: { fontSize: 10, fontWeight: '800' },
 });
