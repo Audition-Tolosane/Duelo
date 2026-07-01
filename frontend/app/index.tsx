@@ -13,7 +13,9 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import { makeRedirectUri } from 'expo-auth-session';
-import { GLASS } from '../theme/glassTheme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS, RADIUS } from '../theme/tokens';
+import { FONTS } from '../theme/fonts';
 import { saveToken } from '../utils/api';
 import { t } from '../utils/i18n';
 
@@ -368,7 +370,7 @@ export default function WelcomeScreen() {
   if (initialLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#8A2BE2" />
+        <ActivityIndicator size="large" color={COLORS.violet} />
       </View>
     );
   }
@@ -388,12 +390,12 @@ export default function WelcomeScreen() {
       {/* Particules — toutes avec renderToHardwareTextureAndroid, pas de shadow */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
         {/* Orbes flottants */}
-        <FloatingOrb size={7}  color="rgba(0,220,255,0.55)"   x={SCREEN_W*0.12} y={SCREEN_H*0.10} durY={3100} durX={3800} delay={0} />
-        <FloatingOrb size={5}  color="rgba(138,43,226,0.65)"  x={SCREEN_W*0.80} y={SCREEN_H*0.08} durY={2700} durX={3200} delay={200} />
-        <FloatingOrb size={9}  color="rgba(0,200,255,0.35)"   x={SCREEN_W*0.62} y={SCREEN_H*0.22} durY={3600} durX={4100} delay={400} />
+        <FloatingOrb size={7}  color="rgba(0,229,255,0.55)"   x={SCREEN_W*0.12} y={SCREEN_H*0.10} durY={3100} durX={3800} delay={0} />
+        <FloatingOrb size={5}  color="rgba(179,102,255,0.65)" x={SCREEN_W*0.80} y={SCREEN_H*0.08} durY={2700} durX={3200} delay={200} />
+        <FloatingOrb size={9}  color="rgba(0,229,255,0.35)"   x={SCREEN_W*0.62} y={SCREEN_H*0.22} durY={3600} durX={4100} delay={400} />
         <FloatingOrb size={5}  color="rgba(255,255,255,0.28)" x={SCREEN_W*0.28} y={SCREEN_H*0.33} durY={2900} durX={3500} delay={600} />
-        <FloatingOrb size={4}  color="rgba(138,43,226,0.45)"  x={SCREEN_W*0.88} y={SCREEN_H*0.52} durY={3300} durX={3900} delay={350} />
-        <FloatingOrb size={6}  color="rgba(0,220,255,0.3)"    x={SCREEN_W*0.04} y={SCREEN_H*0.68} durY={3000} durX={3700} delay={550} />
+        <FloatingOrb size={4}  color="rgba(179,102,255,0.45)" x={SCREEN_W*0.88} y={SCREEN_H*0.52} durY={3300} durX={3900} delay={350} />
+        <FloatingOrb size={6}  color="rgba(0,229,255,0.3)"    x={SCREEN_W*0.04} y={SCREEN_H*0.68} durY={3000} durX={3700} delay={550} />
         <FloatingOrb size={4}  color="rgba(255,255,255,0.22)" x={SCREEN_W*0.48} y={SCREEN_H*0.85} durY={3400} durX={4000} delay={150} />
 
         {/* Sparkles — 8 max */}
@@ -443,12 +445,18 @@ export default function WelcomeScreen() {
               <Animated.View style={[styles.formContainer, { opacity: formFade, transform: [{ translateY: formSlide }] }]}>
                 <View style={styles.glassCard}>
 
-                  {/* Tabs */}
+                  {/* Tabs — gradient actif en absoluteFill, texte noir (cf. pattern onglets) */}
                   <View style={styles.tabs}>
-                    <TouchableOpacity style={[styles.tab, authMode === 'guest' && styles.tabActive]} onPress={() => { setAuthMode('guest'); setError(''); }}>
+                    <TouchableOpacity style={styles.tab} onPress={() => { setAuthMode('guest'); setError(''); }}>
+                      {authMode === 'guest' && (
+                        <LinearGradient colors={[COLORS.cyan, COLORS.violet]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+                      )}
                       <Text style={[styles.tabText, authMode === 'guest' && styles.tabTextActive]}>{t('welcome.tab_guest')}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.tab, authMode === 'email' && styles.tabActive]} onPress={() => { setAuthMode('email'); setError(''); }}>
+                    <TouchableOpacity style={styles.tab} onPress={() => { setAuthMode('email'); setError(''); }}>
+                      {authMode === 'email' && (
+                        <LinearGradient colors={[COLORS.cyan, COLORS.violet]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+                      )}
                       <Text style={[styles.tabText, authMode === 'email' && styles.tabTextActive]}>{t('welcome.tab_email')}</Text>
                     </TouchableOpacity>
                   </View>
@@ -462,14 +470,14 @@ export default function WelcomeScreen() {
                         <TextInput
                           style={[styles.input, available === true && styles.inputValid, available === false && styles.inputError]}
                           placeholder={t('welcome.pseudo_placeholder')}
-                          placeholderTextColor="#525252"
+                          placeholderTextColor={COLORS.inkDim}
                           value={pseudo}
                           onChangeText={setPseudo}
                           autoCapitalize="none"
                           maxLength={20}
                           autoCorrect={false}
                         />
-                        {checking && <ActivityIndicator style={styles.inputIcon} size="small" color="#8A2BE2" />}
+                        {checking && <ActivityIndicator style={styles.inputIcon} size="small" color={COLORS.violet} />}
                         {!checking && available === true && <Text style={[styles.inputIcon, styles.checkMark]}>✓</Text>}
                         {!checking && available === false && <Text style={[styles.inputIcon, styles.crossMark]}>✗</Text>}
                       </View>
@@ -481,7 +489,8 @@ export default function WelcomeScreen() {
                         disabled={!available || loading}
                         activeOpacity={0.8}
                       >
-                        {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.mainButtonText}>{t('welcome.play_guest')}</Text>}
+                        <LinearGradient colors={[COLORS.cyan, COLORS.violet]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+                        {loading ? <ActivityIndicator color={COLORS.abyss} /> : <Text style={styles.mainButtonText}>{t('welcome.play_guest')}</Text>}
                       </TouchableOpacity>
                     </>
                   )}
@@ -492,7 +501,7 @@ export default function WelcomeScreen() {
                       <TextInput
                         style={styles.input}
                         placeholder={t('welcome.email_placeholder')}
-                        placeholderTextColor="#525252"
+                        placeholderTextColor={COLORS.inkDim}
                         value={email}
                         onChangeText={setEmail}
                         keyboardType="email-address"
@@ -503,7 +512,7 @@ export default function WelcomeScreen() {
                       <TextInput
                         style={styles.input}
                         placeholder={t('welcome.password_placeholder')}
-                        placeholderTextColor="#525252"
+                        placeholderTextColor={COLORS.inkDim}
                         value={password}
                         onChangeText={setPassword}
                         secureTextEntry
@@ -515,7 +524,7 @@ export default function WelcomeScreen() {
                           <TextInput
                             style={styles.input}
                             placeholder={t('welcome.choose_pseudo_optional')}
-                            placeholderTextColor="#525252"
+                            placeholderTextColor={COLORS.inkDim}
                             value={emailPseudo}
                             onChangeText={setEmailPseudo}
                             autoCapitalize="none"
@@ -531,8 +540,9 @@ export default function WelcomeScreen() {
                         disabled={loading}
                         activeOpacity={0.8}
                       >
+                        <LinearGradient colors={[COLORS.cyan, COLORS.violet]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
                         {loading
-                          ? <ActivityIndicator color="#FFF" />
+                          ? <ActivityIndicator color={COLORS.abyss} />
                           : <Text style={styles.mainButtonText}>{emailMode === 'login' ? t('welcome.login_btn') : t('welcome.register_btn')}</Text>}
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => { setEmailMode(emailMode === 'login' ? 'register' : 'login'); setError(''); }} style={{ marginTop: 14 }}>
@@ -568,7 +578,7 @@ export default function WelcomeScreen() {
                     <AppleAuthentication.AppleAuthenticationButton
                       buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
                       buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-                      cornerRadius={GLASS.radiusSm}
+                      cornerRadius={RADIUS.md}
                       style={styles.appleNativeButton}
                       onPress={handleAppleSignIn}
                     />
@@ -605,7 +615,7 @@ const styles = StyleSheet.create({
     width: 268, height: 88,
     borderRadius: 44,
     borderWidth: 1,
-    borderColor: 'rgba(0,210,255,0.45)',
+    borderColor: 'rgba(0,229,255,0.45)',
   },
   logoImage: { width: 220, height: 56, zIndex: 1 },
 
@@ -615,7 +625,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingHorizontal: 20, paddingVertical: 10,
     borderWidth: 1,
-    borderColor: 'rgba(0,255,255,0.35)',
+    borderColor: 'rgba(0,229,255,0.35)',
     marginBottom: 32,
     ...Platform.select({
       web: { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } as any,
@@ -623,67 +633,70 @@ const styles = StyleSheet.create({
     }),
   },
   taglineText: {
-    color: '#FFF', fontSize: 13, fontWeight: '600', textAlign: 'center',
+    color: COLORS.white, fontSize: 13, fontFamily: FONTS.display.semiBold, textAlign: 'center',
     lineHeight: 20, letterSpacing: 0.3,
   },
 
   formContainer: { marginBottom: 32 },
   glassCard: {
-    backgroundColor: GLASS.bg,
-    borderRadius: GLASS.radius,
+    backgroundColor: 'rgba(10,10,26,0.72)',
+    borderRadius: RADIUS.xl,
     padding: 24,
     borderWidth: 1,
-    borderColor: GLASS.borderCyan,
+    borderColor: COLORS.strokeCyan,
     ...Platform.select({
       web: { backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' } as any,
       default: {},
     }),
   },
 
-  tabs: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: 4, marginBottom: 20 },
-  tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
-  tabActive: { backgroundColor: '#8A2BE2' },
-  tabText: { color: 'rgba(255,255,255,0.5)', fontSize: 14, fontWeight: '600' },
-  tabTextActive: { color: '#FFF' },
+  tabs: { flexDirection: 'row', backgroundColor: COLORS.surfaceLight, borderRadius: RADIUS.sm + 2, padding: 4, marginBottom: 20 },
+  tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: RADIUS.sm, overflow: 'hidden' },
+  tabText: { color: COLORS.dim2, fontSize: 13, fontFamily: FONTS.display.bold, letterSpacing: 0.5, textTransform: 'uppercase' },
+  tabTextActive: { color: '#000000' },
 
-  formTitle: { fontSize: 20, fontWeight: '700', color: '#FFF', marginBottom: 4 },
-  formHint: { fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 20 },
+  formTitle: { fontSize: 20, fontFamily: FONTS.display.bold, letterSpacing: -0.3, color: COLORS.white, marginBottom: 4 },
+  formHint: { fontSize: 13, fontFamily: FONTS.display.regular, color: COLORS.dim3, marginBottom: 20 },
 
   inputWrapper: { position: 'relative', marginBottom: 8 },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: GLASS.radiusSm,
-    padding: 16, fontSize: 16, color: '#FFF',
-    borderWidth: 1, borderColor: GLASS.borderSubtle,
+    backgroundColor: COLORS.surfaceLight,
+    borderRadius: RADIUS.md,
+    padding: 16, fontSize: 16, color: COLORS.white,
+    fontFamily: FONTS.display.regular,
+    borderWidth: 1, borderColor: COLORS.stroke,
   },
-  inputValid: { borderColor: '#00FF9D' },
-  inputError: { borderColor: '#FF3B30' },
+  inputValid: { borderColor: COLORS.mint },
+  inputError: { borderColor: COLORS.red },
   inputIcon: { position: 'absolute', right: 16, top: 16 },
-  checkMark: { color: '#00FF9D', fontSize: 20, fontWeight: '700' },
-  crossMark: { color: '#FF3B30', fontSize: 20, fontWeight: '700' },
-  errorText: { color: '#FF3B30', fontSize: 12, marginBottom: 4, marginLeft: 4 },
+  checkMark: { color: COLORS.mint, fontSize: 20, fontWeight: '700' },
+  crossMark: { color: COLORS.red, fontSize: 20, fontWeight: '700' },
+  errorText: { color: COLORS.red, fontSize: 12, fontFamily: FONTS.display.medium, marginBottom: 4, marginLeft: 4 },
 
+  // CTA principal — gradient cyan→violet en absoluteFill, texte noir (cf. DuelButton)
   mainButton: {
-    backgroundColor: '#8A2BE2', borderRadius: GLASS.radiusSm,
+    borderRadius: RADIUS.md + 2, overflow: 'hidden',
     padding: 18, alignItems: 'center', marginTop: 12,
-    borderWidth: 1, borderColor: 'rgba(0,255,255,0.3)',
-    shadowColor: '#00FFFF', shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.35, shadowRadius: 10, elevation: 6,
+    shadowColor: COLORS.cyan, shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4, shadowRadius: 20, elevation: 8,
   },
   mainButtonDisabled: { opacity: 0.4 },
-  mainButtonText: { color: '#FFF', fontSize: 16, fontWeight: '800', letterSpacing: 2 },
+  mainButtonText: { color: '#000000', fontSize: 15, fontFamily: FONTS.display.bold, letterSpacing: 1, textTransform: 'uppercase' },
 
-  switchText: { color: 'rgba(0,255,255,0.8)', fontSize: 13, textAlign: 'center', fontWeight: '500' },
+  switchText: { color: COLORS.cyan, fontSize: 13, textAlign: 'center', fontFamily: FONTS.display.medium },
 
   divider: { flexDirection: 'row', alignItems: 'center', marginVertical: 20 },
-  dividerLine: { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.12)' },
-  dividerText: { color: 'rgba(255,255,255,0.4)', fontSize: 12, marginHorizontal: 12 },
+  dividerLine: { flex: 1, height: 1, backgroundColor: COLORS.stroke },
+  dividerText: {
+    color: COLORS.dim3, fontSize: 10, marginHorizontal: 12,
+    fontFamily: FONTS.mono.regular, letterSpacing: 2, textTransform: 'uppercase',
+  },
 
   // Google button — fond blanc, "G" coloré
   googleButton: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: GLASS.radiusSm,
+    borderRadius: RADIUS.md,
     paddingVertical: 13, paddingHorizontal: 16,
     marginBottom: 10,
     borderWidth: 1, borderColor: '#dadce0',
@@ -711,7 +724,7 @@ const styles = StyleSheet.create({
   appleButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     backgroundColor: '#000',
-    borderRadius: GLASS.radiusSm,
+    borderRadius: RADIUS.md,
     height: 50,
     marginBottom: 10,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)',
