@@ -63,8 +63,9 @@ export default function ResultsScreen() {
     playerScore: string; opponentScore: string; opponentPseudo: string;
     category: string; userId: string; isBot: string;
     correctCount: string; opponentLevel: string; opponentId: string;
-    asyncChallenge: string; challengeOpponent: string;
+    asyncChallenge: string; challengeOpponent: string; opponentDisconnected: string;
   }>();
+  const opponentLeft = params.opponentDisconnected === 'true';
   const isAsyncChallenge = params.asyncChallenge === 'true';
   const challengeOpponentName = params.challengeOpponent ? decodeURIComponent(params.challengeOpponent) : '';
 
@@ -116,8 +117,24 @@ export default function ResultsScreen() {
   const cardSlide = useRef(new Animated.Value(60)).current;
   const xpSlide = useRef(new Animated.Value(40)).current;
 
+  // Compteur XP qui s'incrémente 0 → total (écran résultats)
+  const xpCountAnim = useRef(new Animated.Value(0)).current;
+  const [displayXp, setDisplayXp] = useState(0);
+
   // Keep ref in sync to avoid stale closures in WS listeners
   useEffect(() => { rematchStateRef.current = rematchState; }, [rematchState]);
+
+  // Anime le compteur XP dès que le détail des points est disponible
+  useEffect(() => {
+    const total = xpBreakdown?.total ?? 0;
+    if (total <= 0) { setDisplayXp(total); return; }
+    xpCountAnim.setValue(0);
+    const id = xpCountAnim.addListener(({ value }) => setDisplayXp(Math.round(value)));
+    Animated.timing(xpCountAnim, {
+      toValue: total, duration: 900, delay: 300, useNativeDriver: false,
+    }).start();
+    return () => xpCountAnim.removeListener(id);
+  }, [xpBreakdown]);
 
   useEffect(() => {
     submitMatch();
@@ -456,6 +473,21 @@ export default function ResultsScreen() {
           </View>
         )}
 
+        {/* Adversaire parti — bandeau forfait (écran 29) */}
+        {opponentLeft && (
+          <View style={styles.forfeitBanner}>
+            <Text style={styles.forfeitEyebrow}>◆ {t('results.forfeit_eyebrow')}</Text>
+            <Text style={styles.forfeitTitle}>
+              {t('results.forfeit_title', { name: params.opponentPseudo || t('game.opponent') })}
+            </Text>
+            <Text style={styles.forfeitBody}>{t('results.forfeit_body')}</Text>
+            <View style={styles.forfeitChip}>
+              <MaterialCommunityIcons name="trophy" size={16} color="#32E7A3" />
+              <Text style={styles.forfeitChipText}>{t('results.forfeit_chip')}</Text>
+            </View>
+          </View>
+        )}
+
         {/* Result Header */}
         <Animated.View style={[styles.resultHeader, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
           {correctCount >= 7 && (
@@ -604,7 +636,7 @@ export default function ResultsScreen() {
               <View style={styles.xpDivider} />
               <View style={styles.xpRow}>
                 <Text style={styles.xpTotalLabel}>{t('results.total')}</Text>
-                <Text style={styles.xpTotalValue}>+{xpBreakdown.total} XP</Text>
+                <Text style={styles.xpTotalValue}>+{displayXp} XP</Text>
               </View>
             </>
           ) : null}
@@ -1143,6 +1175,28 @@ const styles = StyleSheet.create({
   },
   drawText: { fontFamily: 'Fraunces_500Medium_Italic', color: '#FFFFFF', fontSize: 48, letterSpacing: -1 },
   lossText: { color: 'rgba(255,255,255,0.85)' },
+  forfeitBanner: {
+    alignItems: 'center', marginBottom: 18, paddingHorizontal: 8,
+  },
+  forfeitEyebrow: {
+    fontFamily: 'JetBrainsMono_700Bold', fontSize: 10, letterSpacing: 2.5, color: '#FFB547',
+  },
+  forfeitTitle: {
+    fontFamily: 'SpaceGrotesk_700Bold', fontSize: 24, letterSpacing: -0.5,
+    color: '#FFFFFF', marginTop: 6, textAlign: 'center',
+  },
+  forfeitBody: {
+    fontFamily: 'SpaceGrotesk_400Regular', fontSize: 13, lineHeight: 20,
+    color: 'rgba(255,255,255,0.60)', maxWidth: 280, marginTop: 8, textAlign: 'center',
+  },
+  forfeitChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 16,
+    paddingVertical: 10, paddingHorizontal: 18, borderRadius: 12,
+    backgroundColor: 'rgba(50,231,163,0.13)', borderWidth: 1, borderColor: 'rgba(50,231,163,0.40)',
+  },
+  forfeitChipText: {
+    fontFamily: 'SpaceGrotesk_700Bold', fontSize: 13, color: '#32E7A3',
+  },
   flawlessPill: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
     backgroundColor: '#FFB547', borderRadius: 20,

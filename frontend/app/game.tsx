@@ -113,6 +113,16 @@ export default function GameScreen() {
   // Question slide scale animation
   const questionScaleAnim = useRef(new Animated.Value(0.96)).current;
 
+  // Score pop : scale 1 → 1.4 → 1 sur bonne réponse joueur
+  const scorePopAnim = useRef(new Animated.Value(1)).current;
+  const triggerScorePop = () => {
+    scorePopAnim.setValue(1);
+    Animated.sequence([
+      Animated.spring(scorePopAnim, { toValue: 1.4, useNativeDriver: true, speed: 20, bounciness: 14 }),
+      Animated.spring(scorePopAnim, { toValue: 1, useNativeDriver: true, speed: 12, bounciness: 10 }),
+    ]).start();
+  };
+
   // Correct streak streak toast
   const [correctStreak, setCorrectStreak] = useState(0);
   const correctStreakRef = useRef(0);
@@ -207,7 +217,7 @@ export default function GameScreen() {
         botScoreRef.current = opponent_score;
         setPlayerScore(your_score);
         setBotScore(opponent_score);
-        if (is_correct) correctCountRef.current += 1;
+        if (is_correct) { correctCountRef.current += 1; triggerScorePop(); }
 
         setShowResult(true);
         setShowPending(false);
@@ -407,6 +417,7 @@ export default function GameScreen() {
     botScoreRef.current = newB;
     setPlayerScore(newP);
     setBotScore(newB);
+    if (pPts > 0) triggerScorePop();
 
     // Hide pending on bars (answered)
     setShowPending(false);
@@ -766,7 +777,7 @@ export default function GameScreen() {
             </View>
             <View style={styles.scoreMeta}>
               <Text style={[styles.scoreBoxName, { color: CYAN }]} numberOfLines={1}>{pseudo}</Text>
-              <Text style={styles.scoreBoxScore}>{playerScore}</Text>
+              <Animated.Text style={[styles.scoreBoxScore, { transform: [{ scale: scorePopAnim }] }]}>{playerScore}</Animated.Text>
             </View>
           </View>
 

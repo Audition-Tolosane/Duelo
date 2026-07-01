@@ -31,6 +31,7 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import { WebSocketProvider } from '../contexts/WebSocketContext';
 import RematchModal from '../components/RematchModal';
 import ChallengeReadyModal from '../components/ChallengeReadyModal';
+import OfflineOverlay from '../components/OfflineOverlay';
 
 // All stack pages that support swipe-back with transparent overlay
 const SWIPEABLE_SCREENS = [
@@ -78,6 +79,7 @@ export default function RootLayout() {
       <ErrorBoundary>
       <RematchModal />
       <ChallengeReadyModal />
+      <OfflineOverlay />
       <SwipeBackProvider>
         <StatusBar style="light" />
         <Stack

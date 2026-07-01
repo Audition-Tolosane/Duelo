@@ -43,6 +43,18 @@ const translations: Translations = {
   'common.back': { fr: 'Retour', en: 'Back', es: 'Volver', de: 'Zurück', pt: 'Voltar', it: 'Indietro', ar: 'رجوع', ja: '戻る', ko: '뒤로', zh: '返回' },
   'common.search': { fr: 'Rechercher', en: 'Search', es: 'Buscar', de: 'Suchen', pt: 'Pesquisar', it: 'Cerca', ar: 'بحث', ja: '検索', ko: '검색', zh: '搜索' },
 
+  // Offline overlay (écran 33)
+  'offline.eyebrow': { fr: 'HORS LIGNE', en: 'OFFLINE', es: 'SIN CONEXIÓN', de: 'OFFLINE', pt: 'OFFLINE', it: 'OFFLINE', ar: 'غير متصل', ja: 'オフライン', ko: '오프라인', zh: '离线' },
+  'offline.title': { fr: 'Connexion perdue', en: 'Connection lost', es: 'Conexión perdida', de: 'Verbindung verloren', pt: 'Conexão perdida', it: 'Connessione persa', ar: 'انقطع الاتصال', ja: '接続が切れました', ko: '연결이 끊겼습니다', zh: '连接已断开' },
+  'offline.body': { fr: 'Vérifie ta connexion internet. On réessaie automatiquement dès que tu es de retour.', en: 'Check your internet connection. We\'ll retry automatically as soon as you\'re back.', es: 'Comprueba tu conexión a internet. Reintentaremos automáticamente en cuanto vuelvas.', de: 'Überprüfe deine Internetverbindung. Wir versuchen es automatisch erneut, sobald du zurück bist.', pt: 'Verifique sua conexão com a internet. Tentaremos novamente assim que você voltar.', it: 'Controlla la tua connessione internet. Riproveremo automaticamente appena torni online.', ar: 'تحقق من اتصالك بالإنترنت. سنعيد المحاولة تلقائيًا بمجرد عودتك.', ja: 'インターネット接続を確認してください。復帰次第、自動的に再試行します。', ko: '인터넷 연결을 확인하세요. 다시 연결되면 자동으로 재시도합니다.', zh: '请检查你的网络连接。恢复后我们会自动重试。' },
+  'offline.reconnecting': { fr: 'Reconnexion…', en: 'Reconnecting…', es: 'Reconectando…', de: 'Verbindung wird wiederhergestellt…', pt: 'Reconectando…', it: 'Riconnessione…', ar: 'إعادة الاتصال…', ja: '再接続中…', ko: '재연결 중…', zh: '正在重新连接…' },
+
+  // Résultat — victoire par forfait (écran 29)
+  'results.forfeit_eyebrow': { fr: 'DUEL INTERROMPU', en: 'DUEL INTERRUPTED', es: 'DUELO INTERRUMPIDO', de: 'DUELL UNTERBROCHEN', pt: 'DUELO INTERROMPIDO', it: 'DUELLO INTERROTTO', ar: 'توقفت المبارزة', ja: '対戦中断', ko: '대결 중단', zh: '对决中断' },
+  'results.forfeit_title': { fr: '{name} a quitté', en: '{name} left', es: '{name} se fue', de: '{name} hat verlassen', pt: '{name} saiu', it: '{name} è uscito', ar: 'غادر {name}', ja: '{name}が退出', ko: '{name} 님이 나감', zh: '{name} 已离开' },
+  'results.forfeit_body': { fr: 'Ton adversaire s\'est déconnecté. Tu remportes le duel par forfait — l\'XP est conservé.', en: 'Your opponent disconnected. You win the duel by forfeit — your XP is kept.', es: 'Tu oponente se desconectó. Ganas el duelo por abandono — tu XP se conserva.', de: 'Dein Gegner hat die Verbindung getrennt. Du gewinnst das Duell kampflos — dein XP bleibt erhalten.', pt: 'Seu oponente se desconectou. Você vence o duelo por desistência — seu XP é mantido.', it: 'Il tuo avversario si è disconnesso. Vinci il duello per abbandono — l\'XP è conservato.', ar: 'انقطع اتصال خصمك. تفوز بالمبارزة بالانسحاب — يتم الاحتفاظ بنقاط الخبرة.', ja: '対戦相手が切断しました。不戦勝です — XPは保持されます。', ko: '상대가 연결을 끊었습니다. 부전승으로 승리 — XP는 유지됩니다.', zh: '你的对手已断开连接。你不战而胜——经验值将保留。' },
+  'results.forfeit_chip': { fr: 'Victoire par forfait', en: 'Victory by forfeit', es: 'Victoria por abandono', de: 'Sieg kampflos', pt: 'Vitória por desistência', it: 'Vittoria per abbandono', ar: 'فوز بالانسحاب', ja: '不戦勝', ko: '부전승', zh: '不战而胜' },
+
   // Profile/Settings
   'settings.notifications': { fr: 'Notifications', en: 'Notifications', es: 'Notificaciones', de: 'Benachrichtigungen', pt: 'Notificações', it: 'Notifiche', ar: 'الإشعارات', ja: '通知', ko: '알림', zh: '通知' },
   'settings.language': { fr: 'Langue', en: 'Language', es: 'Idioma', de: 'Sprache', pt: 'Idioma', it: 'Lingua', ar: 'اللغة', ja: '言語', ko: '언어', zh: '语言' },
@@ -253,6 +265,7 @@ const translations: Translations = {
   'game.async_will_play': { fr: 'Jouera plus tard', en: 'Will play later', es: 'Jugará después', de: 'Spielt später', pt: 'Jogará depois', it: 'Giocherà dopo', ar: 'سيلعب لاحقاً', ja: '後でプレイ', ko: '나중에 플레이', zh: '稍后游戏' },
   'game.already_played': { fr: 'A déjà joué', en: 'Already played', es: 'Ya jugó', de: 'Hat gespielt', pt: 'Já jogou', it: 'Ha già giocato', ar: 'لعب بالفعل', ja: 'プレイ済み', ko: '이미 플레이함', zh: '已游戏' },
   'game.player': { fr: 'Joueur', en: 'Player', es: 'Jugador', de: 'Spieler', pt: 'Jogador', it: 'Giocatore', ar: 'لاعب', ja: 'プレイヤー', ko: '플레이어', zh: '玩家' },
+  'game.opponent': { fr: 'Adversaire', en: 'Opponent', es: 'Oponente', de: 'Gegner', pt: 'Oponente', it: 'Avversario', ar: 'الخصم', ja: '対戦相手', ko: '상대', zh: '对手' },
 
   // Matchmaking (extended)
   'matchmaking.searching_opponent': { fr: 'Recherche d\'un adversaire...', en: 'Searching for an opponent...', es: 'Buscando un oponente...', de: 'Suche einen Gegner...', pt: 'Procurando um oponente...', it: 'Ricerca di un avversario...', ar: 'جاري البحث عن خصم...', ja: '対戦相手を探しています...', ko: '상대를 찾는 중...', zh: '正在寻找对手...' },
