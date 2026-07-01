@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import CosmicBackground from '../../components/CosmicBackground';
+import { useTabBar } from '../../contexts/TabBarContext';
 import { t } from '../../utils/i18n';
 import { FONTS } from '../../theme/fonts';
 
@@ -20,6 +21,7 @@ const FIRE = '#FF6B2C';
 // dans l'onglet Thèmes (écran 6) ; pas de section univers ici.
 export default function PlayScreen() {
   const router = useRouter();
+  const { onScroll: onTabScroll } = useTabBar();
 
   // Les tournois ont lieu du vendredi au dimanche (cf. crons backend)
   const day = new Date().getDay();
@@ -28,7 +30,7 @@ export default function PlayScreen() {
   return (
     <CosmicBackground>
       <View style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
 
           {/* Header — modes de jeu */}
           <View style={styles.pageHeader}>
@@ -145,7 +147,7 @@ export default function PlayScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
-  scroll: { paddingBottom: 30 },
+  scroll: { paddingBottom: 120 },
 
   pageHeader: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',

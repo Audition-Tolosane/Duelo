@@ -20,6 +20,7 @@ import DueloHeader from '../../components/DueloHeader';
 import CategoryIcon from '../../components/CategoryIcon';
 import { GLASS } from '../../theme/glassTheme';
 import CosmicBackground from '../../components/CosmicBackground';
+import { useTabBar } from '../../contexts/TabBarContext';
 import UserAvatar from '../../components/UserAvatar';
 import ScalePressable from '../../components/ScalePressable';
 import { t } from '../../utils/i18n';
@@ -390,6 +391,7 @@ const coachStyles = StyleSheet.create({
 // ── Main Screen ──
 export default function PlayersScreen() {
   const router = useRouter();
+  const { onScroll: onTabScroll } = useTabBar();
   const [myId, setMyId] = useState('');
   const [activeSection, setActiveSection] = useState<SectionTab>('pulse');
   const [refreshing, setRefreshing] = useState(false);
@@ -577,8 +579,10 @@ export default function PlayersScreen() {
       {activeSection === 'pulse' && (
         <ScrollView
           contentContainerStyle={s.scrollContent}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#8A2BE2" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#B366FF" />}
           showsVerticalScrollIndicator={false}
+          onScroll={onTabScroll}
+          scrollEventThrottle={16}
         >
           {/* Coach Widget */}
           <CoachWidget suggestions={coachSuggestions} onAction={handleCoachAction} />
@@ -607,7 +611,7 @@ export default function PlayersScreen() {
               />
             ))
           )}
-          <View style={{ height: 80 }} />
+          <View style={{ height: 120 }} />
         </ScrollView>
       )}
 
@@ -615,8 +619,10 @@ export default function PlayersScreen() {
       {activeSection === 'tribus' && (
         <ScrollView
           contentContainerStyle={s.scrollContent}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFD700" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFB547" />}
           showsVerticalScrollIndicator={false}
+          onScroll={onTabScroll}
+          scrollEventThrottle={16}
         >
           {/* Pillar Filter */}
           <ScrollView
@@ -677,7 +683,7 @@ export default function PlayersScreen() {
               });
             })()
           )}
-          <View style={{ height: 80 }} />
+          <View style={{ height: 120 }} />
         </ScrollView>
       )}
 
@@ -686,6 +692,8 @@ export default function PlayersScreen() {
         <ScrollView
           contentContainerStyle={s.scrollContent}
           showsVerticalScrollIndicator={false}
+          onScroll={onTabScroll}
+          scrollEventThrottle={16}
         >
           {/* Forge Hero */}
           <Animated.View entering={FadeInDown.delay(100).springify()}>
@@ -791,7 +799,7 @@ export default function PlayersScreen() {
             </View>
           </Animated.View>
 
-          <View style={{ height: 80 }} />
+          <View style={{ height: 120 }} />
         </ScrollView>
       )}
     </View>

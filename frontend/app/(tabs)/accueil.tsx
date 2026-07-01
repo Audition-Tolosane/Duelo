@@ -21,6 +21,7 @@ import UserAvatar from '../../components/UserAvatar';
 import EmptyState from '../../components/EmptyState';
 import SpinWheelModal from '../../components/SpinWheelModal';
 import { GLASS } from '../../theme/glassTheme';
+import { useTabBar } from '../../contexts/TabBarContext';
 import { authFetch } from '../../utils/api';
 import { t } from '../../utils/i18n';
 import { flushPendingScores } from '../../utils/pendingScores';
@@ -1271,6 +1272,7 @@ const ChallengeCard = React.memo(function ChallengeCard({ challenge, onAccept, o
 // ── Main Screen ──
 export default function AccueilScreen() {
   const router = useRouter();
+  const { onScroll: onTabScroll } = useTabBar();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [pendingDuels, setPendingDuels] = useState<DuelItem[]>([]);
   const [incomingChallenges, setIncomingChallenges] = useState<IncomingChallenge[]>([]);
@@ -1640,6 +1642,8 @@ export default function AccueilScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        onScroll={onTabScroll}
+        scrollEventThrottle={16}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -2133,7 +2137,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   loadingWrap: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   scrollView: { flex: 1 },
-  scrollContent: { paddingBottom: 20 },
+  scrollContent: { paddingBottom: 120 },
 
   topHalo: {
     position: 'absolute',

@@ -15,6 +15,7 @@ import UserAvatar from '../../components/UserAvatar';
 import { GLASS } from '../../theme/glassTheme';
 import { authFetch, clearToken } from '../../utils/api';
 import CosmicBackground from '../../components/CosmicBackground';
+import { useTabBar } from '../../contexts/TabBarContext';
 import { t } from '../../utils/i18n';
 import CategoryIcon from '../../components/CategoryIcon';
 
@@ -287,6 +288,7 @@ type ProfileData = {
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const { onScroll: onTabScroll } = useTabBar();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [profileError, setProfileError] = useState(false);
@@ -551,7 +553,7 @@ export default function ProfileScreen() {
   return (
     <CosmicBackground>
     <View style={s.container}>
-      <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
 
         {profileError && (
           <TouchableOpacity onPress={() => { setProfileError(false); setLoading(true); loadProfile(); }} style={{ padding: 12, alignItems: 'center', backgroundColor: 'rgba(255,61,94,0.08)', marginHorizontal: 16, borderRadius: 12, marginBottom: 8 }}>
@@ -1137,7 +1139,7 @@ const s = StyleSheet.create({
   emptyText: { color: '#A3A3A3', fontSize: 16, marginBottom: 16 },
   loginBtn: { backgroundColor: '#B366FF', borderRadius: 12, paddingHorizontal: 24, paddingVertical: 12 },
   loginBtnText: { color: '#FFF', fontWeight: '700', fontSize: 16 },
-  scroll: { paddingBottom: 40 },
+  scroll: { paddingBottom: 120 },
 
   /* ── Profile Header ── */
   profileHeader: {

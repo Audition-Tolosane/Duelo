@@ -15,6 +15,7 @@ import DueloHeader from '../../components/DueloHeader';
 import { useSwipeBackProgress } from '../../components/SwipeBackContext';
 import { t } from '../../utils/i18n';
 import { useWS } from '../../contexts/WebSocketContext';
+import { TabBarProvider, useTabBar } from '../../contexts/TabBarContext';
 
 // Import screen components directly for the pager
 import AccueilScreen from './accueil';
@@ -112,6 +113,7 @@ function TabBadge({ count }: { count: number }) {
 function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTabPress: (index: number) => void }) {
   const insets = useSafeAreaInsets();
   const { unreadNotifs, unreadMessages } = useWS();
+  const { hidden } = useTabBar();
 
   const badgeForTab = (name: string) => {
     if (name === 'accueil') return unreadNotifs;
@@ -119,8 +121,20 @@ function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTa
     return 0;
   };
 
+  // Repli au scroll : glisse sous l'écran + léger rétrécissement
+  const bottomOffset = (insets.bottom > 0 ? insets.bottom : 12) + 6;
+  const hideStyle = useAnimatedStyle(() => {
+    const h = hidden ? hidden.value : 0;
+    return {
+      transform: [
+        { translateY: interpolate(h, [0, 1], [0, 90 + bottomOffset]) },
+        { scale: interpolate(h, [0, 1], [1, 0.9]) },
+      ],
+    };
+  });
+
   return (
-    <View style={[styles.tabBar, { paddingBottom: insets.bottom > 0 ? insets.bottom : 8 }]}>
+    <Animated.View style={[styles.tabBar, { bottom: bottomOffset }, hideStyle]}>
       {TAB_CONFIG.map((tab, index) => {
         const isFocused = currentIndex === index;
         const color = TAB_COLORS[tab.name as keyof typeof TAB_COLORS];
@@ -157,7 +171,7 @@ function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTa
           </TouchableOpacity>
         );
       })}
-    </View>
+    </Animated.View>
   );
 }
 
@@ -278,6 +292,7 @@ export default function TabLayout() {
   });
 
   return (
+    <TabBarProvider>
     <Animated.View style={[styles.container, parallaxStyle]}>
       {/* Hidden Slot for expo-router compatibility */}
       <View style={styles.hiddenSlot} pointerEvents="none">
@@ -304,6 +319,7 @@ export default function TabLayout() {
 
       <CustomTabBar currentIndex={activeIndex} onTabPress={onTabPress} />
     </Animated.View>
+    </TabBarProvider>
   );
 }
 
@@ -337,14 +353,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#050510',
   },
+  // Cartouche flottante type Insta — pill détachée du bas de l'écran
   tabBar: {
+    position: 'absolute',
+    left: 14,
+    right: 14,
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'space-around',
-    backgroundColor: GLASS.bgDark,
-    borderTopWidth: 1,
-    borderTopColor: GLASS.borderCyan,
+    backgroundColor: 'rgba(13,13,28,0.96)',
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
     paddingTop: 8,
+    paddingBottom: 10,
+    paddingHorizontal: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.55,
+    shadowRadius: 24,
+    elevation: 16,
     ...Platform.select({
       web: {
         backdropFilter: 'blur(20px)',

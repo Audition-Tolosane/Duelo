@@ -12,6 +12,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import CosmicBackground from '../../components/CosmicBackground';
 import CategoryIcon from '../../components/CategoryIcon';
 import ScalePressable from '../../components/ScalePressable';
+import { useTabBar } from '../../contexts/TabBarContext';
 import { COLORS, RADIUS } from '../../theme/tokens';
 import { FONTS } from '../../theme/fonts';
 import { t } from '../../utils/i18n';
@@ -44,6 +45,7 @@ const UPCOMING_CATS = [
 
 export default function ThemesScreen() {
   const router = useRouter();
+  const { onScroll: onTabScroll } = useTabBar();
   const [cats, setCats] = useState<SuperCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -106,7 +108,7 @@ export default function ThemesScreen() {
   return (
     <CosmicBackground>
     <View style={s.container}>
-      <ScrollView contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
 
         {/* ── Header Arène ── */}
         <View style={s.arenaHeader}>
