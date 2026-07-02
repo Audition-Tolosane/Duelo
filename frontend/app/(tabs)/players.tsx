@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
-  Dimensions, FlatList, Modal, Pressable, TextInput, useWindowDimensions,
+  Dimensions, FlatList, Modal, Pressable, useWindowDimensions,
   RefreshControl, Platform,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -124,13 +124,13 @@ const forgeHero = StyleSheet.create({
   wrap: { borderRadius: 20, overflow: 'hidden', position: 'relative', marginHorizontal: 16, marginBottom: 20 },
   neonBorder: {
     ...StyleSheet.absoluteFillObject, borderRadius: 20, borderWidth: 1.5,
-    borderColor: 'rgba(138,43,226,0.6)',
+    borderColor: 'rgba(179,102,255,0.6)',
     shadowColor: '#B366FF', shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5, shadowRadius: 15, elevation: 6,
   },
   inner: {
-    borderRadius: 20, backgroundColor: 'rgba(138,43,226,0.06)',
-    borderWidth: 1, borderColor: 'rgba(138,43,226,0.1)',
+    borderRadius: 20, backgroundColor: 'rgba(179,102,255,0.06)',
+    borderWidth: 1, borderColor: 'rgba(179,102,255,0.1)',
   },
 });
 
@@ -447,11 +447,6 @@ export default function PlayersScreen() {
   const [coachError, setCoachError] = useState(false);
 
   // Forge
-  const [forgeThemeName, setForgeThemeName] = useState('');
-  const [forgeDescription, setForgeDescription] = useState('');
-  const [forgeLoading, setForgeLoading] = useState(false);
-  const [forgeError, setForgeError] = useState('');
-  const [forgeResult, setForgeResult] = useState<{ theme_id: string; name: string; question_count: number } | null>(null);
 
 
   const pillarFilters = [
@@ -731,7 +726,7 @@ export default function PlayersScreen() {
           <Animated.View entering={FadeInDown.delay(100).springify()}>
             <ForgeHeroCard>
               <View style={forgeStyles.hero}>
-                <LinearGradient colors={['rgba(138,43,226,0.25)', 'rgba(138,43,226,0.08)']} style={forgeStyles.heroIconWrap}>
+                <LinearGradient colors={['rgba(179,102,255,0.25)', 'rgba(179,102,255,0.08)']} style={forgeStyles.heroIconWrap}>
                   <MaterialCommunityIcons name="hammer-wrench" size={32} color="#B366FF" />
                 </LinearGradient>
                 <Text style={forgeStyles.heroTitle}>{t('players.forge_title')}</Text>
@@ -742,93 +737,25 @@ export default function PlayersScreen() {
             </ForgeHeroCard>
           </Animated.View>
 
-          {/* Create Theme */}
+          {/* CTA vers la Forge — page unique /create-theme (plus de formulaire dupliqué) */}
           <Animated.View entering={FadeInDown.delay(200).springify()}>
-            <View style={forgeStyles.createSection}>
-              <Text style={forgeStyles.createLabel}>{t('players.create_theme')}</Text>
-              <View style={forgeStyles.inputRow}>
-                <TextInput
-                  style={forgeStyles.input}
-                  placeholder={t('players.theme_placeholder')}
-                  placeholderTextColor="#444"
-                  value={forgeThemeName}
-                  onChangeText={setForgeThemeName}
-                  returnKeyType="done"
-                />
-              </View>
-              <View style={forgeStyles.inputRow}>
-                <TextInput
-                  style={forgeStyles.input}
-                  placeholder={t('forge.description_placeholder')}
-                  placeholderTextColor="#444"
-                  value={forgeDescription}
-                  onChangeText={setForgeDescription}
-                  multiline
-                  numberOfLines={3}
-                  returnKeyType="done"
-                />
-              </View>
-              {forgeError ? (
-                <Text style={forgeStyles.errorText}>{forgeError}</Text>
-              ) : null}
-              {forgeResult ? (
-                <TouchableOpacity
-                  style={forgeStyles.playThemeBtn}
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-                    router.push(`/matchmaking?category=${forgeResult.theme_id}`);
-                  }}
-                  activeOpacity={0.8}
-                >
-                  <MaterialCommunityIcons name="play-circle" size={18} color="#FFF" />
-                  <Text style={forgeStyles.generateBtnText}>{t('forge.play_new_theme')} — {forgeResult.name}</Text>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  style={[forgeStyles.generateBtn, (!forgeThemeName.trim() || forgeDescription.trim().length < 10 || forgeLoading) && { opacity: 0.4 }]}
-                  onPress={async () => {
-                    if (!forgeThemeName.trim() || forgeDescription.trim().length < 10 || forgeLoading) return;
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-                    setForgeLoading(true);
-                    setForgeError('');
-                    try {
-                      const { authFetch } = await import('../../utils/api');
-                      const uid = await (await import('@react-native-async-storage/async-storage')).default.getItem('duelo_user_id');
-                      const res = await authFetch(`${API_URL}/api/forge/create`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ user_id: uid, name: forgeThemeName.trim(), description: forgeDescription.trim() }),
-                      });
-                      const data = await res.json();
-                      if (res.ok) {
-                        setForgeResult({ theme_id: data.theme_id, name: data.name, question_count: data.question_count });
-                        setForgeThemeName('');
-                        setForgeDescription('');
-                      } else {
-                        setForgeError(data.detail || t('forge.error'));
-                      }
-                    } catch {
-                      setForgeError(t('forge.error'));
-                    }
-                    setForgeLoading(false);
-                  }}
-                  disabled={forgeLoading}
-                  activeOpacity={0.7}
-                >
-                  {forgeLoading ? (
-                    <ActivityIndicator size="small" color="#FFF" />
-                  ) : (
-                    <MaterialCommunityIcons name="creation" size={18} color="#FFF" />
-                  )}
-                  <Text style={forgeStyles.generateBtnText}>
-                    {forgeLoading ? t('forge.generating') : t('players.generate_ai')}
-                  </Text>
-                </TouchableOpacity>
-              )}
-              <Text style={forgeStyles.generateHint}>
-                {t('players.generate_hint')}
-              </Text>
-            </View>
+            <TouchableOpacity
+              style={forgeStyles.forgeCta}
+              activeOpacity={0.85}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                router.push('/create-theme');
+              }}
+            >
+              <LinearGradient
+                colors={['#00E5FF', '#B366FF']}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFill}
+              />
+              <MaterialCommunityIcons name="creation" size={18} color="#000" />
+              <Text style={forgeStyles.forgeCtaText}>{t('players.create_theme')}</Text>
+            </TouchableOpacity>
+            <Text style={forgeStyles.generateHint}>{t('players.generate_hint')}</Text>
           </Animated.View>
 
           <View style={{ height: 120 }} />
@@ -843,32 +770,33 @@ export default function PlayersScreen() {
 const forgeStyles = StyleSheet.create({
   hero: { alignItems: 'center', padding: 24 },
   heroIconWrap: {
-    width: 64, height: 64, borderRadius: 22, backgroundColor: 'rgba(138,43,226,0.15)',
+    width: 64, height: 64, borderRadius: 22, backgroundColor: 'rgba(179,102,255,0.15)',
     justifyContent: 'center', alignItems: 'center', marginBottom: 12,
   },
-  heroTitle: { fontSize: 22, fontWeight: '900', color: '#FFF', letterSpacing: 2, marginBottom: 8 },
-  heroSub: { fontSize: 13, color: '#888', fontWeight: '600', textAlign: 'center', lineHeight: 20 },
-
-  createSection: { marginHorizontal: 16, marginBottom: 24 },
-  createLabel: { fontSize: 11, fontWeight: '900', color: '#525252', letterSpacing: 3, marginBottom: 12 },
-  inputRow: { marginBottom: 12 },
-  input: {
-    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 14,
-    paddingHorizontal: 16, paddingVertical: 14, color: '#FFF', fontSize: 15,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+  heroTitle: {
+    fontSize: 22, fontFamily: 'SpaceGrotesk_700Bold', color: '#FFF',
+    letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8,
   },
-  generateBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: '#32E7A3', paddingVertical: 14, borderRadius: 14, gap: 8, marginBottom: 8,
-  },
-  generateBtnText: { color: '#FFF', fontSize: 15, fontWeight: '800' },
-  generateHint: { fontSize: 11, color: '#555', textAlign: 'center', fontWeight: '500' },
-  errorText: { color: '#FF3B5C', fontSize: 13, fontWeight: '600', textAlign: 'center', marginBottom: 8 },
-  playThemeBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: '#B366FF', paddingVertical: 14, borderRadius: 14, gap: 8, marginBottom: 8,
+  heroSub: {
+    fontSize: 13, fontFamily: 'SpaceGrotesk_400Regular', color: 'rgba(255,255,255,0.60)',
+    textAlign: 'center', lineHeight: 20,
   },
 
+  // CTA gradient texte noir → /create-theme (page Forge unique)
+  forgeCta: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+    marginHorizontal: 16, paddingVertical: 16, borderRadius: 16, overflow: 'hidden',
+    shadowColor: '#00E5FF', shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35, shadowRadius: 18, elevation: 8,
+  },
+  forgeCtaText: {
+    color: '#000', fontSize: 14, fontFamily: 'SpaceGrotesk_700Bold',
+    letterSpacing: 0.5, textTransform: 'uppercase',
+  },
+  generateHint: {
+    fontSize: 11, fontFamily: 'SpaceGrotesk_400Regular',
+    color: 'rgba(255,255,255,0.40)', textAlign: 'center', marginTop: 10,
+  },
 });
 
 // ── Main Styles ──
