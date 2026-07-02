@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { View, Text, StyleSheet, Platform, TouchableOpacity, useWindowDimensions } from 'react-native';
 import Svg, { Path, Circle, Line } from 'react-native-svg';
 import { Image } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue, useAnimatedStyle, withSpring, withTiming,
@@ -110,27 +110,30 @@ function TabBadge({ count }: { count: number }) {
   );
 }
 
-// Header qui s'efface au scroll vers le bas (même valeur que la cartouche du bas)
+// Header qui s'efface au scroll vers le bas (même valeur que la cartouche du bas).
+// Le repli inclut la zone safe-area : aucune bande résiduelle, le contenu
+// monte jusqu'au bord physique de l'écran.
 const HEADER_ROW_H = 54;
 
 function CollapsingHeader() {
+  const insets = useSafeAreaInsets();
   const { hidden } = useTabBar();
+  const fullHeight = insets.top + HEADER_ROW_H;
 
   const collapseStyle = useAnimatedStyle(() => {
     const h = hidden ? hidden.value : 0;
     return {
-      height: interpolate(h, [0, 1], [HEADER_ROW_H, 0]),
+      height: interpolate(h, [0, 1], [fullHeight, 0]),
       opacity: interpolate(h, [0, 0.7], [1, 0], Extrapolation.CLAMP),
-      transform: [{ translateY: interpolate(h, [0, 1], [0, -12]) }],
     };
   });
 
   return (
-    <SafeAreaView style={styles.safeTop} edges={['top']}>
-      <Animated.View style={[styles.headerCollapse, collapseStyle]}>
+    <Animated.View style={[styles.headerCollapse, collapseStyle]}>
+      <View style={{ paddingTop: insets.top }}>
         <DueloHeader />
-      </Animated.View>
-    </SafeAreaView>
+      </View>
+    </Animated.View>
   );
 }
 
@@ -367,9 +370,6 @@ const styles = StyleSheet.create({
     height: 1,
     overflow: 'hidden',
     opacity: 0,
-  },
-  safeTop: {
-    backgroundColor: 'transparent',
   },
   headerCollapse: {
     overflow: 'hidden',
