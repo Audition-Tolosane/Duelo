@@ -4,14 +4,14 @@ import {
   Dimensions, FlatList, Modal, Pressable, TextInput, useWindowDimensions,
   RefreshControl, Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import Animated, {
   useSharedValue, useAnimatedStyle, withTiming, withSpring,
   withDelay, withRepeat, withSequence, Easing, FadeIn, FadeInDown,
-  FadeInUp, FadeInLeft, FadeInRight, SlideInRight,
+  FadeInUp, FadeInLeft, FadeInRight, SlideInRight, interpolate,
 } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -418,7 +418,15 @@ const coachStyles = StyleSheet.create({
 // ── Main Screen ──
 export default function PlayersScreen() {
   const router = useRouter();
-  const { onScroll: onTabScroll } = useTabBar();
+  const { onScroll: onTabScroll, hidden: tabHidden } = useTabBar();
+  const insets = useSafeAreaInsets();
+
+  // Le header de page est FIXE : quand le header global se replie (safe-area
+  // comprise), on compense pour ne pas passer sous la zone caméra.
+  const headerSafeStyle = useAnimatedStyle(() => {
+    const h = tabHidden ? tabHidden.value : 0;
+    return { paddingTop: interpolate(h, [0, 1], [0, insets.top]) };
+  });
   const [myId, setMyId] = useState('');
   const [activeSection, setActiveSection] = useState<SectionTab>('pulse');
   const [refreshing, setRefreshing] = useState(false);
@@ -550,29 +558,19 @@ export default function PlayersScreen() {
     ? tribes
     : tribes.filter(tr => tr.pillar_id.toLowerCase() === selectedPillar);
 
-  const sectionColor = activeSection === 'pulse' ? '#B366FF' : activeSection === 'tribus' ? '#FFB547' : '#10B981';
+  const sectionColor = activeSection === 'pulse' ? '#B366FF' : activeSection === 'tribus' ? '#FFB547' : '#32E7A3';
 
   return (
     <CosmicBackground>
     <View style={s.container}>
 
-      {/* Header */}
-      <View style={s.pageHeader}>
+      {/* Header — compensé quand le header global se replie */}
+      <Animated.View style={[s.pageHeader, headerSafeStyle]}>
         <View style={{ flex: 1 }}>
           <Text style={s.pageEyebrow}>◆ {t('players.header_eyebrow')}</Text>
           <Text style={s.pageTitle}>{t('players.header_title')}</Text>
         </View>
-        <TouchableOpacity
-          style={s.searchShortcut}
-          activeOpacity={0.8}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.push('/search?tab=joueurs');
-          }}
-        >
-          <MaterialCommunityIcons name="magnify" size={20} color="#00E5FF" />
-        </TouchableOpacity>
-      </View>
+      </Animated.View>
 
       {/* Section Navigator */}
       <View style={s.sectionNav}>
@@ -581,7 +579,7 @@ export default function PlayersScreen() {
           const meta = {
             pulse: { label: t('players.pulse_label'), icon: 'lightning-bolt' as const, color: '#B366FF' },
             tribus: { label: t('players.tribus_label'), icon: 'crown' as const, color: '#FFB547' },
-            forge: { label: t('players.forge_label'), icon: 'hammer-wrench' as const, color: '#10B981' },
+            forge: { label: t('players.forge_label'), icon: 'hammer-wrench' as const, color: '#32E7A3' },
           }[section];
           return (
             <TouchableOpacity
@@ -854,7 +852,7 @@ const forgeStyles = StyleSheet.create({
   },
   generateBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: '#10B981', paddingVertical: 14, borderRadius: 14, gap: 8, marginBottom: 8,
+    backgroundColor: '#32E7A3', paddingVertical: 14, borderRadius: 14, gap: 8, marginBottom: 8,
   },
   generateBtnText: { color: '#FFF', fontSize: 15, fontWeight: '800' },
   generateHint: { fontSize: 11, color: '#555', textAlign: 'center', fontWeight: '500' },
@@ -883,12 +881,6 @@ const s = StyleSheet.create({
   pageTitle: {
     fontSize: 26, fontFamily: 'SpaceGrotesk_700Bold', color: '#FFF',
     letterSpacing: -1, marginTop: 2, textTransform: 'uppercase',
-  },
-  searchShortcut: {
-    width: 42, height: 42, borderRadius: 21,
-    backgroundColor: 'rgba(0,229,255,0.08)',
-    borderWidth: 1, borderColor: 'rgba(0,229,255,0.25)',
-    justifyContent: 'center', alignItems: 'center',
   },
 
   // Section Nav
