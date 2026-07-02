@@ -123,6 +123,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 7,
+    // léger décollement du bas du header (le logo, lui, reste centré)
+    transform: [{ translateY: -1 }],
   },
   iconBtn: {
     width: 40,
