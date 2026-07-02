@@ -148,13 +148,13 @@ export default function ThemesScreen() {
                   start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
                   style={[StyleSheet.absoluteFill, { borderRadius: RADIUS.lg - 4 }]}
                 />
-                {/* Icône agrandie en haut */}
-                <View style={s.tileIcon}>
-                  <CategoryIcon emoji={cat.icon} size={46} color={cat.color} type="super" />
+                {/* Icône + nom à sa droite (police style vedette) */}
+                <View style={s.tileHeader}>
+                  <CategoryIcon emoji={cat.icon} size={36} color={cat.color} type="super" />
+                  <Text style={s.tileName} numberOfLines={1}>{cat.label.toUpperCase()}</Text>
                 </View>
-                {/* Nom + les 3 grands sous-groupes */}
+                {/* Les 3 grands sous-groupes */}
                 <View style={s.tileBody}>
-                  <Text style={s.tileName} numberOfLines={1}>{cat.label}</Text>
                   {cat.clusters.slice(0, 3).map((cl) => (
                     <Text key={cl.name} style={s.tileCluster} numberOfLines={1}>
                       ◆ {cl.name}
@@ -268,7 +268,7 @@ const s = StyleSheet.create({
     paddingHorizontal: 16, gap: GRID_GAP,
   },
   tile: {
-    width: TILE_W, aspectRatio: 1 / 1.3,
+    width: TILE_W, aspectRatio: 1 / 1.1,
     borderRadius: RADIUS.lg - 4, padding: 14,
     justifyContent: 'space-between', overflow: 'hidden',
   },
@@ -276,18 +276,21 @@ const s = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     borderRadius: RADIUS.lg - 4, borderWidth: 1,
   },
-  tileIcon: { alignSelf: 'flex-start' },
-  tileBody: { flex: 1, justifyContent: 'center', marginVertical: 6 },
+  tileHeader: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+  },
+  tileBody: { flex: 1, justifyContent: 'center', marginVertical: 4 },
+  // Police de la vignette vedette (SG 900, uppercase, serrée)
   tileName: {
-    color: COLORS.white, fontSize: 16, fontFamily: FONTS.display.bold,
-    letterSpacing: -0.3, marginBottom: 4,
+    flex: 1, color: COLORS.white, fontSize: 18, fontFamily: FONTS.display.bold,
+    letterSpacing: -1, lineHeight: 20,
   },
   tileCluster: {
-    color: 'rgba(255,255,255,0.70)', fontSize: 11,
-    fontFamily: FONTS.display.medium, lineHeight: 16,
+    color: 'rgba(255,255,255,0.75)', fontSize: 13,
+    fontFamily: FONTS.display.medium, lineHeight: 19,
   },
   tileStat: {
-    fontFamily: FONTS.mono.regular, fontSize: 9, letterSpacing: 1,
+    fontFamily: FONTS.mono.regular, fontSize: 11, letterSpacing: 1,
   },
 
   // Bientôt (univers verrouillés)
