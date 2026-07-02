@@ -110,6 +110,30 @@ function TabBadge({ count }: { count: number }) {
   );
 }
 
+// Header qui s'efface au scroll vers le bas (même valeur que la cartouche du bas)
+const HEADER_ROW_H = 54;
+
+function CollapsingHeader() {
+  const { hidden } = useTabBar();
+
+  const collapseStyle = useAnimatedStyle(() => {
+    const h = hidden ? hidden.value : 0;
+    return {
+      height: interpolate(h, [0, 1], [HEADER_ROW_H, 0]),
+      opacity: interpolate(h, [0, 0.7], [1, 0], Extrapolation.CLAMP),
+      transform: [{ translateY: interpolate(h, [0, 1], [0, -12]) }],
+    };
+  });
+
+  return (
+    <SafeAreaView style={styles.safeTop} edges={['top']}>
+      <Animated.View style={[styles.headerCollapse, collapseStyle]}>
+        <DueloHeader />
+      </Animated.View>
+    </SafeAreaView>
+  );
+}
+
 function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTabPress: (index: number) => void }) {
   const insets = useSafeAreaInsets();
   const { unreadNotifs, unreadMessages } = useWS();
@@ -313,10 +337,8 @@ export default function TabLayout() {
         <Slot />
       </View>
 
-      {/* Fixed header - stays in place during swipe */}
-      <SafeAreaView style={styles.safeTop} edges={['top']}>
-        <DueloHeader />
-      </SafeAreaView>
+      {/* Header — s'efface au scroll vers le bas, revient au scroll vers le haut */}
+      <CollapsingHeader />
 
       {/* Custom swipeable pager */}
       <View style={styles.pagerContainer}>
@@ -351,6 +373,10 @@ const styles = StyleSheet.create({
   },
   safeTop: {
     backgroundColor: 'transparent',
+  },
+  headerCollapse: {
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
   },
   pagerContainer: {
     flex: 1,
