@@ -130,9 +130,16 @@ export default function ThemesScreen() {
                 <Text style={s.featuredBadgeText}>◆ {t('themes.featured_badge')}</Text>
               </View>
               <Text style={s.featuredTitle}>{featured.label.toUpperCase()}</Text>
-              <Text style={s.featuredSub}>
-                {featured.total_themes} {t('themes.themes_count')} · {featured.clusters.map(c => c.name).slice(0, 3).join(' · ')}
+              <Text style={s.featuredCount}>
+                {featured.total_themes} {t('themes.themes_count').toUpperCase()}
               </Text>
+              <View style={s.featuredClusters}>
+                {featured.clusters.slice(0, 3).map((cl) => (
+                  <View key={cl.name} style={s.featuredClusterChip}>
+                    <Text style={s.featuredClusterText} numberOfLines={1}>{cl.name}</Text>
+                  </View>
+                ))}
+              </View>
               <View style={s.featuredCta}>
                 <Text style={s.featuredCtaText}>{t('themes.featured_cta')} →</Text>
               </View>
@@ -263,8 +270,21 @@ const s = StyleSheet.create({
     fontSize: 36, fontFamily: FONTS.display.bold, color: '#000',
     letterSpacing: -1.5, lineHeight: 38, marginTop: 6,
   },
-  featuredSub: {
-    fontSize: 12, fontFamily: FONTS.display.bold, color: 'rgba(0,0,0,0.7)', marginTop: 4,
+  // Compteur affirmé + sous-catégories en puces sombres (lisibles sur le gradient)
+  featuredCount: {
+    fontSize: 13, fontFamily: FONTS.mono.bold, color: '#000',
+    letterSpacing: 1.5, marginTop: 6,
+  },
+  featuredClusters: {
+    flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10,
+  },
+  featuredClusterChip: {
+    backgroundColor: 'rgba(0,0,0,0.30)',
+    borderRadius: RADIUS.pill,
+    paddingHorizontal: 12, paddingVertical: 5,
+  },
+  featuredClusterText: {
+    fontSize: 12, fontFamily: FONTS.display.semiBold, color: '#FFF',
   },
   featuredCta: {
     alignSelf: 'flex-start', marginTop: 12,
