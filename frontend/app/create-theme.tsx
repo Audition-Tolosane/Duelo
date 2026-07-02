@@ -15,23 +15,13 @@ import { authFetch } from '../utils/api';
 import { t } from '../utils/i18n';
 import DueloHeader from '../components/DueloHeader';
 import SwipeBackPage from '../components/SwipeBackPage';
+import CategoryIcon from '../components/CategoryIcon';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-const UNIVERSES = [
-  { id: 'SCREEN', label: 'Screen', icon: '🎬', color: '#8A2BE2' },
-  { id: 'SOUND',  label: 'Sound',  icon: '🎵', color: '#FF6B35' },
-  { id: 'ARENA',  label: 'Arena',  icon: '⚽', color: '#00FF9D' },
-  { id: 'LEGENDS',label: 'Legends',icon: '🏛️', color: '#FFD700' },
-  { id: 'LAB',    label: 'Lab',    icon: '🔬', color: '#1565C0' },
-  { id: 'TASTE',  label: 'Taste',  icon: '🍽️', color: '#FF69B4' },
-  { id: 'GLOBE',  label: 'Globe',  icon: '🌍', color: '#4ECDC4' },
-  { id: 'PIXEL',  label: 'Pixel',  icon: '🎮', color: '#FF3B5C' },
-  { id: 'STYLE',  label: 'Style',  icon: '✨', color: '#E040FB' },
-  { id: 'ART',    label: 'Art',    icon: '🎨', color: '#E53935' },
-  { id: 'LIFE',   label: 'Life',   icon: '🌱', color: '#2E7D32' },
-  { id: 'MIND',   label: 'Mind',   icon: '🧠', color: '#FFAB40' },
-];
+// Univers réels chargés depuis /api/explore/super-categories (même source que
+// l'onglet Thèmes) — plus de liste codée en dur avec des univers fictifs.
+type Universe = { id: string; label: string; icon: string; color: string };
 
 const PRESET_COLORS = [
   '#8A2BE2', '#FF6B35', '#00FF9D', '#FFD700',
@@ -55,7 +45,8 @@ export default function CreateThemeScreen() {
   const [userId, setUserId] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [universe, setUniverse] = useState(UNIVERSES[0]);
+  const [universes, setUniverses] = useState<Universe[]>([]);
+  const [universe, setUniverse] = useState<Universe | null>(null);
   const [color, setColor] = useState(PRESET_COLORS[0]);
   const [phase, setPhase] = useState<Phase>('form');
   const [result, setResult] = useState<Result | null>(null);
@@ -66,6 +57,21 @@ export default function CreateThemeScreen() {
 
   useEffect(() => {
     AsyncStorage.getItem('duelo_user_id').then(uid => { if (uid) setUserId(uid); });
+    // Univers réels depuis l'API
+    (async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/explore/super-categories`);
+        const data = await res.json();
+        const list: Universe[] = (Array.isArray(data) ? data : []).map((sc: any) => ({
+          id: sc.id, label: sc.label, icon: sc.icon, color: sc.color,
+        }));
+        setUniverses(list);
+        if (list.length > 0) {
+          setUniverse(list[0]);
+          setColor(list[0].color);
+        }
+      } catch {}
+    })();
   }, []);
 
   useEffect(() => {
@@ -94,6 +100,10 @@ export default function CreateThemeScreen() {
       setError(t('forge.error_short_desc'));
       return false;
     }
+    if (!universe) {
+      setError(t('forge.error_generate'));
+      return false;
+    }
     return true;
   };
 
@@ -111,7 +121,7 @@ export default function CreateThemeScreen() {
           user_id: userId,
           name: name.trim(),
           description: description.trim(),
-          super_category: universe.id,
+          super_category: universe!.id,
           color_hex: color,
         }),
       });
@@ -199,26 +209,33 @@ export default function CreateThemeScreen() {
               maxLength={500}
             />
 
-            {/* Universe */}
+            {/* Universe — liste réelle depuis l'API, icônes CategoryIcon */}
             <Text style={styles.label}>{t('forge.universe_label')}</Text>
-            <View style={styles.universesGrid}>
-              {UNIVERSES.map(u => (
-                <TouchableOpacity
-                  key={u.id}
-                  style={[
-                    styles.universeChip,
-                    universe.id === u.id && { borderColor: u.color, backgroundColor: u.color + '18' },
-                  ]}
-                  onPress={() => { setUniverse(u); setColor(u.color); Haptics.selectionAsync(); }}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.universeIcon}>{u.icon}</Text>
-                  <Text style={[styles.universeLabel, universe.id === u.id && { color: u.color }]}>
-                    {u.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+            {universes.length === 0 ? (
+              <ActivityIndicator size="small" color="#B366FF" style={{ marginVertical: 16 }} />
+            ) : (
+              <View style={styles.universesGrid}>
+                {universes.map(u => {
+                  const isActive = universe?.id === u.id;
+                  return (
+                    <TouchableOpacity
+                      key={u.id}
+                      style={[
+                        styles.universeChip,
+                        isActive && { borderColor: u.color, backgroundColor: u.color + '18' },
+                      ]}
+                      onPress={() => { setUniverse(u); setColor(u.color); Haptics.selectionAsync(); }}
+                      activeOpacity={0.7}
+                    >
+                      <CategoryIcon emoji={u.icon} size={18} color={isActive ? u.color : 'rgba(255,255,255,0.45)'} type="super" />
+                      <Text style={[styles.universeLabel, isActive && { color: u.color }]}>
+                        {u.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            )}
 
             {/* Color */}
             <Text style={styles.label}>{t('forge.color_label')}</Text>
@@ -403,9 +420,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
     backgroundColor: 'rgba(255,255,255,0.04)',
-  },
-  universeIcon: {
-    fontSize: 14,
   },
   universeLabel: {
     color: '#A3A3A3',
