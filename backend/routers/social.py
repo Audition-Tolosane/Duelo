@@ -692,7 +692,18 @@ async def social_tribes(user_id: Optional[str] = None, db: AsyncSession = Depend
             "throne": throne, "member_count": member_counts.get(theme.id, 0),
         })
 
-    return {"tribes": tribes}
+    # Payload allégé : tri par activité et plafond par univers — le carrousel
+    # frontend ne montre de toute façon que les premières cartes.
+    MAX_TRIBES_PER_PILLAR = 10
+    by_pillar: dict = {}
+    for tr in tribes:
+        by_pillar.setdefault(tr["pillar_id"], []).append(tr)
+    trimmed = []
+    for pillar_tribes in by_pillar.values():
+        pillar_tribes.sort(key=lambda x: x["member_count"], reverse=True)
+        trimmed.extend(pillar_tribes[:MAX_TRIBES_PER_PILLAR])
+
+    return {"tribes": trimmed}
 
 
 @router.get("/social/coach/{user_id}")

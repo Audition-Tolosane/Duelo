@@ -181,6 +181,8 @@ async def _ensure_columns():
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS best_login_streak INTEGER DEFAULT 0",
             "CREATE TABLE IF NOT EXISTS boost_activations (id VARCHAR(36) PRIMARY KEY, user_id VARCHAR(36) NOT NULL, theme_id VARCHAR(20) NOT NULL, activated_at TIMESTAMPTZ DEFAULT NOW(), expires_at TIMESTAMPTZ NOT NULL)",
             "CREATE INDEX IF NOT EXISTS ix_boost_activations_user_id ON boost_activations(user_id)",
+            # Tribus : top joueur + comptage par thème (DISTINCT ON / GROUP BY)
+            "CREATE INDEX IF NOT EXISTS ix_utx_theme_xp ON user_theme_xp (theme_id, xp DESC)",
             """CREATE TABLE IF NOT EXISTS boost_offer_refreshes (
                 id VARCHAR(36) PRIMARY KEY,
                 user_id VARCHAR(36) NOT NULL,

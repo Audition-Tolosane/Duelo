@@ -695,14 +695,21 @@ export default function PlayersScreen() {
                       <Text style={[s.tribeGroupName, { color: pf?.color || '#FFF' }]}>{pf?.name || pillarId}</Text>
                       <View style={[s.tribeGroupLine, { backgroundColor: (pf?.color || '#333') + '30' }]} />
                     </View>
-                    <ScrollView
-                      horizontal showsHorizontalScrollIndicator={false}
+                    {/* FlatList virtualisée : monte 3 cartes, le reste au scroll */}
+                    <FlatList
+                      horizontal
+                      data={pillarTribes}
+                      keyExtractor={(tr) => tr.id}
+                      renderItem={({ item, index: tribeIndex }) => (
+                        <TribeCard tribe={item} accentColor={pf?.color} index={tribeIndex} onPress={() => handleTribePress(item)} />
+                      )}
+                      showsHorizontalScrollIndicator={false}
                       contentContainerStyle={s.tribeCarousel}
-                    >
-                      {pillarTribes.map((tribe, tribeIndex) => (
-                        <TribeCard key={tribe.id} tribe={tribe} accentColor={pf?.color} index={tribeIndex} onPress={() => handleTribePress(tribe)} />
-                      ))}
-                    </ScrollView>
+                      initialNumToRender={3}
+                      maxToRenderPerBatch={3}
+                      windowSize={3}
+                      removeClippedSubviews
+                    />
                   </Animated.View>
                 );
               });
