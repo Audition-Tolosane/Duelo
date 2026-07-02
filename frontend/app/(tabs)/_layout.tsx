@@ -203,9 +203,6 @@ function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTa
             <Animated.View style={[styles.labelWrap, labelWrapStyle]}>
               <Text style={[styles.tabLabel, isFocused && { color }]}>{t(tab.labelKey)}</Text>
             </Animated.View>
-            {isFocused && (
-              <View style={[styles.activeIndicator, { backgroundColor: color, shadowColor: color }]} />
-            )}
           </TouchableOpacity>
         );
       })}
@@ -399,14 +396,14 @@ const styles = StyleSheet.create({
     left: 14,
     right: 14,
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     justifyContent: 'space-around',
     backgroundColor: 'rgba(13,13,28,0.96)',
     borderRadius: 30,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
-    paddingTop: 8,
-    paddingBottom: 10,
+    paddingTop: 7,
+    paddingBottom: 7,
     paddingHorizontal: 6,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 12 },
@@ -424,13 +421,12 @@ const styles = StyleSheet.create({
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 6,
     minWidth: 56,
     position: 'relative',
   },
   iconGlow: {
     position: 'absolute',
-    top: 2, width: 44, height: 36,
+    top: -5, width: 44, height: 36,
     borderRadius: 12,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
@@ -445,12 +441,6 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.38)',
     fontWeight: '700',
     letterSpacing: 0.5,
-  },
-  activeIndicator: {
-    width: 4, height: 4, borderRadius: 2,
-    marginTop: 4,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1, shadowRadius: 6,
   },
   playTabWrap: {
     alignItems: 'center',
