@@ -289,7 +289,7 @@ export default function NotificationsScreen() {
         </View>
       ) : notifications.length === 0 ? (
         <EmptyState
-          icon="🔔"
+          iconName="bell-outline"
           title={t('notifications.empty_title')}
           body={t('notifications.empty_text')}
           accent="#B366FF"

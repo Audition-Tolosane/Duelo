@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Defs, RadialGradient, Stop, Circle } from 'react-native-svg';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, RADIUS, SPACING } from '../theme/tokens';
 import { FONTS } from '../theme/fonts';
 import DuelButton from './DuelButton';
@@ -9,7 +10,9 @@ const TILE = 96;
 const HALO = TILE + 48;
 
 type EmptyStateProps = {
-  icon: string; // emoji : '⚔', '💬', '🔍'…
+  icon?: string; // emoji : '⚔', '💬', '🔍'…
+  // Icône vectorielle teintée à l'accent — préférer à l'emoji quand possible
+  iconName?: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
   title: string;
   body: string;
   ctaLabel?: string;
@@ -19,7 +22,7 @@ type EmptyStateProps = {
 
 // État vide réutilisable — toujours proposer une action, jamais de page blanche
 export default function EmptyState({
-  icon, title, body, ctaLabel, onPress, accent = COLORS.cyan,
+  icon, iconName, title, body, ctaLabel, onPress, accent = COLORS.cyan,
 }: EmptyStateProps) {
   return (
     <View style={styles.wrap}>
@@ -34,7 +37,11 @@ export default function EmptyState({
           <Circle cx={HALO / 2} cy={HALO / 2} r={HALO / 2} fill="url(#emptyHalo)" />
         </Svg>
         <View style={[styles.tile, { borderColor: accent + '30' }]}>
-          <Text style={styles.icon}>{icon}</Text>
+          {iconName ? (
+            <MaterialCommunityIcons name={iconName} size={42} color={accent} />
+          ) : (
+            <Text style={styles.icon}>{icon}</Text>
+          )}
         </View>
       </View>
       <Text style={styles.title}>{title}</Text>

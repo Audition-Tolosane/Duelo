@@ -254,11 +254,11 @@ export default function ConversationsScreen() {
 
         {loading ? (
           <View style={styles.loadingWrap}>
-            <ActivityIndicator size="large" color="#8A2BE2" />
+            <ActivityIndicator size="large" color="#B366FF" />
           </View>
         ) : filtered.length === 0 && !search ? (
           <EmptyState
-            icon="💬"
+            iconName="chat-outline"
             title={t('conversations.your_messages')}
             body={t('conversations.empty_text')}
             ctaLabel={t('conversations.find_player')}
@@ -270,7 +270,7 @@ export default function ConversationsScreen() {
           />
         ) : filtered.length === 0 && search ? (
           <EmptyState
-            icon="🔍"
+            iconName="magnify"
             title={t('conversations.no_results')}
             body={`${t('conversations.no_match')} « ${search} »`}
           />
