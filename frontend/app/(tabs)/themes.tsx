@@ -162,12 +162,12 @@ export default function ThemesScreen() {
                   <CategoryIcon emoji={cat.icon} size={36} color={cat.color} type="super" />
                   <Text style={s.tileName} numberOfLines={1}>{cat.label.toUpperCase()}</Text>
                 </View>
-                {/* Les 3 grands sous-groupes */}
+                {/* Les 3 grands sous-groupes — cartouches (comme la vedette) */}
                 <View style={s.tileBody}>
                   {cat.clusters.slice(0, 3).map((cl) => (
-                    <Text key={cl.name} style={s.tileCluster} numberOfLines={1}>
-                      ◆ {cl.name}
-                    </Text>
+                    <View key={cl.name} style={s.tileClusterChip}>
+                      <Text style={s.tileClusterText} numberOfLines={1}>{cl.name}</Text>
+                    </View>
                   ))}
                 </View>
                 <Text style={[s.tileStat, { color: cat.color }]}>
@@ -312,15 +312,25 @@ const s = StyleSheet.create({
   tileHeader: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
   },
-  tileBody: { flex: 1, justifyContent: 'center', marginVertical: 4 },
+  tileBody: {
+    flex: 1, justifyContent: 'center',
+    alignItems: 'flex-start', gap: 5, marginVertical: 6,
+  },
   // Police de la vignette vedette (SG 900, uppercase, serrée)
   tileName: {
     flex: 1, color: COLORS.white, fontSize: 18, fontFamily: FONTS.display.bold,
     letterSpacing: -1, lineHeight: 20,
   },
-  tileCluster: {
-    color: 'rgba(255,255,255,0.75)', fontSize: 13,
-    fontFamily: FONTS.display.medium, lineHeight: 19,
+  // Cartouches sous-catégories (déclinaison sombre de celles de la vedette)
+  tileClusterChip: {
+    maxWidth: '100%',
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: RADIUS.pill,
+    paddingHorizontal: 10, paddingVertical: 4,
+  },
+  tileClusterText: {
+    color: 'rgba(255,255,255,0.85)', fontSize: 12,
+    fontFamily: FONTS.display.semiBold,
   },
   tileStat: {
     fontFamily: FONTS.mono.regular, fontSize: 11, letterSpacing: 1,
