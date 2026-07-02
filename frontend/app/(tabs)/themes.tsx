@@ -126,7 +126,9 @@ export default function ThemesScreen() {
                 style={StyleSheet.absoluteFill}
               />
               <Text style={s.featuredWatermark}>{featured.icon}</Text>
-              <Text style={s.featuredBadge}>◆ {t('themes.featured_badge')}</Text>
+              <View style={s.featuredBadge}>
+                <Text style={s.featuredBadgeText}>◆ {t('themes.featured_badge')}</Text>
+              </View>
               <Text style={s.featuredTitle}>{featured.label.toUpperCase()}</Text>
               <Text style={s.featuredSub}>
                 {featured.total_themes} {t('themes.themes_count')} · {featured.clusters.map(c => c.name).slice(0, 3).join(' · ')}
@@ -237,13 +239,24 @@ const s = StyleSheet.create({
   featuredCard: {
     marginHorizontal: 16, marginTop: 16, marginBottom: 12,
     borderRadius: 20, padding: 20, overflow: 'hidden',
+    shadowColor: COLORS.violet, shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.45, shadowRadius: 24, elevation: 10,
   },
   featuredWatermark: {
     position: 'absolute', fontSize: 140, opacity: 0.15,
     right: -10, top: -20,
   },
+  // Pastille or bien visible (le texte mono noir se fondait dans le gradient)
   featuredBadge: {
-    fontFamily: FONTS.mono.bold, fontSize: 9, color: '#000',
+    alignSelf: 'flex-start',
+    backgroundColor: COLORS.gold,
+    borderRadius: RADIUS.pill,
+    paddingHorizontal: 12, paddingVertical: 5,
+    shadowColor: COLORS.gold, shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6, shadowRadius: 10, elevation: 4,
+  },
+  featuredBadgeText: {
+    fontFamily: FONTS.mono.bold, fontSize: 10, color: '#000',
     letterSpacing: 2, textTransform: 'uppercase',
   },
   featuredTitle: {
