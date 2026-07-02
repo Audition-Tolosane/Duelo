@@ -10,7 +10,7 @@ const LOGO = require('../assets/header/duelo_logo.webp');
 // Icônes monochromes — la couleur est réservée aux badges (convention charte)
 const ICON_COLOR = 'rgba(255,255,255,0.80)';
 
-function SearchIcon({ size = 20 }) {
+function SearchIcon({ size = 18 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Circle cx="10.5" cy="10.5" r="6.5" stroke={ICON_COLOR} strokeWidth="2" />
@@ -19,7 +19,7 @@ function SearchIcon({ size = 20 }) {
   );
 }
 
-function MessageIcon({ size = 20 }) {
+function MessageIcon({ size = 18 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -30,7 +30,7 @@ function MessageIcon({ size = 20 }) {
   );
 }
 
-function ShopIcon({ size = 20 }) {
+function ShopIcon({ size = 18 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -43,7 +43,7 @@ function ShopIcon({ size = 20 }) {
   );
 }
 
-function BellIcon({ size = 20 }) {
+function BellIcon({ size = 18 }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path
@@ -113,20 +113,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 6,
     backgroundColor: 'transparent',
   },
-  logoImage: { width: 118, height: 32 },
+  logoImage: { width: 104, height: 28 },
 
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 7,
   },
   iconBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.06)',

@@ -27,8 +27,10 @@ import ProfileScreen from './profile';
 // ── Neon SVG tab icons ────────────────────────────────────────────────────────
 
 function HomeIcon({ color, size = 26 }: { color: string; size?: number }) {
+  // viewBox décalé de -1 : le glyphe maison est dessiné haut (y 3→20) dans sa
+  // boîte, on le recentre pour l'aligner sur les autres icônes du footer.
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Svg width={size} height={size} viewBox="0 -1 24 24" fill="none">
       <Path d="M3 12L12 3l9 9" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       <Path d="M5 10v9a1 1 0 0 0 1 1h4v-5h4v5h4a1 1 0 0 0 1-1v-9" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
@@ -113,7 +115,7 @@ function TabBadge({ count }: { count: number }) {
 // Header qui s'efface au scroll vers le bas (même valeur que la cartouche du bas).
 // Le repli inclut la zone safe-area : aucune bande résiduelle, le contenu
 // monte jusqu'au bord physique de l'écran.
-const HEADER_ROW_H = 54;
+const HEADER_ROW_H = 46; // 34 (pastilles) + 2×6 (paddings) — sync avec DueloHeader
 
 function CollapsingHeader() {
   const insets = useSafeAreaInsets();
@@ -449,8 +451,8 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: 'absolute',
-    top: -4,
-    right: -6,
+    top: -2,
+    right: -5,
     minWidth: 16,
     height: 16,
     borderRadius: 8,
