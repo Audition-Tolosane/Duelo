@@ -190,7 +190,7 @@ export default function CreateThemeScreen() {
             <TextInput
               style={styles.input}
               placeholder={t('forge.name_placeholder')}
-              placeholderTextColor="#555"
+              placeholderTextColor="rgba(255,255,255,0.40)"
               value={name}
               onChangeText={text => { setName(text); setError(''); }}
               maxLength={100}
@@ -201,7 +201,7 @@ export default function CreateThemeScreen() {
             <TextInput
               style={[styles.input, styles.inputMulti]}
               placeholder={t('forge.desc_placeholder')}
-              placeholderTextColor="#555"
+              placeholderTextColor="rgba(255,255,255,0.40)"
               value={description}
               onChangeText={text => { setDescription(text); setError(''); }}
               multiline
@@ -378,13 +378,13 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   headerSub: {
-    color: '#A3A3A3',
+    color: 'rgba(255,255,255,0.80)',
     fontSize: 13,
     marginTop: 4,
     textAlign: 'center',
   },
   label: {
-    color: 'rgba(255,255,255,0.40)',
+    color: 'rgba(255,255,255,0.70)',
     fontSize: 10,
     fontFamily: 'JetBrainsMono_700Bold',
     letterSpacing: 2,
@@ -422,7 +422,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.04)',
   },
   universeLabel: {
-    color: '#A3A3A3',
+    color: 'rgba(255,255,255,0.80)',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -515,7 +515,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   generatingDetail: {
-    color: '#525252',
+    color: 'rgba(255,255,255,0.65)',
     fontSize: 13,
     textAlign: 'center',
     lineHeight: 20,
@@ -554,7 +554,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   doneName: {
-    color: '#A3A3A3',
+    color: 'rgba(255,255,255,0.85)',
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 12,
