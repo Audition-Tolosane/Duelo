@@ -5,7 +5,7 @@ import * as Haptics from 'expo-haptics';
 import Svg, { Path, Circle, Line } from 'react-native-svg';
 import { useWS } from '../contexts/WebSocketContext';
 
-const LOGO = require('../assets/header/duelo_logo.webp');
+const LOGO = require('../assets/header/duelo_header.png');
 
 // Icônes monochromes — la couleur est réservée aux badges (convention charte)
 const ICON_COLOR = 'rgba(255,255,255,0.80)';
@@ -117,7 +117,8 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     backgroundColor: 'transparent',
   },
-  logoImage: { width: 126, height: 34 },
+  // Ratio du logo 4.63 (949×205) — 140×30 tient face aux 4 pastilles sur petit écran
+  logoImage: { width: 140, height: 30 },
 
   actions: {
     flexDirection: 'row',
