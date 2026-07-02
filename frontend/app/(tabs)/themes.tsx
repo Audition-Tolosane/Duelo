@@ -162,11 +162,12 @@ export default function ThemesScreen() {
                   <CategoryIcon emoji={cat.icon} size={36} color={cat.color} type="super" />
                   <Text style={s.tileName} numberOfLines={1}>{cat.label.toUpperCase()}</Text>
                 </View>
-                {/* Les 3 grands sous-groupes — cartouches (comme la vedette) */}
+                {/* Les 3 grands sous-groupes — cartouches (comme la vedette).
+                    Retour à la ligne autorisé (2 lignes max), hauteur de tuile inchangée. */}
                 <View style={s.tileBody}>
                   {cat.clusters.slice(0, 3).map((cl) => (
                     <View key={cl.name} style={s.tileClusterChip}>
-                      <Text style={s.tileClusterText} numberOfLines={1}>{cl.name}</Text>
+                      <Text style={s.tileClusterText} numberOfLines={2}>{cl.name}</Text>
                     </View>
                   ))}
                 </View>
@@ -314,7 +315,8 @@ const s = StyleSheet.create({
   },
   tileBody: {
     flex: 1, justifyContent: 'center',
-    alignItems: 'flex-start', gap: 5, marginVertical: 6,
+    alignItems: 'flex-start', gap: 4, marginVertical: 4,
+    overflow: 'hidden',
   },
   // Police de la vignette vedette (SG 900, uppercase, serrée)
   tileName: {
@@ -325,12 +327,12 @@ const s = StyleSheet.create({
   tileClusterChip: {
     maxWidth: '100%',
     backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: RADIUS.pill,
-    paddingHorizontal: 10, paddingVertical: 4,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: 10, paddingVertical: 3,
   },
   tileClusterText: {
     color: 'rgba(255,255,255,0.85)', fontSize: 12,
-    fontFamily: FONTS.display.semiBold,
+    fontFamily: FONTS.display.semiBold, lineHeight: 15,
   },
   tileStat: {
     fontFamily: FONTS.mono.regular, fontSize: 11, letterSpacing: 1,
