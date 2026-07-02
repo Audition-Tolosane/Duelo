@@ -125,7 +125,7 @@ const forgeHero = StyleSheet.create({
   neonBorder: {
     ...StyleSheet.absoluteFillObject, borderRadius: 20, borderWidth: 1.5,
     borderColor: 'rgba(138,43,226,0.6)',
-    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 0 },
+    shadowColor: '#B366FF', shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5, shadowRadius: 15, elevation: 6,
   },
   inner: {
@@ -151,7 +151,7 @@ const ExploitCard = ({ item, index = 0, onChallenge, onProfile }: {
   item: FeedItem; index?: number; onChallenge: (userId: string, category: string) => void;
   onProfile: (userId: string) => void;
 }) => {
-  const color = item.pillar_color || item.category_color || '#8A2BE2';
+  const color = item.pillar_color || item.category_color || '#B366FF';
   const isPerfect = item.type === 'perfect';
   const isStreak = item.type === 'streak';
 
@@ -183,17 +183,17 @@ const ExploitCard = ({ item, index = 0, onChallenge, onProfile }: {
             <View style={exploitStyles.titleRow}>
               <MaterialCommunityIcons
                 name={isPerfect ? 'star-circle' : isStreak ? 'fire' : 'sword-cross'}
-                size={16}
-                color={isPerfect ? '#FFD700' : isStreak ? '#FF6B35' : color}
+                size={15}
+                color={isPerfect ? '#FFB547' : isStreak ? '#FF6B2C' : color}
               />
-              <Text style={[exploitStyles.title, isPerfect && { color: '#FFD700' }]} numberOfLines={1}>
+              <Text style={[exploitStyles.title, isPerfect && { color: '#FFB547' }]} numberOfLines={1}>
                 {getPulseTitle(item)}
               </Text>
             </View>
-            <Text style={exploitStyles.pseudo}>
+            <Text style={exploitStyles.pseudo} numberOfLines={1}>
               @{item.user_pseudo}
               {item.opponent_pseudo && !isStreak ? (
-                <Text style={exploitStyles.vs}> {t('players.vs')} {item.opponent_pseudo}</Text>
+                <Text style={exploitStyles.vs}> · {t('players.vs').toUpperCase()} {item.opponent_pseudo}</Text>
               ) : null}
             </Text>
             {item.score && (
@@ -211,14 +211,19 @@ const ExploitCard = ({ item, index = 0, onChallenge, onProfile }: {
             )}
           </View>
 
-          {/* DÉFIER Button */}
+          {/* DÉFIER — CTA gradient texte noir (convention charte) */}
           {item.can_challenge && (
             <TouchableOpacity
-              style={[exploitStyles.challengeBtn, { backgroundColor: color + '20', borderColor: color + '40' }]}
+              style={exploitStyles.challengeBtn}
               onPress={() => item.user_id && item.category && onChallenge(item.user_id, item.category)}
-              activeOpacity={0.7}
+              activeOpacity={0.85}
             >
-              <Text style={[exploitStyles.challengeText, { color }]}>{t('players.challenge')}</Text>
+              <LinearGradient
+                colors={['#00E5FF', '#B366FF']}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFill}
+              />
+              <Text style={exploitStyles.challengeText}>{t('players.challenge')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -230,7 +235,7 @@ const ExploitCard = ({ item, index = 0, onChallenge, onProfile }: {
 const exploitStyles = StyleSheet.create({
   card: {
     marginHorizontal: 16, marginBottom: 10, borderRadius: 16,
-    backgroundColor: GLASS.bg, borderWidth: 1,
+    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1,
     padding: 14, overflow: 'hidden',
   },
   cardGlow: {
@@ -239,19 +244,28 @@ const exploitStyles = StyleSheet.create({
   },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   content: { flex: 1 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 },
-  title: { color: '#FFF', fontSize: 14, fontWeight: '700', flex: 1 },
-  pseudo: { color: '#888', fontSize: 12, fontWeight: '600', marginBottom: 4 },
-  vs: { color: '#555' },
-  statsRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  score: { fontSize: 13, fontWeight: '800' },
-  xpEarned: { color: '#10B981', fontSize: 11, fontWeight: '700' },
-  catBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8, borderWidth: 1 },
-  catBadgeText: { fontSize: 9, fontWeight: '700' },
-  challengeBtn: {
-    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, borderWidth: 1,
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 3 },
+  title: { color: '#FFF', fontSize: 13, fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.2, flex: 1 },
+  pseudo: {
+    color: 'rgba(255,255,255,0.40)', fontSize: 9,
+    fontFamily: 'JetBrainsMono_400Regular', letterSpacing: 0.5, marginBottom: 5,
   },
-  challengeText: { fontSize: 11, fontWeight: '900', letterSpacing: 1 },
+  vs: { color: 'rgba(255,255,255,0.30)' },
+  statsRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  score: { fontSize: 14, fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.3 },
+  xpEarned: {
+    color: '#32E7A3', fontSize: 9,
+    fontFamily: 'JetBrainsMono_700Bold', letterSpacing: 0.5,
+  },
+  catBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8, borderWidth: 1 },
+  catBadgeText: { fontSize: 8, fontFamily: 'JetBrainsMono_400Regular', letterSpacing: 0.5 },
+  challengeBtn: {
+    paddingHorizontal: 14, paddingVertical: 9, borderRadius: 12, overflow: 'hidden',
+  },
+  challengeText: {
+    fontSize: 11, fontFamily: 'SpaceGrotesk_700Bold', color: '#000',
+    letterSpacing: 0.5, textTransform: 'uppercase',
+  },
 });
 
 // ── Tribe Card ──
@@ -277,7 +291,7 @@ const TribeCard = ({ tribe, onPress, accentColor, index = 0 }: { tribe: Tribe; o
         {hasThrone ? (
           <View style={tribeStyles.throneWrap}>
             <View style={tribeStyles.throneLabelRow}>
-              <MaterialCommunityIcons name="crown" size={14} color="#FFD700" />
+              <MaterialCommunityIcons name="crown" size={14} color="#FFB547" />
               <Text style={tribeStyles.throneLabel}>{t('players.throne')}</Text>
             </View>
             <AuraAvatar
@@ -330,7 +344,7 @@ const tribeStyles = StyleSheet.create({
   pillarLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 1, marginBottom: 10 },
   throneWrap: { alignItems: 'center', marginBottom: 8 },
   throneLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6 },
-  throneLabel: { fontSize: 10, fontWeight: '700', color: '#FFD700' },
+  throneLabel: { fontSize: 10, fontWeight: '700', color: '#FFB547' },
   thronePseudo: { color: '#CCC', fontSize: 11, fontWeight: '600', marginTop: 4 },
   throneLevel: { fontSize: 10, fontWeight: '800', marginTop: 2 },
   throneEmpty: { alignItems: 'center', marginBottom: 8, paddingVertical: 8, gap: 4 },
@@ -346,7 +360,7 @@ const CoachWidget = ({ suggestions, onAction }: {
 }) => {
   if (!suggestions.length) return null;
   const s = suggestions[0];
-  const color = s.category_color || '#8A2BE2';
+  const color = s.category_color || '#B366FF';
 
   return (
     <Animated.View entering={SlideInRight.springify().delay(300)}>
@@ -355,14 +369,20 @@ const CoachWidget = ({ suggestions, onAction }: {
         onPress={() => onAction(s)}
         activeOpacity={0.8}
       >
-        <LinearGradient colors={[color + '25', color + '08']} style={coachStyles.iconWrap}>
-          <MaterialCommunityIcons name="robot-outline" size={22} color={color} />
-        </LinearGradient>
+        {/* Tuile teintée icône colorée (convention charte) */}
+        <View style={[coachStyles.iconWrap, { backgroundColor: color + '20', borderColor: color + '40' }]}>
+          <MaterialCommunityIcons name="robot-outline" size={20} color={color} />
+        </View>
         <View style={coachStyles.textWrap}>
-          <Text style={coachStyles.label}>{t('players.coach_label')}</Text>
+          <Text style={coachStyles.label}>◆ {t('players.coach_label')}</Text>
           <Text style={coachStyles.message} numberOfLines={2}>{s.message}</Text>
         </View>
-        <View style={[coachStyles.goBtn, { backgroundColor: color }]}>
+        <View style={coachStyles.goBtn}>
+          <LinearGradient
+            colors={['#00E5FF', '#B366FF']}
+            start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
           <Text style={coachStyles.goBtnText}>{t('players.coach_go')}</Text>
         </View>
       </TouchableOpacity>
@@ -373,19 +393,26 @@ const CoachWidget = ({ suggestions, onAction }: {
 const coachStyles = StyleSheet.create({
   widget: {
     marginHorizontal: 16, marginBottom: 16, borderRadius: 16,
-    backgroundColor: GLASS.bg, borderWidth: 1,
+    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1,
     flexDirection: 'row', alignItems: 'center', padding: 14, gap: 12,
   },
   iconWrap: {
-    width: 42, height: 42, borderRadius: 14, justifyContent: 'center', alignItems: 'center',
+    width: 42, height: 42, borderRadius: 12, borderWidth: 1,
+    justifyContent: 'center', alignItems: 'center',
   },
   textWrap: { flex: 1 },
-  label: { fontSize: 9, fontFamily: 'JetBrainsMono_700Bold', color: '#FFD700', letterSpacing: 2, marginBottom: 3 },
-  message: { color: '#CCC', fontSize: 12, fontWeight: '600', lineHeight: 16 },
-  goBtn: {
-    paddingHorizontal: 16, paddingVertical: 8, borderRadius: 10,
+  label: {
+    fontSize: 9, fontFamily: 'JetBrainsMono_700Bold', color: '#FFB547',
+    letterSpacing: 2, textTransform: 'uppercase', marginBottom: 3,
   },
-  goBtnText: { color: '#FFF', fontSize: 12, fontWeight: '900', letterSpacing: 1 },
+  message: { color: 'rgba(255,255,255,0.85)', fontSize: 12, fontFamily: 'SpaceGrotesk_500Medium', lineHeight: 17 },
+  goBtn: {
+    paddingHorizontal: 16, paddingVertical: 9, borderRadius: 10, overflow: 'hidden',
+  },
+  goBtnText: {
+    color: '#000', fontSize: 12, fontFamily: 'SpaceGrotesk_700Bold',
+    letterSpacing: 0.5, textTransform: 'uppercase',
+  },
 });
 
 // ── Main Screen ──
@@ -420,11 +447,11 @@ export default function PlayersScreen() {
 
 
   const pillarFilters = [
-    { id: 'all', name: t('players.all_filter'), icon: '🌐', color: '#8A2BE2' },
-    { id: 'screen', name: 'SCREEN', icon: '🎬', color: '#8A2BE2' },
-    { id: 'sound', name: 'SOUND', icon: '🎵', color: '#FF6B35' },
+    { id: 'all', name: t('players.all_filter'), icon: '🌐', color: '#B366FF' },
+    { id: 'screen', name: 'SCREEN', icon: '🎬', color: '#B366FF' },
+    { id: 'sound', name: 'SOUND', icon: '🎵', color: '#FF6B2C' },
     { id: 'arena', name: 'ARENA', icon: '⚽', color: '#00FF9D' },
-    { id: 'legends', name: 'LEGENDS', icon: '🏛️', color: '#FFD700' },
+    { id: 'legends', name: 'LEGENDS', icon: '🏛️', color: '#FFB547' },
     { id: 'lab', name: 'LAB', icon: '🔬', color: '#1565C0' },
     { id: 'globe', name: 'GLOBE', icon: '🌍', color: '#4ECDC4' },
     { id: 'art', name: 'ART', icon: '🎨', color: '#E53935' },
@@ -523,7 +550,7 @@ export default function PlayersScreen() {
     ? tribes
     : tribes.filter(tr => tr.pillar_id.toLowerCase() === selectedPillar);
 
-  const sectionColor = activeSection === 'pulse' ? '#8A2BE2' : activeSection === 'tribus' ? '#FFD700' : '#10B981';
+  const sectionColor = activeSection === 'pulse' ? '#B366FF' : activeSection === 'tribus' ? '#FFB547' : '#10B981';
 
   return (
     <CosmicBackground>
@@ -552,8 +579,8 @@ export default function PlayersScreen() {
         {(['pulse', 'tribus', 'forge'] as SectionTab[]).map((section) => {
           const isActive = activeSection === section;
           const meta = {
-            pulse: { label: t('players.pulse_label'), icon: 'lightning-bolt' as const, color: '#8A2BE2' },
-            tribus: { label: t('players.tribus_label'), icon: 'crown' as const, color: '#FFD700' },
+            pulse: { label: t('players.pulse_label'), icon: 'lightning-bolt' as const, color: '#B366FF' },
+            tribus: { label: t('players.tribus_label'), icon: 'crown' as const, color: '#FFB547' },
             forge: { label: t('players.forge_label'), icon: 'hammer-wrench' as const, color: '#10B981' },
           }[section];
           return (
@@ -593,10 +620,10 @@ export default function PlayersScreen() {
               <Text style={{ color: '#aaa', fontSize: 14 }}>{t('players.load_error')}</Text>
             </TouchableOpacity>
           ) : loadingFeed ? (
-            <ActivityIndicator size="large" color="#8A2BE2" style={{ marginTop: 40 }} />
+            <ActivityIndicator size="large" color="#B366FF" style={{ marginTop: 40 }} />
           ) : feed.length === 0 ? (
             <View style={s.emptyState}>
-              <MaterialCommunityIcons name="lightning-bolt" size={48} color="#8A2BE230" />
+              <MaterialCommunityIcons name="lightning-bolt" size={48} color="#B366FF30" />
               <Text style={s.emptyTitle}>{t('players.pulse_quiet')}</Text>
               <Text style={s.emptySub}>{t('players.pulse_quiet_sub')}</Text>
             </View>
@@ -653,7 +680,7 @@ export default function PlayersScreen() {
               <Text style={{ color: '#aaa', fontSize: 14 }}>{t('players.load_error')}</Text>
             </TouchableOpacity>
           ) : loadingTribes ? (
-            <ActivityIndicator size="large" color="#FFD700" style={{ marginTop: 40 }} />
+            <ActivityIndicator size="large" color="#FFB547" style={{ marginTop: 40 }} />
           ) : (
             (() => {
               const grouped: { [key: string]: Tribe[] } = {};
@@ -700,7 +727,7 @@ export default function PlayersScreen() {
             <ForgeHeroCard>
               <View style={forgeStyles.hero}>
                 <LinearGradient colors={['rgba(138,43,226,0.25)', 'rgba(138,43,226,0.08)']} style={forgeStyles.heroIconWrap}>
-                  <MaterialCommunityIcons name="hammer-wrench" size={32} color="#8A2BE2" />
+                  <MaterialCommunityIcons name="hammer-wrench" size={32} color="#B366FF" />
                 </LinearGradient>
                 <Text style={forgeStyles.heroTitle}>{t('players.forge_title')}</Text>
                 <Text style={forgeStyles.heroSub}>
@@ -834,7 +861,7 @@ const forgeStyles = StyleSheet.create({
   errorText: { color: '#FF3B5C', fontSize: 13, fontWeight: '600', textAlign: 'center', marginBottom: 8 },
   playThemeBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: '#8A2BE2', paddingVertical: 14, borderRadius: 14, gap: 8, marginBottom: 8,
+    backgroundColor: '#B366FF', paddingVertical: 14, borderRadius: 14, gap: 8, marginBottom: 8,
   },
 
 });
