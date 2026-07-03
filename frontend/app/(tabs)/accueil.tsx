@@ -15,7 +15,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
-import CosmicBackground from '../../components/CosmicBackground';
 import CategoryIcon from '../../components/CategoryIcon';
 import UserAvatar from '../../components/UserAvatar';
 import EmptyState from '../../components/EmptyState';
@@ -1617,18 +1616,18 @@ export default function AccueilScreen() {
 
   if (loading) {
     return (
-      <CosmicBackground>
+      <View style={{ flex: 1 }}>
       <View style={styles.container}>
         <View style={styles.loadingWrap}>
           <ActivityIndicator size="large" color="#00E5FF" />
         </View>
       </View>
-      </CosmicBackground>
+      </View>
     );
   }
 
   return (
-    <CosmicBackground>
+    <View style={{ flex: 1 }}>
     <View style={styles.container}>
 
       {/* Halo violet en haut (écran 2 du handoff) */}
@@ -2110,7 +2109,7 @@ export default function AccueilScreen() {
         <View style={{ height: 32 }} />
       </ScrollView>
     </View>
-    </CosmicBackground>
+    </View>
   );
 }
 

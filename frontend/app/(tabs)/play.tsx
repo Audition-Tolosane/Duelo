@@ -7,7 +7,6 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import CosmicBackground from '../../components/CosmicBackground';
 import { useTabBar } from '../../contexts/TabBarContext';
 import { t } from '../../utils/i18n';
 import { FONTS } from '../../theme/fonts';
@@ -28,7 +27,7 @@ export default function PlayScreen() {
   const isTournamentLive = day === 5 || day === 6 || day === 0;
 
   return (
-    <CosmicBackground>
+    <View style={{ flex: 1 }}>
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
 
@@ -134,7 +133,7 @@ export default function PlayScreen() {
           <View style={{ height: 30 }} />
         </ScrollView>
       </View>
-    </CosmicBackground>
+    </View>
   );
 }
 

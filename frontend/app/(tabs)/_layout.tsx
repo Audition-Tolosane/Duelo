@@ -11,6 +11,7 @@ import Animated, {
 import { useRouter, usePathname, Slot } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { GLASS } from '../../theme/glassTheme';
+import CosmicBackground from '../../components/CosmicBackground';
 import DueloHeader from '../../components/DueloHeader';
 import { useSwipeBackProgress } from '../../components/SwipeBackContext';
 import { t } from '../../utils/i18n';
@@ -334,6 +335,9 @@ export default function TabLayout() {
   return (
     <TabBarProvider>
     <Animated.View style={[styles.container, parallaxStyle]}>
+    {/* Fond cosmique UNIQUE derrière header + contenu + cartouche
+        (les onglets sont transparents — aucune couture sous le header) */}
+    <CosmicBackground>
       {/* Hidden Slot for expo-router compatibility */}
       <View style={styles.hiddenSlot} pointerEvents="none">
         <Slot />
@@ -356,6 +360,7 @@ export default function TabLayout() {
       </View>
 
       <CustomTabBar currentIndex={activeIndex} onTabPress={onTabPress} />
+    </CosmicBackground>
     </Animated.View>
     </TabBarProvider>
   );
@@ -390,7 +395,7 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     flex: 1,
-    backgroundColor: '#050510',
+    backgroundColor: 'transparent',
   },
   // Cartouche flottante type Insta — pill détachée du bas de l'écran
   tabBar: {

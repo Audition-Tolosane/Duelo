@@ -19,7 +19,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DueloHeader from '../../components/DueloHeader';
 import CategoryIcon from '../../components/CategoryIcon';
 import { GLASS } from '../../theme/glassTheme';
-import CosmicBackground from '../../components/CosmicBackground';
 import { useTabBar } from '../../contexts/TabBarContext';
 import UserAvatar from '../../components/UserAvatar';
 import ScalePressable from '../../components/ScalePressable';
@@ -556,7 +555,7 @@ export default function PlayersScreen() {
   const sectionColor = activeSection === 'pulse' ? '#B366FF' : activeSection === 'tribus' ? '#FFB547' : '#32E7A3';
 
   return (
-    <CosmicBackground>
+    <View style={{ flex: 1 }}>
     <View style={s.container}>
 
       {/* Header — compensé quand le header global se replie */}
@@ -762,7 +761,7 @@ export default function PlayersScreen() {
         </ScrollView>
       )}
     </View>
-    </CosmicBackground>
+    </View>
   );
 }
 

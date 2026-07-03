@@ -9,7 +9,6 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import CosmicBackground from '../../components/CosmicBackground';
 import CategoryIcon from '../../components/CategoryIcon';
 import ScalePressable from '../../components/ScalePressable';
 import { useTabBar } from '../../contexts/TabBarContext';
@@ -88,7 +87,7 @@ export default function ThemesScreen() {
 
   if (loadError) {
     return (
-      <CosmicBackground>
+      <View style={{ flex: 1 }}>
         <View style={s.container}>
           <View style={s.loadCenter}>
             <TouchableOpacity onPress={() => { setLoadError(false); setLoading(true); loadCategories(); }} style={{ padding: 20, alignItems: 'center' }}>
@@ -96,7 +95,7 @@ export default function ThemesScreen() {
             </TouchableOpacity>
           </View>
         </View>
-      </CosmicBackground>
+      </View>
     );
   }
 
@@ -106,7 +105,7 @@ export default function ThemesScreen() {
   const rest = cats.filter(c => c.id !== featured?.id);
 
   return (
-    <CosmicBackground>
+    <View style={{ flex: 1 }}>
     <View style={s.container}>
       <ScrollView contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
 
@@ -223,7 +222,7 @@ export default function ThemesScreen() {
         <View style={{ height: 100 }} />
       </ScrollView>
     </View>
-    </CosmicBackground>
+    </View>
   );
 }
 

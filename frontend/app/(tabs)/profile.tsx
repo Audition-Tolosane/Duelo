@@ -14,7 +14,6 @@ import DueloHeader from '../../components/DueloHeader';
 import UserAvatar from '../../components/UserAvatar';
 import { GLASS } from '../../theme/glassTheme';
 import { authFetch, clearToken } from '../../utils/api';
-import CosmicBackground from '../../components/CosmicBackground';
 import { useTabBar } from '../../contexts/TabBarContext';
 import { t } from '../../utils/i18n';
 import CategoryIcon from '../../components/CategoryIcon';
@@ -530,11 +529,11 @@ export default function ProfileScreen() {
   };
 
   if (loading) {
-    return <CosmicBackground><View style={s.loadingContainer}><ActivityIndicator size="large" color="#00E5FF" /></View></CosmicBackground>;
+    return <View style={{ flex: 1 }}><View style={s.loadingContainer}><ActivityIndicator size="large" color="#00E5FF" /></View></View>;
   }
   if (!profile || !profile.user) {
     return (
-      <CosmicBackground>
+      <View style={{ flex: 1 }}>
         <View style={s.container}>
         <View style={s.emptyContainer}>
           <Text style={s.emptyText}>{t('profile.login_prompt')}</Text>
@@ -543,7 +542,7 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
       </View>
-      </CosmicBackground>
+      </View>
     );
   }
 
@@ -551,7 +550,7 @@ export default function ProfileScreen() {
   const displayTitle = user?.selected_title || (all_unlocked_titles && all_unlocked_titles.length > 0 ? all_unlocked_titles[0]?.title : '') || '';
 
   return (
-    <CosmicBackground>
+    <View style={{ flex: 1 }}>
     <View style={s.container}>
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
 
@@ -1128,7 +1127,7 @@ export default function ProfileScreen() {
         </View>
       </Modal>
     </View>
-    </CosmicBackground>
+    </View>
   );
 }
 
