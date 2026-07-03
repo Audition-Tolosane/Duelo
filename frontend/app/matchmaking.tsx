@@ -564,32 +564,40 @@ export default function MatchmakingScreen() {
               viewBox={`0 0 ${SVG_W} ${SVG_H}`}
               style={{ position: 'absolute', top: 0, left: 0 }}
             >
-              {/* Subtle grid */}
+              {/* Grille discrète — violet marque */}
               {Array.from({ length: 9 }).map((_, i) => (
                 <Path key={`h-${i}`} d={`M0,${(i+1)*50} L1000,${(i+1)*50}`}
-                  stroke="rgba(138,43,226,0.05)" strokeWidth={0.4} />
+                  stroke="rgba(179,102,255,0.06)" strokeWidth={0.4} />
               ))}
               {Array.from({ length: 19 }).map((_, i) => (
                 <Path key={`v-${i}`} d={`M${(i+1)*50},0 L${(i+1)*50},500`}
-                  stroke="rgba(138,43,226,0.05)" strokeWidth={0.4} />
+                  stroke="rgba(179,102,255,0.06)" strokeWidth={0.4} />
               ))}
-              {/* Equator */}
-              <Path d="M0,250 L1000,250" stroke="rgba(138,43,226,0.1)"
+              {/* Équateur */}
+              <Path d="M0,250 L1000,250" stroke="rgba(179,102,255,0.14)"
                 strokeWidth={0.5} strokeDasharray="6,4" />
 
-              {/* Real continent shapes - outer glow */}
+              {/* Continents — halo violet large (le duel cyan × violet de la charte) */}
+              {(MAP_PATHS as string[]).map((d, i) => (
+                <Path key={`gv-${i}`} d={d}
+                  fill="none"
+                  stroke="rgba(179,102,255,0.10)"
+                  strokeWidth={7}
+                  strokeLinejoin="round" />
+              ))}
+              {/* Continents — glow cyan rapproché */}
               {(MAP_PATHS as string[]).map((d, i) => (
                 <Path key={`g-${i}`} d={d}
                   fill="none"
-                  stroke="rgba(0,255,255,0.12)"
-                  strokeWidth={4}
+                  stroke="rgba(0,229,255,0.16)"
+                  strokeWidth={3.5}
                   strokeLinejoin="round" />
               ))}
-              {/* Real continent shapes - fill + border */}
+              {/* Continents — remplissage teinté + trait néon cyan */}
               {(MAP_PATHS as string[]).map((d, i) => (
                 <Path key={`f-${i}`} d={d}
-                  fill="rgba(0,255,255,0.06)"
-                  stroke="rgba(0,255,255,0.5)"
+                  fill="rgba(0,229,255,0.08)"
+                  stroke="rgba(0,229,255,0.65)"
                   strokeWidth={0.8}
                   strokeLinejoin="round" />
               ))}
