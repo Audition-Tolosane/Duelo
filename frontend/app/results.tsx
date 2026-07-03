@@ -86,6 +86,7 @@ export default function ResultsScreen() {
   const [xpBreakdown, setXpBreakdown] = useState<XpBreakdown | null>(null);
   const [newLevel, setNewLevel] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(true);
+  const [submitError, setSubmitError] = useState<'auth' | 'network' | null>(null);
   const [matchId, setMatchId] = useState<string | null>(null);
   const [streakBefore, setStreakBefore] = useState(0);
   const [adWatching, setAdWatching] = useState(false);
@@ -206,24 +207,37 @@ export default function ResultsScreen() {
   }, [rematchState]);
 
   const submitMatch = async () => {
+    setSubmitting(true);
+    setSubmitError(null);
     try {
       const userId = params.userId || await AsyncStorage.getItem('duelo_user_id');
-      const res = await authFetch(`${API_URL}/api/game/submit-v2`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          player_id: userId,
-          theme_id: category,
-          player_score: pScore,
-          opponent_score: oScore,
-          opponent_pseudo: params.opponentPseudo,
-          opponent_is_bot: params.isBot === 'true',
-          correct_count: correctCount,
-          opponent_level: parseInt(params.opponentLevel || '1'),
-        }),
+      const body = JSON.stringify({
+        player_id: userId,
+        theme_id: category,
+        player_score: pScore,
+        opponent_score: oScore,
+        opponent_pseudo: params.opponentPseudo,
+        opponent_is_bot: params.isBot === 'true',
+        correct_count: correctCount,
+        opponent_level: parseInt(params.opponentLevel || '1'),
       });
-      if (!res.ok) {
-        console.warn(`[submit-v2] ${res.status} - theme_id="${category}"`);
+      // 3 tentatives avec backoff sur pannes réseau / erreurs serveur —
+      // et surtout : plus JAMAIS d'échec silencieux (bandeau + Réessayer).
+      let res: Response | null = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          res = await authFetch(`${API_URL}/api/game/submit-v2`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body,
+          });
+          if (res.ok || (res.status < 500 && res.status !== 429)) break;
+        } catch { res = null; }
+        if (attempt < 2) await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+      }
+      if (!res || !res.ok) {
+        console.warn(`[submit-v2] ${res ? res.status : 'network'} - theme_id="${category}"`);
+        setSubmitError(res && (res.status === 401 || res.status === 403) ? 'auth' : 'network');
         setSubmitting(false);
         return;
       }
@@ -264,7 +278,7 @@ export default function ResultsScreen() {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }, 900);
       }
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error(e); setSubmitError('network'); }
     setSubmitting(false);
   };
 
@@ -496,10 +510,24 @@ export default function ResultsScreen() {
               <Text style={styles.flawlessPillText}>FLAWLESS</Text>
             </View>
           )}
-          <Text style={[styles.resultTitle, won ? styles.winText : draw ? styles.drawText : styles.lossText]}
-                adjustsFontSizeToFit numberOfLines={1}>
-            {won ? t('results.victory') : draw ? t('results.draw') : t('results.defeat')}
-          </Text>
+          {/* Taille calculée selon la longueur (adjustsFontSizeToFit faisait
+              disparaître le texte à la fin de l'animation scale sur Android) */}
+          {(() => {
+            const label = won ? t('results.victory') : draw ? t('results.draw') : t('results.defeat');
+            const size = draw ? 48 : label.length > 10 ? 40 : label.length > 8 ? 48 : 60;
+            return (
+              <Text
+                style={[
+                  styles.resultTitle,
+                  won ? styles.winText : draw ? styles.drawText : styles.lossText,
+                  { fontSize: size, lineHeight: size + 6 },
+                ]}
+                numberOfLines={1}
+              >
+                {label}
+              </Text>
+            );
+          })()}
           <LinearGradient
             colors={['rgba(138,43,226,0.25)', 'rgba(0,255,255,0.1)']}
             start={{ x: 0, y: 0 }}
@@ -639,6 +667,22 @@ export default function ResultsScreen() {
                 <Text style={styles.xpTotalValue}>+{displayXp} XP</Text>
               </View>
             </>
+          ) : submitError ? (
+            /* Échec d'enregistrement VISIBLE — plus de score perdu en silence */
+            <View style={styles.submitErrorWrap}>
+              <MaterialCommunityIcons
+                name={submitError === 'auth' ? 'account-alert' : 'wifi-off'}
+                size={22} color="#FF3D5E"
+              />
+              <Text style={styles.submitErrorText}>
+                {submitError === 'auth' ? t('results.submit_error_auth') : t('results.submit_error_network')}
+              </Text>
+              {submitError === 'network' && (
+                <TouchableOpacity style={styles.submitRetryBtn} onPress={submitMatch} activeOpacity={0.8}>
+                  <Text style={styles.submitRetryText}>{t('common.retry')}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           ) : null}
         </Animated.View>
 
@@ -1175,6 +1219,18 @@ const styles = StyleSheet.create({
   },
   drawText: { fontFamily: 'Fraunces_500Medium_Italic', color: '#FFFFFF', fontSize: 48, letterSpacing: -1 },
   lossText: { color: 'rgba(255,255,255,0.85)' },
+  // Échec d'enregistrement
+  submitErrorWrap: { alignItems: 'center', gap: 8, paddingVertical: 6 },
+  submitErrorText: {
+    color: 'rgba(255,255,255,0.75)', fontSize: 13, textAlign: 'center',
+    fontFamily: 'SpaceGrotesk_500Medium', lineHeight: 18,
+  },
+  submitRetryBtn: {
+    marginTop: 4, paddingHorizontal: 18, paddingVertical: 8, borderRadius: 12,
+    backgroundColor: 'rgba(255,61,94,0.12)', borderWidth: 1, borderColor: 'rgba(255,61,94,0.40)',
+  },
+  submitRetryText: { color: '#FF3D5E', fontSize: 13, fontFamily: 'SpaceGrotesk_700Bold' },
+
   forfeitBanner: {
     alignItems: 'center', marginBottom: 18, paddingHorizontal: 8,
   },
