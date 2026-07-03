@@ -9,6 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useTabBar } from '../../contexts/TabBarContext';
+import SwordMark from '../../components/SwordMark';
 import { t } from '../../utils/i18n';
 import { FONTS } from '../../theme/fonts';
 
@@ -78,7 +79,9 @@ export default function PlayScreen() {
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                 style={styles.quickGradient}
               >
-                <Text style={styles.quickWatermark}>⚔</Text>
+                <View style={styles.quickWatermark}>
+                  <SwordMark size={140} color="#FFF" />
+                </View>
                 <Text style={styles.quickEyebrow}>◆ {t('play.random').toUpperCase()} · ~8s</Text>
                 <Text style={styles.quickTitle}>QUICK MATCH</Text>
                 <Text style={styles.quickSub}>{t('play.quick_sub')}</Text>
@@ -188,8 +191,8 @@ const styles = StyleSheet.create({
   },
   quickGradient: { padding: 22, overflow: 'hidden' },
   quickWatermark: {
-    position: 'absolute', top: -24, right: -8,
-    fontSize: 120, color: 'rgba(255,255,255,0.18)',
+    position: 'absolute', top: -20, right: -10,
+    opacity: 0.2,
   },
   quickEyebrow: {
     fontSize: 9, fontFamily: FONTS.mono.bold, color: 'rgba(0,0,0,0.70)',

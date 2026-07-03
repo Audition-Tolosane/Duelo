@@ -124,7 +124,9 @@ export default function ThemesScreen() {
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                 style={StyleSheet.absoluteFill}
               />
-              <Text style={s.featuredWatermark}>{featured.icon}</Text>
+              <View style={s.featuredWatermark}>
+                <CategoryIcon emoji={featured.icon} size={130} color="#000" type="super" />
+              </View>
               <View style={s.featuredBadge}>
                 <Text style={s.featuredBadgeText}>◆ {t('themes.featured_badge')}</Text>
               </View>
@@ -250,8 +252,8 @@ const s = StyleSheet.create({
     shadowOpacity: 0.45, shadowRadius: 24, elevation: 10,
   },
   featuredWatermark: {
-    position: 'absolute', fontSize: 140, opacity: 0.15,
-    right: -10, top: -20,
+    position: 'absolute', opacity: 0.14,
+    right: -14, top: -16,
   },
   // Pastille or bien visible (le texte mono noir se fondait dans le gradient)
   featuredBadge: {

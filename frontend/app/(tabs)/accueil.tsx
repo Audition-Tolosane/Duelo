@@ -20,6 +20,7 @@ import UserAvatar from '../../components/UserAvatar';
 import EmptyState from '../../components/EmptyState';
 import SpinWheelModal from '../../components/SpinWheelModal';
 import { GLASS } from '../../theme/glassTheme';
+import SwordMark from '../../components/SwordMark';
 import { useTabBar } from '../../contexts/TabBarContext';
 import { authFetch } from '../../utils/api';
 import { t } from '../../utils/i18n';
@@ -1753,7 +1754,9 @@ export default function AccueilScreen() {
               end={{ x: 1, y: 1 }}
               style={styles.quickPlayGradient}
             >
-              <Text style={styles.quickPlayWatermark}>⚔</Text>
+              <View style={styles.quickPlayWatermark}>
+                <SwordMark size={140} color="#FFF" />
+              </View>
               <Text style={styles.quickPlaySub}>Quick match</Text>
               <Text style={styles.quickPlayTitle}>DUEL !</Text>
               <Text style={styles.quickPlayHint}>Trouve un adversaire en ~8s</Text>
@@ -2421,10 +2424,8 @@ const styles = StyleSheet.create({
   },
   quickPlayWatermark: {
     position: 'absolute',
-    fontSize: 130,
     opacity: 0.2,
-    color: '#FFF',
-    right: 10,
+    right: 0,
     top: -20,
   },
   quickPlaySub: {
