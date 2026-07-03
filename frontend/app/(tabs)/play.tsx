@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView,
+  View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -16,15 +17,41 @@ const VIOLET = '#B366FF';
 const GOLD = '#FFB547';
 const FIRE = '#FF6B2C';
 
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+
 // Écran 18 du handoff — modes de jeu purs. Les univers/thèmes vivent
 // dans l'onglet Thèmes (écran 6) ; pas de section univers ici.
 export default function PlayScreen() {
   const router = useRouter();
   const { onScroll: onTabScroll } = useTabBar();
+  const [quickLoading, setQuickLoading] = useState(false);
 
   // Les tournois ont lieu du vendredi au dimanche (cf. crons backend)
   const day = new Date().getDay();
   const isTournamentLive = day === 5 || day === 6 || day === 0;
+
+  // Quick Match : le matchmaking EXIGE un theme_id (sinon il renvoie vers Jouer).
+  // On tire un thème au hasard parmi les tendances personnalisées avant de naviguer.
+  const handleQuickMatch = async () => {
+    if (quickLoading) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    setQuickLoading(true);
+    try {
+      const uid = await AsyncStorage.getItem('duelo_user_id');
+      const res = await fetch(`${API_URL}/api/themes/trending${uid ? `?user_id=${uid}` : ''}`);
+      const data = await res.json();
+      const list: { id: string; name: string }[] = data.trending || [];
+      if (list.length > 0) {
+        const pick = list[Math.floor(Math.random() * list.length)];
+        router.push(`/matchmaking?category=${pick.id}&themeName=${encodeURIComponent(pick.name)}`);
+      } else {
+        router.push('/(tabs)/themes');
+      }
+    } catch {
+      router.push('/(tabs)/themes');
+    }
+    setQuickLoading(false);
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -44,10 +71,7 @@ export default function PlayScreen() {
             <TouchableOpacity
               style={styles.quickCard}
               activeOpacity={0.88}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-                router.push('/matchmaking');
-              }}
+              onPress={handleQuickMatch}
             >
               <LinearGradient
                 colors={[CYAN, VIOLET]}
@@ -59,7 +83,9 @@ export default function PlayScreen() {
                 <Text style={styles.quickTitle}>QUICK MATCH</Text>
                 <Text style={styles.quickSub}>{t('play.quick_sub')}</Text>
                 <View style={styles.quickCta}>
-                  <Text style={styles.quickCtaText}>{t('tournament.play_now')} →</Text>
+                  {quickLoading
+                    ? <ActivityIndicator size="small" color="#FFF" />
+                    : <Text style={styles.quickCtaText}>{t('tournament.play_now')} →</Text>}
                 </View>
               </LinearGradient>
             </TouchableOpacity>
