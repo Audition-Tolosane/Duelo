@@ -32,19 +32,12 @@ export default function PlayScreen() {
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
 
-          {/* Header — modes de jeu */}
+          {/* Header — modes de jeu (loupe retirée : doublon avec le header global) */}
           <View style={styles.pageHeader}>
             <View style={{ flex: 1 }}>
               <Text style={styles.modesEyebrow}>◆ {t('play.modes_eyebrow')}</Text>
               <Text style={styles.modesTitle}>{t('play.modes_title')}</Text>
             </View>
-            <TouchableOpacity
-              style={styles.searchBtn}
-              onPress={() => router.push('/search')}
-              activeOpacity={0.8}
-            >
-              <MaterialCommunityIcons name="magnify" size={20} color={CYAN} />
-            </TouchableOpacity>
           </View>
 
           {/* Quick Match — gros bloc gradient */}
@@ -84,7 +77,7 @@ export default function PlayScreen() {
               }}
             >
               <View style={[styles.modeIconTile, { backgroundColor: 'rgba(179,102,255,0.15)', borderColor: 'rgba(179,102,255,0.31)' }]}>
-                <Text style={styles.modeIcon}>⚔</Text>
+                <MaterialCommunityIcons name="sword-cross" size={24} color={VIOLET} />
               </View>
               <View style={styles.modeInfo}>
                 <Text style={styles.modeTitle}>{t('play.challenge_friend')}</Text>
@@ -102,7 +95,7 @@ export default function PlayScreen() {
               }}
             >
               <View style={[styles.modeIconTile, { backgroundColor: 'rgba(255,181,71,0.15)', borderColor: 'rgba(255,181,71,0.31)' }]}>
-                <Text style={styles.modeIcon}>🏆</Text>
+                <MaterialCommunityIcons name="trophy" size={24} color={GOLD} />
               </View>
               <View style={styles.modeInfo}>
                 <View style={styles.modeTitleRow}>
@@ -118,7 +111,7 @@ export default function PlayScreen() {
               <MaterialCommunityIcons name="chevron-right" size={22} color={GOLD} />
             </TouchableOpacity>
 
-            {/* Arène — renvoi vers l'onglet Thèmes */}
+            {/* Champ de bataille — renvoi vers l'onglet Thèmes (même intitulé que sa destination) */}
             <TouchableOpacity
               style={[styles.modeRow, { backgroundColor: 'rgba(0,229,255,0.07)', borderColor: 'rgba(0,229,255,0.21)' }]}
               activeOpacity={0.85}
@@ -128,7 +121,7 @@ export default function PlayScreen() {
               }}
             >
               <View style={[styles.modeIconTile, { backgroundColor: 'rgba(0,229,255,0.15)', borderColor: 'rgba(0,229,255,0.31)' }]}>
-                <Text style={styles.modeIcon}>◆</Text>
+                <MaterialCommunityIcons name="compass-outline" size={24} color={CYAN} />
               </View>
               <View style={styles.modeInfo}>
                 <Text style={styles.modeTitle}>{t('play.arena_title')}</Text>
@@ -202,7 +195,6 @@ const styles = StyleSheet.create({
     width: 50, height: 50, borderRadius: 14, borderWidth: 1,
     justifyContent: 'center', alignItems: 'center',
   },
-  modeIcon: { fontSize: 24 },
   modeInfo: { flex: 1 },
   modeTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   modeTitle: { fontSize: 16, fontFamily: FONTS.display.bold, color: '#FFF' },
@@ -213,11 +205,5 @@ const styles = StyleSheet.create({
   },
   liveBadgeText: {
     color: '#FFF', fontSize: 8, fontFamily: FONTS.display.bold, letterSpacing: 1,
-  },
-  searchBtn: {
-    width: 42, height: 42, borderRadius: 21,
-    backgroundColor: 'rgba(0,229,255,0.08)',
-    borderWidth: 1, borderColor: 'rgba(0,229,255,0.25)',
-    justifyContent: 'center', alignItems: 'center',
   },
 });
