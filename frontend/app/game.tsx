@@ -24,6 +24,17 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 const TIMER_DURATION = 10;
+
+// Durée adaptée au volume de lecture (question + 4 réponses) — paliers 10/13/15 s.
+// Déterministe : en PvP les deux clients reçoivent la même question, donc
+// calculent la même durée — équité garantie sans synchronisation serveur.
+// Le bonus vitesse reste calé sur le barème 10 s (au-delà : points de base).
+function getQuestionDuration(q?: { question_text?: string; options?: string[] }): number {
+  if (!q) return TIMER_DURATION;
+  const total = (q.question_text?.length || 0)
+    + (q.options || []).reduce((n, o) => n + (o?.length || 0), 0);
+  return total > 300 ? 15 : total > 180 ? 13 : TIMER_DURATION;
+}
 const TOTAL_QUESTIONS = 7;
 const MAX_PTS_PER_Q = 20;
 const MAX_TOTAL = MAX_PTS_PER_Q * TOTAL_QUESTIONS; // 140
@@ -64,6 +75,8 @@ export default function GameScreen() {
   const [botAnswer, setBotAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
+  const [questionDuration, setQuestionDuration] = useState(TIMER_DURATION);
+  const questionDurationRef = useRef(TIMER_DURATION);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [pseudo, setPseudo] = useState(t('game.player'));
@@ -381,11 +394,15 @@ export default function GameScreen() {
   };
 
   const startTimer = () => {
-    timeLeftRef.current = TIMER_DURATION;
-    setTimeLeft(TIMER_DURATION);
+    // Durée calculée sur la question COURANTE (lue via les refs — jamais le state)
+    const duration = getQuestionDuration(questionsRef.current[currentIndexRef.current]);
+    questionDurationRef.current = duration;
+    setQuestionDuration(duration);
+    timeLeftRef.current = duration;
+    setTimeLeft(duration);
     timerAnim.setValue(1);
     Animated.timing(timerAnim, {
-      toValue: 0, duration: TIMER_DURATION * 1000, useNativeDriver: false,
+      toValue: 0, duration: duration * 1000, useNativeDriver: false,
     }).start();
 
     if (timerRef.current) clearInterval(timerRef.current);
@@ -422,7 +439,11 @@ export default function GameScreen() {
       // Normal range with ±50% variance (wider than before)
       botTimeSec = avgSpeed * (0.55 + Math.random() * 0.90);
     }
-    botTimeSec = Math.max(0.6, Math.min(14, botTimeSec));
+    // Étirement proportionnel sur les questions longues — le bot « lit » lui
+    // aussi, sinon sa rapidité trahirait sa nature sur les pavés.
+    const qDuration = getQuestionDuration(question);
+    botTimeSec = botTimeSec * (qDuration / TIMER_DURATION);
+    botTimeSec = Math.max(0.6, Math.min(qDuration - 1, botTimeSec));
     const botTimeMs = Math.round(botTimeSec * 1000);
 
     if (botCorrect) {
@@ -480,7 +501,7 @@ export default function GameScreen() {
         room_id: params.roomId,
         question_index: currentIndexRef.current,
         answer: -1,
-        time_ms: TIMER_DURATION * 1000,
+        time_ms: questionDurationRef.current * 1000,
       });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } else {
@@ -496,7 +517,7 @@ export default function GameScreen() {
           answer: -1,
           is_correct: false,
           points: 0,
-          time_ms: TIMER_DURATION * 1000,
+          time_ms: questionDurationRef.current * 1000,
         });
       }
 
@@ -506,7 +527,7 @@ export default function GameScreen() {
       } else {
         const { botPick, botPts, botTimeMs } = resolveBotAnswer(question);
         // Simulate bot answering independently: reveal after a natural-looking delay
-        const playerTimeMs = TIMER_DURATION * 1000;
+        const playerTimeMs = questionDurationRef.current * 1000;
         const revealDelay = botTimeMs < playerTimeMs ? 0 : Math.min(botTimeMs - playerTimeMs, 1400);
         handleAnswer(0, botPts, botPick, revealDelay);
       }
@@ -522,7 +543,7 @@ export default function GameScreen() {
     setSelectedOption(optionIndex);
     playerSelectionsRef.current[currentIndexRef.current] = optionIndex;
 
-    const timeTaken = TIMER_DURATION - timeLeftRef.current;
+    const timeTaken = questionDurationRef.current - timeLeftRef.current;
     const timeMs = timeTaken * 1000;
 
     if (isLive) {
@@ -812,7 +833,7 @@ export default function GameScreen() {
           </View>
 
           <View style={styles.timerSection}>
-            <RoundTimer timeLeft={timeLeft} total={TIMER_DURATION} />
+            <RoundTimer timeLeft={timeLeft} total={questionDuration} />
           </View>
 
           <View style={[styles.scoreBox, styles.scoreBoxOpponent]}>
