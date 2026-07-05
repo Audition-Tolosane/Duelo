@@ -882,9 +882,17 @@ export default function GameScreen() {
                           {['A', 'B', 'C', 'D'][index]}
                         </Text>
                       </View>
-                      <Text style={[styles.optionText2x2, { color: textColor }]} numberOfLines={3}>
-                        {question.options[index]}
-                      </Text>
+                      {/* Réponse toujours ENTIÈREMENT visible : police réduite
+                          progressivement selon la longueur, 5 lignes max */}
+                      {(() => {
+                        const optText = question.options[index] || '';
+                        const fs = optText.length > 90 ? 11 : optText.length > 60 ? 12 : optText.length > 40 ? 13 : 15;
+                        return (
+                          <Text style={[styles.optionText2x2, { color: textColor, fontSize: fs, lineHeight: fs + 4 }]} numberOfLines={5}>
+                            {optText}
+                          </Text>
+                        );
+                      })()}
                       {showResult && isPlayerPick && (
                         <View style={styles.optionIndicatorPlayer}>
                           <MaterialCommunityIcons

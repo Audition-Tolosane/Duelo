@@ -134,9 +134,9 @@ const REASON_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: '#FFA500',
-  reviewed: '#00BFFF',
-  resolved: '#00C853',
+  pending: '#FFB547',
+  reviewed: '#00E5FF',
+  resolved: '#32E7A3',
 };
 
 export default function AdminScreen() {
@@ -689,12 +689,12 @@ export default function AdminScreen() {
   const SectionHeader = ({ icon, title, subtitle }: { icon: string; title: string; subtitle?: string }) => (
     <View style={styles.sectionHeaderWrap}>
       <LinearGradient
-        colors={['rgba(138,43,226,0.25)', 'rgba(138,43,226,0.0)']}
+        colors={['rgba(179,102,255,0.25)', 'rgba(179,102,255,0.0)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.sectionHeaderGradient}
       >
-        <MaterialCommunityIcons name={icon as any} size={20} color="#A855F7" style={{ marginRight: 10 }} />
+        <MaterialCommunityIcons name={icon as any} size={20} color="#B366FF" style={{ marginRight: 10 }} />
         <View style={{ flex: 1 }}>
           <Text style={styles.cardTitle}>{title}</Text>
           {subtitle ? <Text style={styles.cardDescSub}>{subtitle}</Text> : null}
@@ -711,15 +711,15 @@ export default function AdminScreen() {
           <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.flex1}>
             <View style={styles.authContainer}>
               <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-                <MaterialCommunityIcons name="arrow-left" size={16} color="#A855F7" style={{ marginRight: 6 }} />
+                <MaterialCommunityIcons name="arrow-left" size={16} color="#B366FF" style={{ marginRight: 6 }} />
                 <Text style={styles.backBtnText}>Retour</Text>
               </TouchableOpacity>
               <View style={styles.authCard}>
                 <LinearGradient
-                  colors={['rgba(138,43,226,0.2)', 'rgba(138,43,226,0.05)']}
+                  colors={['rgba(179,102,255,0.2)', 'rgba(179,102,255,0.05)']}
                   style={styles.authIconWrap}
                 >
-                  <MaterialCommunityIcons name="lock-outline" size={36} color="#A855F7" />
+                  <MaterialCommunityIcons name="lock-outline" size={36} color="#B366FF" />
                 </LinearGradient>
                 <Text style={styles.authTitle}>Administration</Text>
                 <Text style={styles.authSubtitle}>Panel d'administration Duelo</Text>
@@ -740,7 +740,7 @@ export default function AdminScreen() {
                   activeOpacity={0.8}
                 >
                   <LinearGradient
-                    colors={['#8A2BE2', '#6A1FB0']}
+                    colors={['#B366FF', '#B366FF']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.loginBtnGradient}
@@ -773,13 +773,13 @@ export default function AdminScreen() {
         </Text>
         {!fileName ? (
           <TouchableOpacity style={styles.uploadBtn} onPress={pickCSVFile} activeOpacity={0.7}>
-            <MaterialCommunityIcons name="folder-upload-outline" size={32} color="#8A2BE2" style={{ marginBottom: 8 }} />
+            <MaterialCommunityIcons name="folder-upload-outline" size={32} color="#B366FF" style={{ marginBottom: 8 }} />
             <Text style={styles.uploadBtnText}>Choisir un fichier CSV</Text>
           </TouchableOpacity>
         ) : (
           <View>
             <View style={styles.fileInfo}>
-              <MaterialCommunityIcons name="file-document-outline" size={24} color="#A855F7" style={{ marginRight: 12 }} />
+              <MaterialCommunityIcons name="file-document-outline" size={24} color="#B366FF" style={{ marginRight: 12 }} />
               <View style={styles.fileDetails}>
                 <Text style={styles.fileNameText} numberOfLines={1}>{fileName}</Text>
                 <Text style={styles.fileMetaText}>
@@ -788,7 +788,7 @@ export default function AdminScreen() {
                 </Text>
               </View>
               <TouchableOpacity style={styles.resetBtn} onPress={resetCSV}>
-                <MaterialCommunityIcons name="close" size={16} color="#FF3B30" />
+                <MaterialCommunityIcons name="close" size={16} color="#FF3D5E" />
               </TouchableOpacity>
             </View>
             {csvColumns.length > 0 && (
@@ -811,7 +811,7 @@ export default function AdminScreen() {
             {parseErrors.length > 0 && (
               <View style={styles.errorsSection}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-                  <MaterialCommunityIcons name="alert" size={16} color="#FF8A80" style={{ marginRight: 6 }} />
+                  <MaterialCommunityIcons name="alert" size={16} color="#FF7A93" style={{ marginRight: 6 }} />
                   <Text style={styles.errorsTitle}>Avertissements ({parseErrors.length}) :</Text>
                 </View>
                 {parseErrors.slice(0, 10).map((err, i) => (
@@ -826,7 +826,7 @@ export default function AdminScreen() {
               activeOpacity={0.8}
             >
               <LinearGradient
-                colors={importing ? ['#388E3C', '#2E7D32'] : ['#00C853', '#00A844']}
+                colors={importing ? ['#388E3C', '#2E7D32'] : ['#32E7A3', '#00A844']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.importBtnGradient}
@@ -859,7 +859,7 @@ export default function AdminScreen() {
             <MaterialCommunityIcons
               name={importResult.success ? 'check-circle' : 'alert-circle'}
               size={22}
-              color={importResult.success ? '#00C853' : '#FF3B30'}
+              color={importResult.success ? '#32E7A3' : '#FF3D5E'}
               style={{ marginRight: 8 }}
             />
             <Text style={styles.resultTitle}>
@@ -872,7 +872,7 @@ export default function AdminScreen() {
                 colors={['rgba(0,200,83,0.15)', 'rgba(0,200,83,0.03)']}
                 style={styles.resultStatGradient}
               >
-                <MaterialCommunityIcons name="check" size={18} color="#00C853" />
+                <MaterialCommunityIcons name="check" size={18} color="#32E7A3" />
                 <Text style={styles.resultStatNum}>{importResult.imported}</Text>
                 <Text style={styles.resultStatLabel}>importees</Text>
               </LinearGradient>
@@ -882,8 +882,8 @@ export default function AdminScreen() {
                 colors={['rgba(255,160,0,0.15)', 'rgba(255,160,0,0.03)']}
                 style={styles.resultStatGradient}
               >
-                <MaterialCommunityIcons name="content-copy" size={18} color="#FFA000" />
-                <Text style={[styles.resultStatNum, { color: '#FFA000' }]}>{importResult.duplicates}</Text>
+                <MaterialCommunityIcons name="content-copy" size={18} color="#FFB547" />
+                <Text style={[styles.resultStatNum, { color: '#FFB547' }]}>{importResult.duplicates}</Text>
                 <Text style={styles.resultStatLabel}>doublons</Text>
               </LinearGradient>
             </View>
@@ -892,17 +892,17 @@ export default function AdminScreen() {
                 colors={['rgba(255,59,48,0.15)', 'rgba(255,59,48,0.03)']}
                 style={styles.resultStatGradient}
               >
-                <MaterialCommunityIcons name="close" size={18} color="#FF3B30" />
-                <Text style={[styles.resultStatNum, { color: '#FF3B30' }]}>{importResult.errors.length}</Text>
+                <MaterialCommunityIcons name="close" size={18} color="#FF3D5E" />
+                <Text style={[styles.resultStatNum, { color: '#FF3D5E' }]}>{importResult.errors.length}</Text>
                 <Text style={styles.resultStatLabel}>erreurs</Text>
               </LinearGradient>
             </View>
           </View>
           {importResult.errors && importResult.errors.length > 0 && (
             <View style={{ marginTop: 12, padding: 10, backgroundColor: 'rgba(255,59,48,0.1)', borderRadius: 8 }}>
-              <Text style={{ color: '#FF8A80', fontSize: 13, fontWeight: '700', marginBottom: 6 }}>Detail des erreurs :</Text>
+              <Text style={{ color: '#FF7A93', fontSize: 13, fontWeight: '700', marginBottom: 6 }}>Detail des erreurs :</Text>
               {importResult.errors.slice(0, 20).map((err: string, i: number) => (
-                <Text key={i} style={{ color: '#FF8A80', fontSize: 12, marginBottom: 3 }}>{err}</Text>
+                <Text key={i} style={{ color: '#FF7A93', fontSize: 12, marginBottom: 3 }}>{err}</Text>
               ))}
               {importResult.errors.length > 20 && (
                 <Text style={{ color: '#888', fontSize: 11, marginTop: 4 }}>... et {importResult.errors.length - 20} autres</Text>
@@ -921,19 +921,19 @@ export default function AdminScreen() {
         <SectionHeader icon="file-replace-outline" title="Upload CSV Themes" subtitle="Ajoute les nouveaux thèmes et met à jour les existants. Colonnes attendues : ID_Theme;Super_Categorie;Cluster;Nom_Public;..." />
         {!themesFileName ? (
           <TouchableOpacity style={styles.uploadBtn} onPress={pickThemesCSV} activeOpacity={0.7}>
-            <MaterialCommunityIcons name="clipboard-file-outline" size={32} color="#8A2BE2" style={{ marginBottom: 8 }} />
+            <MaterialCommunityIcons name="clipboard-file-outline" size={32} color="#B366FF" style={{ marginBottom: 8 }} />
             <Text style={styles.uploadBtnText}>Choisir le CSV Themes</Text>
           </TouchableOpacity>
         ) : (
           <View>
             <View style={styles.fileInfo}>
-              <MaterialCommunityIcons name="clipboard-file-outline" size={24} color="#A855F7" style={{ marginRight: 12 }} />
+              <MaterialCommunityIcons name="clipboard-file-outline" size={24} color="#B366FF" style={{ marginRight: 12 }} />
               <View style={styles.fileDetails}>
                 <Text style={styles.fileNameText} numberOfLines={1}>{themesFileName}</Text>
                 <Text style={styles.fileMetaText}>{themesPreviewCount} themes detectes</Text>
               </View>
               <TouchableOpacity style={styles.resetBtn} onPress={resetThemesCSV}>
-                <MaterialCommunityIcons name="close" size={16} color="#FF3B30" />
+                <MaterialCommunityIcons name="close" size={16} color="#FF3D5E" />
               </TouchableOpacity>
             </View>
             <TouchableOpacity
@@ -943,7 +943,7 @@ export default function AdminScreen() {
               activeOpacity={0.8}
             >
               <LinearGradient
-                colors={['#FF6B35', '#E55A2B']}
+                colors={['#FF6B2C', '#E55A2B']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.importBtnGradient}
@@ -966,13 +966,13 @@ export default function AdminScreen() {
         {themesUploadResult && (
           <View style={[styles.resultBanner, { marginTop: 12 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-              <MaterialCommunityIcons name="check-circle" size={16} color="#00C853" style={{ marginRight: 6 }} />
+              <MaterialCommunityIcons name="check-circle" size={16} color="#32E7A3" style={{ marginRight: 6 }} />
               <Text style={styles.resultBannerText}>
                 {themesUploadResult.themes_imported} themes importes
               </Text>
             </View>
             {themesUploadResult.errors && themesUploadResult.errors.length > 0 && (
-              <Text style={{ color: '#FF8A80', fontSize: 12, marginTop: 6 }}>
+              <Text style={{ color: '#FF7A93', fontSize: 12, marginTop: 6 }}>
                 Erreurs ({themesUploadResult.errors.length}): {themesUploadResult.errors.slice(0, 5).join(' | ')}
               </Text>
             )}
@@ -991,16 +991,16 @@ export default function AdminScreen() {
           )}
         </View>
         {loadingThemes ? (
-          <ActivityIndicator color="#8A2BE2" style={{ marginVertical: 12 }} />
+          <ActivityIndicator color="#B366FF" style={{ marginVertical: 12 }} />
         ) : themesOverview ? (
           <View>
             {/* Totals */}
             <View style={styles.totalsRow}>
               {[
-                { num: themesOverview.totals.super_categories, label: 'Super Cat.', icon: 'shape-outline', color: '#A855F7' },
-                { num: themesOverview.totals.clusters, label: 'Clusters', icon: 'group', color: '#00BFFF' },
-                { num: themesOverview.totals.themes, label: 'Themes', icon: 'palette-outline', color: '#FFD700' },
-                { num: themesOverview.totals.questions, label: 'Questions', icon: 'help-circle-outline', color: '#00C853' },
+                { num: themesOverview.totals.super_categories, label: 'Super Cat.', icon: 'shape-outline', color: '#B366FF' },
+                { num: themesOverview.totals.clusters, label: 'Clusters', icon: 'group', color: '#00E5FF' },
+                { num: themesOverview.totals.themes, label: 'Themes', icon: 'palette-outline', color: '#FFB547' },
+                { num: themesOverview.totals.questions, label: 'Questions', icon: 'help-circle-outline', color: '#32E7A3' },
               ].map((item, idx) => (
                 <View key={idx} style={styles.totalItemCard}>
                   <LinearGradient
@@ -1121,8 +1121,8 @@ export default function AdminScreen() {
                           <View style={[styles.checkbox, selectedThemes.has(theme.id) && styles.checkboxChecked]}>
                             {selectedThemes.has(theme.id) && <MaterialCommunityIcons name="check" size={12} color="#FFF" />}
                           </View>
-                          <View style={[styles.themeIdBadge, { backgroundColor: theme.color_hex ? theme.color_hex + '30' : 'rgba(138,43,226,0.15)' }]}>
-                            <Text style={[styles.themeIdText, { color: theme.color_hex || '#8A2BE2' }]}>{theme.id}</Text>
+                          <View style={[styles.themeIdBadge, { backgroundColor: theme.color_hex ? theme.color_hex + '30' : 'rgba(179,102,255,0.15)' }]}>
+                            <Text style={[styles.themeIdText, { color: theme.color_hex || '#B366FF' }]}>{theme.id}</Text>
                           </View>
                           <View style={styles.themeInfo}>
                             <Text style={styles.themeName} numberOfLines={1}>{theme.name}</Text>
@@ -1148,17 +1148,17 @@ export default function AdminScreen() {
       <View style={styles.card}>
         <SectionHeader icon="chart-bar" title="Parties par theme" subtitle="Themes classes par popularite (nombre de parties jouees)" />
         {loadingMatchStats ? (
-          <ActivityIndicator color="#8A2BE2" style={{ marginVertical: 12 }} />
+          <ActivityIndicator color="#B366FF" style={{ marginVertical: 12 }} />
         ) : matchStats.length > 0 ? (
           <View>
             <View style={styles.totalMatchCard}>
               <LinearGradient
-                colors={['rgba(138,43,226,0.2)', 'rgba(138,43,226,0.05)']}
+                colors={['rgba(179,102,255,0.2)', 'rgba(179,102,255,0.05)']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.totalMatchGradient}
               >
-                <MaterialCommunityIcons name="gamepad-variant-outline" size={20} color="#A855F7" style={{ marginRight: 10 }} />
+                <MaterialCommunityIcons name="gamepad-variant-outline" size={20} color="#B366FF" style={{ marginRight: 10 }} />
                 <Text style={[styles.statLabel, { fontWeight: '700', color: '#FFF' }]}>Total parties</Text>
                 <Text style={styles.statValue}>{totalMatches}</Text>
               </LinearGradient>
@@ -1168,7 +1168,7 @@ export default function AdminScreen() {
               return (
                 <View key={i} style={styles.matchStatRow}>
                   <LinearGradient
-                    colors={i < 3 ? ['rgba(138,43,226,0.25)', 'rgba(138,43,226,0.08)'] : ['rgba(138,43,226,0.15)', 'rgba(138,43,226,0.03)']}
+                    colors={i < 3 ? ['rgba(179,102,255,0.25)', 'rgba(179,102,255,0.08)'] : ['rgba(179,102,255,0.15)', 'rgba(179,102,255,0.03)']}
                     style={styles.matchStatRank}
                   >
                     <Text style={styles.matchStatRankText}>{i + 1}</Text>
@@ -1180,7 +1180,7 @@ export default function AdminScreen() {
                     </View>
                     <View style={styles.matchStatBarBg}>
                       <LinearGradient
-                        colors={['#8A2BE2', '#A855F7']}
+                        colors={['#B366FF', '#B366FF']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         style={[styles.matchStatBar, { width: `${Math.max(pct, 2)}%` }]}
@@ -1221,8 +1221,8 @@ export default function AdminScreen() {
               colors={['rgba(255,165,0,0.18)', 'rgba(255,165,0,0.04)']}
               style={styles.reportCountGradient}
             >
-              <MaterialCommunityIcons name="clock-outline" size={16} color="#FFA500" style={{ marginBottom: 2 }} />
-              <Text style={[styles.reportCountNum, { color: '#FFA500' }]}>{reportCounts.pending}</Text>
+              <MaterialCommunityIcons name="clock-outline" size={16} color="#FFB547" style={{ marginBottom: 2 }} />
+              <Text style={[styles.reportCountNum, { color: '#FFB547' }]}>{reportCounts.pending}</Text>
               <Text style={styles.reportCountLabel}>En attente</Text>
             </LinearGradient>
           </View>
@@ -1231,8 +1231,8 @@ export default function AdminScreen() {
               colors={['rgba(0,191,255,0.18)', 'rgba(0,191,255,0.04)']}
               style={styles.reportCountGradient}
             >
-              <MaterialCommunityIcons name="eye-outline" size={16} color="#00BFFF" style={{ marginBottom: 2 }} />
-              <Text style={[styles.reportCountNum, { color: '#00BFFF' }]}>{reportCounts.reviewed}</Text>
+              <MaterialCommunityIcons name="eye-outline" size={16} color="#00E5FF" style={{ marginBottom: 2 }} />
+              <Text style={[styles.reportCountNum, { color: '#00E5FF' }]}>{reportCounts.reviewed}</Text>
               <Text style={styles.reportCountLabel}>Examines</Text>
             </LinearGradient>
           </View>
@@ -1241,8 +1241,8 @@ export default function AdminScreen() {
               colors={['rgba(0,200,83,0.18)', 'rgba(0,200,83,0.04)']}
               style={styles.reportCountGradient}
             >
-              <MaterialCommunityIcons name="check-circle-outline" size={16} color="#00C853" style={{ marginBottom: 2 }} />
-              <Text style={[styles.reportCountNum, { color: '#00C853' }]}>{reportCounts.resolved}</Text>
+              <MaterialCommunityIcons name="check-circle-outline" size={16} color="#32E7A3" style={{ marginBottom: 2 }} />
+              <Text style={[styles.reportCountNum, { color: '#32E7A3' }]}>{reportCounts.resolved}</Text>
               <Text style={styles.reportCountLabel}>Resolus</Text>
             </LinearGradient>
           </View>
@@ -1251,7 +1251,7 @@ export default function AdminScreen() {
 
       {/* Reports List */}
       {loadingReports ? (
-        <ActivityIndicator color="#8A2BE2" style={{ marginVertical: 24 }} />
+        <ActivityIndicator color="#B366FF" style={{ marginVertical: 24 }} />
       ) : reports.length > 0 ? (
         reports.map((r) => (
           <View key={r.id} style={styles.reportCard}>
@@ -1292,8 +1292,8 @@ export default function AdminScreen() {
                   activeOpacity={0.7}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                    <MaterialCommunityIcons name="eye-check-outline" size={14} color="#00BFFF" style={{ marginRight: 4 }} />
-                    <Text style={[styles.reportActionText, { color: '#00BFFF' }]}>Marquer examine</Text>
+                    <MaterialCommunityIcons name="eye-check-outline" size={14} color="#00E5FF" style={{ marginRight: 4 }} />
+                    <Text style={[styles.reportActionText, { color: '#00E5FF' }]}>Marquer examine</Text>
                   </View>
                 </TouchableOpacity>
               )}
@@ -1304,8 +1304,8 @@ export default function AdminScreen() {
                   activeOpacity={0.7}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                    <MaterialCommunityIcons name="check-circle-outline" size={14} color="#00C853" style={{ marginRight: 4 }} />
-                    <Text style={[styles.reportActionText, { color: '#00C853' }]}>Marquer resolu</Text>
+                    <MaterialCommunityIcons name="check-circle-outline" size={14} color="#32E7A3" style={{ marginRight: 4 }} />
+                    <Text style={[styles.reportActionText, { color: '#32E7A3' }]}>Marquer resolu</Text>
                   </View>
                 </TouchableOpacity>
               )}
@@ -1324,7 +1324,7 @@ export default function AdminScreen() {
   const renderAvatarsTab = () => (
     <View style={{ flex: 1, padding: 16 }}>
       {/* Upload form */}
-      <View style={{ backgroundColor: 'rgba(138,43,226,0.08)', borderRadius: 16, padding: 16, marginBottom: 20, borderWidth: 1, borderColor: 'rgba(138,43,226,0.2)' }}>
+      <View style={{ backgroundColor: 'rgba(179,102,255,0.08)', borderRadius: 16, padding: 16, marginBottom: 20, borderWidth: 1, borderColor: 'rgba(179,102,255,0.2)' }}>
         <Text style={{ color: '#FFF', fontSize: 16, fontWeight: '800', marginBottom: 12 }}>Uploader un avatar</Text>
 
         <TouchableOpacity
@@ -1335,7 +1335,7 @@ export default function AdminScreen() {
             <Image source={{ uri: `data:image/webp;base64,${avatarImage}` }} style={{ width: 80, height: 80, borderRadius: 40 }} />
           ) : (
             <>
-              <MaterialCommunityIcons name="image-plus" size={32} color="#8A2BE2" />
+              <MaterialCommunityIcons name="image-plus" size={32} color="#B366FF" />
               <Text style={{ color: '#A3A3A3', fontSize: 13, marginTop: 6 }}>Choisir une image</Text>
             </>
           )}
@@ -1355,7 +1355,7 @@ export default function AdminScreen() {
           style={{ opacity: (!avatarImage || uploadingAvatar) ? 0.5 : 1 }}
         >
           <LinearGradient
-            colors={['#8A2BE2', '#6A1FB0']}
+            colors={['#B366FF', '#B366FF']}
             style={{ borderRadius: 12, padding: 14, alignItems: 'center' }}
           >
             {uploadingAvatar ? (
@@ -1373,7 +1373,7 @@ export default function AdminScreen() {
       </Text>
 
       {loadingAvatars ? (
-        <ActivityIndicator color="#8A2BE2" style={{ marginTop: 20 }} />
+        <ActivityIndicator color="#B366FF" style={{ marginTop: 20 }} />
       ) : avatars.length === 0 ? (
         <Text style={{ color: '#525252', textAlign: 'center', marginTop: 20 }}>Aucun avatar uploade</Text>
       ) : (
@@ -1382,7 +1382,7 @@ export default function AdminScreen() {
             <View key={a.id} style={{ alignItems: 'center', width: 80 }}>
               <Image
                 source={{ uri: `${API_URL}/static/${a.image_url}` }}
-                style={{ width: 64, height: 64, borderRadius: 32, borderWidth: 2, borderColor: 'rgba(138,43,226,0.3)', marginBottom: 4 }}
+                style={{ width: 64, height: 64, borderRadius: 32, borderWidth: 2, borderColor: 'rgba(179,102,255,0.3)', marginBottom: 4 }}
               />
               <Text style={{ color: '#E5E5E5', fontSize: 11, fontWeight: '600', textAlign: 'center' }} numberOfLines={1}>{a.name}</Text>
               <Text style={{ color: '#525252', fontSize: 9 }}>{a.category}</Text>
@@ -1390,7 +1390,7 @@ export default function AdminScreen() {
                 onPress={() => deleteAvatar(a.id)}
                 style={{ marginTop: 4, padding: 4 }}
               >
-                <MaterialCommunityIcons name="delete-outline" size={16} color="#FF3B30" />
+                <MaterialCommunityIcons name="delete-outline" size={16} color="#FF3D5E" />
               </TouchableOpacity>
             </View>
           ))}
@@ -1405,16 +1405,16 @@ export default function AdminScreen() {
       <View style={[styles.container, { paddingTop: insets.top }]}>
         {/* Header */}
         <LinearGradient
-          colors={['rgba(138,43,226,0.12)', 'transparent']}
+          colors={['rgba(179,102,255,0.12)', 'transparent']}
           style={styles.header}
         >
           <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-            <MaterialCommunityIcons name="arrow-left" size={16} color="#A855F7" style={{ marginRight: 6 }} />
+            <MaterialCommunityIcons name="arrow-left" size={16} color="#B366FF" style={{ marginRight: 6 }} />
             <Text style={styles.backBtnText}>Retour</Text>
           </TouchableOpacity>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 16 }}>
-            <MaterialCommunityIcons name="cog" size={22} color="#A855F7" style={{ marginRight: 8 }} />
-            <Text style={styles.headerTitle}>Admin Duelo</Text>
+          <View style={{ marginLeft: 16 }}>
+            <Text style={styles.headerEyebrow}>◆ INTERNE</Text>
+            <Text style={styles.headerTitle}>ADMIN DUELO</Text>
           </View>
         </LinearGradient>
 
@@ -1428,18 +1428,21 @@ export default function AdminScreen() {
               activeOpacity={0.7}
             >
               {activeTab === i ? (
-                <LinearGradient
-                  colors={['rgba(138,43,226,0.2)', 'rgba(138,43,226,0.08)']}
-                  style={styles.tabItemGradient}
-                >
-                  <MaterialCommunityIcons name={TAB_ICONS[tab] as any} size={16} color="#A855F7" style={{ marginRight: 4 }} />
+                /* Onglet actif — gradient cyan→violet, contenu NOIR (convention charte) */
+                <View style={styles.tabItemInner}>
+                  <LinearGradient
+                    colors={['#00E5FF', '#B366FF']}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                    style={StyleSheet.absoluteFill}
+                  />
+                  <MaterialCommunityIcons name={TAB_ICONS[tab] as any} size={16} color="#000" style={{ marginRight: 4 }} />
                   <Text style={styles.tabTextActive}>{tab}</Text>
                   {i === 3 && reportCounts.pending > 0 && (
                     <View style={styles.tabBadge}>
                       <Text style={styles.tabBadgeText}>{reportCounts.pending}</Text>
                     </View>
                   )}
-                </LinearGradient>
+                </View>
               ) : (
                 <View style={styles.tabItemInner}>
                   <MaterialCommunityIcons name={TAB_ICONS[tab] as any} size={16} color="#666" style={{ marginRight: 4 }} />
@@ -1459,7 +1462,7 @@ export default function AdminScreen() {
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#8A2BE2" />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#B366FF" />}
         >
           {activeTab === 0 && renderQuestionsTab()}
           {activeTab === 1 && renderThemesTab()}
@@ -1493,7 +1496,7 @@ const styles = StyleSheet.create({
   authCard: {
     backgroundColor: 'rgba(255,255,255,0.04)',
     borderRadius: 20, padding: 32,
-    alignItems: 'center', borderWidth: 1, borderColor: 'rgba(138,43,226,0.15)',
+    alignItems: 'center', borderWidth: 1, borderColor: 'rgba(179,102,255,0.15)',
   },
   authIconWrap: {
     width: 72, height: 72, borderRadius: 36,
@@ -1522,11 +1525,18 @@ const styles = StyleSheet.create({
   },
   backBtn: {
     paddingHorizontal: 12, paddingVertical: 8,
-    backgroundColor: 'rgba(138,43,226,0.1)', borderRadius: 8,
+    backgroundColor: 'rgba(179,102,255,0.1)', borderRadius: 8,
     flexDirection: 'row', alignItems: 'center',
   },
-  backBtnText: { color: '#A855F7', fontSize: 14, fontWeight: '600' },
-  headerTitle: { color: '#FFF', fontSize: 20, fontWeight: '800' },
+  backBtnText: { color: '#B366FF', fontSize: 14, fontWeight: '600' },
+  headerEyebrow: {
+    color: '#B366FF', fontSize: 9, fontFamily: 'JetBrainsMono_700Bold',
+    letterSpacing: 2.5, textTransform: 'uppercase',
+  },
+  headerTitle: {
+    color: '#FFF', fontSize: 20, fontFamily: 'SpaceGrotesk_700Bold',
+    letterSpacing: -0.5, marginTop: 2,
+  },
 
   // Tabs
   tabBar: {
@@ -1546,10 +1556,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     paddingVertical: 10,
   },
-  tabText: { color: '#666', fontSize: 11, fontWeight: '600' },
-  tabTextActive: { color: '#A855F7', fontSize: 11, fontWeight: '800' },
+  tabText: { color: 'rgba(255,255,255,0.45)', fontSize: 11, fontFamily: 'SpaceGrotesk_600SemiBold' },
+  tabTextActive: { color: '#000', fontSize: 11, fontFamily: 'SpaceGrotesk_700Bold' },
   tabBadge: {
-    backgroundColor: '#FF3B30', borderRadius: 8, minWidth: 16, height: 16,
+    backgroundColor: '#FF3D5E', borderRadius: 8, minWidth: 16, height: 16,
     justifyContent: 'center', alignItems: 'center', marginLeft: 4, paddingHorizontal: 4,
   },
   tabBadgeText: { color: '#FFF', fontSize: 9, fontWeight: '800' },
@@ -1573,22 +1583,22 @@ const styles = StyleSheet.create({
 
   // Stats
   statLabel: { color: '#BBB', fontSize: 13, flex: 1 },
-  statValue: { color: '#8A2BE2', fontSize: 20, fontWeight: '900' },
-  statValueSmall: { color: '#8A2BE2', fontSize: 15, fontWeight: '700' },
+  statValue: { color: '#B366FF', fontSize: 20, fontWeight: '900' },
+  statValueSmall: { color: '#B366FF', fontSize: 15, fontWeight: '700' },
   noDataText: { color: '#555', fontSize: 13 },
 
   // Upload
   uploadBtn: {
-    backgroundColor: 'rgba(138,43,226,0.08)',
+    backgroundColor: 'rgba(179,102,255,0.08)',
     borderRadius: 12, paddingVertical: 28, alignItems: 'center',
-    borderWidth: 2, borderColor: 'rgba(138,43,226,0.3)', borderStyle: 'dashed',
+    borderWidth: 2, borderColor: 'rgba(179,102,255,0.3)', borderStyle: 'dashed',
   },
-  uploadBtnText: { color: '#8A2BE2', fontSize: 16, fontWeight: '700' },
+  uploadBtnText: { color: '#B366FF', fontSize: 16, fontWeight: '700' },
 
   // File info
   fileInfo: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(138,43,226,0.08)', borderRadius: 12, padding: 12,
+    backgroundColor: 'rgba(179,102,255,0.08)', borderRadius: 12, padding: 12,
     marginBottom: 12,
   },
   fileDetails: { flex: 1 },
@@ -1612,10 +1622,10 @@ const styles = StyleSheet.create({
   previewTitle: { color: '#777', fontSize: 12, fontWeight: '600', marginBottom: 8 },
   previewCard: {
     backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: 12,
-    marginBottom: 8, borderLeftWidth: 3, borderLeftColor: '#8A2BE2',
+    marginBottom: 8, borderLeftWidth: 3, borderLeftColor: '#B366FF',
   },
   previewCategory: {
-    color: '#8A2BE2', fontSize: 10, fontWeight: '700',
+    color: '#B366FF', fontSize: 10, fontWeight: '700',
     textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4,
   },
   previewQuestion: { color: '#FFF', fontSize: 14, fontWeight: '600' },
@@ -1625,8 +1635,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,59,48,0.06)', borderRadius: 10, padding: 12,
     marginBottom: 12,
   },
-  errorsTitle: { color: '#FF8A80', fontSize: 13, fontWeight: '700' },
-  errorText: { color: '#FF8A80', fontSize: 11, lineHeight: 18 },
+  errorsTitle: { color: '#FF7A93', fontSize: 13, fontWeight: '700' },
+  errorText: { color: '#FF7A93', fontSize: 11, lineHeight: 18 },
 
   // Import button
   importBtnWrap: { borderRadius: 12, overflow: 'hidden' },
@@ -1647,7 +1657,7 @@ const styles = StyleSheet.create({
   resultStatGradient: {
     alignItems: 'center', paddingVertical: 16, paddingHorizontal: 8, borderRadius: 12,
   },
-  resultStatNum: { color: '#00C853', fontSize: 26, fontWeight: '900', marginTop: 6 },
+  resultStatNum: { color: '#32E7A3', fontSize: 26, fontWeight: '900', marginTop: 6 },
   resultStatLabel: { color: '#777', fontSize: 11, marginTop: 2, fontWeight: '600' },
 
   // Result banner
@@ -1655,7 +1665,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,200,83,0.1)', borderRadius: 10, padding: 12,
     borderWidth: 1, borderColor: 'rgba(0,200,83,0.2)',
   },
-  resultBannerText: { color: '#00C853', fontSize: 14, fontWeight: '700', textAlign: 'center' },
+  resultBannerText: { color: '#32E7A3', fontSize: 14, fontWeight: '700', textAlign: 'center' },
 
   // Totals row
   totalsRow: {
@@ -1665,7 +1675,7 @@ const styles = StyleSheet.create({
   totalItemGradient: {
     alignItems: 'center', paddingVertical: 14, paddingHorizontal: 6, borderRadius: 12,
   },
-  totalNum: { color: '#8A2BE2', fontSize: 22, fontWeight: '900' },
+  totalNum: { color: '#B366FF', fontSize: 22, fontWeight: '900' },
   totalLabel: { color: '#888', fontSize: 9, fontWeight: '600', marginTop: 2 },
 
   // Total match card (stats tab)
@@ -1714,7 +1724,7 @@ const styles = StyleSheet.create({
   themeIdText: { fontSize: 10, fontWeight: '800', fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
   themeInfo: { flex: 1 },
   themeName: { color: '#CCC', fontSize: 13, fontWeight: '500' },
-  themeQCount: { color: '#8A2BE2', fontSize: 13, fontWeight: '700' },
+  themeQCount: { color: '#B366FF', fontSize: 13, fontWeight: '700' },
 
   // Match Stats
   matchStatRow: {
@@ -1725,11 +1735,11 @@ const styles = StyleSheet.create({
     width: 30, height: 30, borderRadius: 15,
     justifyContent: 'center', alignItems: 'center', marginRight: 12,
   },
-  matchStatRankText: { color: '#A855F7', fontSize: 12, fontWeight: '800' },
+  matchStatRankText: { color: '#B366FF', fontSize: 12, fontWeight: '800' },
   matchStatInfo: { flex: 1 },
   matchStatHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
   matchStatName: { color: '#DDD', fontSize: 14, fontWeight: '600', flex: 1, marginRight: 8 },
-  matchStatCount: { color: '#00C853', fontSize: 16, fontWeight: '800' },
+  matchStatCount: { color: '#32E7A3', fontSize: 16, fontWeight: '800' },
   matchStatBarBg: {
     height: 6, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 3,
     overflow: 'hidden', marginBottom: 4,
@@ -1743,9 +1753,9 @@ const styles = StyleSheet.create({
     flex: 1, paddingVertical: 8, borderRadius: 8, alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
   },
-  reportFilterBtnActive: { backgroundColor: 'rgba(138,43,226,0.15)', borderColor: '#8A2BE2' },
+  reportFilterBtnActive: { backgroundColor: 'rgba(179,102,255,0.15)', borderColor: '#B366FF' },
   reportFilterText: { color: '#777', fontSize: 11, fontWeight: '600' },
-  reportFilterTextActive: { color: '#A855F7' },
+  reportFilterTextActive: { color: '#B366FF' },
 
   reportCountsRow: { flexDirection: 'row', gap: 8 },
   reportCountCard: { flex: 1, borderRadius: 10, overflow: 'hidden' },
@@ -1768,7 +1778,7 @@ const styles = StyleSheet.create({
   reportMetaValue: { color: '#BBB', fontSize: 12, fontWeight: '500', flex: 1 },
   reportDescBox: {
     backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: 10, marginTop: 8,
-    borderLeftWidth: 3, borderLeftColor: '#FFA500',
+    borderLeftWidth: 3, borderLeftColor: '#FFB547',
   },
   reportDescText: { color: '#BBB', fontSize: 12, lineHeight: 18, fontStyle: 'italic' },
   reportActions: { flexDirection: 'row', gap: 8, marginTop: 12 },
@@ -1786,10 +1796,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center',
   },
   checkboxChecked: {
-    backgroundColor: '#FF3B30', borderColor: '#FF3B30',
+    backgroundColor: '#FF3D5E', borderColor: '#FF3D5E',
   },
   checkboxPartial: {
-    borderColor: '#FF3B30',
+    borderColor: '#FF3D5E',
   },
 
   // Select all row
@@ -1806,9 +1816,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,59,48,0.12)', borderRadius: 12, padding: 14,
     marginBottom: 16, borderWidth: 1, borderColor: 'rgba(255,59,48,0.3)',
   },
-  deleteBarText: { color: '#FF8A80', fontSize: 14, fontWeight: '600' },
+  deleteBarText: { color: '#FF7A93', fontSize: 14, fontWeight: '600' },
   deleteBarBtn: {
-    backgroundColor: '#FF3B30', borderRadius: 8, paddingHorizontal: 20, paddingVertical: 10,
+    backgroundColor: '#FF3D5E', borderRadius: 8, paddingHorizontal: 20, paddingVertical: 10,
   },
   deleteBarBtnText: { color: '#FFF', fontSize: 14, fontWeight: '800' },
   cancelBtn: {
@@ -1818,7 +1828,7 @@ const styles = StyleSheet.create({
 
   // Inline delete buttons (in select-all row)
   inlineDeleteBtn: {
-    backgroundColor: '#FF3B30', borderRadius: 6, paddingHorizontal: 12, paddingVertical: 6,
+    backgroundColor: '#FF3D5E', borderRadius: 6, paddingHorizontal: 12, paddingVertical: 6,
   },
   inlineDeleteBtnText: { color: '#FFF', fontSize: 11, fontWeight: '800' },
   inlineCancelBtn: {
@@ -1826,7 +1836,7 @@ const styles = StyleSheet.create({
   },
   inlineCancelBtnText: { color: '#AAA', fontSize: 11, fontWeight: '600' },
   inlineConfirmBtn: {
-    backgroundColor: '#FF3B30', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 6,
+    backgroundColor: '#FF3D5E', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 6,
   },
   inlineConfirmBtnText: { color: '#FFF', fontSize: 11, fontWeight: '800' },
 });

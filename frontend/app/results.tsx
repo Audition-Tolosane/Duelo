@@ -1046,9 +1046,9 @@ function RewardRow({ reward, delay, streakRestored, adWatching, adCountdown, onW
       case 'level':
         return (
           <>
-            <LinearGradient colors={['#8A2BE2', '#A855F7']} style={rewardsStyles.iconCircle}>
-              <MaterialCommunityIcons name="arrow-up-bold-circle" size={26} color="#FFF" />
-            </LinearGradient>
+            <View style={[rewardsStyles.iconCircle, { backgroundColor: 'rgba(179,102,255,0.18)', borderColor: 'rgba(179,102,255,0.40)' }]}>
+              <MaterialCommunityIcons name="arrow-up-bold-circle" size={24} color="#B366FF" />
+            </View>
             <View style={{ flex: 1 }}>
               <Text style={rewardsStyles.rowLabel}>{t('results.new_level_reached')}</Text>
               <Text style={rewardsStyles.rowValueBig}>{t('results.level_up')} {reward.level}</Text>
@@ -1058,9 +1058,9 @@ function RewardRow({ reward, delay, streakRestored, adWatching, adCountdown, onW
       case 'title':
         return (
           <>
-            <LinearGradient colors={['#FFD700', '#FFA500']} style={rewardsStyles.iconCircle}>
-              <MaterialCommunityIcons name="star-four-points" size={26} color="#FFF" />
-            </LinearGradient>
+            <View style={[rewardsStyles.iconCircle, { backgroundColor: 'rgba(255,181,71,0.18)', borderColor: 'rgba(255,181,71,0.40)' }]}>
+              <MaterialCommunityIcons name="star-four-points" size={24} color="#FFB547" />
+            </View>
             <View style={{ flex: 1 }}>
               <Text style={rewardsStyles.rowLabel}>{t('results.new_title_unlocked')}</Text>
               <Text style={rewardsStyles.rowValueBig}>{reward.title}</Text>
@@ -1071,8 +1071,8 @@ function RewardRow({ reward, delay, streakRestored, adWatching, adCountdown, onW
       case 'achievement':
         return (
           <>
-            <View style={[rewardsStyles.iconCircle, { backgroundColor: 'rgba(191,95,255,0.18)' }]}>
-              <Text style={{ fontSize: 24 }}>{reward.icon || '🏅'}</Text>
+            <View style={[rewardsStyles.iconCircle, { backgroundColor: 'rgba(179,102,255,0.18)', borderColor: 'rgba(179,102,255,0.40)' }]}>
+              <MaterialCommunityIcons name="trophy-variant" size={24} color="#B366FF" />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={rewardsStyles.rowLabel}>{t('results.achievement_unlocked')}</Text>
@@ -1084,8 +1084,11 @@ function RewardRow({ reward, delay, streakRestored, adWatching, adCountdown, onW
       case 'shield':
         return (
           <>
-            <View style={[rewardsStyles.iconCircle, { backgroundColor: 'rgba(255,107,53,0.18)' }]}>
-              <Text style={{ fontSize: 24 }}>{streakRestored ? '🔥' : adWatching ? '📺' : '🛡️'}</Text>
+            <View style={[rewardsStyles.iconCircle, { backgroundColor: 'rgba(255,107,44,0.18)', borderColor: 'rgba(255,107,44,0.40)' }]}>
+              <MaterialCommunityIcons
+                name={streakRestored ? 'fire' : adWatching ? 'television-play' : 'shield-half-full'}
+                size={24} color="#FF6B2C"
+              />
             </View>
             <View style={{ flex: 1 }}>
               {streakRestored ? (
@@ -1103,7 +1106,7 @@ function RewardRow({ reward, delay, streakRestored, adWatching, adCountdown, onW
                   <Text style={rewardsStyles.rowLabel}>{t('results.shield_title', { n: String(reward.streakBefore) })}</Text>
                   <Text style={rewardsStyles.rowSub}>{t('results.shield_sub')}</Text>
                   <TouchableOpacity style={rewardsStyles.adBtn} onPress={onWatchAd} activeOpacity={0.8}>
-                    <LinearGradient colors={['#FFD700', '#FF9F0A']} style={rewardsStyles.adBtnGrad}>
+                    <LinearGradient colors={['#FFB547', '#FF6B2C']} style={rewardsStyles.adBtnGrad}>
                       <MaterialCommunityIcons name="play-circle" size={16} color="#000" />
                       <Text style={rewardsStyles.adBtnText}>{t('results.watch_ad')}</Text>
                     </LinearGradient>
@@ -1163,11 +1166,12 @@ const rewardsStyles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 10,
     paddingHorizontal: 4, width: '100%',
   },
+  // Tuile teintée (convention charte) — bordure colorée passée en inline
   iconCircle: {
-    width: 48, height: 48, borderRadius: 24,
+    width: 48, height: 48, borderRadius: 14, borderWidth: 1,
     justifyContent: 'center', alignItems: 'center',
   },
-  rowLabel: { color: '#A3A3A3', fontSize: 11, fontWeight: '800', letterSpacing: 1.5, marginBottom: 2 },
+  rowLabel: { color: 'rgba(255,255,255,0.60)', fontSize: 11, fontWeight: '800', letterSpacing: 1.5, marginBottom: 2 },
   rowValue: { color: '#FFF', fontSize: 15, fontWeight: '800' },
   rowValueBig: { color: '#FFF', fontSize: 20, fontWeight: '900' },
   rowSub: { color: '#A3A3A3', fontSize: 12, fontWeight: '500', marginTop: 2 },
