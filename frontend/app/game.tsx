@@ -795,7 +795,8 @@ export default function GameScreen() {
         </Animated.View>
       </View>
 
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
+      {/* edges top+bottom : la grille de réponses ne mord plus la barre home */}
+      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
 
         {/* Score boxes + Round Timer */}
         <View style={styles.scoreTimerRow}>
