@@ -497,7 +497,9 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
                     )
                 )
                 t_entry = t_entry_res.scalar_one_or_none()
-                from constants import TOTAL_QUESTIONS
+                # NE PAS ré-importer TOTAL_QUESTIONS ici : un import dans le corps
+                # de la fonction rend le nom LOCAL à toute la fonction → la lecture
+                # en début de submit_match plantait en UnboundLocalError (500).
                 if not t_entry or t_entry.games_played < 3:
                     if t_entry:
                         t_entry.score += player_score
