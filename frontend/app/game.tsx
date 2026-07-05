@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions,
-  Platform, UIManager, ActivityIndicator, Easing, Alert
+  Platform, UIManager, ActivityIndicator, Easing, Alert, AppState,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -112,6 +112,31 @@ export default function GameScreen() {
 
   // Question slide scale animation
   const questionScaleAnim = useRef(new Animated.Value(0.96)).current;
+
+  // Anti-triche : garde de fin de match (évite double navigation + pilote le forfait)
+  const matchEndedRef = useRef(false);
+
+  // ⚔️ Quitter l'app en plein match = FORFAIT immédiat — bot compris.
+  // Sinon on peut mettre l'app en fond, chercher la réponse et revenir.
+  // Déclenché sur 'background' uniquement (pas 'inactive' : centre de
+  // contrôle / appel entrant ne doivent pas coûter le match).
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state !== 'background') return;
+      if (matchEndedRef.current || questionsRef.current.length === 0) return;
+      matchEndedRef.current = true;
+      if (timerRef.current) clearInterval(timerRef.current);
+      const ps = playerScoreRef.current;
+      // Défaite garantie, peu importe le score au moment de l'abandon
+      const forfeitOpp = Math.max(botScoreRef.current, ps + 10);
+      AsyncStorage.getItem('duelo_user_id').then((userId) => {
+        router.replace(
+          `/results?playerScore=${ps}&opponentScore=${forfeitOpp}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId || ''}&isBot=${params.isBot}&correctCount=${correctCountRef.current}&opponentLevel=${parseInt(params.opponentLevel || '1') || 1}&opponentId=${params.opponentId || ''}`
+        );
+      });
+    });
+    return () => sub.remove();
+  }, []);
 
   // Score pop : scale 1 → 1.4 → 1 sur bonne réponse joueur
   const scorePopAnim = useRef(new Animated.Value(1)).current;
@@ -267,6 +292,7 @@ export default function GameScreen() {
       }),
       // Game over
       wsOn('game_over', (msg) => {
+        matchEndedRef.current = true;
         if (timerRef.current) clearInterval(timerRef.current);
         const { your_score, opponent_score, your_correct } = msg.data || {};
         const userId = userIdRef.current;
@@ -277,6 +303,7 @@ export default function GameScreen() {
       }),
       // Opponent disconnected
       wsOn('opponent_disconnected', (msg) => {
+        matchEndedRef.current = true;
         if (timerRef.current) clearInterval(timerRef.current);
         const { your_score, opponent_score, your_correct, compensation_points } = msg.data || {};
         // Navigate to results with auto-victory
@@ -593,6 +620,8 @@ export default function GameScreen() {
   };
 
   const endGame = async () => {
+    if (matchEndedRef.current) return;
+    matchEndedRef.current = true;
     if (timerRef.current) clearInterval(timerRef.current);
     const userId = await AsyncStorage.getItem('duelo_user_id');
     const ps = playerScoreRef.current;

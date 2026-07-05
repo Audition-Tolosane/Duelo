@@ -426,9 +426,17 @@ export default function MatchmakingScreen() {
     };
   }, [phase]);
 
+  // Bot de secours (API injoignable) — doit être INDISCERNABLE d'un humain :
+  // jamais de pseudo « Bot » ni de seed révélatrice.
+  const FALLBACK_PSEUDOS = ['Nova_78', 'Lucas.M', 'SarahQz', 'Tom_Lyon', 'Mimi31', 'AlexKz', 'Leo_Mtp', 'JuJu_92'];
   const FALLBACK_BOT: OpponentData = {
-    id: '', pseudo: 'Bot', avatar_seed: 'bot01', is_bot: true,
-    level: 1, title: '', streak: 0, streak_badge: '', country: 'FR',
+    id: '',
+    pseudo: FALLBACK_PSEUDOS[Math.floor(Math.random() * FALLBACK_PSEUDOS.length)],
+    avatar_seed: `p${Math.floor(Math.random() * 9000) + 1000}`,
+    is_bot: true,
+    level: 2 + Math.floor(Math.random() * 9),
+    title: '', streak: Math.random() < 0.3 ? 1 + Math.floor(Math.random() * 3) : 0,
+    streak_badge: '', country: 'FR',
   };
 
   const fetchBotOpponent = async () => {
