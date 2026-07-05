@@ -86,7 +86,7 @@ export default function ResultsScreen() {
   const [xpBreakdown, setXpBreakdown] = useState<XpBreakdown | null>(null);
   const [newLevel, setNewLevel] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(true);
-  const [submitError, setSubmitError] = useState<'auth' | 'network' | null>(null);
+  const [submitError, setSubmitError] = useState<{ kind: 'auth' | 'network'; status: number | null } | null>(null);
   const [matchId, setMatchId] = useState<string | null>(null);
   const [streakBefore, setStreakBefore] = useState(0);
   const [adWatching, setAdWatching] = useState(false);
@@ -237,7 +237,10 @@ export default function ResultsScreen() {
       }
       if (!res || !res.ok) {
         console.warn(`[submit-v2] ${res ? res.status : 'network'} - theme_id="${category}"`);
-        setSubmitError(res && (res.status === 401 || res.status === 403) ? 'auth' : 'network');
+        setSubmitError({
+          kind: res && (res.status === 401 || res.status === 403) ? 'auth' : 'network',
+          status: res ? res.status : null,
+        });
         setSubmitting(false);
         return;
       }
@@ -278,7 +281,7 @@ export default function ResultsScreen() {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }, 900);
       }
-    } catch (e) { console.error(e); setSubmitError('network'); }
+    } catch (e) { console.error(e); setSubmitError({ kind: 'network', status: null }); }
     setSubmitting(false);
   };
 
@@ -671,13 +674,17 @@ export default function ResultsScreen() {
             /* Échec d'enregistrement VISIBLE — plus de score perdu en silence */
             <View style={styles.submitErrorWrap}>
               <MaterialCommunityIcons
-                name={submitError === 'auth' ? 'account-alert' : 'wifi-off'}
+                name={submitError.kind === 'auth' ? 'account-alert' : 'wifi-off'}
                 size={22} color="#FF3D5E"
               />
               <Text style={styles.submitErrorText}>
-                {submitError === 'auth' ? t('results.submit_error_auth') : t('results.submit_error_network')}
+                {submitError.kind === 'auth' ? t('results.submit_error_auth') : t('results.submit_error_network')}
               </Text>
-              {submitError === 'network' && (
+              {/* Détail technique — permet de diagnostiquer sans les logs Metro */}
+              <Text style={styles.submitErrorDetail}>
+                {submitError.status ? `HTTP ${submitError.status}` : 'AUCUNE RÉPONSE DU SERVEUR'}
+              </Text>
+              {submitError.kind === 'network' && (
                 <TouchableOpacity style={styles.submitRetryBtn} onPress={submitMatch} activeOpacity={0.8}>
                   <Text style={styles.submitRetryText}>{t('common.retry')}</Text>
                 </TouchableOpacity>
@@ -1224,6 +1231,10 @@ const styles = StyleSheet.create({
   submitErrorText: {
     color: 'rgba(255,255,255,0.75)', fontSize: 13, textAlign: 'center',
     fontFamily: 'SpaceGrotesk_500Medium', lineHeight: 18,
+  },
+  submitErrorDetail: {
+    color: 'rgba(255,255,255,0.40)', fontSize: 9,
+    fontFamily: 'JetBrainsMono_400Regular', letterSpacing: 1,
   },
   submitRetryBtn: {
     marginTop: 4, paddingHorizontal: 18, paddingVertical: 8, borderRadius: 12,
