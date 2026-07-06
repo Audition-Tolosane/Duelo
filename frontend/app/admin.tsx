@@ -13,6 +13,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Papa from 'papaparse';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import {
+  AdminShell, TopBar, AdminCard, SectionHead, NeonButton,
+  StatCard, BarRow, ReportCard, NeonGrid, useWide,
+} from '../components/admin/AdminUI';
+import { NEON } from '../theme/adminTheme';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -119,6 +124,14 @@ const TAB_ICONS: Record<string, string> = {
   Signalements: 'alert-circle-outline',
   Avatars: 'account-circle-outline',
 };
+
+const SUBTITLES = [
+  'Importer et vérifier les questions',
+  'Super-catégories, clusters et thèmes',
+  'Popularité des thèmes et volume de parties',
+  'Modérer les questions signalées',
+  'Gérer les avatars disponibles',
+];
 
 const showAlert = (title: string, msg: string) => {
   if (Platform.OS === 'web') { window.alert(`${title}: ${msg}`); }
@@ -686,21 +699,10 @@ export default function AdminScreen() {
   }, [activeTab]);
 
   // ── Section Header with gradient ──
+  // Pont vers le kit Neon : les onglets non encore portés en AdminCard
+  // profitent déjà du SectionHead officiel.
   const SectionHeader = ({ icon, title, subtitle }: { icon: string; title: string; subtitle?: string }) => (
-    <View style={styles.sectionHeaderWrap}>
-      <LinearGradient
-        colors={['rgba(179,102,255,0.25)', 'rgba(179,102,255,0.0)']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={styles.sectionHeaderGradient}
-      >
-        <MaterialCommunityIcons name={icon as any} size={20} color="#B366FF" style={{ marginRight: 10 }} />
-        <View style={{ flex: 1 }}>
-          <Text style={styles.cardTitle}>{title}</Text>
-          {subtitle ? <Text style={styles.cardDescSub}>{subtitle}</Text> : null}
-        </View>
-      </LinearGradient>
-    </View>
+    <SectionHead icon={icon as any} title={title} desc={subtitle} />
   );
 
   // ── Auth Screen ──
@@ -1145,178 +1147,96 @@ export default function AdminScreen() {
 
   const renderStatsTab = () => (
     <View>
-      <View style={styles.card}>
-        <SectionHeader icon="chart-bar" title="Parties par theme" subtitle="Themes classes par popularite (nombre de parties jouees)" />
+      <AdminCard>
+        <SectionHead icon="chart-bar" title="Parties par thème" desc="Thèmes classés par popularité (nombre de parties jouées)" />
         {loadingMatchStats ? (
           <ActivityIndicator color="#B366FF" style={{ marginVertical: 12 }} />
         ) : matchStats.length > 0 ? (
           <View>
-            <View style={styles.totalMatchCard}>
-              <LinearGradient
-                colors={['rgba(179,102,255,0.2)', 'rgba(179,102,255,0.05)']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.totalMatchGradient}
-              >
-                <MaterialCommunityIcons name="gamepad-variant-outline" size={20} color="#B366FF" style={{ marginRight: 10 }} />
-                <Text style={[styles.statLabel, { fontWeight: '700', color: '#FFF' }]}>Total parties</Text>
-                <Text style={styles.statValue}>{totalMatches}</Text>
-              </LinearGradient>
+            <View style={{ flexDirection: 'row', gap: 12, marginBottom: 16 }}>
+              <StatCard num={totalMatches} label="Total parties" icon="gamepad-variant-outline" color={NEON.violet} />
+              <StatCard num={matchStats.length} label="Thèmes joués" icon="palette-outline" color={NEON.cyan} />
             </View>
             {matchStats.map((stat, i) => {
-              const pct = totalMatches > 0 ? (stat.match_count / totalMatches * 100) : 0;
+              // pct = part relative au 1er du classement (barres comparables entre elles)
+              const pctOfTop = matchStats[0].match_count > 0
+                ? (stat.match_count / matchStats[0].match_count * 100) : 0;
+              const pctOfTotal = totalMatches > 0 ? (stat.match_count / totalMatches * 100) : 0;
               return (
-                <View key={i} style={styles.matchStatRow}>
-                  <LinearGradient
-                    colors={i < 3 ? ['rgba(179,102,255,0.25)', 'rgba(179,102,255,0.08)'] : ['rgba(179,102,255,0.15)', 'rgba(179,102,255,0.03)']}
-                    style={styles.matchStatRank}
-                  >
-                    <Text style={styles.matchStatRankText}>{i + 1}</Text>
-                  </LinearGradient>
-                  <View style={styles.matchStatInfo}>
-                    <View style={styles.matchStatHeader}>
-                      <Text style={styles.matchStatName} numberOfLines={1}>{stat.theme_name}</Text>
-                      <Text style={styles.matchStatCount}>{stat.match_count}</Text>
-                    </View>
-                    <View style={styles.matchStatBarBg}>
-                      <LinearGradient
-                        colors={['#B366FF', '#B366FF']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={[styles.matchStatBar, { width: `${Math.max(pct, 2)}%` }]}
-                      />
-                    </View>
-                    <Text style={styles.matchStatId}>{stat.theme_id} | {pct.toFixed(1)}%</Text>
-                  </View>
-                </View>
+                <BarRow
+                  key={i}
+                  rank={i + 1}
+                  name={stat.theme_name}
+                  count={String(stat.match_count)}
+                  sub={`${stat.theme_id} · ${pctOfTotal.toFixed(1)}% des parties`}
+                  pct={pctOfTop}
+                  top={i < 3}
+                />
               );
             })}
           </View>
         ) : <Text style={styles.noDataText}>Aucune partie jouee</Text>}
-      </View>
+      </AdminCard>
     </View>
   );
 
   const renderReportsTab = () => (
     <View>
-      {/* Filter */}
-      <View style={styles.card}>
-        <SectionHeader icon="alert-circle-outline" title="Signalements de questions" />
-        <View style={styles.reportFilterRow}>
+      {/* Filtres + compteurs */}
+      <AdminCard>
+        <SectionHead icon="alert-circle-outline" title="Signalements de questions" desc="Filtre par statut" />
+        <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
           {['', 'pending', 'reviewed', 'resolved'].map((f) => (
-            <TouchableOpacity
+            <NeonButton
               key={f}
-              style={[styles.reportFilterBtn, reportFilter === f && styles.reportFilterBtnActive]}
+              label={f === '' ? 'Tous' : f === 'pending' ? 'En attente' : f === 'reviewed' ? 'Examiné' : 'Résolu'}
+              variant={reportFilter === f ? 'primary' : 'ghost'}
               onPress={() => { setReportFilter(f); setTimeout(loadReports, 100); }}
-            >
-              <Text style={[styles.reportFilterText, reportFilter === f && styles.reportFilterTextActive]}>
-                {f === '' ? 'Tous' : f === 'pending' ? 'En attente' : f === 'reviewed' ? 'Examine' : 'Resolu'}
-              </Text>
-            </TouchableOpacity>
+            />
           ))}
         </View>
-        <View style={styles.reportCountsRow}>
-          <View style={styles.reportCountCard}>
-            <LinearGradient
-              colors={['rgba(255,165,0,0.18)', 'rgba(255,165,0,0.04)']}
-              style={styles.reportCountGradient}
-            >
-              <MaterialCommunityIcons name="clock-outline" size={16} color="#FFB547" style={{ marginBottom: 2 }} />
-              <Text style={[styles.reportCountNum, { color: '#FFB547' }]}>{reportCounts.pending}</Text>
-              <Text style={styles.reportCountLabel}>En attente</Text>
-            </LinearGradient>
-          </View>
-          <View style={styles.reportCountCard}>
-            <LinearGradient
-              colors={['rgba(0,191,255,0.18)', 'rgba(0,191,255,0.04)']}
-              style={styles.reportCountGradient}
-            >
-              <MaterialCommunityIcons name="eye-outline" size={16} color="#00E5FF" style={{ marginBottom: 2 }} />
-              <Text style={[styles.reportCountNum, { color: '#00E5FF' }]}>{reportCounts.reviewed}</Text>
-              <Text style={styles.reportCountLabel}>Examines</Text>
-            </LinearGradient>
-          </View>
-          <View style={styles.reportCountCard}>
-            <LinearGradient
-              colors={['rgba(0,200,83,0.18)', 'rgba(0,200,83,0.04)']}
-              style={styles.reportCountGradient}
-            >
-              <MaterialCommunityIcons name="check-circle-outline" size={16} color="#32E7A3" style={{ marginBottom: 2 }} />
-              <Text style={[styles.reportCountNum, { color: '#32E7A3' }]}>{reportCounts.resolved}</Text>
-              <Text style={styles.reportCountLabel}>Resolus</Text>
-            </LinearGradient>
-          </View>
+        <View style={{ flexDirection: 'row', gap: 12 }}>
+          <StatCard num={reportCounts.pending} label="En attente" icon="clock-outline" color={NEON.gold} />
+          <StatCard num={reportCounts.reviewed} label="Examinés" icon="eye-outline" color={NEON.cyan} />
+          <StatCard num={reportCounts.resolved} label="Résolus" icon="check-circle-outline" color={NEON.mint} />
         </View>
-      </View>
+      </AdminCard>
 
-      {/* Reports List */}
+      {/* Liste */}
       {loadingReports ? (
         <ActivityIndicator color="#B366FF" style={{ marginVertical: 24 }} />
       ) : reports.length > 0 ? (
         reports.map((r) => (
-          <View key={r.id} style={styles.reportCard}>
-            <View style={styles.reportCardHeader}>
-              <View style={[styles.reportStatusBadge, { backgroundColor: (STATUS_COLORS[r.status] || '#888') + '25' }]}>
-                <Text style={[styles.reportStatusText, { color: STATUS_COLORS[r.status] || '#888' }]}>{r.status}</Text>
-              </View>
-              <Text style={styles.reportDate}>
-                {r.created_at ? new Date(r.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
-              </Text>
-            </View>
-            <Text style={styles.reportQuestionText} numberOfLines={3}>{r.question_text}</Text>
-            <View style={styles.reportMetaRow}>
-              <MaterialCommunityIcons name="account-outline" size={14} color="#777" style={{ marginRight: 4 }} />
-              <Text style={styles.reportMetaLabel}>Joueur:</Text>
-              <Text style={styles.reportMetaValue}>{r.user_pseudo}</Text>
-            </View>
-            <View style={styles.reportMetaRow}>
-              <MaterialCommunityIcons name="tag-outline" size={14} color="#777" style={{ marginRight: 4 }} />
-              <Text style={styles.reportMetaLabel}>Categorie:</Text>
-              <Text style={styles.reportMetaValue}>{r.category}</Text>
-            </View>
-            <View style={styles.reportMetaRow}>
-              <MaterialCommunityIcons name="flag-outline" size={14} color="#777" style={{ marginRight: 4 }} />
-              <Text style={styles.reportMetaLabel}>Raison:</Text>
-              <Text style={styles.reportMetaValue}>{REASON_LABELS[r.reason_type] || r.reason_type}</Text>
-            </View>
-            {r.description ? (
-              <View style={styles.reportDescBox}>
-                <Text style={styles.reportDescText}>{r.description}</Text>
-              </View>
-            ) : null}
-            <View style={styles.reportActions}>
-              {r.status !== 'reviewed' && (
-                <TouchableOpacity
-                  style={[styles.reportActionBtn, { backgroundColor: 'rgba(0,191,255,0.15)' }]}
-                  onPress={() => updateReportStatus(r.id, 'reviewed')}
-                  activeOpacity={0.7}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                    <MaterialCommunityIcons name="eye-check-outline" size={14} color="#00E5FF" style={{ marginRight: 4 }} />
-                    <Text style={[styles.reportActionText, { color: '#00E5FF' }]}>Marquer examine</Text>
-                  </View>
-                </TouchableOpacity>
-              )}
-              {r.status !== 'resolved' && (
-                <TouchableOpacity
-                  style={[styles.reportActionBtn, { backgroundColor: 'rgba(0,200,83,0.15)' }]}
-                  onPress={() => updateReportStatus(r.id, 'resolved')}
-                  activeOpacity={0.7}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                    <MaterialCommunityIcons name="check-circle-outline" size={14} color="#32E7A3" style={{ marginRight: 4 }} />
-                    <Text style={[styles.reportActionText, { color: '#32E7A3' }]}>Marquer resolu</Text>
-                  </View>
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
+          <ReportCard
+            key={r.id}
+            status={(['pending', 'reviewed', 'resolved'].includes(r.status) ? r.status : 'pending') as 'pending' | 'reviewed' | 'resolved'}
+            date={r.created_at ? new Date(r.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
+            question={r.question_text}
+            meta={[
+              { icon: 'account-outline', label: 'Joueur', value: r.user_pseudo },
+              { icon: 'tag-outline', label: 'Thème', value: r.category },
+              { icon: 'flag-outline', label: 'Raison', value: REASON_LABELS[r.reason_type] || r.reason_type },
+            ]}
+            desc={r.description || undefined}
+            actions={
+              <>
+                {r.status !== 'reviewed' && (
+                  <NeonButton label="Examiné" icon="eye-check-outline" variant="ghost"
+                    onPress={() => updateReportStatus(r.id, 'reviewed')} />
+                )}
+                {r.status !== 'resolved' && (
+                  <NeonButton label="Résolu" icon="check-circle-outline" variant="accent"
+                    onPress={() => updateReportStatus(r.id, 'resolved')} />
+                )}
+              </>
+            }
+          />
         ))
       ) : (
-        <View style={styles.emptyState}>
-          <MaterialCommunityIcons name="inbox-outline" size={48} color="#555" style={{ marginBottom: 12 }} />
+        <AdminCard style={{ alignItems: 'center', paddingVertical: 36 }}>
+          <MaterialCommunityIcons name="inbox-outline" size={48} color={NEON.txt3} style={{ marginBottom: 12 }} />
           <Text style={styles.emptyText}>Aucun signalement{reportFilter ? ` (${reportFilter})` : ''}</Text>
-        </View>
+        </AdminCard>
       )}
     </View>
   );
@@ -1399,68 +1319,30 @@ export default function AdminScreen() {
     </View>
   );
 
-  // ── Main Admin Screen ──
+  // ── Main Admin Screen — shell Neon (sidebar desktop / tab-bar mobile) ──
   return (
-    <View style={styles.opaqueWrapper} testID="admin-bg" nativeID="admin-bg">
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        {/* Header */}
-        <LinearGradient
-          colors={['rgba(179,102,255,0.12)', 'transparent']}
-          style={styles.header}
-        >
-          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-            <MaterialCommunityIcons name="arrow-left" size={16} color="#B366FF" style={{ marginRight: 6 }} />
-            <Text style={styles.backBtnText}>Retour</Text>
-          </TouchableOpacity>
-          <View style={{ marginLeft: 16 }}>
-            <Text style={styles.headerEyebrow}>◆ INTERNE</Text>
-            <Text style={styles.headerTitle}>ADMIN DUELO</Text>
-          </View>
-        </LinearGradient>
-
-        {/* Tabs */}
-        <View style={styles.tabBar}>
-          {TABS.map((tab, i) => (
-            <TouchableOpacity
-              key={tab}
-              style={[styles.tabItem, activeTab === i && styles.tabItemActive]}
-              onPress={() => setActiveTab(i)}
-              activeOpacity={0.7}
-            >
-              {activeTab === i ? (
-                /* Onglet actif — gradient cyan→violet, contenu NOIR (convention charte) */
-                <View style={styles.tabItemInner}>
-                  <LinearGradient
-                    colors={['#00E5FF', '#B366FF']}
-                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                    style={StyleSheet.absoluteFill}
-                  />
-                  <MaterialCommunityIcons name={TAB_ICONS[tab] as any} size={16} color="#000" style={{ marginRight: 4 }} />
-                  <Text style={styles.tabTextActive}>{tab}</Text>
-                  {i === 3 && reportCounts.pending > 0 && (
-                    <View style={styles.tabBadge}>
-                      <Text style={styles.tabBadgeText}>{reportCounts.pending}</Text>
-                    </View>
-                  )}
-                </View>
-              ) : (
-                <View style={styles.tabItemInner}>
-                  <MaterialCommunityIcons name={TAB_ICONS[tab] as any} size={16} color="#666" style={{ marginRight: 4 }} />
-                  <Text style={styles.tabText}>{tab}</Text>
-                  {i === 3 && reportCounts.pending > 0 && (
-                    <View style={styles.tabBadge}>
-                      <Text style={styles.tabBadgeText}>{reportCounts.pending}</Text>
-                    </View>
-                  )}
-                </View>
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Content */}
+    <View style={[styles.opaqueWrapper, { backgroundColor: NEON.bg, paddingTop: insets.top }]} testID="admin-bg" nativeID="admin-bg">
+      <NeonGrid />
+      <AdminShell
+        tabs={TABS}
+        tabIcons={TAB_ICONS}
+        active={activeTab}
+        onTab={setActiveTab}
+        badges={{ Signalements: reportCounts.pending }}
+        onLogout={() => setIsAuthenticated(false)}
+      >
+        <TopBar
+          title={TABS[activeTab]}
+          subtitle={SUBTITLES[activeTab]}
+          right={
+            <NeonButton
+              label="Fermer" icon="close" variant="ghost"
+              onPress={() => router.back()}
+            />
+          }
+        />
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={{ padding: 28, maxWidth: 1080, alignSelf: 'center', width: '100%' }}
           showsVerticalScrollIndicator={false}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#B366FF" />}
         >
@@ -1474,9 +1356,9 @@ export default function AdminScreen() {
 
         {/* Delete bar - OUTSIDE ScrollView - uses web-compatible approach */}
         {activeTab === 1 && selectedThemes.size > 0 && (
-          <View style={{height: 0}} />
+          <View style={{ height: 0 }} />
         )}
-      </View>
+      </AdminShell>
     </View>
   );
 }
@@ -1489,7 +1371,6 @@ const styles = StyleSheet.create({
     ...(Platform.OS === 'web' ? { position: 'fixed' as any, top: 0, left: 0, right: 0, bottom: 0, zIndex: 100 } : {}),
   },
   flex1: { flex: 1 },
-  scrollContent: { paddingHorizontal: 16, paddingTop: 8 },
 
   // Auth
   authContainer: { flex: 1, justifyContent: 'center', paddingHorizontal: 24 },
@@ -1518,73 +1399,24 @@ const styles = StyleSheet.create({
   loginBtnDisabled: { opacity: 0.5 },
   loginBtnText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
 
-  // Header
-  header: {
-    flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 16,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)',
-  },
+  // Header/tabs/sections : remplacés par AdminShell + TopBar + SectionHead (kit Neon)
   backBtn: {
     paddingHorizontal: 12, paddingVertical: 8,
     backgroundColor: 'rgba(179,102,255,0.1)', borderRadius: 8,
     flexDirection: 'row', alignItems: 'center',
   },
   backBtnText: { color: '#B366FF', fontSize: 14, fontWeight: '600' },
-  headerEyebrow: {
-    color: '#B366FF', fontSize: 9, fontFamily: 'JetBrainsMono_700Bold',
-    letterSpacing: 2.5, textTransform: 'uppercase',
-  },
-  headerTitle: {
-    color: '#FFF', fontSize: 20, fontFamily: 'SpaceGrotesk_700Bold',
-    letterSpacing: -0.5, marginTop: 2,
-  },
-
-  // Tabs
-  tabBar: {
-    flexDirection: 'row', paddingHorizontal: 8, paddingVertical: 8,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)',
-    gap: 4,
-  },
-  tabItem: {
-    flex: 1, borderRadius: 10, overflow: 'hidden',
-  },
-  tabItemActive: {},
-  tabItemGradient: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 10, borderRadius: 10,
-  },
-  tabItemInner: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 10,
-  },
-  tabText: { color: 'rgba(255,255,255,0.45)', fontSize: 11, fontFamily: 'SpaceGrotesk_600SemiBold' },
-  tabTextActive: { color: '#000', fontSize: 11, fontFamily: 'SpaceGrotesk_700Bold' },
-  tabBadge: {
-    backgroundColor: '#FF3D5E', borderRadius: 8, minWidth: 16, height: 16,
-    justifyContent: 'center', alignItems: 'center', marginLeft: 4, paddingHorizontal: 4,
-  },
-  tabBadgeText: { color: '#FFF', fontSize: 9, fontWeight: '800' },
-
-  // Section header
-  sectionHeaderWrap: { marginBottom: 12, borderRadius: 10, overflow: 'hidden' },
-  sectionHeaderGradient: {
-    flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 12,
-    borderRadius: 10,
-  },
 
   // Card
+  // Pont Neon : mêmes valeurs que AdminCard (panneau + bordure cyan)
   card: {
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 16, padding: 20, marginBottom: 16,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(10,12,28,0.60)',
+    borderRadius: 16, padding: 22, marginBottom: 20,
+    borderWidth: 1, borderColor: 'rgba(0,229,255,0.18)',
   },
-  cardTitle: { color: '#FFF', fontSize: 17, fontWeight: '700' },
   cardDesc: { color: '#999', fontSize: 11, lineHeight: 17, marginBottom: 8, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
-  cardDescSub: { color: '#666', fontSize: 11, lineHeight: 16, marginTop: 2 },
 
   // Stats
-  statLabel: { color: '#BBB', fontSize: 13, flex: 1 },
-  statValue: { color: '#B366FF', fontSize: 20, fontWeight: '900' },
-  statValueSmall: { color: '#B366FF', fontSize: 15, fontWeight: '700' },
   noDataText: { color: '#555', fontSize: 13 },
 
   // Upload
@@ -1678,13 +1510,6 @@ const styles = StyleSheet.create({
   totalNum: { color: '#B366FF', fontSize: 22, fontWeight: '900' },
   totalLabel: { color: '#888', fontSize: 9, fontWeight: '600', marginTop: 2 },
 
-  // Total match card (stats tab)
-  totalMatchCard: { marginBottom: 16, borderRadius: 12, overflow: 'hidden' },
-  totalMatchGradient: {
-    flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 16,
-    borderRadius: 12,
-  },
-
   // Super Category
   scContainer: { marginBottom: 4 },
   scHeader: {
@@ -1726,67 +1551,7 @@ const styles = StyleSheet.create({
   themeName: { color: '#CCC', fontSize: 13, fontWeight: '500' },
   themeQCount: { color: '#B366FF', fontSize: 13, fontWeight: '700' },
 
-  // Match Stats
-  matchStatRow: {
-    flexDirection: 'row', alignItems: 'center', paddingVertical: 10,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)',
-  },
-  matchStatRank: {
-    width: 30, height: 30, borderRadius: 15,
-    justifyContent: 'center', alignItems: 'center', marginRight: 12,
-  },
-  matchStatRankText: { color: '#B366FF', fontSize: 12, fontWeight: '800' },
-  matchStatInfo: { flex: 1 },
-  matchStatHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  matchStatName: { color: '#DDD', fontSize: 14, fontWeight: '600', flex: 1, marginRight: 8 },
-  matchStatCount: { color: '#32E7A3', fontSize: 16, fontWeight: '800' },
-  matchStatBarBg: {
-    height: 6, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 3,
-    overflow: 'hidden', marginBottom: 4,
-  },
-  matchStatBar: { height: 6, borderRadius: 3 },
-  matchStatId: { color: '#555', fontSize: 10, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
-
-  // Reports
-  reportFilterRow: { flexDirection: 'row', gap: 6, marginBottom: 12 },
-  reportFilterBtn: {
-    flex: 1, paddingVertical: 8, borderRadius: 8, alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
-  },
-  reportFilterBtnActive: { backgroundColor: 'rgba(179,102,255,0.15)', borderColor: '#B366FF' },
-  reportFilterText: { color: '#777', fontSize: 11, fontWeight: '600' },
-  reportFilterTextActive: { color: '#B366FF' },
-
-  reportCountsRow: { flexDirection: 'row', gap: 8 },
-  reportCountCard: { flex: 1, borderRadius: 10, overflow: 'hidden' },
-  reportCountGradient: { alignItems: 'center', paddingVertical: 12, paddingHorizontal: 6, borderRadius: 10 },
-  reportCountNum: { fontSize: 20, fontWeight: '900' },
-  reportCountLabel: { color: '#888', fontSize: 9, fontWeight: '600', marginTop: 2 },
-
-  // Report card
-  reportCard: {
-    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 14, padding: 16, marginBottom: 10,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
-  },
-  reportCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  reportStatusBadge: { borderRadius: 6, paddingHorizontal: 10, paddingVertical: 4 },
-  reportStatusText: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase' },
-  reportDate: { color: '#666', fontSize: 10 },
-  reportQuestionText: { color: '#EEE', fontSize: 14, fontWeight: '600', lineHeight: 20, marginBottom: 10 },
-  reportMetaRow: { flexDirection: 'row', paddingVertical: 2, alignItems: 'center' },
-  reportMetaLabel: { color: '#777', fontSize: 12, width: 76 },
-  reportMetaValue: { color: '#BBB', fontSize: 12, fontWeight: '500', flex: 1 },
-  reportDescBox: {
-    backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: 10, marginTop: 8,
-    borderLeftWidth: 3, borderLeftColor: '#FFB547',
-  },
-  reportDescText: { color: '#BBB', fontSize: 12, lineHeight: 18, fontStyle: 'italic' },
-  reportActions: { flexDirection: 'row', gap: 8, marginTop: 12 },
-  reportActionBtn: { flex: 1, borderRadius: 8, paddingVertical: 8, alignItems: 'center' },
-  reportActionText: { fontSize: 11, fontWeight: '700' },
-
-  // Empty state
-  emptyState: { alignItems: 'center', paddingVertical: 40 },
+  // Stats & Reports : remplacés par StatCard / BarRow / ReportCard (kit Neon)
   emptyText: { color: '#666', fontSize: 14, fontWeight: '500' },
 
   // Checkbox
