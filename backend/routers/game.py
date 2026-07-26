@@ -170,8 +170,8 @@ async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db:
 
 # Deprecated alias — use /questions directly
 @router.get("/questions-v2", deprecated=True)
-async def get_game_questions_v2(theme: str, lang: str = 'fr', db: AsyncSession = Depends(get_db)):
-    return await get_game_questions(theme, lang, db)
+async def get_game_questions_v2(theme: str, request: Request, lang: str = 'fr', db: AsyncSession = Depends(get_db)):
+    return await get_game_questions(theme, request, lang, db)
 
 
 @router.post("/matchmaking")
