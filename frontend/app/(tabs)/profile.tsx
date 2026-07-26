@@ -712,7 +712,7 @@ export default function ProfileScreen() {
                 <TouchableOpacity
                   key={thm.id}
                   style={s.topicCard}
-                  onPress={() => router.push(`/matchmaking?category=${thm.id}&themeName=${encodeURIComponent(thm.name)}`)}
+                  onPress={() => router.push(`/category-detail?id=${thm.id}`)}
                   activeOpacity={0.8}
                 >
                   <View style={[s.topicCardInner, { borderColor: thm.color_hex + '30' }]}>

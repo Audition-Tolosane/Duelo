@@ -32,6 +32,25 @@ def get_level(xp: int) -> int:
 # Keep old name as alias for compatibility during migration
 get_category_level = get_level
 
+
+def difficulty_mix(level):
+    """Fenêtre glissante : mix de 7 questions (Facile/Moyen/Difficile) selon le niveau
+    du joueur dans le thème (0-50), aligné sur les paliers de titres 1/10/20/35/50.
+    Le Facile (pool rare) est plafonné à 2 ; l'accessibilité vient du Moyen (abondant),
+    la difficulté monte en remplaçant du Moyen par du Difficile.
+    level=None (anonyme / non déterminé) -> équilibré 2/3/2 (comportement historique)."""
+    if level is None:
+        return [("Facile", 2), ("Moyen", 3), ("Difficile", 2)]
+    if level < 10:
+        return [("Facile", 2), ("Moyen", 5), ("Difficile", 0)]   # découverte
+    if level < 20:
+        return [("Facile", 2), ("Moyen", 4), ("Difficile", 1)]
+    if level < 35:
+        return [("Facile", 2), ("Moyen", 3), ("Difficile", 2)]   # équilibré
+    if level < 50:
+        return [("Facile", 1), ("Moyen", 3), ("Difficile", 3)]
+    return [("Facile", 0), ("Moyen", 3), ("Difficile", 4)]        # expert (niveau 50)
+
 def get_xp_progress(xp: int, level: int) -> dict:
     """Get XP progress within current level."""
     if level >= MAX_LEVEL:

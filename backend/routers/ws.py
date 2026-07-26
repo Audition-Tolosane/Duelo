@@ -15,7 +15,7 @@ from services.ws_manager import manager
 from services.xp import (
     get_level, get_streak_bonus, get_streak_badge,
     get_theme_title, check_new_title_theme, MAX_LEVEL, TITLE_THRESHOLDS,
-    get_daily_streak_bonus, update_login_streak,
+    get_daily_streak_bonus, update_login_streak, difficulty_mix,
 )
 from services.notifications import create_notification
 from config import JWT_SECRET, JWT_ALGORITHM
@@ -283,7 +283,28 @@ async def load_and_start_game(room_id: str, theme_id: str):
     async with AsyncSessionLocal() as db:
         selected = []
 
-        for difficulty, count in [("Facile", 2), ("Moyen", 3), ("Difficile", 2)]:
+        # Difficulté adaptative : moyenne des niveaux des 2 joueurs sur le thème (duel équitable).
+        avg_level = None
+        try:
+            levels = []
+            for pid in (room.player1_id, room.player2_id):
+                if not pid:
+                    continue
+                r = await db.execute(
+                    select(UserThemeXP.xp).where(
+                        UserThemeXP.user_id == pid, UserThemeXP.theme_id == theme_id
+                    )
+                )
+                x = r.scalar_one_or_none()
+                levels.append(get_level(x) if x is not None else 0)
+            if levels:
+                avg_level = sum(levels) // len(levels)
+        except Exception as e:
+            logger.warning(f"[ws] niveau indisponible, mix par défaut: {e}")
+        mix = difficulty_mix(avg_level)
+        logger.info(f"[ws] room={room_id} theme={theme_id} avg_level={avg_level} mix={mix}")
+
+        for difficulty, count in mix:
             result = await db.execute(
                 select(Question).where(Question.category == theme_id, Question.difficulty == difficulty)
                 .order_by(func.random()).limit(count)

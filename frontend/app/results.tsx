@@ -469,7 +469,7 @@ export default function ResultsScreen() {
       <LinearGradient colors={bgTint} locations={[0, 0.32, 0.7]} style={StyleSheet.absoluteFill} />
       <DueloHeader />
       <View style={styles.subHeader}>
-        <TouchableOpacity onPress={() => router.replace('/(tabs)/accueil')} style={styles.backCircle} activeOpacity={0.6}>
+        <TouchableOpacity onPress={() => { if (router.canGoBack()) { router.back(); } else { router.replace(category ? `/category-detail?id=${category}` : '/(tabs)/play'); } }} style={styles.backCircle} activeOpacity={0.6}>
           <MaterialCommunityIcons name="chevron-left" size={26} color="#FFF" />
         </TouchableOpacity>
       </View>

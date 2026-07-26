@@ -23,10 +23,10 @@ from helpers import shuffle_question_options
 from services.xp import (
     get_level, get_streak_bonus, get_streak_badge,
     get_theme_title, check_new_title_theme, MAX_LEVEL, TITLE_THRESHOLDS,
-    get_daily_streak_bonus, update_login_streak,
+    get_daily_streak_bonus, update_login_streak, difficulty_mix,
 )
 from services.notifications import create_notification
-from auth_middleware import get_current_user_id
+from auth_middleware import get_current_user_id, get_optional_user_id
 from rate_limit import rate_limit
 
 logger = logging.getLogger(__name__)
@@ -72,8 +72,9 @@ async def _resolve_theme_category(theme: str, db: AsyncSession) -> str:
 
 
 @router.get("/questions")
-async def get_game_questions(theme: str, lang: str = 'fr', db: AsyncSession = Depends(get_db)):
-    """Get 7 questions: 2 Facile + 3 Moyen + 2 Difficile, all from different angles.
+async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db: AsyncSession = Depends(get_db)):
+    """Get 7 questions from different angles, with an adaptive difficulty mix based on the
+    player's level in this theme (sliding window). Anonymous -> balanced 2/3/2.
     If lang='en', return English VO questions when available, fall back to 'fr'."""
     # Resolve theme to the correct Question.category value
     category = await _resolve_theme_category(theme, db)
@@ -96,10 +97,29 @@ async def get_game_questions(theme: str, lang: str = 'fr', db: AsyncSession = De
         Question.language == 'fr', Question.language.is_(None)
     )
 
+    # Niveau du joueur dans ce thème -> difficulté adaptative (fenêtre glissante).
+    # Best-effort : si non authentifié ou pas d'XP sur le thème, on reste sur l'équilibré.
+    level = None
+    try:
+        user_id = await get_optional_user_id(request)
+        if user_id:
+            xp_res = await db.execute(
+                select(UserThemeXP.xp).where(
+                    UserThemeXP.user_id == user_id, UserThemeXP.theme_id == theme
+                )
+            )
+            xp = xp_res.scalar_one_or_none()
+            if xp is not None:
+                level = get_level(xp)
+    except Exception as e:
+        logger.warning(f"[questions] niveau indisponible, mix par défaut: {e}")
+    mix = difficulty_mix(level)
+    logger.info(f"[questions] category='{category}' level={level} mix={mix}")
+
     selected = []
     used_angles = set()
 
-    for difficulty, count in [("Facile", 2), ("Moyen", 3), ("Difficile", 2)]:
+    for difficulty, count in mix:
         result = await db.execute(
             select(Question).where(Question.category == category, Question.difficulty == difficulty, lang_filter)
             .order_by(func.random())
