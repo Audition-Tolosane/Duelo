@@ -36,17 +36,26 @@ get_category_level = get_level
 def difficulty_mix(level):
     """Fenêtre glissante : mix de 7 questions (Facile/Moyen/Difficile) selon le niveau
     du joueur dans le thème (0-50), aligné sur les paliers de titres 1/10/20/35/50.
-    Le Facile (pool rare) est plafonné à 2 ; l'accessibilité vient du Moyen (abondant),
-    la difficulté monte en remplaçant du Moyen par du Difficile.
+
+    L'escalade porte sur le nombre de FACILES (3 → 2 → 1 → 1 → 0), pas sur le glissement
+    Moyen → Difficile. Raison : l'audit SCREEN du 28/07/2026 a montré que les étiquettes
+    Moyen et Difficile ne recouvrent pas deux niveaux distincts — sur chaque indicateur
+    structurel elles sont à 1 point l'une de l'autre (réponse = nom propre court : 33,4 %
+    vs 32,3 % ; options en phrases longues : 54,9 % vs 56,0 %), et la relecture de triplets
+    pris dans le même angle trouve régulièrement le « Moyen » plus dur que le « Difficile ».
+    Seul le Facile est un palier fiable. L'ancienne courbe gardait Facile bloqué à 2 du
+    niveau 0 au niveau 34 et faisait monter la difficulté en échangeant du Moyen contre du
+    Difficile : la progression était donc inerte sur toute cette plage.
+
     level=None (anonyme / non déterminé) -> équilibré 2/3/2 (comportement historique)."""
     if level is None:
         return [("Facile", 2), ("Moyen", 3), ("Difficile", 2)]
     if level < 10:
-        return [("Facile", 2), ("Moyen", 5), ("Difficile", 0)]   # découverte
+        return [("Facile", 3), ("Moyen", 4), ("Difficile", 0)]   # découverte
     if level < 20:
         return [("Facile", 2), ("Moyen", 4), ("Difficile", 1)]
     if level < 35:
-        return [("Facile", 2), ("Moyen", 3), ("Difficile", 2)]   # équilibré
+        return [("Facile", 1), ("Moyen", 4), ("Difficile", 2)]
     if level < 50:
         return [("Facile", 1), ("Moyen", 3), ("Difficile", 3)]
     return [("Facile", 0), ("Moyen", 3), ("Difficile", 4)]        # expert (niveau 50)

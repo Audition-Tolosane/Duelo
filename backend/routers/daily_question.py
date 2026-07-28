@@ -10,11 +10,24 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import UserThemeXP, Theme, Question, DailyQuestionAnswer, User
 from auth_middleware import get_current_user_id
-from helpers import shuffle_question_options
+from helpers import resolve_theme_category
 
 router = APIRouter(prefix="/daily-question", tags=["daily-question"])
 
 DAILY_XP = 25
+
+
+def _permutation(user_id: str, question_id: str, today: str, n: int) -> list[int]:
+    """Ordre d'affichage des options — déterministe pour un joueur/question/jour donné.
+
+    /today envoie les options mélangées mais sans dire laquelle est la bonne ; /answer
+    doit donc pouvoir recalculer exactement le même ordre pour retrouver l'option
+    d'origine choisie par le joueur. Un mélange aléatoire non reproductible fausserait
+    la correction (la bonne réponse est toujours à l'index 0 en base).
+    """
+    idx = list(range(n))
+    random.Random(f"daily_shuffle:{user_id}:{question_id}:{today}").shuffle(idx)
+    return idx
 
 
 async def _get_today_theme(user_id: str, db: AsyncSession) -> Theme | None:
@@ -37,8 +50,11 @@ async def _get_today_theme(user_id: str, db: AsyncSession) -> Theme | None:
 
 async def _get_today_question(theme_id: str, db: AsyncSession) -> Question | None:
     today = datetime.now(timezone.utc).date().isoformat()
+    # questions.category stocke tantôt le theme_id, tantôt le nom du thème : on résout
+    # comme le mode solo, sinon aucune question n'est trouvée pour les thèmes par nom.
+    category = await resolve_theme_category(theme_id, db)
     res = await db.execute(
-        select(Question).where(Question.category == theme_id).limit(100)
+        select(Question).where(Question.category == category).limit(100)
     )
     questions = res.scalars().all()
     if not questions:
@@ -78,7 +94,7 @@ async def get_today_question(
     if not question:
         raise HTTPException(status_code=404, detail="Aucune question disponible pour ce thème.")
 
-    q = shuffle_question_options(question)
+    idx = _permutation(current_user, question.id, today, len(question.options))
     return {
         "already_answered": False,
         "question_id": question.id,
@@ -86,7 +102,7 @@ async def get_today_question(
         "theme_name": theme.name,
         "theme_color": theme.color_hex or "#8A2BE2",
         "question_text": question.question_text,
-        "options": q["options"],
+        "options": [question.options[i] for i in idx],
         "xp_reward": DAILY_XP,
     }
 
@@ -121,7 +137,13 @@ async def answer_today(
     if not question:
         raise HTTPException(status_code=404, detail="Question introuvable.")
 
-    correct = (answer_index == question.correct_option)
+    # /today a envoyé les options mélangées : on recalcule la même permutation pour
+    # retrouver l'option d'origine derrière l'index cliqué par le joueur.
+    idx = _permutation(current_user, question.id, today, len(question.options))
+    if not isinstance(answer_index, int) or not 0 <= answer_index < len(idx):
+        raise HTTPException(status_code=400, detail="Réponse invalide.")
+    correct = (idx[answer_index] == question.correct_option)
+    correct_affiche = idx.index(question.correct_option)
 
     # Save answer
     record = DailyQuestionAnswer(
@@ -152,7 +174,9 @@ async def answer_today(
 
     return {
         "correct": correct,
-        "correct_option": question.correct_option,
+        # position de la bonne réponse DANS LA LISTE AFFICHÉE (accueil.tsx compare
+        # cet index à celui de l'option rendue), pas sa position en base.
+        "correct_option": correct_affiche,
         "xp_earned": DAILY_XP,
         "new_achievements": new_achievements,
     }

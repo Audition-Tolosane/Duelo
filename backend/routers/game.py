@@ -19,7 +19,7 @@ _submit_locks: dict[str, asyncio.Lock] = {}
 # client-scored, so this caps how much a tampered client can inflate the
 # XP leaderboard). ~40/h is well above normal human play (~1-2 min/match).
 SOLO_XP_HOURLY_CAP = 40
-from helpers import shuffle_question_options
+from helpers import shuffle_question_options, resolve_theme_category
 from services.xp import (
     get_level, get_streak_bonus, get_streak_badge,
     get_theme_title, check_new_title_theme, MAX_LEVEL, TITLE_THRESHOLDS,
@@ -34,41 +34,17 @@ router = APIRouter(prefix="/game", tags=["game"])
 
 
 async def _resolve_theme_category(theme: str, db: AsyncSession) -> str:
-    """Resolve a theme parameter to the actual Question.category value.
-    The frontend sends theme_id (e.g. 'STV_BBAD'), but Question.category
-    might store either the theme_id or the theme name (e.g. 'Breaking Bad').
-    Try both and return whichever matches questions in the DB."""
-    # First: check if questions exist with this exact value
-    count_res = await db.execute(
+    """Thin wrapper around the shared resolver (helpers.resolve_theme_category),
+    kept for logging. ws.py and daily_question.py use the same helper so the three
+    game paths resolve themes identically."""
+    category = await resolve_theme_category(theme, db)
+    if category != theme:
+        logger.info(f"[questions] Resolved theme '{theme}' -> category '{category}'")
+    elif not await db.scalar(
         select(func.count()).select_from(Question).where(Question.category == theme)
-    )
-    if (count_res.scalar() or 0) > 0:
-        return theme
-
-    # Second: look up Theme by id and try with theme.name
-    theme_res = await db.execute(select(Theme).where(Theme.id == theme))
-    theme_obj = theme_res.scalar_one_or_none()
-    if theme_obj:
-        count_res2 = await db.execute(
-            select(func.count()).select_from(Question).where(Question.category == theme_obj.name)
-        )
-        if (count_res2.scalar() or 0) > 0:
-            logger.info(f"[questions] Resolved theme_id '{theme}' -> name '{theme_obj.name}'")
-            return theme_obj.name
-
-    # Third: try matching by Theme.name directly (if frontend sent a name)
-    theme_by_name = await db.execute(select(Theme).where(Theme.name == theme))
-    t = theme_by_name.scalar_one_or_none()
-    if t:
-        count_res3 = await db.execute(
-            select(func.count()).select_from(Question).where(Question.category == t.id)
-        )
-        if (count_res3.scalar() or 0) > 0:
-            logger.info(f"[questions] Resolved theme name '{theme}' -> id '{t.id}'")
-            return t.id
-
-    logger.warning(f"[questions] No questions found for theme='{theme}'")
-    return theme
+    ):
+        logger.warning(f"[questions] No questions found for theme='{theme}'")
+    return category
 
 
 @router.get("/questions")

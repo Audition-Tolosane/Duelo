@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import AsyncSessionLocal
 from models import User, Question, Match, ChatMessage, UserThemeXP, Theme
 from constants import TOTAL_QUESTIONS
-from helpers import shuffle_question_options
+from helpers import shuffle_question_options, resolve_theme_category
 from services.ws_manager import manager
 from services.xp import (
     get_level, get_streak_bonus, get_streak_badge,
@@ -283,6 +283,11 @@ async def load_and_start_game(room_id: str, theme_id: str):
     async with AsyncSessionLocal() as db:
         selected = []
 
+        # questions.category stocke tantôt le theme_id, tantôt le nom du thème selon le
+        # script d'import : on résout comme le fait le mode solo (game.py), sinon aucune
+        # question n'est trouvée pour les thèmes stockés par nom.
+        category = await resolve_theme_category(theme_id, db)
+
         # Difficulté adaptative : moyenne des niveaux des 2 joueurs sur le thème (duel équitable).
         avg_level = None
         try:
@@ -302,18 +307,18 @@ async def load_and_start_game(room_id: str, theme_id: str):
         except Exception as e:
             logger.warning(f"[ws] niveau indisponible, mix par défaut: {e}")
         mix = difficulty_mix(avg_level)
-        logger.info(f"[ws] room={room_id} theme={theme_id} avg_level={avg_level} mix={mix}")
+        logger.info(f"[ws] room={room_id} theme={theme_id} category={category} avg_level={avg_level} mix={mix}")
 
         for difficulty, count in mix:
             result = await db.execute(
-                select(Question).where(Question.category == theme_id, Question.difficulty == difficulty)
+                select(Question).where(Question.category == category, Question.difficulty == difficulty)
                 .order_by(func.random()).limit(count)
             )
             selected.extend(result.scalars().all())
 
         if len(selected) < 7:
             result = await db.execute(
-                select(Question).where(Question.category == theme_id)
+                select(Question).where(Question.category == category)
                 .order_by(func.random()).limit(7)
             )
             fallback = result.scalars().all()

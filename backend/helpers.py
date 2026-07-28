@@ -97,6 +97,50 @@ def shuffle_question_options(options: list, correct_option: int) -> tuple:
     new_correct = indices.index(correct_option)
     return new_options, new_correct
 
+
+async def resolve_theme_category(theme: str, db) -> str:
+    """Resolve a theme parameter to the actual Question.category value.
+
+    The frontend sends theme_id (e.g. 'STV_BBAD'), but Question.category may store
+    either the theme_id or the theme name (e.g. 'Breaking Bad') depending on which
+    import script produced the rows. Try both and return whichever matches questions.
+
+    Shared by game.py (solo), ws.py (duels) and daily_question.py so the three paths
+    behave identically — they used to diverge, and the two latter found no questions
+    at all for the ~844 themes stored under their name.
+    """
+    from sqlalchemy import select, func
+    from models import Question, Theme
+
+    # First: the value is already the stored category
+    count_res = await db.execute(
+        select(func.count()).select_from(Question).where(Question.category == theme)
+    )
+    if (count_res.scalar() or 0) > 0:
+        return theme
+
+    # Second: a theme_id whose questions are stored under the theme name
+    theme_res = await db.execute(select(Theme).where(Theme.id == theme))
+    theme_obj = theme_res.scalar_one_or_none()
+    if theme_obj:
+        count_res2 = await db.execute(
+            select(func.count()).select_from(Question).where(Question.category == theme_obj.name)
+        )
+        if (count_res2.scalar() or 0) > 0:
+            return theme_obj.name
+
+    # Third: a theme name whose questions are stored under the theme id
+    theme_by_name = await db.execute(select(Theme).where(Theme.name == theme))
+    t = theme_by_name.scalars().first()
+    if t:
+        count_res3 = await db.execute(
+            select(func.count()).select_from(Question).where(Question.category == t.id)
+        )
+        if (count_res3.scalar() or 0) > 0:
+            return t.id
+
+    return theme
+
 async def detect_country_from_ip(request: Request) -> Optional[str]:
     """Detect country from IP using ip-api.com."""
     try:
