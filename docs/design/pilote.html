@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pilote SKILKI</title>
+<style>
+  :root { --bg:#071F26; --card:#0B3D4A; --ink:#E8F1EC; --muted:rgba(232,241,236,.66); --line:rgba(232,241,236,.12); --yellow:#FFDB3D; --coral:#FF6B5B; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  header { max-width:1200px; margin:0 auto; padding:32px 16px 8px; }
+  h1 { margin:0 0 4px; font-size:26px; } h1 span { color:var(--yellow); }
+  header p { margin:0; color:var(--muted); max-width:760px; }
+  nav { max-width:1200px; margin:16px auto 0; padding:0 16px; display:flex; gap:8px; flex-wrap:wrap; }
+  nav a { color:var(--ink); text-decoration:none; border:1px solid var(--line); border-radius:999px; padding:6px 14px; }
+  nav a:hover { background:var(--card); }
+  section { max-width:1200px; margin:28px auto; padding:0 16px; }
+  h2 { font-size:20px; margin:0 0 4px; }
+  .note { color:var(--muted); margin:0 0 14px; max-width:820px; }
+  .pair { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+  figure { margin:0; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:12px; }
+  figure img { width:100%; height:auto; display:block; border-radius:10px; }
+  figcaption { font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+  figure.after figcaption { color:var(--yellow); }
+  ul { margin:8px 0 0; padding-left:18px; color:var(--muted); }
+  footer { max-width:1200px; margin:40px auto; padding:0 16px; color:var(--muted); font-size:13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pilote <span>SKILKI</span> — avant / après</h1>
+  <p>6 écrans refaits avec le design system, mobile 390×844 (web). Même compte invité, mêmes conditions. Le gameplay reste l'écran le plus spectaculaire ; la navigation est plus calme.</p>
+</header>
+<nav>
+  <a href="#question">Question</a><a href="#vs">VS</a><a href="#theme">Page thème</a><a href="#explorer">Explorer</a><a href="#accueil">Accueil</a><a href="#profil">Profil</a>
+</nav>
+
+<section id="question">
+  <h2>1 · Question</h2>
+  <p class="note">Fond nuit pétrole uni, scores moi (jaune) / rival (corail), chrono crème → corail → rouge, 7 tirets sémantiques, question posée sans carte, réponses neutres. Révélation : vert + ✓, rouge + ✕, point corail = choix du rival.</p>
+  <div class="pair">
+    <figure><figcaption>Avant</figcaption><img src="captures/avant/question.png" alt="Question avant"></figure>
+    <figure class="after"><figcaption>Après</figcaption><img src="captures/apres/question.png" alt="Question après"></figure>
+    <figure class="after"><figcaption>Après · révélation</figcaption><img src="captures/apres/question-revelation.png" alt="Révélation"></figure>
+  </div>
+</section>
+
+<section id="vs">
+  <h2>2 · VS</h2>
+  <p class="note">Moi = carte jaune, rival = carte corail (plus de cyan/violet), « vs » en Fraunces, décompte 72 px conservé, carte du monde sur une seule couche, épingle du rival en corail.</p>
+  <div class="pair">
+    <figure><figcaption>Avant</figcaption><img src="captures/avant/vs.png" alt="VS avant"></figure>
+    <figure class="after"><figcaption>Après · adversaire localisé</figcaption><img src="captures/apres/vs-localise.png" alt="Adversaire localisé"></figure>
+    <figure class="after"><figcaption>Après · VS (capture pendant l'animation)</figcaption><img src="captures/apres/vs.png" alt="VS après"></figure>
+  </div>
+</section>
+
+<section id="theme">
+  <h2>3 · Page thème</h2>
+  <p class="note">Hero à plat avec l'icône SKILKI sur plaque crème, « Jouer ce thème » jaune collant en bas (plus 3 boutons égaux), Suivre dans l'en-tête, progression unique avec paliers lisibles, classement en ligne, titre « Maître » en or.</p>
+  <div class="pair">
+    <figure><figcaption>Avant</figcaption><img src="captures/avant/page-theme.png" alt="Page thème avant"></figure>
+    <figure class="after"><figcaption>Après</figcaption><img src="captures/apres/page-theme.png" alt="Page thème après"></figure>
+    <figure class="after"><figcaption>Après · progression</figcaption><img src="captures/apres/page-theme-progression.png" alt="Progression"></figure>
+  </div>
+</section>
+
+<section id="explorer">
+  <h2>4 · Explorer</h2>
+  <p class="note">Recherche pleine largeur en tête, « Tes thèmes » en haut d'Explorer (pas sur l'accueil), univers à la une en aplat pétrole, grille des univers sans cartouches, « Voir tout » vers un écran liste plein écran.</p>
+  <div class="pair">
+    <figure><figcaption>Avant</figcaption><img src="captures/avant/explorer.png" alt="Explorer avant"></figure>
+    <figure class="after"><figcaption>Après</figcaption><img src="captures/apres/explorer.png" alt="Explorer après"></figure>
+  </div>
+</section>
+
+<section id="accueil">
+  <h2>5 · Accueil + tab bar</h2>
+  <p class="note">Compris en 2 secondes : un seul CTA jaune « Trouver un adversaire », progression + série, missions du jour, un seul carrousel. Roue, offres ×2, question du jour, ligue/rival/tournoi regroupés dans « Bonus &amp; événements ». Tab bar : actif jaune, bouton Jouer jaune central, logotype SKILKI.</p>
+  <div class="pair">
+    <figure><figcaption>Avant</figcaption><img src="captures/avant/accueil.png" alt="Accueil avant"></figure>
+    <figure class="after"><figcaption>Après</figcaption><img src="captures/apres/accueil.png" alt="Accueil après"></figure>
+  </div>
+</section>
+
+<section id="profil">
+  <h2>6 · Profil</h2>
+  <p class="note">Niveau et progression en tête, rang en or, une seule carte de 4 stats (plus de doublons), succès, thèmes favoris. Réglages, parrainage, déconnexion et suppression de compte déplacés dans un écran Réglages (engrenage).</p>
+  <div class="pair">
+    <figure><figcaption>Avant</figcaption><img src="captures/avant/profil.png" alt="Profil avant"></figure>
+    <figure class="after"><figcaption>Après</figcaption><img src="captures/apres/profil.png" alt="Profil après"></figure>
+  </div>
+</section>
+
+<footer>Détails, points à valider et risques : docs/design/05-pilote.md</footer>
+</body>
+</html>

@@ -1,27 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
-  Dimensions,
-} from 'react-native';
-import { useRouter } from 'expo-router';
+import { View, StyleSheet, ScrollView, Pressable, useWindowDimensions } from 'react-native';
+import { useRouter, Href } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
-import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import CategoryIcon from '../../components/CategoryIcon';
-import ScalePressable from '../../components/ScalePressable';
+import {
+  Txt, Icon, Button, Card, Section, SearchField, ThemeIcon, ThemeCard, ListRow, Loader, EmptyState,
+} from '../../components/ui';
 import { useTabBar } from '../../contexts/TabBarContext';
-import { COLORS, RADIUS } from '../../theme/tokens';
-import { FONTS } from '../../theme/fonts';
+import { COLOR, SPACE, RADII, BORDER, SIZE, ICON_SIZE } from '../../theme/tokens';
+import { authFetch } from '../../utils/api';
 import { t } from '../../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
-const { width: SCREEN_W } = Dimensions.get('window');
 
-// Grille 2 colonnes de tuiles carrées teintées (écran 6 du handoff)
-const GRID_GAP = 10;
-const TILE_W = (SCREEN_W - 16 * 2 - GRID_GAP) / 2;
+// « Tes thèmes » : 5 cartes en carrousel, « Voir tout » au-delà
+const MY_THEMES_SHOWN = 5;
+// `as Href` sur /theme-list : route nouvelle, absente des types générés jusqu'au prochain `expo start`.
 
 type ClusterInfo = { name: string; icon: string; theme_count: number };
 
@@ -30,26 +25,34 @@ type SuperCategory = {
   clusters: ClusterInfo[]; total_themes: number;
 };
 
-// Univers teasés verrouillés (déplacé depuis l'écran Jouer)
+// Thème joué, tel que renvoyé par GET /api/player/{id}/profile (champ themes)
+type PlayedTheme = {
+  id: string; name: string; level: number; xp: number;
+  cluster?: string; super_category?: string;
+};
+
+// Univers teasés verrouillés : une ligne de pied de page (noms de marque, pas de traduction)
 const UPCOMING_CATS = [
-  { id: 'SOUND', label: 'Sound', icon: '🎵', color: '#FF6B35' },
-  { id: 'ARENA', label: 'Arena', icon: '⚽', color: '#00FF9D' },
-  { id: 'LEGENDS', label: 'Legends', icon: '🏛️', color: '#FFD700' },
-  { id: 'LAB', label: 'Lab', icon: '🔬', color: '#1565C0' },
-  { id: 'TASTE', label: 'Taste', icon: '🍽️', color: '#FF69B4' },
-  { id: 'GLOBE', label: 'Globe', icon: '🌍', color: '#4ECDC4' },
-  { id: 'PIXEL', label: 'Pixel', icon: '🎮', color: '#FF3B5C' },
-  { id: 'STYLE', label: 'Style', icon: '✨', color: '#E040FB' },
+  { id: 'SOUND', label: 'Sound' },
+  { id: 'ARENA', label: 'Arena' },
+  { id: 'LEGENDS', label: 'Legends' },
+  { id: 'LAB', label: 'Lab' },
+  { id: 'TASTE', label: 'Taste' },
+  { id: 'GLOBE', label: 'Globe' },
+  { id: 'PIXEL', label: 'Pixel' },
+  { id: 'STYLE', label: 'Style' },
 ];
 
 export default function ThemesScreen() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
   const { onScroll: onTabScroll } = useTabBar();
   const [cats, setCats] = useState<SuperCategory[]>([]);
+  const [myThemes, setMyThemes] = useState<PlayedTheme[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
 
-  useEffect(() => { loadCategories(); }, []);
+  useEffect(() => { loadCategories(); loadMyThemes(); }, []);
 
   const loadCategories = async () => {
     setLoadError(false);
@@ -67,6 +70,22 @@ export default function ThemesScreen() {
     setLoading(false);
   };
 
+  // Thèmes joués du joueur (profil public) — en cas d'échec, le bloc reste simplement masqué
+  const loadMyThemes = async () => {
+    try {
+      const uid = await AsyncStorage.getItem('duelo_user_id');
+      if (!uid) return;
+      const res = await authFetch(`${API_URL}/api/player/${uid}/profile?viewer_id=${uid}&posts_limit=0`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const map: Record<string, Omit<PlayedTheme, 'id'>> = data?.themes ?? {};
+      const list = Object.entries(map)
+        .map(([id, th]) => ({ id, ...th }))
+        .sort((a, b) => (b.xp ?? 0) - (a.xp ?? 0));
+      setMyThemes(list);
+    } catch { /* bloc masqué */ }
+  };
+
   const openUniverse = (cat: SuperCategory) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.push(`/super-category?id=${cat.id}`);
@@ -76,24 +95,19 @@ export default function ThemesScreen() {
   const upcomingFiltered = UPCOMING_CATS.filter(c => !loadedIds.has(c.id));
 
   if (loading) {
-    return (
-      <View style={s.container}>
-        <View style={s.loadCenter}>
-          <ActivityIndicator size="large" color={COLORS.violet} />
-        </View>
-      </View>
-    );
+    return <View style={s.container}><Loader fill /></View>;
   }
 
   if (loadError) {
     return (
-      <View style={{ flex: 1 }}>
-        <View style={s.container}>
-          <View style={s.loadCenter}>
-            <TouchableOpacity onPress={() => { setLoadError(false); setLoading(true); loadCategories(); }} style={{ padding: 20, alignItems: 'center' }}>
-              <Text style={{ color: '#aaa', fontSize: 14 }}>{t('themes.load_error')}</Text>
-            </TouchableOpacity>
-          </View>
+      <View style={s.container}>
+        <View style={s.center}>
+          <EmptyState
+            icon="info"
+            title={t('common.error_loading')}
+            actionLabel={t('common.retry')}
+            onAction={() => { setLoadError(false); setLoading(true); loadCategories(); }}
+          />
         </View>
       </View>
     );
@@ -103,290 +117,187 @@ export default function ThemesScreen() {
   const featured = cats.reduce<SuperCategory | null>(
     (best, c) => (!best || c.total_themes > best.total_themes ? c : best), null);
   const rest = cats.filter(c => c.id !== featured?.id);
+  const tileW = (width - SPACE.screenX * 2 - SPACE.md) / 2;
+  const themesLabel = t('themes.themes_count');
 
   return (
-    <View style={{ flex: 1 }}>
     <View style={s.container}>
-      <ScrollView contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
-
-        {/* ── Header Arène ── */}
-        <View style={s.arenaHeader}>
-          <Text style={s.arenaEyebrow}>◆ {t('themes.arena_eyebrow')}</Text>
-          <Text style={s.arenaTitle}>{t('themes.arena_title')}</Text>
+      <ScrollView
+        contentContainerStyle={s.scrollContent}
+        showsVerticalScrollIndicator={false}
+        onScroll={onTabScroll}
+        scrollEventThrottle={16}
+      >
+        {/* ── Titre compact + recherche pleine largeur ── */}
+        <View style={s.head}>
+          <View style={s.titles}>
+            <Txt variant="overline">{t('themes.arena_eyebrow')}</Txt>
+            <Txt variant="h1">{t('themes.arena_title')}</Txt>
+          </View>
+          <SearchField
+            testID="explorer-search"
+            placeholder={t('search.placeholder_themes')}
+            onPressTrigger={() => router.push('/search')}
+          />
         </View>
 
-        {/* ── Vedette — gradient violet→cyan, texte noir (écran 6) ── */}
+        {/* ── Tes thèmes (masqué tant que le joueur n'a rien joué) ── */}
+        {myThemes.length > 0 && (
+          <Section
+            title={t('pilot.explorer.your_themes')}
+            insetTitle
+            onSeeAll={myThemes.length > MY_THEMES_SHOWN ? () => router.push('/theme-list?mine=1' as Href) : undefined}
+          >
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.carousel}>
+              {myThemes.slice(0, MY_THEMES_SHOWN).map((th) => (
+                <ThemeCard
+                  key={th.id}
+                  name={th.name}
+                  cluster={th.cluster}
+                  superCategory={th.super_category}
+                  level={th.level}
+                  meta={th.cluster || undefined}
+                  onPress={() => router.push(`/category-detail?id=${th.id}`)}
+                />
+              ))}
+            </ScrollView>
+          </Section>
+        )}
+
+        {/* ── À la une : aplat pétrole, une seule action jaune ── */}
         {featured && (
-          <Animated.View entering={FadeInDown.duration(450)}>
-            <TouchableOpacity style={s.featuredCard} activeOpacity={0.88} onPress={() => openUniverse(featured)}>
-              <LinearGradient
-                colors={[COLORS.violet, COLORS.cyan]}
-                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
-              />
-              <View style={s.featuredWatermark}>
-                <CategoryIcon emoji={featured.icon} size={130} color="#000" type="super" />
-              </View>
-              <View style={s.featuredBadge}>
-                <Text style={s.featuredBadgeText}>◆ {t('themes.featured_badge')}</Text>
-              </View>
-              <Text style={s.featuredTitle}>{featured.label.toUpperCase()}</Text>
-              <Text style={s.featuredCount}>
-                {featured.total_themes} {t('themes.themes_count').toUpperCase()}
-              </Text>
-              <View style={s.featuredClusters}>
-                {featured.clusters.slice(0, 3).map((cl) => (
-                  <View key={cl.name} style={s.featuredClusterChip}>
-                    <Text style={s.featuredClusterText} numberOfLines={1}>{cl.name}</Text>
+          <Animated.View entering={FadeInDown.duration(450)} style={s.inset}>
+            <Section title={t('pilot.explorer.featured')}>
+              <Card testID="explorer-featured">
+                <View style={s.featuredRow}>
+                  <ThemeIcon superCategory={featured.id} size={ICON_SIZE.theme.lg} />
+                  <View style={s.featuredTexts}>
+                    <Txt variant="h2" numberOfLines={1}>{featured.label.toUpperCase()}</Txt>
+                    <Txt variant="label" color={COLOR.text.secondary}>
+                      {`${featured.total_themes} ${themesLabel}`}
+                    </Txt>
+                    {featured.clusters.length > 0 && (
+                      <Txt variant="caption" numberOfLines={2}>
+                        {featured.clusters.slice(0, 3).map(cl => cl.name).join(' · ')}
+                      </Txt>
+                    )}
                   </View>
-                ))}
-              </View>
-              <View style={s.featuredCta}>
-                <Text style={s.featuredCtaText}>{t('themes.featured_cta')} →</Text>
-              </View>
-            </TouchableOpacity>
+                </View>
+                <Button
+                  label={t('pilot.explorer.explore_cta')}
+                  icon="compass"
+                  fullWidth
+                  onPress={() => openUniverse(featured)}
+                  style={s.featuredCta}
+                />
+              </Card>
+            </Section>
           </Animated.View>
         )}
 
-        {/* ── Grille 2 colonnes — tuiles carrées teintées ── */}
-        <View style={s.grid}>
-          {rest.map((cat, index) => (
-            <Animated.View key={cat.id} entering={FadeInDown.delay(Math.min(index, 8) * 70).duration(450)}>
-              <ScalePressable style={s.tile} onPress={() => openUniverse(cat)}>
-                <LinearGradient
-                  colors={[cat.color + '25', cat.color + '08']}
-                  start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
-                  style={[StyleSheet.absoluteFill, { borderRadius: RADIUS.lg - 4 }]}
-                />
-                {/* Icône + nom à sa droite (police style vedette) */}
-                <View style={s.tileHeader}>
-                  <CategoryIcon emoji={cat.icon} size={36} color={cat.color} type="super" />
-                  <Text style={s.tileName} numberOfLines={1}>{cat.label.toUpperCase()}</Text>
-                </View>
-                {/* Les 3 grands sous-groupes — cartouches (comme la vedette).
-                    Retour à la ligne autorisé (2 lignes max), hauteur de tuile inchangée. */}
-                <View style={s.tileBody}>
-                  {cat.clusters.slice(0, 3).map((cl) => (
-                    <View key={cl.name} style={s.tileClusterChip}>
-                      <Text style={s.tileClusterText} numberOfLines={2}>{cl.name}</Text>
-                    </View>
-                  ))}
-                </View>
-                <Text style={[s.tileStat, { color: cat.color }]}>
-                  {cat.total_themes} {t('themes.themes_count').toUpperCase()}
-                </Text>
-                <View style={[s.tileBorder, { borderColor: cat.color + '40' }]} pointerEvents="none" />
-              </ScalePressable>
-            </Animated.View>
-          ))}
-        </View>
-
-        {/* ── BIENTÔT — univers verrouillés ── */}
-        {upcomingFiltered.length > 0 && (
-          <>
-            <Text style={s.comingSoonTitle}>◆ {t('themes.coming_soon')}</Text>
-            <View style={s.upcomingGrid}>
-              {upcomingFiltered.map((c) => (
-                <View key={c.id} style={s.upcomingCard}>
-                  <View style={s.upcomingInner}>
-                    <LinearGradient colors={[c.color + '25', 'transparent']} style={s.upcomingGlow} />
-                    <View style={[s.upcomingIconCircle, { backgroundColor: c.color + '18' }]}>
-                      <Text style={s.upcomingIcon}>{c.icon}</Text>
-                    </View>
-                    <Text style={[s.upcomingLabel, { color: c.color }]}>{c.label.toUpperCase()}</Text>
-                    <MaterialCommunityIcons name="lock-outline" size={11} color="rgba(255,255,255,0.3)" />
-                  </View>
-                </View>
-              ))}
-            </View>
-          </>
+        {/* ── Tous les univers : grille 2 colonnes, icône / nom / compteur ── */}
+        {rest.length > 0 && (
+          <View style={s.inset}>
+            <Section title={t('pilot.explorer.all_universes')}>
+              <View style={s.grid}>
+                {rest.map((cat, index) => (
+                  <Animated.View key={cat.id} entering={FadeInDown.delay(Math.min(index, 8) * 70).duration(450)}>
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={cat.label}
+                      onPress={() => openUniverse(cat)}
+                      style={({ pressed }) => [s.tile, { width: tileW }, pressed && s.tilePressed]}
+                    >
+                      <ThemeIcon superCategory={cat.id} size={ICON_SIZE.theme.md} />
+                      <View style={s.tileTexts}>
+                        <Txt variant="cardTitle" numberOfLines={1}>{cat.label.toUpperCase()}</Txt>
+                        <Txt variant="caption" numberOfLines={1}>{`${cat.total_themes} ${themesLabel}`}</Txt>
+                      </View>
+                    </Pressable>
+                  </Animated.View>
+                ))}
+              </View>
+            </Section>
+          </View>
         )}
 
-        {/* ── LA FORGE ── */}
-        <TouchableOpacity style={s.forgeCard} activeOpacity={0.8} onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-          router.push('/create-theme');
-        }}>
-          <LinearGradient colors={['rgba(179,102,255,0.15)', 'rgba(0,229,255,0.08)']}
-            start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.forgeBg} />
-          <View style={s.forgeIconWrap}>
-            <MaterialCommunityIcons name="hammer-wrench" size={26} color="#FFF" />
-          </View>
-          <View style={s.forgeText}>
-            <Text style={s.forgeTitle}>{t('themes.create_theme')}</Text>
-            <Text style={s.forgeSub}>{t('themes.create_subtitle')}</Text>
-          </View>
-          <View style={s.forgeArrow}>
-            <MaterialCommunityIcons name="chevron-right" size={22} color="rgba(255,255,255,0.5)" />
-          </View>
-        </TouchableOpacity>
+        {/* ── La Forge : ligne discrète, icône corail ── */}
+        <View style={s.inset}>
+          <ListRow
+            testID="explorer-forge"
+            title={t('themes.create_theme')}
+            subtitle={t('themes.create_subtitle')}
+            leading={
+              <View style={s.forgeIcon}>
+                <Icon name="forge" size={ICON_SIZE.md} color={COLOR.accent.warm} />
+              </View>
+            }
+            chevron
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+              router.push('/create-theme');
+            }}
+            style={s.forgeRow}
+          />
+        </View>
 
-        <View style={{ height: 100 }} />
+        {/* ── Bientôt : une ligne de pied de page ── */}
+        {upcomingFiltered.length > 0 && (
+          <View style={[s.inset, s.soonRow]}>
+            <Icon name="lock" size={ICON_SIZE.sm} color={COLOR.text.tertiary} />
+            <Txt variant="caption" style={s.soonText}>
+              <Txt variant="overline">{t('themes.coming_soon')}</Txt>
+              {`  ${upcomingFiltered.map(c => c.label).join(' · ')}`}
+            </Txt>
+          </View>
+        )}
+
+        <View style={s.tabBarSpacer} />
       </ScrollView>
-    </View>
     </View>
   );
 }
 
 const s = StyleSheet.create({
+  // Fond : porté par la mise en page des onglets (le header et la tab bar y vivent aussi)
   container: { flex: 1, backgroundColor: 'transparent' },
-  loadCenter: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  scrollContent: { paddingBottom: 40 },
+  center: { flex: 1, justifyContent: 'center' },
+  scrollContent: { paddingTop: SPACE.lg, gap: SPACE.sectionGap },
+  inset: { paddingHorizontal: SPACE.screenX },
 
-  // Header Arène
-  arenaHeader: { paddingHorizontal: 20, paddingTop: 16 },
-  arenaEyebrow: {
-    fontSize: 11, fontFamily: FONTS.display.bold, color: COLORS.gold,
-    letterSpacing: 2.5, textTransform: 'uppercase',
-  },
-  arenaTitle: {
-    fontSize: 28, fontFamily: FONTS.display.bold, color: COLORS.white,
-    letterSpacing: -1, lineHeight: 30, marginTop: 4, textTransform: 'uppercase',
-  },
+  head: { paddingHorizontal: SPACE.screenX, gap: SPACE.lg },
+  titles: { gap: SPACE.xs },
 
-  // Vedette — texte noir sur gradient (convention handoff)
-  featuredCard: {
-    marginHorizontal: 16, marginTop: 16, marginBottom: 12,
-    borderRadius: 20, padding: 20, overflow: 'hidden',
-    shadowColor: COLORS.violet, shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.45, shadowRadius: 24, elevation: 10,
-  },
-  featuredWatermark: {
-    position: 'absolute', opacity: 0.14,
-    right: -14, top: -16,
-  },
-  // Pastille or bien visible (le texte mono noir se fondait dans le gradient)
-  featuredBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: COLORS.gold,
-    borderRadius: RADIUS.pill,
-    paddingHorizontal: 12, paddingVertical: 5,
-    shadowColor: COLORS.gold, shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6, shadowRadius: 10, elevation: 4,
-  },
-  featuredBadgeText: {
-    fontFamily: FONTS.mono.bold, fontSize: 10, color: '#000',
-    letterSpacing: 2, textTransform: 'uppercase',
-  },
-  featuredTitle: {
-    fontSize: 36, fontFamily: FONTS.display.bold, color: '#000',
-    letterSpacing: -1.5, lineHeight: 38, marginTop: 6,
-  },
-  // Compteur affirmé + sous-catégories en puces sombres (lisibles sur le gradient)
-  featuredCount: {
-    fontSize: 13, fontFamily: FONTS.mono.bold, color: '#000',
-    letterSpacing: 1.5, marginTop: 6,
-  },
-  featuredClusters: {
-    flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10,
-  },
-  featuredClusterChip: {
-    backgroundColor: 'rgba(0,0,0,0.30)',
-    borderRadius: RADIUS.pill,
-    paddingHorizontal: 12, paddingVertical: 5,
-  },
-  featuredClusterText: {
-    fontSize: 12, fontFamily: FONTS.display.semiBold, color: '#FFF',
-  },
-  featuredCta: {
-    alignSelf: 'flex-start', marginTop: 12,
-    backgroundColor: '#000', borderRadius: RADIUS.sm,
-    paddingHorizontal: 14, paddingVertical: 8,
-  },
-  featuredCtaText: {
-    fontSize: 12, fontFamily: FONTS.display.bold, color: '#FFF', letterSpacing: 0.5,
-  },
+  carousel: { paddingHorizontal: SPACE.screenX, gap: SPACE.md },
 
-  // Grille 2 colonnes
-  grid: {
-    flexDirection: 'row', flexWrap: 'wrap',
-    paddingHorizontal: 16, gap: GRID_GAP,
-  },
+  featuredRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
+  featuredTexts: { flex: 1, gap: SPACE.xs },
+  featuredCta: { marginTop: SPACE.lg },
+
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.md },
   tile: {
-    width: TILE_W, aspectRatio: 1 / 1.1,
-    borderRadius: RADIUS.lg - 4, padding: 14,
-    justifyContent: 'space-between', overflow: 'hidden',
+    minHeight: 132,
+    padding: SPACE.md,
+    gap: SPACE.md,
+    borderRadius: RADII.lg,
+    backgroundColor: COLOR.surface.card,
+    borderWidth: BORDER.hair,
+    borderColor: COLOR.border.subtle,
+    justifyContent: 'space-between',
   },
-  tileBorder: {
-    ...StyleSheet.absoluteFill,
-    borderRadius: RADIUS.lg - 4, borderWidth: 1,
-  },
-  tileHeader: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-  },
-  tileBody: {
-    flex: 1, justifyContent: 'center',
-    alignItems: 'flex-start', gap: 4, marginVertical: 4,
-    overflow: 'hidden',
-  },
-  // Police de la vignette vedette (SG 900, uppercase, serrée)
-  tileName: {
-    flex: 1, color: COLORS.white, fontSize: 18, fontFamily: FONTS.display.bold,
-    letterSpacing: -1, lineHeight: 20,
-  },
-  // Cartouches sous-catégories (déclinaison sombre de celles de la vedette)
-  tileClusterChip: {
-    maxWidth: '100%',
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: RADIUS.md,
-    paddingHorizontal: 10, paddingVertical: 3,
-  },
-  tileClusterText: {
-    color: 'rgba(255,255,255,0.85)', fontSize: 12,
-    fontFamily: FONTS.display.semiBold, lineHeight: 15,
-  },
-  tileStat: {
-    fontFamily: FONTS.mono.regular, fontSize: 11, letterSpacing: 1,
+  tilePressed: { backgroundColor: COLOR.surface.elevated },
+  tileTexts: { gap: SPACE.xxs },
+
+  forgeRow: { borderTopWidth: BORDER.hair, borderBottomWidth: BORDER.hair, borderColor: COLOR.border.subtle },
+  forgeIcon: {
+    width: SIZE.touch, height: SIZE.touch, borderRadius: SIZE.touch / 2,
+    backgroundColor: COLOR.tint.opponent,
+    alignItems: 'center', justifyContent: 'center',
   },
 
-  // Bientôt (univers verrouillés)
-  comingSoonTitle: {
-    fontSize: 10, fontFamily: FONTS.mono.bold, color: 'rgba(255,255,255,0.40)',
-    letterSpacing: 2.5, textTransform: 'uppercase',
-    paddingHorizontal: 20, marginTop: 20, marginBottom: 10,
-  },
-  upcomingGrid: {
-    flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 14,
-  },
-  upcomingCard: { width: '25%', padding: 4 },
-  upcomingInner: {
-    borderRadius: 16, paddingVertical: 14, paddingHorizontal: 6,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
-    alignItems: 'center', overflow: 'hidden',
-  },
-  upcomingGlow: {
-    position: 'absolute', top: 0, left: 0, right: 0, height: 40,
-  },
-  upcomingIconCircle: {
-    width: 40, height: 40, borderRadius: 20,
-    justifyContent: 'center', alignItems: 'center', marginBottom: 8,
-  },
-  upcomingIcon: { fontSize: 18 },
-  upcomingLabel: {
-    fontSize: 9, fontFamily: FONTS.display.bold, letterSpacing: 1, marginBottom: 4,
-  },
+  soonRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm },
+  soonText: { flex: 1 },
 
-  // La Forge
-  forgeCard: {
-    flexDirection: 'row', alignItems: 'center',
-    marginHorizontal: 16, marginTop: 20,
-    borderRadius: 18, padding: 16, overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1, borderColor: 'rgba(179,102,255,0.3)',
-  },
-  forgeBg: { ...StyleSheet.absoluteFill, borderRadius: 18 },
-  forgeIconWrap: {
-    width: 48, height: 48, borderRadius: 24,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    justifyContent: 'center', alignItems: 'center',
-  },
-  forgeText: { flex: 1, marginLeft: 14 },
-  forgeTitle: { fontSize: 16, fontFamily: FONTS.display.bold, color: '#FFF', marginBottom: 2 },
-  forgeSub: { fontSize: 12, fontFamily: FONTS.display.regular, color: 'rgba(255,255,255,0.45)' },
-  forgeArrow: {
-    width: 32, height: 32, borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    justifyContent: 'center', alignItems: 'center',
-  },
+  // Espace sous la tab bar flottante
+  tabBarSpacer: { height: 100 },
 });

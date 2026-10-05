@@ -1,22 +1,16 @@
 {
  "totals": {
-  "hex": 1488,
-  "rgba": 673,
-  "fontSize": 689,
-  "heavy": 215,
-  "gradient": 152,
-  "iconLib": 32,
-  "emoji": 113
+  "gradient": 103,
+  "hex": 940,
+  "rgba": 435,
+  "fontSize": 385,
+  "iconLib": 25,
+  "heavy": 122,
+  "emoji": 74
  },
  "files": {
   "app/(tabs)/accueil.tsx": {
-   "hex": 188,
-   "rgba": 71,
-   "fontSize": 99,
-   "heavy": 35,
-   "gradient": 21,
-   "iconLib": 1,
-   "emoji": 18
+   "gradient": 3
   },
   "app/(tabs)/play.tsx": {
    "hex": 12,
@@ -34,41 +28,11 @@
    "iconLib": 1,
    "emoji": 11
   },
-  "app/(tabs)/profile.tsx": {
-   "hex": 137,
-   "rgba": 43,
-   "fontSize": 70,
-   "heavy": 22,
-   "gradient": 8,
-   "iconLib": 1,
-   "emoji": 3
-  },
-  "app/(tabs)/themes.tsx": {
-   "hex": 18,
-   "rgba": 15,
-   "fontSize": 16,
-   "gradient": 4,
-   "iconLib": 1,
-   "emoji": 8
-  },
-  "app/(tabs)/_layout.tsx": {
-   "hex": 14,
-   "rgba": 5,
-   "fontSize": 2,
-   "heavy": 1
-  },
   "app/+html.tsx": {
-   "hex": 5,
-   "rgba": 1
+   "hex": 5
   },
   "app/category-detail.tsx": {
-   "hex": 70,
-   "rgba": 30,
-   "fontSize": 57,
-   "heavy": 19,
-   "gradient": 2,
-   "iconLib": 1,
-   "emoji": 7
+   "gradient": 1
   },
   "app/challenge-waiting.tsx": {
    "hex": 21,
@@ -112,15 +76,6 @@
    "iconLib": 1,
    "emoji": 1
   },
-  "app/game.tsx": {
-   "hex": 44,
-   "rgba": 21,
-   "fontSize": 24,
-   "heavy": 10,
-   "gradient": 7,
-   "iconLib": 1,
-   "emoji": 3
-  },
   "app/index.tsx": {
    "hex": 16,
    "rgba": 15,
@@ -144,12 +99,7 @@
    "iconLib": 1
   },
   "app/matchmaking.tsx": {
-   "hex": 62,
-   "rgba": 41,
-   "fontSize": 20,
-   "heavy": 3,
-   "gradient": 12,
-   "iconLib": 1
+   "gradient": 4
   },
   "app/notification-settings.tsx": {
    "hex": 38,
@@ -207,14 +157,6 @@
    "gradient": 3,
    "iconLib": 1
   },
-  "app/super-category.tsx": {
-   "hex": 12,
-   "rgba": 8,
-   "fontSize": 13,
-   "heavy": 1,
-   "gradient": 3,
-   "iconLib": 1
-  },
   "app/support.tsx": {
    "hex": 26,
    "rgba": 28,
@@ -262,12 +204,6 @@
    "fontSize": 2,
    "gradient": 1
   },
-  "components/DueloHeader.tsx": {
-   "hex": 3,
-   "rgba": 3,
-   "fontSize": 1,
-   "heavy": 1
-  },
   "components/EmptyState.tsx": {
    "fontSize": 3,
    "iconLib": 1
@@ -295,10 +231,6 @@
    "heavy": 3,
    "gradient": 2,
    "iconLib": 1
-  },
-  "components/RoundTimer.tsx": {
-   "fontSize": 2,
-   "heavy": 1
   },
   "components/SpinWheelModal.tsx": {
    "hex": 38,

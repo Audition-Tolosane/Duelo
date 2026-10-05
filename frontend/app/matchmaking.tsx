@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  View, Text, StyleSheet, Dimensions, TouchableOpacity, BackHandler, Platform,
+  View, StyleSheet, Dimensions, BackHandler, Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   useSharedValue, useAnimatedStyle, withRepeat, withTiming,
@@ -14,13 +13,15 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import SwipeBackPage from '../components/SwipeBackPage';
-import DueloHeader from '../components/DueloHeader';
+import {
+  ScreenContainer, AppHeader, Txt, Icon, Button, Card, PlayerCard, Dialog,
+} from '../components/ui';
+import type { IconName } from '../components/ui';
 import { useWS } from '../contexts/WebSocketContext';
 import { dueloWS } from '../services/websocket';
 import { authFetch } from '../utils/api';
 import { t } from '../utils/i18n';
-import { COLORS } from '../theme/tokens';
-import { FONTS } from '../theme/fonts';
+import { COLOR, SPACE, RADII, SIZE, BORDER, GRADIENTS, GLOW, ELEVATION } from '../theme/tokens';
 
 // Real world map paths from Natural Earth data (Mercator projection, 1000×500 viewBox)
 import MAP_PATHS from '../assets/map-paths.json';
@@ -28,7 +29,10 @@ import MAP_PATHS from '../assets/map-paths.json';
 const { width: SW, height: SH } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-const BADGE_ICON_MAP: Record<string, string> = { fire: 'fire', bolt: 'lightning-bolt', glow: 'shimmer' };
+
+// Badge de série de l'adversaire → icône Lucide du registre
+const BADGE_ICON_MAP: Record<string, IconName> = { fire: 'flame', bolt: 'bolt', glow: 'sparkles' };
+
 
 // Villes réelles (lat/lon) pour les dots joueurs
 const CITY_PINS = [
@@ -56,12 +60,6 @@ const CITY_PINS = [
   { lat: 48,  lon: 68,   name: 'Diego' }, // Kazakhstan
 ];
 
-const PIN_COLORS = [
-  '#FF6B35', '#00D4FF', '#4CAF50', '#FF3B5C', '#FFB800',
-  '#00FF9D', '#E53935', '#8A2BE2', '#FF69B4', '#1565C0',
-  '#FF9800', '#00BCD4', '#9C27B0', '#CDDC39', '#FF5722', '#3F51B5',
-  '#7C4DFF', '#00E5FF', '#F50057', '#69F0AE', '#FFAB40', '#E040FB',
-];
 
 // Centres des pays pour le départ (code ISO → lat/lon)
 const COUNTRY_START: Record<string, { lat: number; lon: number }> = {
@@ -112,7 +110,7 @@ const COUNTRY_NAME_FR: Record<string, { lat: number; lon: number }> = {
   'inde':             COUNTRY_START.IN, 'chine':            COUNTRY_START.CN,
   'japon':            COUNTRY_START.JP, 'corée du sud':     COUNTRY_START.KR,
   'arabie saoudite':  COUNTRY_START.SA, 'émirats arabes unis': COUNTRY_START.AE,
-  'thaïlande':        COUNTRY_START.TH, 'thaïlande':        COUNTRY_START.TH,
+  'thaïlande':        COUNTRY_START.TH,
   'indonésie':        COUNTRY_START.ID, 'australie':        COUNTRY_START.AU,
   'nouvelle-zélande': COUNTRY_START.NZ, 'pakistan':         COUNTRY_START.PK,
   'bangladesh':       COUNTRY_START.BD,
@@ -153,6 +151,7 @@ function svgToOffset(svgX: number, svgY: number, s: number = 1) {
 // Par défaut : centré sur Europe occidentale
 const DEFAULT_START = svgToOffset(...Object.values(latLonToSvg(48, 10)) as [number, number]);
 
+
 type OpponentData = {
   id: string;
   pseudo: string;
@@ -163,14 +162,20 @@ type OpponentData = {
   streak: number;
   streak_badge: string;
   country?: string;
+  // Profil de jeu du bot (renvoyé par /matchmaking-v2, transmis tel quel à /game)
+  skill_level?: number;
+  avg_speed?: number;
 };
 
 type PlayerData = { level: number; title: string };
 
-// ── Player Pin Component ──
-function PlayerPin({ x, y, name, color, isTarget }: {
-  x: number; y: number; name: string; color: string; isTarget?: boolean;
-}) {
+// ── Épingles de la carte ──
+// Joueurs en ligne : simples points crème à 60 % qui respirent (aucune couleur d'identité).
+// Rival : disque corail avec son initiale et une onde qui pulse (événement).
+const PIN_DOT = 10;
+const PIN_TARGET = 32;
+
+function PlayerPin({ x, y }: { x: number; y: number }) {
   const pulse = useSharedValue(0.5);
 
   useEffect(() => {
@@ -183,44 +188,38 @@ function PlayerPin({ x, y, name, color, isTarget }: {
     );
   }, []);
 
-  const pulseStyle = useAnimatedStyle(() => ({
-    opacity: pulse.value,
-  }));
-
-  const size = isTarget ? 38 : 24;
-  const fontSize = isTarget ? 14 : 9;
+  const pulseStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
 
   return (
     <Animated.View
       style={[
-        {
-          position: 'absolute',
-          left: x * SCALE - size / 2,
-          top: y * SCALE - size / 2,
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          backgroundColor: color,
-          justifyContent: 'center',
-          alignItems: 'center',
-          borderWidth: isTarget ? 3 : 1,
-          borderColor: isTarget ? '#FFF' : 'rgba(255,255,255,0.35)',
-          zIndex: isTarget ? 100 : 10,
-        },
-        !isTarget && pulseStyle,
-        isTarget && {
-          shadowColor: color,
-          shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.9,
-          shadowRadius: 25,
-          elevation: 12,
-        },
+        styles.pinDot,
+        { left: x * SCALE - PIN_DOT / 2, top: y * SCALE - PIN_DOT / 2 },
+        pulseStyle,
       ]}
-    >
-      <Text style={{ color: '#FFF', fontSize, fontWeight: '900' }}>
-        {name[0]?.toUpperCase()}
-      </Text>
-    </Animated.View>
+    />
+  );
+}
+
+function OpponentPin({ x, y, name }: { x: number; y: number; name: string }) {
+  const wave = useSharedValue(0);
+
+  useEffect(() => {
+    wave.value = withRepeat(withTiming(1, { duration: 1400, easing: Easing.out(Easing.ease) }), -1, false);
+  }, []);
+
+  const waveStyle = useAnimatedStyle(() => ({
+    opacity: 0.55 * (1 - wave.value),
+    transform: [{ scale: 1 + wave.value * 1.4 }],
+  }));
+
+  return (
+    <View style={[styles.pinTargetWrap, { left: x * SCALE - PIN_TARGET / 2, top: y * SCALE - PIN_TARGET / 2 }]}>
+      <Animated.View style={[styles.pinWave, waveStyle]} />
+      <View style={styles.pinTarget}>
+        <Txt variant="label" color={COLOR.text.onAction}>{name[0]?.toUpperCase()}</Txt>
+      </View>
+    </View>
   );
 }
 
@@ -257,16 +256,15 @@ export default function MatchmakingScreen() {
   const [targetPin, setTargetPin] = useState<{ x: number; y: number } | null>(null);
 
   // Pins régénérés à chaque mount (shuffle + lat/lon réels)
-  const playerPinsRef = useRef<Array<{ x: number; y: number; name: string; color: string }> | null>(null);
+  const playerPinsRef = useRef<Array<{ x: number; y: number; name: string }> | null>(null);
   if (!playerPinsRef.current) {
     const shuffledCities = [...CITY_PINS].sort(() => Math.random() - 0.5);
-    playerPinsRef.current = shuffledCities.map((city, i) => {
+    playerPinsRef.current = shuffledCities.map((city) => {
       const svg = latLonToSvg(city.lat, city.lon);
       return {
         x: svg.x,
         y: svg.y,
         name: city.name,
-        color: PIN_COLORS[i % PIN_COLORS.length],
       };
     });
   }
@@ -575,447 +573,268 @@ export default function MatchmakingScreen() {
     return name || 'Quiz';
   };
 
-  const oppBadgeIcon = opponent ? (BADGE_ICON_MAP[opponent.streak_badge] || '') : '';
-  const oppIsGlow = opponent?.streak_badge === 'glow';
+  const oppBadgeIcon: IconName = (opponent && BADGE_ICON_MAP[opponent.streak_badge]) || 'flame';
+
+  const challengeName = challengeOpponentPseudo ? decodeURIComponent(challengeOpponentPseudo) : '...';
+  // Défi : accent corail (événement) ; recherche publique : jaune (mon action en cours)
+  const searchAccent = isChallengeMode ? COLOR.accent.warm : COLOR.action.primary;
+  const overlayBottom = { bottom: insets.bottom + SPACE.huge };
 
   return (
     <SwipeBackPage enabled={phase === 'searching'} onBack={handleCancel}>
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <DueloHeader />
-
-        {/* ── World Map Layer ── */}
-        <View style={styles.mapViewport}>
+      <ScreenContainer>
+        {/* ── Carte du monde : une seule couche pétrole ── */}
+        <View style={styles.mapViewport} pointerEvents="none">
           <Animated.View style={[styles.mapContainer, mapStyle]}>
             <Svg
               width={REAL_W}
               height={REAL_H}
               viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-              style={{ position: 'absolute', top: 0, left: 0 }}
+              style={styles.mapSvg}
             >
-              {/* Grille discrète — violet marque */}
-              {Array.from({ length: 9 }).map((_, i) => (
-                <Path key={`h-${i}`} d={`M0,${(i+1)*50} L1000,${(i+1)*50}`}
-                  stroke="rgba(179,102,255,0.06)" strokeWidth={0.4} />
-              ))}
-              {Array.from({ length: 19 }).map((_, i) => (
-                <Path key={`v-${i}`} d={`M${(i+1)*50},0 L${(i+1)*50},500`}
-                  stroke="rgba(179,102,255,0.06)" strokeWidth={0.4} />
-              ))}
-              {/* Équateur */}
-              <Path d="M0,250 L1000,250" stroke="rgba(179,102,255,0.14)"
-                strokeWidth={0.5} strokeDasharray="6,4" />
-
-              {/* Continents — halo violet large (le duel cyan × violet de la charte) */}
-              {(MAP_PATHS as string[]).map((d, i) => (
-                <Path key={`gv-${i}`} d={d}
-                  fill="none"
-                  stroke="rgba(179,102,255,0.10)"
-                  strokeWidth={7}
-                  strokeLinejoin="round" />
-              ))}
-              {/* Continents — glow cyan rapproché */}
-              {(MAP_PATHS as string[]).map((d, i) => (
-                <Path key={`g-${i}`} d={d}
-                  fill="none"
-                  stroke="rgba(0,229,255,0.16)"
-                  strokeWidth={3.5}
-                  strokeLinejoin="round" />
-              ))}
-              {/* Continents — remplissage teinté + trait néon cyan */}
               {(MAP_PATHS as string[]).map((d, i) => (
                 <Path key={`f-${i}`} d={d}
-                  fill="rgba(0,229,255,0.08)"
-                  stroke="rgba(0,229,255,0.65)"
-                  strokeWidth={0.8}
+                  fill={COLOR.surface.card}
+                  stroke={COLOR.surface.elevated}
+                  strokeWidth={0.6}
                   strokeLinejoin="round" />
               ))}
             </Svg>
 
-            {/* Player pins */}
+            {/* Joueurs en ligne */}
             {playerPins.map((pin, i) => (
-              <PlayerPin key={`pin-${i}`} x={pin.x} y={pin.y}
-                name={pin.name} color={pin.color} />
+              <PlayerPin key={`pin-${i}`} x={pin.x} y={pin.y} />
             ))}
 
-            {/* Target opponent pin */}
+            {/* Rival localisé */}
             {targetPin && opponent && (
-              <PlayerPin x={targetPin.x} y={targetPin.y}
-                name={opponent.pseudo}
-                color={oppIsGlow ? '#00FFFF' : '#FF3B5C'}
-                isTarget />
+              <OpponentPin x={targetPin.x} y={targetPin.y} name={opponent.pseudo} />
             )}
           </Animated.View>
 
-          {/* Vignette edges */}
-          <LinearGradient
-            colors={['#050510', 'transparent', 'transparent', '#050510']}
-            locations={[0, 0.12, 0.88, 1]}
-            style={styles.vignetteV} />
-          <LinearGradient
-            colors={['#050510', 'transparent', 'transparent', '#050510']}
-            locations={[0, 0.12, 0.88, 1]}
-            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-            style={styles.vignetteH} />
+          {/* Fondus haut / bas : la carte se fond dans la nuit pétrole */}
+          <LinearGradient colors={GRADIENTS.fadeTop.colors} style={styles.fadeTop} />
+          <LinearGradient colors={GRADIENTS.fadeBottom.colors} style={styles.fadeBottom} />
         </View>
 
-        {/* ── Search UI overlay ── */}
+        {phase !== 'versus' && <AppHeader />}
+
+        {/* ── Recherche ── */}
         {phase === 'searching' && (
-          <View style={styles.searchOverlay}>
-            <View style={styles.searchCard}>
-              <LinearGradient
-                colors={isChallengeMode ? ['rgba(191,95,255,0.15)', 'rgba(5,5,16,0.95)'] : ['rgba(138,43,226,0.12)', 'rgba(5,5,16,0.95)']}
-                style={styles.searchCardGradient}>
-                <View style={styles.categoryChip}>
-                  <MaterialCommunityIcons name="sword-cross" size={14} color={isChallengeMode ? '#BF5FFF' : '#8A2BE2'} />
-                  <Text style={[styles.categoryLabel, isChallengeMode && { color: '#BF5FFF' }]}>{getCategoryLabel()}</Text>
-                </View>
-                <View style={styles.scannerRow}>
-                  <View style={[styles.scannerDot, isChallengeMode && { backgroundColor: '#BF5FFF' }]} />
-                  <Text style={styles.searchMessage}>
-                    {isChallengeMode
-                      ? `${t('challenge.waiting_for')} ${challengeOpponentPseudo ? decodeURIComponent(challengeOpponentPseudo) : '...'}${dots}`
-                      : `${message}${dots}`}
-                  </Text>
-                </View>
-                <View style={styles.hintRow}>
-                  <MaterialCommunityIcons name={isChallengeMode ? 'shield-sword' : 'earth'} size={14} color="#525252" />
-                  <Text style={styles.hint}>
-                    {isChallengeMode ? t('challenge.ready_title') : t('matchmaking.scanning_active')}
-                  </Text>
-                </View>
-              </LinearGradient>
-            </View>
-            <TouchableOpacity style={styles.cancelBtn} onPress={handleCancel} activeOpacity={0.75}>
-              <MaterialCommunityIcons name="close-circle-outline" size={18} color="#FF3B30" />
-              <Text style={styles.cancelText}>{t('common.cancel')}</Text>
-            </TouchableOpacity>
+          <View style={[styles.bottomOverlay, overlayBottom]}>
+            <Card style={styles.searchCard}>
+              <View style={styles.themePill}>
+                <Icon name="duel" size={16} color={searchAccent} />
+                <Txt variant="label" color={COLOR.text.primary} numberOfLines={1} style={styles.shrink}>
+                  {getCategoryLabel()}
+                </Txt>
+              </View>
+              <View style={styles.scannerRow}>
+                <View style={[styles.scannerDot, { backgroundColor: searchAccent }]} />
+                <Txt variant="body" numberOfLines={2} style={styles.shrink}>
+                  {isChallengeMode
+                    ? `${t('challenge.waiting_for')} ${challengeName}${dots}`
+                    : `${message}${dots}`}
+                </Txt>
+              </View>
+              <View style={styles.hintRow}>
+                <Icon name={isChallengeMode ? 'shield' : 'globe'} size={16} color={COLOR.text.tertiary} />
+                <Txt variant="caption" numberOfLines={1} style={styles.shrink}>
+                  {isChallengeMode ? t('challenge.ready_title') : t('matchmaking.scanning_active')}
+                </Txt>
+              </View>
+            </Card>
+            <Button
+              label={t('common.cancel')}
+              variant="ghost"
+              icon="close"
+              fullWidth
+              haptic={false}
+              onPress={handleCancel}
+            />
           </View>
         )}
 
-        {/* ── "Found" indicator ── */}
+        {/* ── Adversaire localisé (événement → corail) ── */}
         {phase === 'found' && opponent && (
-          <View style={styles.foundOverlay}>
-            <View style={styles.foundCard}>
-              <LinearGradient
-                colors={['rgba(0,255,157,0.15)', 'rgba(5,5,16,0.9)']}
-                style={styles.foundCardGradient}>
-                <MaterialCommunityIcons name="target-account" size={24} color="#00FF9D" />
-                <Text style={styles.foundText}>{t('matchmaking.opponent_located')}</Text>
-                <Text style={styles.foundName}>{opponent.pseudo}</Text>
-              </LinearGradient>
-            </View>
+          <View style={[styles.bottomOverlay, overlayBottom]}>
+            <Card accent="event" style={styles.foundCard}>
+              <Icon name="target" size={28} color={COLOR.accent.warm} />
+              <Txt variant="h3" color={COLOR.accent.warm} align="center">{t('matchmaking.opponent_located')}</Txt>
+              <Txt variant="h2" align="center" numberOfLines={1}>{opponent.pseudo}</Txt>
+            </Card>
           </View>
         )}
 
-        {/* ── Versus overlay ── */}
+        {/* ── VS ── */}
         {phase === 'versus' && opponent && (
           <>
             <Animated.View style={[styles.versusBackdrop, overlayStyle]} />
-            {/* Reveal : teinte cyan en haut (toi) / violet en bas (adversaire) */}
+            {/* Halos : jaune en haut (moi), corail en bas (rival) */}
             <Animated.View style={[StyleSheet.absoluteFill, overlayStyle]} pointerEvents="none">
+              <LinearGradient colors={GRADIENTS.vsSelf.colors} style={styles.haloTop} />
               <LinearGradient
-                colors={['rgba(0,229,255,0.20)', 'rgba(5,5,16,0)', 'rgba(5,5,16,0)', 'rgba(179,102,255,0.20)']}
-                locations={[0, 0.38, 0.62, 1]}
-                style={StyleSheet.absoluteFill}
+                colors={GRADIENTS.vsOpponent.colors}
+                start={{ x: 0, y: 1 }} end={{ x: 0, y: 0 }}
+                style={styles.haloBottom}
               />
             </Animated.View>
-            <View style={styles.versusOverlay}>
+            <View style={[styles.versusOverlay, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
               <View style={styles.versusContent}>
-                <View style={styles.versusCategoryRow}>
-                  <Text style={styles.versusEyebrow}>◆ {t('matchmaking.opponent_located')} ◆</Text>
-                  <Text style={styles.versusCategory}>{getCategoryLabel()}</Text>
+                <View style={styles.versusHeader}>
+                  <Txt variant="overline" color={COLOR.accent.warm} align="center">{t('matchmaking.opponent_located')}</Txt>
+                  <Txt variant="h2" align="center" numberOfLines={2}>{getCategoryLabel()}</Txt>
                 </View>
 
-                {/* Carte joueur — cyan, glisse depuis la gauche */}
-                <Animated.View style={[styles.versusCard, styles.versusCardPlayer, playerStyle]}>
-                  <LinearGradient
-                    colors={['rgba(0,229,255,0.30)', 'rgba(0,229,255,0)']}
-                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                    style={StyleSheet.absoluteFill}
+                {/* Moi : jaune, glisse depuis la gauche */}
+                <Animated.View style={[styles.selfSlot, playerStyle]}>
+                  <PlayerCard
+                    side="self"
+                    spotlight
+                    pseudo={pseudo}
+                    title={playerInfo?.title || undefined}
+                    subtitle={`${t('matchmaking.level_short')} ${playerInfo?.level || 1}`}
                   />
-                  <LinearGradient colors={[COLORS.cyan, '#0090B0']} style={styles.versusAvatar}>
-                    <Text style={styles.versusAvatarText}>{pseudo[0]?.toUpperCase()}</Text>
-                  </LinearGradient>
-                  <View style={styles.versusCardInfo}>
-                    <Text style={styles.versusPseudo} numberOfLines={1}>{pseudo}</Text>
-                    <Text style={[styles.versusLevel, { color: COLORS.cyan }]}>
-                      {t('matchmaking.level_short')} {playerInfo?.level || 1}
-                    </Text>
-                  </View>
                 </Animated.View>
 
-                {/* VS serif or */}
+                {/* « vs » éditorial entre deux filets : jaune (moi) / corail (rival) */}
                 <Animated.View style={[styles.vsRow, vsAnimStyle]}>
-                  <LinearGradient
-                    colors={['rgba(255,181,71,0)', COLORS.gold]}
-                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                    style={styles.vsLine}
-                  />
-                  <Text style={styles.vsSerif}>VS</Text>
-                  <LinearGradient
-                    colors={[COLORS.gold, 'rgba(255,181,71,0)']}
-                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                    style={styles.vsLine}
-                  />
+                  <View style={[styles.vsLine, { backgroundColor: COLOR.player.self }]} />
+                  <Txt variant="moment">{t('players.vs')}</Txt>
+                  <View style={[styles.vsLine, { backgroundColor: COLOR.player.opponent }]} />
                 </Animated.View>
 
-                {/* Carte adversaire — violet, glisse depuis la droite */}
-                <Animated.View style={[styles.versusCard, styles.versusCardOpponent, opponentStyle]}>
-                  <LinearGradient
-                    colors={['rgba(179,102,255,0)', 'rgba(179,102,255,0.30)']}
-                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                    style={StyleSheet.absoluteFill}
+                {/* Rival : corail, glisse depuis la droite */}
+                <Animated.View style={[styles.opponentSlot, opponentStyle]}>
+                  <PlayerCard
+                    side="opponent"
+                    spotlight
+                    pseudo={opponent.pseudo}
+                    avatarSeed={opponent.avatar_seed}
+                    title={opponent.title || undefined}
+                    subtitle={`${t('matchmaking.level_short')} ${opponent.level}`}
                   />
-                  <LinearGradient
-                    colors={oppIsGlow ? ['#00CCCC', COLORS.cyan] : [COLORS.violet, '#7B45CC']}
-                    style={[styles.versusAvatar, oppIsGlow && styles.versusAvatarGlow]}>
-                    <Text style={styles.versusAvatarText}>{opponent.pseudo[0]?.toUpperCase()}</Text>
-                  </LinearGradient>
-                  <View style={[styles.versusCardInfo, styles.versusCardInfoRight]}>
-                    <View style={styles.versusPseudoRow}>
-                      {oppBadgeIcon ? (
-                        <MaterialCommunityIcons name={oppBadgeIcon as any} size={14}
-                          color={oppIsGlow ? '#00FFFF' : '#FFA500'} />
-                      ) : null}
-                      <Text style={[styles.versusPseudo, oppIsGlow && styles.glowPseudo]} numberOfLines={1}>
-                        {opponent.pseudo}
-                      </Text>
+                  {opponent.streak >= 3 && (
+                    <View style={styles.streakTag}>
+                      <Icon name={oppBadgeIcon} size={16} color={COLOR.accent.warm} />
+                      <Txt variant="label" color={COLOR.accent.warm}>
+                        {opponent.streak} {t('matchmaking.wins')}
+                      </Txt>
                     </View>
-                    <Text style={[styles.versusLevel, { color: COLORS.violet }]}>
-                      {t('matchmaking.level_short')} {opponent.level}
-                    </Text>
-                    {opponent.title ? <Text style={styles.versusTitle}>{opponent.title}</Text> : null}
-                    {opponent.streak >= 3 && (
-                      <View style={[styles.streakTag, oppIsGlow && styles.streakTagGlow]}>
-                        <MaterialCommunityIcons name={(oppBadgeIcon || 'fire') as any} size={12}
-                          color={oppIsGlow ? '#00FFFF' : '#FFA500'} />
-                        <Text style={[styles.streakText, oppIsGlow && { color: '#00FFFF' }]}>
-                          {opponent.streak} {t('matchmaking.wins')}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
+                  )}
                 </Animated.View>
 
-                {/* Décompte or */}
+                {/* Décompte : crème, puis jaune sur le dernier temps */}
                 <Animated.View style={[styles.countdownWrap, vsAnimStyle]}>
-                  <Text style={styles.countdownNum}>{vsCountdown}</Text>
-                  <Text style={styles.countdownLabel}>{t('matchmaking.duel_starting')}</Text>
+                  <Txt variant="countdown" color={vsCountdown === 1 ? COLOR.action.primary : COLOR.text.primary}>
+                    {vsCountdown}
+                  </Txt>
+                  <Txt variant="overline" align="center">{t('matchmaking.duel_starting')}</Txt>
                 </Animated.View>
               </View>
             </View>
           </>
         )}
-      </View>
+      </ScreenContainer>
 
-      {/* ── Challenge Timeout Modal ── */}
-      {showTimeoutModal && (
-        <View style={styles.timeoutOverlay}>
-          <View style={styles.timeoutCard}>
-            <MaterialCommunityIcons name="clock-alert-outline" size={40} color="#FF9F0A" style={{ marginBottom: 12 }} />
-            <Text style={styles.timeoutTitle}>{t('challenge.timeout_title')}</Text>
-            <Text style={styles.timeoutBody}>{t('challenge.timeout_body')}</Text>
-            <View style={styles.timeoutButtons}>
-              <TouchableOpacity
-                style={styles.timeoutCancelBtn}
-                onPress={() => { setShowTimeoutModal(false); router.replace('/(tabs)/accueil'); }}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.timeoutCancelText}>{t('common.cancel')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.timeoutPlayBtn}
-                onPress={() => { setShowTimeoutModal(false); fetchBotOpponent(); }}
-                activeOpacity={0.8}
-              >
-                <LinearGradient
-                  colors={['#8A2BE2', '#00FFFF']}
-                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                  style={styles.timeoutPlayGradient}
-                >
-                  <MaterialCommunityIcons name="lightning-bolt" size={16} color="#FFF" />
-                  <Text style={styles.timeoutPlayText}>{t('challenge.play_now')}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      )}
+      {/* ── Défi : l'adversaire n'a pas rejoint ── */}
+      <Dialog
+        visible={showTimeoutModal}
+        dismissable={false}
+        onClose={() => { if (phaseRef.current === 'searching') handleCancel(); }}
+        icon="clock"
+        tone="event"
+        title={t('challenge.timeout_title')}
+        message={t('challenge.timeout_body')}
+        actions={(
+          <>
+            <Button
+              label={t('challenge.play_now')}
+              icon="bolt"
+              fullWidth
+              haptic={false}
+              onPress={() => { setShowTimeoutModal(false); fetchBotOpponent(); }}
+            />
+            <Button
+              label={t('common.cancel')}
+              variant="ghost"
+              fullWidth
+              haptic={false}
+              onPress={() => { setShowTimeoutModal(false); router.replace('/(tabs)/accueil'); }}
+            />
+          </>
+        )}
+      />
     </SwipeBackPage>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#050510' },
+  // Carte du monde
   mapViewport: { ...StyleSheet.absoluteFill, overflow: 'hidden' },
   mapContainer: { width: REAL_W, height: REAL_H, position: 'absolute' },
-  vignetteV: { ...StyleSheet.absoluteFill },
-  vignetteH: { ...StyleSheet.absoluteFill },
+  mapSvg: { position: 'absolute', top: 0, left: 0 },
+  fadeTop: { position: 'absolute', top: 0, left: 0, right: 0, height: 160 },
+  fadeBottom: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 320 },
 
-  searchOverlay: { position: 'absolute', bottom: 60, left: 0, right: 0, alignItems: 'center' },
-  searchCard: { borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(138,43,226,0.2)' },
-  searchCardGradient: { paddingHorizontal: 24, paddingVertical: 20, alignItems: 'center', minWidth: SW * 0.8 },
-  categoryChip: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: 'rgba(138,43,226,0.15)', paddingHorizontal: 14,
-    paddingVertical: 6, borderRadius: 16, marginBottom: 16,
-    borderWidth: 1, borderColor: 'rgba(138,43,226,0.25)',
+  // Épingles
+  pinDot: {
+    position: 'absolute',
+    width: PIN_DOT, height: PIN_DOT, borderRadius: RADII.pill,
+    backgroundColor: COLOR.text.tertiary,
+    zIndex: 10,
   },
-  categoryLabel: { fontSize: 14, fontFamily: FONTS.display.bold, color: '#FFF' },
-  scannerRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
-  scannerDot: {
-    width: 8, height: 8, borderRadius: 4, backgroundColor: COLORS.mint,
-    shadowColor: COLORS.mint, shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8, shadowRadius: 6,
+  pinTargetWrap: {
+    position: 'absolute',
+    width: PIN_TARGET, height: PIN_TARGET,
+    alignItems: 'center', justifyContent: 'center',
+    zIndex: 100,
   },
-  searchMessage: { fontSize: 15, fontFamily: FONTS.display.medium, color: '#FFF' },
-  hintRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  hint: { fontSize: 12, fontFamily: FONTS.mono.regular, color: '#525252' },
-  cancelBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 16,
-    paddingHorizontal: 20, paddingVertical: 12, borderRadius: 24,
-    backgroundColor: 'rgba(255,59,48,0.12)', borderWidth: 1, borderColor: 'rgba(255,59,48,0.35)',
-  },
-  cancelText: { fontSize: 15, fontFamily: FONTS.display.bold, color: COLORS.red },
-
-  foundOverlay: { position: 'absolute', bottom: 60, left: 0, right: 0, alignItems: 'center' },
-  foundCard: { borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(0,255,157,0.3)' },
-  foundCardGradient: { paddingHorizontal: 24, paddingVertical: 20, alignItems: 'center', minWidth: SW * 0.7, gap: 6 },
-  foundText: { fontSize: 16, fontFamily: FONTS.display.bold, color: COLORS.mint },
-  foundName: { fontSize: 20, fontFamily: FONTS.display.bold, color: '#FFF' },
-
-  versusBackdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(5,5,16,0.88)' },
-  versusOverlay: { ...StyleSheet.absoluteFill, justifyContent: 'center', alignItems: 'center' },
-  versusContent: { width: '100%', paddingHorizontal: 20 },
-  versusCategoryRow: { alignItems: 'center', gap: 6, marginBottom: 28 },
-  versusEyebrow: {
-    fontSize: 11, fontFamily: FONTS.display.bold, color: COLORS.gold,
-    letterSpacing: 3, textTransform: 'uppercase',
-  },
-  versusCategory: {
-    fontSize: 24, fontFamily: FONTS.display.bold, color: '#FFF',
-    letterSpacing: -0.5, textTransform: 'uppercase', textAlign: 'center',
-  },
-  versusCard: {
-    flexDirection: 'row', alignItems: 'center', gap: 16,
-    padding: 18, borderRadius: 20, borderWidth: 2, overflow: 'hidden',
-  },
-  versusCardPlayer: {
-    borderColor: COLORS.cyan,
-    shadowColor: COLORS.cyan, shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35, shadowRadius: 24, elevation: 8,
-  },
-  versusCardOpponent: {
-    flexDirection: 'row-reverse', borderColor: COLORS.violet,
-    shadowColor: COLORS.violet, shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35, shadowRadius: 24, elevation: 8,
-  },
-  versusCardInfo: { flex: 1 },
-  versusCardInfoRight: { alignItems: 'flex-end' },
-  versusAvatar: {
-    width: 64, height: 64, borderRadius: 32,
-    justifyContent: 'center', alignItems: 'center',
-  },
-  versusAvatarGlow: {
-    shadowColor: COLORS.cyan, shadowOpacity: 0.8, shadowRadius: 20,
-    borderWidth: 2, borderColor: 'rgba(0,229,255,0.5)',
-  },
-  versusAvatarText: { color: '#FFF', fontSize: 28, fontFamily: FONTS.display.bold },
-  versusPseudoRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  versusPseudo: { color: '#FFF', fontSize: 20, fontFamily: FONTS.display.bold, letterSpacing: -0.5, maxWidth: 180 },
-  glowPseudo: {
-    color: COLORS.cyan, textShadowColor: COLORS.cyan,
-    textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 10,
-  },
-  versusLevel: { fontSize: 11, fontFamily: FONTS.mono.bold, letterSpacing: 1, marginTop: 2 },
-  versusTitle: { color: COLORS.violet, fontSize: 11, fontFamily: FONTS.mono.bold, marginTop: 3 },
-  streakTag: {
-    marginTop: 8, backgroundColor: 'rgba(255,100,0,0.12)', borderRadius: 10,
-    paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1,
-    borderColor: 'rgba(255,100,0,0.25)', flexDirection: 'row', alignItems: 'center', gap: 4,
-  },
-  streakTagGlow: { backgroundColor: 'rgba(0,229,255,0.1)', borderColor: 'rgba(0,229,255,0.3)' },
-  streakText: { color: COLORS.gold, fontSize: 11, fontFamily: FONTS.mono.bold },
-
-  vsRow: { flexDirection: 'row', alignItems: 'center', gap: 14, marginVertical: 18 },
-  vsLine: { flex: 1, height: 1 },
-  vsSerif: { color: COLORS.gold, fontSize: 38, fontFamily: FONTS.editorial.mediumItalic },
-  countdownWrap: { alignItems: 'center', marginTop: 28 },
-  countdownNum: {
-    color: COLORS.gold, fontSize: 72, fontFamily: FONTS.display.bold,
-    letterSpacing: -4, lineHeight: 76,
-    textShadowColor: 'rgba(255,181,71,0.6)', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 30,
-  },
-  countdownLabel: {
-    color: 'rgba(255,255,255,0.40)', fontSize: 10, fontFamily: FONTS.mono.regular,
-    letterSpacing: 2, textTransform: 'uppercase', marginTop: 2,
-  },
-
-  timeoutOverlay: {
+  pinWave: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(0,0,0,0.88)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-    zIndex: 200,
+    borderRadius: RADII.pill,
+    backgroundColor: COLOR.player.opponent,
   },
-  timeoutCard: {
-    width: '100%',
-    backgroundColor: '#0D0D1A',
-    borderRadius: 24,
-    padding: 28,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,159,10,0.3)',
+  pinTarget: {
+    width: PIN_TARGET, height: PIN_TARGET, borderRadius: RADII.pill,
+    backgroundColor: COLOR.player.opponent,
+    borderWidth: BORDER.strong, borderColor: COLOR.text.primary,
+    alignItems: 'center', justifyContent: 'center',
+    ...GLOW.opponent,
   },
-  timeoutTitle: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#FFF',
-    textAlign: 'center',
-    marginBottom: 8,
+
+  // Recherche / adversaire localisé
+  bottomOverlay: { position: 'absolute', left: SPACE.screenX, right: SPACE.screenX, gap: SPACE.md },
+  searchCard: { alignItems: 'center', gap: SPACE.md, ...ELEVATION.e2 },
+  themePill: {
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.sm,
+    height: SIZE.chip, maxWidth: '100%', paddingHorizontal: SPACE.md,
+    borderRadius: RADII.pill,
+    backgroundColor: COLOR.action.ghost,
+    borderWidth: BORDER.hair, borderColor: COLOR.border.default,
   },
-  timeoutBody: {
-    fontSize: 14,
-    color: '#A3A3A3',
-    textAlign: 'center',
-    marginBottom: 24,
+  shrink: { flexShrink: 1 },
+  scannerRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm },
+  scannerDot: { width: SPACE.sm, height: SPACE.sm, borderRadius: RADII.pill },
+  hintRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm },
+  foundCard: { alignItems: 'center', gap: SPACE.sm, ...ELEVATION.e2 },
+
+  // VS
+  versusBackdrop: { ...StyleSheet.absoluteFill, backgroundColor: COLOR.overlay.scrim },
+  haloTop: { position: 'absolute', top: 0, left: 0, right: 0, height: '30%' },
+  haloBottom: { position: 'absolute', bottom: 0, left: 0, right: 0, height: '30%' },
+  versusOverlay: { ...StyleSheet.absoluteFill, justifyContent: 'center', alignItems: 'center' },
+  versusContent: { width: '100%', paddingHorizontal: SPACE.screenX },
+  versusHeader: { alignItems: 'center', gap: SPACE.xs, marginBottom: SPACE.xxl },
+  // Cartes décalées : moi à gauche, le rival à droite (tension du face-à-face)
+  selfSlot: { marginRight: SPACE.xxxl },
+  opponentSlot: { marginLeft: SPACE.xxxl, gap: SPACE.sm },
+  streakTag: {
+    alignSelf: 'flex-end', flexDirection: 'row', alignItems: 'center', gap: SPACE.xs,
+    paddingHorizontal: SPACE.md, paddingVertical: SPACE.xs,
+    borderRadius: RADII.pill, backgroundColor: COLOR.tint.opponent,
   },
-  timeoutButtons: {
-    flexDirection: 'row',
-    gap: 12,
-    width: '100%',
-  },
-  timeoutCancelBtn: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 14,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
-  },
-  timeoutCancelText: {
-    color: '#A3A3A3',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  timeoutPlayBtn: {
-    flex: 1.5,
-    borderRadius: 14,
-    overflow: 'hidden',
-  },
-  timeoutPlayGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    padding: 14,
-    borderRadius: 14,
-  },
-  timeoutPlayText: {
-    color: '#FFF',
-    fontSize: 14,
-    fontWeight: '800',
-  },
+  vsRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md, marginVertical: SPACE.lg },
+  vsLine: { flex: 1, height: BORDER.hair },
+  countdownWrap: { alignItems: 'center', marginTop: SPACE.xxl },
 });

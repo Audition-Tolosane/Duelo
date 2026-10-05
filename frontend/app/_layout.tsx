@@ -40,7 +40,7 @@ const SWIPEABLE_SCREENS = [
   'results', 'matchmaking', 'game',
   'super-category', 'notification-settings', 'leaderboard',
   'language-settings', 'terms', 'support', 'create-theme',
-  'challenge-waiting',
+  'challenge-waiting', 'theme-list', 'settings',
 ];
 
 // Platform-specific options for swipeable screens

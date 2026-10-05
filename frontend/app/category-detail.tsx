@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Image,
-  ActivityIndicator, KeyboardAvoidingView, Platform, Keyboard, RefreshControl,
-  Modal, Dimensions, Alert, Animated
+  View, Pressable, StyleSheet, ScrollView, TextInput, Image,
+  KeyboardAvoidingView, Platform, Keyboard, RefreshControl, Modal, Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -10,47 +9,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { GLASS } from '../theme/glassTheme';
 import { authFetch } from '../utils/api';
 import { t, getLanguage } from '../utils/i18n';
 import SwipeBackPage from '../components/SwipeBackPage';
-import DueloHeader from '../components/DueloHeader';
-import CategoryIcon from '../components/CategoryIcon';
 import UserAvatar from '../components/UserAvatar';
+import {
+  Txt, Icon, Button, IconButton, Badge, Card, Chip, Section, ScreenContainer, ScreenHeader,
+  ProgressBar, ListRow, Loader, EmptyState, ThemeIcon,
+} from '../components/ui';
+import { COLOR, SPACE, RADII, SIZE, BORDER, GRADIENTS, TYPO } from '../theme/tokens';
 
-const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-const CYAN   = '#00E5FF';
-const VIOLET = '#B366FF';
-const GOLD   = '#FFB547';
-const MINT   = '#32E7A3';
-const RED    = '#FF3D5E';
-
-function hslToHex(h: number, s: number, l: number): string {
-  s /= 100; l /= 100;
-  const hue2rgb = (p: number, q: number, t: number) => {
-    if (t < 0) t += 1; if (t > 1) t -= 1;
-    if (t < 1/6) return p + (q - p) * 6 * t;
-    if (t < 1/2) return q;
-    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-    return p;
-  };
-  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-  const p = 2 * l - q;
-  const toHex = (v: number) => Math.round(v * 255).toString(16).padStart(2, '0');
-  return `#${toHex(hue2rgb(p, q, h/360 + 1/3))}${toHex(hue2rgb(p, q, h/360))}${toHex(hue2rgb(p, q, h/360 - 1/3))}`;
-}
-
-function hashColor(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    hash |= 0;
-  }
-  return hslToHex(Math.abs(hash) % 360, 65, 55);
-}
+// Paliers de titres affichés dans « Ta progression ».
+const MILESTONES = [1, 10, 20, 35, 50] as const;
+// Nombre de posts du mur visibles avant « Voir tout ».
+const WALL_PREVIEW = 2;
 
 type TopPlayer = {
   id: string; pseudo: string; avatar_seed: string;
@@ -97,11 +71,8 @@ export default function CategoryDetailScreen() {
     return null;
   }
 
-  const oldMeta = { icon: '❓', color: '#B366FF', bgPattern: '' };
-
   const [userId, setUserId] = useState('');
   const [detail, setDetail] = useState<CategoryDetail | null>(null);
-  const [meta, setMeta] = useState(oldMeta);
   const [posts, setPosts] = useState<WallPostData[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -126,12 +97,20 @@ export default function CategoryDetailScreen() {
   const [voMode, setVoMode] = useState(false);
   const [voGenerating, setVoGenerating] = useState(false);
 
-  const xpBarAnim = useRef(new Animated.Value(0)).current;
+  // Présentation uniquement : mur replié à 2 posts, bouton collant masqué quand le clavier est ouvert.
+  const [showAllPosts, setShowAllPosts] = useState(false);
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
 
   // Leaderboard (navigates to separate screen)
 
   useEffect(() => {
     init();
+  }, []);
+
+  useEffect(() => {
+    const show = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow', () => setKeyboardOpen(true));
+    const hide = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', () => setKeyboardOpen(false));
+    return () => { show.remove(); hide.remove(); };
   }, []);
 
   const init = async () => {
@@ -177,16 +156,6 @@ export default function CategoryDetailScreen() {
         all_titles: data.all_titles || {},
         unlocked_titles: data.unlocked_titles || [],
         top_player: data.top_player || undefined,
-      });
-      Animated.timing(xpBarAnim, {
-        toValue: xpProg.progress,
-        duration: 900,
-        useNativeDriver: false,
-      }).start();
-      setMeta({
-        icon: data.name?.[0]?.toUpperCase() || '?',
-        color: hashColor(data.id),
-        bgPattern: '',
       });
     } catch { setFetchError(true); }
   };
@@ -367,414 +336,397 @@ export default function CategoryDetailScreen() {
   };
 
   if (loading) {
-    return <View style={styles.loadingContainer}><ActivityIndicator size="large" color={CYAN} /></View>;
+    return <ScreenContainer><Loader fill /></ScreenContainer>;
   }
 
   if (fetchError && !detail) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text style={{ color: '#FF3D5E', fontSize: 16, fontWeight: '700' }}>{t('common.error_loading')}</Text>
-        <TouchableOpacity onPress={() => { setFetchError(false); setLoading(true); init(); }} style={{ marginTop: 16, padding: 12, backgroundColor: 'rgba(255,59,48,0.12)', borderRadius: 12 }}>
-          <Text style={{ color: '#FF3D5E', fontWeight: '600' }}>{t('common.retry')}</Text>
-        </TouchableOpacity>
-      </View>
+      <ScreenContainer safeTop>
+        <View style={styles.centerFill}>
+          <EmptyState
+            icon="error"
+            title={t('common.error_loading')}
+            actionLabel={t('common.retry')}
+            onAction={() => { setFetchError(false); setLoading(true); init(); }}
+          />
+        </View>
+      </ScreenContainer>
     );
   }
 
   if (!detail) return null;
 
+  const isMaxLevel = detail.user_level >= 50;
+  const hasMilestones = !!detail.all_titles && Object.keys(detail.all_titles).length > 0;
+  const visiblePosts = showAllPosts ? posts : posts.slice(0, WALL_PREVIEW);
+  const wallTruncated = !showAllPosts && posts.length > WALL_PREVIEW;
+
   return (
     <SwipeBackPage>
-    <View style={styles.container}>
+    <ScreenContainer>
+      <ScreenHeader
+        overline={detail.cluster || detail.super_category || undefined}
+        title={detail.name}
+        right={
+          <IconButton
+            testID="follow-button"
+            icon="heart"
+            active={detail.is_following}
+            accessibilityLabel={detail.is_following ? t('category.following') : t('category.follow')}
+            onPress={handleFollow}
+          />
+        }
+      />
+
       {/* Post success toast */}
       {postSuccess && (
-        <View style={styles.successToast}>
-          <Text style={styles.successToastText}>{t('category.post_published')}</Text>
+        <View style={styles.successToast} pointerEvents="none">
+          <Icon name="success" size={16} color={COLOR.status.success} />
+          <Txt variant="label" color={COLOR.status.success}>{t('category.post_published')}</Txt>
         </View>
       )}
-      <View style={{ paddingTop: insets.top, backgroundColor: GLASS.bgDark }}>
-        <DueloHeader />
-      </View>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={meta.color} />}
+          keyboardShouldPersistTaps="handled"
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLOR.text.primary} />}
         >
-          {/* Back button + Cluster label on same row */}
-          <View style={styles.topNavRow}>
-            <TouchableOpacity data-testid="back-button" onPress={() => router.back()}>
-              <LinearGradient
-                colors={['rgba(255,255,255,0.10)', 'rgba(255,255,255,0.04)']}
-                style={styles.backCircle}
-              >
-                <MaterialCommunityIcons name="chevron-left" size={22} color="#A3A3A3" />
-              </LinearGradient>
-            </TouchableOpacity>
-            {detail.cluster ? (
-              <View style={styles.clusterBadgeAbsolute}>
-                <View style={[styles.clusterBadge, { backgroundColor: meta.color + '18', borderColor: meta.color + '40' }]}>
-                  <Text style={[styles.clusterBadgeText, { color: meta.color }]}>{detail.cluster.toUpperCase()}</Text>
-                </View>
+          {/* ── Hero à plat : plaque crème, nom, description, chiffres ── */}
+          <View style={styles.hero}>
+            <ThemeIcon
+              themeName={detail.name}
+              cluster={detail.cluster}
+              superCategory={detail.super_category}
+              size={104}
+            />
+            <View style={styles.heroTexts}>
+              <Txt variant="h1" align="center">{detail.name}</Txt>
+              {detail.description ? (
+                <Txt variant="bodySmall" align="center">{detail.description}</Txt>
+              ) : null}
+            </View>
+            <View style={styles.heroStats}>
+              <View style={styles.heroStat}>
+                <Txt variant="statMedium">{detail.followers_count.toLocaleString()}</Txt>
+                <Txt variant="overline">{t('category.followers')}</Txt>
               </View>
-            ) : null}
+              <View style={styles.heroStatDivider} />
+              <View style={styles.heroStat}>
+                <Txt variant="statMedium">{detail.total_questions.toLocaleString()}</Txt>
+                <Txt variant="overline">{t('category.questions')}</Txt>
+              </View>
+            </View>
+
+            {/* VO — thèmes SCREEN uniquement : puce neutre (jaune quand active = sélection) */}
+            {detail.super_category === 'SCREEN' && (
+              <View style={styles.voRow}>
+                <Chip
+                  icon={voGenerating ? 'clock' : voMode ? 'check' : 'film'}
+                  label={voGenerating ? t('category.vo_generating') : t('category.vo_toggle')}
+                  selected={voMode && !voGenerating}
+                  onPress={handleVoToggle}
+                />
+                <Txt variant="caption" align="center">
+                  {voMode ? t('category.vo_on') : t('category.vo_off')}
+                </Txt>
+              </View>
+            )}
           </View>
 
-          {/* Category Header */}
-          <View style={[styles.headerCard, { borderColor: meta.color + '30' }]}>
-            <View style={styles.headerTop}>
-              <View style={[styles.catImageBox, { backgroundColor: meta.color + '20' }]}>
-                <CategoryIcon themeId={id} emoji={meta.icon} size={32} color={meta.color} type="theme" />
-              </View>
-              <View style={styles.headerInfo}>
-                <Text style={styles.catName}>{detail.name}</Text>
-                <Text style={styles.catDescription}>{detail.description}</Text>
-              </View>
-            </View>
-
-            {/* Action Buttons Row */}
-            <View style={styles.actionsRow}>
-              <TouchableOpacity data-testid="play-button" style={[styles.actionBtn, styles.playBtn]} onPress={handlePlay} activeOpacity={0.8}>
-                <Text style={styles.playBtnIcon}>⚡</Text>
-                <Text style={styles.playBtnText}>{t('category.play')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                data-testid="follow-button"
-                style={[styles.actionBtn, detail.is_following ? styles.followingBtn : styles.followBtn]}
-                onPress={handleFollow} activeOpacity={0.8} disabled={followLoading}
-              >
-                <Text style={styles.followIcon}>{detail.is_following ? '✓' : '+'}</Text>
-                <Text style={[styles.followText, detail.is_following && { color: '#32E7A3' }]}>
-                  {detail.is_following ? t('category.following') : t('category.follow')}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity data-testid="leaderboard-button" style={[styles.actionBtn, styles.leaderBtn]} onPress={handleLeaderboard} activeOpacity={0.8}>
-                <Text style={styles.leaderIcon}>🏆</Text>
-                <Text style={styles.leaderText}>{t('category.leaderboard')}</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* VO Toggle — SCREEN themes only */}
-            {detail.super_category === 'SCREEN' && (
-              <TouchableOpacity
-                style={[styles.voToggleBtn, voMode && styles.voToggleBtnActive]}
-                onPress={handleVoToggle}
-                activeOpacity={0.8}
-                disabled={voGenerating}
-              >
-                {voGenerating ? (
-                  <ActivityIndicator size="small" color="#A78BFA" />
-                ) : (
-                  <Text style={styles.voToggleIcon}>🎬</Text>
-                )}
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.voToggleText, voMode && { color: '#A78BFA' }]}>
-                    {voGenerating ? t('category.vo_generating') : t('category.vo_toggle')}
-                  </Text>
-                  <Text style={styles.voToggleSub}>
-                    {voMode ? t('category.vo_on') : t('category.vo_off')}
-                  </Text>
+          {/* ── Ta progression : une seule carte, une seule barre ── */}
+          <Section title={t('pilot.theme.progress_title')}>
+            <Card>
+              <View style={styles.levelRow}>
+                <View>
+                  <Txt variant="overline">{t('pilot.theme.level')}</Txt>
+                  <Txt variant="statLarge" color={COLOR.action.primary}>{detail.user_level}</Txt>
                 </View>
-                <View style={[styles.voToggleSwitch, voMode && styles.voToggleSwitchActive]}>
-                  <View style={[styles.voToggleKnob, voMode && styles.voToggleKnobActive]} />
-                </View>
-              </TouchableOpacity>
-            )}
-
-            {/* XP Progression Section */}
-            <View style={styles.xpSection}>
-              {/* Level header */}
-              <View style={styles.xpHeader}>
-                <View style={[styles.xpLevelBadge, { backgroundColor: meta.color + '20', borderColor: meta.color + '50' }]}>
-                  <Text style={[styles.xpLevelNum, { color: meta.color }]}>{detail.user_level}</Text>
-                  <Text style={styles.xpLevelLabel}>LVL</Text>
-                </View>
-                <View style={styles.xpHeaderInfo}>
+                <View style={styles.levelInfo}>
                   {detail.user_title ? (
-                    <Text style={[styles.xpTitle, { color: meta.color }]}>{detail.user_title}</Text>
+                    <Txt variant="cardTitle" align="right" numberOfLines={2}>{detail.user_title}</Txt>
                   ) : (
-                    <Text style={styles.xpNoTitle}>{t('category.no_title_yet')}</Text>
+                    <Txt variant="bodySmall" align="right">{t('category.no_title_yet')}</Txt>
                   )}
-                  <Text style={styles.xpXpLabel}>
-                    {detail.user_level >= 50
-                      ? t('category.max_level')
-                      : `${detail.xp_progress.current.toLocaleString()} / ${detail.xp_progress.needed.toLocaleString()} XP`}
-                  </Text>
                 </View>
-                {detail.user_level < 50 && (
-                  <View style={[styles.xpNextBadge, { borderColor: meta.color + '30' }]}>
-                    <Text style={styles.xpNextLabel}>{t('category.next')}</Text>
-                    <Text style={[styles.xpNextNum, { color: meta.color }]}>{detail.user_level + 1}</Text>
-                  </View>
-                )}
               </View>
 
-              {/* ── Zone 1 : XP dans le niveau actuel ── */}
-              {detail.user_level < 50 ? (
-                <>
-                  <View style={styles.xpLevelRow}>
-                    <Text style={[styles.xpLevelFrom, { color: meta.color }]}>Niv. {detail.user_level}</Text>
-                    <View style={styles.xpBarTrack}>
-                      <Animated.View style={[
-                        styles.xpBarFill,
-                        {
-                          backgroundColor: meta.color,
-                          width: xpBarAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
-                        }
-                      ]} />
-                    </View>
-                    <Text style={styles.xpLevelTo}>Niv. {detail.user_level + 1}</Text>
-                  </View>
-                  <Text style={styles.xpXpHint}>
-                    {detail.xp_progress.current.toLocaleString()} / {detail.xp_progress.needed.toLocaleString()} XP
-                  </Text>
-                </>
+              {isMaxLevel ? (
+                <Txt variant="label" color={COLOR.reward.gold} style={styles.maxLevel}>{t('category.max_level')}</Txt>
               ) : (
-                <Text style={[styles.xpXpLabel, { color: meta.color, fontWeight: '800' }]}>{t('category.max_level')}</Text>
+                <View style={styles.xpBlock}>
+                  <ProgressBar value={detail.xp_progress.progress} />
+                  <View style={styles.xpLegend}>
+                    <Txt variant="caption">
+                      {t('pilot.theme.next_level', { level: String(detail.user_level + 1) })}
+                    </Txt>
+                    <Txt variant="caption" style={styles.tabular}>
+                      {detail.xp_progress.current.toLocaleString()} / {detail.xp_progress.needed.toLocaleString()} XP
+                    </Txt>
+                  </View>
+                </View>
               )}
 
-              {/* ── Zone 2 : Roadmap des paliers de titres ── */}
-              {detail.all_titles && Object.keys(detail.all_titles).length > 0 && (
-                <View style={styles.roadmapContainer}>
-                  {/* Ligne de fond */}
-                  <View style={[styles.roadmapTrack, { backgroundColor: 'rgba(255,255,255,0.08)' }]} />
-                  {/* Portion complétée jusqu'au niveau actuel */}
-                  <View style={[styles.roadmapTrack, styles.roadmapTrackDone, {
-                    width: `${Math.min((detail.user_level - 1) / 49, 1) * 100}%`,
-                    backgroundColor: meta.color,
-                    opacity: 0.4,
-                  }]} />
-                  {/* Curseur niveau actuel */}
-                  <View style={[styles.roadmapCursor, {
-                    left: `${Math.min((detail.user_level - 1) / 49, 1) * 100}%`,
-                    backgroundColor: meta.color,
-                    borderColor: '#050510',
-                  }]} />
-
-                  {/* Paliers */}
-                  {([1, 10, 20, 35, 50] as const).map((lvl) => {
+              {/* Jalons des titres 1 / 10 / 20 / 35 / 50 */}
+              {hasMilestones && (
+                <View style={styles.milestones}>
+                  {/* Liste verticale : les titres longs restent lisibles en entier (plus de mots coupés) */}
+                  {MILESTONES.map((lvl, i) => {
                     const title = detail.all_titles?.[String(lvl)];
                     if (!title) return null;
                     const reached = detail.user_level >= lvl;
-                    const pct = ((lvl - 1) / 49) * 100;
+                    const last = i === MILESTONES.length - 1;
                     return (
-                      <View key={lvl} style={[styles.roadmapMilestone, { left: `${pct}%` }]}>
-                        <View style={[styles.roadmapDot, {
-                          backgroundColor: reached ? meta.color : '#1A1A2E',
-                          borderColor: reached ? meta.color : 'rgba(255,255,255,0.15)',
-                        }]}>
-                          {reached && <MaterialCommunityIcons name="check" size={9} color="#FFF" />}
+                      <View key={lvl} style={styles.milestone}>
+                        <View style={styles.milestoneRail}>
+                          <View style={[styles.milestoneDot, reached && styles.milestoneDotReached]}>
+                            {reached ? <Icon name="check" size={12} color={COLOR.text.onAction} strokeWidth={3} /> : null}
+                          </View>
+                          {!last ? <View style={[styles.milestoneLine, reached && styles.milestoneLineReached]} /> : null}
                         </View>
-                        <Text style={[styles.roadmapLvl, { color: reached ? meta.color : '#444' }]}>
-                          {lvl === 1 ? 'Dép.' : lvl}
-                        </Text>
-                        <Text style={[styles.roadmapTitle, { color: reached ? '#FFF' : '#444' }]} numberOfLines={2}>
+                        <Txt variant="overline" color={reached ? COLOR.action.primary : COLOR.text.tertiary} style={styles.milestoneLvl}>
+                          {lvl === 1 ? t('pilot.theme.milestone_start') : `Niv. ${lvl}`}
+                        </Txt>
+                        <Txt variant="label" color={reached ? COLOR.text.primary : COLOR.text.tertiary} style={styles.milestoneTitle}>
                           {title}
-                        </Text>
+                        </Txt>
                       </View>
                     );
                   })}
                 </View>
               )}
+            </Card>
+          </Section>
 
-            </View>
-
-            {/* Stats Row */}
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <Text style={styles.statLabel}>{t('category.followers')}</Text>
-                <Text style={styles.statValue}>{detail.followers_count.toLocaleString()}</Text>
-              </View>
-              <View style={[styles.statDivider, { backgroundColor: meta.color + '30' }]} />
-              <View style={styles.statItem}>
-                <Text style={styles.statLabel}>{t('category.questions')}</Text>
-                <Text style={styles.statValue}>{detail.total_questions}</Text>
-              </View>
-              <View style={[styles.statDivider, { backgroundColor: meta.color + '30' }]} />
-              <View style={styles.statItem}>
-                <Text style={styles.statLabel}>{t('category.top_master')}</Text>
-                {detail.top_player ? (
-                  <TouchableOpacity
-                    onPress={() => router.push(`/player-profile?id=${detail.top_player!.id}`)}
-                    activeOpacity={0.75}
-                    style={styles.topPlayerBtn}
-                  >
+          {/* ── Classement : maître du thème + lien vers le classement complet ── */}
+          <Section title={t('category.leaderboard')}>
+            <Card padded={false} style={styles.listCard}>
+              {detail.top_player ? (
+                <ListRow
+                  leading={
                     <UserAvatar
                       avatarUrl={detail.top_player.avatar_url}
                       avatarSeed={detail.top_player.avatar_seed}
                       pseudo={detail.top_player.pseudo}
-                      size={32}
+                      size={40}
                     />
-                    <View style={styles.topPlayerInfo}>
-                      <Text style={styles.topPlayerPseudo} numberOfLines={1}>{detail.top_player.pseudo}</Text>
-                      <Text style={[styles.topPlayerTitle, { color: meta.color }]} numberOfLines={1}>{detail.top_player.title}</Text>
+                  }
+                  title={detail.top_player.pseudo}
+                  subtitle={detail.top_player.title}
+                  trailing={<Badge label={t('category.top_master')} tone="reward" />}
+                  chevron
+                  onPress={() => router.push(`/player-profile?id=${detail.top_player!.id}`)}
+                />
+              ) : (
+                <ListRow
+                  leading={<Icon name="crown" size={22} color={COLOR.reward.gold} />}
+                  title={t('pilot.theme.no_master')}
+                />
+              )}
+              <View style={styles.rowDivider} />
+              <ListRow
+                testID="leaderboard-button"
+                leadingIcon="trophy"
+                title={t('pilot.theme.see_leaderboard')}
+                onPress={handleLeaderboard}
+              />
+            </Card>
+          </Section>
+
+          {/* ── Mur de la communauté : 2 posts + « Voir tout » ── */}
+          <Section
+            overline={t('category.community_wall')}
+            title={t('pilot.theme.community')}
+            onSeeAll={wallTruncated ? () => setShowAllPosts(true) : undefined}
+          >
+            {posts.length === 0 ? (
+              <EmptyState
+                icon="message"
+                title={t('category.be_first_to_post')}
+                message={t('category.share_opinions')}
+                actionLabel={t('category.publish_btn')}
+                onAction={() => setShowCreatePost(true)}
+              />
+            ) : (
+              <>
+                <Button
+                  testID="create-post-button"
+                  label={t('category.publish_btn')}
+                  icon="plus"
+                  variant="secondary"
+                  size="sm"
+                  fullWidth
+                  haptic={false}
+                  onPress={() => setShowCreatePost(true)}
+                />
+                {visiblePosts.map(post => (
+                  <Card key={post.id} testID={`post-card-${post.id}`}>
+                    {/* Post Header */}
+                    <Pressable
+                      style={styles.postHeader}
+                      onPress={() => router.push(`/player-profile?id=${post.user.id}`)}
+                      accessibilityRole="button"
+                    >
+                      <UserAvatar avatarUrl={post.user.avatar_url} avatarSeed={post.user.avatar_seed} pseudo={post.user.pseudo} size={40} />
+                      <View style={styles.flex}>
+                        <Txt variant="cardTitle" numberOfLines={1}>{post.user.pseudo}</Txt>
+                        <Txt variant="caption">{timeAgo(post.created_at)}</Txt>
+                      </View>
+                    </Pressable>
+
+                    {/* Post Content */}
+                    <Txt variant="body" style={styles.postContent}>{post.content}</Txt>
+
+                    {/* Post Image */}
+                    {post.image_base64 && (
+                      <Image source={{ uri: post.image_base64 }} style={styles.postImage} resizeMode="cover" />
+                    )}
+
+                    {/* Post Actions */}
+                    <View style={styles.postActions}>
+                      <Pressable
+                        style={styles.postActionBtn}
+                        onPress={() => handleLike(post.id)}
+                        accessibilityRole="button"
+                        accessibilityLabel={t('pilot.theme.like')}
+                        accessibilityState={{ selected: post.is_liked }}
+                      >
+                        <Icon name="heart" size={20} color={post.is_liked ? COLOR.accent.warm : COLOR.text.secondary} />
+                        <Txt variant="label" color={post.is_liked ? COLOR.accent.warm : COLOR.text.secondary} style={styles.tabular}>
+                          {post.likes_count}
+                        </Txt>
+                      </Pressable>
+                      <Pressable
+                        style={styles.postActionBtn}
+                        onPress={() => loadComments(post.id)}
+                        accessibilityRole="button"
+                        accessibilityLabel={t('pilot.theme.comments')}
+                        accessibilityState={{ expanded: expandedPost === post.id }}
+                      >
+                        <Icon name="message" size={20} color={expandedPost === post.id ? COLOR.text.primary : COLOR.text.secondary} />
+                        <Txt variant="label" style={styles.tabular}>{post.comments_count}</Txt>
+                      </Pressable>
                     </View>
-                  </TouchableOpacity>
-                ) : (
-                  <Text style={styles.topPlayerNone}>—</Text>
-                )}
-              </View>
-            </View>
-          </View>
 
-          {/* Wall Header + Create Post */}
-          <View style={styles.wallHeader}>
-            <Text style={styles.wallTitle}>{t('category.community_wall')}</Text>
-            <TouchableOpacity
-              data-testid="create-post-button"
-              style={[styles.createPostBtn, { backgroundColor: meta.color + '20', borderColor: meta.color + '40' }]}
-              onPress={() => setShowCreatePost(true)}
-            >
-              <Text style={[styles.createPostText, { color: meta.color }]}>{t('category.publish')}</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Wall Posts */}
-          {posts.length === 0 ? (
-            <View style={styles.emptyWall}>
-              <LinearGradient
-                colors={[meta.color, meta.color + '80']}
-                style={styles.emptyIconCircle}
-              >
-                <MaterialCommunityIcons name="chat-outline" size={36} color="#FFF" />
-              </LinearGradient>
-              <Text style={styles.emptyText}>{t('category.be_first_to_post')}</Text>
-              <Text style={styles.emptySub}>{t('category.share_opinions')}</Text>
-            </View>
-          ) : (
-            posts.map(post => (
-              <View key={post.id} data-testid={`post-card-${post.id}`} style={styles.postCard}>
-                {/* Post Header */}
-                <TouchableOpacity
-                  style={styles.postHeader}
-                  onPress={() => router.push(`/player-profile?id=${post.user.id}`)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.postAvatar}>
-                    <UserAvatar avatarUrl={post.user.avatar_url} avatarSeed={post.user.avatar_seed} pseudo={post.user.pseudo} size={40} />
-                  </View>
-                  <View style={styles.postUserInfo}>
-                    <Text style={styles.postUsername}>{post.user.pseudo}</Text>
-                    <Text style={styles.postTime}>{timeAgo(post.created_at)}</Text>
-                  </View>
-                </TouchableOpacity>
-
-                {/* Post Content */}
-                <Text style={styles.postContent}>{post.content}</Text>
-
-                {/* Post Image */}
-                {post.image_base64 && (
-                  <Image source={{ uri: post.image_base64 }} style={styles.postImage} resizeMode="cover" />
-                )}
-
-                {/* Post Actions */}
-                <View style={styles.postActions}>
-                  <TouchableOpacity style={styles.postActionBtn} onPress={() => handleLike(post.id)}>
-                    <Text style={[styles.postActionIcon, post.is_liked && { color: '#FF3D5E' }]}>
-                      {post.is_liked ? '❤️' : '🤍'}
-                    </Text>
-                    <Text style={[styles.postActionCount, post.is_liked && { color: '#FF3D5E' }]}>
-                      {post.likes_count}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.postActionBtn} onPress={() => loadComments(post.id)}>
-                    <Text style={styles.postActionIcon}>💬</Text>
-                    <Text style={styles.postActionCount}>{post.comments_count}</Text>
-                  </TouchableOpacity>
-                </View>
-
-                {/* Comments Section */}
-                {expandedPost === post.id && (
-                  <View style={styles.commentsSection}>
-                    {(comments[post.id] || []).map(c => (
-                      <View key={c.id} style={styles.commentRow}>
-                        <View style={styles.commentAvatar}>
-                          <UserAvatar avatarUrl={c.user.avatar_url} avatarSeed={c.user.avatar_seed} pseudo={c.user.pseudo} size={28} />
-                        </View>
-                        <View style={styles.commentContent}>
-                          <Text style={styles.commentUser}>{c.user.pseudo}</Text>
-                          <Text style={styles.commentText}>{c.content}</Text>
-                          <Text style={styles.commentTime}>{timeAgo(c.created_at)}</Text>
+                    {/* Comments Section */}
+                    {expandedPost === post.id && (
+                      <View style={styles.commentsSection}>
+                        {(comments[post.id] || []).map(c => (
+                          <View key={c.id} style={styles.commentRow}>
+                            <UserAvatar avatarUrl={c.user.avatar_url} avatarSeed={c.user.avatar_seed} pseudo={c.user.pseudo} size={28} />
+                            <View style={styles.commentContent}>
+                              <Txt variant="label" color={COLOR.text.primary}>{c.user.pseudo}</Txt>
+                              <Txt variant="bodySmall">{c.content}</Txt>
+                              <Txt variant="caption">{timeAgo(c.created_at)}</Txt>
+                            </View>
+                          </View>
+                        ))}
+                        {/* Add comment input */}
+                        <View style={styles.commentInputRow}>
+                          <TextInput
+                            style={styles.commentInput}
+                            placeholder={t('category.add_comment')}
+                            placeholderTextColor={COLOR.text.tertiary}
+                            value={commentingPost === post.id ? commentText : ''}
+                            onFocus={() => setCommentingPost(post.id)}
+                            onChangeText={text => { setCommentingPost(post.id); setCommentText(text); }}
+                            multiline
+                            maxFontSizeMultiplier={1.3}
+                          />
+                          <Pressable
+                            style={({ pressed }) => [styles.sendBtn, pressed && styles.pressed]}
+                            onPress={() => handleComment(post.id)}
+                            accessibilityRole="button"
+                            accessibilityLabel={t('pilot.theme.send')}
+                          >
+                            <Icon name="chevronRight" size={20} color={COLOR.text.onAction} strokeWidth={2.5} />
+                          </Pressable>
                         </View>
                       </View>
-                    ))}
-                    {/* Add comment input */}
-                    <View style={styles.commentInputRow}>
-                      <TextInput
-                        style={styles.commentInput}
-                        placeholder={t('category.add_comment')}
-                        placeholderTextColor="#525252"
-                        value={commentingPost === post.id ? commentText : ''}
-                        onFocus={() => setCommentingPost(post.id)}
-                        onChangeText={text => { setCommentingPost(post.id); setCommentText(text); }}
-                        multiline
-                      />
-                      <TouchableOpacity
-                        style={[styles.commentSend, { backgroundColor: meta.color }]}
-                        onPress={() => handleComment(post.id)}
-                      >
-                        <Text style={styles.commentSendText}>↑</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                )}
-              </View>
-            ))
-          )}
+                    )}
+                  </Card>
+                ))}
+              </>
+            )}
+          </Section>
         </ScrollView>
+
+        {/* ── CTA collant : « Jouer ce thème » au-dessus de la safe area ── */}
+        {!keyboardOpen && (
+          <View style={[styles.footer, { paddingBottom: insets.bottom + SPACE.md }]}>
+            <LinearGradient colors={GRADIENTS.fadeBottom.colors} style={styles.footerFade} pointerEvents="none" />
+            <Button
+              testID="play-button"
+              label={t('pilot.theme.play')}
+              icon="duel"
+              size="lg"
+              fullWidth
+              haptic={false}
+              onPress={handlePlay}
+            />
+          </View>
+        )}
       </KeyboardAvoidingView>
 
       {/* Create Post Modal */}
       <Modal visible={showCreatePost} transparent animationType="slide" onRequestClose={() => setShowCreatePost(false)}>
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <View style={styles.modalOverlay}>
             <ScrollView
               keyboardDismissMode="on-drag"
               keyboardShouldPersistTaps="handled"
-              style={{ width: '100%' }}
-              contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}
+              style={styles.modalScroll}
+              contentContainerStyle={styles.modalScrollContent}
             >
-            <View style={styles.createModalContent}>
+            <View style={[styles.createModalContent, { paddingBottom: insets.bottom + SPACE.xxl }]}>
+              <View style={styles.grabber} />
               <View style={styles.createModalHeader}>
-                <TouchableOpacity onPress={() => { setShowCreatePost(false); setNewPostImage(null); setNewPostText(''); }}>
-                  <Text style={styles.createModalCancel}>{t('category.cancel')}</Text>
-                </TouchableOpacity>
-                <Text style={styles.createModalTitle}>{t('category.new_post')}</Text>
-                <TouchableOpacity
-                  style={[styles.publishBtn, { backgroundColor: newPostText.trim() ? meta.color : '#333' }]}
+                <Button
+                  label={t('category.cancel')}
+                  variant="ghost"
+                  size="sm"
+                  haptic={false}
+                  onPress={() => { setShowCreatePost(false); setNewPostImage(null); setNewPostText(''); }}
+                />
+                <Txt variant="h3" numberOfLines={1} style={styles.createModalTitle}>{t('category.new_post')}</Txt>
+                <Button
+                  label={t('category.publish_btn')}
+                  size="sm"
+                  haptic={false}
                   onPress={handleCreatePost}
                   disabled={!newPostText.trim() || posting}
-                >
-                  {posting ? <ActivityIndicator size="small" color="#FFF" /> : <Text style={styles.publishText}>{t('category.publish_btn')}</Text>}
-                </TouchableOpacity>
+                  loading={posting}
+                />
               </View>
 
               <TextInput
                 style={styles.postInput}
                 placeholder={t('category.share_with_community')}
-                placeholderTextColor="#525252"
+                placeholderTextColor={COLOR.text.tertiary}
                 value={newPostText}
                 onChangeText={setNewPostText}
                 multiline
                 maxLength={500}
                 autoFocus
+                maxFontSizeMultiplier={1.3}
               />
 
               {newPostImage && (
                 <View style={styles.previewImageContainer}>
                   <Image source={{ uri: newPostImage }} style={styles.previewImage} resizeMode="cover" />
-                  <TouchableOpacity style={styles.removeImage} onPress={() => setNewPostImage(null)}>
-                    <Text style={styles.removeImageText}>✕</Text>
-                  </TouchableOpacity>
+                  <IconButton
+                    icon="close"
+                    accessibilityLabel={t('pilot.theme.remove_photo')}
+                    onPress={() => setNewPostImage(null)}
+                    style={styles.removeImage}
+                  />
                 </View>
               )}
 
               <View style={styles.createModalActions}>
-                <TouchableOpacity style={styles.mediaBtn} onPress={pickImage}>
-                  <MaterialCommunityIcons name="camera-outline" size={20} color={meta.color} />
-                  <Text style={[styles.mediaBtnText, { color: meta.color }]}>{t('category.photo')}</Text>
-                </TouchableOpacity>
-                <Text style={styles.charCount}>{newPostText.length}/500</Text>
+                <Button label={t('category.photo')} icon="plus" variant="ghost" size="sm" haptic={false} onPress={pickImage} />
+                <Txt variant="caption" style={styles.tabular}>{newPostText.length}/500</Txt>
               </View>
             </View>
             </ScrollView>
@@ -782,261 +734,111 @@ export default function CategoryDetailScreen() {
         </KeyboardAvoidingView>
       </Modal>
 
-    </View>
+    </ScreenContainer>
     </SwipeBackPage>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'transparent' },
-  loadingContainer: { flex: 1, backgroundColor: '#050510', justifyContent: 'center', alignItems: 'center' },
+  flex: { flex: 1 },
+  centerFill: { flex: 1, justifyContent: 'center' },
+  tabular: { fontVariant: ['tabular-nums'] },
+  pressed: { opacity: 0.7 },
+
   successToast: {
-    position: 'absolute', top: 60, alignSelf: 'center', zIndex: 999,
-    backgroundColor: 'rgba(50,231,163,0.15)', borderWidth: 1, borderColor: 'rgba(50,231,163,0.4)',
-    borderRadius: 20, paddingHorizontal: 20, paddingVertical: 10,
+    position: 'absolute', top: SIZE.header + SPACE.giant, alignSelf: 'center', zIndex: 10,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.sm,
+    backgroundColor: COLOR.status.successFill, borderWidth: BORDER.hair, borderColor: COLOR.status.success,
+    borderRadius: RADII.pill, paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm,
   },
-  successToastText: { color: '#32E7A3', fontWeight: '700', fontSize: 14 },
-  scrollContent: { paddingBottom: 40 },
 
-  // Top nav row (back + cluster)
-  topNavRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 },
-  clusterBadgeAbsolute: { position: 'absolute', left: 0, right: 0, alignItems: 'center', pointerEvents: 'none' },
-  backCircle: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
+  scrollContent: {
+    paddingHorizontal: SPACE.screenX,
+    paddingTop: SPACE.xxl,
+    paddingBottom: SPACE.xxxl,
+    gap: SPACE.sectionGap,
+  },
 
-  // Header Card
-  headerCard: {
-    marginHorizontal: 16, borderRadius: GLASS.radiusLg, backgroundColor: GLASS.bg,
-    padding: 20, borderWidth: 1, borderColor: GLASS.borderCyan, marginBottom: 20,
-  },
-  headerTop: { flexDirection: 'row', marginBottom: 20 },
-  catImageBox: { width: 80, height: 80, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
-  catEmoji: { fontSize: 42 },
-  headerInfo: { flex: 1, justifyContent: 'center' },
-  catName: { fontSize: 26, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.8, textTransform: 'uppercase', color: '#FFF', marginBottom: 4 },
-  catDescription: { fontSize: 14, color: '#A3A3A3', lineHeight: 20 },
+  // Hero (à plat, sans carte)
+  hero: { alignItems: 'center', gap: SPACE.lg },
+  heroTexts: { alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.sm },
+  heroStats: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xxl },
+  heroStat: { alignItems: 'center', gap: SPACE.xxs, minWidth: 96 },
+  heroStatDivider: { width: BORDER.hair, height: SPACE.xxxl, backgroundColor: COLOR.border.default },
+  voRow: { alignItems: 'center', gap: SPACE.xs },
 
-  // Action Buttons
-  actionsRow: { flexDirection: 'row', gap: 8, marginBottom: 20 },
-  actionBtn: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 12, borderRadius: 14, gap: 6,
-  },
-  playBtn: { backgroundColor: '#B366FF' },
-  playBtnIcon: { fontSize: 16 },
-  playBtnText: { color: '#FFF', fontSize: 14, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold' },
-  followBtn: {
-    backgroundColor: GLASS.bgLight, borderWidth: 1, borderColor: GLASS.borderSubtle,
-  },
-  followingBtn: {
-    backgroundColor: 'rgba(50,231,163,0.1)', borderWidth: 1, borderColor: 'rgba(50,231,163,0.3)',
-  },
-  followIcon: { fontSize: 14, color: '#FFF', fontWeight: '800' },
-  followText: { color: '#FFF', fontSize: 13, fontWeight: '700' },
-  leaderBtn: {
-    backgroundColor: 'rgba(255,181,71,0.1)', borderWidth: 1, borderColor: 'rgba(255,181,71,0.3)',
-  },
-  leaderIcon: { fontSize: 14 },
-  leaderText: { color: '#FFB547', fontSize: 12, fontWeight: '700' },
+  // Progression
+  levelRow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: SPACE.md },
+  levelInfo: { flex: 1, alignItems: 'flex-end', paddingBottom: SPACE.xs },
+  maxLevel: { marginTop: SPACE.md },
+  xpBlock: { marginTop: SPACE.md, gap: SPACE.sm },
+  xpLegend: { flexDirection: 'row', justifyContent: 'space-between', gap: SPACE.sm },
 
-  // XP Section
-  xpSection: { marginBottom: 20 },
-  xpHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12, gap: 12 },
-  xpLevelBadge: {
-    width: 52, height: 52, borderRadius: 14, borderWidth: 1,
-    justifyContent: 'center', alignItems: 'center',
+  // Jalons : liste verticale reliée par un rail
+  milestones: { marginTop: SPACE.xl },
+  milestone: { flexDirection: 'row', alignItems: 'flex-start', gap: SPACE.md, minHeight: 36 },
+  milestoneRail: { alignItems: 'center', alignSelf: 'stretch' },
+  milestoneLine: { flex: 1, width: BORDER.default, backgroundColor: COLOR.border.default, marginVertical: SPACE.xxs },
+  milestoneLineReached: { backgroundColor: COLOR.action.primary },
+  milestoneLvl: { width: 64, paddingTop: 3 },
+  milestoneTitle: { flex: 1, paddingTop: 2 },
+  milestoneDot: {
+    width: SPACE.xl, height: SPACE.xl, borderRadius: SPACE.xl / 2,
+    borderWidth: BORDER.strong, borderColor: COLOR.text.disabled, backgroundColor: COLOR.surface.card,
+    alignItems: 'center', justifyContent: 'center',
   },
-  xpLevelNum: { fontSize: 22, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', lineHeight: 26 },
-  xpLevelLabel: { fontSize: 8, fontWeight: '800', color: '#525252', letterSpacing: 1 },
-  xpHeaderInfo: { flex: 1 },
-  xpTitle: { fontSize: 15, fontWeight: '800', marginBottom: 2 },
-  xpNoTitle: { fontSize: 13, color: '#525252', fontWeight: '600', marginBottom: 2 },
-  xpXpLabel: { fontSize: 11, color: '#A3A3A3', fontWeight: '600' },
-  xpNextBadge: {
-    borderWidth: 1, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6,
-    alignItems: 'center',
-  },
-  xpNextLabel: { fontSize: 8, color: '#525252', fontWeight: '800', letterSpacing: 1 },
-  xpNextNum: { fontSize: 16, fontWeight: '900' },
+  milestoneDotReached: { backgroundColor: COLOR.action.primary, borderColor: COLOR.action.primary },
 
-  // Zone 1 — XP dans le niveau actuel
-  xpLevelRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 5,
-  },
-  xpLevelFrom: { fontSize: 10, fontWeight: '800', minWidth: 42, textAlign: 'right' },
-  xpLevelTo: { fontSize: 10, fontWeight: '600', color: '#525252', minWidth: 42 },
-  xpBarTrack: {
-    flex: 1, height: 7, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 4,
-    overflow: 'hidden',
-  },
-  xpBarFill: { height: 7, borderRadius: 4, position: 'absolute', left: 0, top: 0 },
-  xpXpHint: { fontSize: 10, color: '#525252', fontWeight: '600', textAlign: 'center', marginBottom: 16 },
+  // Classement
+  listCard: { paddingHorizontal: SPACE.cardPad },
+  rowDivider: { height: BORDER.hair, backgroundColor: COLOR.border.subtle },
 
-  // Zone 2 — Roadmap des paliers
-  roadmapContainer: {
-    position: 'relative', height: 84, marginTop: 8, marginBottom: 4,
-  },
-  roadmapTrack: {
-    position: 'absolute', top: 10, left: 0, right: 0, height: 3, borderRadius: 2,
-  },
-  roadmapTrackDone: {
-    position: 'absolute', top: 10, left: 0, height: 3, borderRadius: 2,
-  },
-  roadmapCursor: {
-    position: 'absolute', top: 4, width: 14, height: 14, borderRadius: 7,
-    borderWidth: 2, marginLeft: -7, zIndex: 3,
-  },
-  roadmapMilestone: {
-    position: 'absolute', top: 0, alignItems: 'center', width: 55, marginLeft: -27,
-  },
-  roadmapDot: {
-    width: 22, height: 22, borderRadius: 11, borderWidth: 2,
-    justifyContent: 'center', alignItems: 'center', marginBottom: 3,
-  },
-  roadmapLvl: { fontSize: 9, fontWeight: '800', marginBottom: 1 },
-  roadmapTitle: { fontSize: 10, fontWeight: '600', textAlign: 'center', lineHeight: 13 },
+  // Post
+  postHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md, minHeight: SIZE.touch, marginBottom: SPACE.md },
+  postContent: { marginBottom: SPACE.md },
+  postImage: { width: '100%', height: 200, borderRadius: RADII.md, marginBottom: SPACE.md },
+  postActions: { flexDirection: 'row', gap: SPACE.xl },
+  postActionBtn: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, minHeight: SIZE.touch, minWidth: SIZE.touch },
 
-  titlesScroll: { marginTop: 4 },
-  titlesScrollContent: { gap: 6 },
-  titleChip: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, borderWidth: 1,
-  },
-  titleChipText: { fontSize: 11, fontWeight: '700' },
-
-  // Stats Row
-  statsRow: { flexDirection: 'row', alignItems: 'flex-start' },
-  statItem: { flex: 1, alignItems: 'center' },
-  statLabel: { fontSize: 8, fontFamily: 'JetBrainsMono_700Bold', color: 'rgba(255,255,255,0.40)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 6 },
-  statValue: { fontSize: 28, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -1, color: '#FFF' },
-  statSub: { fontSize: 11, color: '#A3A3A3', fontWeight: '600', marginTop: 2 },
-  statDivider: { width: 1, height: 40 },
-  topPlayerBtn: { alignItems: 'center', gap: 4 },
-  topPlayerInfo: { alignItems: 'center' },
-  topPlayerPseudo: { fontSize: 11, fontWeight: '800', color: '#FFF', maxWidth: 80, textAlign: 'center' },
-  topPlayerTitle: { fontSize: 9, fontWeight: '600', maxWidth: 80, textAlign: 'center' },
-  topPlayerNone: { fontSize: 22, color: '#525252', fontWeight: '700' },
-
-  // Wall
-  wallHeader: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 20, marginBottom: 16,
-  },
-  wallTitle: { fontSize: 12, fontWeight: '800', color: '#525252', letterSpacing: 2 },
-  createPostBtn: { borderRadius: 20, paddingHorizontal: 16, paddingVertical: 8, borderWidth: 1 },
-  createPostText: { fontSize: 13, fontWeight: '700' },
-
-  emptyWall: { alignItems: 'center', paddingVertical: 48, paddingHorizontal: 40 },
-  emptyIconCircle: { width: 80, height: 80, borderRadius: 40, justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
-  emptyText: { fontSize: 18, fontWeight: '700', color: '#FFF', marginBottom: 4 },
-  emptySub: { fontSize: 14, color: '#525252', textAlign: 'center' },
-
-  // Cluster badge
-  clusterBadge: { height: 36, borderWidth: 1, borderRadius: 18, paddingHorizontal: 14, justifyContent: 'center' },
-  clusterBadgeText: { fontSize: 12, fontWeight: '800', letterSpacing: 1.5 },
-
-  // Post Card
-  postCard: {
-    marginHorizontal: 16, backgroundColor: GLASS.bg,
-    borderRadius: 16, padding: 16, marginBottom: 12,
-    borderWidth: 1, borderColor: GLASS.borderSubtle,
-  },
-  postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  postAvatar: {
-    width: 40, height: 40, borderRadius: 20, backgroundColor: '#B366FF',
-    justifyContent: 'center', alignItems: 'center', marginRight: 10,
-  },
-  postAvatarText: { color: '#FFF', fontSize: 18, fontWeight: '800' },
-  postUserInfo: { flex: 1 },
-  postUsername: { color: '#FFF', fontSize: 15, fontWeight: '700' },
-  postTime: { color: '#525252', fontSize: 12, marginTop: 1 },
-  postContent: { color: '#E0E0E0', fontSize: 15, lineHeight: 22, marginBottom: 12 },
-  postImage: { width: '100%', height: 200, borderRadius: 12, marginBottom: 12 },
-
-  // Post Actions
-  postActions: { flexDirection: 'row', gap: 20 },
-  postActionBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  postActionIcon: { fontSize: 18 },
-  postActionCount: { color: '#A3A3A3', fontSize: 14, fontWeight: '600' },
-
-  // Comments
-  commentsSection: { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.06)' },
-  commentRow: { flexDirection: 'row', marginBottom: 12 },
-  commentAvatar: {
-    width: 28, height: 28, borderRadius: 14, backgroundColor: '#333',
-    justifyContent: 'center', alignItems: 'center', marginRight: 8,
-  },
-  commentAvatarText: { color: '#FFF', fontSize: 12, fontWeight: '700' },
-  commentContent: { flex: 1 },
-  commentUser: { color: '#FFF', fontSize: 13, fontWeight: '700' },
-  commentText: { color: '#D0D0D0', fontSize: 13, marginTop: 2 },
-  commentTime: { color: '#525252', fontSize: 11, marginTop: 4 },
-  commentInputRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 },
+  // Commentaires
+  commentsSection: { marginTop: SPACE.sm, paddingTop: SPACE.md, borderTopWidth: BORDER.hair, borderTopColor: COLOR.border.subtle, gap: SPACE.md },
+  commentRow: { flexDirection: 'row', gap: SPACE.sm },
+  commentContent: { flex: 1, gap: SPACE.xxs },
+  commentInputRow: { flexDirection: 'row', alignItems: 'flex-end', gap: SPACE.sm },
   commentInput: {
-    flex: 1, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 20,
-    paddingHorizontal: 14, paddingVertical: 10, color: '#FFF', fontSize: 14, maxHeight: 80,
+    ...TYPO.bodySmall,
+    flex: 1, minHeight: SIZE.touch, maxHeight: 96,
+    color: COLOR.text.primary, backgroundColor: COLOR.bg.primary,
+    borderRadius: RADII.md, borderWidth: BORDER.hair, borderColor: COLOR.border.default,
+    paddingHorizontal: SPACE.md, paddingTop: SPACE.md, paddingBottom: SPACE.md,
   },
-  commentSend: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
-  commentSendText: { color: '#FFF', fontSize: 18, fontWeight: '800' },
+  sendBtn: {
+    width: SIZE.touch, height: SIZE.touch, borderRadius: SIZE.touch / 2,
+    backgroundColor: COLOR.action.primary, alignItems: 'center', justifyContent: 'center',
+  },
 
-  // Create Post Modal
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'flex-end' },
+  // CTA collant
+  footer: { paddingHorizontal: SPACE.screenX, paddingTop: SPACE.sm, backgroundColor: COLOR.bg.primary },
+  footerFade: { position: 'absolute', left: 0, right: 0, top: -SPACE.xxl, height: SPACE.xxl },
+
+  // Modale de création
+  modalOverlay: { flex: 1, backgroundColor: COLOR.overlay.scrim, justifyContent: 'flex-end' },
+  modalScroll: { width: '100%' },
+  modalScrollContent: { flexGrow: 1, justifyContent: 'flex-end' },
   createModalContent: {
-    backgroundColor: GLASS.bgDark, borderTopLeftRadius: 24, borderTopRightRadius: 24,
-    paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40, minHeight: 300,
+    backgroundColor: COLOR.surface.card, borderTopLeftRadius: RADII.xl, borderTopRightRadius: RADII.xl,
+    borderWidth: BORDER.hair, borderColor: COLOR.border.subtle,
+    paddingHorizontal: SPACE.screenX, minHeight: 300, gap: SPACE.md,
   },
-  createModalHeader: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16,
-  },
-  createModalCancel: { color: '#A3A3A3', fontSize: 15, fontWeight: '600' },
-  createModalTitle: { color: '#FFF', fontSize: 17, fontWeight: '800' },
-  publishBtn: { borderRadius: 20, paddingHorizontal: 16, paddingVertical: 8 },
-  publishText: { color: '#FFF', fontSize: 14, fontWeight: '700' },
-  postInput: {
-    color: '#FFF', fontSize: 16, minHeight: 100, textAlignVertical: 'top',
-    lineHeight: 24,
-  },
-  previewImageContainer: { position: 'relative', marginBottom: 12 },
-  previewImage: { width: '100%', height: 200, borderRadius: 12 },
-  removeImage: {
-    position: 'absolute', top: 8, right: 8, width: 28, height: 28, borderRadius: 14,
-    backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center',
-  },
-  removeImageText: { color: '#FFF', fontSize: 14, fontWeight: '800' },
+  grabber: { alignSelf: 'center', width: SPACE.huge, height: SPACE.xs, borderRadius: RADII.xs, backgroundColor: COLOR.border.strong, marginTop: SPACE.sm },
+  createModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: SPACE.sm },
+  createModalTitle: { flex: 1, textAlign: 'center' },
+  postInput: { ...TYPO.body, color: COLOR.text.primary, minHeight: 100, textAlignVertical: 'top' },
+  previewImageContainer: { position: 'relative' },
+  previewImage: { width: '100%', height: 200, borderRadius: RADII.md },
+  removeImage: { position: 'absolute', top: SPACE.sm, right: SPACE.sm, backgroundColor: COLOR.overlay.soft },
   createModalActions: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.08)', paddingTop: 12,
+    borderTopWidth: BORDER.hair, borderTopColor: COLOR.border.subtle, paddingTop: SPACE.md,
   },
-  mediaBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 12, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.06)' },
-  mediaBtnText: { fontSize: 14, fontWeight: '600' },
-  charCount: { color: '#525252', fontSize: 13, fontWeight: '500' },
-
-  // VO Toggle
-  voToggleBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    backgroundColor: 'rgba(167,139,250,0.08)', borderRadius: 14,
-    paddingHorizontal: 16, paddingVertical: 12, marginTop: 4,
-    borderWidth: 1, borderColor: 'rgba(167,139,250,0.2)',
-  },
-  voToggleBtnActive: {
-    backgroundColor: 'rgba(167,139,250,0.15)',
-    borderColor: 'rgba(167,139,250,0.4)',
-  },
-  voToggleIcon: { fontSize: 20 },
-  voToggleText: { color: '#D4D4D4', fontSize: 14, fontWeight: '700' },
-  voToggleSub: { color: '#525252', fontSize: 11, marginTop: 2 },
-  voToggleSwitch: {
-    width: 44, height: 24, borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', paddingHorizontal: 2,
-  },
-  voToggleSwitchActive: {
-    backgroundColor: 'rgba(167,139,250,0.4)', borderColor: 'rgba(167,139,250,0.6)',
-  },
-  voToggleKnob: {
-    width: 18, height: 18, borderRadius: 9, backgroundColor: '#666',
-  },
-  voToggleKnobActive: {
-    backgroundColor: '#A78BFA', alignSelf: 'flex-end',
-  },
-
 });

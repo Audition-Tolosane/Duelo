@@ -159,8 +159,8 @@ export const GRADIENTS = {
   fadeBottom:    { colors: ['rgba(7,31,38,0)', '#071F26'] as const },                                      // fin de scroll
   fadeTop:       { colors: ['#071F26', 'rgba(7,31,38,0)'] as const },
   fadeRight:     { colors: ['rgba(7,31,38,0)', '#071F26'] as const, start: { x: 0, y: 0 }, end: { x: 1, y: 0 } },
-  vsSelf:        { colors: ['rgba(255,219,61,0.22)', 'rgba(255,219,61,0)'] as const },                    // halo moi (VS)
-  vsOpponent:    { colors: ['rgba(255,107,91,0.22)', 'rgba(255,107,91,0)'] as const },                    // halo rival (VS)
+  vsSelf:        { colors: ['rgba(255,219,61,0.12)', 'rgba(255,219,61,0)'] as const },                    // halo moi (VS)
+  vsOpponent:    { colors: ['rgba(255,107,91,0.12)', 'rgba(255,107,91,0)'] as const },                    // halo rival (VS)
   victory:       { colors: ['rgba(255,219,61,0.22)', 'rgba(7,31,38,0)'] as const },                       // halo victoire
   defeat:        { colors: ['#0B3D4A', '#071F26'] as const },                                              // défaite = pétrole, jamais rouge
   draw:          { colors: ['rgba(232,241,236,0.10)', 'rgba(7,31,38,0)'] as const },

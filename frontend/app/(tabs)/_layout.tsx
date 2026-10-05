@@ -1,22 +1,20 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, Platform, TouchableOpacity, useWindowDimensions } from 'react-native';
-import Svg, { Path, Circle, Line } from 'react-native-svg';
-import { Image } from 'react-native';
+import { View, StyleSheet, Platform, Pressable, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue, useAnimatedStyle, withSpring, withTiming,
   runOnJS, interpolate, Extrapolation,
 } from 'react-native-reanimated';
-import { useRouter, usePathname, Slot } from 'expo-router';
+import { usePathname, Slot } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { GLASS } from '../../theme/glassTheme';
-import CosmicBackground from '../../components/CosmicBackground';
 import DueloHeader from '../../components/DueloHeader';
 import { useSwipeBackProgress } from '../../components/SwipeBackContext';
 import { t } from '../../utils/i18n';
-import { useWS } from '../../contexts/WebSocketContext';
 import { TabBarProvider, useTabBar } from '../../contexts/TabBarContext';
+import { ScreenContainer, Txt, Icon } from '../../components/ui';
+import type { IconName } from '../../components/ui';
+import { COLOR, SPACE, SIZE, RADII, BORDER, ELEVATION, ICON_SIZE, TYPO } from '../../theme/tokens';
 
 // Import screen components directly for the pager
 import AccueilScreen from './accueil';
@@ -25,68 +23,16 @@ import PlayScreen from './play';
 import ThemesScreen from './themes';
 import ProfileScreen from './profile';
 
-// ── Neon SVG tab icons ────────────────────────────────────────────────────────
-
-function HomeIcon({ color, size = 26 }: { color: string; size?: number }) {
-  // viewBox décalé de -1 : le glyphe maison est dessiné haut (y 3→20) dans sa
-  // boîte, on le recentre pour l'aligner sur les autres icônes du footer.
-  return (
-    <Svg width={size} height={size} viewBox="0 -1 24 24" fill="none">
-      <Path d="M3 12L12 3l9 9" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <Path d="M5 10v9a1 1 0 0 0 1 1h4v-5h4v5h4a1 1 0 0 0 1-1v-9" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </Svg>
-  );
-}
-
-function PlayersIcon({ color, size = 26 }: { color: string; size?: number }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Circle cx="9" cy="7" r="3.5" stroke={color} strokeWidth="2" />
-      <Path d="M2 21v-1a7 7 0 0 1 7-7h1" stroke={color} strokeWidth="2" strokeLinecap="round" />
-      <Circle cx="17" cy="9" r="3" stroke={color} strokeWidth="2" />
-      <Path d="M13 21v-1a5 5 0 0 1 5-5h0a5 5 0 0 1 5 5v1" stroke={color} strokeWidth="2" strokeLinecap="round" />
-    </Svg>
-  );
-}
-
-const PLAY_ICON = require('../../assets/tabs/play.webp');
-
-function ThemesIcon({ color, size = 26 }: { color: string; size?: number }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path
-        d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"
-        stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"
-      />
-    </Svg>
-  );
-}
-
-function ProfileIcon({ color, size = 26 }: { color: string; size?: number }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Circle cx="12" cy="8" r="4" stroke={color} strokeWidth="2" />
-      <Path d="M4 20a8 8 0 0 1 16 0" stroke={color} strokeWidth="2" strokeLinecap="round" />
-    </Svg>
-  );
-}
-
 // ── Tab config ────────────────────────────────────────────────────────────────
+// Icônes Lucide (registre <Icon>) : actif = jaune (icône + libellé + point), inactif = crème.
+// Les pastilles de notification vivent uniquement dans l'en-tête (DueloHeader).
 
-const TAB_COLORS = {
-  accueil: '#00E5FF',   // cyan
-  players: '#BF5FFF',  // violet
-  play:    '#FFFFFF',  // blanc (bouton central)
-  themes:  '#FF3E9D',  // rose
-  profile: '#FF9F0A',  // orange
-};
-
-const TAB_CONFIG = [
-  { name: 'accueil', labelKey: 'tab.home' as const },
-  { name: 'players', labelKey: 'tab.players' as const },
-  { name: 'play', labelKey: 'tab.play' as const, isCenter: true },
-  { name: 'themes', labelKey: 'tab.themes' as const },
-  { name: 'profile', labelKey: 'tab.profile' as const },
+const TAB_CONFIG: { name: string; labelKey: string; icon: IconName; isCenter?: boolean }[] = [
+  { name: 'accueil', labelKey: 'tab.home', icon: 'home' },
+  { name: 'players', labelKey: 'tab.players', icon: 'users' },
+  { name: 'play', labelKey: 'tab.play', icon: 'duel', isCenter: true },
+  { name: 'themes', labelKey: 'tab.themes', icon: 'compass' },
+  { name: 'profile', labelKey: 'tab.profile', icon: 'user' },
 ];
 
 const TAB_NAMES = TAB_CONFIG.map(tab => tab.name);
@@ -95,28 +41,18 @@ const SCREENS = [AccueilScreen, PlayersScreen, PlayScreen, ThemesScreen, Profile
 
 const SPRING_CONFIG = { damping: 22, stiffness: 220, mass: 0.8 };
 
-function TabIcon({ name, color, size }: { name: string; color: string; size?: number }) {
-  if (name === 'accueil') return <HomeIcon color={color} size={size} />;
-  if (name === 'players') return <PlayersIcon color={color} size={size} />;
-  if (name === 'play')    return <Image source={PLAY_ICON} style={{ width: size ?? 30, height: size ?? 30 }} resizeMode="contain" />;
-  if (name === 'themes')  return <ThemesIcon color={color} size={size} />;
-  if (name === 'profile') return <ProfileIcon color={color} size={size} />;
-  return null;
-}
+// D9 : le glisser horizontal entre onglets est désactivé (conflit avec les carrousels,
+// la tab bar suffit). Repasser à true pour le réactiver après les retours du pilote.
+const PAGER_SWIPE_ENABLED = false;
 
-function TabBadge({ count }: { count: number }) {
-  if (count <= 0) return null;
-  return (
-    <View style={styles.badge}>
-      <Text style={styles.badgeText}>{count > 99 ? '99' : String(count)}</Text>
-    </View>
-  );
-}
+// Libellés d'onglet à 11 px (plancher lisibilité) : Space Grotesk Medium à la taille de l'overline.
+const TAB_LABEL_SIZE = { fontSize: TYPO.overline.fontSize, lineHeight: TYPO.overline.lineHeight };
+const PLAY_DISC = SIZE.buttonLg; // disque central Jouer : 56 px
 
 // Header qui s'efface au scroll vers le bas (même valeur que la cartouche du bas).
 // Le repli inclut la zone safe-area : aucune bande résiduelle, le contenu
 // monte jusqu'au bord physique de l'écran.
-const HEADER_ROW_H = 46; // 34 (pastilles) + 2×6 (paddings) — sync avec DueloHeader
+const HEADER_ROW_H = SIZE.header; // 46 px — sync avec DueloHeader
 
 function CollapsingHeader() {
   const insets = useSafeAreaInsets();
@@ -142,17 +78,10 @@ function CollapsingHeader() {
 
 function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTabPress: (index: number) => void }) {
   const insets = useSafeAreaInsets();
-  const { unreadNotifs, unreadMessages } = useWS();
   const { hidden } = useTabBar();
 
-  const badgeForTab = (name: string) => {
-    if (name === 'accueil') return unreadNotifs;
-    if (name === 'players') return unreadMessages;
-    return 0;
-  };
-
   // Réduction au scroll : la cartouche se compacte (icônes seules, légèrement plus petite)
-  const bottomOffset = (insets.bottom > 0 ? insets.bottom : 12) + 6;
+  const bottomOffset = (insets.bottom > 0 ? insets.bottom : SPACE.md) + SPACE.xs;
   const hideStyle = useAnimatedStyle(() => {
     const h = hidden ? hidden.value : 0;
     return {
@@ -168,8 +97,8 @@ function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTa
     const h = hidden ? hidden.value : 0;
     return {
       opacity: interpolate(h, [0, 0.6], [1, 0], Extrapolation.CLAMP),
-      height: interpolate(h, [0, 1], [17, 0]),
-      marginTop: interpolate(h, [0, 1], [4, 0]),
+      height: interpolate(h, [0, 1], [TYPO.overline.lineHeight + SPACE.xxs, 0]),
+      marginTop: interpolate(h, [0, 1], [SPACE.xxs, 0]),
     };
   });
 
@@ -177,39 +106,48 @@ function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTa
     <Animated.View style={[styles.tabBar, { bottom: bottomOffset }, hideStyle]}>
       {TAB_CONFIG.map((tab, index) => {
         const isFocused = currentIndex === index;
-        const color = TAB_COLORS[tab.name as keyof typeof TAB_COLORS];
-        const badgeCount = badgeForTab(tab.name);
+        const fg = isFocused ? COLOR.action.primary : COLOR.text.tertiary;
+        const label = t(tab.labelKey);
 
         if (tab.isCenter) {
           return (
-            <TouchableOpacity key={tab.name} style={styles.playTabWrap} onPress={() => onTabPress(index)} activeOpacity={1}>
-              <View style={[
-                styles.playTabCircle,
-                isFocused && { borderColor: 'rgba(0,255,255,0.8)', shadowOpacity: 0.8, shadowRadius: 18 },
-              ]}>
-                <TabIcon name={tab.name} color="#FFF" size={30} />
-              </View>
-              <Animated.View style={[styles.labelWrap, labelWrapStyle]}>
-                <Text style={[styles.tabLabel, isFocused && { color: '#00FFFF' }]}>{t(tab.labelKey)}</Text>
-              </Animated.View>
-            </TouchableOpacity>
+            <Pressable
+              key={tab.name}
+              style={styles.playTabWrap}
+              onPress={() => onTabPress(index)}
+              accessibilityRole="tab"
+              accessibilityLabel={label}
+              accessibilityState={{ selected: isFocused }}
+            >
+              {({ pressed }) => (
+                <>
+                  <View style={[styles.playTabCircle, pressed && styles.playTabPressed]}>
+                    <Icon name={tab.icon} size={ICON_SIZE.xl} color={COLOR.text.onAction} />
+                  </View>
+                  <Animated.View style={[styles.labelWrap, labelWrapStyle]}>
+                    <Txt variant="label" color={fg} style={TAB_LABEL_SIZE} numberOfLines={1}>{label}</Txt>
+                  </Animated.View>
+                </>
+              )}
+            </Pressable>
           );
         }
 
         return (
-          <TouchableOpacity key={tab.name} style={styles.tabItem} onPress={() => onTabPress(index)} activeOpacity={1}>
-            {/* Glow spot when active */}
-            {isFocused && (
-              <View style={[styles.iconGlow, { backgroundColor: color + '22', shadowColor: color }]} />
-            )}
-            <View style={{ opacity: isFocused ? 1 : 0.38 }}>
-              <TabIcon name={tab.name} color={color} size={26} />
-              <TabBadge count={badgeCount} />
-            </View>
+          <Pressable
+            key={tab.name}
+            style={({ pressed }) => [styles.tabItem, pressed && styles.tabPressed]}
+            onPress={() => onTabPress(index)}
+            accessibilityRole="tab"
+            accessibilityLabel={label}
+            accessibilityState={{ selected: isFocused }}
+          >
+            <Icon name={tab.icon} size={ICON_SIZE.lg} color={fg} />
             <Animated.View style={[styles.labelWrap, labelWrapStyle]}>
-              <Text style={[styles.tabLabel, isFocused && { color }]}>{t(tab.labelKey)}</Text>
+              <Txt variant="label" color={fg} style={TAB_LABEL_SIZE} numberOfLines={1}>{label}</Txt>
             </Animated.View>
-          </TouchableOpacity>
+            <View style={[styles.activeDot, isFocused && styles.activeDotOn]} />
+          </Pressable>
         );
       })}
     </Animated.View>
@@ -258,6 +196,7 @@ export default function TabLayout() {
   }, [activeIndex]);
 
   const panGesture = Gesture.Pan()
+    .enabled(PAGER_SWIPE_ENABLED)
     .activeOffsetX([-30, 30])
     .failOffsetY([-15, 15])
     .onUpdate((e) => {
@@ -335,9 +274,9 @@ export default function TabLayout() {
   return (
     <TabBarProvider>
     <Animated.View style={[styles.container, parallaxStyle]}>
-    {/* Fond cosmique UNIQUE derrière header + contenu + cartouche
+    {/* Fond nuit pétrole UNIQUE derrière header + contenu + cartouche
         (les onglets sont transparents — aucune couture sous le header) */}
-    <CosmicBackground>
+    <ScreenContainer>
       {/* Hidden Slot for expo-router compatibility */}
       <View style={styles.hiddenSlot} pointerEvents="none">
         <Slot />
@@ -360,7 +299,7 @@ export default function TabLayout() {
       </View>
 
       <CustomTabBar currentIndex={activeIndex} onTabPress={onTabPress} />
-    </CosmicBackground>
+    </ScreenContainer>
     </Animated.View>
     </TabBarProvider>
   );
@@ -369,7 +308,7 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050510',
+    backgroundColor: COLOR.bg.primary,
   },
   hiddenSlot: {
     position: 'absolute',
@@ -397,26 +336,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
-  // Cartouche flottante type Insta — pill détachée du bas de l'écran
+  // Cartouche flottante détachée du bas de l'écran : nuit pétrole, liseré crème 8 %
   tabBar: {
     position: 'absolute',
-    left: 14,
-    right: 14,
+    left: SPACE.md,
+    right: SPACE.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    backgroundColor: 'rgba(13,13,28,0.96)',
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    paddingTop: 7,
-    paddingBottom: 7,
-    paddingHorizontal: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.55,
-    shadowRadius: 24,
-    elevation: 16,
+    backgroundColor: COLOR.bg.primary,
+    borderRadius: RADII.pill,
+    borderWidth: BORDER.hair,
+    borderColor: COLOR.border.subtle,
+    paddingVertical: SPACE.xs,
+    paddingHorizontal: SPACE.xs,
+    ...ELEVATION.e3,
     ...Platform.select({
       web: {
         backdropFilter: 'blur(20px)',
@@ -428,58 +362,41 @@ const styles = StyleSheet.create({
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 56,
-    position: 'relative',
+    minWidth: SIZE.buttonLg,
+    minHeight: SIZE.touch,
+    paddingTop: SPACE.xs,
   },
-  iconGlow: {
-    position: 'absolute',
-    top: -5, width: 44, height: 36,
-    borderRadius: 12,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 10,
-  },
+  tabPressed: { opacity: 0.7 },
   labelWrap: {
     overflow: 'hidden',
     alignItems: 'center',
   },
-  tabLabel: {
-    fontSize: 9,
-    color: 'rgba(255,255,255,0.38)',
-    fontWeight: '700',
-    letterSpacing: 0.5,
+  // Point actif de 4 px sous le libellé (reste visible quand la cartouche est compacte)
+  activeDot: {
+    width: SPACE.xs,
+    height: SPACE.xs,
+    borderRadius: RADII.xs,
+    marginTop: SPACE.xxs,
+    backgroundColor: 'transparent',
   },
+  activeDotOn: { backgroundColor: COLOR.action.primary },
   playTabWrap: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -14,
+    minWidth: SIZE.buttonLg,
+    marginTop: -SPACE.lg,
   },
-  badge: {
-    position: 'absolute',
-    top: -2,
-    right: -5,
-    minWidth: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#FF3B30',
+  // Bouton central Jouer : disque jaune plein, icône nuit
+  playTabCircle: {
+    width: PLAY_DISC,
+    height: PLAY_DISC,
+    borderRadius: PLAY_DISC / 2,
+    backgroundColor: COLOR.action.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 3,
-    borderWidth: 1.5,
-    borderColor: '#050510',
+    borderWidth: BORDER.strong,
+    borderColor: COLOR.bg.primary,
+    ...ELEVATION.e2,
   },
-  badgeText: {
-    color: '#FFF',
-    fontSize: 9,
-    fontWeight: '900',
-    lineHeight: 12,
-  },
-  playTabCircle: {
-    width: 56, height: 56, borderRadius: 28,
-    backgroundColor: '#7B22E2',
-    justifyContent: 'center', alignItems: 'center',
-    borderWidth: 1.5, borderColor: 'rgba(0,255,255,0.45)',
-    shadowColor: '#00FFFF', shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5, shadowRadius: 14, elevation: 8,
-  },
+  playTabPressed: { backgroundColor: COLOR.action.primaryPressed, transform: [{ scale: 0.96 }] },
 });

@@ -1,20 +1,23 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions,
-  Platform, UIManager, ActivityIndicator, Easing, Alert, AppState, BackHandler,
+  View, StyleSheet, Animated,
+  Platform, UIManager, Easing, Alert, AppState, BackHandler,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { GLASS } from '../theme/glassTheme';
 import SwipeBackPage from '../components/SwipeBackPage';
 import RoundTimer from '../components/RoundTimer';
+import Txt from '../components/ui/Txt';
+import Icon from '../components/ui/Icon';
+import Button from '../components/ui/Button';
+import IconButton from '../components/ui/IconButton';
+import Loader from '../components/ui/Loader';
+import ScreenContainer from '../components/ui/ScreenContainer';
+import AnswerButton, { AnswerState } from '../components/ui/AnswerButton';
 import { useWS } from '../contexts/WebSocketContext';
 import { dueloWS } from '../services/websocket';
-import { COLOR } from '../theme/tokens';
+import { COLOR, SPACE, RADII, BORDER, ELEVATION } from '../theme/tokens';
 import { authFetch } from '../utils/api';
 import { saveScoreWithRetry } from '../utils/pendingScores';
 import { t, getLanguage } from '../utils/i18n';
@@ -48,12 +51,17 @@ type Question = {
   correct_option: number;
 };
 
-// ── Design tokens ──
-const CYAN = '#00E5FF';
-const VIOLET = '#B366FF';
-const GOLD = '#FFB547';
-const MINT = '#32E7A3';
-const RED = '#FF3D5E';
+// ── Présentation ──
+const LETTERS = ['A', 'B', 'C', 'D'];
+const TIMER_SIZE = 64; // anneau compact, centré entre les deux scores
+
+// Question par paliers de longueur (Space Grotesk Bold) : 24/30 · 22/28 · 19/25 · 17/23.
+// Le kit n'a pas encore de variante « question » : on part de h2 et on ajuste taille et interligne.
+const questionTier = (len: number) =>
+  len <= 60 ? { size: 24, line: 30 }
+  : len <= 100 ? { size: 22, line: 28 }
+  : len <= 150 ? { size: 19, line: 25 }
+  : { size: 17, line: 23 };
 
 export default function GameScreen() {
   const router = useRouter();
@@ -83,10 +91,6 @@ export default function GameScreen() {
   const [pseudo, setPseudo] = useState(t('game.player'));
   const [showPending, setShowPending] = useState(true);
 
-  // Loading spinner animation
-  const spinAnim = useRef(new Animated.Value(0)).current;
-  const pulseAnim = useRef(new Animated.Value(0.6)).current;
-
   // Score refs to avoid stale closures
   const playerScoreRef = useRef(0);
   const botScoreRef = useRef(0);
@@ -97,12 +101,13 @@ export default function GameScreen() {
 
   // Progress bar state (questions)
   const [completedQuestions, setCompletedQuestions] = useState(0);
+  // Affichage seul : juste/faux par question pour colorer les tirets de progression
+  const questionResultsRef = useRef<Record<number, boolean>>({});
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeLeftRef = useRef(TIMER_DURATION);
   const questionsRef = useRef<Question[]>([]);
   const currentIndexRef = useRef(0);
-  const timerAnim = useRef(new Animated.Value(1)).current;
   const questionFade = useRef(new Animated.Value(0)).current;
   const questionSlide = useRef(new Animated.Value(24)).current;
   const userIdRef = useRef<string | null>(null);
@@ -121,10 +126,6 @@ export default function GameScreen() {
   // Guards
   const isSubmittingRef = useRef(false);               // #18 double-tap prevention
   const wsAnswerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // #17 WS hang timeout
-
-  // Progress bar animation
-  const progressAnim = useRef(new Animated.Value(0)).current;
-  const progressPendingOpacity = useRef(new Animated.Value(1)).current;
 
   // Question slide scale animation
   const questionScaleAnim = useRef(new Animated.Value(0.96)).current;
@@ -218,24 +219,8 @@ export default function GameScreen() {
       fetchQuestions();
     }
 
-    // Start loading animation
-    const spin = Animated.loop(
-      Animated.timing(spinAnim, {
-        toValue: 1, duration: 1200, easing: Easing.linear, useNativeDriver: true,
-      })
-    );
-    spin.start();
-    const pulse = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
-        Animated.timing(pulseAnim, { toValue: 0.6, duration: 800, useNativeDriver: true }),
-      ])
-    );
-    pulse.start();
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
-      spin.stop();
-      pulse.stop();
     };
   }, []);
 
@@ -286,15 +271,8 @@ export default function GameScreen() {
         setShowPending(false);
 
         const done = question_index + 1;
+        questionResultsRef.current[question_index] = !!is_correct;
         setCompletedQuestions(done);
-        Animated.timing(progressAnim, {
-          toValue: done / TOTAL_QUESTIONS,
-          duration: 400,
-          useNativeDriver: false,
-        }).start();
-        Animated.timing(progressPendingOpacity, {
-          toValue: 0, duration: 300, useNativeDriver: false,
-        }).start();
 
         Haptics.notificationAsync(
           is_correct ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Error
@@ -322,9 +300,6 @@ export default function GameScreen() {
           setShowResult(false);
           lastCorrectOptionRef.current = null;
           setShowPending(true);
-          Animated.timing(progressPendingOpacity, {
-            toValue: 1, duration: 200, useNativeDriver: false,
-          }).start();
           animateQuestion();
           startTimer();
         }
@@ -449,10 +424,6 @@ export default function GameScreen() {
     setQuestionDuration(duration);
     timeLeftRef.current = duration;
     setTimeLeft(duration);
-    timerAnim.setValue(1);
-    Animated.timing(timerAnim, {
-      toValue: 0, duration: duration * 1000, useNativeDriver: false,
-    }).start();
 
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
@@ -519,19 +490,9 @@ export default function GameScreen() {
     // Hide pending on bars (answered)
     setShowPending(false);
 
-    // Animate progress bar: question completed
+    // Progression : question terminée
     const done = completedQuestions + 1;
     setCompletedQuestions(done);
-    Animated.timing(progressAnim, {
-      toValue: done / TOTAL_QUESTIONS,
-      duration: 400,
-      useNativeDriver: false,
-    }).start();
-
-    // Fade out progress pending
-    Animated.timing(progressPendingOpacity, {
-      toValue: 0, duration: 300, useNativeDriver: false,
-    }).start();
 
     // Reveal bot answer with a small independent delay (simulates opponent responding
     // at their own pace rather than instantly when the player answers)
@@ -559,6 +520,7 @@ export default function GameScreen() {
       playSound('wrong');
       const question = questionsRef.current[currentIndexRef.current];
       if (!question) return;
+      questionResultsRef.current[currentIndexRef.current] = false;
 
       // Record timeout to history for async modes
       if (isAsync) {
@@ -623,6 +585,7 @@ export default function GameScreen() {
       const question = questions[currentIndex];
       const isCorrect = optionIndex === question.correct_option;
       const pPts = isCorrect ? Math.max(MAX_PTS_PER_Q - timeTaken, 10) : 0;
+      questionResultsRef.current[currentIndexRef.current] = isCorrect;
 
       Haptics.notificationAsync(
         isCorrect ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Error
@@ -678,13 +641,6 @@ export default function GameScreen() {
     setBotAnswer(null);
     setShowResult(false);
     setShowPending(true);
-    // Reset timer anim for new question
-    timerAnim.setValue(1);
-
-    // Show progress pending for new question
-    Animated.timing(progressPendingOpacity, {
-      toValue: 1, duration: 200, useNativeDriver: false,
-    }).start();
 
     animateQuestion();
     startTimer();
@@ -734,10 +690,6 @@ export default function GameScreen() {
   };
 
   if (loading || questions.length === 0) {
-    const spinInterp = spinAnim.interpolate({
-      inputRange: [0, 1], outputRange: ['0deg', '360deg'],
-    });
-
     // Invalid params — guard after all hooks
     if (!themeId) {
       Alert.alert(t('common.error'), t('game.invalid_game'), [{ text: t('common.ok'), onPress: () => router.replace('/(tabs)/play') }]);
@@ -748,66 +700,36 @@ export default function GameScreen() {
     if (loadError) {
       return (
         <SwipeBackPage>
-        <View style={styles.container}>
-          <SafeAreaView style={styles.safeArea}>
-            <View style={styles.loadingView}>
-              <View style={styles.errorIconWrap}>
-                <MaterialCommunityIcons name="alert-circle-outline" size={48} color="#FF6B6B" />
-              </View>
-              <Text style={styles.errorTitle}>{t('game.loading_error')}</Text>
-              <Text style={styles.errorMessage}>{loadError}</Text>
-              <TouchableOpacity style={styles.retryBtn} onPress={fetchQuestions} activeOpacity={0.8}>
-                <LinearGradient
-                  colors={['#8A2BE2', '#6A1FBF']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.retryBtnGradient}
-                >
-                  <MaterialCommunityIcons name="refresh" size={18} color="#FFF" style={{ marginRight: 6 }} />
-                  <Text style={styles.retryBtnText}>{t('common.retry')}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.backBtnLoading} onPress={() => router.back()} activeOpacity={0.8}>
-                <MaterialCommunityIcons name="arrow-left" size={16} color="#888" style={{ marginRight: 6 }} />
-                <Text style={styles.backBtnLoadingText}>{t('common.back')}</Text>
-              </TouchableOpacity>
+        <ScreenContainer safeTop safeBottom>
+          <View style={styles.stateView}>
+            <Icon name="error" size={40} color={COLOR.status.error} />
+            <Txt variant="h2" align="center">{t('game.loading_error')}</Txt>
+            <Txt variant="body" color={COLOR.text.secondary} align="center" style={styles.errorMessage}>{loadError}</Txt>
+            <View style={styles.stateActions}>
+              <Button label={t('common.retry')} icon="replay" onPress={fetchQuestions} haptic={false} fullWidth />
+              <Button label={t('common.back')} icon="back" variant="ghost" onPress={() => router.back()} haptic={false} fullWidth />
             </View>
-          </SafeAreaView>
-        </View>
+          </View>
+        </ScreenContainer>
         </SwipeBackPage>
       );
     }
 
-    // Loading spinner
+    // Loading
     return (
       <SwipeBackPage enabled={false}>
-      <View style={styles.container}>
-        <SafeAreaView style={styles.safeArea}>
-          <View style={styles.loadingView}>
-            <View style={styles.spinnerContainer}>
-              <Animated.View style={[styles.spinnerOuter, { transform: [{ rotate: spinInterp }] }]}>
-                <View style={styles.spinnerDot} />
-              </Animated.View>
-              <Animated.View style={[styles.spinnerInner, { opacity: pulseAnim }]}>
-                <MaterialCommunityIcons name="target" size={28} color="#8A2BE2" />
-              </Animated.View>
-            </View>
-            <Animated.Text style={[styles.loadingTitle, { opacity: pulseAnim }]}>
-              {t('game.loading_questions')}
-            </Animated.Text>
-            <Text style={styles.loadingSubtitle}>
-              {t('game.fetching_from_db')}
-            </Text>
-            <ActivityIndicator color="#8A2BE2" size="small" style={{ marginTop: 16 }} />
-          </View>
-        </SafeAreaView>
-      </View>
+      <ScreenContainer safeTop safeBottom>
+        <Loader label={t('game.loading_questions')} fill />
+      </ScreenContainer>
       </SwipeBackPage>
     );
   }
 
   const question = questions[currentIndex];
   const optionRows: Array<[number, number]> = [[0, 1], [2, 3]];
+  // En live, les questions arrivent une par une : le total affiché reste celui du match.
+  const totalShown = isLive ? TOTAL_QUESTIONS : questions.length;
+  const qTier = questionTier(question.question_text?.length || 0);
 
   // Sémantique : neutre avant réponse · jaune = ma sélection (en attente) ·
   // vert + ✓ = bonne réponse révélée · rouge + ✕ = ma mauvaise réponse.
@@ -822,426 +744,163 @@ export default function GameScreen() {
     showResult && index === selectedOption && !isOptionCorrectReveal(index);
   const isPendingPick = (index: number): boolean => !showResult && index === selectedOption;
 
-  const getOptionFill = (index: number): [string, string] => {
-    const c = isOptionCorrectReveal(index) ? COLOR.status.success
-      : isWrongPick(index) ? COLOR.status.errorFill
-      : isPendingPick(index) ? COLOR.action.selectedFill
-      : showResult ? COLOR.surface.subtle
-      : COLOR.surface.card;
-    return [c, c];
-  };
+  const answerState = (index: number): AnswerState =>
+    isOptionCorrectReveal(index) ? 'correct'
+    : isWrongPick(index) ? 'wrong'
+    : isPendingPick(index) ? 'selected'
+    : showResult ? 'dimmed'
+    : 'idle';
 
-  const getOptionBorderCol = (index: number): string => {
-    if (isOptionCorrectReveal(index)) return COLOR.status.success;
-    if (isWrongPick(index)) return COLOR.status.error;
-    if (isPendingPick(index)) return COLOR.border.active;
-    return showResult ? COLOR.border.subtle : COLOR.border.default;
-  };
-
-  const getOptionTxtCol = (index: number): string => {
-    if (isOptionCorrectReveal(index)) return COLOR.text.onAction;
-    if (isWrongPick(index) || isPendingPick(index)) return COLOR.text.primary;
-    return showResult ? COLOR.text.disabled : COLOR.text.primary;
+  // Tirets : vert = juste · rouge = faux · jaune = question en cours · crème 12 % = à venir
+  const dashColor = (i: number): string => {
+    if (i < completedQuestions) {
+      const r = questionResultsRef.current[i];
+      return r === true ? COLOR.status.success : r === false ? COLOR.status.error : COLOR.border.strong;
+    }
+    return i === currentIndex ? COLOR.action.primary : COLOR.track;
   };
 
   return (
     <SwipeBackPage enabled={false}>
-    <View style={styles.container}>
-      {/* Fond : teinte cyan en haut → violet en bas (duel) */}
-      <LinearGradient
-        colors={['rgba(0,229,255,0.10)', '#050510', '#050510', 'rgba(179,102,255,0.10)']}
-        locations={[0, 0.3, 0.7, 1]}
-        style={StyleSheet.absoluteFill}
-      />
+    <ScreenContainer safeTop safeBottom>
 
-      {/* Progress bar */}
-      <View style={styles.progressBarBg}>
-        <Animated.View style={[styles.progressBarSolid, {
-          width: progressAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
-        }]}>
-          <LinearGradient colors={[CYAN, '#00A8CC']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} />
+      {/* Rangée haute : abandon (le swipe-retour est désactivé en match) + scores + timer */}
+      <View style={styles.topRow}>
+        <IconButton
+          testID="forfeit-btn"
+          icon="close"
+          onPress={confirmForfeit}
+          accessibilityLabel={t('game.forfeit')}
+        />
+
+        <View style={[styles.scoreBox, styles.scoreBoxSelf]} accessibilityLabel={`${pseudo} ${playerScore}`}>
+          <Txt variant="overline" color={COLOR.player.self} numberOfLines={1}>{pseudo}</Txt>
+          <Animated.View style={{ transform: [{ scale: scorePopAnim }] }}>
+            <Txt variant="score">{playerScore}</Txt>
+          </Animated.View>
+        </View>
+
+        <RoundTimer timeLeft={timeLeft} total={questionDuration} size={TIMER_SIZE} />
+
+        <View style={[styles.scoreBox, styles.scoreBoxOpponent]} accessibilityLabel={`${params.opponentPseudo || ''} ${isAsyncSolo ? '' : botScore}`}>
+          <Txt variant="overline" color={COLOR.player.opponent} numberOfLines={1}>
+            {params.opponentPseudo?.slice(0, 10)}
+          </Txt>
+          <Txt variant="score">{isAsyncSolo ? '—' : botScore}</Txt>
+        </View>
+      </View>
+
+      {/* Progression : 7 tirets sémantiques + compteur */}
+      <View style={styles.progressRow}>
+        <View style={styles.dashes}>
+          {Array.from({ length: TOTAL_QUESTIONS }).map((_, i) => (
+            <View key={i} style={[styles.dash, { backgroundColor: dashColor(i) }]} />
+          ))}
+        </View>
+        <Txt variant="overline" color={COLOR.text.secondary}>
+          {t('pilot.game.question_counter', { n: String(currentIndex + 1), total: String(totalShown) })}
+        </Txt>
+      </View>
+
+      {/* Question, posée sur le fond (sans carte) */}
+      <View style={styles.questionZone}>
+        <Animated.View style={{
+          opacity: questionFade,
+          transform: [{ translateX: questionSlide }, { scale: questionScaleAnim }],
+        }}>
+          <Txt variant="h2" align="center" style={{ fontSize: qTier.size, lineHeight: qTier.line }}>
+            {question.question_text}
+          </Txt>
         </Animated.View>
       </View>
 
-      {/* edges top+bottom : la grille de réponses ne mord plus la barre home */}
-      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-
-        {/* Abandon explicite (le swipe-retour est désactivé en match) */}
-        <View style={styles.topActions}>
-          <TouchableOpacity
-            testID="forfeit-btn"
-            onPress={confirmForfeit}
-            style={styles.forfeitBtn}
-            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-            accessibilityRole="button"
-            accessibilityLabel={t('game.forfeit')}
-          >
-            <MaterialCommunityIcons name="close" size={22} color={COLOR.text.secondary} />
-          </TouchableOpacity>
-        </View>
-
-        {/* Score boxes + Round Timer */}
-        <View style={styles.scoreTimerRow}>
-          <View style={[styles.scoreBox, styles.scoreBoxPlayer]}>
-            <LinearGradient colors={['rgba(0,229,255,0.12)', 'rgba(0,229,255,0.03)']} style={StyleSheet.absoluteFill} />
-            <View style={[styles.scoreAvatar, { borderColor: 'rgba(0,229,255,0.5)' }]}>
-              <Text style={styles.scoreAvatarLetter}>{pseudo[0]?.toUpperCase()}</Text>
-            </View>
-            <View style={styles.scoreMeta}>
-              <Text style={[styles.scoreBoxName, { color: CYAN }]} numberOfLines={1}>{pseudo}</Text>
-              <Animated.Text style={[styles.scoreBoxScore, { transform: [{ scale: scorePopAnim }] }]}>{playerScore}</Animated.Text>
-            </View>
-          </View>
-
-          <View style={styles.timerSection}>
-            <RoundTimer timeLeft={timeLeft} total={questionDuration} />
-          </View>
-
-          <View style={[styles.scoreBox, styles.scoreBoxOpponent]}>
-            <LinearGradient colors={['rgba(179,102,255,0.12)', 'rgba(179,102,255,0.03)']} style={StyleSheet.absoluteFill} />
-            <View style={[styles.scoreAvatar, { borderColor: 'rgba(179,102,255,0.5)' }]}>
-              <Text style={styles.scoreAvatarLetter}>{(params.opponentPseudo || 'B')[0]?.toUpperCase()}</Text>
-            </View>
-            <View style={[styles.scoreMeta, styles.scoreMetaRight]}>
-              <Text style={[styles.scoreBoxName, { color: VIOLET }]} numberOfLines={1}>
-                {params.opponentPseudo?.slice(0, 10)}
-              </Text>
-              <Text style={styles.scoreBoxScore}>
-                {isAsyncSolo ? '—' : botScore}
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Dots progression */}
-        <View style={styles.dotsProgressRow}>
-          {Array.from({ length: TOTAL_QUESTIONS }).map((_, i) => (
-            <View key={i} style={[
-              styles.dot,
-              i < completedQuestions ? styles.dotDone :
-              i === completedQuestions ? styles.dotCurrent : styles.dotPending,
-            ]} />
-          ))}
-        </View>
-
-        {/* Question + 2×2 Options */}
-        <View style={styles.centerContent}>
-          <Animated.View style={[styles.questionBox, {
-            opacity: questionFade,
-            transform: [{ translateX: questionSlide }, { scale: questionScaleAnim }],
-          }]}>
-            <Text style={styles.questionEyebrow}>◆ Q{currentIndex + 1} · {questions.length}</Text>
-            <Text style={styles.questionText}>{question.question_text}</Text>
-          </Animated.View>
-
-          <View style={styles.optionsGrid}>
-            {optionRows.map((row, rowIdx) => (
-              <View key={rowIdx} style={styles.optionsRow}>
-                {row.map((index) => {
-                  const fillColors = getOptionFill(index);
-                  const borderColor = getOptionBorderCol(index);
-                  const textColor = getOptionTxtCol(index);
-                  const isPlayerPick = selectedOption === index;
-                  const isBotPick = botAnswer === index;
-                  const correctReveal = isOptionCorrectReveal(index);
-                  return (
-                    <TouchableOpacity
-                      key={index}
-                      testID={`option-${index}`}
-                      style={[styles.optionCard2x2, { borderColor }, isPendingPick(index) && styles.optionCardSelected, correctReveal && styles.optionCardCorrect]}
-                      onPress={() => selectAnswer(index)}
-                      disabled={showResult}
-                      activeOpacity={0.85}
-                    >
-                      <LinearGradient colors={fillColors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
-                      <View style={[styles.optionLetterBadge, {
-                        backgroundColor: correctReveal ? 'rgba(7,31,38,0.18)'
-                          : isPendingPick(index) ? COLOR.action.primary
-                          : COLOR.surface.subtle,
-                      }]}>
-                        <Text style={[styles.optionLetterText, {
-                          color: correctReveal || isPendingPick(index) ? COLOR.text.onAction
-                            : showResult ? COLOR.text.disabled : COLOR.text.secondary,
-                        }]}>
-                          {['A', 'B', 'C', 'D'][index]}
-                        </Text>
-                      </View>
-                      {/* Réponse toujours ENTIÈREMENT visible : police réduite
-                          progressivement selon la longueur, 5 lignes max */}
-                      {(() => {
-                        const optText = question.options[index] || '';
-                        const fs = optText.length > 90 ? 11 : optText.length > 60 ? 12 : optText.length > 40 ? 13 : 15;
-                        return (
-                          <Text style={[styles.optionText2x2, { color: textColor, fontSize: fs, lineHeight: fs + 4 }]} numberOfLines={5}>
-                            {optText}
-                          </Text>
-                        );
-                      })()}
-                      {(correctReveal || isWrongPick(index)) && (
-                        <View style={styles.optionIndicatorPlayer}>
-                          <MaterialCommunityIcons
-                            name={correctReveal ? 'check-circle' : 'close-circle'}
-                            size={18}
-                            color={correctReveal ? COLOR.text.onAction : COLOR.status.error}
-                          />
-                        </View>
-                      )}
-                      {showResult && isBotPick && !isPlayerPick && (
-                        <View style={styles.optionIndicatorBot} />
-                      )}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
+      {/* Réponses 2×2 dans la zone du pouce — toujours entièrement visibles */}
+      <View style={styles.optionsGrid}>
+        {optionRows.map((row, rowIdx) => (
+          <View key={rowIdx} style={styles.optionsRow}>
+            {row.map((index) => (
+              <AnswerButton
+                key={index}
+                testID={`option-${index}`}
+                letter={LETTERS[index]}
+                text={question.options[index] || ''}
+                state={answerState(index)}
+                opponentPick={showResult && botAnswer === index && selectedOption !== index}
+                onPress={() => selectAnswer(index)}
+                disabled={showResult}
+              />
             ))}
           </View>
-        </View>
+        ))}
+      </View>
 
-      </SafeAreaView>
-
-      {/* Streak Toast */}
+      {/* Toast de série */}
       {streakToastVisible && (
         <View style={styles.streakToastWrapper} pointerEvents="none">
-        <Animated.View style={[styles.streakToast, {
-          opacity: streakToastAnim,
-          transform: [{ scale: streakToastAnim.interpolate({ inputRange: [0, 1], outputRange: [0.7, 1] }) }],
-        }]}>
-          <LinearGradient
-            colors={streakToastCount === 7 ? ['#FFD700', '#FF9F0A'] : ['#8A2BE2', '#A855F7']}
-            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-            style={styles.streakToastGrad}
-          >
-            <Text style={styles.streakToastEmoji}>
-              {streakToastCount === 7 ? '🏆' : streakToastCount === 5 ? '⚡' : '🔥'}
-            </Text>
-            <Text style={styles.streakToastText}>
-              {streakToastCount === 7 ? 'PARFAIT !' : `${streakToastCount}x EN SÉRIE !`}
-            </Text>
-          </LinearGradient>
-        </Animated.View>
+          <Animated.View style={[styles.streakToast, {
+            opacity: streakToastAnim,
+            transform: [{ scale: streakToastAnim.interpolate({ inputRange: [0, 1], outputRange: [0.7, 1] }) }],
+          }]}>
+            <Icon name="flame" size={24} color={COLOR.text.onAction} />
+            <Txt variant="h2" color={COLOR.text.onAction}>
+              {streakToastCount === 7 ? t('pilot.game.streak_perfect') : t('pilot.game.streak', { n: String(streakToastCount) })}
+            </Txt>
+          </Animated.View>
         </View>
       )}
-    </View>
+    </ScreenContainer>
     </SwipeBackPage>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#050510' },
-  safeArea: { flex: 1 },
-  loadingView: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32 },
-  loadingText: { color: '#FFF', fontSize: 16 },
+  // États chargement / erreur
+  stateView: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: SPACE.xxxl, gap: SPACE.md },
+  errorMessage: { marginBottom: SPACE.md },
+  stateActions: { alignSelf: 'stretch', gap: SPACE.md },
 
-  // Loading spinner
-  spinnerContainer: { width: 80, height: 80, justifyContent: 'center', alignItems: 'center', marginBottom: 24 },
-  spinnerOuter: {
-    width: 80, height: 80, borderRadius: 40,
-    borderWidth: 3, borderColor: 'transparent',
-    borderTopColor: '#8A2BE2', borderRightColor: 'rgba(138,43,226,0.3)',
-    position: 'absolute',
-  },
-  spinnerInner: { justifyContent: 'center', alignItems: 'center' },
-  spinnerDot: {
-    width: 8, height: 8, borderRadius: 4, backgroundColor: '#8A2BE2',
-    position: 'absolute', top: 0, left: '50%', marginLeft: -4,
-  },
-  loadingTitle: { color: '#FFF', fontSize: 18, fontWeight: '700', textAlign: 'center', marginBottom: 8 },
-  loadingSubtitle: { color: '#888', fontSize: 13, textAlign: 'center' },
-
-  // Error state
-  errorIconWrap: { marginBottom: 16 },
-  errorTitle: { color: '#FFF', fontSize: 20, fontWeight: '800', marginBottom: 8 },
-  errorMessage: { color: '#AAA', fontSize: 14, textAlign: 'center', marginBottom: 24, lineHeight: 20 },
-  retryBtn: {
-    borderRadius: 12, overflow: 'hidden',
-    marginBottom: 12,
-  },
-  retryBtnGradient: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 14, paddingHorizontal: 40, borderRadius: 12,
-  },
-  retryBtnText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
-  backBtnLoading: {
+  // Rangée haute : abandon + scores + timer
+  topRow: {
     flexDirection: 'row', alignItems: 'center',
-    borderRadius: 12, paddingVertical: 12, paddingHorizontal: 32,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
-    backgroundColor: GLASS.bg,
+    paddingHorizontal: SPACE.screenX, paddingTop: SPACE.xs, gap: SPACE.sm,
   },
-  backBtnLoadingText: { color: '#888', fontSize: 14, fontWeight: '600' },
+  scoreBox: {
+    flex: 1, minWidth: 0,
+    backgroundColor: COLOR.surface.card,
+    borderRadius: RADII.md, borderWidth: BORDER.strong,
+    paddingHorizontal: SPACE.md, paddingVertical: SPACE.sm,
+  },
+  scoreBoxSelf: { borderColor: COLOR.player.self, alignItems: 'flex-start' },
+  scoreBoxOpponent: { borderColor: COLOR.player.opponent, alignItems: 'flex-end' },
 
-  // Progress bar (question advancement)
-  progressBarBg: {
-    height: 4, backgroundColor: 'rgba(255,255,255,0.06)', width: '100%',
-    overflow: 'hidden',
+  // Progression
+  progressRow: {
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.md,
+    paddingHorizontal: SPACE.screenX, paddingTop: SPACE.md,
   },
-  progressBarSolid: {
-    position: 'absolute', height: 4,
-    borderRadius: 0, overflow: 'hidden',
-  },
-  progressBarPending: {
-    position: 'absolute', height: 4,
-    backgroundColor: 'rgba(138,43,226,0.35)',
+  dashes: { flex: 1, flexDirection: 'row', gap: SPACE.xs },
+  dash: { flex: 1, height: SPACE.xs, borderRadius: RADII.xs },
+
+  // Question
+  questionZone: {
+    flexGrow: 1, flexShrink: 0, justifyContent: 'center',
+    paddingHorizontal: SPACE.xl, paddingVertical: SPACE.lg,
   },
 
-  // Header
-  headerRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 12, paddingVertical: 10,
-    backgroundColor: GLASS.bg,
-    borderBottomWidth: 1, borderBottomColor: GLASS.borderSubtle,
-  },
-  playerInfo: { flexDirection: 'row', alignItems: 'center', flex: 1 },
-  opponentInfo: { flexDirection: 'row', alignItems: 'center', flex: 1, justifyContent: 'flex-end' },
-  avatarCircle: {
-    width: 44, height: 44, borderRadius: 22,
-    justifyContent: 'center', alignItems: 'center',
-    borderWidth: 2, borderColor: 'rgba(255,255,255,0.15)',
-  },
-  avatarLetter: { color: '#FFF', fontSize: 20, fontWeight: '800' },
-  playerMeta: { marginHorizontal: 8 },
-  playerName: { color: '#FFF', fontSize: 13, fontWeight: '700', maxWidth: 80 },
-  playerTitle: { color: '#666', fontSize: 10, marginBottom: 2 },
-  scoreRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  playerScoreNum: { color: '#00C853', fontSize: 20, fontWeight: '900' },
+  // Grille 2×2
+  optionsGrid: { flex: 1.4, paddingHorizontal: SPACE.screenX, paddingBottom: SPACE.md, gap: SPACE.sm },
+  optionsRow: { flex: 1, flexDirection: 'row', gap: SPACE.sm },
 
-  // Timer
-  timerCenter: { alignItems: 'center', paddingHorizontal: 8 },
-  timerLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginBottom: 4 },
-  timerLabel: { color: '#888', fontSize: 9, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1 },
-  timerCircle: {
-    width: 50, height: 50, borderRadius: 25, borderWidth: 2.5, borderColor: '#00BFFF',
-    justifyContent: 'center', alignItems: 'center', overflow: 'hidden',
-  },
-  timerDanger: { borderColor: '#FF3B30' },
-  timerNum: { color: '#00BFFF', fontSize: 22, fontWeight: '900' },
-  timerNumDanger: { color: '#FF3B30' },
-  timerSweep: {
-    position: 'absolute', bottom: 0, left: 0, height: 3,
-  },
-  // Streak toast
+  // Toast de série : corail plein, texte nuit
   streakToastWrapper: {
     position: 'absolute', top: '38%', left: 0, right: 0,
     alignItems: 'center',
   },
   streakToast: {
-    borderRadius: 20, overflow: 'hidden', elevation: 10,
-    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 12,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.sm,
+    paddingHorizontal: SPACE.xl, paddingVertical: SPACE.md,
+    borderRadius: RADII.pill,
+    backgroundColor: COLOR.accent.warm,
+    ...ELEVATION.e2,
   },
-  streakToastGrad: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    paddingHorizontal: 20, paddingVertical: 12,
-  },
-  streakToastEmoji: { fontSize: 22 },
-  streakToastText: { color: '#FFF', fontSize: 18, fontWeight: '900', letterSpacing: 1.5 },
-
-  questionCounterRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: 6, paddingVertical: 8,
-  },
-  questionCounter: {
-    color: '#666', fontSize: 11, fontWeight: '700',
-    textTransform: 'uppercase', letterSpacing: 2,
-  },
-
-  // Game area
-  gameArea: { flex: 1, flexDirection: 'row' },
-
-  // Score bars
-  barColumn: { width: 22, paddingVertical: 8, alignItems: 'center' },
-  barTrack: {
-    width: 14, flex: 1, backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 7, overflow: 'hidden', position: 'relative',
-  },
-  barScoreLabel: { flexDirection: 'column', alignItems: 'center', marginTop: 4 },
-  barScoreText: { fontSize: 9, fontWeight: '800' },
-
-  // Center (full-width, no side bars)
-  centerContent: { flex: 1 },
-  questionBox: {
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 20, marginHorizontal: 12, marginVertical: 8,
-    paddingHorizontal: 20, paddingVertical: 18,
-    alignItems: 'center',
-  },
-  questionEyebrow: {
-    color: GOLD, fontSize: 11, fontWeight: '700',
-    fontFamily: 'JetBrainsMono_700Bold',
-    letterSpacing: 2, marginBottom: 8,
-  },
-  questionText: { color: '#FFF', fontSize: 24, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', textAlign: 'center', lineHeight: 28, letterSpacing: -0.5 },
-
-  // 2×2 Options grid
-  optionsGrid: { flex: 1, paddingHorizontal: 12, paddingBottom: 12, paddingTop: 4, gap: 10 },
-  optionsRow: { flex: 1, flexDirection: 'row', gap: 10 },
-  optionCard2x2: {
-    flex: 1, borderRadius: 16, borderWidth: 2, overflow: 'hidden',
-    padding: 12, justifyContent: 'space-between',
-  },
-  optionCardSelected: { borderWidth: 3 },
-  optionCardCorrect: {
-    shadowColor: MINT, shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5, shadowRadius: 16, elevation: 8,
-  },
-  optionLetterBadge: {
-    width: 28, height: 28, borderRadius: 8,
-    justifyContent: 'center', alignItems: 'center',
-    marginBottom: 6, alignSelf: 'flex-start',
-  },
-  optionLetterText: { fontSize: 13, fontWeight: '900' },
-  optionText2x2: { fontSize: 15, fontWeight: '700', lineHeight: 20, flex: 1 },
-  optionIndicatorPlayer: { alignSelf: 'flex-end', marginTop: 4 },
-  optionIndicatorBot: {
-    width: 8, height: 8, borderRadius: 4,
-    backgroundColor: COLOR.player.opponent, alignSelf: 'flex-end', marginTop: 4,
-  },
-
-  topActions: { flexDirection: 'row', paddingHorizontal: 10, paddingTop: 2 },
-  forfeitBtn: {
-    width: 36, height: 36, borderRadius: 18,
-    alignItems: 'center', justifyContent: 'center',
-    backgroundColor: COLOR.action.ghost,
-  },
-
-  // Score boxes + timer row
-  scoreTimerRow: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: 10, paddingVertical: 8, gap: 6,
-  },
-  scoreBox: {
-    flex: 1, borderRadius: 12, overflow: 'hidden',
-    paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1,
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-  },
-  scoreBoxPlayer: { borderColor: 'rgba(0,229,255,0.40)' },
-  scoreBoxOpponent: { borderColor: 'rgba(179,102,255,0.40)', flexDirection: 'row-reverse' },
-  scoreAvatar: {
-    width: 32, height: 32, borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    justifyContent: 'center', alignItems: 'center',
-    borderWidth: 1.5,
-  },
-  scoreAvatarLetter: { color: '#FFF', fontSize: 14, fontWeight: '800' },
-  scoreMeta: { flex: 1 },
-  scoreMetaRight: { alignItems: 'flex-end' },
-  scoreBoxName: {
-    fontFamily: 'JetBrainsMono_400Regular', fontSize: 9,
-    letterSpacing: 1, textTransform: 'uppercase', marginBottom: 2,
-  },
-  scoreBoxScore: { color: '#FFF', fontSize: 22, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', lineHeight: 24 },
-  timerSection: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
-
-  // Dots progression
-  dotsProgressRow: {
-    flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
-    gap: 6, paddingVertical: 4,
-  },
-  dot: { width: 20, height: 5, borderRadius: 3 },
-  dotDone: { backgroundColor: MINT },
-  dotCurrent: {
-    backgroundColor: GOLD,
-    shadowColor: GOLD, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.8, shadowRadius: 4,
-    elevation: 3,
-  },
-  dotPending: { backgroundColor: 'rgba(255,255,255,0.12)' },
 });

@@ -4,6 +4,7 @@ import {
   Clock, Compass, Crown, Film, FlaskConical, Flame, Gamepad2, Gift, Globe, Heart, House, Landmark, Leaf, Lock,
   Medal, MessageCircle, Music, Palette, Plus, RotateCcw, Search, Settings, Share2, ShoppingBag, Sparkles,
   Star, Swords, Target, Timer, Trophy, User, Users, X, Zap, Info, LogOut, Trash2, Shield, Calendar, TrendingUp,
+  Camera, Pencil, Send, Hammer, LayoutGrid, Bookmark, CircleHelp, FileText, Languages, Image as ImageIcon, Headphones, Gem, Dumbbell,
 } from 'lucide-react-native';
 import { COLOR, ICON_SIZE } from '../../theme/tokens';
 
@@ -18,6 +19,8 @@ const REGISTRY = {
   settings: Settings, share: Share2, shop: ShoppingBag, sparkles: Sparkles, star: Star, duel: Swords,
   target: Target, timer: Timer, trophy: Trophy, user: User, users: Users, close: X, bolt: Zap, info: Info,
   logout: LogOut, trash: Trash2, shield: Shield, calendar: Calendar, trend: TrendingUp,
+  camera: Camera, edit: Pencil, send: Send, forge: Hammer, grid: LayoutGrid, bookmark: Bookmark, help: CircleHelp,
+  document: FileText, language: Languages, image: ImageIcon, support: Headphones, gem: Gem, training: Dumbbell,
 } as const;
 
 export type IconName = keyof typeof REGISTRY;
