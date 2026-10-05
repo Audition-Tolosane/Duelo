@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Égypte antique">
+  <path d="M128 32C96 32 76 48 70 76L48 196C46 208 54 216 66 216H190C202 216 210 208 208 196L186 76C180 48 160 32 128 32Z" fill="#12606D"/>
+  <path d="M66 132L86 132" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M62 160L86 160" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M58 188L86 188" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M170 132L190 132" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M170 160L194 160" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M170 188L198 188" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="118" y="168" width="20" height="44" rx="8" fill="#FF6B5B"/>
+  <path d="M100 72H156V136C156 162 144 178 128 178C112 178 100 162 100 136Z" fill="#FFDB3D"/>
+  <ellipse cx="128" cy="66" rx="8" ry="13" fill="#FF6B5B"/>
+  <path d="M110 114L118 114" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M138 114L146 114" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M80 84L90 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

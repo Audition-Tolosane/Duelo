@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Espace">
+  <polygon points="58,44 64,58 78,62 64,66 58,80 52,66 38,62 52,58" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="198" cy="196" r="14" fill="#FFDB3D"/>
+  <path d="M174 204C178 196 210 186 222 188" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g transform="rotate(45 128 128)">
+  <path d="M108 180H148C148 202 138 214 128 226C118 214 108 202 108 180Z" fill="#FFDB3D"/>
+  <path d="M88 128L60 160C56 166 58 176 66 176H88Z" fill="#FF6B5B"/>
+  <path d="M168 128L196 160C200 166 198 176 190 176H168Z" fill="#FF6B5B"/>
+  <path d="M128 30C156 50 168 84 168 124V172H88V124C88 84 100 50 128 30Z" fill="#12606D"/>
+  <rect x="102" y="166" width="52" height="16" rx="6" fill="#12606D"/>
+  <circle cx="128" cy="100" r="20" fill="#E8F1EC"/>
+  <circle cx="128" cy="100" r="10" fill="#12606D"/>
+  <path d="M102 130L102 152" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

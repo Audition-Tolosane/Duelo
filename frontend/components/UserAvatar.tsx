@@ -5,7 +5,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 function getAvatarColor(seed: string): string {
-  const colors = ['#8A2BE2', '#FF3B30', '#00C97A', '#FF6B35', '#00BFFF', '#FFD700', '#FF69B4', '#7B68EE'];
+  // Teintes de repli SKILKI (pas de néon) : pétrole clair, corail, or, vert, pétrole foncé, crème grisée
+  // jamais jaune (mon camp / action) ni corail (adversaire) : un avatar ne doit pas brouiller les rôles
+  const colors = ['#12606D', '#2E7D86', '#3E6B5C', '#5E7F86', '#7A6A55', '#4F5D8A'];
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
     hash = seed.charCodeAt(i) + ((hash << 5) - hash);

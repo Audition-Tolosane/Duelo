@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cinéma">
+  <rect x="44" y="112" width="168" height="104" rx="16" fill="#12606D"/>
+  <g transform="rotate(-14 48 100)"><rect x="44" y="70" width="168" height="30" rx="10" fill="#FFDB3D"/><polygon points="82,70 100,70 88,100 70,100" fill="#12606D"/><polygon points="122,70 140,70 128,100 110,100" fill="#12606D"/><polygon points="162,70 180,70 168,100 150,100" fill="#12606D"/></g>
+  <polygon points="128.0,136.0 135.6,155.5 156.5,156.7 140.4,170.0 145.6,190.3 128.0,179.0 110.4,190.3 115.6,170.0 99.5,156.7 120.4,155.5" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M68 136L68 156" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

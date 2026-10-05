@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Géographie">
+  <path d="M128 24A88 88 0 0 1 128 200" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="120" y="198" width="16" height="16" fill="#12606D"/>
+  <rect x="84" y="208" width="88" height="16" rx="8" fill="#12606D"/>
+  <circle cx="128" cy="112" r="72" fill="#12606D"/>
+  <path d="M86 80C100 74 114 80 114 94C114 108 100 112 104 126C108 140 120 146 116 160C112 172 100 174 94 164C88 152 88 138 80 128C72 118 66 108 70 98C74 88 78 84 86 80Z" fill="#FFDB3D"/>
+  <path d="M146 60C162 54 182 62 186 76C190 90 178 96 168 98C158 100 156 112 164 122C172 132 178 144 170 156C162 166 150 162 146 150C142 138 140 126 134 116C128 106 132 92 136 80C138 70 138 64 146 60Z" fill="#FFDB3D"/>
+  <path d="M160 116C150 104 138 94 138 78A22 22 0 0 1 182 78C182 94 170 104 160 116Z" fill="#FF6B5B"/>
+  <circle cx="160" cy="78" r="8" fill="#E8F1EC"/>
+  <path d="M86 70A60 60 0 0 1 112 54" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

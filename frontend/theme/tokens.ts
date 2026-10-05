@@ -6,7 +6,7 @@ import { FONTS } from './fonts';
 // or = récompense / rang / prestige ; vert = juste ; rouge = faux / erreur ;
 // pétrole = structure ; crème = texte ; violet = rareté (flawless, premium) uniquement.
 // ─────────────────────────────────────────────────────────────────────────────
-const PALETTE = {
+export const PALETTE = {
   night:      '#071F26',
   nightDeep:  '#05171C',
   petrol:     '#0B3D4A',
@@ -70,8 +70,164 @@ export const COLOR = {
   },
   overlay: {
     scrim:     'rgba(5,23,28,0.85)',
+    soft:      'rgba(5,23,28,0.60)',
+  },
+  // Piste des barres de progression / anneaux
+  track:       'rgba(232,241,236,0.12)',
+  // Voile posé sur une surface verte/jaune (badge lettre de la bonne réponse)
+  onAccentTint:'rgba(7,31,38,0.16)',
+  // Plaque des icônes de thèmes : crème + liseré pétrole très léger (validé)
+  plate: {
+    fill:      PALETTE.cream,
+    border:    'rgba(11,61,74,0.18)',
+  },
+  // Teintes « douces » pour fonds de puces / halos (jamais pour du texte)
+  tint: {
+    self:      'rgba(255,219,61,0.14)',
+    opponent:  'rgba(255,107,91,0.14)',
+    gold:      'rgba(240,169,59,0.14)',
+    rare:      'rgba(167,139,250,0.14)',
   },
 } as const;
+
+// ── Espacements (grille de 4) ─────────────────────────────────────────────────
+export const SPACE = {
+  xxs: 2, xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 24, xxxl: 32, huge: 40, giant: 56,
+  screenX: 16,      // marge latérale de tous les écrans
+  cardPad: 16,      // padding interne des cartes
+  sectionGap: 28,   // espace entre deux sections
+} as const;
+
+// ── Rayons ────────────────────────────────────────────────────────────────────
+export const RADII = {
+  xs: 4,       // barres, tirets
+  sm: 8,       // puces, badges lettre
+  md: 12,      // boutons, champs, réponses
+  lg: 16,      // cartes
+  xl: 24,      // hero, modales, cartes VS
+  plate: 14,   // plaque d'icône de thème (squircle)
+  pill: 999,
+} as const;
+
+// ── Hauteurs ──────────────────────────────────────────────────────────────────
+export const SIZE = {
+  touch: 44,          // cible tactile minimale
+  buttonSm: 40,
+  button: 52,
+  buttonLg: 56,
+  input: 48,
+  chip: 32,
+  listRow: 60,
+  header: 46,         // hauteur de la rangée d'en-tête (constante historique conservée)
+  tabBar: 64,
+} as const;
+
+// ── Épaisseurs de bordure ─────────────────────────────────────────────────────
+export const BORDER = {
+  hair: 1,
+  default: 1.5,
+  strong: 2,
+  selected: 3,        // ma sélection en jeu
+} as const;
+
+// ── Tailles d'icônes ──────────────────────────────────────────────────────────
+export const ICON_SIZE = {
+  sm: 16, md: 20, lg: 24, xl: 28,
+  theme: { xs: 28, sm: 40, md: 56, lg: 80, hero: 112 },
+} as const;
+
+// ── Ombres (noires uniquement) ────────────────────────────────────────────────
+export const ELEVATION = {
+  e1: { shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 8,  shadowOffset: { width: 0, height: 2 },  elevation: 2 },
+  e2: { shadowColor: '#000', shadowOpacity: 0.35, shadowRadius: 16, shadowOffset: { width: 0, height: 6 },  elevation: 6 },
+  e3: { shadowColor: '#000', shadowOpacity: 0.50, shadowRadius: 24, shadowOffset: { width: 0, height: 12 }, elevation: 12 },
+} as const;
+
+// ── Halos colorés : réservés aux moments forts (VS, victoire, CTA actif, bonne réponse)
+export const GLOW = {
+  cta:      { shadowColor: PALETTE.yellow, shadowOpacity: 0.35, shadowRadius: 16, shadowOffset: { width: 0, height: 4 }, elevation: 8 },
+  opponent: { shadowColor: PALETTE.coral,  shadowOpacity: 0.30, shadowRadius: 16, shadowOffset: { width: 0, height: 4 }, elevation: 8 },
+  success:  { shadowColor: PALETTE.green,  shadowOpacity: 0.40, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 8 },
+  reward:   { shadowColor: PALETTE.gold,   shadowOpacity: 0.35, shadowRadius: 20, shadowOffset: { width: 0, height: 4 }, elevation: 8 },
+} as const;
+
+// ── Dégradés AUTORISÉS (liste fermée — tout autre LinearGradient est à migrer) ──
+// Jamais de dégradé entre deux teintes (cyan→violet…), jamais sur un bouton ou une carte.
+export const GRADIENTS = {
+  screen:        { colors: ['#0B3D4A', '#071F26', '#071F26'] as const, locations: [0, 0.45, 1] as const },  // ambiance d'écran
+  screenDeep:    { colors: ['#071F26', '#05171C'] as const },                                              // bas de page
+  fadeBottom:    { colors: ['rgba(7,31,38,0)', '#071F26'] as const },                                      // fin de scroll
+  fadeTop:       { colors: ['#071F26', 'rgba(7,31,38,0)'] as const },
+  fadeRight:     { colors: ['rgba(7,31,38,0)', '#071F26'] as const, start: { x: 0, y: 0 }, end: { x: 1, y: 0 } },
+  vsSelf:        { colors: ['rgba(255,219,61,0.22)', 'rgba(255,219,61,0)'] as const },                    // halo moi (VS)
+  vsOpponent:    { colors: ['rgba(255,107,91,0.22)', 'rgba(255,107,91,0)'] as const },                    // halo rival (VS)
+  victory:       { colors: ['rgba(255,219,61,0.22)', 'rgba(7,31,38,0)'] as const },                       // halo victoire
+  defeat:        { colors: ['#0B3D4A', '#071F26'] as const },                                              // défaite = pétrole, jamais rouge
+  draw:          { colors: ['rgba(232,241,236,0.10)', 'rgba(7,31,38,0)'] as const },
+  reward:        { colors: ['rgba(240,169,59,0.24)', 'rgba(240,169,59,0)'] as const },                    // récompense exceptionnelle
+  rare:          { colors: ['rgba(167,139,250,0.22)', 'rgba(167,139,250,0)'] as const },                  // flawless / premium
+  hero:          { colors: ['#12606D', '#0B3D4A'] as const, start: { x: 0, y: 0 }, end: { x: 1, y: 1 } }, // carte hero (même famille)
+  scrim:         { colors: ['rgba(5,23,28,0)', 'rgba(5,23,28,0.85)'] as const },                         // lisibilité sur image
+} as const;
+
+// ── Typographie ───────────────────────────────────────────────────────────────
+// Toujours via <Txt variant="…">. La graisse est portée par la famille : fontWeight interdit
+// (Space Grotesk s'arrête à 700, un 800/900 est un faux gras).
+const SG = {
+  regular: 'SpaceGrotesk_400Regular',
+  medium: 'SpaceGrotesk_500Medium',
+  semiBold: 'SpaceGrotesk_600SemiBold',
+  bold: 'SpaceGrotesk_700Bold',
+} as const;
+const TAB = { fontVariant: ['tabular-nums'] as ('tabular-nums')[] };
+
+export const TYPO = {
+  display:    { fontFamily: SG.bold,     fontSize: 44, lineHeight: 48, letterSpacing: -1.5 },
+  h1:         { fontFamily: SG.bold,     fontSize: 28, lineHeight: 32, letterSpacing: -0.6 },
+  h2:         { fontFamily: SG.bold,     fontSize: 22, lineHeight: 26, letterSpacing: -0.3 },
+  h3:         { fontFamily: SG.semiBold, fontSize: 18, lineHeight: 22, letterSpacing: -0.2 },
+  cardTitle:  { fontFamily: SG.semiBold, fontSize: 16, lineHeight: 20, letterSpacing: -0.1 },
+  bodyLarge:  { fontFamily: SG.regular,  fontSize: 17, lineHeight: 24 },
+  body:       { fontFamily: SG.regular,  fontSize: 15, lineHeight: 22 },
+  bodySmall:  { fontFamily: SG.regular,  fontSize: 13, lineHeight: 18 },
+  label:      { fontFamily: SG.medium,   fontSize: 13, lineHeight: 16 },
+  caption:    { fontFamily: SG.medium,   fontSize: 12, lineHeight: 16 },
+  overline:   { fontFamily: 'JetBrainsMono_700Bold', fontSize: 11, lineHeight: 14, letterSpacing: 1.5, textTransform: 'uppercase' as const },
+  button:     { fontFamily: SG.bold,     fontSize: 15, lineHeight: 20, letterSpacing: 0.6, textTransform: 'uppercase' as const },
+  buttonSmall:{ fontFamily: SG.bold,     fontSize: 13, lineHeight: 16, letterSpacing: 0.5, textTransform: 'uppercase' as const },
+  statLarge:  { fontFamily: SG.bold,     fontSize: 40, lineHeight: 44, letterSpacing: -1, ...TAB },
+  statMedium: { fontFamily: SG.bold,     fontSize: 24, lineHeight: 28, letterSpacing: -0.5, ...TAB },
+  score:      { fontFamily: SG.bold,     fontSize: 30, lineHeight: 34, letterSpacing: -0.5, ...TAB },
+  // Exceptions documentées : moments de jeu
+  countdown:  { fontFamily: SG.bold,     fontSize: 72, lineHeight: 76, letterSpacing: -3, ...TAB },
+  moment:     { fontFamily: 'Fraunces_500Medium_Italic', fontSize: 40, lineHeight: 44, letterSpacing: -0.5 },
+  // Pastilles de compteur uniquement (seul texte sous 11 px)
+  micro:      { fontFamily: SG.bold,     fontSize: 10, lineHeight: 12 },
+} as const;
+
+export type TypoVariant = keyof typeof TYPO;
+
+// Couleur par défaut de chaque variante
+export const TYPO_COLOR: Record<TypoVariant, string> = {
+  display: COLOR.text.primary, h1: COLOR.text.primary, h2: COLOR.text.primary, h3: COLOR.text.primary,
+  cardTitle: COLOR.text.primary, bodyLarge: COLOR.text.primary, body: COLOR.text.primary,
+  bodySmall: COLOR.text.secondary, label: COLOR.text.secondary, caption: COLOR.text.tertiary,
+  overline: COLOR.text.tertiary, button: COLOR.text.onAction, buttonSmall: COLOR.text.onAction,
+  statLarge: COLOR.text.primary, statMedium: COLOR.text.primary, score: COLOR.text.primary,
+  countdown: COLOR.text.primary, moment: COLOR.text.primary, micro: COLOR.text.onAction,
+};
+
+// Durées d'animation communes
+export const MOTION = {
+  fast: 150,
+  base: 250,
+  slow: 400,
+} as const;
+
+// ═════════════════════════════════════════════════════════════════════════════
+// ANCIEN SYSTÈME (Duelo) — @deprecated, conservé le temps de la migration écran par écran.
+// Ne plus utiliser dans du nouveau code : COLOR / SPACE / RADII / TYPO ci-dessus.
+// ═════════════════════════════════════════════════════════════════════════════
 
 export const COLORS = {
   // Accents marque (DUEL = cyan vs violet)

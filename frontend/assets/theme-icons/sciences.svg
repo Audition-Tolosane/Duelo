@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sciences">
+  <path d="M190 54L170 76" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M190 54L214 70" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="190" cy="54" r="15" fill="#FF6B5B"/>
+  <circle cx="170" cy="76" r="9" fill="#FFDB3D"/>
+  <circle cx="214" cy="70" r="9" fill="#FFDB3D"/>
+  <path d="M108 44H148V100L204 192Q212 214 188 216H68Q44 214 52 192L108 100Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="96" y="32" width="64" height="20" rx="10" fill="#12606D"/>
+  <path d="M84 150H172L194 188Q200 202 184 204H72Q56 202 62 188Z" fill="#FFDB3D"/>
+  <circle cx="112" cy="180" r="8" fill="#E8F1EC"/>
+  <path d="M108 120L96 140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

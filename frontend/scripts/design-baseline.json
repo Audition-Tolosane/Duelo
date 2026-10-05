@@ -1,0 +1,326 @@
+{
+ "totals": {
+  "hex": 1488,
+  "rgba": 673,
+  "fontSize": 689,
+  "heavy": 215,
+  "gradient": 152,
+  "iconLib": 32,
+  "emoji": 113
+ },
+ "files": {
+  "app/(tabs)/accueil.tsx": {
+   "hex": 188,
+   "rgba": 71,
+   "fontSize": 99,
+   "heavy": 35,
+   "gradient": 21,
+   "iconLib": 1,
+   "emoji": 18
+  },
+  "app/(tabs)/play.tsx": {
+   "hex": 12,
+   "rgba": 15,
+   "fontSize": 9,
+   "gradient": 1,
+   "iconLib": 1
+  },
+  "app/(tabs)/players.tsx": {
+   "hex": 65,
+   "rgba": 15,
+   "fontSize": 29,
+   "heavy": 6,
+   "gradient": 6,
+   "iconLib": 1,
+   "emoji": 11
+  },
+  "app/(tabs)/profile.tsx": {
+   "hex": 137,
+   "rgba": 43,
+   "fontSize": 70,
+   "heavy": 22,
+   "gradient": 8,
+   "iconLib": 1,
+   "emoji": 3
+  },
+  "app/(tabs)/themes.tsx": {
+   "hex": 18,
+   "rgba": 15,
+   "fontSize": 16,
+   "gradient": 4,
+   "iconLib": 1,
+   "emoji": 8
+  },
+  "app/(tabs)/_layout.tsx": {
+   "hex": 14,
+   "rgba": 5,
+   "fontSize": 2,
+   "heavy": 1
+  },
+  "app/+html.tsx": {
+   "hex": 5,
+   "rgba": 1
+  },
+  "app/category-detail.tsx": {
+   "hex": 70,
+   "rgba": 30,
+   "fontSize": 57,
+   "heavy": 19,
+   "gradient": 2,
+   "iconLib": 1,
+   "emoji": 7
+  },
+  "app/challenge-waiting.tsx": {
+   "hex": 21,
+   "rgba": 7,
+   "fontSize": 10,
+   "heavy": 5,
+   "gradient": 1,
+   "iconLib": 1
+  },
+  "app/chat.tsx": {
+   "hex": 60,
+   "rgba": 24,
+   "fontSize": 23,
+   "heavy": 9,
+   "gradient": 7,
+   "iconLib": 1,
+   "emoji": 6
+  },
+  "app/conversations.tsx": {
+   "hex": 32,
+   "rgba": 19,
+   "fontSize": 9,
+   "heavy": 4,
+   "gradient": 1,
+   "iconLib": 1
+  },
+  "app/create-theme.tsx": {
+   "hex": 40,
+   "rgba": 19,
+   "fontSize": 15,
+   "heavy": 6,
+   "gradient": 5,
+   "iconLib": 1
+  },
+  "app/followers.tsx": {
+   "hex": 9,
+   "rgba": 5,
+   "fontSize": 6,
+   "heavy": 4,
+   "gradient": 1,
+   "iconLib": 1,
+   "emoji": 1
+  },
+  "app/game.tsx": {
+   "hex": 44,
+   "rgba": 21,
+   "fontSize": 24,
+   "heavy": 10,
+   "gradient": 7,
+   "iconLib": 1,
+   "emoji": 3
+  },
+  "app/index.tsx": {
+   "hex": 16,
+   "rgba": 15,
+   "fontSize": 13,
+   "gradient": 4
+  },
+  "app/language-settings.tsx": {
+   "hex": 8,
+   "rgba": 11,
+   "fontSize": 4,
+   "heavy": 1,
+   "gradient": 1,
+   "iconLib": 1
+  },
+  "app/leaderboard.tsx": {
+   "hex": 72,
+   "rgba": 21,
+   "fontSize": 32,
+   "heavy": 13,
+   "gradient": 6,
+   "iconLib": 1
+  },
+  "app/matchmaking.tsx": {
+   "hex": 62,
+   "rgba": 41,
+   "fontSize": 20,
+   "heavy": 3,
+   "gradient": 12,
+   "iconLib": 1
+  },
+  "app/notification-settings.tsx": {
+   "hex": 38,
+   "rgba": 26,
+   "fontSize": 10,
+   "heavy": 1,
+   "gradient": 5,
+   "iconLib": 1
+  },
+  "app/notifications.tsx": {
+   "hex": 19,
+   "rgba": 18,
+   "fontSize": 8,
+   "heavy": 1,
+   "iconLib": 1
+  },
+  "app/onboarding.tsx": {
+   "hex": 28,
+   "rgba": 8,
+   "fontSize": 12,
+   "gradient": 11,
+   "iconLib": 1
+  },
+  "app/player-profile.tsx": {
+   "hex": 107,
+   "rgba": 34,
+   "fontSize": 34,
+   "heavy": 15,
+   "gradient": 10,
+   "iconLib": 1
+  },
+  "app/results.tsx": {
+   "hex": 145,
+   "rgba": 90,
+   "fontSize": 63,
+   "heavy": 27,
+   "gradient": 14,
+   "iconLib": 1,
+   "emoji": 2
+  },
+  "app/search.tsx": {
+   "hex": 57,
+   "rgba": 30,
+   "fontSize": 26,
+   "heavy": 4,
+   "gradient": 1,
+   "iconLib": 1,
+   "emoji": 4
+  },
+  "app/shop.tsx": {
+   "hex": 32,
+   "rgba": 7,
+   "fontSize": 12,
+   "heavy": 4,
+   "gradient": 3,
+   "iconLib": 1
+  },
+  "app/super-category.tsx": {
+   "hex": 12,
+   "rgba": 8,
+   "fontSize": 13,
+   "heavy": 1,
+   "gradient": 3,
+   "iconLib": 1
+  },
+  "app/support.tsx": {
+   "hex": 26,
+   "rgba": 28,
+   "fontSize": 13,
+   "heavy": 2,
+   "gradient": 5,
+   "iconLib": 1
+  },
+  "app/terms.tsx": {
+   "hex": 5,
+   "rgba": 6,
+   "fontSize": 6,
+   "heavy": 2,
+   "iconLib": 1
+  },
+  "app/tournament.tsx": {
+   "hex": 32,
+   "rgba": 14,
+   "fontSize": 15,
+   "heavy": 6,
+   "gradient": 4,
+   "iconLib": 1
+  },
+  "app/_layout.tsx": {
+   "hex": 3
+  },
+  "components/CategoryIcon.tsx": {
+   "iconLib": 1,
+   "emoji": 40
+  },
+  "components/ChallengeReadyModal.tsx": {
+   "hex": 19,
+   "rgba": 6,
+   "fontSize": 6,
+   "heavy": 3,
+   "gradient": 2,
+   "iconLib": 1
+  },
+  "components/CosmicBackground.tsx": {
+   "hex": 1,
+   "rgba": 1
+  },
+  "components/DuelButton.tsx": {
+   "hex": 1,
+   "fontSize": 2,
+   "gradient": 1
+  },
+  "components/DueloHeader.tsx": {
+   "hex": 3,
+   "rgba": 3,
+   "fontSize": 1,
+   "heavy": 1
+  },
+  "components/EmptyState.tsx": {
+   "fontSize": 3,
+   "iconLib": 1
+  },
+  "components/ErrorBoundary.tsx": {
+   "hex": 5,
+   "fontSize": 4,
+   "emoji": 1
+  },
+  "components/GlassIconFrame.tsx": {
+   "hex": 2,
+   "rgba": 4,
+   "fontSize": 3,
+   "heavy": 1
+  },
+  "components/OfflineOverlay.tsx": {
+   "rgba": 2,
+   "fontSize": 4,
+   "iconLib": 1
+  },
+  "components/RematchModal.tsx": {
+   "hex": 16,
+   "rgba": 5,
+   "fontSize": 5,
+   "heavy": 3,
+   "gradient": 2,
+   "iconLib": 1
+  },
+  "components/RoundTimer.tsx": {
+   "fontSize": 2,
+   "heavy": 1
+  },
+  "components/SpinWheelModal.tsx": {
+   "hex": 38,
+   "rgba": 4,
+   "fontSize": 9,
+   "heavy": 4,
+   "gradient": 2,
+   "iconLib": 1,
+   "emoji": 9
+  },
+  "components/SwipeBackPage.tsx": {
+   "hex": 3,
+   "rgba": 1
+  },
+  "components/SwordMark.tsx": {
+   "hex": 3,
+   "gradient": 1
+  },
+  "components/UserAvatar.tsx": {
+   "hex": 20,
+   "heavy": 1,
+   "gradient": 1
+  }
+ }
+}

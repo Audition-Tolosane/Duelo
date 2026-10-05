@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Révolution française">
+  <path d="M64 176C60 124 84 74 136 64C172 58 204 80 210 120C212 140 200 148 192 138C186 128 180 118 168 118C180 136 194 156 192 176Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="52" y="176" width="152" height="32" rx="14" fill="#12606D"/>
+  <circle cx="104" cy="142" r="26" fill="#12606D"/>
+  <circle cx="104" cy="142" r="17" fill="#E8F1EC"/>
+  <circle cx="104" cy="142" r="8" fill="#12606D"/>
+  <path d="M88 96A52 52 0 0 1 112 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

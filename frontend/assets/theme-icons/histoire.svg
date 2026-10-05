@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Histoire">
+  <polygon points="40,100 128,46 216,100" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="84" r="10" fill="#FF6B5B"/>
+  <rect x="56" y="118" width="24" height="70" rx="6" fill="#FFDB3D"/>
+  <rect x="96" y="118" width="24" height="70" rx="6" fill="#FFDB3D"/>
+  <rect x="136" y="118" width="24" height="70" rx="6" fill="#FFDB3D"/>
+  <rect x="176" y="118" width="24" height="70" rx="6" fill="#FFDB3D"/>
+  <rect x="36" y="196" width="184" height="24" rx="12" fill="#12606D"/>
+  <path d="M80 90L102 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Gastronomie">
+  <path d="M170 182C162 172 178 166 170 154" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M198 182C190 172 206 166 198 150" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g transform="rotate(-14 50 172)">
+  <circle cx="128" cy="70" r="14" fill="#FF6B5B"/>
+  <path d="M50 170C50 116 84 82 128 82C172 82 206 116 206 170Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M78 142C80 124 90 110 106 102" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <rect x="32" y="188" width="192" height="20" rx="10" fill="#12606D"/>
+</svg>

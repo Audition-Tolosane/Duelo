@@ -37,6 +37,8 @@ const translations: Translations = {
   'welcome.continue_google': { fr: 'Continuer avec Google', en: 'Continue with Google', es: 'Continuar con Google', de: 'Mit Google fortfahren', pt: 'Continuar com o Google', it: 'Continua con Google', ar: 'المتابعة باستخدام Google', ja: 'Googleで続ける', ko: 'Google로 계속', zh: '使用 Google 继续' },
   'welcome.pseudo_placeholder': { fr: 'Ex: QuizMaster_42', en: 'e.g. QuizMaster_42', es: 'Ej: QuizMaster_42', de: 'z.B. QuizMaster_42', pt: 'Ex: QuizMaster_42', it: 'Es: QuizMaster_42', ar: 'مثال: QuizMaster_42', ja: '例: QuizMaster_42', ko: '예: QuizMaster_42', zh: '例: QuizMaster_42' },
   'common.retry': { fr: 'Réessayer', en: 'Retry', es: 'Reintentar', de: 'Erneut versuchen', pt: 'Tentar novamente', it: 'Riprova', ar: 'إعادة المحاولة', ja: '再試行', ko: '다시 시도', zh: '重试' },
+  'common.see_all': { fr: 'Voir tout', en: 'See all', es: 'Ver todo', de: 'Alle ansehen', pt: 'Ver tudo', it: 'Vedi tutto', ar: 'عرض الكل', ja: 'すべて見る', ko: '모두 보기', zh: '查看全部' },
+  'common.close': { fr: 'Fermer', en: 'Close', es: 'Cerrar', de: 'Schließen', pt: 'Fechar', it: 'Chiudi', ar: 'إغلاق', ja: '閉じる', ko: '닫기', zh: '关闭' },
   'common.cancel': { fr: 'Annuler', en: 'Cancel', es: 'Cancelar', de: 'Abbrechen', pt: 'Cancelar', it: 'Annulla', ar: 'إلغاء', ja: 'キャンセル', ko: '취소', zh: '取消' },
   'common.ok': { fr: 'OK', en: 'OK', es: 'OK', de: 'OK', pt: 'OK', it: 'OK', ar: 'حسنا', ja: 'OK', ko: '확인', zh: '确定' },
   'common.save': { fr: 'Enregistrer', en: 'Save', es: 'Guardar', de: 'Speichern', pt: 'Salvar', it: 'Salva', ar: 'حفظ', ja: '保存', ko: '저장', zh: '保存' },
@@ -291,8 +293,8 @@ const translations: Translations = {
 
   // Results (extended)
   'results.victory': { fr: 'VICTOIRE !', en: 'VICTORY!', es: '¡VICTORIA!', de: 'SIEG!', pt: 'VITÓRIA!', it: 'VITTORIA!', ar: 'فوز!', ja: '勝利！', ko: '승리!', zh: '胜利！' },
-  'results.defeat': { fr: 'DEFAITE', en: 'DEFEAT', es: 'DERROTA', de: 'NIEDERLAGE', pt: 'DERROTA', it: 'SCONFITTA', ar: 'هزيمة', ja: '敗北', ko: '패배', zh: '失败' },
-  'results.draw': { fr: 'EGALITE !', en: 'DRAW!', es: '¡EMPATE!', de: 'UNENTSCHIEDEN!', pt: 'EMPATE!', it: 'PAREGGIO!', ar: 'تعادل!', ja: '引き分け！', ko: '무승부!', zh: '平局！' },
+  'results.defeat': { fr: 'DÉFAITE', en: 'DEFEAT', es: 'DERROTA', de: 'NIEDERLAGE', pt: 'DERROTA', it: 'SCONFITTA', ar: 'هزيمة', ja: '敗北', ko: '패배', zh: '失败' },
+  'results.draw': { fr: 'ÉGALITÉ !', en: 'DRAW!', es: '¡EMPATE!', de: 'UNENTSCHIEDEN!', pt: 'EMPATE!', it: 'PAREGGIO!', ar: 'تعادل!', ja: '引き分け！', ko: '무승부!', zh: '平局！' },
   'results.correct_answers': { fr: 'bonnes reponses', en: 'correct answers', es: 'respuestas correctas', de: 'richtige Antworten', pt: 'respostas corretas', it: 'risposte corrette', ar: 'إجابات صحيحة', ja: '正解', ko: '정답', zh: '正确答案' },
   'results.level_up': { fr: 'Niveau', en: 'Level', es: 'Nivel', de: 'Stufe', pt: 'Nível', it: 'Livello', ar: 'المستوى', ja: 'レベル', ko: '레벨', zh: '等级' },
   'results.xp_title': { fr: 'XP GAGNE', en: 'XP EARNED', es: 'XP GANADO', de: 'XP VERDIENT', pt: 'XP GANHO', it: 'XP GUADAGNATO', ar: 'نقاط الخبرة المكتسبة', ja: '獲得XP', ko: '획득 XP', zh: '获得经验' },
@@ -305,7 +307,7 @@ const translations: Translations = {
   'results.challenge_friend': { fr: 'DEFIER UN AMI', en: 'CHALLENGE A FRIEND', es: 'RETAR A UN AMIGO', de: 'EINEN FREUND HERAUSFORDERN', pt: 'DESAFIAR UM AMIGO', it: 'SFIDA UN AMICO', ar: 'تحدي صديق', ja: '友達に挑戦', ko: '친구에게 도전', zh: '挑战好友' },
   'results.waiting': { fr: 'EN ATTENTE...', en: 'WAITING...', es: 'ESPERANDO...', de: 'WARTEN...', pt: 'AGUARDANDO...', it: 'IN ATTESA...', ar: 'في الانتظار...', ja: '待機中...', ko: '대기 중...', zh: '等待中...' },
   'results.declined': { fr: 'REFUSÉE · NOUVEAU DUEL', en: 'DECLINED · NEW DUEL', es: 'RECHAZADA · NUEVO DUELO', de: 'ABGELEHNT · NEUES DUELL', pt: 'RECUSADA · NOVO DUELO', it: 'RIFIUTATA · NUOVO DUELLO', ar: 'مرفوضة · مبارزة جديدة', ja: '拒否 · 新しい対戦', ko: '거절됨 · 새 대결', zh: '已拒绝 · 新对决' },
-  'results.accepted': { fr: 'ACCEPTE !', en: 'ACCEPTED!', es: '¡ACEPTADO!', de: 'ANGENOMMEN!', pt: 'ACEITO!', it: 'ACCETTATO!', ar: 'مقبول!', ja: '承諾！', ko: '수락!', zh: '已接受！' },
+  'results.accepted': { fr: 'ACCEPTÉE !', en: 'ACCEPTED!', es: '¡ACEPTADO!', de: 'ANGENOMMEN!', pt: 'ACEITO!', it: 'ACCETTATO!', ar: 'مقبول!', ja: '承諾！', ko: '수락!', zh: '已接受！' },
   'results.rematch': { fr: 'REVANCHE', en: 'REMATCH', es: 'REVANCHA', de: 'REVANCHE', pt: 'REVANCHE', it: 'RIVINCITA', ar: 'إعادة المباراة', ja: 'リマッチ', ko: '재대결', zh: '再来一局' },
   'results.share_score': { fr: 'PARTAGER MON SCORE', en: 'SHARE MY SCORE', es: 'COMPARTIR MI PUNTUACIÓN', de: 'MEINEN SCORE TEILEN', pt: 'COMPARTILHAR MINHA PONTUAÇÃO', it: 'CONDIVIDI IL MIO PUNTEGGIO', ar: 'شارك نتيجتي', ja: 'スコアを共有', ko: '내 점수 공유', zh: '分享我的分数' },
   'game.forfeit': { fr: 'Abandonner', en: 'Forfeit', es: 'Abandonar', de: 'Aufgeben', pt: 'Desistir', it: 'Abbandona', ar: 'انسحاب', ja: '棄権', ko: '기권', zh: '认输' },
