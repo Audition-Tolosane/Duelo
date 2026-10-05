@@ -3,8 +3,8 @@ import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import { startQuickMatch } from '../../utils/quickMatch';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -18,7 +18,6 @@ const VIOLET = '#B366FF';
 const GOLD = '#FFB547';
 const FIRE = '#FF6B2C';
 
-const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 // Écran 18 du handoff — modes de jeu purs. Les univers/thèmes vivent
 // dans l'onglet Thèmes (écran 6) ; pas de section univers ici.
@@ -31,26 +30,12 @@ export default function PlayScreen() {
   const day = new Date().getDay();
   const isTournamentLive = day === 5 || day === 6 || day === 0;
 
-  // Quick Match : le matchmaking EXIGE un theme_id (sinon il renvoie vers Jouer).
-  // On tire un thème au hasard parmi les tendances personnalisées avant de naviguer.
+  // Quick Match partagé avec l'Accueil (utils/quickMatch.ts).
   const handleQuickMatch = async () => {
     if (quickLoading) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     setQuickLoading(true);
-    try {
-      const uid = await AsyncStorage.getItem('duelo_user_id');
-      const res = await fetch(`${API_URL}/api/themes/trending${uid ? `?user_id=${uid}` : ''}`);
-      const data = await res.json();
-      const list: { id: string; name: string }[] = data.trending || [];
-      if (list.length > 0) {
-        const pick = list[Math.floor(Math.random() * list.length)];
-        router.push(`/matchmaking?category=${pick.id}&themeName=${encodeURIComponent(pick.name)}`);
-      } else {
-        router.push('/(tabs)/themes');
-      }
-    } catch {
-      router.push('/(tabs)/themes');
-    }
+    await startQuickMatch(router);
     setQuickLoading(false);
   };
 
@@ -82,7 +67,7 @@ export default function PlayScreen() {
                 <View style={styles.quickWatermark}>
                   <SwordMark size={140} color="#FFF" />
                 </View>
-                <Text style={styles.quickEyebrow}>◆ {t('play.random').toUpperCase()} · ~8s</Text>
+                <Text style={styles.quickEyebrow}>◆ {t('play.random').toUpperCase()}</Text>
                 <Text style={styles.quickTitle}>QUICK MATCH</Text>
                 <Text style={styles.quickSub}>{t('play.quick_sub')}</Text>
                 <View style={styles.quickCta}>

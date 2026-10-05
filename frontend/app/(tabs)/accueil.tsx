@@ -6,6 +6,7 @@ import {
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import { startQuickMatch } from '../../utils/quickMatch';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, {
@@ -45,6 +46,7 @@ const CATEGORY_ICONS: Record<string, string> = {
 interface DuelItem {
   id: string;
   opponent_pseudo: string;
+  opponent_id?: string | null;   // null = bot (ou serveur ancien) → « Rejouer ce thème »
   opponent_avatar_seed: string;
   opponent_avatar_url?: string;
   user_avatar_url?: string;
@@ -317,7 +319,8 @@ const RivalBanner = React.memo(function RivalBanner({ router }: { router: any })
           style={rivalStyles.challengeBtn}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            router.push(`/matchmaking?opponentId=${rival.user_id}`);
+            // Vrai défi nominatif : la fiche du rival ouvre la fenêtre de défi.
+            router.push(`/player-profile?id=${rival.user_id}&challenge=1`);
           }}
           activeOpacity={0.8}
         >
@@ -690,7 +693,7 @@ const DuelCard = React.memo(function DuelCard({ duel, index, onRematch }: { duel
               style={styles.rematchGradient}
             >
               <MaterialCommunityIcons name="sword-cross" size={14} color="#FFF" />
-              <Text style={styles.rematchText}>{t('home.rematch_label')}</Text>
+              <Text style={styles.rematchText}>{duel.opponent_id ? t('home.rematch_label') : t('common.replay_theme')}</Text>
             </LinearGradient>
           </TouchableOpacity>
 
@@ -1188,10 +1191,11 @@ const ChallengeSuggestions = React.memo(function ChallengeSuggestions({ router }
                 activeOpacity={0.8}
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  const path = s.common_theme_id
-                    ? `/matchmaking?category=${s.common_theme_id}&opponentId=${s.user_id}`
-                    : `/matchmaking?opponentId=${s.user_id}`;
-                  router.push(path as any);
+                  // Vrai défi nominatif, thème commun présélectionné s'il existe.
+                  const theme = s.common_theme_id
+                    ? `&themeId=${s.common_theme_id}&themeName=${encodeURIComponent(s.common_theme_name || '')}`
+                    : '';
+                  router.push(`/player-profile?id=${s.user_id}&challenge=1${theme}` as any);
                 }}
               >
                 <LinearGradient colors={['#FF6B2C', '#FFB547']} style={sugStyles.challengeGrad}>
@@ -1532,9 +1536,15 @@ export default function AccueilScreen() {
     setRefreshing(false);
   }, []);
 
+  // Revanche = vrai défi contre le même joueur. Contre un bot (pas d'opponent_id),
+  // le bouton s'appelle « Rejouer ce thème » et lance un duel sur le thème.
   const handleRematch = useCallback((duel: DuelItem) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    router.push(`/matchmaking?category=${duel.category}`);
+    if (duel.opponent_id) {
+      router.push(`/player-profile?id=${duel.opponent_id}&challenge=1&themeId=${duel.category}&themeName=${encodeURIComponent(duel.category_name || '')}` as any);
+    } else {
+      router.push(`/matchmaking?category=${duel.category}&themeName=${encodeURIComponent(duel.category_name || '')}`);
+    }
   }, [router]);
 
   const handleAcceptChallenge = useCallback(async (challenge: IncomingChallenge) => {
@@ -1740,7 +1750,8 @@ export default function AccueilScreen() {
               }
 
               if (!chosen || allThemes.length === 0) {
-                router.push('/matchmaking');
+                // Nouveau joueur (aucun thème joué ni événement) : même Quick Match que l'onglet Jouer.
+                startQuickMatch(router);
                 return;
               }
               setSlotThemes(allThemes);
@@ -1759,7 +1770,6 @@ export default function AccueilScreen() {
               </View>
               <Text style={styles.quickPlaySub}>Quick match</Text>
               <Text style={styles.quickPlayTitle}>DUEL !</Text>
-              <Text style={styles.quickPlayHint}>Trouve un adversaire en ~8s</Text>
               <View style={styles.quickPlayCta}>
                 <Text style={styles.quickPlayCtaText}>◆ Trouver un adversaire</Text>
               </View>
@@ -2059,7 +2069,7 @@ export default function AccueilScreen() {
               ctaLabel="Trouver un adversaire"
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                router.push('/matchmaking');
+                startQuickMatch(router);
               }}
             />
           </Animated.View>

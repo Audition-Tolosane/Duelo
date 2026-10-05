@@ -159,33 +159,30 @@ export default function ResultsScreen() {
 
     // Rematch WS listeners
     const unsubs = [
-      on('rematch_accepted', () => {
+      on('rematch_accepted', (msg) => {
+        // Seul celui qui a proposé navigue d'ici ; celui qui accepte est guidé par RematchModal.
+        if (rematchStateRef.current !== 'waiting') return;
         setRematchState('accepted');
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        const roomId = msg?.data?.room_id;
         setTimeout(() => {
           if (hasNavigatedRef.current) return;
           hasNavigatedRef.current = true;
-          router.replace(`/matchmaking?category=${category}&rematch=true`);
+          router.replace(
+            roomId
+              ? `/matchmaking?room_id=${roomId}&category=${category}&challenge=true&rematch=true&opponentPseudo=${encodeURIComponent(params.opponentPseudo || '')}`
+              : `/matchmaking?category=${category}`
+          );
         }, 600);
       }),
       on('rematch_declined', () => {
         setRematchState('declined');
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        setTimeout(() => {
-          if (hasNavigatedRef.current) return;
-          hasNavigatedRef.current = true;
-          router.replace(`/matchmaking?category=${category}`);
-        }, 2000);
       }),
       on('rematch_expired', () => {
         if (rematchStateRef.current === 'waiting') {
           setRematchState('declined');
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-          setTimeout(() => {
-            if (hasNavigatedRef.current) return;
-            hasNavigatedRef.current = true;
-            router.replace(`/matchmaking?category=${category}`);
-          }, 2000);
         }
       }),
     ];
@@ -197,11 +194,6 @@ export default function ResultsScreen() {
     if (rematchState !== 'waiting') return;
     const timeout = setTimeout(() => {
       setRematchState('declined');
-      setTimeout(() => {
-        if (hasNavigatedRef.current) return;
-        hasNavigatedRef.current = true;
-        router.replace(`/matchmaking?category=${category}`); // #37 — replace not push
-      }, 1500);
     }, 20000);
     return () => clearTimeout(timeout);
   }, [rematchState]);
@@ -411,9 +403,17 @@ export default function ResultsScreen() {
     };
   }, []);
 
+  const newDuel = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    if (hasNavigatedRef.current) return;
+    hasNavigatedRef.current = true;
+    router.replace(`/matchmaking?category=${category}`);
+  };
+
   const playAgain = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     if (rematchState === 'waiting') return;
+    if (rematchState === 'declined') { newDuel(); return; }
 
     setRematchState('waiting');
 
@@ -426,14 +426,11 @@ export default function ResultsScreen() {
           setRematchState('accepted');
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           setTimeout(() => {
-            router.replace(`/matchmaking?category=${category}&rematch=true`);
+            router.replace(`/matchmaking?category=${category}&rematch=true&botPseudo=${encodeURIComponent(params.opponentPseudo || '')}`);
           }, 800);
         } else {
           setRematchState('declined');
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-          setTimeout(() => {
-            router.replace(`/matchmaking?category=${category}`);
-          }, 2000);
         }
       }, delay);
       return;
@@ -759,11 +756,11 @@ export default function ResultsScreen() {
               style={styles.shareGradient}
             >
               <MaterialCommunityIcons name="share-variant" size={18} color="#00FFFF" />
-              <Text style={styles.shareText}>{t('results.challenge_friend')}</Text>
+              <Text style={styles.shareText}>{t('results.share_score')}</Text>
             </LinearGradient>
           </TouchableOpacity>
           <View style={styles.actionRow}>
-            <TouchableOpacity testID="go-home-btn" style={styles.homeButton} onPress={() => router.replace('/(tabs)/play')}>
+            <TouchableOpacity testID="go-home-btn" style={styles.homeButton} onPress={() => router.replace('/(tabs)/accueil')}>
               <Text style={styles.homeText}>{t('results.back_home')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -792,7 +789,7 @@ export default function ResultsScreen() {
                   </>
                 ) : rematchState === 'declined' ? (
                   <>
-                    <MaterialCommunityIcons name="close-circle" size={18} color="#FFF" />
+                    <MaterialCommunityIcons name="refresh" size={18} color="#FFF" />
                     <Text style={[styles.playAgainText, { color: '#FFF' }]}>{t('results.declined')}</Text>
                   </>
                 ) : rematchState === 'accepted' ? (

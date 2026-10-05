@@ -1,5 +1,78 @@
 import { FONTS } from './fonts';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SKILKI — couleurs PAR RÔLE. Les écrans n'utilisent que ces rôles, jamais un hex.
+// Règles : jaune = action / sélection / mon camp ; corail = adversaire / accent chaud ;
+// or = récompense / rang / prestige ; vert = juste ; rouge = faux / erreur ;
+// pétrole = structure ; crème = texte ; violet = rareté (flawless, premium) uniquement.
+// ─────────────────────────────────────────────────────────────────────────────
+const PALETTE = {
+  night:      '#071F26',
+  nightDeep:  '#05171C',
+  petrol:     '#0B3D4A',
+  petrolLight:'#12606D',
+  yellow:     '#FFDB3D',
+  coral:      '#FF6B5B',
+  cream:      '#E8F1EC',
+  gold:       '#F0A93B',   // plus chaud et plus sombre que le jaune : jamais confondu avec une action
+  green:      '#32E7A3',
+  red:        '#F0445E',   // plus froid que le corail : une erreur ne ressemble pas à l'adversaire
+  violet:     '#A78BFA',
+} as const;
+
+export const COLOR = {
+  bg: {
+    primary:   PALETTE.night,
+    deep:      PALETTE.nightDeep,
+  },
+  surface: {
+    card:      PALETTE.petrol,
+    elevated:  PALETTE.petrolLight,           // pressé / élevé — jamais pour du texte
+    subtle:    'rgba(232,241,236,0.04)',
+    input:     PALETTE.petrol,
+  },
+  text: {
+    primary:   PALETTE.cream,
+    secondary: 'rgba(232,241,236,0.72)',
+    tertiary:  'rgba(232,241,236,0.60)',
+    disabled:  'rgba(232,241,236,0.40)',
+    onAction:  PALETTE.night,                 // texte posé sur jaune, corail, vert, or
+  },
+  action: {
+    primary:   PALETTE.yellow,
+    primaryPressed: '#E9C52F',
+    secondary: PALETTE.petrolLight,
+    ghost:     'rgba(232,241,236,0.06)',
+    selectedFill: 'rgba(255,219,61,0.14)',
+  },
+  player: {
+    self:      PALETTE.yellow,
+    opponent:  PALETTE.coral,
+  },
+  accent: {
+    warm:      PALETTE.coral,                 // événements, série, défi reçu
+    rare:      PALETTE.violet,                // flawless, premium — rien d'autre
+  },
+  status: {
+    success:   PALETTE.green,
+    successFill: 'rgba(50,231,163,0.16)',
+    error:     PALETTE.red,
+    errorFill: 'rgba(240,68,94,0.16)',
+  },
+  reward: {
+    gold:      PALETTE.gold,
+  },
+  border: {
+    subtle:    'rgba(232,241,236,0.08)',
+    default:   'rgba(232,241,236,0.14)',
+    strong:    'rgba(232,241,236,0.24)',
+    active:    PALETTE.yellow,
+  },
+  overlay: {
+    scrim:     'rgba(5,23,28,0.85)',
+  },
+} as const;
+
 export const COLORS = {
   // Accents marque (DUEL = cyan vs violet)
   cyan:   '#00E5FF',   // joueur 1 / primaire

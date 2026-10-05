@@ -456,7 +456,7 @@ export default function LeaderboardScreen() {
                       </View>
                       <TouchableOpacity
                         style={styles.rivalDefiBtn}
-                        onPress={() => router.push(`/matchmaking?opponentId=${rivalEntry.id}&opponentPseudo=${encodeURIComponent(rivalEntry.pseudo)}`)}
+                        onPress={() => router.push(`/player-profile?id=${rivalEntry.id}&challenge=1`)}
                         activeOpacity={0.8}
                       >
                         <LinearGradient colors={['#FF9F0A', '#FF6B00']} style={styles.rivalDefiBtnGrad}>

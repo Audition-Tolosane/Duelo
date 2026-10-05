@@ -174,10 +174,11 @@ export default function ChatScreen() {
     }
   };
 
+  // Revanche depuis une conversation = défi nominatif envoyé à l'interlocuteur, sur ce thème.
   const handleRevanche = (gameData: any) => {
-    if (gameData?.category) {
+    if (gameData?.category && partnerId) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-      router.push(`/matchmaking?category=${gameData.category}`);
+      router.push(`/player-profile?id=${partnerId}&challenge=1&themeId=${gameData.category}&themeName=${encodeURIComponent(gameData.category_name || gameData.theme_name || '')}` as any);
     }
   };
 

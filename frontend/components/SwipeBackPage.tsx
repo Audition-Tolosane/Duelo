@@ -20,9 +20,13 @@ const IS_WEB = Platform.OS === 'web';
 
 interface SwipeBackPageProps {
   children: React.ReactNode;
+  /** false = pas de swipe-retour (match en cours : on ne quitte pas sans forfait). */
+  enabled?: boolean;
+  /** Remplace router.back() (ex. annuler la recherche proprement avant de partir). */
+  onBack?: () => void;
 }
 
-export default function SwipeBackPage({ children }: SwipeBackPageProps) {
+export default function SwipeBackPage({ children, enabled = true, onBack }: SwipeBackPageProps) {
   const router = useRouter();
   const { width: SCREEN_WIDTH } = useWindowDimensions();
   // On web: start off-screen for custom entry animation
@@ -54,10 +58,12 @@ export default function SwipeBackPage({ children }: SwipeBackPageProps) {
   };
 
   const goBack = () => {
-    router.back();
+    if (onBack) onBack();
+    else router.back();
   };
 
   const panGesture = Gesture.Pan()
+    .enabled(enabled)
     // Touch-friendly thresholds (more tolerant for finger input)
     .activeOffsetX(IS_WEB ? 20 : 15)
     .failOffsetX(IS_WEB ? -10 : -20)

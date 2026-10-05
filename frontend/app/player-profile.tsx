@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, Image,
-  ActivityIndicator, RefreshControl, Dimensions, Modal,
+  ActivityIndicator, RefreshControl, Dimensions, Modal, Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -56,7 +56,11 @@ const getAvatarColor = (letter: string) => {
 export default function PlayerProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  // challenge=1 ouvre directement la fenêtre de défi (boutons « Défier X » des autres écrans) ;
+  // themeId/themeName présélectionnent le thème du contexte (rival, suggestion…).
+  const { id, challenge, themeId, themeName } = useLocalSearchParams<{
+    id: string; challenge?: string; themeId?: string; themeName?: string;
+  }>();
 
   if (!id) {
     router.back();
@@ -83,9 +87,10 @@ export default function PlayerProfileScreen() {
   const init = async () => {
     const uid = await AsyncStorage.getItem('duelo_user_id');
     if (uid) setMyId(uid);
-    await fetchProfile(uid || '');
+    const loaded = await fetchProfile(uid || '');
     if (uid && uid !== id) {
       fetchVsStats(uid);
+      if (challenge === '1') openChallenge(loaded);
     }
     if (uid === id) {
       fetchChallengeHistory(uid);
@@ -115,7 +120,22 @@ export default function PlayerProfileScreen() {
       const res = await fetch(`${API_URL}/api/player/${id}/profile?viewer_id=${viewerId}`);
       const data = await res.json();
       setProfile(data);
+      return data as PlayerProfile;
     } catch (e) { console.error(e); }
+    return null;
+  };
+
+  // Un défi exige un thème : sans thème, la salle de duel ne trouve aucune question
+  // (load_and_start_game côté serveur). On présélectionne le thème du contexte,
+  // sinon le meilleur thème de l'adversaire.
+  const openChallenge = (p: PlayerProfile | null = profile) => {
+    if (themeId) {
+      setSelectedTheme({ id: themeId, name: themeName || themeId, color: '#FFDB3D' });
+    } else if (p?.themes && Object.keys(p.themes).length > 0) {
+      const [bestId, best] = Object.entries(p.themes).reduce((a, b) => (b[1].xp > a[1].xp ? b : a));
+      setSelectedTheme({ id: bestId, name: best.name || bestId, color: best.color_hex || '#FFDB3D' });
+    }
+    setChallengeModalVisible(true);
   };
 
   const onRefresh = async () => {
@@ -191,8 +211,15 @@ export default function PlayerProfileScreen() {
           `&theme_id=${encodeURIComponent(selectedTheme?.id || '')}` +
           `&theme_name=${encodeURIComponent(selectedTheme?.name || '')}`
         );
+      } else {
+        // 404 (thème introuvable), 429 (trop de défis envoyés)… : on le dit au lieu d'échouer en silence.
+        const err = await res.json().catch(() => null);
+        Alert.alert(t('common.error'), err?.detail || t('common.error_loading'));
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+      Alert.alert(t('common.error'), t('common.error_loading'));
+    }
     setChallengeSending(false);
   };
 
@@ -286,7 +313,7 @@ export default function PlayerProfileScreen() {
                 data-testid="challenge-button"
                 style={s.challengeTouchable}
                 activeOpacity={0.85}
-                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); setChallengeModalVisible(true); }}
+                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); openChallenge(); }}
               >
                 <LinearGradient
                   colors={['#00E5FF', '#B366FF']}
@@ -534,17 +561,15 @@ export default function PlayerProfileScreen() {
 
             <Text style={s.modalSubtitle}>{t('challenge.choose_theme')}</Text>
 
-            {/* No theme option */}
-            <TouchableOpacity
-              style={[s.themeChip, !selectedTheme && s.themeChipSelected]}
-              onPress={() => setSelectedTheme(null)}
-            >
-              <Text style={[s.themeChipText, !selectedTheme && { color: '#FFF' }]}>{t('challenge.no_theme')}</Text>
-            </TouchableOpacity>
-
-            {/* Theme chips from profile categories */}
+            {/* Thèmes proposés : celui du contexte s'il y en a un, puis ceux de l'adversaire.
+                Pas d'option « thème libre » : une salle sans thème ne trouve aucune question. */}
             <View style={s.themesGrid}>
-              {Object.entries(profile?.themes || {}).slice(0, 6).map(([catKey, catData]) => {
+              {([
+                ...(themeId && !profile?.themes?.[themeId]
+                  ? [[themeId, { xp: 0, level: 0, title: '', name: themeName || themeId }]]
+                  : []),
+                ...Object.entries(profile?.themes || {}).slice(0, 6),
+              ] as [string, PlayerProfile['themes'][string]][]).map(([catKey, catData]) => {
                 const nameSlug = (catData.name || catKey).toLowerCase()
                   .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
                   .replace(/[\s\-]+/g, '_');
@@ -568,13 +593,13 @@ export default function PlayerProfileScreen() {
             {challengeSent ? (
               <View style={s.sentRow}>
                 <MaterialCommunityIcons name="check-circle" size={20} color="#00FF9D" />
-                <Text style={s.sentText}>{t('challenge.sent')}</Text>
+                <Text style={s.sentText}>{t('challenge.already_pending')}</Text>
               </View>
             ) : (
               <TouchableOpacity
-                style={[s.sendChallengeBtn, challengeSending && { opacity: 0.6 }]}
+                style={[s.sendChallengeBtn, (challengeSending || !selectedTheme) && { opacity: 0.4 }]}
                 onPress={handleSendChallenge}
-                disabled={challengeSending}
+                disabled={challengeSending || !selectedTheme}
                 activeOpacity={0.8}
               >
                 <LinearGradient colors={['#8A2BE2', '#BF5FFF']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={s.sendChallengeBtnGradient}>

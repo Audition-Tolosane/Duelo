@@ -21,6 +21,8 @@ export default function RematchModal() {
   const [countdown, setCountdown] = useState(TIMEOUT_SECONDS);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Vrai entre notre « Accepter » et la réponse du serveur (qui fournit la salle privée).
+  const acceptingRef = useRef<{ themeId: string; proposer: string } | null>(null);
   const progressAnim = useRef(new Animated.Value(1)).current;
 
   const clearTimer = () => {
@@ -70,8 +72,18 @@ export default function RematchModal() {
       }),
 
       on('rematch_accepted', (msg: any) => {
-        // If we're the opponent who just accepted, navigate to matchmaking
         dismiss();
+        // Nous avons accepté : on rejoint la salle privée créée par le serveur pour les deux joueurs.
+        const accepting = acceptingRef.current;
+        if (!accepting) return;
+        acceptingRef.current = null;
+        const roomId = msg?.data?.room_id;
+        const theme = msg?.data?.theme_id || accepting.themeId;
+        router.replace(
+          roomId
+            ? `/matchmaking?room_id=${roomId}&category=${theme}&challenge=true&rematch=true&opponentPseudo=${encodeURIComponent(accepting.proposer)}`
+            : `/matchmaking?category=${theme}`
+        );
       }),
     ];
 
@@ -83,9 +95,9 @@ export default function RematchModal() {
 
   const handleAccept = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    acceptingRef.current = { themeId, proposer: proposerPseudo };
     send({ action: 'rematch_accept' });
     dismiss();
-    router.replace(`/matchmaking?category=${themeId}`);
   };
 
   const handleDecline = () => {

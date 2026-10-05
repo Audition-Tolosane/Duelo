@@ -26,6 +26,12 @@ class DueloWebSocket {
   private pingInterval: ReturnType<typeof setInterval> | null = null;
   /** Messages queued while the socket is not yet OPEN */
   private sendQueue: Record<string, any>[] = [];
+  /**
+   * Dernier game_start reçu. Le serveur l'envoie dès l'appariement, pendant que le joueur
+   * regarde encore l'animation VS : l'écran de jeu n'écoute pas encore et le raterait.
+   * game.tsx le récupère au montage via takeGameStart(roomId).
+   */
+  private lastGameStart: WSMessage | null = null;
 
   /**
    * Connect to the WebSocket server.
@@ -135,7 +141,18 @@ class DueloWebSocket {
     return this.userId;
   }
 
+  /** Récupère (une seule fois) le game_start déjà reçu pour cette salle. */
+  takeGameStart(roomId: string): WSMessage | null {
+    const msg = this.lastGameStart;
+    if (msg && msg.data?.room_id === roomId) {
+      this.lastGameStart = null;
+      return msg;
+    }
+    return null;
+  }
+
   private emit(msg: WSMessage) {
+    if (msg.type === 'game_start') this.lastGameStart = msg;
     // Notify specific type listeners
     this.listeners.get(msg.type)?.forEach((h) => h(msg));
     // Notify wildcard listeners

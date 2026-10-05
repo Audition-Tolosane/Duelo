@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions,
-  Platform, UIManager, ActivityIndicator, Easing, Alert, AppState,
+  Platform, UIManager, ActivityIndicator, Easing, Alert, AppState, BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -13,6 +13,8 @@ import { GLASS } from '../theme/glassTheme';
 import SwipeBackPage from '../components/SwipeBackPage';
 import RoundTimer from '../components/RoundTimer';
 import { useWS } from '../contexts/WebSocketContext';
+import { dueloWS } from '../services/websocket';
+import { COLOR } from '../theme/tokens';
 import { authFetch } from '../utils/api';
 import { saveScoreWithRetry } from '../utils/pendingScores';
 import { t, getLanguage } from '../utils/i18n';
@@ -52,7 +54,6 @@ const VIOLET = '#B366FF';
 const GOLD = '#FFB547';
 const MINT = '#32E7A3';
 const RED = '#FF3D5E';
-const OPTION_COLORS = [CYAN, MINT, VIOLET, GOLD];
 
 export default function GameScreen() {
   const router = useRouter();
@@ -106,6 +107,8 @@ export default function GameScreen() {
   const questionSlide = useRef(new Animated.Value(24)).current;
   const userIdRef = useRef<string | null>(null);
   const lastAnswerCorrectRef = useRef(false);
+  // Bonne réponse renvoyée par le serveur après notre réponse (null si serveur ancien / pas de réponse)
+  const lastCorrectOptionRef = useRef<number | null>(null);
 
   // Async challenge tracking
   type AnswerRecord = { answer: number; is_correct: boolean; points: number; time_ms: number };
@@ -133,20 +136,50 @@ export default function GameScreen() {
   // Sinon on peut mettre l'app en fond, chercher la réponse et revenir.
   // Déclenché sur 'background' uniquement (pas 'inactive' : centre de
   // contrôle / appel entrant ne doivent pas coûter le match).
+  const forfeit = () => {
+    if (matchEndedRef.current || questionsRef.current.length === 0) return;
+    matchEndedRef.current = true;
+    if (timerRef.current) clearInterval(timerRef.current);
+    const ps = playerScoreRef.current;
+    // Défaite garantie, peu importe le score au moment de l'abandon
+    const forfeitOpp = Math.max(botScoreRef.current, ps + 10);
+    AsyncStorage.getItem('duelo_user_id').then((userId) => {
+      router.replace(
+        `/results?playerScore=${ps}&opponentScore=${forfeitOpp}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId || ''}&isBot=${params.isBot}&correctCount=${correctCountRef.current}&opponentLevel=${parseInt(params.opponentLevel || '1') || 1}&opponentId=${params.opponentId || ''}`
+      );
+    });
+  };
+
   useEffect(() => {
     const sub = AppState.addEventListener('change', (state) => {
       if (state !== 'background') return;
-      if (matchEndedRef.current || questionsRef.current.length === 0) return;
-      matchEndedRef.current = true;
-      if (timerRef.current) clearInterval(timerRef.current);
-      const ps = playerScoreRef.current;
-      // Défaite garantie, peu importe le score au moment de l'abandon
-      const forfeitOpp = Math.max(botScoreRef.current, ps + 10);
-      AsyncStorage.getItem('duelo_user_id').then((userId) => {
-        router.replace(
-          `/results?playerScore=${ps}&opponentScore=${forfeitOpp}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId || ''}&isBot=${params.isBot}&correctCount=${correctCountRef.current}&opponentLevel=${parseInt(params.opponentLevel || '1') || 1}&opponentId=${params.opponentId || ''}`
-        );
-      });
+      forfeit();
+    });
+    return () => sub.remove();
+  }, []);
+
+  // Abandon volontaire (bouton ✕ ou retour Android) : même forfait, mais confirmé.
+  // Le swipe-retour est désactivé en match : on ne quitte plus une partie par accident.
+  const confirmForfeit = () => {
+    if (matchEndedRef.current) return;
+    if (questionsRef.current.length === 0) { router.back(); return; }
+    const title = t('game.forfeit_title');
+    const body = t('game.forfeit_body');
+    if (Platform.OS === 'web') {
+      if (typeof window !== 'undefined' && window.confirm(`${title}\n\n${body}`)) forfeit();
+      return;
+    }
+    Alert.alert(title, body, [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('game.forfeit'), style: 'destructive', onPress: forfeit },
+    ]);
+  };
+
+  useEffect(() => {
+    if (Platform.OS === 'web') return; // pas de bouton retour matériel sur le web
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      confirmForfeit();
+      return true;
     });
     return () => sub.remove();
   }, []);
@@ -231,17 +264,8 @@ export default function GameScreen() {
     const unsubs = [
       // Server sends game_start with first question
       wsOn('game_start', (msg) => {
-        const q = msg.data?.question;
-        if (q) {
-          // Store total questions count, set first question
-          const total = msg.data?.total_questions || TOTAL_QUESTIONS;
-          questionsRef.current = [q];
-          currentIndexRef.current = 0;
-          setQuestions([q]);
-          setLoading(false);
-          animateQuestion();
-          startTimer();
-        }
+        dueloWS.takeGameStart(params.roomId as string);
+        applyGameStart(msg);
       }),
       // Our answer result
       wsOn('answer_result', (msg) => {
@@ -249,8 +273,9 @@ export default function GameScreen() {
         if (wsAnswerTimeoutRef.current) clearTimeout(wsAnswerTimeoutRef.current);
         isSubmittingRef.current = false;
 
-        const { is_correct, points, your_score, opponent_score, question_index } = msg.data || {};
+        const { is_correct, points, your_score, opponent_score, question_index, correct_option } = msg.data || {};
         lastAnswerCorrectRef.current = is_correct;
+        lastCorrectOptionRef.current = typeof correct_option === 'number' ? correct_option : null;
         playerScoreRef.current = your_score;
         botScoreRef.current = opponent_score;
         setPlayerScore(your_score);
@@ -295,6 +320,7 @@ export default function GameScreen() {
           setSelectedOption(null);
           setBotAnswer(null);
           setShowResult(false);
+          lastCorrectOptionRef.current = null;
           setShowPending(true);
           Animated.timing(progressPendingOpacity, {
             toValue: 1, duration: 200, useNativeDriver: false,
@@ -332,9 +358,24 @@ export default function GameScreen() {
       }),
     ];
 
+    // game_start a pu arriver pendant l'animation VS, avant que cet écran n'écoute.
+    const pendingStart = dueloWS.takeGameStart(params.roomId as string);
+    if (pendingStart) applyGameStart(pendingStart);
+
     return () => unsubs.forEach((u) => u());
   // #38 — isLive is derived from URL params (never changes), use [] to prevent listener leak on re-render
   }, []);
+
+  function applyGameStart(msg: { data?: any }) {
+    const q = msg.data?.question;
+    if (!q || questionsRef.current.length > 0) return;
+    questionsRef.current = [q];
+    currentIndexRef.current = 0;
+    setQuestions([q]);
+    setLoading(false);
+    animateQuestion();
+    startTimer();
+  }
 
   const loadPseudo = async () => {
     const p = await AsyncStorage.getItem('duelo_pseudo');
@@ -547,6 +588,7 @@ export default function GameScreen() {
     if (isSubmittingRef.current) return; // #18 double-tap guard
     isSubmittingRef.current = true;
     if (timerRef.current) clearInterval(timerRef.current);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     setSelectedOption(optionIndex);
     playerSelectionsRef.current[currentIndexRef.current] = optionIndex;
@@ -738,7 +780,7 @@ export default function GameScreen() {
 
     // Loading spinner
     return (
-      <SwipeBackPage>
+      <SwipeBackPage enabled={false}>
       <View style={styles.container}>
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.loadingView}>
@@ -767,46 +809,43 @@ export default function GameScreen() {
   const question = questions[currentIndex];
   const optionRows: Array<[number, number]> = [[0, 1], [2, 3]];
 
-  // La bonne réponse révélée passe en gradient menthe plein (texte sombre)
-  const isOptionCorrectReveal = (index: number): boolean => {
-    if (!showResult) return false;
-    return isLive
-      ? (index === selectedOption && lastAnswerCorrectRef.current)
-      : index === question.correct_option;
+  // Sémantique : neutre avant réponse · jaune = ma sélection (en attente) ·
+  // vert + ✓ = bonne réponse révélée · rouge + ✕ = ma mauvaise réponse.
+  const correctIndex = (): number | null => {
+    if (!showResult) return null;
+    if (!isLive) return question.correct_option;
+    if (lastCorrectOptionRef.current !== null) return lastCorrectOptionRef.current;
+    return lastAnswerCorrectRef.current ? selectedOption : null;
   };
+  const isOptionCorrectReveal = (index: number): boolean => index === correctIndex();
+  const isWrongPick = (index: number): boolean =>
+    showResult && index === selectedOption && !isOptionCorrectReveal(index);
+  const isPendingPick = (index: number): boolean => !showResult && index === selectedOption;
 
   const getOptionFill = (index: number): [string, string] => {
-    if (!showResult) return [`${OPTION_COLORS[index]}18`, `${OPTION_COLORS[index]}08`];
-    const isWrong = isLive
-      ? (index === selectedOption && !lastAnswerCorrectRef.current)
-      : (index === selectedOption && index !== question.correct_option);
-    if (isOptionCorrectReveal(index)) return [MINT, '#1FA877'];
-    if (isWrong) return ['rgba(255,61,94,0.22)', 'rgba(255,61,94,0.06)'];
-    return ['rgba(255,255,255,0.02)', 'rgba(255,255,255,0.02)'];
+    const c = isOptionCorrectReveal(index) ? COLOR.status.success
+      : isWrongPick(index) ? COLOR.status.errorFill
+      : isPendingPick(index) ? COLOR.action.selectedFill
+      : showResult ? COLOR.surface.subtle
+      : COLOR.surface.card;
+    return [c, c];
   };
 
   const getOptionBorderCol = (index: number): string => {
-    if (!showResult) return `${OPTION_COLORS[index]}55`;
-    const isWrong = isLive
-      ? (index === selectedOption && !lastAnswerCorrectRef.current)
-      : (index === selectedOption && index !== question.correct_option);
-    if (isOptionCorrectReveal(index)) return MINT;
-    if (isWrong) return RED;
-    return 'rgba(255,255,255,0.06)';
+    if (isOptionCorrectReveal(index)) return COLOR.status.success;
+    if (isWrongPick(index)) return COLOR.status.error;
+    if (isPendingPick(index)) return COLOR.border.active;
+    return showResult ? COLOR.border.subtle : COLOR.border.default;
   };
 
   const getOptionTxtCol = (index: number): string => {
-    if (!showResult) return '#FFF';
-    const isWrong = isLive
-      ? (index === selectedOption && !lastAnswerCorrectRef.current)
-      : (index === selectedOption && index !== question.correct_option);
-    if (isOptionCorrectReveal(index)) return '#050510';
-    if (isWrong) return RED;
-    return 'rgba(255,255,255,0.28)';
+    if (isOptionCorrectReveal(index)) return COLOR.text.onAction;
+    if (isWrongPick(index) || isPendingPick(index)) return COLOR.text.primary;
+    return showResult ? COLOR.text.disabled : COLOR.text.primary;
   };
 
   return (
-    <SwipeBackPage>
+    <SwipeBackPage enabled={false}>
     <View style={styles.container}>
       {/* Fond : teinte cyan en haut → violet en bas (duel) */}
       <LinearGradient
@@ -826,6 +865,20 @@ export default function GameScreen() {
 
       {/* edges top+bottom : la grille de réponses ne mord plus la barre home */}
       <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+
+        {/* Abandon explicite (le swipe-retour est désactivé en match) */}
+        <View style={styles.topActions}>
+          <TouchableOpacity
+            testID="forfeit-btn"
+            onPress={confirmForfeit}
+            style={styles.forfeitBtn}
+            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            accessibilityRole="button"
+            accessibilityLabel={t('game.forfeit')}
+          >
+            <MaterialCommunityIcons name="close" size={22} color={COLOR.text.secondary} />
+          </TouchableOpacity>
+        </View>
 
         {/* Score boxes + Round Timer */}
         <View style={styles.scoreTimerRow}>
@@ -885,7 +938,6 @@ export default function GameScreen() {
             {optionRows.map((row, rowIdx) => (
               <View key={rowIdx} style={styles.optionsRow}>
                 {row.map((index) => {
-                  const optColor = OPTION_COLORS[index];
                   const fillColors = getOptionFill(index);
                   const borderColor = getOptionBorderCol(index);
                   const textColor = getOptionTxtCol(index);
@@ -896,17 +948,20 @@ export default function GameScreen() {
                     <TouchableOpacity
                       key={index}
                       testID={`option-${index}`}
-                      style={[styles.optionCard2x2, { borderColor }, correctReveal && styles.optionCardCorrect]}
+                      style={[styles.optionCard2x2, { borderColor }, isPendingPick(index) && styles.optionCardSelected, correctReveal && styles.optionCardCorrect]}
                       onPress={() => selectAnswer(index)}
                       disabled={showResult}
                       activeOpacity={0.85}
                     >
                       <LinearGradient colors={fillColors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
                       <View style={[styles.optionLetterBadge, {
-                        backgroundColor: correctReveal ? 'rgba(5,5,16,0.18)' : showResult ? 'rgba(255,255,255,0.05)' : `${optColor}22`,
+                        backgroundColor: correctReveal ? 'rgba(7,31,38,0.18)'
+                          : isPendingPick(index) ? COLOR.action.primary
+                          : COLOR.surface.subtle,
                       }]}>
                         <Text style={[styles.optionLetterText, {
-                          color: correctReveal ? '#050510' : showResult ? 'rgba(255,255,255,0.25)' : optColor,
+                          color: correctReveal || isPendingPick(index) ? COLOR.text.onAction
+                            : showResult ? COLOR.text.disabled : COLOR.text.secondary,
                         }]}>
                           {['A', 'B', 'C', 'D'][index]}
                         </Text>
@@ -922,12 +977,12 @@ export default function GameScreen() {
                           </Text>
                         );
                       })()}
-                      {showResult && isPlayerPick && (
+                      {(correctReveal || isWrongPick(index)) && (
                         <View style={styles.optionIndicatorPlayer}>
                           <MaterialCommunityIcons
                             name={correctReveal ? 'check-circle' : 'close-circle'}
-                            size={16}
-                            color={correctReveal ? '#050510' : RED}
+                            size={18}
+                            color={correctReveal ? COLOR.text.onAction : COLOR.status.error}
                           />
                         </View>
                       )}
@@ -1123,6 +1178,7 @@ const styles = StyleSheet.create({
     flex: 1, borderRadius: 16, borderWidth: 2, overflow: 'hidden',
     padding: 12, justifyContent: 'space-between',
   },
+  optionCardSelected: { borderWidth: 3 },
   optionCardCorrect: {
     shadowColor: MINT, shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.5, shadowRadius: 16, elevation: 8,
@@ -1137,7 +1193,14 @@ const styles = StyleSheet.create({
   optionIndicatorPlayer: { alignSelf: 'flex-end', marginTop: 4 },
   optionIndicatorBot: {
     width: 8, height: 8, borderRadius: 4,
-    backgroundColor: VIOLET, alignSelf: 'flex-end', marginTop: 4,
+    backgroundColor: COLOR.player.opponent, alignSelf: 'flex-end', marginTop: 4,
+  },
+
+  topActions: { flexDirection: 'row', paddingHorizontal: 10, paddingTop: 2 },
+  forfeitBtn: {
+    width: 36, height: 36, borderRadius: 18,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: COLOR.action.ghost,
   },
 
   // Score boxes + timer row

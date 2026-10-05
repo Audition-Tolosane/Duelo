@@ -787,6 +787,8 @@ async def get_home_feed(user_id: str, limit: int = 20, offset: int = 0, db: Asyn
         theme_name, theme_color = await _get_theme_info(db, m.category)
         pending_duels.append({
             "id": m.id, "opponent_pseudo": m.player2_pseudo,
+            # None pour un bot : le front propose alors « Rejouer ce thème » au lieu d'une revanche.
+            "opponent_id": m.player2_id if (m.player2_id and not m.player2_is_bot and m.player2_id != "deleted") else None,
             "opponent_avatar_seed": secrets.token_hex(4),
             "category": m.category, "category_name": theme_name, "category_color": theme_color,
             "player_score": m.player1_score, "opponent_score": m.player2_score,

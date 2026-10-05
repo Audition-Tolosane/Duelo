@@ -376,17 +376,30 @@ class ConnectionManager:
         theme_id = rematch["theme_id"]
         self._cleanup_rematch(rematch_id)
 
+        # Salle privée réservée aux deux joueurs (même mécanisme que les défis acceptés) :
+        # sans elle, chacun repartait de son côté (file d'attente aléatoire / bot).
+        room_id = secrets.token_hex(8)
+        self.pending_challenge_rooms[room_id] = {
+            "acceptor_id": opponent_id,
+            "challenger_id": proposer_id,
+            "theme_id": theme_id,
+            "players_data": {},
+        }
+        self.pending_challenge_rooms[room_id]["timer"] = asyncio.create_task(
+            self._challenge_room_timeout(room_id, opponent_id)
+        )
+
         # Notify both players
         await self.send_to_user(proposer_id, {
             "type": "rematch_accepted",
-            "data": {"theme_id": theme_id},
+            "data": {"theme_id": theme_id, "room_id": room_id},
         })
         await self.send_to_user(opponent_id, {
             "type": "rematch_accepted",
-            "data": {"theme_id": theme_id},
+            "data": {"theme_id": theme_id, "room_id": room_id},
         })
-        logger.info(f"Rematch accepted: {proposer_id} vs {opponent_id}")
-        return {"proposer_id": proposer_id, "opponent_id": opponent_id, "theme_id": theme_id}
+        logger.info(f"Rematch accepted: {proposer_id} vs {opponent_id} (room {room_id})")
+        return {"proposer_id": proposer_id, "opponent_id": opponent_id, "theme_id": theme_id, "room_id": room_id}
 
     async def decline_rematch(self, opponent_id: str):
         """Opponent declines the rematch."""
@@ -539,6 +552,10 @@ class ConnectionManager:
                 "points": points,
                 "your_score": room.get_score(user_id),
                 "opponent_score": room.get_score(opponent_id),
+                # Envoyé APRÈS la réponse du joueur (pas d'avantage anti-triche) : permet
+                # d'afficher la bonne réponse quand on s'est trompé ou que le temps a expiré.
+                "correct_option": room.questions[question_index].get("correct_option")
+                if 0 <= question_index < len(room.questions) else None,
             },
         })
 

@@ -400,6 +400,13 @@ async def handle_challenge_join(user_id: str, data: dict):
 
     await manager.join_challenge_room(user_id, room_id, user_data)
 
+    # Quand les deux joueurs sont entrés, join_challenge_room crée la salle de jeu sous le même
+    # room_id : il faut alors charger les questions, comme pour le matchmaking classique.
+    # Sans ça, les deux joueurs attendaient indéfiniment game_start.
+    room = manager.game_rooms.get(room_id)
+    if room and not room.questions:
+        await load_and_start_game(room_id, theme_id)
+
 
 # ── Game Handlers ──
 

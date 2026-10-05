@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  View, Text, StyleSheet, Dimensions, TouchableOpacity,
+  View, Text, StyleSheet, Dimensions, TouchableOpacity, BackHandler, Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -228,7 +228,7 @@ function PlayerPin({ x, y, name, color, isTarget }: {
 export default function MatchmakingScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { category: rawCategory, themeName, rematch, room_id: challengeRoomId, challenge, opponentPseudo: challengeOpponentPseudo } = useLocalSearchParams<{ category: string; themeName: string; rematch: string; room_id: string; challenge: string; opponentPseudo: string }>();
+  const { category: rawCategory, themeName, rematch, room_id: challengeRoomId, challenge, opponentPseudo: challengeOpponentPseudo, botPseudo: rematchBotPseudo, botSeed: rematchBotSeed } = useLocalSearchParams<{ category: string; themeName: string; rematch: string; room_id: string; challenge: string; opponentPseudo: string; botPseudo: string; botSeed: string }>();
   const category = rawCategory || '';
   const isRematch = rematch === 'true';
   const isChallengeMode = challenge === 'true' && !!challengeRoomId;
@@ -297,7 +297,9 @@ export default function MatchmakingScreen() {
       return;
     }
     loadPlayerInfo();
-    if (isRematch) {
+    // Revanche contre un joueur réel : salle privée (isChallengeMode + room_id).
+    // Revanche contre un bot (rematch=true sans salle) : même bot, même pseudo.
+    if (isRematch && !isChallengeMode) {
       fetchBotOpponent();
     } else if (isChallengeMode) {
       // Challenge mode: join the private room instead of the matchmaking queue
@@ -463,7 +465,12 @@ export default function MatchmakingScreen() {
       }
       const data = await res.json();
       console.log('[fetchBotOpponent] opponent:', data.opponent?.pseudo, '| category:', category);
-      const opp: OpponentData = data.opponent ?? FALLBACK_BOT;
+      let opp: OpponentData = data.opponent ?? FALLBACK_BOT;
+      // Revanche contre un bot : on garde l'identité de l'adversaire du match précédent,
+      // sinon « Revanche » ferait affronter quelqu'un d'autre.
+      if (isRematch && rematchBotPseudo) {
+        opp = { ...opp, pseudo: decodeURIComponent(rematchBotPseudo), avatar_seed: rematchBotSeed || opp.avatar_seed };
+      }
       setOpponent(opp);
       setPlayerInfo(data.player ?? { level: 1, title: '' });
       handleMatchFound(opp);
@@ -550,6 +557,19 @@ export default function MatchmakingScreen() {
     router.back();
   };
 
+  // Retour Android : annule proprement pendant la recherche ; bloqué une fois l'adversaire trouvé
+  // (la partie est déjà créée côté serveur, partir laisserait l'autre joueur seul).
+  const phaseRef = useRef(phase);
+  phaseRef.current = phase;
+  useEffect(() => {
+    if (Platform.OS === 'web') return; // pas de bouton retour matériel sur le web
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (phaseRef.current === 'searching') handleCancel();
+      return true;
+    });
+    return () => sub.remove();
+  }, []);
+
   const getCategoryLabel = () => {
     const name = themeName ? decodeURIComponent(themeName) : category;
     return name || 'Quiz';
@@ -559,7 +579,7 @@ export default function MatchmakingScreen() {
   const oppIsGlow = opponent?.streak_badge === 'glow';
 
   return (
-    <SwipeBackPage>
+    <SwipeBackPage enabled={phase === 'searching'} onBack={handleCancel}>
       <View style={[styles.container, { paddingTop: insets.top }]}>
         <DueloHeader />
 

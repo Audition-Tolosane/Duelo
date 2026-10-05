@@ -147,7 +147,7 @@ function getPulseTitle(item: FeedItem): string {
 
 // ── Exploit Card (Pulse Feed) ──
 const ExploitCard = ({ item, index = 0, onChallenge, onProfile }: {
-  item: FeedItem; index?: number; onChallenge: (userId: string, category: string) => void;
+  item: FeedItem; index?: number; onChallenge: (userId: string, category: string, categoryName?: string) => void;
   onProfile: (userId: string) => void;
 }) => {
   const color = item.pillar_color || item.category_color || '#B366FF';
@@ -214,7 +214,7 @@ const ExploitCard = ({ item, index = 0, onChallenge, onProfile }: {
           {item.can_challenge && (
             <TouchableOpacity
               style={exploitStyles.challengeBtn}
-              onPress={() => item.user_id && item.category && onChallenge(item.user_id, item.category)}
+              onPress={() => item.user_id && item.category && onChallenge(item.user_id, item.category, item.category_name)}
               activeOpacity={0.85}
             >
               <LinearGradient
@@ -524,9 +524,10 @@ export default function PlayersScreen() {
     setRefreshing(false);
   }, [myId]);
 
-  const handleChallenge = useCallback((userId: string, category: string) => {
+  // Vrai défi nominatif sur le thème de l'exploit (et non un matchmaking aléatoire).
+  const handleChallenge = useCallback((userId: string, category: string, categoryName?: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    router.push(`/matchmaking?category=${category}`);
+    router.push(`/player-profile?id=${userId}&challenge=1&themeId=${category}&themeName=${encodeURIComponent(categoryName || '')}`);
   }, [router]);
 
   const handleProfile = useCallback((userId: string) => {
