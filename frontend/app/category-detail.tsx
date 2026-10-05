@@ -13,7 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { GLASS } from '../theme/glassTheme';
 import { authFetch } from '../utils/api';
-import { t } from '../utils/i18n';
+import { t, getLanguage } from '../utils/i18n';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
 import CategoryIcon from '../components/CategoryIcon';
@@ -146,7 +146,13 @@ export default function CategoryDetailScreen() {
 
   const fetchDetail = async (uid: string) => {
     try {
-      const res = await fetch(`${API_URL}/api/theme/${id}/detail${uid ? `?user_id=${uid}` : ''}`);
+      // La langue est transmise pour que le nom du thème, sa description et les
+      // titres de niveau reviennent traduits. Le serveur retombe champ par champ sur
+      // le français pour tout ce qui n'est pas encore traduit.
+      const lang = getLanguage();
+      const qs = [uid ? `user_id=${uid}` : '', lang && lang !== 'fr' ? `lang=${lang}` : '']
+        .filter(Boolean).join('&');
+      const res = await fetch(`${API_URL}/api/theme/${id}/detail${qs ? `?${qs}` : ''}`);
       if (!res.ok) { setFetchError(true); return; }
       const data = await res.json();
       setFetchError(false);

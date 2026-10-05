@@ -15,7 +15,7 @@ import RoundTimer from '../components/RoundTimer';
 import { useWS } from '../contexts/WebSocketContext';
 import { authFetch } from '../utils/api';
 import { saveScoreWithRetry } from '../utils/pendingScores';
-import { t } from '../utils/i18n';
+import { t, getLanguage } from '../utils/i18n';
 import { preloadSounds, playSound } from '../utils/sounds';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -347,10 +347,18 @@ export default function GameScreen() {
     setLoading(true);
     setLoadError(null);
     try {
+      // LANGUE DES QUESTIONS. Deux sources, dans cet ordre :
+      //   1. le mode VO (thèmes SCREEN) force l'anglais — c'est un choix explicite du
+      //      joueur « je veux les répliques dans la langue du film », indépendant de la
+      //      langue de l'interface ;
+      //   2. sinon on suit la langue de l'app.
+      // Le serveur vérifie thème par thème que la langue existe et retombe sur le
+      // français sinon : un thème non traduit reste donc jouable, sans rien casser.
       const voFlag = await AsyncStorage.getItem(`duelo_vo_${params.category}`);
-      const langParam = voFlag === 'true' ? '&lang=en' : '';
+      const lang = voFlag === 'true' ? 'en' : getLanguage();
+      const langParam = lang && lang !== 'fr' ? `&lang=${lang}` : '';
       const url = `${API_URL}/api/game/questions-v2?theme=${params.category}${langParam}`;
-      const res = await fetch(url);
+      const res = await authFetch(url);
       if (!res.ok) {
         throw new Error(`${t('game.server_error')} (${res.status})`);
       }

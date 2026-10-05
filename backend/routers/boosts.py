@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
+from i18n import nom_theme
 from auth_middleware import get_current_user_id
 from services.boosts import (
     activate_boost, get_any_active_boost, get_used_theme_ids_today,
@@ -32,6 +33,7 @@ async def activate_boost_route(
 @router.post("/boosts/refresh-offers")
 async def refresh_offers(
     current_user: str = Depends(get_current_user_id),
+    lang: str = 'fr',
     db: AsyncSession = Depends(get_db),
 ):
     """Appelé après visionnage de pub. Change les offres x2 XP immédiatement."""
@@ -45,7 +47,7 @@ async def refresh_offers(
         is_active = active_boost and active_boost.theme_id == t.id
         result.append({
             "theme_id": t.id,
-            "theme_name": t.name,
+            "theme_name": nom_theme(t, lang),
             "color": t.color_hex or "#8A2BE2",
             "is_active": is_active,
             "expires_at": active_boost.expires_at.isoformat() if is_active else None,

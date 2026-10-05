@@ -287,7 +287,10 @@ class Theme(Base):
     title_lv35 = Column(String(100), nullable=True)
     title_lv50 = Column(String(100), nullable=True)
     icon_url = Column(Text, nullable=True)
-    question_count = Column(Integer, default=0)
+    question_count = Column(Integer, default=0)   # FRANÇAIS seul : c'est le chiffre
+                                                 # affiché au joueur, il ne doit pas
+                                                 # gonfler avec les traductions.
+    translations = Column(JSON, nullable=True)   # {"en": {"name": ..., "title_lv1": ...}, "es": {...}}
     created_at = Column(DateTime(timezone=True), default=utc_now)
     updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
 

@@ -29,12 +29,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#050510',
   },
   bgImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: '100%' as any,
     height: '100%' as any,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0, 0, 10, 0.15)',
   },
   content: {

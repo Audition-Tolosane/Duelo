@@ -11,6 +11,7 @@ from database import AsyncSessionLocal
 from models import User, Question, Match, ChatMessage, UserThemeXP, Theme
 from constants import TOTAL_QUESTIONS
 from helpers import shuffle_question_options, resolve_theme_category
+from i18n import LANGUE_REFERENCE, filtre_langue_questions
 from services.ws_manager import manager
 from services.xp import (
     get_level, get_streak_bonus, get_streak_badge,
@@ -309,16 +310,26 @@ async def load_and_start_game(room_id: str, theme_id: str):
         mix = difficulty_mix(avg_level)
         logger.info(f"[ws] room={room_id} theme={theme_id} category={category} avg_level={avg_level} mix={mix}")
 
+        # LANGUE DE LA PARTIE. Les deux joueurs partagent un seul jeu de questions, mais
+        # rien ne dit qu'ils parlent la même langue : le multijoueur reste donc en
+        # français, la langue de référence du catalogue. Sans ce filtre, une partie
+        # piocherait indifféremment parmi les lignes FR, EN et ES d'un même thème et
+        # afficherait un mélange des trois — ce que personne ne verrait avant la mise en
+        # production. Servir une langue par salon suppose de décider quoi faire quand les
+        # deux joueurs diffèrent : c'est un choix produit, pas une correction technique.
+        filtre_langue = filtre_langue_questions(Question.language, LANGUE_REFERENCE)
+
         for difficulty, count in mix:
             result = await db.execute(
-                select(Question).where(Question.category == category, Question.difficulty == difficulty)
+                select(Question).where(Question.category == category,
+                                       Question.difficulty == difficulty, filtre_langue)
                 .order_by(func.random()).limit(count)
             )
             selected.extend(result.scalars().all())
 
         if len(selected) < 7:
             result = await db.execute(
-                select(Question).where(Question.category == category)
+                select(Question).where(Question.category == category, filtre_langue)
                 .order_by(func.random()).limit(7)
             )
             fallback = result.scalars().all()

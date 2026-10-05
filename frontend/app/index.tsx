@@ -600,9 +600,9 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#050510' },
   loadingContainer: { flex: 1, backgroundColor: '#050510', justifyContent: 'center', alignItems: 'center' },
 
-  bgLayer: { ...StyleSheet.absoluteFillObject, top: -40, bottom: -40 },
+  bgLayer: { ...StyleSheet.absoluteFill, top: -40, bottom: -40 },
   bgImage: { width: '100%' as any, height: '100%' as any },
-  bgOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,10,0.2)' },
+  bgOverlay: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,10,0.2)' },
 
   container: { flex: 1, backgroundColor: 'transparent' },
   keyboardView: { flex: 1 },

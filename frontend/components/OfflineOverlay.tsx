@@ -88,7 +88,7 @@ export default function OfflineOverlay() {
 
 const styles = StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     zIndex: 9999,
     backgroundColor: COLORS.abyss,
     alignItems: 'center',

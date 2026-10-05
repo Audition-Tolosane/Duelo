@@ -2288,7 +2288,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   duelGlass: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0, 255, 255, 0.02)',
     borderRadius: GLASS.radius,
   },

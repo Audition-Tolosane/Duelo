@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from database import get_db
 from models import User, Question, Theme, UserThemeXP, Match, ThemeFollow
+from i18n import libelles_theme, nom_theme, theme_localise
 from constants import SUPER_CATEGORY_META, CLUSTER_ICONS
 from services.xp import (
     get_level, get_xp_progress, get_theme_title, get_theme_unlocked_titles,
@@ -15,7 +16,8 @@ router = APIRouter(tags=["themes"])
 
 
 @router.get("/themes/trending")
-async def get_trending_themes(user_id: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+async def get_trending_themes(user_id: Optional[str] = None, lang: str = 'fr',
+                              db: AsyncSession = Depends(get_db)):
     """Top 6 thèmes scorés par tendance × affinité joueur."""
     from services.recommendations import get_trending_themes_scored
 
@@ -23,9 +25,9 @@ async def get_trending_themes(user_id: Optional[str] = None, db: AsyncSession = 
     trending = [
         {
             "id": e["theme"].id,
-            "name": e["theme"].name,
+            "name": libelles_theme(e["theme"], lang)["name"],
             "color_hex": e["theme"].color_hex or "#8A2BE2",
-            "description": e["theme"].description or "",
+            "description": libelles_theme(e["theme"], lang)["description"],
             "match_count": e["match_count"],
             "icon_url": getattr(e["theme"], "icon_url", "") or "",
             "affinity_label": e["affinity_label"],
@@ -41,9 +43,9 @@ async def get_trending_themes(user_id: Optional[str] = None, db: AsyncSession = 
         )
         for theme in filler_res.scalars().all():
             trending.append({
-                "id": theme.id, "name": theme.name,
+                "id": theme.id, "name": libelles_theme(theme, lang)["name"],
                 "color_hex": theme.color_hex or "#8A2BE2",
-                "description": theme.description or "",
+                "description": libelles_theme(theme, lang)["description"],
                 "match_count": 0,
                 "icon_url": getattr(theme, "icon_url", "") or "",
                 "affinity_label": "global",
@@ -53,7 +55,8 @@ async def get_trending_themes(user_id: Optional[str] = None, db: AsyncSession = 
 
 
 @router.get("/themes/explore")
-async def themes_explore(user_id: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+async def themes_explore(user_id: Optional[str] = None, lang: str = 'fr',
+                         db: AsyncSession = Depends(get_db)):
     """Return pillar structure from Theme table."""
     result = await db.execute(select(Theme).order_by(Theme.super_category, Theme.cluster, Theme.name))
     all_themes = result.scalars().all()
@@ -90,11 +93,12 @@ async def themes_explore(user_id: Optional[str] = None, db: AsyncSession = Depen
             for t in theme_list:
                 t_xp = user_xp_map.get(t.id, 0)
                 t_level = get_level(t_xp)
+                lib = libelles_theme(t, lang)
                 topics.append({
-                    "id": t.id, "name": t.name,
-                    "icon": t.name[0].upper() if t.name else "?",
+                    "id": t.id, "name": lib["name"],
+                    "icon": lib["name"][0].upper() if lib["name"] else "?",
                     "icon_url": t.icon_url or "", "category_id": t.id,
-                    "level": t_level, "description": t.description or "",
+                    "level": t_level, "description": lib["description"],
                 })
 
             cluster_themes.append({
@@ -140,7 +144,8 @@ async def get_super_categories(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/explore/{super_category}/clusters")
-async def get_clusters(super_category: str, user_id: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+async def get_clusters(super_category: str, user_id: Optional[str] = None,
+                       lang: str = 'fr', db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(Theme).where(Theme.super_category == super_category.upper())
         .order_by(Theme.cluster, Theme.name)
@@ -165,12 +170,13 @@ async def get_clusters(super_category: str, user_id: Optional[str] = None, db: A
 
         theme_xp = user_xp_map.get(t.id, 0)
         theme_level = get_level(theme_xp)
+        vue = theme_localise(t, lang)
 
         clusters[t.cluster]["themes"].append({
-            "id": t.id, "name": t.name, "description": t.description or "",
+            "id": t.id, "name": vue.name, "description": vue.description,
             "icon_url": t.icon_url or "", "color_hex": t.color_hex or "#8A2BE2",
             "question_count": t.question_count or 0, "user_level": theme_level,
-            "user_title": get_theme_title(t, theme_level) if theme_level > 0 else "",
+            "user_title": get_theme_title(vue, theme_level) if theme_level > 0 else "",
         })
 
     meta = SUPER_CATEGORY_META.get(super_category.upper(), {"icon": "❓", "color": "#8A2BE2", "label": super_category})
@@ -182,11 +188,16 @@ async def get_clusters(super_category: str, user_id: Optional[str] = None, db: A
 
 
 @router.get("/theme/{theme_id}/detail")
-async def get_theme_detail(theme_id: str, user_id: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+async def get_theme_detail(theme_id: str, user_id: Optional[str] = None,
+                           lang: str = 'fr', db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Theme).where(Theme.id == theme_id))
     theme = result.scalar_one_or_none()
     if not theme:
         raise HTTPException(status_code=404, detail="Thème introuvable")
+
+    # Vue localisée : tout ce qui est affiché passe par elle, y compris les titres de
+    # niveau que get_theme_title() lit par attribut.
+    vue = theme_localise(theme, lang)
 
     user_xp = 0
     user_level = 0
@@ -206,7 +217,7 @@ async def get_theme_detail(theme_id: str, user_id: Optional[str] = None, db: Asy
         if uxp:
             user_xp = uxp.xp
             user_level = get_level(user_xp)
-            user_title = get_theme_title(theme, user_level)
+            user_title = get_theme_title(vue, user_level)
 
         follow_res = await db.execute(
             select(ThemeFollow).where(ThemeFollow.user_id == user_id, ThemeFollow.theme_id == theme_id)
@@ -214,7 +225,7 @@ async def get_theme_detail(theme_id: str, user_id: Optional[str] = None, db: Asy
         is_following = follow_res.scalar_one_or_none() is not None
 
     xp_progress = get_xp_progress(user_xp, user_level)
-    unlocked_titles = get_theme_unlocked_titles(theme, user_level)
+    unlocked_titles = get_theme_unlocked_titles(vue, user_level)
 
     # Top player by theme XP (excluding bots)
     top_res = await db.execute(
@@ -237,11 +248,11 @@ async def get_theme_detail(theme_id: str, user_id: Optional[str] = None, db: Asy
             "avatar_frame": getattr(top_user, "avatar_frame", None),
             "xp": top_uxp.xp,
             "level": top_lvl,
-            "title": get_theme_title(theme, top_lvl),
+            "title": get_theme_title(vue, top_lvl),
         }
 
     return {
-        "id": theme.id, "name": theme.name, "description": theme.description or "",
+        "id": theme.id, "name": vue.name, "description": vue.description,
         "super_category": theme.super_category, "cluster": theme.cluster,
         "color_hex": theme.color_hex or "#8A2BE2", "icon_url": theme.icon_url or "",
         "question_count": theme.question_count or 0,
@@ -250,9 +261,9 @@ async def get_theme_detail(theme_id: str, user_id: Optional[str] = None, db: Asy
         "xp_progress": xp_progress, "is_following": is_following,
         "unlocked_titles": unlocked_titles,
         "all_titles": {
-            1: theme.title_lv1 or "", 10: theme.title_lv10 or "",
-            20: theme.title_lv20 or "", 35: theme.title_lv35 or "",
-            50: theme.title_lv50 or "",
+            1: vue.title_lv1, 10: vue.title_lv10,
+            20: vue.title_lv20, 35: vue.title_lv35,
+            50: vue.title_lv50,
         },
         "top_player": top_player,
     }

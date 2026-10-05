@@ -20,6 +20,7 @@ _submit_locks: dict[str, asyncio.Lock] = {}
 # XP leaderboard). ~40/h is well above normal human play (~1-2 min/match).
 SOLO_XP_HOURLY_CAP = 40
 from helpers import shuffle_question_options, resolve_theme_category
+from i18n import LANGUES_TRADUITES, filtre_langue_questions, normaliser_langue
 from services.xp import (
     get_level, get_streak_bonus, get_streak_badge,
     get_theme_title, check_new_title_theme, MAX_LEVEL, TITLE_THRESHOLDS,
@@ -51,27 +52,29 @@ async def _resolve_theme_category(theme: str, db: AsyncSession) -> str:
 async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db: AsyncSession = Depends(get_db)):
     """Get 7 questions from different angles, with an adaptive difficulty mix based on the
     player's level in this theme (sliding window). Anonymous -> balanced 2/3/2.
-    If lang='en', return English VO questions when available, fall back to 'fr'."""
+    For any translated language, return that language when the theme has it, else 'fr'."""
     # Resolve theme to the correct Question.category value
     category = await _resolve_theme_category(theme, db)
     logger.info(f"[questions] theme='{theme}' -> category='{category}', lang='{lang}'")
 
-    # If VO requested, check if EN questions exist; otherwise fall back to FR
+    # Le catalogue est traduit THÈME PAR THÈME : à tout moment certains thèmes existent
+    # dans la langue demandée et d'autres non. On vérifie donc l'existence avant de
+    # filtrer, et on retombe sur le français sinon. C'est ce qui permet de déployer les
+    # traductions au fil de l'eau sans jamais servir un thème vide.
     effective_lang = 'fr'
-    if lang == 'en':
-        en_count = await db.execute(
+    lang = normaliser_langue(lang)
+    if lang in LANGUES_TRADUITES:
+        n = await db.execute(
             select(func.count()).select_from(Question).where(
-                Question.category == category, Question.language == 'en'
+                Question.category == category, Question.language == lang
             )
         )
-        if (en_count.scalar() or 0) > 0:
-            effective_lang = 'en'
+        if (n.scalar() or 0) > 0:
+            effective_lang = lang
         else:
-            logger.info(f"[questions] No EN questions for '{category}', falling back to FR")
+            logger.info(f"[questions] No {lang.upper()} questions for '{category}', falling back to FR")
 
-    lang_filter = Question.language == effective_lang if effective_lang == 'en' else or_(
-        Question.language == 'fr', Question.language.is_(None)
-    )
+    lang_filter = filtre_langue_questions(Question.language, effective_lang)
 
     # Niveau du joueur dans ce thème -> difficulté adaptative (fenêtre glissante).
     # Best-effort : si non authentifié ou pas d'XP sur le thème, on reste sur l'équilibré.

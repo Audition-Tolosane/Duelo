@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   dimOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: '#000',
     zIndex: 0,
   },

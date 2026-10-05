@@ -18,7 +18,7 @@ import Animated, {
 import ConfettiCannon from 'react-native-confetti-cannon';
 import CategoryIcon from '../components/CategoryIcon';
 import { authFetch } from '../utils/api';
-import { t } from '../utils/i18n';
+import { t, getLanguage } from '../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
@@ -80,7 +80,9 @@ export default function OnboardingScreen() {
 
   const fetchTrending = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/themes/trending`);
+      const lang = getLanguage();
+      const res = await fetch(
+        `${API_URL}/api/themes/trending${lang && lang !== 'fr' ? `?lang=${lang}` : ''}`);
       if (res.ok) {
         const data = await res.json();
         setTrending(data.trending || []);

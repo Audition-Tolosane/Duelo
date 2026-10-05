@@ -308,7 +308,7 @@ const s = StyleSheet.create({
     justifyContent: 'space-between', overflow: 'hidden',
   },
   tileBorder: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: RADIUS.lg - 4, borderWidth: 1,
   },
   tileHeader: {
@@ -375,7 +375,7 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.04)',
     borderWidth: 1, borderColor: 'rgba(179,102,255,0.3)',
   },
-  forgeBg: { ...StyleSheet.absoluteFillObject, borderRadius: 18 },
+  forgeBg: { ...StyleSheet.absoluteFill, borderRadius: 18 },
   forgeIconWrap: {
     width: 48, height: 48, borderRadius: 24,
     backgroundColor: 'rgba(255,255,255,0.08)',

@@ -12,7 +12,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SwipeBackPage from '../components/SwipeBackPage';
 import DueloHeader from '../components/DueloHeader';
 import CategoryIcon from '../components/CategoryIcon';
-import { t } from '../utils/i18n';
+import { t, getLanguage } from '../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -114,7 +114,10 @@ export default function SuperCategoryScreen() {
   const loadData = async () => {
     try {
       const userId = await AsyncStorage.getItem('duelo_user_id');
-      const url = `${API_URL}/api/explore/${id}/clusters${userId ? `?user_id=${userId}` : ''}`;
+      const lang = getLanguage();
+      const qs = [userId ? `user_id=${userId}` : '', lang && lang !== 'fr' ? `lang=${lang}` : '']
+        .filter(Boolean).join('&');
+      const url = `${API_URL}/api/explore/${id}/clusters${qs ? `?${qs}` : ''}`;
       const res = await fetch(url);
       const result = await res.json();
       setData(result);
@@ -372,7 +375,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   tileBorder: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: 18, borderWidth: 1,
   },
   carouselTop: {

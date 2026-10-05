@@ -122,7 +122,7 @@ const ForgeHeroCard = ({ children }: { children: React.ReactNode }) => {
 const forgeHero = StyleSheet.create({
   wrap: { borderRadius: 20, overflow: 'hidden', position: 'relative', marginHorizontal: 16, marginBottom: 20 },
   neonBorder: {
-    ...StyleSheet.absoluteFillObject, borderRadius: 20, borderWidth: 1.5,
+    ...StyleSheet.absoluteFill, borderRadius: 20, borderWidth: 1.5,
     borderColor: 'rgba(179,102,255,0.6)',
     shadowColor: '#B366FF', shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5, shadowRadius: 15, elevation: 6,

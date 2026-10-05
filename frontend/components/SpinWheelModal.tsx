@@ -286,7 +286,7 @@ const s = StyleSheet.create({
   laterText: { color: '#525252', fontSize: 13 },
   // Result overlay
   resultOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'center', alignItems: 'center', padding: 24,
   },

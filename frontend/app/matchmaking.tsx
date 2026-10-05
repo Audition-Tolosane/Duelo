@@ -692,7 +692,7 @@ export default function MatchmakingScreen() {
           <>
             <Animated.View style={[styles.versusBackdrop, overlayStyle]} />
             {/* Reveal : teinte cyan en haut (toi) / violet en bas (adversaire) */}
-            <Animated.View style={[StyleSheet.absoluteFillObject, overlayStyle]} pointerEvents="none">
+            <Animated.View style={[StyleSheet.absoluteFill, overlayStyle]} pointerEvents="none">
               <LinearGradient
                 colors={['rgba(0,229,255,0.20)', 'rgba(5,5,16,0)', 'rgba(5,5,16,0)', 'rgba(179,102,255,0.20)']}
                 locations={[0, 0.38, 0.62, 1]}
@@ -827,10 +827,10 @@ export default function MatchmakingScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#050510' },
-  mapViewport: { ...StyleSheet.absoluteFillObject, overflow: 'hidden' },
+  mapViewport: { ...StyleSheet.absoluteFill, overflow: 'hidden' },
   mapContainer: { width: REAL_W, height: REAL_H, position: 'absolute' },
-  vignetteV: { ...StyleSheet.absoluteFillObject },
-  vignetteH: { ...StyleSheet.absoluteFillObject },
+  vignetteV: { ...StyleSheet.absoluteFill },
+  vignetteH: { ...StyleSheet.absoluteFill },
 
   searchOverlay: { position: 'absolute', bottom: 60, left: 0, right: 0, alignItems: 'center' },
   searchCard: { borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(138,43,226,0.2)' },
@@ -864,8 +864,8 @@ const styles = StyleSheet.create({
   foundText: { fontSize: 16, fontFamily: FONTS.display.bold, color: COLORS.mint },
   foundName: { fontSize: 20, fontFamily: FONTS.display.bold, color: '#FFF' },
 
-  versusBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(5,5,16,0.88)' },
-  versusOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', alignItems: 'center' },
+  versusBackdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(5,5,16,0.88)' },
+  versusOverlay: { ...StyleSheet.absoluteFill, justifyContent: 'center', alignItems: 'center' },
   versusContent: { width: '100%', paddingHorizontal: 20 },
   versusCategoryRow: { alignItems: 'center', gap: 6, marginBottom: 28 },
   versusEyebrow: {
@@ -932,7 +932,7 @@ const styles = StyleSheet.create({
   },
 
   timeoutOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0,0,0,0.88)',
     justifyContent: 'center',
     alignItems: 'center',

@@ -162,6 +162,10 @@ async def _ensure_columns():
             "ALTER TABLE questions ADD COLUMN IF NOT EXISTS angle_num INTEGER DEFAULT 0",
             "ALTER TABLE questions ADD COLUMN IF NOT EXISTS batch TEXT",
             "ALTER TABLE questions ADD COLUMN IF NOT EXISTS language VARCHAR(10) DEFAULT 'fr'",
+            # Libellés de thème traduits (nom, description, 5 titres de niveau).
+            # Une colonne JSON plutôt qu'une table jointe : 7 champs courts sur
+            # 917 thèmes, la jointure aurait alourdi une dizaine d'endpoints.
+            "ALTER TABLE themes ADD COLUMN IF NOT EXISTS translations JSON",
             # Widen id column to support long quiz_generator IDs
             "ALTER TABLE questions ALTER COLUMN id TYPE VARCHAR(100)",
             "ALTER TABLE question_reports ALTER COLUMN question_id TYPE VARCHAR(100)",

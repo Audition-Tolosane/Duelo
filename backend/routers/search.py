@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from database import get_db
 from models import User, Question, Match, Theme, UserThemeXP, WallPost, PostLike, PostComment
+from i18n import libelles_theme
 from constants import DIFFICULTY_LEVELS, COUNTRY_FLAGS
 from services.xp import get_level, get_theme_title, get_theme_unlocked_titles, get_xp_progress
 
@@ -146,7 +147,7 @@ def _theme_score(query: str, theme_name: str, cluster: str, super_cat: str, desc
 async def search_themes(
     q: Optional[str] = None, difficulty: Optional[str] = None,
     user_id: Optional[str] = None, limit: int = 20, offset: int = 0,
-    db: AsyncSession = Depends(get_db)
+    lang: str = 'fr', db: AsyncSession = Depends(get_db)
 ):
     limit = min(limit, 100)
     query_lower = (q or "").strip().lower()
@@ -190,8 +191,8 @@ async def search_themes(
                 break
 
         results.append({
-            "id": theme.id, "name": theme.name,
-            "description": theme.description or "",
+            "id": theme.id, "name": libelles_theme(theme, lang)["name"],
+            "description": libelles_theme(theme, lang)["description"],
             "total_questions": theme.question_count or 0,
             "color_hex": theme.color_hex or "#8A2BE2",
             "cluster": theme.cluster or "",

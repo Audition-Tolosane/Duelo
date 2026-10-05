@@ -783,7 +783,7 @@ const s = StyleSheet.create({
     backgroundColor: '#0D0D1A',
     borderWidth: 1, borderColor: 'rgba(138,43,226,0.3)',
   },
-  modalBg: { ...StyleSheet.absoluteFillObject },
+  modalBg: { ...StyleSheet.absoluteFill },
   modalHeader: {
     flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 20,
   },

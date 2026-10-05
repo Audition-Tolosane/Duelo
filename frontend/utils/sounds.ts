@@ -1,4 +1,4 @@
-import { Audio } from 'expo-av';
+import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-audio';
 
 type SoundKey = 'correct' | 'wrong' | 'tick' | 'victory' | 'defeat';
 
@@ -10,7 +10,7 @@ const SOUND_FILES: Record<SoundKey, any> = {
   defeat:  require('../assets/sounds/defeat.wav'),
 };
 
-const _cache: Partial<Record<SoundKey, Audio.Sound>> = {};
+const _cache: Partial<Record<SoundKey, AudioPlayer>> = {};
 let _enabled = true;
 let _loaded = false;
 
@@ -18,13 +18,10 @@ export async function preloadSounds(): Promise<void> {
   if (_loaded) return;
   _loaded = true;
   try {
-    await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
-    await Promise.all(
-      (Object.keys(SOUND_FILES) as SoundKey[]).map(async (key) => {
-        const { sound } = await Audio.Sound.createAsync(SOUND_FILES[key], { shouldPlay: false });
-        _cache[key] = sound;
-      })
-    );
+    await setAudioModeAsync({ playsInSilentMode: true });
+    (Object.keys(SOUND_FILES) as SoundKey[]).forEach((key) => {
+      _cache[key] = createAudioPlayer(SOUND_FILES[key]);
+    });
   } catch {
     // Sounds are non-critical — fail silently
   }
@@ -33,10 +30,10 @@ export async function preloadSounds(): Promise<void> {
 export async function playSound(key: SoundKey): Promise<void> {
   if (!_enabled) return;
   try {
-    const sound = _cache[key];
-    if (!sound) return;
-    await sound.setPositionAsync(0);
-    await sound.playAsync();
+    const player = _cache[key];
+    if (!player) return;
+    await player.seekTo(0);
+    player.play();
   } catch {
     // Non-critical
   }
@@ -51,7 +48,13 @@ export function isSoundEnabled(): boolean {
 }
 
 export async function unloadSounds(): Promise<void> {
-  await Promise.all(
-    Object.values(_cache).map((s) => s?.unloadAsync().catch(() => {}))
-  );
+  (Object.keys(_cache) as SoundKey[]).forEach((key) => {
+    try {
+      _cache[key]?.remove();
+    } catch {
+      // Non-critical
+    }
+    delete _cache[key];
+  });
+  _loaded = false;
 }
