@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pilote SKILKI V1.2</title>
+<style>
+  :root { --bg:#071F26; --card:#0B3D4A; --ink:#E8F1EC; --muted:rgba(232,241,236,.66); --line:rgba(232,241,236,.12); --yellow:#FFDB3D; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  header, section, nav, footer { max-width:1240px; margin:0 auto; padding:0 16px; }
+  header { padding-top:32px; } h1 { margin:0 0 4px; font-size:26px; } h1 span { color:var(--yellow); }
+  header p, .note { color:var(--muted); max-width:860px; margin:0 0 14px; }
+  nav { margin-top:16px; display:flex; gap:8px; flex-wrap:wrap; }
+  nav a { color:var(--ink); text-decoration:none; border:1px solid var(--line); border-radius:999px; padding:6px 14px; }
+  section { margin-top:30px; } h2 { font-size:20px; margin:0 0 4px; }
+  .pair { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
+  figure { margin:0; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:12px; }
+  figure img { width:100%; height:auto; display:block; border-radius:10px; }
+  figcaption { font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+  figure.after figcaption { color:var(--yellow); }
+  .wide img { max-width:100%; }
+  footer { margin:40px auto; color:var(--muted); font-size:13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pilote <span>SKILKI</span> — V1.1 → V1.2</h1>
+  <p>Mini V1.2 : uniquement les 6 corrections prioritaires (P1) et les P2 recommandés par la revue Better Design. Aucune nouvelle couleur, aucun nouveau composant, aucune animation ajoutée. Captures 390×844 et 320×568.</p>
+</header>
+<nav><a href="#theme">Page thème</a><a href="#question">Question</a><a href="#vs">VS</a><a href="#explorer">Explorer</a><a href="#accueil">Accueil</a><a href="#profil">Profil</a><a href="#reglages">Réglages</a><a href="#planches">Planches</a></nav>
+
+<section id="theme"><h2>Page thème</h2><p class="note">T1 : plus aucun glissement horizontal (largeur de page = largeur d’écran). T2 : « Abonnés » au lieu de « FOLLOWERS ». « Communauté » n’est plus répété.</p>
+<div class="pair">
+  <figure><figcaption>V1.1 · 390</figcaption><img src="captures/v1.1/390x844/page-theme.png"></figure>
+  <figure class="after"><figcaption>V1.2 · 390</figcaption><img src="captures/v1.2/390x844/page-theme.png"></figure>
+  <figure class="after"><figcaption>V1.2 · 320</figcaption><img src="captures/v1.2/320x568/page-theme.png"></figure>
+</div></section>
+
+<section id="question"><h2>Question</h2><p class="note">Q1 : la question est centrée dans l’espace libre. Pseudo du rival en corail lisible (4,69:1). Réponses grisées plus lisibles après révélation (5,06:1).</p>
+<div class="pair">
+  <figure><figcaption>V1.1 · 390</figcaption><img src="captures/v1.1/390x844/question.png"></figure>
+  <figure class="after"><figcaption>V1.2 · 390</figcaption><img src="captures/v1.2/390x844/question.png"></figure>
+  <figure class="after"><figcaption>V1.2 · 320</figcaption><img src="captures/v1.2/320x568/question.png"></figure>
+</div></section>
+
+<section id="vs"><h2>VS</h2><p class="note">V1 : plus d’épingle fantôme sous « vs ». « Adversaire localisé » en corail lisible, sans changer de rôle de couleur.</p>
+<div class="pair">
+  <figure><figcaption>V1.1 · 390</figcaption><img src="captures/v1.1/390x844/vs.png"></figure>
+  <figure class="after"><figcaption>V1.2 · 390</figcaption><img src="captures/v1.2/390x844/vs.png"></figure>
+  <figure class="after"><figcaption>V1.2 · 320</figcaption><img src="captures/v1.2/320x568/vs.png"></figure>
+</div></section>
+
+<section id="explorer"><h2>Explorer</h2><p class="note">Titre « Explore les thèmes ». E1 : chaque univers montre ses 2 premières sous-catégories pour qu’on comprenne ce qu’il contient.</p>
+<div class="pair">
+  <figure><figcaption>V1.1 · 390</figcaption><img src="captures/v1.1/390x844/explorer.png"></figure>
+  <figure class="after"><figcaption>V1.2 · 390</figcaption><img src="captures/v1.2/390x844/explorer.png"></figure>
+  <figure class="after"><figcaption>V1.2 · 320</figcaption><img src="captures/v1.2/320x568/explorer.png"></figure>
+</div></section>
+
+<section id="accueil"><h2>Accueil</h2><p class="note">« 1 jour de série » au singulier, carte progression aux écarts réguliers, 8 px entre les boutons d’en-tête, puces à 44 px de zone tactile.</p>
+<div class="pair">
+  <figure><figcaption>V1.1 · 390</figcaption><img src="captures/v1.1/390x844/accueil.png"></figure>
+  <figure class="after"><figcaption>V1.2 · 390</figcaption><img src="captures/v1.2/390x844/accueil.png"></figure>
+  <figure class="after"><figcaption>V1.2 · 320</figcaption><img src="captures/v1.2/320x568/accueil.png"></figure>
+</div></section>
+
+<section id="profil"><h2>Profil</h2><p class="note">P1 : « Points de classement » remplace « MMR ». Un seul écart de 12 px entre rang et niveau.</p>
+<div class="pair">
+  <figure><figcaption>V1.1 · 390</figcaption><img src="captures/v1.1/390x844/profil.png"></figure>
+  <figure class="after"><figcaption>V1.2 · 390</figcaption><img src="captures/v1.2/390x844/profil.png"></figure>
+  <figure class="after"><figcaption>V1.2 · 320</figcaption><img src="captures/v1.2/320x568/profil.png"></figure>
+</div></section>
+
+<section id="reglages"><h2>Réglages</h2><p class="note">« Supprimer le compte » en rouge lisible (4,62:1 au lieu de 3,96:1).</p>
+<div class="pair"><figure class="after"><figcaption>V1.2 · 320</figcaption><img src="captures/v1.2/320x568/reglages.png"></figure></div></section>
+
+<section id="planches"><h2>Planches V1.2</h2>
+<div class="pair">
+  <figure class="after wide"><figcaption>390×844</figcaption><img src="captures/v1.2/planche-390x844.png"></figure>
+  <figure class="after wide"><figcaption>320×568</figcaption><img src="captures/v1.2/planche-320x568.png"></figure>
+</div></section>
+
+<footer>Verdict : prêt pour la généralisation côté design. Restent hors design : duel humain contre humain après redéploiement du backend, animation du VS sur téléphone. Détails dans 09-v1.2.md.</footer>
+</body>
+</html>
