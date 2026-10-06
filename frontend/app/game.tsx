@@ -73,8 +73,9 @@ const COMPACT_HEIGHT = 700;
 
 // ── Répartition verticale question / réponses ──
 // Sous la rangée progression, deux zones en colonne :
-//  · question : base = hauteur de son texte, poids de croissance 1, texte calé EN HAUT
-//    (plus de question centrée dans un grand vide). En dernier recours elle rétrécit :
+//  · question : base = hauteur de son texte, poids de croissance 1, texte CENTRÉ dans sa zone
+//    (V1.2 : le vide se répartit au-dessus et en dessous au lieu de s'accumuler sous la
+//    question — 130 px mesurés en 390). En dernier recours elle rétrécit :
 //    son texte est dans un ScrollView (jamais coupé, jamais sous les réponses) ;
 //  · réponses : base = hauteur de leur contenu (jamais compressées), poids de croissance 2,
 //    calées en bas (zone du pouce).
@@ -865,7 +866,7 @@ export default function GameScreen() {
         <RoundTimer timeLeft={timeLeft} total={questionDuration} size={TIMER_SIZE} />
 
         <View style={[styles.scoreBox, styles.scoreBoxOpponent]} accessibilityLabel={`${params.opponentPseudo || ''} ${isAsyncSolo ? '' : botScore}`}>
-          <Txt variant="overline" color={COLOR.player.opponent} numberOfLines={1}>
+          <Txt variant="overline" color={COLOR.player.opponentText} numberOfLines={1}>
             {params.opponentPseudo?.slice(0, 10)}
           </Txt>
           <Txt variant="score">{isAsyncSolo ? '—' : botScore}</Txt>
@@ -989,9 +990,9 @@ const styles = StyleSheet.create({
   dashes: { flex: 1, flexDirection: 'row', gap: SPACE.xs },
   dash: { flex: 1, height: SPACE.xs, borderRadius: RADII.xs },
 
-  // Question : base = contenu, croissance QUESTION_GROW, texte en haut ; rétrécit en dernier
+  // Question : base = contenu, croissance QUESTION_GROW, texte centré ; rétrécit en dernier
   // recours (minHeight 0) et défile alors au lieu de chevaucher les réponses.
-  questionZone: { flexShrink: 1, flexBasis: 'auto', minHeight: 0, justifyContent: 'flex-start' },
+  questionZone: { flexShrink: 1, flexBasis: 'auto', minHeight: 0, justifyContent: 'center' },
   questionScroll: { flexGrow: 0, flexShrink: 1 },
   questionContent: { paddingHorizontal: SPACE.xl, paddingTop: SPACE.xl, paddingBottom: SPACE.lg },
   questionContentCompact: { paddingHorizontal: SPACE.lg, paddingTop: SPACE.md, paddingBottom: SPACE.md },

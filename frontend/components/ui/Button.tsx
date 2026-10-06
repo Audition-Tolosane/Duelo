@@ -35,7 +35,7 @@ const FG: Record<Variant, string> = {
   primary: COLOR.text.onAction,
   secondary: COLOR.text.primary,
   ghost: COLOR.text.primary,
-  danger: COLOR.status.error,
+  danger: COLOR.status.errorText,
 };
 const HEIGHT: Record<Size, number> = { sm: SIZE.buttonSm, md: SIZE.button, lg: SIZE.buttonLg };
 

@@ -41,7 +41,7 @@ export const ANSWER_ROW_MIN_HEIGHT = 56;
 export default function AnswerButton({ letter, text, state, opponentPick, onPress, disabled, testID, layout = 'tile', style }: Props) {
   const isRow = layout === 'row';
   const fs = isRow ? rowAnswerSize(text.length) : answerSize(text.length);
-  const fg = state === 'correct' ? COLOR.text.onAction : state === 'dimmed' ? COLOR.text.disabled : COLOR.text.primary;
+  const fg = state === 'correct' ? COLOR.text.onAction : state === 'dimmed' ? COLOR.text.dimmed : COLOR.text.primary;
   return (
     <Pressable
       testID={testID}

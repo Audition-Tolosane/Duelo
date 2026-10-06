@@ -53,5 +53,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: SPACE.screenX,
   },
-  actions: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm },
 });

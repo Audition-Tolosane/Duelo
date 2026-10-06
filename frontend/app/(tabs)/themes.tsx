@@ -43,6 +43,20 @@ const UPCOMING_CATS = [
   { id: 'STYLE', label: 'Style' },
 ];
 
+// 2 premières sous-catégories d'un univers, sans doublon d'accent (« Litterature » / « Littérature »)
+function universeHint(clusters: ClusterInfo[]): string {
+  const seen = new Set<string>();
+  const names: string[] = [];
+  for (const cl of clusters) {
+    const key = cl.name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    if (seen.has(key)) continue;
+    seen.add(key);
+    names.push(cl.name);
+    if (names.length === 2) break;
+  }
+  return names.join(' · ');
+}
+
 export default function ThemesScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
@@ -208,6 +222,8 @@ export default function ThemesScreen() {
                       <ThemeIcon superCategory={cat.id} size={ICON_SIZE.theme.sm} />
                       <View style={s.tileTexts}>
                         <Txt variant="cardTitle" numberOfLines={1}>{cat.label.toUpperCase()}</Txt>
+                        {/* Ce que contient l'univers : les noms (SCREEN, LAB…) ne le disent pas seuls */}
+                        <Txt variant="caption" color={COLOR.text.secondary} numberOfLines={1}>{universeHint(cat.clusters)}</Txt>
                         <Txt variant="caption" numberOfLines={1}>{`${cat.total_themes} ${themesLabel}`}</Txt>
                       </View>
                     </Pressable>

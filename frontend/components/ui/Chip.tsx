@@ -22,6 +22,9 @@ export default function Chip({ label, selected, onPress, icon, testID, style }: 
       testID={testID}
       accessibilityRole="button"
       accessibilityState={{ selected: !!selected }}
+      // 32 px visibles + 6 px de chaque côté en vertical = cible de 44 px (pas en horizontal :
+      // les puces voisines sont à 8 px, les zones ne doivent pas se chevaucher)
+      hitSlop={{ top: 6, bottom: 6 }}
       onPress={() => { Haptics.selectionAsync(); onPress?.(); }}
       style={({ pressed }) => [styles.base, selected && styles.selected, pressed && !selected && styles.pressed, style]}
     >

@@ -145,6 +145,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'transparent',
+    // La page entre en glissant depuis la droite (web) : sans ce rognage, sa position hors écran
+    // élargit la zone de mise en page du navigateur (glissement horizontal persistant, V1.2).
+    overflow: 'hidden',
   },
   dimOverlay: {
     ...StyleSheet.absoluteFill,

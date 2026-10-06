@@ -466,14 +466,19 @@ export default function CategoryDetailScreen() {
             style={[styles.hero, compact && styles.heroCompact]}
             onLayout={e => { heroYRef.current = e.nativeEvent.layout.y; }}
           >
-            {/* Composition ton sur ton propre au thème (décor pur, ignoré par les lecteurs d'écran) */}
+            {/* Composition ton sur ton propre au thème (décor pur, ignoré par les lecteurs d'écran).
+                Cadre de la largeur exacte de l'écran, débordement coupé : le disque (1,6 × l'écran)
+                ne doit jamais élargir la page (glissement horizontal sur le web). */}
             <View
               pointerEvents="none"
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
+              style={[styles.domeClip, { top: domeTop, left: -SPACE.screenX, width: winW, height: domeD }]}
+            >
+            <View
               style={[
                 styles.dome,
-                { width: domeD, height: domeD, borderRadius: domeD / 2, top: domeTop, left: domeLeft, borderColor: alpha(accent, 0.4) },
+                { width: domeD, height: domeD, borderRadius: domeD / 2, top: 0, left: domeLeft + SPACE.screenX, borderColor: alpha(accent, 0.4) },
               ]}
             >
               <View style={[styles.domeArt, { left: artLeftInDome, top: artTopInDome }]}>
@@ -483,6 +488,7 @@ export default function CategoryDetailScreen() {
                   <Icon name={heroArt.name} size={artSize} color={PALETTE.cream} strokeWidth={1.2} />
                 )}
               </View>
+            </View>
             </View>
 
             <ThemeIcon
@@ -652,7 +658,6 @@ export default function CategoryDetailScreen() {
 
           {/* ── Mur de la communauté : 2 posts + « Voir tout » ── */}
           <Section
-            overline={t('category.community_wall')}
             title={t('pilot.theme.community')}
             onSeeAll={wallTruncated ? () => setShowAllPosts(true) : undefined}
           >
@@ -887,6 +892,7 @@ const styles = StyleSheet.create({
   hero: { alignItems: 'center', gap: SPACE.lg },
   heroCompact: { gap: SPACE.md },
   // Dôme pétrole + illustration géante à 6 % : la seule touche « propre au thème »
+  domeClip: { position: 'absolute', overflow: 'hidden' },
   dome: {
     position: 'absolute', overflow: 'hidden',
     backgroundColor: alpha(PALETTE.petrolLight, 0.16),

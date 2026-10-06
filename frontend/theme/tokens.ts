@@ -43,6 +43,7 @@ export const COLOR = {
     secondary: 'rgba(232,241,236,0.72)',
     tertiary:  'rgba(232,241,236,0.60)',
     disabled:  'rgba(232,241,236,0.40)',
+    dimmed:    'rgba(232,241,236,0.55)',  // réponses non choisies après révélation (≥ 5:1, reste en retrait)
     onAction:  PALETTE.night,                 // texte posé sur jaune, corail, vert, or
   },
   action: {
@@ -55,6 +56,8 @@ export const COLOR = {
   player: {
     self:      PALETTE.yellow,
     opponent:  PALETTE.coral,
+    // Même corail, éclairci de 14 % vers le crème : petit texte du rival lisible (4,7:1 sur pétrole)
+    opponentText: '#FC7E6F',
   },
   accent: {
     warm:      PALETTE.coral,                 // événements, série, défi reçu
@@ -64,6 +67,8 @@ export const COLOR = {
     success:   PALETTE.green,
     successFill: 'rgba(50,231,163,0.16)',
     error:     PALETTE.red,
+    // Même rouge, éclairci de 17 % vers le crème : texte d'erreur sur fond nuit (4,6:1)
+    errorText: '#EF6176',
     errorFill: 'rgba(240,68,94,0.16)',
   },
   reward: {

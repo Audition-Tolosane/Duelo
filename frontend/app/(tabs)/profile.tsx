@@ -684,15 +684,15 @@ export default function ProfileScreen() {
                   </View>
                   <View style={s.alignEnd}>
                     <Txt variant="statMedium" numberOfLines={1}>{fmt(leagueData.mmr)}</Txt>
-                    <Txt variant="overline">MMR</Txt>
+                    <Txt variant="overline" align="right" numberOfLines={2} style={s.pointsLabel}>{t('pilot.league.ranking_points')}</Txt>
                   </View>
                 </View>
                 <ProgressBar value={leagueData.tier_progress} tone="reward" height={6} />
-                <Divider />
               </>
             )}
 
-            <View style={s.levelRow}>
+            {/* Séparateur porté par la ligne niveau : un seul écart de 12 entre les blocs (V1.2) */}
+            <View style={[s.levelRow, leagueData && s.levelRowSeparated]}>
               <View>
                 <Txt variant="overline">{t('pilot.profile.level')}</Txt>
                 <Txt variant="statLarge">{lvl}</Txt>
@@ -996,6 +996,8 @@ export default function ProfileScreen() {
 const AVATAR_ITEM = 64;
 
 const s = StyleSheet.create({
+  levelRowSeparated: { borderTopWidth: BORDER.hair, borderTopColor: COLOR.border.subtle, paddingTop: SPACE.md },
+  pointsLabel: { maxWidth: 104 },
   container: { flex: 1, backgroundColor: 'transparent' },
   centered: { justifyContent: 'center' },
   scroll: { paddingBottom: SIZE.tabBar + SPACE.giant },

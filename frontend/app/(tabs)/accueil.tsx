@@ -231,7 +231,7 @@ const LeagueBlock = React.memo(function LeagueBlock({ league }: { league: League
           <Txt variant="caption">{league.season.name}</Txt>
         </View>
         <ProgressBar value={league.tier_progress} tone="reward" height={6} />
-        <Txt variant="caption">{`${league.mmr} MMR`}</Txt>
+        <Txt variant="caption">{t('pilot.league.points_value', { n: String(league.mmr) })}</Txt>
       </View>
       <View style={styles.rankBox}>
         <Txt variant="statMedium">{`#${league.global_rank}`}</Txt>
@@ -1355,7 +1355,7 @@ export default function AccueilScreen() {
         {/* ── 4. Progression + série : une seule carte ── */}
         {userData && xp ? (
           <Animated.View entering={FadeInDown.delay(160).duration(400)}>
-            <Card>
+            <Card style={styles.progressCard}>
               <View style={styles.rowBetween}>
                 <Txt variant="cardTitle" numberOfLines={1}>{`${levelShort()} ${lvl}`}</Txt>
                 <Txt variant="label" color={COLOR.reward.gold} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85} style={styles.shrink}>
@@ -1380,7 +1380,7 @@ export default function AccueilScreen() {
                 </View>
                 <View style={styles.flexGap}>
                   <Txt variant="cardTitle">
-                    {streak > 0 ? `${streak} ${t('home.streak_days')}` : t('home.no_streak')}
+                    {streak > 0 ? t(streak === 1 ? 'pilot.home.streak_one' : 'pilot.home.streak_many', { n: String(streak) }) : t('home.no_streak')}
                   </Txt>
                   <Txt variant="caption" color={hasPlayedToday ? COLOR.status.success : COLOR.text.tertiary}>
                     {hasPlayedToday
@@ -1742,10 +1742,12 @@ const styles = StyleSheet.create({
   revengeCard: { paddingBottom: SPACE.sm },
 
   // ── 4. Progression ──
-  xpBar: { marginTop: SPACE.sm, marginBottom: SPACE.xs },
+  // Un seul écart (8) dans le groupe niveau ; la série forme un 2e groupe (8 + 8 + filet) — V1.2
+  progressCard: { gap: SPACE.sm },
+  xpBar: {},
   streakRow: {
     flexDirection: 'row', alignItems: 'center', gap: SPACE.md,
-    marginTop: SPACE.lg, paddingTop: SPACE.lg,
+    marginTop: SPACE.sm, paddingTop: SPACE.lg,
     borderTopWidth: BORDER.hair, borderTopColor: COLOR.border.subtle,
   },
 

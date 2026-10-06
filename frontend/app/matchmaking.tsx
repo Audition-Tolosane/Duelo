@@ -702,13 +702,12 @@ export default function MatchmakingScreen() {
                 ))}
               </Svg>
   
-              {/* Joueurs en ligne */}
-              {playerPins.map((pin, i) => (
+              {/* Joueurs en ligne et rival localisé : masqués pendant le VS, sinon l'épingle du
+                  rival réapparaît en « cercle fantôme » sous la ligne vs (V1.2). */}
+              {phase !== 'versus' && playerPins.map((pin, i) => (
                 <PlayerPin key={`pin-${i}`} x={pin.x} y={pin.y} />
               ))}
-  
-              {/* Rival localisé */}
-              {targetPin && opponent && (
+              {phase !== 'versus' && targetPin && opponent && (
                 <OpponentPin x={targetPin.x} y={targetPin.y} name={opponent.pseudo} />
               )}
             </Animated.View>
@@ -762,7 +761,7 @@ export default function MatchmakingScreen() {
           <View style={[styles.bottomOverlay, overlayBottom]}>
             <Card accent="event" style={styles.foundCard}>
               <Icon name="target" size={28} color={COLOR.accent.warm} />
-              <Txt variant="h3" color={COLOR.accent.warm} align="center">{t('matchmaking.opponent_located')}</Txt>
+              <Txt variant="h3" color={COLOR.player.opponentText} align="center">{t('matchmaking.opponent_located')}</Txt>
               <Txt variant="h2" align="center" numberOfLines={1}>{opponent.pseudo}</Txt>
             </Card>
           </View>
@@ -784,7 +783,7 @@ export default function MatchmakingScreen() {
             <View style={[styles.versusOverlay, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
               <View style={styles.versusContent}>
                 <View style={styles.versusHeader}>
-                  <Txt variant="overline" color={COLOR.accent.warm} align="center" numberOfLines={1}>{t('matchmaking.opponent_located')}</Txt>
+                  <Txt variant="overline" color={COLOR.player.opponentText} align="center" numberOfLines={1}>{t('matchmaking.opponent_located')}</Txt>
                   <Txt variant="h2" align="center" numberOfLines={COMPACT_VS ? 1 : 2}>{getCategoryLabel()}</Txt>
                 </View>
 
@@ -831,7 +830,7 @@ export default function MatchmakingScreen() {
                   {opponent.streak >= 3 && (
                     <View style={styles.streakTag}>
                       <Icon name={oppBadgeIcon} size={16} color={COLOR.accent.warm} />
-                      <Txt variant="label" color={COLOR.accent.warm}>
+                      <Txt variant="label" color={COLOR.player.opponentText}>
                         {opponent.streak} {t('matchmaking.wins')}
                       </Txt>
                     </View>
