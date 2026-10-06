@@ -92,7 +92,7 @@ const BOOSTS: ShopItem[] = [
 const PREMIUM: ShopItem[] = [
   {
     id: 'premium_monthly',
-    title: 'Duelo Premium',
+    title: 'SKILKI Premium',
     description: 'XP ×1.5, pas de pubs, missions bonus',
     price: '4,99 € / mois',
     icon: 'crown',

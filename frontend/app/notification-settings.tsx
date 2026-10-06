@@ -183,7 +183,7 @@ export default function NotificationSettingsScreen() {
           <MaterialCommunityIcons name="chevron-left" size={22} color="#FFF" />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.headerEyebrow}>◆ DUELO</Text>
+          <Text style={styles.headerEyebrow}>◆ SKILKI</Text>
           <Text style={styles.headerTitle}>{t('notif_settings.header')}</Text>
         </View>
       </View>

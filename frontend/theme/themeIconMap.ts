@@ -13,6 +13,8 @@ const BY_THEME_NAME: [RegExp, ThemeIconName][] = [
   [/\begypt/, 'egypte-antique'],
   [/\bmoyen age\b|\bmedieva|\bchevalier/, 'moyen-age'],
   [/\brevolution francaise\b/, 'revolution-francaise'],
+  // Rétro / arcade : le Space Invader ; « Jeux vidéo » générique garde la manette
+  [/\bretro|\barcade|\bpixel|\bspace invaders?\b|\bpac ?man\b|\batari\b|\bnes\b|\bsnes\b/, 'retro-gaming'],
 ];
 
 // Cluster (sous-catégorie) normalisé

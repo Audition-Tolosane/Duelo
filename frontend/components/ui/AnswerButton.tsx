@@ -9,6 +9,15 @@ import { COLOR, RADII, SPACE, BORDER, GLOW } from '../../theme/tokens';
 // · dimmed = autres réponses après révélation. Le corail ne sert qu'au marqueur du rival.
 export type AnswerState = 'idle' | 'selected' | 'correct' | 'wrong' | 'dimmed';
 
+/**
+ * Mise en page :
+ * - 'tile' (défaut) : tuile de grille 2×2 — lettre en haut, texte au milieu, marqueurs en bas ;
+ * - 'row' : ligne pleine largeur pour la liste 1×4 — lettre à gauche, texte multiligne (≤ 4 lignes)
+ *   au centre, marqueurs (rival, ✓/✕) à droite. Hauteur minimale 56 px.
+ * Les états et le marqueur rival ont exactement la même sémantique dans les deux cas.
+ */
+export type AnswerLayout = 'tile' | 'row';
+
 type Props = {
   letter: string;
   text: string;
@@ -18,14 +27,20 @@ type Props = {
   onPress?: () => void;
   disabled?: boolean;
   testID?: string;
+  layout?: AnswerLayout;
   style?: StyleProp<ViewStyle>;
 };
 
 // Taille par paliers selon la longueur : la réponse est toujours lisible en entier.
 const answerSize = (len: number) => (len > 60 ? 13 : len > 32 ? 14 : 16);
+// En ligne (1×4), la largeur est ~2× celle d'une tuile : on garde 16/15 et jamais moins de 14.
+const rowAnswerSize = (len: number) => (len > 90 ? 14 : len > 50 ? 15 : 16);
+/** Hauteur minimale d'une réponse en ligne (cible tactile confortable). */
+export const ANSWER_ROW_MIN_HEIGHT = 56;
 
-export default function AnswerButton({ letter, text, state, opponentPick, onPress, disabled, testID, style }: Props) {
-  const fs = answerSize(text.length);
+export default function AnswerButton({ letter, text, state, opponentPick, onPress, disabled, testID, layout = 'tile', style }: Props) {
+  const isRow = layout === 'row';
+  const fs = isRow ? rowAnswerSize(text.length) : answerSize(text.length);
   const fg = state === 'correct' ? COLOR.text.onAction : state === 'dimmed' ? COLOR.text.disabled : COLOR.text.primary;
   return (
     <Pressable
@@ -37,6 +52,7 @@ export default function AnswerButton({ letter, text, state, opponentPick, onPres
       onPress={onPress}
       style={({ pressed }) => [
         styles.base,
+        isRow ? styles.row : styles.tile,
         styles[state],
         state === 'correct' && GLOW.success,
         pressed && state === 'idle' && styles.pressed,
@@ -46,8 +62,8 @@ export default function AnswerButton({ letter, text, state, opponentPick, onPres
       <View style={[styles.letter, state === 'selected' && styles.letterSelected, state === 'correct' && styles.letterCorrect]}>
         <Txt variant="buttonSmall" color={state === 'selected' || state === 'correct' ? COLOR.text.onAction : COLOR.text.secondary}>{letter}</Txt>
       </View>
-      <Txt variant="cardTitle" color={fg} numberOfLines={5} style={[styles.text, { fontSize: fs, lineHeight: fs + 5 }]}>{text}</Txt>
-      <View style={styles.markers}>
+      <Txt variant="cardTitle" color={fg} numberOfLines={isRow ? 4 : 5} style={[styles.text, { fontSize: fs, lineHeight: fs + 5 }]}>{text}</Txt>
+      <View style={[styles.markers, isRow && styles.markersRow]}>
         {opponentPick ? <View style={styles.opponentDot} accessibilityLabel="opponent" /> : null}
         {state === 'correct' ? <Icon name="success" size={20} color={COLOR.text.onAction} /> : null}
         {state === 'wrong' ? <Icon name="error" size={20} color={COLOR.status.error} /> : null}
@@ -58,12 +74,14 @@ export default function AnswerButton({ letter, text, state, opponentPick, onPres
 
 const styles = StyleSheet.create({
   base: {
-    flex: 1,
     borderRadius: RADII.lg,
     borderWidth: BORDER.default,
     padding: SPACE.md,
-    gap: SPACE.sm,
-    justifyContent: 'space-between',
+  },
+  tile: { flex: 1, gap: SPACE.sm, justifyContent: 'space-between' },
+  row: {
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.md,
+    minHeight: ANSWER_ROW_MIN_HEIGHT, paddingVertical: SPACE.sm,
   },
   idle: { backgroundColor: COLOR.surface.card, borderColor: COLOR.border.default },
   selected: { backgroundColor: COLOR.action.selectedFill, borderColor: COLOR.border.active, borderWidth: BORDER.selected },
@@ -76,5 +94,7 @@ const styles = StyleSheet.create({
   letterCorrect: { backgroundColor: COLOR.onAccentTint },
   text: { flex: 1 },
   markers: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: SPACE.sm, minHeight: 20 },
+  // En ligne : colonne réservée à droite (20 px = icône ✓/✕) pour limiter le reflux du texte à la révélation.
+  markersRow: { minWidth: 20, minHeight: 0 },
   opponentDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: COLOR.player.opponent },
 });

@@ -9,7 +9,7 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
   useSharedValue, useAnimatedStyle, withRepeat, withTiming,
-  withSequence, withSpring, Easing,
+  withSequence, withSpring, withDelay, Easing, useReducedMotion,
 } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import SwipeBackPage from '../components/SwipeBackPage';
@@ -21,13 +21,26 @@ import { useWS } from '../contexts/WebSocketContext';
 import { dueloWS } from '../services/websocket';
 import { authFetch } from '../utils/api';
 import { t } from '../utils/i18n';
-import { COLOR, SPACE, RADII, SIZE, BORDER, GRADIENTS, GLOW, ELEVATION } from '../theme/tokens';
+import { COLOR, SPACE, RADII, SIZE, BORDER, GRADIENTS, GLOW, ELEVATION, PALETTE, alpha } from '../theme/tokens';
 
 // Real world map paths from Natural Earth data (Mercator projection, 1000×500 viewBox)
 import MAP_PATHS from '../assets/map-paths.json';
 
 const { width: SW, height: SH } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+// Petits écrans (320×568…) : espacements resserrés pour que le VS tienne sans défilement
+const COMPACT_VS = SH < 700;
+
+// ── Écran VS : chorégraphie (ms) ──
+const VS_IMPACT_DELAY = 260; // les cartes arrivent, puis le « vs » claque au centre
+const VS_POP_DUR      = 280; // « vs » 1.4 → 1
+const VS_FLASH_IN     = 70;  // éclair : montée…
+const VS_FLASH_OUT    = 300; // …et extinction (total < 400 ms, une seule fois)
+const VS_LINE_DUR     = 240; // demi-traits qui jaillissent du centre
+const VS_WAVE_DUR     = 520; // onde de choc unique
+const VS_DEPTH_DUR    = 3000; // dérive lente de la carte pendant le VS
+const VS_FLASH_SIZE   = 96;
+const VS_WAVE_SIZE    = 64;
 
 
 // Badge de série de l'adversaire → icône Lucide du registre
@@ -252,6 +265,21 @@ export default function MatchmakingScreen() {
   const vsScale = useSharedValue(0.5);
   const playerSlideX = useSharedValue(-SW);
   const opponentSlideX = useSharedValue(SW);
+  // Collision au centre : demi-traits, éclair, onde (une seule fois)
+  const vsLineScale = useSharedValue(0);
+  const vsFlash = useSharedValue(0);
+  const vsWave = useSharedValue(0);
+  const cardHalo = useSharedValue(0);
+  // Pop du décompte
+  const countPop = useSharedValue(1);
+  const countFade = useSharedValue(1);
+  // Profondeur lente du fond pendant le VS
+  const depth = useSharedValue(0);
+
+  // « Réduire les animations » : pas de glissade, ni éclair, ni onde, ni dérive
+  const reduceMotion = useReducedMotion();
+  const reduceMotionRef = useRef(reduceMotion);
+  reduceMotionRef.current = reduceMotion;
 
   const [targetPin, setTargetPin] = useState<{ x: number; y: number } | null>(null);
 
@@ -479,6 +507,42 @@ export default function MatchmakingScreen() {
     }
   };
 
+  // Chorégraphie d'entrée du VS (présentation seulement, aucune incidence sur la navigation)
+  const playVersusEntrance = () => {
+    if (reduceMotionRef.current) {
+      playerSlideX.value = 0;
+      opponentSlideX.value = 0;
+      vsScale.value = 1;
+      vsLineScale.value = 1;
+      cardHalo.value = 1;
+      vsOpacity.value = withTiming(1, { duration: 250 });
+      return;
+    }
+    // Cartes : entrée opposée avec un ressort court (léger dépassement puis retour)
+    playerSlideX.value = withSpring(0, { damping: 11, stiffness: 150, mass: 0.8 });
+    opponentSlideX.value = withSpring(0, { damping: 11, stiffness: 150, mass: 0.8 });
+    cardHalo.value = withDelay(VS_IMPACT_DELAY, withTiming(1, { duration: 300 }));
+
+    // « vs » : impulsion 1.4 → 1 au moment de l'impact
+    vsScale.value = 1.4;
+    vsScale.value = withDelay(VS_IMPACT_DELAY, withTiming(1, { duration: VS_POP_DUR, easing: Easing.out(Easing.cubic) }));
+    vsOpacity.value = withDelay(VS_IMPACT_DELAY, withTiming(1, { duration: 160 }));
+
+    // Éclair unique (< 400 ms)
+    vsFlash.value = withDelay(VS_IMPACT_DELAY, withSequence(
+      withTiming(1, { duration: VS_FLASH_IN }),
+      withTiming(0, { duration: VS_FLASH_OUT, easing: Easing.out(Easing.quad) }),
+    ));
+    // Demi-traits qui jaillissent du centre
+    vsLineScale.value = withDelay(VS_IMPACT_DELAY, withTiming(1, { duration: VS_LINE_DUR, easing: Easing.out(Easing.cubic) }));
+    // Onde de choc : une seule, depuis le point d'impact
+    vsWave.value = 0;
+    vsWave.value = withDelay(VS_IMPACT_DELAY, withTiming(1, { duration: VS_WAVE_DUR, easing: Easing.out(Easing.quad) }));
+
+    // Fond : zoom / dérive très lents (quelques %), pendant le VS uniquement
+    depth.value = withTiming(1, { duration: VS_DEPTH_DUR, easing: Easing.out(Easing.quad) });
+  };
+
   const handleMatchFound = (opp: OpponentData, matchRoomId?: string) => {
     const oppCenter = lookupCountry(opp.country || '')
       || CITY_PINS[Math.floor(Math.random() * CITY_PINS.length)];
@@ -505,10 +569,7 @@ export default function MatchmakingScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
       setPhase('versus');
       overlayOpacity.value = withTiming(1, { duration: 400 });
-      vsOpacity.value = withTiming(1, { duration: 500 });
-      vsScale.value = withSpring(1, { damping: 12, stiffness: 100 });
-      playerSlideX.value = withSpring(0, { damping: 14, stiffness: 80 });
-      opponentSlideX.value = withSpring(0, { damping: 14, stiffness: 80 });
+      playVersusEntrance();
       // Décompte visuel 3 → 2 → 1 calé sur la fenêtre versus (~2,7s)
       setVsCountdown(3);
       setTimeout(() => setVsCountdown(2), 900);
@@ -540,6 +601,44 @@ export default function MatchmakingScreen() {
     opacity: vsOpacity.value,
     transform: [{ scale: vsScale.value }],
   }));
+
+  const vsLineStyle = useAnimatedStyle(() => ({
+    transform: [{ scaleX: vsLineScale.value }],
+  }));
+
+  const vsFlashStyle = useAnimatedStyle(() => ({
+    opacity: vsFlash.value,
+    transform: [{ scale: 0.7 + vsFlash.value * 0.4 }],
+  }));
+
+  const vsWaveStyle = useAnimatedStyle(() => ({
+    opacity: vsWave.value > 0 ? 0.6 * (1 - vsWave.value) : 0,
+    transform: [{ scale: 0.4 + vsWave.value * 2.2 }],
+  }));
+
+  const cardHaloStyle = useAnimatedStyle(() => ({ opacity: cardHalo.value }));
+
+  const countPopStyle = useAnimatedStyle(() => ({
+    opacity: countFade.value,
+    transform: [{ scale: countPop.value }],
+  }));
+
+  const depthStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: -SW * 0.015 * depth.value },
+      { translateY: -SH * 0.01 * depth.value },
+      { scale: 1 + 0.05 * depth.value },
+    ],
+  }));
+
+  // Chaque chiffre du décompte fait un « pop » (1.25 → 1)
+  useEffect(() => {
+    if (phase !== 'versus' || reduceMotionRef.current) return;
+    countPop.value = 1.25;
+    countFade.value = 0.3;
+    countPop.value = withTiming(1, { duration: 260, easing: Easing.out(Easing.cubic) });
+    countFade.value = withTiming(1, { duration: 200 });
+  }, [vsCountdown, phase]);
 
   const playerStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: playerSlideX.value }],
@@ -585,31 +684,34 @@ export default function MatchmakingScreen() {
       <ScreenContainer>
         {/* ── Carte du monde : une seule couche pétrole ── */}
         <View style={styles.mapViewport} pointerEvents="none">
-          <Animated.View style={[styles.mapContainer, mapStyle]}>
-            <Svg
-              width={REAL_W}
-              height={REAL_H}
-              viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-              style={styles.mapSvg}
-            >
-              {(MAP_PATHS as string[]).map((d, i) => (
-                <Path key={`f-${i}`} d={d}
-                  fill={COLOR.surface.card}
-                  stroke={COLOR.surface.elevated}
-                  strokeWidth={0.6}
-                  strokeLinejoin="round" />
+          {/* Couche de profondeur : immobile sauf pendant le VS (dérive lente de quelques %) */}
+          <Animated.View style={[StyleSheet.absoluteFill, depthStyle]}>
+            <Animated.View style={[styles.mapContainer, mapStyle]}>
+              <Svg
+                width={REAL_W}
+                height={REAL_H}
+                viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+                style={styles.mapSvg}
+              >
+                {(MAP_PATHS as string[]).map((d, i) => (
+                  <Path key={`f-${i}`} d={d}
+                    fill={COLOR.surface.card}
+                    stroke={COLOR.surface.elevated}
+                    strokeWidth={0.6}
+                    strokeLinejoin="round" />
+                ))}
+              </Svg>
+  
+              {/* Joueurs en ligne */}
+              {playerPins.map((pin, i) => (
+                <PlayerPin key={`pin-${i}`} x={pin.x} y={pin.y} />
               ))}
-            </Svg>
-
-            {/* Joueurs en ligne */}
-            {playerPins.map((pin, i) => (
-              <PlayerPin key={`pin-${i}`} x={pin.x} y={pin.y} />
-            ))}
-
-            {/* Rival localisé */}
-            {targetPin && opponent && (
-              <OpponentPin x={targetPin.x} y={targetPin.y} name={opponent.pseudo} />
-            )}
+  
+              {/* Rival localisé */}
+              {targetPin && opponent && (
+                <OpponentPin x={targetPin.x} y={targetPin.y} name={opponent.pseudo} />
+              )}
+            </Animated.View>
           </Animated.View>
 
           {/* Fondus haut / bas : la carte se fond dans la nuit pétrole */}
@@ -682,38 +784,50 @@ export default function MatchmakingScreen() {
             <View style={[styles.versusOverlay, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
               <View style={styles.versusContent}>
                 <View style={styles.versusHeader}>
-                  <Txt variant="overline" color={COLOR.accent.warm} align="center">{t('matchmaking.opponent_located')}</Txt>
-                  <Txt variant="h2" align="center" numberOfLines={2}>{getCategoryLabel()}</Txt>
+                  <Txt variant="overline" color={COLOR.accent.warm} align="center" numberOfLines={1}>{t('matchmaking.opponent_located')}</Txt>
+                  <Txt variant="h2" align="center" numberOfLines={COMPACT_VS ? 1 : 2}>{getCategoryLabel()}</Txt>
                 </View>
 
-                {/* Moi : jaune, glisse depuis la gauche */}
+                {/* Moi : jaune, entre depuis la gauche avec un ressort court */}
                 <Animated.View style={[styles.selfSlot, playerStyle]}>
-                  <PlayerCard
-                    side="self"
-                    spotlight
-                    pseudo={pseudo}
-                    title={playerInfo?.title || undefined}
-                    subtitle={`${t('matchmaking.level_short')} ${playerInfo?.level || 1}`}
-                  />
+                  <View>
+                    <Animated.View pointerEvents="none" style={[styles.cardHalo, styles.cardHaloSelf, cardHaloStyle]} />
+                    <PlayerCard
+                      side="self"
+                      spotlight
+                      pseudo={pseudo}
+                      title={playerInfo?.title || undefined}
+                      subtitle={`${t('matchmaking.level_short')} ${playerInfo?.level || 1}`}
+                    />
+                  </View>
                 </Animated.View>
 
-                {/* « vs » éditorial entre deux filets : jaune (moi) / corail (rival) */}
-                <Animated.View style={[styles.vsRow, vsAnimStyle]}>
-                  <View style={[styles.vsLine, { backgroundColor: COLOR.player.self }]} />
-                  <Txt variant="moment">{t('players.vs')}</Txt>
-                  <View style={[styles.vsLine, { backgroundColor: COLOR.player.opponent }]} />
-                </Animated.View>
+                {/* Collision : demi-traits jaune (moi) / corail (rival) qui jaillissent du centre, « vs » au point d'impact */}
+                <View style={styles.vsRow}>
+                  <View style={styles.vsImpact} pointerEvents="none">
+                    <Animated.View style={[styles.vsFlash, vsFlashStyle]} />
+                    <Animated.View style={[styles.vsWave, vsWaveStyle]} />
+                  </View>
+                  <Animated.View style={[styles.vsLine, styles.vsLineSelf, vsLineStyle]} />
+                  <Animated.View style={vsAnimStyle}>
+                    <Txt variant="moment">{t('players.vs')}</Txt>
+                  </Animated.View>
+                  <Animated.View style={[styles.vsLine, styles.vsLineOpponent, vsLineStyle]} />
+                </View>
 
-                {/* Rival : corail, glisse depuis la droite */}
+                {/* Rival : corail, entre depuis la droite avec un ressort court */}
                 <Animated.View style={[styles.opponentSlot, opponentStyle]}>
-                  <PlayerCard
-                    side="opponent"
-                    spotlight
-                    pseudo={opponent.pseudo}
-                    avatarSeed={opponent.avatar_seed}
-                    title={opponent.title || undefined}
-                    subtitle={`${t('matchmaking.level_short')} ${opponent.level}`}
-                  />
+                  <View>
+                    <Animated.View pointerEvents="none" style={[styles.cardHalo, styles.cardHaloOpponent, cardHaloStyle]} />
+                    <PlayerCard
+                      side="opponent"
+                      spotlight
+                      pseudo={opponent.pseudo}
+                      avatarSeed={opponent.avatar_seed}
+                      title={opponent.title || undefined}
+                      subtitle={`${t('matchmaking.level_short')} ${opponent.level}`}
+                    />
+                  </View>
                   {opponent.streak >= 3 && (
                     <View style={styles.streakTag}>
                       <Icon name={oppBadgeIcon} size={16} color={COLOR.accent.warm} />
@@ -724,12 +838,14 @@ export default function MatchmakingScreen() {
                   )}
                 </Animated.View>
 
-                {/* Décompte : crème, puis jaune sur le dernier temps */}
-                <Animated.View style={[styles.countdownWrap, vsAnimStyle]}>
-                  <Txt variant="countdown" color={vsCountdown === 1 ? COLOR.action.primary : COLOR.text.primary}>
-                    {vsCountdown}
-                  </Txt>
-                  <Txt variant="overline" align="center">{t('matchmaking.duel_starting')}</Txt>
+                {/* Décompte : crème, puis jaune sur le dernier temps ; chaque chiffre fait un « pop » */}
+                <Animated.View style={[styles.countdownWrap, overlayStyle]}>
+                  <Animated.View style={countPopStyle}>
+                    <Txt variant="countdown" color={vsCountdown === 1 ? COLOR.action.primary : COLOR.text.primary}>
+                      {vsCountdown}
+                    </Txt>
+                  </Animated.View>
+                  <Txt variant="overline" align="center" numberOfLines={1}>{t('matchmaking.duel_starting')}</Txt>
                 </Animated.View>
               </View>
             </View>
@@ -825,16 +941,40 @@ const styles = StyleSheet.create({
   haloBottom: { position: 'absolute', bottom: 0, left: 0, right: 0, height: '30%' },
   versusOverlay: { ...StyleSheet.absoluteFill, justifyContent: 'center', alignItems: 'center' },
   versusContent: { width: '100%', paddingHorizontal: SPACE.screenX },
-  versusHeader: { alignItems: 'center', gap: SPACE.xs, marginBottom: SPACE.xxl },
+  versusHeader: { alignItems: 'center', gap: SPACE.xs, marginBottom: COMPACT_VS ? SPACE.md : SPACE.xxl },
   // Cartes décalées : moi à gauche, le rival à droite (tension du face-à-face)
   selfSlot: { marginRight: SPACE.xxxl },
   opponentSlot: { marginLeft: SPACE.xxxl, gap: SPACE.sm },
+  // Halo très léger derrière chaque carte (déborde de SPACE.sm, reste dans la marge d'écran)
+  cardHalo: {
+    position: 'absolute',
+    top: -SPACE.sm, bottom: -SPACE.sm, left: -SPACE.sm, right: -SPACE.sm,
+    borderRadius: RADII.xl + SPACE.sm,
+  },
+  cardHaloSelf: { backgroundColor: alpha(PALETTE.yellow, 0.10) },
+  cardHaloOpponent: { backgroundColor: alpha(PALETTE.coral, 0.10) },
   streakTag: {
     alignSelf: 'flex-end', flexDirection: 'row', alignItems: 'center', gap: SPACE.xs,
     paddingHorizontal: SPACE.md, paddingVertical: SPACE.xs,
     borderRadius: RADII.pill, backgroundColor: COLOR.tint.opponent,
   },
-  vsRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md, marginVertical: SPACE.lg },
-  vsLine: { flex: 1, height: BORDER.hair },
-  countdownWrap: { alignItems: 'center', marginTop: SPACE.xxl },
+  vsRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md, marginVertical: COMPACT_VS ? SPACE.sm : SPACE.lg },
+  // Demi-traits pleins : chacun grandit depuis le centre (origine côté « vs »)
+  vsLine: { flex: 1, height: BORDER.strong, borderRadius: RADII.xs },
+  vsLineSelf: { backgroundColor: COLOR.player.self, transformOrigin: 'right' },
+  vsLineOpponent: { backgroundColor: COLOR.player.opponent, transformOrigin: 'left' },
+  // Point d'impact centré sur le « vs » : éclair crème + onde (une fois)
+  vsImpact: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center' },
+  vsFlash: {
+    position: 'absolute',
+    width: VS_FLASH_SIZE, height: VS_FLASH_SIZE, borderRadius: RADII.pill,
+    backgroundColor: alpha(PALETTE.cream, 0.16),
+    shadowColor: PALETTE.yellow, shadowOpacity: 0.5, shadowRadius: 24, shadowOffset: { width: 0, height: 0 },
+  },
+  vsWave: {
+    position: 'absolute',
+    width: VS_WAVE_SIZE, height: VS_WAVE_SIZE, borderRadius: RADII.pill,
+    borderWidth: BORDER.strong, borderColor: alpha(PALETTE.cream, 0.7),
+  },
+  countdownWrap: { alignItems: 'center', marginTop: COMPACT_VS ? SPACE.md : SPACE.xxl },
 });

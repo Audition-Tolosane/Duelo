@@ -311,8 +311,8 @@ export default function ResultsScreen() {
     const xpPart = xpBreakdown ? ` · +${xpBreakdown.total} XP` : '';
     const levelPart = newLevel ? ` · ${t('results.level_up')} ${newLevel} ↑` : '';
     const text = won
-      ? `🏆 ${t('results.share_victory')} ${pScore}-${oScore} en ${categoryName} (${correctCount}/7)${xpPart}${levelPart}. ${t('results.share_challenge')} #Duelo`
-      : `⚔️ ${t('results.share_intense')} ${pScore}-${oScore} en ${categoryName}${xpPart}. ${t('results.share_beat_me')} #Duelo`;
+      ? `🏆 ${t('results.share_victory')} ${pScore}-${oScore} en ${categoryName} (${correctCount}/7)${xpPart}${levelPart}. ${t('results.share_challenge')} #SKILKI`
+      : `⚔️ ${t('results.share_intense')} ${pScore}-${oScore} en ${categoryName}${xpPart}. ${t('results.share_beat_me')} #SKILKI`;
     try { await Share.share({ message: text }); } catch (e) { console.error(e); }
   };
 

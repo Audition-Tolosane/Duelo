@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Pressable, StyleSheet, ScrollView, TextInput, Image,
-  KeyboardAvoidingView, Platform, Keyboard, RefreshControl, Modal, Alert,
+  KeyboardAvoidingView, Platform, Keyboard, RefreshControl, Modal, Alert, useWindowDimensions,
+  NativeSyntheticEvent, NativeScrollEvent, LayoutChangeEvent,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -15,11 +16,22 @@ import SwipeBackPage from '../components/SwipeBackPage';
 import UserAvatar from '../components/UserAvatar';
 import {
   Txt, Icon, Button, IconButton, Badge, Card, Chip, Section, ScreenContainer, ScreenHeader,
-  ProgressBar, ListRow, Loader, EmptyState, ThemeIcon,
+  ProgressBar, ListRow, Loader, EmptyState, ThemeIcon, ThemeIllustration,
 } from '../components/ui';
-import { COLOR, SPACE, RADII, SIZE, BORDER, GRADIENTS, TYPO } from '../theme/tokens';
+import { COLOR, SPACE, RADII, SIZE, BORDER, GRADIENTS, TYPO, ICON_SIZE, PALETTE, alpha } from '../theme/tokens';
+import { resolveThemeIcon } from '../theme/themeIconMap';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+
+// Liseré d'univers (fin, jamais en aplat) : chaud = corail (accent secondaire), patrimoine = or,
+// le reste = crème. Uniquement des couleurs de PALETTE.
+const UNIVERSE_ACCENT: Record<string, string> = {
+  SCREEN: PALETTE.coral, SOUND: PALETTE.coral, ARENA: PALETTE.coral, ART: PALETTE.coral,
+  LEGENDS: PALETTE.gold,
+  LAB: PALETTE.cream, GLOBE: PALETTE.cream, LIFE: PALETTE.cream, MIND: PALETTE.cream,
+};
+// Au-delà, la description est repliée sur 3 lignes avec « Lire la suite ».
+const DESC_CLAMP_CHARS = 140;
 
 // Paliers de titres affichés dans « Ta progression ».
 const MILESTONES = [1, 10, 20, 35, 50] as const;
@@ -100,6 +112,30 @@ export default function CategoryDetailScreen() {
   // Présentation uniquement : mur replié à 2 posts, bouton collant masqué quand le clavier est ouvert.
   const [showAllPosts, setShowAllPosts] = useState(false);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
+
+  // Présentation : description repliable, nom du thème dans l'en-tête quand le hero sort de l'écran.
+  const { width: winW, height: winH } = useWindowDimensions();
+  const [descExpanded, setDescExpanded] = useState(false);
+  const [headerTitleShown, setHeaderTitleShown] = useState(false);
+  const headerTitleShownRef = useRef(false);
+  const heroYRef = useRef(0);
+  const heroTextsYRef = useRef(0);
+  const heroTitleBottomRef = useRef(-1); // bas du titre dans heroTexts ; -1 = pas encore mesuré
+
+  // Les mesures arrivent dans un ordre quelconque : on additionne au moment du défilement.
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (heroTitleBottomRef.current < 0) return;
+    const limit = heroYRef.current + heroTextsYRef.current + heroTitleBottomRef.current;
+    const show = e.nativeEvent.contentOffset.y > limit;
+    if (show !== headerTitleShownRef.current) {
+      headerTitleShownRef.current = show;
+      setHeaderTitleShown(show);
+    }
+  };
+  const onTitleLayout = (e: LayoutChangeEvent) => {
+    const { y, height } = e.nativeEvent.layout;
+    heroTitleBottomRef.current = y + height;
+  };
 
   // Leaderboard (navigates to separate screen)
 
@@ -361,20 +397,50 @@ export default function CategoryDetailScreen() {
   const visiblePosts = showAllPosts ? posts : posts.slice(0, WALL_PREVIEW);
   const wallTruncated = !showAllPosts && posts.length > WALL_PREVIEW;
 
+  // ── Hero : mesures de la composition ton sur ton ──
+  const compact = winH < 700;                       // 320×568 et petits Android
+  const plateSize = compact ? 88 : 104;
+  const universe = (detail.super_category || '').toUpperCase();
+  const accent = UNIVERSE_ACCENT[universe] ?? PALETTE.cream;
+  const headerOverline = [detail.super_category, detail.cluster].filter(Boolean).join(' · ') || undefined;
+  const descLong = detail.description.length > DESC_CLAMP_CHARS;
+  const descClamped = descLong && !descExpanded;
+  const heroArt = resolveThemeIcon({ themeName: detail.name, cluster: detail.cluster, superCategory: detail.super_category });
+  // Dôme pétrole : un grand disque dont seul l'arc inférieur entre dans l'écran. Il descend
+  // jusqu'aux 4/5 de la plaque, jamais derrière le nom ni la description.
+  const domeD = winW * 1.6;
+  const domeBottom = Math.round(plateSize * 0.8);
+  const domeTop = domeBottom - domeD;               // repère : haut du hero
+  const domeLeft = (winW - domeD) / 2 - SPACE.screenX;
+  // Illustration géante, décalée à droite et rognée par le dôme.
+  const artSize = Math.round(winW * 0.9);
+  const artLeftInDome = (domeD - winW) / 2 + winW * 0.42;
+  const artTopInDome = (-SPACE.xxl - artSize * 0.3) - domeTop;
+
   return (
     <SwipeBackPage>
     <ScreenContainer>
+      {/* En-tête allégé : retour + univers/cluster + favori. Le nom n'y apparaît que lorsque le hero est sorti de l'écran. */}
       <ScreenHeader
-        overline={detail.cluster || detail.super_category || undefined}
-        title={detail.name}
+        overline={headerOverline}
+        title={headerTitleShown ? detail.name : undefined}
         right={
-          <IconButton
+          <Pressable
             testID="follow-button"
-            icon="heart"
-            active={detail.is_following}
+            accessibilityRole="button"
             accessibilityLabel={detail.is_following ? t('category.following') : t('category.follow')}
+            accessibilityState={{ selected: detail.is_following, busy: followLoading }}
+            hitSlop={4}
             onPress={handleFollow}
-          />
+            style={({ pressed }) => [styles.favBtn, detail.is_following && styles.favBtnActive, pressed && styles.pressed]}
+          >
+            <Icon
+              name="heart"
+              size={ICON_SIZE.md}
+              color={detail.is_following ? COLOR.accent.warm : COLOR.text.primary}
+              strokeWidth={detail.is_following ? 2.5 : 2}
+            />
+          </Pressable>
         }
       />
 
@@ -391,20 +457,70 @@ export default function CategoryDetailScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          onScroll={onScroll}
+          scrollEventThrottle={32}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLOR.text.primary} />}
         >
           {/* ── Hero à plat : plaque crème, nom, description, chiffres ── */}
-          <View style={styles.hero}>
+          <View
+            style={[styles.hero, compact && styles.heroCompact]}
+            onLayout={e => { heroYRef.current = e.nativeEvent.layout.y; }}
+          >
+            {/* Composition ton sur ton propre au thème (décor pur, ignoré par les lecteurs d'écran) */}
+            <View
+              pointerEvents="none"
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+              style={[
+                styles.dome,
+                { width: domeD, height: domeD, borderRadius: domeD / 2, top: domeTop, left: domeLeft, borderColor: alpha(accent, 0.4) },
+              ]}
+            >
+              <View style={[styles.domeArt, { left: artLeftInDome, top: artTopInDome }]}>
+                {heroArt.kind === 'illustration' ? (
+                  <ThemeIllustration name={heroArt.name} size={artSize} />
+                ) : (
+                  <Icon name={heroArt.name} size={artSize} color={PALETTE.cream} strokeWidth={1.2} />
+                )}
+              </View>
+            </View>
+
             <ThemeIcon
               themeName={detail.name}
               cluster={detail.cluster}
               superCategory={detail.super_category}
-              size={104}
+              size={plateSize}
             />
-            <View style={styles.heroTexts}>
-              <Txt variant="h1" align="center">{detail.name}</Txt>
+            <View style={styles.heroTexts} onLayout={e => { heroTextsYRef.current = e.nativeEvent.layout.y; }}>
+              <Txt
+                variant="h1"
+                align="center"
+                accessibilityRole="header"
+                numberOfLines={2}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}
+                onLayout={onTitleLayout}
+              >
+                {detail.name}
+              </Txt>
               {detail.description ? (
-                <Txt variant="bodySmall" align="center">{detail.description}</Txt>
+                <>
+                  <Txt variant="bodySmall" align="center" numberOfLines={descClamped ? 3 : undefined}>
+                    {detail.description}
+                  </Txt>
+                  {descLong ? (
+                    <Pressable
+                      onPress={() => setDescExpanded(v => !v)}
+                      accessibilityRole="button"
+                      accessibilityState={{ expanded: descExpanded }}
+                      style={({ pressed }) => [styles.descToggle, pressed && styles.pressed]}
+                    >
+                      <Txt variant="label" color={COLOR.text.primary}>
+                        {descExpanded ? t('pilot.theme.read_less') : t('pilot.theme.read_more')}
+                      </Txt>
+                    </Pressable>
+                  ) : null}
+                </>
               ) : null}
             </View>
             <View style={styles.heroStats}>
@@ -486,7 +602,7 @@ export default function CategoryDetailScreen() {
                           {!last ? <View style={[styles.milestoneLine, reached && styles.milestoneLineReached]} /> : null}
                         </View>
                         <Txt variant="overline" color={reached ? COLOR.action.primary : COLOR.text.tertiary} style={styles.milestoneLvl}>
-                          {lvl === 1 ? t('pilot.theme.milestone_start') : `Niv. ${lvl}`}
+                          {lvl === 1 ? t('pilot.theme.milestone_start') : t('common.level_short', { n: String(lvl) })}
                         </Txt>
                         <Txt variant="label" color={reached ? COLOR.text.primary : COLOR.text.tertiary} style={styles.milestoneTitle}>
                           {title}
@@ -745,6 +861,14 @@ const styles = StyleSheet.create({
   tabular: { fontVariant: ['tabular-nums'] },
   pressed: { opacity: 0.7 },
 
+  // Favori : corail (accent chaud), jamais le rouge d'erreur ni le jaune de sélection
+  favBtn: {
+    width: SIZE.touch, height: SIZE.touch, borderRadius: SIZE.touch / 2,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: COLOR.action.ghost, borderWidth: BORDER.hair, borderColor: COLOR.border.subtle,
+  },
+  favBtnActive: { backgroundColor: alpha(PALETTE.coral, 0.14), borderColor: alpha(PALETTE.coral, 0.4) },
+
   successToast: {
     position: 'absolute', top: SIZE.header + SPACE.giant, alignSelf: 'center', zIndex: 10,
     flexDirection: 'row', alignItems: 'center', gap: SPACE.sm,
@@ -761,6 +885,15 @@ const styles = StyleSheet.create({
 
   // Hero (à plat, sans carte)
   hero: { alignItems: 'center', gap: SPACE.lg },
+  heroCompact: { gap: SPACE.md },
+  // Dôme pétrole + illustration géante à 6 % : la seule touche « propre au thème »
+  dome: {
+    position: 'absolute', overflow: 'hidden',
+    backgroundColor: alpha(PALETTE.petrolLight, 0.16),
+    borderWidth: BORDER.default,
+  },
+  domeArt: { position: 'absolute', opacity: 0.06 },
+  descToggle: { minHeight: SIZE.touch, justifyContent: 'center', paddingHorizontal: SPACE.md, marginTop: -SPACE.sm },
   heroTexts: { alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.sm },
   heroStats: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xxl },
   heroStat: { alignItems: 'center', gap: SPACE.xxs, minWidth: 96 },

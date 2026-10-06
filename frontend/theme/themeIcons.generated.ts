@@ -3,7 +3,7 @@
 
 export type SvgNode = { t: string; p: Record<string, string | number>; c?: SvgNode[] };
 
-export type ThemeIconName = 'cinema' | 'egypte-antique' | 'espace' | 'gastronomie' | 'geographie' | 'histoire' | 'jeux-video' | 'moyen-age' | 'musique' | 'revolution-francaise' | 'sciences' | 'sport';
+export type ThemeIconName = 'cinema' | 'egypte-antique' | 'espace' | 'gastronomie' | 'geographie' | 'histoire' | 'jeux-video' | 'moyen-age' | 'musique' | 'retro-gaming' | 'revolution-francaise' | 'sciences' | 'sport';
 
 export const THEME_ICONS: Record<ThemeIconName, SvgNode[]> = {
  "cinema": [
@@ -560,55 +560,86 @@ export const THEME_ICONS: Record<ThemeIconName, SvgNode[]> = {
   {
    "t": "path",
    "p": {
-    "d": "M68.5 64h17v17h-17ZM170.5 64h17v17h-17ZM85.5 81h17v17h-17ZM153.5 81h17v17h-17ZM68.5 98h17v17h-17ZM85.5 98h17v17h-17ZM102.5 98h17v17h-17ZM119.5 98h17v17h-17ZM136.5 98h17v17h-17ZM153.5 98h17v17h-17ZM170.5 98h17v17h-17ZM51.5 115h17v17h-17ZM68.5 115h17v17h-17ZM85.5 115h17v17h-17ZM102.5 115h17v17h-17ZM119.5 115h17v17h-17ZM136.5 115h17v17h-17ZM153.5 115h17v17h-17ZM170.5 115h17v17h-17ZM187.5 115h17v17h-17ZM34.5 132h17v17h-17ZM51.5 132h17v17h-17ZM68.5 132h17v17h-17ZM85.5 132h17v17h-17ZM102.5 132h17v17h-17ZM119.5 132h17v17h-17ZM136.5 132h17v17h-17ZM153.5 132h17v17h-17ZM170.5 132h17v17h-17ZM187.5 132h17v17h-17ZM204.5 132h17v17h-17ZM34.5 149h17v17h-17ZM68.5 149h17v17h-17ZM85.5 149h17v17h-17ZM102.5 149h17v17h-17ZM119.5 149h17v17h-17ZM136.5 149h17v17h-17ZM153.5 149h17v17h-17ZM170.5 149h17v17h-17ZM204.5 149h17v17h-17ZM34.5 166h17v17h-17ZM68.5 166h17v17h-17ZM170.5 166h17v17h-17ZM204.5 166h17v17h-17ZM85.5 183h17v17h-17ZM102.5 183h17v17h-17ZM136.5 183h17v17h-17ZM153.5 183h17v17h-17Z",
-    "fill": "#12606D",
-    "stroke": "#12606D",
-    "strokeWidth": 6.0,
+    "d": "M86 74C88 64 100 60 110 64L118 68H138L146 64C156 60 168 64 170 74Z",
+    "fill": "#FF6B5B",
+    "stroke": "#FF6B5B",
+    "strokeWidth": 12.0,
     "strokeLinejoin": "round"
    }
   },
   {
+   "t": "path",
+   "p": {
+    "d": "M80 84H176C202 84 214 104 218 130L224 172C228 198 206 210 190 196L166 172H90L66 196C50 210 28 198 32 172L38 130C42 104 54 84 80 84Z",
+    "fill": "#12606D"
+   }
+  },
+  {
    "t": "rect",
    "p": {
-    "x": 85.5,
-    "y": 115.0,
-    "width": 17.0,
-    "height": 17.0,
-    "rx": 4.0,
+    "x": 68.0,
+    "y": 120.0,
+    "width": 44.0,
+    "height": 16.0,
+    "rx": 6.0,
     "fill": "#FFDB3D"
    }
   },
   {
    "t": "rect",
    "p": {
-    "x": 153.5,
-    "y": 115.0,
-    "width": 17.0,
-    "height": 17.0,
-    "rx": 4.0,
+    "x": 82.0,
+    "y": 106.0,
+    "width": 16.0,
+    "height": 44.0,
+    "rx": 6.0,
     "fill": "#FFDB3D"
    }
   },
   {
-   "t": "rect",
+   "t": "circle",
    "p": {
-    "x": 122.5,
-    "y": 34.0,
-    "width": 11.0,
-    "height": 21.0,
-    "rx": 5.0,
+    "cx": 168.0,
+    "cy": 114.0,
+    "r": 11.0,
     "fill": "#FF6B5B"
    }
   },
   {
-   "t": "rect",
+   "t": "circle",
    "p": {
-    "x": 55.5,
-    "y": 136.0,
-    "width": 9.0,
-    "height": 9.0,
-    "rx": 3.0,
+    "cx": 190.0,
+    "cy": 138.0,
+    "r": 11.0,
+    "fill": "#FFDB3D"
+   }
+  },
+  {
+   "t": "circle",
+   "p": {
+    "cx": 114.0,
+    "cy": 160.0,
+    "r": 9.0,
     "fill": "#E8F1EC"
+   }
+  },
+  {
+   "t": "circle",
+   "p": {
+    "cx": 148.0,
+    "cy": 160.0,
+    "r": 9.0,
+    "fill": "#E8F1EC"
+   }
+  },
+  {
+   "t": "path",
+   "p": {
+    "d": "M58 110L70 98",
+    "stroke": "#E8F1EC",
+    "strokeWidth": 12.0,
+    "strokeLinecap": "round",
+    "fill": "none"
    }
   }
  ],
@@ -760,6 +791,62 @@ export const THEME_ICONS: Record<ThemeIconName, SvgNode[]> = {
     "strokeWidth": 12.0,
     "strokeLinecap": "round",
     "fill": "none"
+   }
+  }
+ ],
+ "retro-gaming": [
+  {
+   "t": "path",
+   "p": {
+    "d": "M68.5 64h17v17h-17ZM170.5 64h17v17h-17ZM85.5 81h17v17h-17ZM153.5 81h17v17h-17ZM68.5 98h17v17h-17ZM85.5 98h17v17h-17ZM102.5 98h17v17h-17ZM119.5 98h17v17h-17ZM136.5 98h17v17h-17ZM153.5 98h17v17h-17ZM170.5 98h17v17h-17ZM51.5 115h17v17h-17ZM68.5 115h17v17h-17ZM85.5 115h17v17h-17ZM102.5 115h17v17h-17ZM119.5 115h17v17h-17ZM136.5 115h17v17h-17ZM153.5 115h17v17h-17ZM170.5 115h17v17h-17ZM187.5 115h17v17h-17ZM34.5 132h17v17h-17ZM51.5 132h17v17h-17ZM68.5 132h17v17h-17ZM85.5 132h17v17h-17ZM102.5 132h17v17h-17ZM119.5 132h17v17h-17ZM136.5 132h17v17h-17ZM153.5 132h17v17h-17ZM170.5 132h17v17h-17ZM187.5 132h17v17h-17ZM204.5 132h17v17h-17ZM34.5 149h17v17h-17ZM68.5 149h17v17h-17ZM85.5 149h17v17h-17ZM102.5 149h17v17h-17ZM119.5 149h17v17h-17ZM136.5 149h17v17h-17ZM153.5 149h17v17h-17ZM170.5 149h17v17h-17ZM204.5 149h17v17h-17ZM34.5 166h17v17h-17ZM68.5 166h17v17h-17ZM170.5 166h17v17h-17ZM204.5 166h17v17h-17ZM85.5 183h17v17h-17ZM102.5 183h17v17h-17ZM136.5 183h17v17h-17ZM153.5 183h17v17h-17Z",
+    "fill": "#12606D",
+    "stroke": "#12606D",
+    "strokeWidth": 6.0,
+    "strokeLinejoin": "round"
+   }
+  },
+  {
+   "t": "rect",
+   "p": {
+    "x": 85.5,
+    "y": 115.0,
+    "width": 17.0,
+    "height": 17.0,
+    "rx": 4.0,
+    "fill": "#FFDB3D"
+   }
+  },
+  {
+   "t": "rect",
+   "p": {
+    "x": 153.5,
+    "y": 115.0,
+    "width": 17.0,
+    "height": 17.0,
+    "rx": 4.0,
+    "fill": "#FFDB3D"
+   }
+  },
+  {
+   "t": "rect",
+   "p": {
+    "x": 122.5,
+    "y": 34.0,
+    "width": 11.0,
+    "height": 21.0,
+    "rx": 5.0,
+    "fill": "#FF6B5B"
+   }
+  },
+  {
+   "t": "rect",
+   "p": {
+    "x": 55.5,
+    "y": 136.0,
+    "width": 9.0,
+    "height": 9.0,
+    "rx": 3.0,
+    "fill": "#E8F1EC"
    }
   }
  ],

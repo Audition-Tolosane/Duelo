@@ -61,7 +61,7 @@ export default function SupportScreen() {
             <MaterialCommunityIcons name="chevron-left" size={22} color="#FFF" />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
-            <Text style={styles.headerEyebrow}>◆ DUELO</Text>
+            <Text style={styles.headerEyebrow}>◆ SKILKI</Text>
             <Text style={styles.headerTitle}>{t('support.title')}</Text>
           </View>
         </View>

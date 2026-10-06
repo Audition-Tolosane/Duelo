@@ -20,6 +20,13 @@ export const PALETTE = {
   violet:     '#A78BFA',
 } as const;
 
+/** Teinte transparente d'une couleur de la palette : alpha(PALETTE.yellow, 0.12). Pour halos et motifs ton sur ton. */
+export function alpha(hex: string, a: number): string {
+  const h = hex.replace('#', '');
+  const n = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+
 export const COLOR = {
   bg: {
     primary:   PALETTE.night,

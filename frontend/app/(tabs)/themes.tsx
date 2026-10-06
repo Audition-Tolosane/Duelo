@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import {
-  Txt, Icon, Button, Card, Section, SearchField, ThemeIcon, ThemeCard, ListRow, Loader, EmptyState,
+  Txt, Icon, Card, Section, SearchField, ThemeIcon, ThemeCard, ListRow, Loader, EmptyState,
 } from '../../components/ui';
 import { useTabBar } from '../../contexts/TabBarContext';
 import { COLOR, SPACE, RADII, BORDER, SIZE, ICON_SIZE } from '../../theme/tokens';
@@ -14,8 +14,8 @@ import { t } from '../../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-// « Tes thèmes » : 5 cartes en carrousel, « Voir tout » au-delà
-const MY_THEMES_SHOWN = 5;
+// « Tes thèmes » : carrousel dense de cartes compactes (3 et demie visibles en 390), « Voir tout » au-delà
+const MY_THEMES_SHOWN = 8;
 // `as Href` sur /theme-list : route nouvelle, absente des types générés jusqu'au prochain `expo start`.
 
 type ClusterInfo = { name: string; icon: string; theme_count: number };
@@ -117,7 +117,7 @@ export default function ThemesScreen() {
   const featured = cats.reduce<SuperCategory | null>(
     (best, c) => (!best || c.total_themes > best.total_themes ? c : best), null);
   const rest = cats.filter(c => c.id !== featured?.id);
-  const tileW = (width - SPACE.screenX * 2 - SPACE.md) / 2;
+  const tileW = (width - SPACE.screenX * 2 - SPACE.sm) / 2;
   const themesLabel = t('themes.themes_count');
 
   return (
@@ -132,7 +132,7 @@ export default function ThemesScreen() {
         <View style={s.head}>
           <View style={s.titles}>
             <Txt variant="overline">{t('themes.arena_eyebrow')}</Txt>
-            <Txt variant="h1">{t('themes.arena_title')}</Txt>
+            <Txt variant="h2" numberOfLines={2}>{t('themes.arena_title')}</Txt>
           </View>
           <SearchField
             testID="explorer-search"
@@ -146,17 +146,18 @@ export default function ThemesScreen() {
           <Section
             title={t('pilot.explorer.your_themes')}
             insetTitle
+            style={s.section}
             onSeeAll={myThemes.length > MY_THEMES_SHOWN ? () => router.push('/theme-list?mine=1' as Href) : undefined}
           >
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.carousel}>
               {myThemes.slice(0, MY_THEMES_SHOWN).map((th) => (
                 <ThemeCard
                   key={th.id}
+                  layout="compact"
                   name={th.name}
                   cluster={th.cluster}
                   superCategory={th.super_category}
                   level={th.level}
-                  meta={th.cluster || undefined}
                   onPress={() => router.push(`/category-detail?id=${th.id}`)}
                 />
               ))}
@@ -164,32 +165,28 @@ export default function ThemesScreen() {
           </Section>
         )}
 
-        {/* ── À la une : aplat pétrole, une seule action jaune ── */}
+        {/* ── À la une : une rangée éditoriale — plaque, nom, compteur, sous-catégories, disque jaune ── */}
         {featured && (
           <Animated.View entering={FadeInDown.duration(450)} style={s.inset}>
-            <Section title={t('pilot.explorer.featured')}>
-              <Card testID="explorer-featured">
+            <Section title={t('pilot.explorer.featured')} style={s.section}>
+              <Card testID="explorer-featured" onPress={() => openUniverse(featured)} style={s.featuredCard}>
                 <View style={s.featuredRow}>
-                  <ThemeIcon superCategory={featured.id} size={ICON_SIZE.theme.lg} />
+                  <ThemeIcon superCategory={featured.id} size={ICON_SIZE.theme.md} />
                   <View style={s.featuredTexts}>
-                    <Txt variant="h2" numberOfLines={1}>{featured.label.toUpperCase()}</Txt>
-                    <Txt variant="label" color={COLOR.text.secondary}>
-                      {`${featured.total_themes} ${themesLabel}`}
+                    <Txt variant="cardTitle" numberOfLines={1}>
+                      {featured.label.toUpperCase()}
+                      <Txt variant="caption">{`  ${featured.total_themes} ${themesLabel}`}</Txt>
                     </Txt>
                     {featured.clusters.length > 0 && (
-                      <Txt variant="caption" numberOfLines={2}>
+                      <Txt variant="caption" color={COLOR.text.secondary} numberOfLines={2}>
                         {featured.clusters.slice(0, 3).map(cl => cl.name).join(' · ')}
                       </Txt>
                     )}
                   </View>
+                  <View style={s.featuredCta}>
+                    <Icon name="chevronRight" size={ICON_SIZE.lg} color={COLOR.text.onAction} />
+                  </View>
                 </View>
-                <Button
-                  label={t('pilot.explorer.explore_cta')}
-                  icon="compass"
-                  fullWidth
-                  onPress={() => openUniverse(featured)}
-                  style={s.featuredCta}
-                />
               </Card>
             </Section>
           </Animated.View>
@@ -198,17 +195,17 @@ export default function ThemesScreen() {
         {/* ── Tous les univers : grille 2 colonnes, icône / nom / compteur ── */}
         {rest.length > 0 && (
           <View style={s.inset}>
-            <Section title={t('pilot.explorer.all_universes')}>
+            <Section title={t('pilot.explorer.all_universes')} style={s.section}>
               <View style={s.grid}>
                 {rest.map((cat, index) => (
-                  <Animated.View key={cat.id} entering={FadeInDown.delay(Math.min(index, 8) * 70).duration(450)}>
+                  <Animated.View key={cat.id} entering={FadeInDown.delay(Math.min(index, 8) * 50).duration(400)}>
                     <Pressable
                       accessibilityRole="button"
                       accessibilityLabel={cat.label}
                       onPress={() => openUniverse(cat)}
                       style={({ pressed }) => [s.tile, { width: tileW }, pressed && s.tilePressed]}
                     >
-                      <ThemeIcon superCategory={cat.id} size={ICON_SIZE.theme.md} />
+                      <ThemeIcon superCategory={cat.id} size={ICON_SIZE.theme.sm} />
                       <View style={s.tileTexts}>
                         <Txt variant="cardTitle" numberOfLines={1}>{cat.label.toUpperCase()}</Txt>
                         <Txt variant="caption" numberOfLines={1}>{`${cat.total_themes} ${themesLabel}`}</Txt>
@@ -262,31 +259,43 @@ const s = StyleSheet.create({
   // Fond : porté par la mise en page des onglets (le header et la tab bar y vivent aussi)
   container: { flex: 1, backgroundColor: 'transparent' },
   center: { flex: 1, justifyContent: 'center' },
-  scrollContent: { paddingTop: SPACE.lg, gap: SPACE.sectionGap },
+  // Haut de page resserré : 20 px entre blocs (au lieu de 28) pour montrer le catalogue dès le premier écran
+  scrollContent: { paddingTop: SPACE.md, gap: SPACE.xl },
   inset: { paddingHorizontal: SPACE.screenX },
 
-  head: { paddingHorizontal: SPACE.screenX, gap: SPACE.lg },
-  titles: { gap: SPACE.xs },
+  head: { paddingHorizontal: SPACE.screenX, gap: SPACE.md },
+  titles: { gap: SPACE.xxs },
+  // Titre de section → contenu : 8 px (au lieu de 12) sur cet écran dense
+  section: { gap: SPACE.sm },
 
-  carousel: { paddingHorizontal: SPACE.screenX, gap: SPACE.md },
+  carousel: { paddingHorizontal: SPACE.screenX, gap: SPACE.sm },
 
-  featuredRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
-  featuredTexts: { flex: 1, gap: SPACE.xs },
-  featuredCta: { marginTop: SPACE.lg },
+  featuredCard: { padding: SPACE.md },
+  featuredRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md },
+  featuredTexts: { flex: 1, gap: SPACE.xxs },
+  // Disque jaune : signal d'action ; toute la carte est la cible tactile
+  featuredCta: {
+    width: SIZE.buttonSm, height: SIZE.buttonSm, borderRadius: SIZE.buttonSm / 2,
+    backgroundColor: COLOR.action.primary,
+    alignItems: 'center', justifyContent: 'center',
+  },
 
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.md },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.sm },
+  // Tuile basse (64 px) : plaque 40 à gauche, nom + compteur à droite
   tile: {
-    minHeight: 132,
-    padding: SPACE.md,
-    gap: SPACE.md,
-    borderRadius: RADII.lg,
+    minHeight: SIZE.listRow + SPACE.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: SPACE.md,
+    paddingHorizontal: SPACE.sm,
+    gap: SPACE.sm,
+    borderRadius: RADII.md,
     backgroundColor: COLOR.surface.card,
     borderWidth: BORDER.hair,
     borderColor: COLOR.border.subtle,
-    justifyContent: 'space-between',
   },
   tilePressed: { backgroundColor: COLOR.surface.elevated },
-  tileTexts: { gap: SPACE.xxs },
+  tileTexts: { flex: 1, gap: SPACE.xxs },
 
   forgeRow: { borderTopWidth: BORDER.hair, borderBottomWidth: BORDER.hair, borderColor: COLOR.border.subtle },
   forgeIcon: {

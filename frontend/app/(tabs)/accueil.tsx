@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
-  View, StyleSheet, ScrollView, Pressable, RefreshControl, Modal, Alert, Share,
+  View, StyleSheet, ScrollView, Pressable, RefreshControl, Modal, Alert, Share, useWindowDimensions,
 } from 'react-native';
+import Svg, { Defs, Pattern, Path, Rect } from 'react-native-svg';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
@@ -24,7 +25,7 @@ import {
   BottomSheet, ThemeIcon, ThemeCard, AnswerButton, EmptyState, StatCard,
 } from '../../components/ui';
 import type { IconName, AnswerState } from '../../components/ui';
-import { COLOR, SPACE, RADII, SIZE, BORDER, ELEVATION, GRADIENTS, ICON_SIZE } from '../../theme/tokens';
+import { COLOR, SPACE, RADII, SIZE, BORDER, ELEVATION, GRADIENTS, ICON_SIZE, PALETTE, alpha } from '../../theme/tokens';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -624,6 +625,30 @@ const OfferRow = React.memo(function OfferRow({ item, onActivate, onLaunch }: {
   );
 });
 
+// ── Décor du bloc Duel rapide : treillis de losanges + épées en filigrane, ton sur ton ──
+// Purement décoratif (pointerEvents none, masqué à l'accessibilité). Aucune animation :
+// l'Accueil reste plus calme que le jeu, le CTA jaune reste l'unique point focal.
+const HERO_LATTICE = 20;
+const HERO_MARK = 176;
+const HeroDecor = React.memo(function HeroDecor() {
+  const h = HERO_LATTICE / 2;
+  return (
+    <View style={StyleSheet.absoluteFill} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <Svg width="100%" height="100%">
+        <Defs>
+          <Pattern id="skilkiHeroLattice" width={HERO_LATTICE} height={HERO_LATTICE} patternUnits="userSpaceOnUse">
+            <Path d={`M${h} ${h - 2.5} L${h + 2.5} ${h} L${h} ${h + 2.5} L${h - 2.5} ${h} Z`} fill={alpha(PALETTE.cream, 0.05)} />
+          </Pattern>
+        </Defs>
+        <Rect x="0" y="0" width="100%" height="100%" fill="url(#skilkiHeroLattice)" />
+      </Svg>
+      <View style={styles.heroMark}>
+        <SwordMark size={HERO_MARK} color={PALETTE.cream} />
+      </View>
+    </View>
+  );
+});
+
 // ── Machine à sous (tirage du thème du Duel rapide) ──
 const SLOT_CARD_W = 84;
 const SLOT_GAP = 10;
@@ -742,6 +767,9 @@ const MOVES_PREVIEW = 2;
 export default function AccueilScreen() {
   const router = useRouter();
   const { onScroll: onTabScroll } = useTabBar();
+  // Très petits écrans (320 px) : hero un peu plus serré pour que le CTA tienne sur une ligne
+  const { width: screenW } = useWindowDimensions();
+  const compact = screenW < 360;
   const [userData, setUserData] = useState<UserData | null>(null);
   const [pendingDuels, setPendingDuels] = useState<DuelItem[]>([]);
   const [incomingChallenges, setIncomingChallenges] = useState<IncomingChallenge[]>([]);
@@ -1222,9 +1250,13 @@ export default function AccueilScreen() {
         {/* ── 1. En-tête compact : salut, titre (or), niveau ── */}
         <Animated.View entering={FadeInDown.duration(400)} style={styles.greeting}>
           <View style={styles.flexGap}>
-            <Txt variant="h2" numberOfLines={1}>
-              {`${t('home.greeting')} ${userData?.pseudo || t('home.player')} ${userData?.country_flag || ''}`.trim()}
-            </Txt>
+            {/* Pseudo long : réduit puis tronqué ; le drapeau reste toujours visible */}
+            <View style={styles.rowTight}>
+              <Txt variant="h2" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} style={styles.shrink}>
+                {`${t('home.greeting')} ${userData?.pseudo || t('home.player')}`}
+              </Txt>
+              {userData?.country_flag ? <Txt variant="h2">{userData.country_flag}</Txt> : null}
+            </View>
             <View style={styles.rowTight}>
               <Icon name="crown" size={14} color={COLOR.reward.gold} />
               <Txt variant="label" color={COLOR.reward.gold} numberOfLines={1}>{userData?.selected_title || t('home.novice')}</Txt>
@@ -1249,15 +1281,16 @@ export default function AccueilScreen() {
         ) : null}
 
         {/* ── 2. HERO Duel rapide : un seul CTA jaune ── */}
-        <Animated.View entering={FadeInDown.delay(60).duration(400)}>
+        <Animated.View entering={FadeInDown.delay(60).duration(400)} style={styles.heroShell}>
           <LinearGradient
             colors={GRADIENTS.hero.colors}
             start={GRADIENTS.hero.start}
             end={GRADIENTS.hero.end}
-            style={styles.hero}
+            style={[styles.hero, compact && styles.heroCompact]}
           >
+            <HeroDecor />
             <View style={styles.heroHead}>
-              <SwordMark size={48} color={COLOR.text.primary} />
+              <SwordMark size={compact ? 36 : 48} color={COLOR.text.primary} />
               <View style={styles.flexGap}>
                 <Txt variant="overline" color={COLOR.text.secondary}>{t('pilot.home.hero_overline')}</Txt>
                 <Txt variant="h1">{t('pilot.home.hero_title')}</Txt>
@@ -1266,9 +1299,10 @@ export default function AccueilScreen() {
             <Txt variant="bodySmall">{t('pilot.home.hero_subtitle')}</Txt>
             <Button
               label={t('challenge.find_opponent')}
-              icon="duel"
+              icon={compact ? undefined : 'duel'}
               size="lg"
               fullWidth
+              style={compact ? styles.heroCtaCompact : undefined}
               haptic={false}
               onPress={handleQuickDuel}
               testID="home-quick-duel"
@@ -1323,8 +1357,8 @@ export default function AccueilScreen() {
           <Animated.View entering={FadeInDown.delay(160).duration(400)}>
             <Card>
               <View style={styles.rowBetween}>
-                <Txt variant="cardTitle">{`${levelShort()} ${lvl}`}</Txt>
-                <Txt variant="label" color={COLOR.reward.gold}>
+                <Txt variant="cardTitle" numberOfLines={1}>{`${levelShort()} ${lvl}`}</Txt>
+                <Txt variant="label" color={COLOR.reward.gold} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85} style={styles.shrink}>
                   {`${xp.current.toLocaleString()} / ${xp.needed.toLocaleString()} XP`}
                 </Txt>
               </View>
@@ -1653,6 +1687,7 @@ const styles = StyleSheet.create({
     gap: SPACE.xxl,
   },
   flex: { flex: 1 },
+  shrink: { flexShrink: 1 },
   flexGap: { flex: 1, gap: SPACE.xs },
   pressed: { opacity: 0.7 },
   rowCenter: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md },
@@ -1673,13 +1708,30 @@ const styles = StyleSheet.create({
   },
 
   // ── 2. Hero ──
+  // Coque : porte l'ombre (le hero lui-même rogne son décor, ce qui couperait l'ombre sur iOS)
+  heroShell: {
+    borderRadius: RADII.xl,
+    backgroundColor: COLOR.surface.card,
+    ...ELEVATION.e2,
+  },
   hero: {
     borderRadius: RADII.xl,
     borderWidth: BORDER.hair,
     borderColor: COLOR.border.subtle,
+    borderTopColor: alpha(PALETTE.cream, 0.10),   // liseré haut : relief discret
     padding: SPACE.xl,
     gap: SPACE.lg,
-    ...ELEVATION.e2,
+    overflow: 'hidden',
+  },
+  heroCompact: { padding: SPACE.lg },
+  heroCtaCompact: { paddingHorizontal: SPACE.md },
+  // Épées en filigrane, rognées dans l'angle haut droit
+  heroMark: {
+    position: 'absolute',
+    top: -SPACE.huge,
+    right: -SPACE.giant,
+    opacity: 0.06,
+    transform: [{ rotate: '-14deg' }],
   },
   heroHead: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
   replayRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: SPACE.sm },

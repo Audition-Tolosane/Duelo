@@ -125,7 +125,7 @@ export default function SettingsScreen() {
               <View style={s.spread}>
                 <View style={s.flex}>
                   <Txt variant="caption">{t('referral.your_code')}</Txt>
-                  <Txt variant="h2" selectable style={s.code}>{referralData.code}</Txt>
+                  <Txt variant="h2" selectable numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} style={s.code}>{referralData.code}</Txt>
                 </View>
                 {proActive ? <Badge label={t('pilot.settings.pro_badge')} tone="rare" /> : null}
               </View>
@@ -234,7 +234,7 @@ const s = StyleSheet.create({
   group: { gap: SPACE.sm },
   groupCard: { paddingHorizontal: SPACE.cardPad },
   referral: { gap: SPACE.lg },
-  code: { letterSpacing: 2 },
+  code: { letterSpacing: SPACE.xxs },
   steps: { gap: SPACE.sm, padding: SPACE.md, borderRadius: RADII.md, backgroundColor: COLOR.surface.subtle },
   step: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm },
   metaBlock: { gap: SPACE.xs },

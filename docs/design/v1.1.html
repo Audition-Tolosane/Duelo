@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pilote SKILKI V1.1</title>
+<style>
+  :root { --bg:#071F26; --card:#0B3D4A; --ink:#E8F1EC; --muted:rgba(232,241,236,.66); --line:rgba(232,241,236,.12); --yellow:#FFDB3D; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  header, section, nav, footer { max-width:1240px; margin:0 auto; padding:0 16px; }
+  header { padding-top:32px; } h1 { margin:0 0 4px; font-size:26px; } h1 span { color:var(--yellow); }
+  header p, .note { color:var(--muted); max-width:860px; margin:0 0 14px; }
+  nav { margin-top:16px; display:flex; gap:8px; flex-wrap:wrap; }
+  nav a { color:var(--ink); text-decoration:none; border:1px solid var(--line); border-radius:999px; padding:6px 14px; }
+  section { margin-top:30px; } h2 { font-size:20px; margin:0 0 4px; }
+  .pair { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
+  figure { margin:0; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:12px; }
+  figure img { width:100%; height:auto; display:block; border-radius:10px; }
+  figcaption { font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+  figure.after figcaption { color:var(--yellow); }
+  .wide img { max-width:100%; }
+  footer { margin:40px auto; color:var(--muted); font-size:13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pilote <span>SKILKI</span> — V1 → V1.1</h1>
+  <p>Même DA, mêmes arbitrages. +10 % de spectacle aux moments émotionnels (VS, révélation), plus de densité (Explorer), un peu de personnalité (page thème, Duel rapide), cas limites mobiles. Captures 390×844 sauf mention.</p>
+</header>
+<nav><a href="#vs">VS</a><a href="#question">Question</a><a href="#theme">Page thème</a><a href="#explorer">Explorer</a><a href="#accueil">Accueil</a><a href="#profil">Profil</a><a href="#responsive">Petits écrans</a></nav>
+
+<section id="vs"><h2>VS</h2><p class="note">Entrées opposées en ressort, « vs » en impulsion, ligne de collision jaune | corail + onde unique, halos légers, décompte qui « pop », fond qui avance doucement. Aucune nouvelle couleur.</p>
+<div class="pair">
+  <figure><figcaption>V1</figcaption><img src="captures/apres/vs.png"></figure>
+  <figure class="after"><figcaption>V1.1 (capture pendant l'animation)</figcaption><img src="captures/v1.1/390x844/vs.png"></figure>
+  <figure class="after"><figcaption>V1.1 · 320×568</figcaption><img src="captures/v1.1/320x568/vs.png"></figure>
+</div></section>
+
+<section id="question"><h2>Question</h2><p class="note">Question calée en haut (moins de vide), tuiles plus hautes. Réponses longues : bascule automatique en liste 1×4 (règle : une réponse dépasse 2 lignes de tuile ou contient un mot plus long qu'une ligne).</p>
+<div class="pair">
+  <figure><figcaption>V1</figcaption><img src="captures/apres/question.png"></figure>
+  <figure class="after"><figcaption>V1.1 · réponses courtes</figcaption><img src="captures/v1.1/375x812/question.png"></figure>
+  <figure class="after"><figcaption>V1.1 · réponses longues (1×4)</figcaption><img src="captures/v1.1/390x844/question-longues.png"></figure>
+  <figure class="after"><figcaption>V1.1 · révélation en 1×4</figcaption><img src="captures/v1.1/390x844/question-longues-revelation.png"></figure>
+</div></section>
+
+<section id="theme"><h2>Page thème</h2><p class="note">Arc ton-sur-ton derrière le hero avec l'illustration du thème en filigrane (6 %), liseré d'univers, en-tête sans répétition du nom, favori en corail.</p>
+<div class="pair">
+  <figure><figcaption>V1</figcaption><img src="captures/apres/page-theme.png"></figure>
+  <figure class="after"><figcaption>V1.1</figcaption><img src="captures/v1.1/390x844/page-theme.png"></figure>
+  <figure class="after"><figcaption>V1.1 · progression</figcaption><img src="captures/v1.1/390x844/page-theme-progression.png"></figure>
+</div></section>
+
+<section id="explorer"><h2>Explorer</h2><p class="note">Titre compact, cartes « Tes thèmes » compactes, « À la une » en une rangée de 80 px, univers en tuiles de 64 px : 6 univers visibles dès le premier écran (contre 2).</p>
+<div class="pair">
+  <figure><figcaption>V1</figcaption><img src="captures/apres/explorer.png"></figure>
+  <figure class="after"><figcaption>V1.1</figcaption><img src="captures/v1.1/390x844/explorer.png"></figure>
+</div></section>
+
+<section id="accueil"><h2>Accueil</h2><p class="note">Structure inchangée. Duel rapide : treillis de losanges ton-sur-ton, épées en filigrane, liseré haut, ombre — le CTA jaune reste le seul point focal.</p>
+<div class="pair">
+  <figure><figcaption>V1</figcaption><img src="captures/apres/accueil.png"></figure>
+  <figure class="after"><figcaption>V1.1</figcaption><img src="captures/v1.1/390x844/accueil.png"></figure>
+</div></section>
+
+<section id="profil"><h2>Profil</h2><p class="note">Rang → progression → victoires. Taux de victoire en grand + « x victoires / y duels », nombre brut conservé dans la grille. Écussons de succès vectoriels (or obtenu, violet rare, crème verrouillé).</p>
+<div class="pair">
+  <figure><figcaption>V1</figcaption><img src="captures/apres/profil.png"></figure>
+  <figure class="after"><figcaption>V1.1</figcaption><img src="captures/v1.1/390x844/profil.png"></figure>
+</div></section>
+
+<section id="responsive"><h2>Petits écrans</h2><p class="note">Aucun débordement horizontal, aucune erreur de développement affichée, CTA visibles, réponses longues entièrement à l'écran en 320×568.</p>
+<figure class="wide"><figcaption>320×568</figcaption><img src="captures/v1.1/planche-320.png"></figure><br>
+<figure class="wide"><figcaption>375×812 (haut) · 360×800 (bas)</figcaption><img src="captures/v1.1/planche-375-360.png"></figure>
+</section>
+<footer>Détails, tests et points ouverts : docs/design/07-v1.1.md</footer>
+</body>
+</html>

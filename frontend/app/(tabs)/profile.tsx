@@ -7,14 +7,16 @@ import * as ImagePicker from 'expo-image-picker';
 import UserAvatar from '../../components/UserAvatar';
 import { authFetch } from '../../utils/api';
 import { useTabBar } from '../../contexts/TabBarContext';
-import { t } from '../../utils/i18n';
+import Svg, { Path, Circle } from 'react-native-svg';
+import { t, getLocale } from '../../utils/i18n';
 import {
-  Txt, Icon, IconName, Button, IconButton, Card, Section, StatCard, ProgressBar, ListRow, Loader, Dialog,
+  Txt, Icon, IconName, Button, IconButton, Card, Section, ProgressBar, ListRow, Loader, Dialog,
   BottomSheet, ThemeIcon, EmptyState,
 } from '../../components/ui';
-import { COLOR, SPACE, RADII, SIZE, BORDER, ICON_SIZE, TYPO } from '../../theme/tokens';
+import { COLOR, PALETTE, SPACE, RADII, SIZE, BORDER, ICON_SIZE, TYPO, alpha } from '../../theme/tokens';
 
-// Profil SKILKI : hero → niveau et ligue → 4 stats → abonnés → succès et titres → thèmes → historique.
+// Profil SKILKI : hero → rang puis niveau (une carte) → victoires et stats → abonnés → succès et titres
+// → thèmes → historique.
 // Parrainage, réglages, déconnexion et suppression de compte vivent dans /settings.
 // `as Href` sur /settings et /theme-list : routes absentes des types générés jusqu'au prochain `expo start`.
 
@@ -98,16 +100,105 @@ const ACH_ICONS: Record<string, IconName> = {
 // Rare = succès cosmétique (cadre) ou palier ≥ 1000 XP : seul cas où le violet apparaît.
 const isRareAch = (a: any) => !!a?.frame || (a?.xp ?? 0) >= 1000;
 
+// Grands nombres lisibles (12 345) selon la langue de l'app.
+const fmt = (n: number | null | undefined) => Number(n || 0).toLocaleString(getLocale());
+
 function Divider() {
   return <View style={s.divider} />;
 }
 
-// ── Écusson de ligue : aplat or (violet au palier ultime), bouclier crème-nuit ──
+// ── Écusson commun (rangs et succès) : forme vectorielle simple, viewBox 48×52 ──
+const CREST_W = 48;
+const CREST_H = 52;
+const CREST_PATH = 'M24 2 L44 8.5 V25 C44 37.5 35.5 46.5 24 50 C12.5 46.5 4 37.5 4 25 V8.5 Z';
+
+function Crest({ width, fill, tint, stroke, children }: {
+  width: number; fill: string; tint?: string; stroke?: string; children?: React.ReactNode;
+}) {
+  const height = (width * CREST_H) / CREST_W;
+  // Trait constant à l'écran, quelle que soit la taille de l'écusson
+  const strokeWidth = (BORDER.default * CREST_W) / width;
+  return (
+    <View style={[s.crestBox, { width, height }]}>
+      <Svg width={width} height={height} viewBox={`0 0 ${CREST_W} ${CREST_H}`} style={StyleSheet.absoluteFill}>
+        <Path d={CREST_PATH} fill={fill} />
+        {tint ? <Path d={CREST_PATH} fill={tint} /> : null}
+        {stroke ? <Path d={CREST_PATH} fill="none" stroke={stroke} strokeWidth={strokeWidth} strokeLinejoin="round" /> : null}
+      </Svg>
+      <View style={s.crestIcon}>{children}</View>
+    </View>
+  );
+}
+
+// ── Écusson de ligue : aplat or (violet au palier ultime), pictogramme nuit ──
 function LeagueCrest({ tier }: { tier: string }) {
   const ultimate = tier === ULTIMATE_TIER;
   return (
-    <View style={[s.crest, { backgroundColor: ultimate ? COLOR.accent.rare : COLOR.reward.gold }]}>
+    <Crest width={SIZE.touch + SPACE.xs} fill={ultimate ? COLOR.accent.rare : COLOR.reward.gold}>
       <Icon name={ultimate ? 'crown' : 'shield'} size={ICON_SIZE.lg} color={COLOR.text.onAction} />
+    </Crest>
+  );
+}
+
+// ── Médaillon de succès : pétrole plein ; obtenu = or (liseré + teinte), rare obtenu = violet,
+//    verrouillé = crème 40 % sur pétrole profond, avec barre fine si la progression a commencé ──
+function AchievementMedal({ item, width }: { item: any; width: number }) {
+  const done = !!item.unlocked;
+  const rare = done && isRareAch(item);
+  const accent = rare ? COLOR.accent.rare : COLOR.reward.gold;
+  const pct = done ? 1 : Math.min(1, (item.progress || 0) / (item.target || 1));
+  return (
+    <View style={s.medalWrap}>
+      <Crest
+        width={width}
+        fill={done ? COLOR.surface.elevated : COLOR.bg.primary}
+        tint={done ? alpha(rare ? PALETTE.violet : PALETTE.gold, 0.18) : undefined}
+        stroke={done ? accent : COLOR.border.default}
+      >
+        <Icon name={ACH_ICONS[item.id] ?? 'star'} size={ICON_SIZE.md} color={done ? accent : COLOR.text.disabled} />
+      </Crest>
+      {!done && pct > 0 ? (
+        <View style={[s.medalTrack, { width: width - SPACE.md }]}>
+          <View style={[s.medalFill, { width: `${pct * 100}%` }]} />
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+// ── Anneau du taux de victoire (lecture rapide) : piste crème 12 %, arc jaune = moi ──
+const RING = 64;
+const RING_STROKE = 6;
+function WinRing({ value }: { value: number }) {
+  const r = (RING - RING_STROKE) / 2;
+  const c = 2 * Math.PI * r;
+  const v = Math.max(0, Math.min(1, value));
+  return (
+    <Svg width={RING} height={RING} aria-hidden>
+      <Circle cx={RING / 2} cy={RING / 2} r={r} stroke={COLOR.track} strokeWidth={RING_STROKE} fill="none" />
+      {v > 0 ? (
+        <Circle
+          cx={RING / 2} cy={RING / 2} r={r}
+          stroke={COLOR.player.self} strokeWidth={RING_STROKE} fill="none" strokeLinecap="round"
+          strokeDasharray={`${c * v} ${c}`}
+          transform={`rotate(-90 ${RING / 2} ${RING / 2})`}
+        />
+      ) : null}
+    </Svg>
+  );
+}
+
+// ── Cellule de stat détaillée : chiffre tabulaire qui rétrécit plutôt que de déborder ──
+function StatCell({ value, label, icon }: { value: string; label: string; icon?: IconName }) {
+  return (
+    <View style={s.statCell} accessible accessibilityLabel={`${label} ${value}`}>
+      <View style={s.statValueRow}>
+        {icon ? <Icon name={icon} size={ICON_SIZE.sm} color={COLOR.accent.warm} /> : null}
+        <Txt variant="statMedium" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6} style={s.shrink}>
+          {value}
+        </Txt>
+      </View>
+      <Txt variant="overline" numberOfLines={1}>{label}</Txt>
     </View>
   );
 }
@@ -141,24 +232,22 @@ function AchievementsSection({ userId, footer }: { userId: string; footer?: Reac
 
   const renderCell = (item: any, onPress: () => void) => {
     const done = item.unlocked;
-    const rare = isRareAch(item);
-    const tone = !done ? COLOR.text.disabled : rare ? COLOR.accent.rare : COLOR.reward.gold;
     return (
       <Pressable
         key={item.id}
         style={({ pressed }) => [s.achCell, pressed && s.pressed]}
         onPress={onPress}
         accessibilityRole="button"
-        accessibilityLabel={item.name}
+        accessibilityLabel={done ? item.name : `${item.name}, ${item.progress || 0} / ${item.target}`}
       >
-        <View style={[s.achDisc, { backgroundColor: !done ? COLOR.surface.subtle : rare ? COLOR.tint.rare : COLOR.tint.gold }]}>
-          <Icon name={ACH_ICONS[item.id] ?? 'star'} size={ICON_SIZE.md} color={tone} />
-        </View>
-        <Txt variant="caption" color={done ? COLOR.text.primary : COLOR.text.disabled} align="center" numberOfLines={2}>
+        <AchievementMedal item={item} width={SIZE.touch} />
+        <Txt variant="caption" color={done ? COLOR.text.primary : COLOR.text.tertiary} align="center" numberOfLines={2}>
           {item.name}
         </Txt>
         {!done ? (
-          <Txt variant="caption" color={COLOR.text.disabled} style={s.tabular}>{`${item.progress || 0}/${item.target}`}</Txt>
+          <Txt variant="caption" color={COLOR.text.disabled} style={s.tabular} numberOfLines={1}>
+            {`${fmt(item.progress)}/${fmt(item.target)}`}
+          </Txt>
         ) : null}
       </Pressable>
     );
@@ -208,11 +297,11 @@ function AchievementsSection({ userId, footer }: { userId: string; footer?: Reac
                 ? (sel.unlocked_at
                   ? t('pilot.profile.ach_unlocked_on', { date: new Date(sel.unlocked_at).toLocaleDateString('fr-FR') })
                   : t('pilot.profile.ach_unlocked'))
-                : `${sel.progress || 0} / ${sel.target}`}
+                : `${fmt(sel.progress)} / ${fmt(sel.target)}`}
             </Txt>
             {!selDone ? (
               <Txt variant="caption" align="center" color={COLOR.reward.gold}>
-                {t('pilot.profile.ach_reward', { xp: String(sel.xp) })}
+                {t('pilot.profile.ach_reward', { xp: fmt(sel.xp) })}
               </Txt>
             ) : null}
           </View>
@@ -500,6 +589,7 @@ export default function ProfileScreen() {
   const historyShown = historyExpanded ? history : history.slice(0, HISTORY_SHOWN);
   const ultimate = leagueData?.tier === ULTIMATE_TIER;
   const leagueTone = ultimate ? COLOR.accent.rare : COLOR.reward.gold;
+  const winRate = Math.max(0, Math.min(100, Math.round(user?.win_rate || 0)));
   const countryFlag = (name: string) => COUNTRIES.find(c => c.name === name)?.flag;
 
   return (
@@ -544,17 +634,18 @@ export default function ProfileScreen() {
             </View>
           </Pressable>
 
-          <Txt variant="h1" align="center" numberOfLines={1}>{user?.pseudo || t('profile.player_default')}</Txt>
+          <Txt variant="h1" align="center" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75} style={s.heroName}>
+            {user?.pseudo || t('profile.player_default')}
+          </Txt>
 
           <Pressable
             onPress={() => setShowTitleModal(true)}
             accessibilityRole="button"
             accessibilityLabel={t('profile.change_title')}
-            hitSlop={SPACE.xs}
             style={({ pressed }) => [s.heroLink, pressed && s.pressed]}
           >
             <Icon name="crown" size={ICON_SIZE.sm} color={displayTitle ? COLOR.reward.gold : COLOR.text.tertiary} />
-            <Txt variant="label" color={displayTitle ? COLOR.reward.gold : COLOR.text.tertiary} numberOfLines={1}>
+            <Txt variant="label" color={displayTitle ? COLOR.reward.gold : COLOR.text.tertiary} numberOfLines={1} style={s.shrink}>
               {displayTitle || t('profile.no_title')}
             </Txt>
             <Icon name="chevronDown" size={ICON_SIZE.sm} color={COLOR.text.tertiary} />
@@ -564,13 +655,12 @@ export default function ProfileScreen() {
             onPress={openLocationModal}
             accessibilityRole="button"
             accessibilityLabel={t('profile.edit_location')}
-            hitSlop={SPACE.xs}
             style={({ pressed }) => [s.heroLink, pressed && s.pressed]}
           >
             {user?.country_flag
               ? <Txt variant="label">{user.country_flag}</Txt>
               : <Icon name="globe" size={ICON_SIZE.sm} color={COLOR.text.secondary} />}
-            <Txt variant="label" numberOfLines={1}>
+            <Txt variant="label" numberOfLines={1} style={s.shrink}>
               {user?.city && user?.country
                 ? `${user.city}, ${user.country}`
                 : user?.country || t('profile.world')}
@@ -580,54 +670,67 @@ export default function ProfileScreen() {
         </View>
 
         <View style={s.body}>
-          {/* ── Niveau + progression, puis ligue (une seule carte) ── */}
+          {/* ── Rang (prestige, en tête) puis niveau et progression — une seule carte ── */}
           <Card style={s.progressCard}>
+            {leagueData && (
+              <>
+                <View style={s.leagueRow}>
+                  <LeagueCrest tier={leagueData.tier} />
+                  <View style={s.flex}>
+                    <Txt variant="h3" color={leagueTone} numberOfLines={1}>{leagueData.tier_label}</Txt>
+                    <Txt variant="caption" numberOfLines={1} style={s.tabular}>
+                      {`${leagueData.season.name} · ${t('pilot.profile.global_rank', { rank: fmt(leagueData.global_rank) })}`}
+                    </Txt>
+                  </View>
+                  <View style={s.alignEnd}>
+                    <Txt variant="statMedium" numberOfLines={1}>{fmt(leagueData.mmr)}</Txt>
+                    <Txt variant="overline">MMR</Txt>
+                  </View>
+                </View>
+                <ProgressBar value={leagueData.tier_progress} tone="reward" height={6} />
+                <Divider />
+              </>
+            )}
+
             <View style={s.levelRow}>
               <View>
                 <Txt variant="overline">{t('pilot.profile.level')}</Txt>
                 <Txt variant="statLarge">{lvl}</Txt>
               </View>
-              <View style={s.alignEnd}>
-                <Txt variant="label" color={COLOR.reward.gold} style={s.tabular}>
-                  {`${(user.total_xp || 0).toLocaleString()} XP`}
+              <View style={[s.alignEnd, s.shrink]}>
+                <Txt variant="label" color={COLOR.reward.gold} style={s.tabular} numberOfLines={1}>
+                  {`${fmt(user.total_xp)} XP`}
                 </Txt>
-                <Txt variant="caption">{t('profile.total_xp')}</Txt>
+                <Txt variant="caption" numberOfLines={1}>{t('profile.total_xp')}</Txt>
               </View>
             </View>
             <ProgressBar value={progress} tone="action" />
             <View style={s.spread}>
-              <Txt variant="caption" style={s.tabular}>{`${current.toLocaleString()} / ${needed.toLocaleString()} XP`}</Txt>
+              <Txt variant="caption" style={s.tabular}>{`${fmt(current)} / ${fmt(needed)} XP`}</Txt>
               <Txt variant="caption" color={COLOR.text.secondary}>{`${t('profile.level_short')} ${Math.min(lvl + 1, 50)}`}</Txt>
             </View>
-
-            {leagueData && (
-              <>
-                <Divider />
-                <View style={s.leagueRow}>
-                  <LeagueCrest tier={leagueData.tier} />
-                  <View style={s.flex}>
-                    <Txt variant="h3" color={leagueTone} numberOfLines={1}>{leagueData.tier_label}</Txt>
-                    <Txt variant="caption" numberOfLines={1}>
-                      {`${leagueData.season.name} · ${t('pilot.profile.global_rank', { rank: String(leagueData.global_rank) })}`}
-                    </Txt>
-                  </View>
-                  <View style={s.alignEnd}>
-                    <Txt variant="statMedium">{leagueData.mmr}</Txt>
-                    <Txt variant="overline">MMR</Txt>
-                  </View>
-                </View>
-                <ProgressBar value={leagueData.tier_progress} tone="reward" height={6} />
-              </>
-            )}
           </Card>
 
-          {/* ── Une seule rangée de 4 stats, abonnés juste dessous ── */}
+          {/* ── Victoires : % en lecture rapide + nombre brut, puis 4 stats détaillées ── */}
           <View style={s.statsBlock}>
-            <Card style={s.statsRow}>
-              <StatCard appearance="plain" value={user?.matches_played || 0} label={t('pilot.profile.stat_duels')} />
-              <StatCard appearance="plain" value={`${user?.win_rate || 0}%`} label={t('pilot.profile.stat_win_rate')} />
-              <StatCard appearance="plain" value={user?.current_streak || 0} label={t('pilot.profile.stat_streak')} icon="flame" tone="warm" />
-              <StatCard appearance="plain" value={user?.best_streak || 0} label={t('pilot.profile.stat_best')} />
+            <Card style={s.statsCard}>
+              <View style={s.winRow}>
+                <View style={s.flex}>
+                  <Txt variant="overline" numberOfLines={1}>{t('pilot.profile.win_rate_title')}</Txt>
+                  <Txt variant="statLarge" numberOfLines={1}>{`${winRate}%`}</Txt>
+                  <Txt variant="caption" numberOfLines={2} style={s.tabular}>
+                    {t('pilot.profile.win_summary', { wins: fmt(user?.matches_won), played: fmt(user?.matches_played) })}
+                  </Txt>
+                </View>
+                <WinRing value={winRate / 100} />
+              </View>
+              <Divider />
+              <View style={s.statGrid}>
+                <StatCell value={fmt(user?.matches_played)} label={t('pilot.profile.stat_duels')} />
+                <StatCell value={fmt(user?.matches_won)} label={t('profile.matches_won')} />
+                <StatCell value={fmt(user?.current_streak)} label={t('pilot.profile.stat_streak')} icon="flame" />
+                <StatCell value={fmt(user?.best_streak)} label={t('pilot.profile.stat_best')} />
+              </View>
             </Card>
 
             {/* ── Abonnés / abonnements (ligne compacte) ── */}
@@ -637,7 +740,7 @@ export default function ProfileScreen() {
                 accessibilityRole="button"
                 style={({ pressed }) => [s.socialItem, pressed && s.pressed]}
               >
-                <Txt variant="cardTitle" style={s.tabular}>{user?.followers_count || 0}</Txt>
+                <Txt variant="cardTitle" style={s.tabular}>{fmt(user?.followers_count)}</Txt>
                 <Txt variant="overline">{t('profile.followers_label')}</Txt>
               </Pressable>
               <View style={s.socialDot} />
@@ -646,7 +749,7 @@ export default function ProfileScreen() {
                 accessibilityRole="button"
                 style={({ pressed }) => [s.socialItem, pressed && s.pressed]}
               >
-                <Txt variant="cardTitle" style={s.tabular}>{user?.following_count || 0}</Txt>
+                <Txt variant="cardTitle" style={s.tabular}>{fmt(user?.following_count)}</Txt>
                 <Txt variant="overline">{t('profile.following_label')}</Txt>
               </Pressable>
             </View>
@@ -719,7 +822,7 @@ export default function ProfileScreen() {
                         <Txt variant="cardTitle" style={s.tabular}>{`${m.player_score} - ${m.opponent_score}`}</Txt>
                         <View style={s.inline}>
                           <Txt variant="overline" color={resultColor}>{m.won ? t('profile.victory') : t('profile.defeat')}</Txt>
-                          {m.xp_earned > 0 && <Txt variant="caption" color={COLOR.reward.gold} style={s.tabular}>{`+${m.xp_earned} XP`}</Txt>}
+                          {m.xp_earned > 0 && <Txt variant="caption" color={COLOR.reward.gold} style={s.tabular}>{`+${fmt(m.xp_earned)} XP`}</Txt>}
                         </View>
                       </View>
                     </View>
@@ -895,45 +998,49 @@ const AVATAR_ITEM = 64;
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   centered: { justifyContent: 'center' },
-  scroll: { paddingBottom: 120 },
+  scroll: { paddingBottom: SIZE.tabBar + SPACE.giant },
   body: { paddingHorizontal: SPACE.screenX, gap: SPACE.sectionGap },
   flex: { flex: 1 },
   inline: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs },
   spread: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   alignEnd: { alignItems: 'flex-end' },
   tabular: { fontVariant: ['tabular-nums'] },
+  shrink: { flexShrink: 1 },
   pressed: { opacity: 0.7 },
   divider: { height: BORDER.hair, backgroundColor: COLOR.border.subtle },
 
   errorCard: { marginHorizontal: SPACE.screenX, marginTop: SPACE.md },
 
   /* Hero */
-  hero: { alignItems: 'center', paddingTop: SPACE.xl, paddingBottom: SPACE.xxl, paddingHorizontal: SPACE.screenX, gap: SPACE.xs },
+  hero: { alignItems: 'center', paddingTop: SPACE.xl, paddingBottom: SPACE.md, paddingHorizontal: SPACE.screenX },  // + marge interne des liens de 44 px ≈ sectionGap
   gear: { position: 'absolute', top: SPACE.sm, right: SPACE.screenX },
-  avatarWrap: { marginBottom: SPACE.sm },
+  avatarWrap: { marginBottom: SPACE.md },
+  heroName: { alignSelf: 'stretch', marginBottom: SPACE.xxs },
   avatarEdit: {
     position: 'absolute', bottom: 0, right: 0,
-    width: 28, height: 28, borderRadius: RADII.pill,
+    width: ICON_SIZE.xl, height: ICON_SIZE.xl, borderRadius: RADII.pill,
     backgroundColor: COLOR.action.primary,
     borderWidth: BORDER.strong, borderColor: COLOR.bg.primary,
     alignItems: 'center', justifyContent: 'center',
   },
-  heroLink: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs, minHeight: 36, maxWidth: '90%' },
+  heroLink: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs, minHeight: SIZE.touch, maxWidth: '100%', paddingHorizontal: SPACE.sm },
 
   /* Niveau + ligue */
   progressCard: { gap: SPACE.md },
-  levelRow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
+  levelRow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: SPACE.md },
   leagueRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md },
-  crest: {
-    width: 48, height: 52,
-    borderTopLeftRadius: RADII.md, borderTopRightRadius: RADII.md,
-    borderBottomLeftRadius: RADII.xl, borderBottomRightRadius: RADII.xl,
-    alignItems: 'center', justifyContent: 'center',
-  },
 
-  /* Stats */
-  statsBlock: { gap: SPACE.xs },
-  statsRow: { flexDirection: 'row', gap: SPACE.sm },
+  /* Écusson commun (rang, succès) */
+  crestBox: { alignItems: 'center', justifyContent: 'center' },
+  crestIcon: { marginTop: -SPACE.xs },   // centre optique : la pointe du bas alourdit la forme
+
+  /* Victoires + stats */
+  statsBlock: { gap: SPACE.sm },
+  statsCard: { gap: SPACE.lg },
+  winRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
+  statGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: SPACE.lg },
+  statCell: { width: '50%', gap: SPACE.xxs, paddingRight: SPACE.sm },
+  statValueRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs },
 
   /* Social */
   socialRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.lg },
@@ -943,14 +1050,16 @@ const s = StyleSheet.create({
   /* Succès */
   achGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: SPACE.lg },
   achCell: { width: '25%', alignItems: 'center', gap: SPACE.xs, paddingHorizontal: SPACE.xxs },
-  achDisc: { width: SIZE.touch + 4, height: SIZE.touch + 4, borderRadius: RADII.pill, alignItems: 'center', justifyContent: 'center' },
+  medalWrap: { alignItems: 'center', gap: SPACE.xs },
+  medalTrack: { height: BORDER.selected, borderRadius: RADII.pill, backgroundColor: COLOR.track, overflow: 'hidden' },
+  medalFill: { height: '100%', borderRadius: RADII.pill, backgroundColor: COLOR.text.secondary },
   achDetail: { gap: SPACE.sm },
   trailingTitle: { maxWidth: 120 },
 
   /* Listes (thèmes, historique) */
   listCard: { paddingHorizontal: SPACE.cardPad },
   matchRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md, minHeight: SIZE.listRow, paddingVertical: SPACE.sm },
-  matchMark: { width: 3, alignSelf: 'stretch', borderRadius: RADII.xs },
+  matchMark: { width: BORDER.selected, alignSelf: 'stretch', borderRadius: RADII.xs },
 
   /* Feuilles */
   sheetLabel: { marginTop: SPACE.sm },

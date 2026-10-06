@@ -18,7 +18,7 @@ export default function Terms() {
           <Ionicons name="arrow-back" size={22} color="#fff" />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.headerEyebrow}>◆ DUELO</Text>
+          <Text style={styles.headerEyebrow}>◆ SKILKI</Text>
           <Text style={styles.headerTitle}>{t('terms.title')}</Text>
         </View>
       </View>

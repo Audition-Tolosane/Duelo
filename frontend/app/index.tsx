@@ -4,6 +4,7 @@ import {
   KeyboardAvoidingView, Platform, Keyboard, ActivityIndicator, Dimensions,
   Image,
 } from 'react-native';
+import { Wordmark } from '../components/ui';
 import Svg, { Path } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -24,7 +25,6 @@ WebBrowser.maybeCompleteAuthSession();
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 const GOOGLE_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '';
-const DUELO_LOGO = require('../assets/header/duelo_logo.webp');
 const BG_IMAGE = require('../assets/images/fond_duelo.webp');
 
 type AuthMode = 'guest' | 'email';
@@ -433,7 +433,8 @@ export default function WelcomeScreen() {
                 }]}
               >
                 <Animated.View style={[styles.logoRing, { opacity: ringOpacity, transform: [{ rotate: ringRotation }] }]} />
-                <Image source={DUELO_LOGO} style={styles.logoImage} resizeMode="contain" />
+                {/* Logotype SKILKI (renommage visuel ; logo définitif à venir) */}
+                <View style={styles.logoImage}><Wordmark size="lg" /></View>
               </Animated.View>
 
               {/* Tagline */}
@@ -617,7 +618,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(0,229,255,0.45)',
   },
-  logoImage: { width: 220, height: 56, zIndex: 1 },
+  logoImage: { zIndex: 1, alignItems: 'center', justifyContent: 'center' },
 
   taglinePill: {
     alignSelf: 'center',

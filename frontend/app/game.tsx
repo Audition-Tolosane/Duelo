@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  View, StyleSheet, Animated,
+  View, StyleSheet, Animated, ScrollView, useWindowDimensions,
   Platform, UIManager, Easing, Alert, AppState, BackHandler,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -14,7 +14,7 @@ import Button from '../components/ui/Button';
 import IconButton from '../components/ui/IconButton';
 import Loader from '../components/ui/Loader';
 import ScreenContainer from '../components/ui/ScreenContainer';
-import AnswerButton, { AnswerState } from '../components/ui/AnswerButton';
+import AnswerButton, { AnswerState, ANSWER_ROW_MIN_HEIGHT } from '../components/ui/AnswerButton';
 import { useWS } from '../contexts/WebSocketContext';
 import { dueloWS } from '../services/websocket';
 import { COLOR, SPACE, RADII, BORDER, ELEVATION } from '../theme/tokens';
@@ -57,11 +57,80 @@ const TIMER_SIZE = 64; // anneau compact, centré entre les deux scores
 
 // Question par paliers de longueur (Space Grotesk Bold) : 24/30 · 22/28 · 19/25 · 17/23.
 // Le kit n'a pas encore de variante « question » : on part de h2 et on ajuste taille et interligne.
-const questionTier = (len: number) =>
-  len <= 60 ? { size: 24, line: 30 }
-  : len <= 100 ? { size: 22, line: 28 }
-  : len <= 150 ? { size: 19, line: 25 }
-  : { size: 17, line: 23 };
+// Écran compact (hauteur < 700 : 320×568, 375×667…) : un palier plus bas, plancher 16/22.
+const QUESTION_TIERS = [
+  { size: 24, line: 30 },
+  { size: 22, line: 28 },
+  { size: 19, line: 25 },
+  { size: 17, line: 23 },
+  { size: 16, line: 22 },
+];
+const questionTier = (len: number, compact: boolean) => {
+  const i = len <= 60 ? 0 : len <= 100 ? 1 : len <= 150 ? 2 : 3;
+  return QUESTION_TIERS[Math.min(i + (compact ? 1 : 0), QUESTION_TIERS.length - 1)];
+};
+const COMPACT_HEIGHT = 700;
+
+// ── Répartition verticale question / réponses ──
+// Sous la rangée progression, deux zones en colonne :
+//  · question : base = hauteur de son texte, poids de croissance 1, texte calé EN HAUT
+//    (plus de question centrée dans un grand vide). En dernier recours elle rétrécit :
+//    son texte est dans un ScrollView (jamais coupé, jamais sous les réponses) ;
+//  · réponses : base = hauteur de leur contenu (jamais compressées), poids de croissance 2,
+//    calées en bas (zone du pouce).
+// L'espace libre va donc pour 2/3 aux réponses et 1/3 sous la question. Les rangées 2×2
+// sont plafonnées à 1,6 × la largeur d'une tuile (tuile légèrement en portrait) ; au-delà, le surplus revient
+// à la zone question (Yoga redistribue l'espace d'un élément plafonné).
+const QUESTION_GROW = 1;
+const ANSWERS_GROW = 2;
+const TILE_RATIO_MAX = 1.6;
+
+// ── Grille 2×2 ou liste 1×4 ──
+// Largeur utile du texte d'une tuile 2×2 = (écran − 2×16 de marges − 8 d'écart) / 2 − 2×12 de padding
+//   ≈ 151 px en 390, 143 en 375, 136 en 360, 116 en 320.
+// En Space Grotesk SemiBold 16 px, un caractère moyen fait ≈ 0,56 em ≈ 9 px
+//   → ≈ 16 caractères par ligne en 390/375, 15 en 360, 12 en 320.
+// Règle : on bascule en liste 1×4 si AU MOINS UNE réponse
+//   (a) dépasse 2 lignes de tuile (longueur > 2 × caractères/ligne : 32 en 390/375, 30 en 360,
+//       24 en 320) — au-delà, la tuile tomberait à 14 px sur 3-4 lignes, lecture pénible ; ou
+//   (b) contient un mot plus long qu'une ligne de tuile (sinon coupure au milieu du mot,
+//       ex. « Constantinople » en 320).
+// Exemples : « 4 », « 1990 », « La Machine volante » → 2×2 ;
+//            « Le traité de Versailles signé en 1919 » (37 car.) → 1×4.
+// Les quatre réponses passent toujours ensemble dans la même mise en page.
+const CHAR_EM = 0.56;
+const TILE_FONT = 16;
+const tileCharsPerLine = (screenW: number) => {
+  const textW = (screenW - SPACE.screenX * 2 - SPACE.sm) / 2 - SPACE.md * 2;
+  return Math.max(8, Math.floor(textW / (TILE_FONT * CHAR_EM)));
+};
+const needsListLayout = (options: string[], screenW: number): boolean => {
+  const cpl = tileCharsPerLine(screenW);
+  return options.some((o) => {
+    const txt = (o || '').trim();
+    if (txt.length > cpl * 2) return true;
+    return txt.split(/\s+/).some((w) => w.length > cpl);
+  });
+};
+
+// Liste 1×4 : hauteur commune estimée pour que les quatre lignes soient égales.
+// Largeur du texte = écran − marges − padding − lettre (24) − 2 écarts − colonne marqueurs (20).
+// Taille 16/15/14 selon la longueur (même barème qu'AnswerButton), ≤ 4 lignes, +15 % de marge de césure.
+const LETTER_BADGE = 24;
+const MARKER_COL = 20;
+const rowFont = (len: number) => (len > 90 ? 14 : len > 50 ? 15 : 16);
+const ROW_MAX_GROW = 88; // une ligne courte ne s'étire pas au-delà
+const listRowHeight = (options: string[], screenW: number, padV: number) => {
+  const textW = screenW - SPACE.screenX * 2 - SPACE.md * 2 - LETTER_BADGE - SPACE.md * 2 - MARKER_COL;
+  const h = options.reduce((max, o) => {
+    const len = (o || '').length;
+    const fs = rowFont(len);
+    const cpl = Math.max(8, Math.floor(textW / (fs * CHAR_EM)));
+    const lines = Math.min(4, Math.max(1, Math.ceil((len * 1.15) / cpl)));
+    return Math.max(max, lines * (fs + 5) + padV * 2 + 2 * BORDER.default);
+  }, 0);
+  return Math.max(ANSWER_ROW_MIN_HEIGHT, Math.ceil(h));
+};
 
 export default function GameScreen() {
   const router = useRouter();
@@ -71,6 +140,7 @@ export default function GameScreen() {
     botSkill: string; botSpeed: string;
   }>();
   const { send: wsSend, on: wsOn } = useWS();
+  const { width: screenW, height: screenH } = useWindowDimensions();
 
   const themeId = params.category;
   const isLive = params.roomId && params.isBot !== 'true';
@@ -729,7 +799,19 @@ export default function GameScreen() {
   const optionRows: Array<[number, number]> = [[0, 1], [2, 3]];
   // En live, les questions arrivent une par une : le total affiché reste celui du match.
   const totalShown = isLive ? TOTAL_QUESTIONS : questions.length;
-  const qTier = questionTier(question.question_text?.length || 0);
+  const compact = screenH < COMPACT_HEIGHT;
+  const qTier = questionTier(question.question_text?.length || 0, compact);
+  const options = [0, 1, 2, 3].map((i) => question.options?.[i] || '');
+  const listLayout = needsListLayout(options, screenW);
+  // Grille : rangées plafonnées à 1,25 × la largeur d'une tuile.
+  const tileW = (screenW - SPACE.screenX * 2 - SPACE.sm) / 2;
+  const gridRowMax = Math.round(tileW * TILE_RATIO_MAX);
+  const answersPadBottom = compact ? SPACE.sm : SPACE.md;
+  const gridMax = gridRowMax * 2 + SPACE.sm + answersPadBottom;
+  // Liste : hauteur commune ; peut grandir jusqu'à 88 px (ou sa hauteur estimée si elle est plus grande).
+  const rowPadV = compact ? SPACE.xs + SPACE.xxs : SPACE.sm;
+  const listRowMin = listLayout ? listRowHeight(options, screenW, rowPadV) : ANSWER_ROW_MIN_HEIGHT;
+  const listRowMax = Math.max(ROW_MAX_GROW, Math.round(listRowMin * 1.35));
 
   // Sémantique : neutre avant réponse · jaune = ma sélection (en attente) ·
   // vert + ✓ = bonne réponse révélée · rouge + ✕ = ma mauvaise réponse.
@@ -802,37 +884,63 @@ export default function GameScreen() {
         </Txt>
       </View>
 
-      {/* Question, posée sur le fond (sans carte) */}
-      <View style={styles.questionZone}>
-        <Animated.View style={{
-          opacity: questionFade,
-          transform: [{ translateX: questionSlide }, { scale: questionScaleAnim }],
-        }}>
-          <Txt variant="h2" align="center" style={{ fontSize: qTier.size, lineHeight: qTier.line }}>
-            {question.question_text}
-          </Txt>
-        </Animated.View>
+      {/* Question, posée sur le fond (sans carte), calée en haut de sa zone */}
+      <View style={[styles.questionZone, { flexGrow: QUESTION_GROW }]}>
+        <ScrollView
+          style={styles.questionScroll}
+          contentContainerStyle={[styles.questionContent, compact && styles.questionContentCompact]}
+          bounces={false}
+          showsVerticalScrollIndicator={false}
+        >
+          <Animated.View style={{
+            opacity: questionFade,
+            transform: [{ translateX: questionSlide }, { scale: questionScaleAnim }],
+          }}>
+            <Txt variant="h2" align="center" style={{ fontSize: qTier.size, lineHeight: qTier.line }}>
+              {question.question_text}
+            </Txt>
+          </Animated.View>
+        </ScrollView>
       </View>
 
-      {/* Réponses 2×2 dans la zone du pouce — toujours entièrement visibles */}
-      <View style={styles.optionsGrid}>
-        {optionRows.map((row, rowIdx) => (
-          <View key={rowIdx} style={styles.optionsRow}>
-            {row.map((index) => (
-              <AnswerButton
-                key={index}
-                testID={`option-${index}`}
-                letter={LETTERS[index]}
-                text={question.options[index] || ''}
-                state={answerState(index)}
-                opponentPick={showResult && botAnswer === index && selectedOption !== index}
-                onPress={() => selectAnswer(index)}
-                disabled={showResult}
-              />
-            ))}
-          </View>
-        ))}
-      </View>
+      {/* Réponses dans la zone du pouce : grille 2×2, ou liste 1×4 si une réponse est longue */}
+      {listLayout ? (
+        <View style={[styles.answersZone, { flexGrow: ANSWERS_GROW, paddingBottom: answersPadBottom }]}>
+          {options.map((opt, index) => (
+            <AnswerButton
+              key={index}
+              testID={`option-${index}`}
+              layout="row"
+              letter={LETTERS[index]}
+              text={opt}
+              state={answerState(index)}
+              opponentPick={showResult && botAnswer === index && selectedOption !== index}
+              onPress={() => selectAnswer(index)}
+              disabled={showResult}
+              style={[styles.listRow, { minHeight: listRowMin, maxHeight: listRowMax, paddingVertical: rowPadV }]}
+            />
+          ))}
+        </View>
+      ) : (
+        <View style={[styles.answersZone, { flexGrow: ANSWERS_GROW, maxHeight: gridMax, paddingBottom: answersPadBottom }]}>
+          {optionRows.map((row, rowIdx) => (
+            <View key={rowIdx} style={[styles.optionsRow, { maxHeight: gridRowMax }]}>
+              {row.map((index) => (
+                <AnswerButton
+                  key={index}
+                  testID={`option-${index}`}
+                  letter={LETTERS[index]}
+                  text={options[index]}
+                  state={answerState(index)}
+                  opponentPick={showResult && botAnswer === index && selectedOption !== index}
+                  onPress={() => selectAnswer(index)}
+                  disabled={showResult}
+                />
+              ))}
+            </View>
+          ))}
+        </View>
+      )}
 
       {/* Toast de série */}
       {streakToastVisible && (
@@ -881,15 +989,22 @@ const styles = StyleSheet.create({
   dashes: { flex: 1, flexDirection: 'row', gap: SPACE.xs },
   dash: { flex: 1, height: SPACE.xs, borderRadius: RADII.xs },
 
-  // Question
-  questionZone: {
-    flexGrow: 1, flexShrink: 0, justifyContent: 'center',
-    paddingHorizontal: SPACE.xl, paddingVertical: SPACE.lg,
-  },
+  // Question : base = contenu, croissance QUESTION_GROW, texte en haut ; rétrécit en dernier
+  // recours (minHeight 0) et défile alors au lieu de chevaucher les réponses.
+  questionZone: { flexShrink: 1, flexBasis: 'auto', minHeight: 0, justifyContent: 'flex-start' },
+  questionScroll: { flexGrow: 0, flexShrink: 1 },
+  questionContent: { paddingHorizontal: SPACE.xl, paddingTop: SPACE.xl, paddingBottom: SPACE.lg },
+  questionContentCompact: { paddingHorizontal: SPACE.lg, paddingTop: SPACE.md, paddingBottom: SPACE.md },
 
-  // Grille 2×2
-  optionsGrid: { flex: 1.4, paddingHorizontal: SPACE.screenX, paddingBottom: SPACE.md, gap: SPACE.sm },
-  optionsRow: { flex: 1, flexDirection: 'row', gap: SPACE.sm },
+  // Réponses : base = contenu (jamais compressées), croissance ANSWERS_GROW, calées en bas
+  answersZone: {
+    flexShrink: 0, flexBasis: 'auto', justifyContent: 'flex-end',
+    paddingHorizontal: SPACE.screenX, gap: SPACE.sm,
+  },
+  // Grille 2×2 : deux rangées qui se partagent la hauteur (plafond gridRowMax)
+  optionsRow: { flexGrow: 1, flexShrink: 0, flexBasis: 'auto', flexDirection: 'row', gap: SPACE.sm },
+  // Liste 1×4 : quatre lignes pleine largeur de même hauteur (listRowMin → listRowMax)
+  listRow: { flexGrow: 1, flexShrink: 0, flexBasis: 'auto' },
 
   // Toast de série : corail plein, texte nuit
   streakToastWrapper: {
