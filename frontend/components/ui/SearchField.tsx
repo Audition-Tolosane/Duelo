@@ -65,5 +65,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACE.lg,
   },
   pressed: { backgroundColor: COLOR.surface.elevated },
-  input: { flex: 1, ...TYPO.body, color: COLOR.text.primary, paddingVertical: 0 },
+  // Le champ occupe toute la hauteur de la barre : un toucher n'importe où donne le focus
+  input: { flex: 1, alignSelf: 'stretch', ...TYPO.body, color: COLOR.text.primary, paddingVertical: 0 },
 });

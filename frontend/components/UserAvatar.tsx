@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import Txt from './ui/Txt';
+import { COLOR } from '../theme/tokens';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -61,7 +63,7 @@ export default function UserAvatar({
           height: size,
           borderRadius: radius,
           overflow: 'hidden',
-          backgroundColor: hasImage ? '#1A1A2E' : bgColor,
+          backgroundColor: hasImage ? COLOR.surface.card : bgColor,
           justifyContent: 'center',
           alignItems: 'center',
         },
@@ -75,9 +77,10 @@ export default function UserAvatar({
           resizeMode="cover"
         />
       ) : (
-        <Text style={{ color: '#FFF', fontSize, fontWeight: '900' }}>
+        // Initiale : graisse et police du système (h1), seule la taille suit le diamètre de l'avatar
+        <Txt variant="h1" color={COLOR.text.primary} style={{ fontSize, lineHeight: fontSize * 1.15 }}>
           {initial}
-        </Text>
+        </Txt>
       )}
     </View>
   );

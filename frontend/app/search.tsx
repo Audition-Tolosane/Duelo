@@ -1,72 +1,37 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet, TextInput, FlatList,
-  ActivityIndicator, ScrollView, Animated, Keyboard, Platform,
-  KeyboardAvoidingView, Dimensions
-} from 'react-native';
-import ReAnimated, { FadeInDown } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, StyleSheet, FlatList, ScrollView, Platform, KeyboardAvoidingView, Pressable } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
-import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SwipeBackPage from '../components/SwipeBackPage';
-import DueloHeader from '../components/DueloHeader';
-import CategoryIcon from '../components/CategoryIcon';
 import UserAvatar from '../components/UserAvatar';
-import ScalePressable from '../components/ScalePressable';
-import EmptyState from '../components/EmptyState';
+import {
+  Txt, Icon, IconName, Card, Chip, ListRow, SearchField, ScreenContainer, ScreenHeader, ThemeCard, Loader, EmptyState,
+} from '../components/ui';
+import { COLOR, SPACE, RADII, BORDER, ICON_SIZE } from '../theme/tokens';
 import { t } from '../utils/i18n';
 
-const CYAN = '#00E5FF';
-const VIOLET = '#B366FF';
-const GOLD = '#FFB547';
-const MINT = '#32E7A3';
-const RED = '#FF3D5E';
+// Recherche (thèmes, joueurs, contenu des murs). Ouverte depuis la loupe de l'en-tête ou d'Explorer.
+//   /search?tab=joueurs | contenu  → onglet de départ
 
-const { width } = Dimensions.get('window');
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-function hslToHex(h: number, s: number, l: number): string {
-  s /= 100; l /= 100;
-  const hue2rgb = (p: number, q: number, t: number) => {
-    if (t < 0) t += 1; if (t > 1) t -= 1;
-    if (t < 1/6) return p + (q - p) * 6 * t;
-    if (t < 1/2) return q;
-    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-    return p;
-  };
-  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-  const p = 2 * l - q;
-  const toHex = (v: number) => Math.round(v * 255).toString(16).padStart(2, '0');
-  return `#${toHex(hue2rgb(p, q, h/360 + 1/3))}${toHex(hue2rgb(p, q, h/360))}${toHex(hue2rgb(p, q, h/360 - 1/3))}`;
-}
+// Univers filtrables côté joueurs : libellé + pictogramme (plus de pastilles de couleur muettes)
+const PLAYER_CATEGORIES: { key: string; labelKey: string; icon: IconName }[] = [
+  { key: 'series_tv', labelKey: 'chat.category.series_tv', icon: 'tv' },
+  { key: 'geographie', labelKey: 'chat.category.geographie', icon: 'globe' },
+  { key: 'histoire', labelKey: 'chat.category.histoire', icon: 'landmark' },
+  { key: 'cinema', labelKey: 'chat.category.cinema', icon: 'film' },
+  { key: 'sport', labelKey: 'chat.category.sport', icon: 'trophy' },
+  { key: 'musique', labelKey: 'chat.category.musique', icon: 'music' },
+  { key: 'sciences', labelKey: 'chat.category.sciences', icon: 'flask' },
+  { key: 'gastronomie', labelKey: 'chat.category.gastronomie', icon: 'food' },
+];
 
-function hashColor(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    hash |= 0;
-  }
-  return hslToHex(Math.abs(hash) % 360, 65, 55);
-}
-
-const CATEGORY_META: Record<string, { color: string; bg: string }> = {
-  series_tv: { color: '#E040FB', bg: '#2D1B4E' },
-  geographie: { color: CYAN, bg: '#0D2B2B' },
-  histoire: { color: GOLD, bg: '#2B2510' },
-  cinema: { color: '#FF6B6B', bg: '#2B1515' },
-  sport: { color: MINT, bg: '#0D2B1A' },
-  musique: { color: '#FF8C00', bg: '#2B1E0D' },
-  sciences: { color: '#7B68EE', bg: '#1A1533' },
-  gastronomie: { color: '#FF69B4', bg: '#152B2B' },
-};
-
-const DIFFICULTY_FILTER_KEYS: { key: string; labelKey: string; icon: React.ComponentProps<typeof MaterialCommunityIcons>['name'] }[] = [
-  { key: 'all', labelKey: 'search.difficulty_all', icon: 'star-outline' },
+const DIFFICULTY_FILTER_KEYS: { key: string; labelKey: string; icon: IconName }[] = [
+  { key: 'all', labelKey: 'search.difficulty_all', icon: 'grid' },
   { key: 'debutant', labelKey: 'search.difficulty_beginner', icon: 'sprout' },
-  { key: 'intermediaire', labelKey: 'search.difficulty_intermediate', icon: 'fire' },
+  { key: 'intermediaire', labelKey: 'search.difficulty_intermediate', icon: 'flame' },
   { key: 'avance', labelKey: 'search.difficulty_advanced', icon: 'star' },
   { key: 'expert', labelKey: 'search.difficulty_expert', icon: 'crown' },
 ];
@@ -105,15 +70,14 @@ type TrendingTag = { tag: string; icon: string; type: string };
 
 type Tab = 'themes' | 'joueurs' | 'contenu';
 
-const TAB_ICONS: Record<Tab, React.ComponentProps<typeof MaterialCommunityIcons>['name']> = {
-  themes: 'book-open-variant',
-  joueurs: 'account-group',
-  contenu: 'text-box-outline',
-};
+const TABS: { key: Tab; labelKey: string; icon: IconName }[] = [
+  { key: 'themes', labelKey: 'search.tab_themes', icon: 'book' },
+  { key: 'joueurs', labelKey: 'search.tab_players', icon: 'users' },
+  { key: 'contenu', labelKey: 'search.tab_content', icon: 'document' },
+];
 
 export default function SearchScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { tab: initialTab } = useLocalSearchParams<{ tab?: string }>();
   const [myId, setMyId] = useState('');
   const [activeTab, setActiveTab] = useState<Tab>(
@@ -139,7 +103,6 @@ export default function SearchScreen() {
   const [trendingTags, setTrendingTags] = useState<TrendingTag[]>([]);
   const [topPlayers, setTopPlayers] = useState<any[]>([]);
 
-  const searchInputRef = useRef<TextInput>(null);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -280,151 +243,95 @@ export default function SearchScreen() {
 
   // ── Renders ──
 
-  const renderThemeItem = ({ item, index = 0 }: { item: ThemeResult; index?: number }) => {
-    const color = hashColor(item.id);
-    return (
-      <ReAnimated.View key={item.id} entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
-      <ScalePressable
-        style={st.themeCard}
-        onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          router.push(`/category-detail?id=${item.id}`);
-        }}
-      >
-        {/* Ligne plate écran 12 : tuile teintée 42 + nom + méta mono */}
-        <View style={st.resultRow}>
-          <View style={[st.themeIconBox, { backgroundColor: color + '25', borderColor: color + '50' }]}>
-            <CategoryIcon themeId={item.id} emoji={item.cluster || item.super_category} size={22} color={color} type="cluster" />
-          </View>
-          <View style={st.resultInfo}>
-            <Text style={st.resultName} numberOfLines={1}>{item.name}</Text>
-            <Text style={[st.resultMeta, { color: color + 'CC' }]} numberOfLines={1}>
-              ◆ {t('search.tab_themes').toUpperCase()} · {item.total_questions} QUIZ
-              {item.user_level > 0 ? ` · ${t('search.level_short').toUpperCase()} ${item.user_level}` : ''}
-            </Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={18} color="rgba(255,255,255,0.40)" />
-        </View>
-      </ScalePressable>
-      </ReAnimated.View>
-    );
-  };
+  const renderThemeItem = ({ item, index = 0 }: { item: ThemeResult; index?: number }) => (
+    <ThemeCard
+      key={item.id}
+      layout="row"
+      name={item.name}
+      cluster={item.cluster}
+      superCategory={item.super_category}
+      level={item.user_level > 0 ? item.user_level : undefined}
+      meta={t('pilot.supercat.questions_count', { n: (item.total_questions ?? 0).toLocaleString() })}
+      onPress={() => router.push(`/category-detail?id=${item.id}`)}
+      style={index > 0 ? st.rowDivider : undefined}
+    />
+  );
 
-  const renderPlayerItem = ({ item, index = 0 }: { item: PlayerResult; index?: number }) => {
-    return (
-      <ReAnimated.View entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
-      <ScalePressable
-        style={st.playerCard}
-        onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          router.push(`/player-profile?id=${item.id}`);
-        }}
-      >
-        {/* Ligne plate écran 12 : avatar 42 + nom + méta mono */}
-        <View style={st.resultRow}>
-          <UserAvatar avatarUrl={item.avatar_url} avatarSeed={item.avatar_seed} pseudo={item.pseudo} size={42} />
-          <View style={st.resultInfo}>
-            <View style={st.playerNameRow}>
-              <Text style={st.resultName} numberOfLines={1}>{item.pseudo}</Text>
-              <Text style={st.playerFlag}>{item.country_flag}</Text>
-            </View>
-            <Text style={st.resultMeta} numberOfLines={1}>
-              👤 {t('search.tab_players').toUpperCase()} · {item.total_xp.toLocaleString()} XP · {item.matches_played} {t('search.matches').toUpperCase()}
-            </Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={18} color="rgba(255,255,255,0.40)" />
-        </View>
-      </ScalePressable>
-      </ReAnimated.View>
-    );
-  };
+  const renderPlayerItem = ({ item, index = 0 }: { item: PlayerResult; index?: number }) => (
+    <ListRow
+      title={item.country_flag ? `${item.pseudo} ${item.country_flag}` : item.pseudo}
+      subtitle={`${(item.total_xp ?? 0).toLocaleString()} XP · ${(item.matches_played ?? 0).toLocaleString()} ${t('search.matches')}`}
+      leading={<UserAvatar avatarUrl={item.avatar_url} avatarSeed={item.avatar_seed} pseudo={item.pseudo} size={44} />}
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        router.push(`/player-profile?id=${item.id}`);
+      }}
+      style={index > 0 ? st.rowDivider : undefined}
+    />
+  );
 
-  const renderPostItem = ({ item }: { item: PostResult }) => {
-    const meta = CATEGORY_META[item.category_id] || { color: VIOLET, bg: '#1A1A2E' };
-    return (
-      <TouchableOpacity
-        style={st.postCard}
-        onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          router.push(`/category-detail?id=${item.category_id}`);
-        }}
-        activeOpacity={0.7}
-      >
-        <View style={st.postHeader}>
-          <View style={st.postAvatarSmall}>
-            <UserAvatar avatarUrl={item.user.avatar_url} avatarSeed={item.user.avatar_seed} pseudo={item.user.pseudo} size={36} />
-          </View>
-          <View style={st.postHeaderInfo}>
-            <Text style={st.postAuthor}>{item.user.pseudo}</Text>
-            <View style={st.postCatRow}>
-              <Text style={[st.postCatBadge, { color: meta.color }]}>{item.category_name}</Text>
-              <Text style={st.postTime}>{timeAgo(item.created_at)}</Text>
-            </View>
-          </View>
+  const renderPostItem = ({ item }: { item: PostResult }) => (
+    <Card
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        router.push(`/category-detail?id=${item.category_id}`);
+      }}
+      style={st.post}
+    >
+      <View style={st.author}>
+        <UserAvatar avatarUrl={item.user.avatar_url} avatarSeed={item.user.avatar_seed} pseudo={item.user.pseudo} size={36} />
+        <View style={st.flex}>
+          <Txt variant="cardTitle" numberOfLines={1}>{item.user.pseudo}</Txt>
+          <Txt variant="caption" numberOfLines={1}>{`${item.category_name} · ${timeAgo(item.created_at)}`}</Txt>
         </View>
-        <Text style={st.postContent} numberOfLines={3}>{item.content}</Text>
-        <View style={st.postFooter}>
-          <View style={st.postStatRow}>
-            <MaterialCommunityIcons
-              name={item.is_liked ? 'heart' : 'heart-outline'}
-              size={15}
-              color={item.is_liked ? '#FF4D6A' : '#525252'}
-            />
-            <Text style={[st.postStat, item.is_liked && { color: '#FF4D6A' }]}>{item.likes_count}</Text>
-          </View>
-          <View style={st.postStatRow}>
-            <MaterialCommunityIcons name="comment-outline" size={15} color="#525252" />
-            <Text style={st.postStat}>{item.comments_count}</Text>
-          </View>
-          {item.has_image && (
-            <View style={st.postStatRow}>
-              <MaterialCommunityIcons name="camera" size={15} color="#525252" />
-            </View>
-          )}
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
-  const renderCommentItem = ({ item }: { item: CommentResult }) => {
-    const meta = CATEGORY_META[item.category_id] || { color: VIOLET, bg: '#1A1A2E' };
-    return (
-      <View style={st.commentCard}>
-        <View style={st.commentHeader}>
-          <View style={st.commentAvatarSmall}>
-            <UserAvatar avatarUrl={item.user.avatar_url} avatarSeed={item.user.avatar_seed} pseudo={item.user.pseudo} size={28} />
-          </View>
-          <Text style={st.commentAuthor}>{item.user.pseudo}</Text>
-          <Text style={[st.commentCat, { color: meta.color }]}>{item.category_name}</Text>
-        </View>
-        <Text style={st.commentContent} numberOfLines={2}>{item.content}</Text>
-        <Text style={st.commentTime}>{timeAgo(item.created_at)}</Text>
       </View>
-    );
-  };
+      <Txt variant="body" numberOfLines={3}>{item.content}</Txt>
+      <View style={st.stats}>
+        <View style={st.stat}>
+          <Icon name="heart" size={ICON_SIZE.sm} color={item.is_liked ? COLOR.accent.warm : COLOR.text.tertiary} />
+          <Txt variant="caption" color={item.is_liked ? COLOR.accent.warm : COLOR.text.tertiary}>{item.likes_count}</Txt>
+        </View>
+        <View style={st.stat}>
+          <Icon name="message" size={ICON_SIZE.sm} color={COLOR.text.tertiary} />
+          <Txt variant="caption">{item.comments_count}</Txt>
+        </View>
+        {item.has_image && <Icon name="camera" size={ICON_SIZE.sm} color={COLOR.text.tertiary} />}
+      </View>
+    </Card>
+  );
+
+  const renderCommentItem = ({ item }: { item: CommentResult }) => (
+    <Card style={st.comment}>
+      <View style={st.author}>
+        <UserAvatar avatarUrl={item.user.avatar_url} avatarSeed={item.user.avatar_seed} pseudo={item.user.pseudo} size={28} />
+        <Txt variant="label" color={COLOR.text.primary} numberOfLines={1} style={st.shrink}>{item.user.pseudo}</Txt>
+        <Txt variant="caption" numberOfLines={1} style={st.shrink}>{item.category_name}</Txt>
+      </View>
+      <Txt variant="bodySmall" numberOfLines={2}>{item.content}</Txt>
+      <Txt variant="caption">{timeAgo(item.created_at)}</Txt>
+    </Card>
+  );
 
   // ── Difficulty filter row (shared) ──
 
   const renderDifficultyFilters = () => (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.diffFiltersWrap}>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={st.filterRow} contentContainerStyle={st.chipsRow}>
       {DIFFICULTY_FILTER_KEYS.map((d) => (
-        <TouchableOpacity
+        <Chip
           key={d.key}
-          style={[st.diffChip, difficultyFilter === d.key && st.diffChipActive]}
+          label={t(d.labelKey)}
+          icon={d.icon}
+          selected={difficultyFilter === d.key}
           onPress={() => handleDifficultyChange(d.key)}
-        >
-          <MaterialCommunityIcons
-            name={d.icon}
-            size={14}
-            color={difficultyFilter === d.key ? CYAN : '#A3A3A3'}
-          />
-          <Text style={[st.diffChipText, difficultyFilter === d.key && st.diffChipTextActive]}>
-            {t(d.labelKey)}
-          </Text>
-        </TouchableOpacity>
+        />
       ))}
     </ScrollView>
   );
+
+  const renderCount = (n: number) =>
+    searchQuery.trim() && n > 0 ? (
+      <Txt variant="overline" style={st.count}>{`${n} ${t('search.results_label')}`}</Txt>
+    ) : null;
 
   // ── Main Render ──
 
@@ -432,159 +339,113 @@ export default function SearchScreen() {
 
   return (
     <SwipeBackPage>
-    <View style={st.container}>
-      <View style={{ paddingTop: insets.top, backgroundColor: '#050510' }}>
-        <DueloHeader />
-      </View>
+    <ScreenContainer>
+      <ScreenHeader title={t('search.title')} />
 
-      {/* Back + champ sur une seule ligne (écran 12 du handoff) */}
-      <View style={st.searchBarWrap}>
-        <TouchableOpacity onPress={() => router.back()} style={st.backBtnCircle} activeOpacity={0.6}>
-          <MaterialCommunityIcons name="chevron-left" size={26} color="#FFF" />
-        </TouchableOpacity>
-        <View style={st.searchBar}>
-          <MaterialCommunityIcons name="magnify" size={18} color={CYAN} style={{ marginRight: 10 }} />
-          <TextInput
-            ref={searchInputRef}
-            style={st.searchInput}
-            placeholder={
-              activeTab === 'themes' ? t('search.placeholder_themes') :
-              activeTab === 'joueurs' ? t('search.placeholder_players') :
-              t('search.placeholder_content')
-            }
-            placeholderTextColor="rgba(255,255,255,0.30)"
-            value={searchQuery}
-            onChangeText={handleSearchChange}
-            returnKeyType="search"
-            onSubmitEditing={() => performSearch(searchQuery)}
-            autoFocus
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => { setSearchQuery(''); performSearch(''); }} style={st.clearBtn}>
-              <MaterialCommunityIcons name="close-circle" size={18} color="rgba(255,255,255,0.40)" />
-            </TouchableOpacity>
-          )}
+      <View style={st.top}>
+        <SearchField
+          placeholder={
+            activeTab === 'themes' ? t('search.placeholder_themes') :
+            activeTab === 'joueurs' ? t('search.placeholder_players') :
+            t('search.placeholder_content')
+          }
+          value={searchQuery}
+          onChangeText={handleSearchChange}
+          autoFocus
+          inputProps={{ onSubmitEditing: () => performSearch(searchQuery) }}
+        />
+
+        {/* Onglets : puces de choix (jaune = sélection) */}
+        <View style={st.tabs} accessibilityRole="tablist">
+          {TABS.map((tab) => (
+            <Chip
+              key={tab.key}
+              label={t(tab.labelKey)}
+              icon={tab.icon}
+              selected={activeTab === tab.key}
+              onPress={() => handleTabChange(tab.key)}
+              style={st.tab}
+            />
+          ))}
         </View>
       </View>
 
-      {/* Tabs */}
-      <View style={st.tabsRow}>
-        {([
-          { key: 'themes' as Tab, label: t('search.tab_themes') },
-          { key: 'joueurs' as Tab, label: t('search.tab_players') },
-          { key: 'contenu' as Tab, label: t('search.tab_content') },
-        ]).map((tab) => (
-          <TouchableOpacity
-            key={tab.key}
-            style={st.tabBtn}
-            onPress={() => handleTabChange(tab.key)}
-          >
-            {activeTab === tab.key && (
-              <LinearGradient colors={[CYAN, VIOLET]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
-            )}
-            <View style={st.tabInner}>
-              <MaterialCommunityIcons
-                name={TAB_ICONS[tab.key]}
-                size={16}
-                color={activeTab === tab.key ? '#000' : '#A3A3A3'}
-              />
-              <Text style={[st.tabText, activeTab === tab.key && st.tabTextActive]}>
-                {tab.label}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        {/* Trending Section (visible when no search query + themes tab) */}
+      <KeyboardAvoidingView style={st.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        {/* Tendances (onglet Thèmes, sans recherche) */}
         {showTrendingSection && (
-          <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} keyboardDismissMode="on-drag" keyboardShouldPersistTaps="handled">
-            {/* Trending Tags */}
+          <ScrollView style={st.flex} contentContainerStyle={st.trending} showsVerticalScrollIndicator={false} keyboardDismissMode="on-drag" keyboardShouldPersistTaps="handled">
             {trendingTags.length > 0 && (
-              <View style={st.trendingSection}>
-                <Text style={st.sectionLabel}>{t('search.trending')}</Text>
-                <View style={st.trendingTagsWrap}>
+              <View style={st.section}>
+                <Txt variant="overline" style={st.inset}>{t('search.trending')}</Txt>
+                <View style={[st.tagsWrap, st.inset]}>
                   {trendingTags.map((tag, idx) => (
-                    <TouchableOpacity
+                    <Chip
                       key={idx}
-                      style={[st.trendingTag, tag.type === 'hot' && st.trendingTagHot]}
+                      label={tag.tag}
+                      icon={tag.type === 'hot' ? 'flame' : undefined}
                       onPress={() => handleTrendingTag(tag.tag)}
-                    >
-                      <Text style={[st.trendingTagText, tag.type === 'hot' && st.trendingTagTextHot]}>
-                        {tag.tag}
-                      </Text>
-                    </TouchableOpacity>
+                    />
                   ))}
                 </View>
               </View>
             )}
 
-            {/* Top Players */}
             {topPlayers.length > 0 && (
-              <View style={st.trendingSection}>
-                <Text style={st.sectionLabel}>{t('search.top_players')}</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.topPlayersScroll}>
+              <View style={st.section}>
+                <Txt variant="overline" style={st.inset}>{t('search.top_players')}</Txt>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.topPlayers}>
                   {topPlayers.map((p: any) => (
-                    <TouchableOpacity
+                    <Pressable
                       key={p.id}
-                      style={st.topPlayerCard}
+                      accessibilityRole="button"
+                      accessibilityLabel={p.pseudo}
+                      style={({ pressed }) => [st.topPlayer, pressed && st.pressed]}
                       onPress={() => {
                         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         router.push(`/player-profile?id=${p.id}`);
                       }}
                     >
-                      <View style={st.topPlayerAvatar}>
-                        <UserAvatar avatarUrl={p.avatar_url} avatarSeed={p.avatar_seed || p.id} pseudo={p.pseudo} size={44} />
-                      </View>
-                      <Text style={st.topPlayerName} numberOfLines={1}>{p.pseudo}</Text>
-                      <Text style={st.topPlayerXp}>{p.total_xp.toLocaleString()} XP</Text>
-                    </TouchableOpacity>
+                      <UserAvatar avatarUrl={p.avatar_url} avatarSeed={p.avatar_seed || p.id} pseudo={p.pseudo} size={44} />
+                      <Txt variant="label" color={COLOR.text.primary} align="center" numberOfLines={1}>{p.pseudo}</Txt>
+                      <Txt variant="caption" align="center" numberOfLines={1}>{`${(p.total_xp ?? 0).toLocaleString()} XP`}</Txt>
+                    </Pressable>
                   ))}
                 </ScrollView>
               </View>
             )}
 
-            {/* All Themes */}
-            <View style={st.trendingSection}>
-              <Text style={st.sectionLabel}>{t('search.all_themes')}</Text>
-              {/* Difficulty filter */}
+            <View style={st.section}>
+              <Txt variant="overline" style={st.inset}>{t('search.all_themes')}</Txt>
               {renderDifficultyFilters()}
-              {themes.map((theme, idx) => renderThemeItem({ item: theme, index: idx }))}
+              <View style={st.inset}>
+                {themes.map((theme, idx) => renderThemeItem({ item: theme, index: idx }))}
+              </View>
             </View>
           </ScrollView>
         )}
 
-        {/* Themes Results (with query) */}
+        {/* Résultats thèmes (avec recherche) */}
         {activeTab === 'themes' && !showTrendingSection && (
-          <View style={{ flex: 1 }}>
-            {/* Difficulty filter */}
-            <View style={st.filterRow}>
-              {renderDifficultyFilters()}
-            </View>
+          <View style={st.flex}>
+            {renderDifficultyFilters()}
             {searchError ? (
-              <View style={st.emptyState}>
-                <MaterialCommunityIcons name="wifi-off" size={40} color={RED} style={{ marginBottom: 12 }} />
-                <Text style={[st.emptyTitle, { color: RED }]}>{t('search.error')}</Text>
-              </View>
+              <EmptyState icon="offline" title={t('search.error')} />
             ) : isSearching ? (
-              <ActivityIndicator size="large" color={CYAN} style={{ marginTop: 40 }} />
+              <Loader />
             ) : (
               <FlatList
                 data={themes}
                 keyExtractor={item => item.id}
                 renderItem={renderThemeItem}
-                contentContainerStyle={st.listContent}
+                contentContainerStyle={st.list}
                 keyboardDismissMode="on-drag"
                 keyboardShouldPersistTaps="handled"
-                ListHeaderComponent={searchQuery.trim() && themes.length > 0 ? (
-                  <Text style={st.resultsCount}>{themes.length} {t('search.results_label')}</Text>
-                ) : null}
+                ListHeaderComponent={renderCount(themes.length)}
                 ListEmptyComponent={
                   <EmptyState
-                    icon="🔍"
+                    icon="search"
                     title={t('search.no_theme_found')}
-                    body={searchQuery.trim() ? `« ${searchQuery.trim()} » — ${t('search.try_other_keywords')}` : t('search.try_other_keywords')}
+                    message={searchQuery.trim() ? `« ${searchQuery.trim()} » · ${t('search.try_other_keywords')}` : t('search.try_other_keywords')}
                   />
                 }
               />
@@ -592,43 +453,36 @@ export default function SearchScreen() {
           </View>
         )}
 
-        {/* Players Results */}
+        {/* Résultats joueurs */}
         {activeTab === 'joueurs' && (
-          <View style={{ flex: 1 }}>
-            {/* Category filter */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={st.filterRow} contentContainerStyle={st.catFiltersWrap}>
-              {Object.entries(CATEGORY_META).map(([key, meta]) => (
-                <TouchableOpacity
-                  key={key}
-                  style={[st.catChip, playerCatFilter === key && { backgroundColor: meta.color + '25', borderColor: meta.color + '50' }]}
-                  onPress={() => handlePlayerCatFilter(key)}
-                >
-                  <View style={[st.catChipDot, { backgroundColor: meta.color }]} />
-                  {playerCatFilter === key && (
-                    <MaterialCommunityIcons name="check" size={14} color={meta.color} />
-                  )}
-                </TouchableOpacity>
+          <View style={st.flex}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={st.filterRow} contentContainerStyle={st.chipsRow}>
+              {PLAYER_CATEGORIES.map((c) => (
+                <Chip
+                  key={c.key}
+                  label={t(c.labelKey)}
+                  icon={c.icon}
+                  selected={playerCatFilter === c.key}
+                  onPress={() => handlePlayerCatFilter(c.key)}
+                />
               ))}
             </ScrollView>
             {isSearching ? (
-              <ActivityIndicator size="large" color={CYAN} style={{ marginTop: 40 }} />
+              <Loader />
             ) : (
               <FlatList
                 data={players}
                 keyExtractor={item => item.id}
                 renderItem={renderPlayerItem}
-                contentContainerStyle={st.listContent}
+                contentContainerStyle={st.list}
                 keyboardDismissMode="on-drag"
                 keyboardShouldPersistTaps="handled"
-                ListHeaderComponent={searchQuery.trim() && players.length > 0 ? (
-                  <Text style={st.resultsCount}>{players.length} {t('search.results_label')}</Text>
-                ) : null}
+                ListHeaderComponent={renderCount(players.length)}
                 ListEmptyComponent={
                   <EmptyState
-                    icon="🔍"
+                    icon="users"
                     title={t('search.no_player_found')}
-                    body={searchQuery.trim() ? `« ${searchQuery.trim()} » — ${t('search.search_by_pseudo')}` : t('search.search_by_pseudo')}
-                    accent="#B366FF"
+                    message={searchQuery.trim() ? `« ${searchQuery.trim()} » · ${t('search.search_by_pseudo')}` : t('search.search_by_pseudo')}
                   />
                 }
               />
@@ -636,222 +490,89 @@ export default function SearchScreen() {
           </View>
         )}
 
-        {/* Content Results */}
+        {/* Résultats contenu */}
         {activeTab === 'contenu' && (
-          <ScrollView style={{ flex: 1 }} contentContainerStyle={st.listContent} showsVerticalScrollIndicator={false}>
+          <ScrollView style={st.flex} contentContainerStyle={st.list} showsVerticalScrollIndicator={false} keyboardDismissMode="on-drag" keyboardShouldPersistTaps="handled">
             {isSearching ? (
-              <ActivityIndicator size="large" color={CYAN} style={{ marginTop: 40 }} />
+              <Loader />
             ) : !searchQuery.trim() ? (
-              <View style={st.emptyState}>
-                <MaterialCommunityIcons name="text-box-outline" size={48} color="#525252" style={{ marginBottom: 12 }} />
-                <Text style={st.emptyTitle}>{t('search.search_content')}</Text>
-                <Text style={st.emptyDesc}>{t('search.search_content_desc')}</Text>
-              </View>
+              <EmptyState icon="document" title={t('search.search_content')} message={t('search.search_content_desc')} />
             ) : posts.length === 0 && comments.length === 0 ? (
               <EmptyState
-                icon="🔍"
+                icon="search"
                 title={t('search.no_results')}
-                body={`« ${searchQuery.trim()} » — ${t('search.try_other_terms')}`}
+                message={`« ${searchQuery.trim()} » · ${t('search.try_other_terms')}`}
               />
             ) : (
-              <>
+              <View style={st.contentGroups}>
                 {posts.length > 0 && (
-                  <>
-                    <View style={st.contentSectionLabelRow}>
-                      <MaterialCommunityIcons name="clipboard-text-outline" size={13} color="#525252" />
-                      <Text style={st.contentSectionLabel}>{t('search.publications')} ({posts.length})</Text>
+                  <View style={st.group}>
+                    <View style={st.groupHead}>
+                      <Icon name="clipboard" size={ICON_SIZE.sm} color={COLOR.text.tertiary} />
+                      <Txt variant="overline">{`${t('search.publications')} (${posts.length})`}</Txt>
                     </View>
                     {posts.map((post) => (
                       <View key={post.id}>{renderPostItem({ item: post })}</View>
                     ))}
-                  </>
+                  </View>
                 )}
                 {comments.length > 0 && (
-                  <>
-                    <View style={[st.contentSectionLabelRow, { marginTop: 20 }]}>
-                      <MaterialCommunityIcons name="comment-outline" size={13} color="#525252" />
-                      <Text style={st.contentSectionLabel}>{t('search.comments')} ({comments.length})</Text>
+                  <View style={st.group}>
+                    <View style={st.groupHead}>
+                      <Icon name="message" size={ICON_SIZE.sm} color={COLOR.text.tertiary} />
+                      <Txt variant="overline">{`${t('search.comments')} (${comments.length})`}</Txt>
                     </View>
                     {comments.map((comment) => (
                       <View key={comment.id}>{renderCommentItem({ item: comment })}</View>
                     ))}
-                  </>
+                  </View>
                 )}
-              </>
+              </View>
             )}
           </ScrollView>
         )}
       </KeyboardAvoidingView>
-    </View>
+    </ScreenContainer>
     </SwipeBackPage>
   );
 }
 
 const st = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#050510' },
+  flex: { flex: 1 },
+  shrink: { flexShrink: 1 },
+  inset: { paddingHorizontal: SPACE.screenX },
 
-  // Back + champ sur une ligne (écran 12)
-  searchBarWrap: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    paddingHorizontal: 16, paddingVertical: 12,
-  },
-  backBtnCircle: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    justifyContent: 'center', alignItems: 'center',
-  },
-  searchBar: {
-    flex: 1, flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 14,
-    paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(0,229,255,0.31)',
-  },
-  searchInput: {
-    flex: 1, color: '#FFF', fontSize: 14, paddingVertical: 12,
-    fontFamily: 'SpaceGrotesk_400Regular',
-  },
-  clearBtn: { padding: 8 },
+  top: { paddingHorizontal: SPACE.screenX, paddingTop: SPACE.md, gap: SPACE.md },
+  tabs: { flexDirection: 'row', gap: SPACE.sm },
+  tab: { flex: 1, justifyContent: 'center', paddingHorizontal: SPACE.sm },
 
-  // Tabs — gradient actif en absoluteFill, texte noir
-  tabsRow: {
-    flexDirection: 'row', paddingHorizontal: 16, gap: 8, marginBottom: 4,
-  },
-  tabBtn: {
-    flex: 1, paddingVertical: 10, borderRadius: 12, alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.04)', overflow: 'hidden',
-  },
-  tabInner: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  tabText: { color: '#A3A3A3', fontSize: 12, fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: 0.5, textTransform: 'uppercase' },
-  tabTextActive: { color: '#000000' },
+  filterRow: { flexGrow: 0 },
+  chipsRow: { paddingHorizontal: SPACE.screenX, paddingVertical: SPACE.md, gap: SPACE.sm },
 
-  // Filter rows
-  filterRow: { flexGrow: 0, marginBottom: 4 },
-  diffFiltersWrap: { paddingHorizontal: 16, gap: 8, paddingVertical: 8 },
-  diffChip: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
-  },
-  diffChipActive: { backgroundColor: 'rgba(0,229,255,0.12)', borderColor: 'rgba(0,229,255,0.4)' },
-  diffChipText: { color: '#A3A3A3', fontSize: 12, fontWeight: '600' },
-  diffChipTextActive: { color: CYAN },
+  list: { paddingHorizontal: SPACE.screenX, paddingBottom: SPACE.huge, flexGrow: 1 },
+  rowDivider: { borderTopWidth: BORDER.hair, borderTopColor: COLOR.border.subtle },
+  count: { paddingTop: SPACE.xs, paddingBottom: SPACE.sm },
 
-  catFiltersWrap: { paddingHorizontal: 16, gap: 8, paddingVertical: 8 },
-  catChip: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+  // Tendances
+  trending: { paddingTop: SPACE.xl, paddingBottom: SPACE.huge, gap: SPACE.sectionGap },
+  section: { gap: SPACE.md },
+  tagsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.sm },
+  topPlayers: { paddingHorizontal: SPACE.screenX, gap: SPACE.sm },
+  topPlayer: {
+    width: 92, alignItems: 'center', gap: SPACE.xs,
+    paddingVertical: SPACE.md, paddingHorizontal: SPACE.sm,
+    borderRadius: RADII.lg, backgroundColor: COLOR.surface.card,
+    borderWidth: BORDER.hair, borderColor: COLOR.border.subtle,
   },
-  catChipDot: {
-    width: 10, height: 10, borderRadius: 5,
-  },
+  pressed: { backgroundColor: COLOR.surface.elevated },
 
-  // List
-  listContent: { paddingHorizontal: 16, paddingBottom: 30 },
-
-  // Empty state
-  emptyState: { alignItems: 'center', paddingVertical: 60 },
-  emptyTitle: { color: '#FFF', fontSize: 18, fontWeight: '700', marginBottom: 4 },
-  emptyDesc: { color: '#525252', fontSize: 13, textAlign: 'center' },
-
-  // Trending — eyebrow mono + pills simples (écran 12)
-  trendingSection: { paddingHorizontal: 16, marginTop: 16 },
-  sectionLabel: {
-    fontSize: 9, fontFamily: 'JetBrainsMono_400Regular', color: 'rgba(255,255,255,0.40)',
-    letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10,
-  },
-  trendingTagsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
-  trendingTag: {
-    paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.06)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)',
-  },
-  trendingTagHot: { borderColor: 'rgba(255,107,44,0.4)', backgroundColor: 'rgba(255,107,44,0.10)' },
-  trendingTagText: { color: '#FFF', fontSize: 12, fontFamily: 'SpaceGrotesk_600SemiBold' },
-  trendingTagTextHot: { color: '#FF6B2C' },
-
-  // Lignes de résultats plates (écran 12)
-  resultsCount: {
-    fontSize: 9, fontFamily: 'JetBrainsMono_400Regular', color: 'rgba(255,255,255,0.40)',
-    letterSpacing: 2, textTransform: 'uppercase', marginTop: 10, marginBottom: 8,
-  },
-  resultRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    paddingVertical: 10, paddingHorizontal: 8, borderRadius: 12,
-  },
-  resultInfo: { flex: 1 },
-  resultName: {
-    color: '#FFF', fontSize: 14, fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.2,
-  },
-  resultMeta: {
-    fontSize: 9, fontFamily: 'JetBrainsMono_400Regular', color: 'rgba(255,255,255,0.40)',
-    letterSpacing: 1, marginTop: 3,
-  },
-
-  // Top Players (horizontal scroll)
-  topPlayersScroll: { gap: 12, paddingBottom: 8 },
-  topPlayerCard: {
-    alignItems: 'center', width: 80, paddingVertical: 12, borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
-  },
-  topPlayerAvatar: {
-    width: 44, height: 44, borderRadius: 22,
-    justifyContent: 'center', alignItems: 'center', marginBottom: 6,
-  },
-  topPlayerAvatarText: { color: '#FFF', fontSize: 18, fontWeight: '800' },
-  topPlayerName: { color: '#FFF', fontSize: 11, fontWeight: '700', textAlign: 'center', paddingHorizontal: 4 },
-  topPlayerXp: { color: CYAN, fontSize: 10, fontWeight: '700', marginTop: 2 },
-
-  // Theme / Player rows
-  themeCard: { marginBottom: 2 },
-  themeIconBox: {
-    width: 42, height: 42, borderRadius: 12, borderWidth: 1,
-    justifyContent: 'center', alignItems: 'center',
-  },
-  playerCard: { marginBottom: 2 },
-  playerNameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  playerFlag: { fontSize: 13 },
-
-  // Post Card
-  postCard: {
-    padding: 14, borderRadius: 14, marginBottom: 10,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
-  },
-  postHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  postAvatarSmall: {
-    width: 36, height: 36, borderRadius: 18, backgroundColor: VIOLET,
-    justifyContent: 'center', alignItems: 'center', marginRight: 10,
-  },
-  postAvatarText: { color: '#FFF', fontSize: 14, fontWeight: '800' },
-  postHeaderInfo: { flex: 1 },
-  postAuthor: { color: '#FFF', fontSize: 14, fontWeight: '700' },
-  postCatRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 },
-  postCatBadge: { fontSize: 12, fontWeight: '600' },
-  postTime: { color: '#525252', fontSize: 11 },
-  postContent: { color: '#E0E0E0', fontSize: 14, lineHeight: 20, marginBottom: 10 },
-  postFooter: { flexDirection: 'row', gap: 16 },
-  postStatRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  postStat: { color: '#525252', fontSize: 13 },
-
-  // Comment Card
-  commentCard: {
-    padding: 12, borderRadius: 12, marginBottom: 8,
-    backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)',
-  },
-  commentHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 6, gap: 8 },
-  commentAvatarSmall: {
-    width: 28, height: 28, borderRadius: 14, backgroundColor: '#333',
-    justifyContent: 'center', alignItems: 'center',
-  },
-  commentAvatarText: { color: '#FFF', fontSize: 11, fontWeight: '800' },
-  commentAuthor: { color: '#FFF', fontSize: 13, fontWeight: '700' },
-  commentCat: { fontSize: 11, fontWeight: '600' },
-  commentContent: { color: '#A3A3A3', fontSize: 13, lineHeight: 18 },
-  commentTime: { color: '#333', fontSize: 10, marginTop: 4 },
-
-  // Content section label
-  contentSectionLabelRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12, marginTop: 8,
-  },
-  contentSectionLabel: {
-    fontSize: 12, fontWeight: '800', color: '#525252', letterSpacing: 2,
-  },
+  // Contenu
+  contentGroups: { gap: SPACE.sectionGap, paddingTop: SPACE.md },
+  group: { gap: SPACE.sm },
+  groupHead: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm },
+  post: { gap: SPACE.md },
+  comment: { gap: SPACE.sm },
+  author: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md },
+  stats: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
+  stat: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs },
 });

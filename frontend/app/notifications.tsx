@@ -1,21 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet, FlatList,
-  ActivityIndicator, RefreshControl, Platform,
-} from 'react-native';
+import { View, StyleSheet, FlatList, Pressable, RefreshControl } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import SwipeBackPage from '../components/SwipeBackPage';
-import DueloHeader from '../components/DueloHeader';
-import ScalePressable from '../components/ScalePressable';
 import { t, getLocale } from '../utils/i18n';
 import UserAvatar from '../components/UserAvatar';
-import EmptyState from '../components/EmptyState';
 import { authFetch } from '../utils/api';
+import { Txt, Icon, IconName, IconButton, ScreenContainer, ScreenHeader, EmptyState, Loader } from '../components/ui';
+import { COLOR, SPACE, SIZE, BORDER, ICON_SIZE } from '../theme/tokens';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -34,18 +28,19 @@ interface NotificationItem {
   created_at: string;
 }
 
-// Icône MCI + couleur marque par type (tuile carrée teintée, cf. écran 13 du handoff)
-const TYPE_META: Record<string, { icon: string; color: string }> = {
-  challenge:    { icon: 'sword-cross',  color: '#00E5FF' },
-  match_result: { icon: 'trophy',       color: '#FFB547' },
-  follow:       { icon: 'account-plus', color: '#B366FF' },
-  message:      { icon: 'chat',         color: '#32E7A3' },
-  like:         { icon: 'heart',        color: '#FF3D5E' },
-  comment:      { icon: 'comment-text', color: '#FFB547' },
-  system:       { icon: 'bell',         color: 'rgba(255,255,255,0.5)' },
+// Pictogramme Lucide par type. Couleur = rôle : défi = corail (événement), résultat = or (récompense),
+// le reste en crème neutre (jamais de cyan / violet).
+const TYPE_META: Record<string, { icon: IconName; color: string }> = {
+  challenge:    { icon: 'duel',     color: COLOR.accent.warm },
+  match_result: { icon: 'trophy',   color: COLOR.reward.gold },
+  follow:       { icon: 'userPlus', color: COLOR.text.secondary },
+  message:      { icon: 'message',  color: COLOR.text.secondary },
+  like:         { icon: 'heart',    color: COLOR.text.secondary },
+  comment:      { icon: 'message',  color: COLOR.text.secondary },
+  system:       { icon: 'bell',     color: COLOR.text.secondary },
 };
 
-const DEFAULT_META = { icon: 'bell-outline', color: 'rgba(255,255,255,0.5)' };
+const DEFAULT_META: { icon: IconName; color: string } = { icon: 'bell', color: COLOR.text.secondary };
 
 function translateNotif(text: string): string {
   // Format: "notif.key:actorName" or just "notif.key"
@@ -91,7 +86,6 @@ function getDateGroup(dateStr: string): string {
 
 export default function NotificationsScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -197,7 +191,7 @@ export default function NotificationsScreen() {
     if ('_sectionHeader' in item) {
       return (
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>{item._sectionHeader}</Text>
+          <Txt variant="overline">{item._sectionHeader}</Txt>
         </View>
       );
     }
@@ -206,93 +200,83 @@ export default function NotificationsScreen() {
 
     return (
       <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
-      <ScalePressable
-        style={[styles.notifCard, !item.read && styles.notifCardUnread]}
+      <Pressable
+        style={({ pressed }) => [styles.notifRow, pressed && styles.pressed]}
         onPress={() => handleNotificationPress(item)}
+        accessibilityRole="button"
       >
-        {/* Avatar ou tuile carrée teintée par type (écran 13) */}
-        <View style={styles.avatarWrap}>
+        {/* Avatar de l'auteur + pastille de type, ou pictogramme seul */}
+        <View>
           {item.actor_pseudo || item.actor_avatar_seed ? (
             <>
               <UserAvatar avatarUrl={item.actor_avatar_url} avatarSeed={item.actor_avatar_seed || ''} pseudo={item.actor_pseudo || '?'} size={44} />
-              <View style={[styles.typeBadge, { backgroundColor: '#050510', borderColor: meta.color + '66' }]}>
-                <MaterialCommunityIcons name={meta.icon as any} size={10} color={meta.color} />
+              <View style={styles.typeBadge}>
+                <Icon name={meta.icon} size={12} color={meta.color} />
               </View>
             </>
           ) : (
-            <View style={[styles.iconTile, { backgroundColor: meta.color + '20', borderColor: meta.color + '40' }]}>
-              <MaterialCommunityIcons name={meta.icon as any} size={20} color={meta.color} />
+            <View style={styles.iconTile}>
+              <Icon name={meta.icon} size={ICON_SIZE.md} color={meta.color} />
             </View>
           )}
         </View>
 
-        {/* Content */}
         <View style={styles.notifContent}>
-          <Text style={[styles.notifBody, !item.read && styles.notifBodyUnread]} numberOfLines={2}>
+          <Txt
+            variant={item.read ? 'bodySmall' : 'body'}
+            color={item.read ? COLOR.text.secondary : COLOR.text.primary}
+            numberOfLines={2}
+          >
             {translateNotif(item.body)}
-          </Text>
-          <Text style={styles.notifTime}>{getTimeAgo(item.created_at)}</Text>
+          </Txt>
+          <Txt variant="caption" style={styles.tabular}>{getTimeAgo(item.created_at)}</Txt>
         </View>
 
-        {/* Chevron */}
-        <MaterialCommunityIcons name="chevron-right" size={18} color="rgba(255,255,255,0.2)" />
-      </ScalePressable>
+        {/* Non lu : pastille corail (un événement attend le joueur) */}
+        {!item.read ? <View style={styles.unreadDot} accessibilityLabel={t('notifications.unread_label')} /> : null}
+        <Icon name="chevronRight" size={18} color={COLOR.text.disabled} />
+      </Pressable>
       </Animated.View>
     );
   };
 
   return (
     <SwipeBackPage>
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <DueloHeader />
+    <ScreenContainer>
+      <ScreenHeader
+        title={t('notifications.title')}
+        overline={unreadCount > 0 ? `${unreadCount} ${t('notifications.unread_label')}` : undefined}
+        right={
+          <IconButton
+            icon="settings"
+            accessibilityLabel={t('pilot.settings.title')}
+            onPress={() => router.push('/notification-settings')}
+          />
+        }
+      />
 
-      {/* Sub-header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backBtn}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.back();
-          }}
-        >
-          <MaterialCommunityIcons name="chevron-left" size={22} color="#FFF" />
-        </TouchableOpacity>
-
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerEyebrow}>◆ {unreadCount} {t('notifications.unread_label')}</Text>
-          <Text style={styles.headerTitle}>{t('notifications.title')}</Text>
-        </View>
-
-        <View style={styles.headerRight}>
-          {unreadCount > 0 && (
-            <TouchableOpacity style={styles.readAllBtn} onPress={markAllAsRead}>
-              <MaterialCommunityIcons name="check-all" size={14} color="#00E5FF" />
-              <Text style={styles.readAllText}>{t('notifications.read_all')}</Text>
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity
-            style={styles.settingsBtn}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.push('/notification-settings');
-            }}
+      {/* « Tout lire » : action secondaire nommée (pas d'icône seule ambiguë) */}
+      {!loading && unreadCount > 0 && (
+        <View style={styles.toolbar}>
+          <Pressable
+            onPress={markAllAsRead}
+            accessibilityRole="button"
+            hitSlop={{ top: 6, bottom: 6 }}
+            style={({ pressed }) => [styles.readAllBtn, pressed && styles.pressed]}
           >
-            <MaterialCommunityIcons name="cog-outline" size={18} color="rgba(255,255,255,0.6)" />
-          </TouchableOpacity>
+            <Icon name="readAll" size={ICON_SIZE.sm} color={COLOR.action.primary} />
+            <Txt variant="label" color={COLOR.action.primary}>{t('notifications.read_all')}</Txt>
+          </Pressable>
         </View>
-      </View>
+      )}
 
-      {/* Content */}
       {loading ? (
-        <View style={styles.loadingWrap}>
-          <ActivityIndicator size="large" color="#B366FF" />
-        </View>
+        <Loader fill />
       ) : notifications.length === 0 ? (
         <EmptyState
-          iconName="bell-outline"
+          icon="bell"
           title={t('notifications.empty_title')}
-          body={t('notifications.empty_text')}
-          accent="#B366FF"
+          message={t('notifications.empty_text')}
         />
       ) : (
         <FlatList
@@ -304,165 +288,56 @@ export default function NotificationsScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor="#B366FF"
-              colors={['#B366FF']}
+              tintColor={COLOR.text.primary}
+              colors={[COLOR.text.primary]}
+              progressBackgroundColor={COLOR.surface.card}
             />
           }
           showsVerticalScrollIndicator={false}
         />
       )}
-    </View>
+    </ScreenContainer>
     </SwipeBackPage>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#050510',
-  },
-  header: {
+  toolbar: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(179,102,255,0.15)',
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-  },
-  headerCenter: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  headerEyebrow: {
-    fontSize: 9,
-    fontFamily: 'JetBrainsMono_400Regular',
-    color: 'rgba(255,255,255,0.40)',
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: '900',
-    fontFamily: 'SpaceGrotesk_700Bold',
-    color: '#FFF',
-    letterSpacing: -0.8,
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    justifyContent: 'flex-end',
+    paddingHorizontal: SPACE.screenX,
+    paddingTop: SPACE.sm,
   },
   readAllBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0,229,255,0.10)',
-    borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.25)',
-  },
-  readAllText: {
-    color: '#00E5FF',
-    fontSize: 12,
-    fontWeight: '700',
-    fontFamily: 'SpaceGrotesk_600SemiBold',
-  },
-  settingsBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-  },
-  loadingWrap: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emptyWrap: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
-  emptyIconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#FFF',
-    marginBottom: 8,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#888',
-    textAlign: 'center',
-    lineHeight: 20,
+    gap: SPACE.xs,
+    minHeight: SIZE.chip,
   },
   sectionHeader: {
-    paddingHorizontal: 16,
-    paddingTop: 20,
-    paddingBottom: 8,
-  },
-  sectionTitle: {
-    fontSize: 10,
-    fontFamily: 'JetBrainsMono_700Bold',
-    color: 'rgba(255,255,255,0.4)',
-    letterSpacing: 2,
-    textTransform: 'uppercase',
+    paddingHorizontal: SPACE.screenX,
+    paddingTop: SPACE.xl,
+    paddingBottom: SPACE.xs,
   },
   listContent: {
-    paddingBottom: 24,
+    paddingBottom: SPACE.xxl,
   },
-  notifCard: {
+  notifRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginHorizontal: 12,
-    marginVertical: 3,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.02)',
-    position: 'relative',
-    overflow: 'hidden',
+    gap: SPACE.md,
+    minHeight: SIZE.listRow,
+    paddingHorizontal: SPACE.screenX,
+    paddingVertical: SPACE.md,
+    borderBottomWidth: BORDER.hair,
+    borderBottomColor: COLOR.border.subtle,
   },
-  notifCardUnread: {
-    backgroundColor: 'rgba(0,229,255,0.06)',
-    borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.18)',
-  },
-  avatarWrap: {
-    position: 'relative',
-    marginRight: 12,
-  },
-  // Tuile carrée teintée par type (écran 13 du handoff)
+  pressed: { opacity: 0.7 },
   iconTile: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    borderWidth: 1,
+    width: SIZE.touch,
+    height: SIZE.touch,
+    borderRadius: SIZE.touch / 2,
+    backgroundColor: COLOR.surface.subtle,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -472,29 +347,22 @@ const styles = StyleSheet.create({
     right: -2,
     width: 20,
     height: 20,
-    borderRadius: 6,
+    borderRadius: 10,
+    backgroundColor: COLOR.bg.primary,
+    borderWidth: BORDER.hair,
+    borderColor: COLOR.border.default,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
   },
   notifContent: {
     flex: 1,
-    marginRight: 8,
+    gap: SPACE.xxs,
   },
-  notifBody: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.5)',
-    lineHeight: 20,
-  },
-  notifBodyUnread: {
-    color: '#FFF',
-    fontWeight: '600',
-  },
-  notifTime: {
-    fontSize: 9,
-    fontFamily: 'JetBrainsMono_400Regular',
-    color: 'rgba(255,255,255,0.40)',
-    letterSpacing: 1,
-    marginTop: 4,
+  tabular: { fontVariant: ['tabular-nums'] },
+  unreadDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLOR.accent.warm,
   },
 });

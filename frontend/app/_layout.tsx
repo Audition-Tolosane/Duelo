@@ -32,6 +32,7 @@ import { WebSocketProvider } from '../contexts/WebSocketContext';
 import RematchModal from '../components/RematchModal';
 import ChallengeReadyModal from '../components/ChallengeReadyModal';
 import OfflineOverlay from '../components/OfflineOverlay';
+import { COLOR } from '../theme/tokens';
 
 // All stack pages that support swipe-back with transparent overlay
 const SWIPEABLE_SCREENS = [
@@ -85,7 +86,7 @@ export default function RootLayout() {
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: '#050510' },
+            contentStyle: { backgroundColor: COLOR.bg.primary },
             animation: Platform.OS === 'web' ? 'none' : 'slide_from_right',
             animationDuration: 300,
           }}
@@ -108,6 +109,6 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#050510',
+    backgroundColor: COLOR.bg.primary,
   },
 });

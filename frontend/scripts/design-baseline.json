@@ -1,23 +1,20 @@
 {
  "totals": {
-  "gradient": 103,
-  "hex": 940,
-  "rgba": 435,
-  "fontSize": 385,
-  "iconLib": 25,
-  "heavy": 122,
-  "emoji": 74
+  "gradient": 73,
+  "hex": 659,
+  "rgba": 267,
+  "fontSize": 263,
+  "heavy": 101,
+  "iconLib": 16,
+  "emoji": 63,
+  "legacy": 18
  },
  "files": {
   "app/(tabs)/accueil.tsx": {
    "gradient": 3
   },
   "app/(tabs)/play.tsx": {
-   "hex": 12,
-   "rgba": 15,
-   "fontSize": 9,
-   "gradient": 1,
-   "iconLib": 1
+   "gradient": 1
   },
   "app/(tabs)/players.tsx": {
    "hex": 65,
@@ -28,9 +25,6 @@
    "iconLib": 1,
    "emoji": 11
   },
-  "app/+html.tsx": {
-   "hex": 5
-  },
   "app/category-detail.tsx": {
    "gradient": 1
   },
@@ -39,23 +33,6 @@
    "rgba": 7,
    "fontSize": 10,
    "heavy": 5,
-   "gradient": 1,
-   "iconLib": 1
-  },
-  "app/chat.tsx": {
-   "hex": 60,
-   "rgba": 24,
-   "fontSize": 23,
-   "heavy": 9,
-   "gradient": 7,
-   "iconLib": 1,
-   "emoji": 6
-  },
-  "app/conversations.tsx": {
-   "hex": 32,
-   "rgba": 19,
-   "fontSize": 9,
-   "heavy": 4,
    "gradient": 1,
    "iconLib": 1
   },
@@ -77,18 +54,7 @@
    "emoji": 1
   },
   "app/index.tsx": {
-   "hex": 16,
-   "rgba": 15,
-   "fontSize": 13,
-   "gradient": 4
-  },
-  "app/language-settings.tsx": {
-   "hex": 8,
-   "rgba": 11,
-   "fontSize": 4,
-   "heavy": 1,
-   "gradient": 1,
-   "iconLib": 1
+   "hex": 4
   },
   "app/leaderboard.tsx": {
    "hex": 72,
@@ -100,28 +66,6 @@
   },
   "app/matchmaking.tsx": {
    "gradient": 4
-  },
-  "app/notification-settings.tsx": {
-   "hex": 38,
-   "rgba": 26,
-   "fontSize": 10,
-   "heavy": 1,
-   "gradient": 5,
-   "iconLib": 1
-  },
-  "app/notifications.tsx": {
-   "hex": 19,
-   "rgba": 18,
-   "fontSize": 8,
-   "heavy": 1,
-   "iconLib": 1
-  },
-  "app/onboarding.tsx": {
-   "hex": 28,
-   "rgba": 8,
-   "fontSize": 12,
-   "gradient": 11,
-   "iconLib": 1
   },
   "app/player-profile.tsx": {
    "hex": 107,
@@ -139,15 +83,6 @@
    "gradient": 14,
    "iconLib": 1,
    "emoji": 2
-  },
-  "app/search.tsx": {
-   "hex": 57,
-   "rgba": 30,
-   "fontSize": 26,
-   "heavy": 4,
-   "gradient": 1,
-   "iconLib": 1,
-   "emoji": 4
   },
   "app/shop.tsx": {
    "hex": 32,
@@ -181,7 +116,7 @@
    "iconLib": 1
   },
   "app/_layout.tsx": {
-   "hex": 3
+   "hex": 1
   },
   "components/CategoryIcon.tsx": {
    "iconLib": 1,
@@ -202,27 +137,19 @@
   "components/DuelButton.tsx": {
    "hex": 1,
    "fontSize": 2,
-   "gradient": 1
+   "gradient": 1,
+   "legacy": 10
   },
   "components/EmptyState.tsx": {
    "fontSize": 3,
-   "iconLib": 1
-  },
-  "components/ErrorBoundary.tsx": {
-   "hex": 5,
-   "fontSize": 4,
-   "emoji": 1
+   "iconLib": 1,
+   "legacy": 8
   },
   "components/GlassIconFrame.tsx": {
    "hex": 2,
    "rgba": 4,
    "fontSize": 3,
    "heavy": 1
-  },
-  "components/OfflineOverlay.tsx": {
-   "rgba": 2,
-   "fontSize": 4,
-   "iconLib": 1
   },
   "components/RematchModal.tsx": {
    "hex": 16,
@@ -242,7 +169,7 @@
    "emoji": 9
   },
   "components/SwipeBackPage.tsx": {
-   "hex": 3,
+   "hex": 2,
    "rgba": 1
   },
   "components/SwordMark.tsx": {
@@ -250,8 +177,7 @@
    "gradient": 1
   },
   "components/UserAvatar.tsx": {
-   "hex": 20,
-   "heavy": 1,
+   "hex": 18,
    "gradient": 1
   }
  }

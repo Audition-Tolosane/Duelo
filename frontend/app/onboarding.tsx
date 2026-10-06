@@ -1,27 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet, Dimensions,
-  ActivityIndicator, Platform,
-} from 'react-native';
-import { COLORS } from '../theme/tokens';
-import { FONTS } from '../theme/fonts';
+import { View, Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
-import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, {
   FadeIn, FadeInDown, FadeInUp, SlideInRight,
-  useSharedValue, useAnimatedStyle, withSpring, withTiming, withSequence, withRepeat,
-  interpolate, Extrapolation,
+  useSharedValue, useAnimatedStyle, withSpring, withTiming,
 } from 'react-native-reanimated';
 import ConfettiCannon from 'react-native-confetti-cannon';
-import CategoryIcon from '../components/CategoryIcon';
+import { Txt, Icon, Button, Card, ScreenContainer, ThemeIcon, Loader } from '../components/ui';
+import type { IconName } from '../components/ui';
+import { COLOR, PALETTE, SPACE, SIZE, RADII } from '../theme/tokens';
 import { authFetch } from '../utils/api';
 import { t, getLanguage } from '../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 
 type TrendingTheme = {
   id: string;
@@ -32,29 +26,42 @@ type TrendingTheme = {
   icon_url: string;
 };
 
-const TUTO_SLIDES = [
-  {
-    icon: 'magnify' as const,
-    titleKey: 'onboarding.tuto_title_1',
-    bodyKey: 'onboarding.tuto_body_1',
-    color: COLORS.violet,
-  },
-  {
-    icon: 'head-question' as const,
-    titleKey: 'onboarding.tuto_title_2',
-    bodyKey: 'onboarding.tuto_body_2',
-    color: COLORS.cyan,
-  },
-  {
-    icon: 'trending-up' as const,
-    titleKey: 'onboarding.tuto_title_3',
-    bodyKey: 'onboarding.tuto_body_3',
-    color: COLORS.mint,
-  },
+// Pictogrammes Lucide crème sur disque pétrole : le tutoriel explique, il ne décore pas.
+const TUTO_SLIDES: { icon: IconName; titleKey: string; bodyKey: string }[] = [
+  { icon: 'search', titleKey: 'onboarding.tuto_title_1', bodyKey: 'onboarding.tuto_body_1' },
+  { icon: 'brain', titleKey: 'onboarding.tuto_title_2', bodyKey: 'onboarding.tuto_body_2' },
+  { icon: 'trend', titleKey: 'onboarding.tuto_title_3', bodyKey: 'onboarding.tuto_body_3' },
 ];
+
+// Confettis du bonus de bienvenue (moment de récompense) : couleurs de la palette SKILKI uniquement
+const CONFETTI_COLORS = [PALETTE.yellow, PALETTE.gold, PALETTE.coral, PALETTE.green, PALETTE.cream];
+
+/** Points d'étape : l'étape en cours est un trait jaune (état actif). */
+function StepDots({ count, active }: { count: number; active: number }) {
+  return (
+    <View style={styles.dotsRow} accessibilityRole="progressbar" accessibilityValue={{ min: 1, max: count, now: active + 1 }}>
+      {Array.from({ length: count }, (_, i) => (
+        <View key={i} style={[styles.dot, active === i && styles.dotActive]} />
+      ))}
+    </View>
+  );
+}
+
+/** Lien texte « Passer » (cible de 44 px). */
+function SkipLink({ onPress }: { onPress: () => void }) {
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button" hitSlop={4} style={styles.skipBtn}>
+      <Txt variant="label" color={COLOR.text.secondary}>{t('onboarding.skip')}</Txt>
+    </Pressable>
+  );
+}
 
 export default function OnboardingScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { width: winW } = useWindowDimensions();
+  // Grille de 3 thèmes par ligne, calculée sur la largeur réelle (320 → 88 px par tuile)
+  const tileW = Math.floor((Math.min(winW, 480) - SPACE.screenX * 2 - SPACE.md * 2) / 3);
   const [step, setStep] = useState(0); // 0=welcome, 1=trending, 2=tuto
   const [trending, setTrending] = useState<TrendingTheme[]>([]);
   const [loadingTrending, setLoadingTrending] = useState(true);
@@ -152,150 +159,97 @@ export default function OnboardingScreen() {
     transform: [{ translateY: xpBannerY.value }],
   }));
 
+  const top = { paddingTop: insets.top + SPACE.lg };
+  const bottom = { paddingBottom: insets.bottom + SPACE.xxl };
+
   // -- Step 0: Welcome --
   if (step === 0) {
     return (
-      <View style={styles.container}>
-        <LinearGradient
-          colors={[COLORS.abyss, '#12042A', COLORS.abyss]}
-          style={StyleSheet.absoluteFill}
-        />
+      <ScreenContainer style={top}>
+        <StepDots count={3} active={step} />
         <Animated.View style={[styles.welcomeCenter, logoStyle]}>
-          <LinearGradient
-            colors={[COLORS.violet, COLORS.cyan]}
-            style={styles.welcomeLogoCircle}
-          >
-            <MaterialCommunityIcons name="sword-cross" size={60} color="#FFF" />
-          </LinearGradient>
-          <Animated.Text entering={FadeInDown.delay(400).duration(600)} style={styles.welcomeTitle}>
-            {t('onboarding.welcome')}
-          </Animated.Text>
-          <Animated.Text entering={FadeInDown.delay(600).duration(600)} style={styles.welcomeSub}>
-            {t('onboarding.subtitle')}
-          </Animated.Text>
+          <View style={styles.welcomeDisc}>
+            <Icon name="duel" size={48} color={COLOR.text.primary} />
+          </View>
+          <Animated.View entering={FadeInDown.delay(400).duration(600)}>
+            <Txt variant="h1" align="center">{t('onboarding.welcome')}</Txt>
+          </Animated.View>
+          <Animated.View entering={FadeInDown.delay(600).duration(600)}>
+            <Txt variant="body" color={COLOR.text.secondary} align="center">{t('onboarding.subtitle')}</Txt>
+          </Animated.View>
         </Animated.View>
 
-        <Animated.View entering={FadeInUp.delay(800).duration(500)} style={styles.bottomArea}>
-          <TouchableOpacity onPress={nextStep} activeOpacity={0.85}>
-            <LinearGradient
-              colors={[COLORS.violet, COLORS.cyan]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.mainBtn}
-            >
-              <Text style={styles.mainBtnText}>{t('onboarding.lets_go')}</Text>
-              <MaterialCommunityIcons name="arrow-right" size={20} color="#FFF" />
-            </LinearGradient>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={finishOnboarding} style={styles.skipBtn}>
-            <Text style={styles.skipText}>{t('onboarding.skip')}</Text>
-          </TouchableOpacity>
+        <Animated.View entering={FadeInUp.delay(800).duration(500)} style={[styles.bottomArea, bottom]}>
+          <Button label={t('onboarding.lets_go')} onPress={nextStep} fullWidth />
+          <SkipLink onPress={finishOnboarding} />
         </Animated.View>
-
-        {/* Step dots */}
-        <View style={styles.dotsRow}>
-          {[0, 1, 2].map(i => (
-            <View key={i} style={[styles.dot, step === i && styles.dotActive]} />
-          ))}
-        </View>
-      </View>
+      </ScreenContainer>
     );
   }
 
   // -- Step 1: Pick Favorite Themes --
   if (step === 1) {
+    const count = selectedThemes.length;
     return (
-      <View style={styles.container}>
-        <LinearGradient
-          colors={[COLORS.abyss, '#12042A', COLORS.abyss]}
-          style={StyleSheet.absoluteFill}
-        />
-        <Animated.View entering={FadeIn.duration(500)} style={styles.stepContent}>
-          <View style={styles.stepHeader}>
-            <LinearGradient colors={[COLORS.violet, COLORS.cyan]} style={styles.stepIconCircle}>
-              <MaterialCommunityIcons name="heart" size={24} color="#FFF" />
-            </LinearGradient>
-            <Text style={styles.stepTitle}>{t('onboarding.pick_favorites')}</Text>
-            <Text style={styles.stepSub}>{t('onboarding.pick_sub')}</Text>
-          </View>
-
-          {/* Selected counter */}
-          <View style={styles.selectedCounter}>
-            <LinearGradient
-              colors={selectedThemes.length > 0 ? [COLORS.violet, '#A855F7'] : ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.05)']}
-              style={styles.selectedCounterBadge}
-            >
-              <MaterialCommunityIcons name="check-circle" size={13} color={selectedThemes.length > 0 ? '#FFF' : '#555'} />
-              <Text style={[styles.selectedCounterText, selectedThemes.length > 0 && { color: '#FFF' }]}>
-                {t('onboarding.selected').replace('{n}', String(selectedThemes.length))}
-              </Text>
-            </LinearGradient>
-          </View>
+      <ScreenContainer style={top}>
+        <StepDots count={3} active={step} />
+        <ScrollView contentContainerStyle={styles.stepScroll} showsVerticalScrollIndicator={false}>
+          <Animated.View entering={FadeIn.duration(500)} style={styles.stepHeader}>
+            <View style={styles.stepDisc}>
+              <Icon name="heart" size={24} color={COLOR.text.primary} />
+            </View>
+            <Txt variant="h2" align="center">{t('onboarding.pick_favorites')}</Txt>
+            <Txt variant="bodySmall" align="center">{t('onboarding.pick_sub')}</Txt>
+            <Txt variant="label" color={count > 0 ? COLOR.action.primary : COLOR.text.tertiary} style={styles.counter}>
+              {t('pilot.onboarding.selection', { n: String(count) })}
+            </Txt>
+          </Animated.View>
 
           {loadingTrending ? (
-            <ActivityIndicator size="large" color="#8A2BE2" style={{ marginTop: 40 }} />
+            <Loader />
           ) : (
             <View style={styles.themesGrid}>
               {trending.map((theme, idx) => {
                 const isSelected = selectedThemes.includes(theme.id);
                 return (
-                  <Animated.View
-                    key={theme.id}
-                    entering={FadeInDown.delay(idx * 80).duration(350)}
-                  >
-                    <TouchableOpacity
-                      activeOpacity={0.8}
+                  <Animated.View key={theme.id} entering={FadeInDown.delay(idx * 80).duration(350)}>
+                    <Card
                       onPress={() => toggleTheme(theme.id)}
-                      style={[
-                        styles.themeCard,
-                        isSelected && { borderColor: theme.color_hex + '80', backgroundColor: theme.color_hex + '15' },
-                      ]}
+                      accent={isSelected ? 'selected' : 'none'}
+                      padded={false}
+                      style={[styles.themeCard, styles.tileFill, { width: tileW }]}
                     >
-                      <View style={[styles.themeIconWrap, { backgroundColor: theme.color_hex + (isSelected ? '30' : '20') }]}>
-                        <CategoryIcon themeId={theme.id} size={28} />
-                      </View>
-                      <Text style={[styles.themeName, isSelected && { color: theme.color_hex }]} numberOfLines={1}>{theme.name}</Text>
-                      {isSelected ? (
-                        <View style={[styles.themeMatchBadge, { backgroundColor: theme.color_hex + '30' }]}>
-                          <MaterialCommunityIcons name="check" size={10} color={theme.color_hex} />
-                        </View>
-                      ) : theme.match_count > 0 ? (
-                        <View style={styles.themeMatchBadge}>
-                          <MaterialCommunityIcons name="sword-cross" size={9} color="rgba(255,255,255,0.5)" />
-                          <Text style={styles.themeMatchCount}>{theme.match_count}</Text>
+                      <ThemeIcon themeName={theme.name} size={48} />
+                      <Txt variant="label" color={COLOR.text.primary} align="center" numberOfLines={2} style={styles.tileName}>{theme.name}</Txt>
+                      {theme.match_count > 0 ? (
+                        <View style={styles.themeMeta}>
+                          <Icon name="duel" size={12} color={COLOR.text.tertiary} />
+                          <Txt variant="caption">{theme.match_count}</Txt>
                         </View>
                       ) : null}
-                    </TouchableOpacity>
+                      {isSelected ? (
+                        <View style={styles.checkBadge}>
+                          <Icon name="check" size={12} color={COLOR.text.onAction} strokeWidth={3} />
+                        </View>
+                      ) : null}
+                    </Card>
                   </Animated.View>
                 );
               })}
             </View>
           )}
-        </Animated.View>
+        </ScrollView>
 
-        <Animated.View entering={FadeInUp.delay(400).duration(500)} style={styles.bottomArea}>
-          <TouchableOpacity onPress={nextStep} activeOpacity={0.85}>
-            <LinearGradient
-              colors={selectedThemes.length > 0 ? [COLORS.violet, COLORS.cyan] : ['#444', '#333']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.mainBtn}
-            >
-              <Text style={styles.mainBtnText}>{t('onboarding.next_upper')}</Text>
-              <MaterialCommunityIcons name="arrow-right" size={20} color="#FFF" />
-            </LinearGradient>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={finishOnboarding} style={styles.skipBtn}>
-            <Text style={styles.skipText}>{t('onboarding.skip')}</Text>
-          </TouchableOpacity>
+        <Animated.View entering={FadeInUp.delay(400).duration(500)} style={[styles.bottomArea, bottom]}>
+          <Button
+            label={t('onboarding.next_upper')}
+            onPress={nextStep}
+            variant={count > 0 ? 'primary' : 'secondary'}
+            fullWidth
+          />
+          <SkipLink onPress={finishOnboarding} />
         </Animated.View>
-
-        <View style={styles.dotsRow}>
-          {[0, 1, 2].map(i => (
-            <View key={i} style={[styles.dot, step === i && styles.dotActive]} />
-          ))}
-        </View>
-      </View>
+      </ScreenContainer>
     );
   }
 
@@ -303,88 +257,77 @@ export default function OnboardingScreen() {
   const slide = TUTO_SLIDES[tutoIndex];
   const isLastSlide = tutoIndex === TUTO_SLIDES.length - 1;
   return (
-    <View style={styles.container}>
-      <LinearGradient
-        colors={[COLORS.abyss, '#12042A', COLORS.abyss]}
-        style={StyleSheet.absoluteFill}
-      />
-      <Animated.View key={tutoIndex} entering={SlideInRight.duration(400)} style={styles.stepContent}>
-        <View style={styles.stepHeader}>
-          <LinearGradient colors={[slide.color, slide.color + '80']} style={styles.tutoIconCircle}>
-            <MaterialCommunityIcons name={slide.icon} size={36} color="#FFF" />
-          </LinearGradient>
-          <Text style={styles.tutoTitle}>{t(slide.titleKey)}</Text>
-          <Text style={styles.tutoBody}>{t(slide.bodyKey)}</Text>
+    <ScreenContainer style={top}>
+      <StepDots count={3} active={step} />
+      <Animated.View key={tutoIndex} entering={SlideInRight.duration(400)} style={styles.tutoCenter}>
+        <View style={styles.tutoDisc}>
+          <Icon name={slide.icon} size={36} color={COLOR.text.primary} />
         </View>
-
-        {/* Tuto dots */}
+        <Txt variant="h2" align="center">{t(slide.titleKey)}</Txt>
+        <Txt variant="body" color={COLOR.text.secondary} align="center">{t(slide.bodyKey)}</Txt>
         <View style={styles.tutoDotsRow}>
           {TUTO_SLIDES.map((_, i) => (
-            <View key={i} style={[styles.tutoDot, tutoIndex === i && { backgroundColor: slide.color, width: 20 }]} />
+            <View key={i} style={[styles.dot, tutoIndex === i && styles.dotActive]} />
           ))}
         </View>
       </Animated.View>
 
-      {/* XP Banner — shown when finish is triggered */}
+      {/* Bonus de bienvenue : moment de récompense (or), affiché à la fin */}
       {showXpBanner && (
         <Animated.View style={[styles.xpBanner, xpBannerStyle]}>
-          <LinearGradient colors={[COLORS.violet, COLORS.cyan]} style={styles.xpBannerGrad}>
-            <MaterialCommunityIcons name="lightning-bolt" size={20} color="#FFF" />
-            <Text style={styles.xpBannerText}>{t('onboarding.xp_bonus')}</Text>
-          </LinearGradient>
+          <Card accent="reward" style={styles.xpBannerCard}>
+            <Icon name="bolt" size={24} color={COLOR.reward.gold} />
+            <Txt variant="h2" color={COLOR.reward.gold} align="center" style={styles.xpBannerText}>{t('onboarding.xp_bonus')}</Txt>
+          </Card>
         </Animated.View>
       )}
 
-      <Animated.View entering={FadeInUp.delay(200).duration(400)} style={styles.bottomArea}>
+      <Animated.View entering={FadeInUp.delay(200).duration(400)} style={[styles.bottomArea, bottom]}>
         {!showXpBanner && (
-          <TouchableOpacity onPress={nextStep} activeOpacity={0.85}>
-            <LinearGradient
-              colors={isLastSlide ? [COLORS.mint, COLORS.cyan] : [COLORS.violet, COLORS.cyan]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.mainBtn}
-            >
-              <Text style={styles.mainBtnText}>
-                {isLastSlide ? t('onboarding.begin') : t('onboarding.next_upper')}
-              </Text>
-              <MaterialCommunityIcons
-                name={isLastSlide ? 'play' : 'arrow-right'}
-                size={20}
-                color="#FFF"
-              />
-            </LinearGradient>
-          </TouchableOpacity>
+          <Button
+            label={isLastSlide ? t('onboarding.begin') : t('onboarding.next_upper')}
+            onPress={nextStep}
+            fullWidth
+          />
         )}
         {tutoIndex < TUTO_SLIDES.length - 1 && !showXpBanner && (
-          <TouchableOpacity onPress={finishOnboarding} style={styles.skipBtn}>
-            <Text style={styles.skipText}>{t('onboarding.skip')}</Text>
-          </TouchableOpacity>
+          <SkipLink onPress={finishOnboarding} />
         )}
       </Animated.View>
-
-      <View style={styles.dotsRow}>
-        {[0, 1, 2].map(i => (
-          <View key={i} style={[styles.dot, step === i && styles.dotActive]} />
-        ))}
-      </View>
 
       {/* Confetti — fires on last slide completion */}
       <ConfettiCannon
         ref={confettiRef}
         count={120}
-        origin={{ x: SCREEN_W / 2, y: -10 }}
+        origin={{ x: winW / 2, y: -10 }}
         autoStart={false}
         fadeOut
-        colors={['#8A2BE2', '#00BFFF', '#00FF9D', '#FFD700', '#FF6B35']}
+        colors={CONFETTI_COLORS}
       />
-    </View>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.abyss,
+  // Nom sur 2 lignes réservées : toutes les tuiles d'une rangée ont la même hauteur
+  tileName: { minHeight: 32 },
+  // La tuile remplit la hauteur de sa rangée (celles sans compteur de parties sont plus courtes)
+  tileFill: { flexGrow: 1 },
+  // Points d'étape
+  dotsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: SPACE.sm,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLOR.track,
+  },
+  dotActive: {
+    backgroundColor: COLOR.action.primary,
+    width: 20,
   },
 
   // Welcome
@@ -392,242 +335,125 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
+    gap: SPACE.md,
+    paddingHorizontal: SPACE.xxxl,
   },
-  welcomeLogoCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    justifyContent: 'center',
+  welcomeDisc: {
+    width: 104,
+    height: 104,
+    borderRadius: 52,
+    backgroundColor: COLOR.surface.card,
+    borderWidth: 1,
+    borderColor: COLOR.border.subtle,
     alignItems: 'center',
-    marginBottom: 28,
-  },
-  welcomeTitle: {
-    fontSize: 40,
-    fontFamily: FONTS.display.bold,
-    color: '#FFF',
-    textAlign: 'center',
-    marginBottom: 12,
-    letterSpacing: -1,
-    textTransform: 'uppercase',
-  },
-  welcomeSub: {
-    fontSize: 15,
-    fontFamily: FONTS.display.regular,
-    color: COLORS.inkSub,
-    textAlign: 'center',
-    lineHeight: 24,
+    justifyContent: 'center',
+    marginBottom: SPACE.lg,
   },
 
-  // Steps
-  stepContent: {
-    flex: 1,
-    paddingTop: SCREEN_H * 0.12,
-    paddingHorizontal: 24,
+  // Étape « thèmes »
+  stepScroll: {
+    paddingTop: SPACE.xxxl,
+    paddingHorizontal: SPACE.screenX,
+    paddingBottom: SPACE.xxl,
+    gap: SPACE.xxl,
   },
   stepHeader: {
     alignItems: 'center',
-    marginBottom: 32,
+    gap: SPACE.sm,
   },
-  stepIconCircle: {
+  stepDisc: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    justifyContent: 'center',
+    backgroundColor: COLOR.surface.card,
     alignItems: 'center',
-    marginBottom: 16,
+    justifyContent: 'center',
+    marginBottom: SPACE.sm,
   },
-  stepTitle: {
-    fontSize: 24,
-    fontFamily: FONTS.display.bold,
-    color: '#FFF',
-    marginBottom: 8,
-    letterSpacing: -0.3,
-    textTransform: 'uppercase',
-  },
-  stepSub: {
-    fontSize: 14,
-    fontFamily: FONTS.display.regular,
-    color: COLORS.inkSub,
-    textAlign: 'center',
-  },
-
-  // Themes grid
+  counter: { marginTop: SPACE.xs },
   themesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 12,
-    paddingHorizontal: 8,
+    gap: SPACE.md,
   },
   themeCard: {
-    width: (SCREEN_W - 80) / 3,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 16,
-    padding: 14,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    gap: SPACE.sm,
+    paddingVertical: SPACE.md,
+    paddingHorizontal: SPACE.sm,
+    overflow: 'visible',
   },
-  themeIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  themeName: {
-    fontSize: 11,
-    fontFamily: FONTS.display.bold,
-    color: '#FFF',
-    textAlign: 'center',
-  },
-  themeMatchBadge: {
+  themeMeta: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
-    marginTop: 4,
+    gap: SPACE.xs,
   },
-  themeMatchCount: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.4)',
+  checkBadge: {
+    position: 'absolute',
+    top: SPACE.xs,
+    right: SPACE.xs,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: COLOR.action.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
-  // Tutorial
-  tutoIconCircle: {
+  // Tutoriel
+  tutoCenter: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: SPACE.md,
+    paddingHorizontal: SPACE.xxxl,
+  },
+  tutoDisc: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    justifyContent: 'center',
+    backgroundColor: COLOR.surface.card,
+    borderWidth: 1,
+    borderColor: COLOR.border.subtle,
     alignItems: 'center',
-    marginBottom: 24,
-  },
-  tutoTitle: {
-    fontSize: 22,
-    fontFamily: FONTS.display.bold,
-    color: '#FFF',
-    marginBottom: 12,
-    textAlign: 'center',
-    textTransform: 'uppercase',
-  },
-  tutoBody: {
-    fontSize: 15,
-    fontFamily: FONTS.display.regular,
-    color: COLORS.inkSub,
-    textAlign: 'center',
-    lineHeight: 22,
+    justifyContent: 'center',
+    marginBottom: SPACE.md,
   },
   tutoDotsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 6,
-    marginTop: 32,
-  },
-  tutoDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    gap: SPACE.sm,
+    marginTop: SPACE.xl,
   },
 
-  // Bottom
+  // Bas d'écran
   bottomArea: {
-    paddingHorizontal: 24,
-    paddingBottom: Platform.OS === 'ios' ? 50 : 32,
+    paddingHorizontal: SPACE.xxl,
+    paddingTop: SPACE.md,
     alignItems: 'center',
-    gap: 12,
-  },
-  mainBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 48,
-    borderRadius: 28,
-    gap: 8,
-    width: SCREEN_W - 48,
-  },
-  mainBtnText: {
-    fontSize: 16,
-    fontFamily: FONTS.display.bold,
-    color: '#FFF',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
+    gap: SPACE.xs,
   },
   skipBtn: {
-    paddingVertical: 8,
-  },
-  skipText: {
-    fontSize: 14,
-    fontFamily: FONTS.display.medium,
-    color: COLORS.inkDim,
-  },
-
-  // Dots
-  dotsRow: {
-    position: 'absolute',
-    top: Platform.OS === 'ios' ? 60 : 40,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
+    minHeight: SIZE.touch,
+    paddingHorizontal: SPACE.lg,
+    alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-  },
-  dotActive: {
-    backgroundColor: COLORS.violet,
-    width: 20,
   },
 
-  // Theme selection counter
-  selectedCounter: {
-    alignItems: 'center',
-    marginBottom: 16,
-    marginTop: -8,
-  },
-  selectedCounterBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 16,
-    paddingVertical: 7,
-    borderRadius: 20,
-  },
-  selectedCounterText: {
-    fontSize: 13,
-    fontFamily: FONTS.mono.bold,
-    color: COLORS.inkDim,
-  },
-
-  // XP Banner (shown on finish)
+  // Bonus XP (fin du tutoriel)
   xpBanner: {
     position: 'absolute',
     top: '40%',
-    left: 40,
-    right: 40,
-    borderRadius: 20,
-    overflow: 'hidden',
+    left: SPACE.huge,
+    right: SPACE.huge,
     zIndex: 10,
   },
-  xpBannerGrad: {
-    flexDirection: 'row',
+  xpBannerCard: {
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingVertical: 20,
-    paddingHorizontal: 24,
+    gap: SPACE.sm,
+    paddingVertical: SPACE.xl,
+    borderRadius: RADII.xl,
   },
-  xpBannerText: {
-    fontSize: 22,
-    fontFamily: FONTS.display.bold,
-    color: '#FFF',
-    letterSpacing: -0.3,
-  },
+  xpBannerText: { flexShrink: 1 },
 });

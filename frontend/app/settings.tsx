@@ -189,6 +189,8 @@ export default function SettingsScreen() {
                 onValueChange={toggleSound}
                 trackColor={{ false: COLOR.surface.elevated, true: COLOR.action.primary }}
                 thumbColor={COLOR.text.primary}
+                // react-native-web colore le pouce actif à part (sinon vert-bleu par défaut)
+                {...({ activeThumbColor: COLOR.text.primary } as object)}
                 ios_backgroundColor={COLOR.surface.elevated}
                 accessibilityLabel={t('pilot.settings.sound')}
               />

@@ -49,6 +49,8 @@ export default function Button({
       accessibilityRole="button"
       accessibilityState={{ disabled: !!inactive, busy: !!loading }}
       disabled={inactive}
+      // Petit bouton : 40 px visibles + 2 px de chaque côté = cible de 44 px, sans changement visuel
+      hitSlop={size === 'sm' ? { top: 2, bottom: 2 } : undefined}
       onPress={() => {
         if (haptic) Haptics.impactAsync(variant === 'primary' ? Haptics.ImpactFeedbackStyle.Medium : Haptics.ImpactFeedbackStyle.Light);
         onPress?.();

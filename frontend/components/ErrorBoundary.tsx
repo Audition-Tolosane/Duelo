@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { t } from '../utils/i18n';
+import { Txt, Icon, Button } from './ui';
+import { COLOR, SPACE } from '../theme/tokens';
 
 interface Props {
   children: React.ReactNode;
@@ -10,6 +12,7 @@ interface State {
   hasError: boolean;
 }
 
+// Erreur inattendue de rendu : même gabarit que les états vides SKILKI (pictogramme Lucide, une action jaune).
 class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -32,12 +35,10 @@ class ErrorBoundary extends React.Component<Props, State> {
     if (this.state.hasError) {
       return (
         <View style={styles.container}>
-          <Text style={styles.emoji}>⚠️</Text>
-          <Text style={styles.title}>{t('error.title')}</Text>
-          <Text style={styles.subtitle}>{t('error.subtitle')}</Text>
-          <TouchableOpacity style={styles.button} onPress={this.handleRetry}>
-            <Text style={styles.buttonText}>{t('common.retry')}</Text>
-          </TouchableOpacity>
+          <View style={styles.iconWrap}><Icon name="warning" size={32} color={COLOR.text.secondary} /></View>
+          <Txt variant="h2" align="center">{t('error.title')}</Txt>
+          <Txt variant="body" color={COLOR.text.secondary} align="center">{t('error.subtitle')}</Txt>
+          <Button label={t('common.retry')} onPress={this.handleRetry} style={styles.cta} />
         </View>
       );
     }
@@ -49,39 +50,19 @@ class ErrorBoundary extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: COLOR.bg.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    gap: SPACE.sm,
+    padding: SPACE.xxl,
   },
-  emoji: {
-    fontSize: 48,
-    marginBottom: 16,
+  iconWrap: {
+    width: 64, height: 64, borderRadius: 32,
+    backgroundColor: COLOR.surface.subtle,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: SPACE.sm,
   },
-  title: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    color: '#888',
-    fontSize: 14,
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-  button: {
-    backgroundColor: '#6C63FF',
-    paddingHorizontal: 32,
-    paddingVertical: 14,
-    borderRadius: 12,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  cta: { marginTop: SPACE.lg, alignSelf: 'stretch' },
 });
 
 export default ErrorBoundary;

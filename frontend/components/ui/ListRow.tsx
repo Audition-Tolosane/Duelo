@@ -22,10 +22,10 @@ type Props = {
 // Ligne de liste scannable (thèmes, réglages, joueurs). Hauteur ≥ 60 px.
 export default function ListRow({ title, subtitle, leading, leadingIcon, trailing, chevron, onPress, destructive, testID, style }: Props) {
   const showChevron = chevron || (!!onPress && trailing === undefined);
-  const titleColor = destructive ? COLOR.status.error : COLOR.text.primary;
+  const titleColor = destructive ? COLOR.status.errorText : COLOR.text.primary;
   const body = (
     <>
-      {leading ?? (leadingIcon ? <Icon name={leadingIcon} size={22} color={destructive ? COLOR.status.error : COLOR.text.secondary} /> : null)}
+      {leading ?? (leadingIcon ? <Icon name={leadingIcon} size={22} color={destructive ? COLOR.status.errorText : COLOR.text.secondary} /> : null)}
       <View style={styles.texts}>
         <Txt variant="cardTitle" color={titleColor} numberOfLines={1}>{title}</Txt>
         {subtitle ? <Txt variant="caption" numberOfLines={1}>{subtitle}</Txt> : null}

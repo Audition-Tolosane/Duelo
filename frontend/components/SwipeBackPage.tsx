@@ -13,6 +13,7 @@ import Animated, {
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useSwipeBackProgress } from './SwipeBackContext';
+import { COLOR } from '../theme/tokens';
 
 const SPRING_CONFIG = { damping: 22, stiffness: 220, mass: 0.8 };
 const SWIPE_THRESHOLD_RATIO = 0.3;
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
   },
   page: {
     flex: 1,
-    backgroundColor: '#050510',
+    backgroundColor: COLOR.bg.primary,
     zIndex: 1,
     ...Platform.select({
       ios: {

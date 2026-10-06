@@ -5,6 +5,8 @@ import {
   Medal, MessageCircle, Music, Palette, Plus, RotateCcw, Search, Settings, Share2, ShoppingBag, Sparkles,
   Star, Swords, Target, Timer, Trophy, User, Users, X, Zap, Info, LogOut, Trash2, Shield, Calendar, TrendingUp,
   Camera, Pencil, Send, Hammer, LayoutGrid, Bookmark, CircleHelp, FileText, Languages, Image as ImageIcon, Headphones, Gem, Dumbbell,
+  WifiOff, CheckCheck, UserPlus, BellRing, Lightbulb, Moon, SlidersHorizontal, ArrowUp, ArrowRight, Pin,
+  UtensilsCrossed, Tv, Sprout, ClipboardList, TriangleAlert, Mail, Eye, EyeOff, Microscope, Inbox, RefreshCw,
 } from 'lucide-react-native';
 import { COLOR, ICON_SIZE } from '../../theme/tokens';
 
@@ -21,6 +23,11 @@ const REGISTRY = {
   logout: LogOut, trash: Trash2, shield: Shield, calendar: Calendar, trend: TrendingUp,
   camera: Camera, edit: Pencil, send: Send, forge: Hammer, grid: LayoutGrid, bookmark: Bookmark, help: CircleHelp,
   document: FileText, language: Languages, image: ImageIcon, support: Headphones, gem: Gem, training: Dumbbell,
+  // Lot A (navigation et écrans transversaux)
+  offline: WifiOff, readAll: CheckCheck, userPlus: UserPlus, bellRing: BellRing, idea: Lightbulb, moon: Moon,
+  sliders: SlidersHorizontal, arrowUp: ArrowUp, arrowRight: ArrowRight, pin: Pin, food: UtensilsCrossed, tv: Tv,
+  sprout: Sprout, clipboard: ClipboardList, warning: TriangleAlert, mail: Mail, eye: Eye, eyeOff: EyeOff,
+  microscope: Microscope, inbox: Inbox, refresh: RefreshCw,
 } as const;
 
 export type IconName = keyof typeof REGISTRY;

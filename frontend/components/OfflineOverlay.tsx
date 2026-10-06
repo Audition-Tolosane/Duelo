@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { View, StyleSheet, Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useWS } from '../contexts/WebSocketContext';
-import { COLORS, RADIUS, SPACING } from '../theme/tokens';
-import { FONTS } from '../theme/fonts';
+import { Txt, Icon } from './ui';
+import { COLOR, SPACE, RADII, BORDER } from '../theme/tokens';
 import { t } from '../utils/i18n';
 
 // Écran 33 — Hors ligne. Overlay plein écran branché sur WebSocketContext.
@@ -65,22 +64,18 @@ export default function OfflineOverlay() {
 
   if (!visible) return null;
 
+  // Une coupure réseau n'est pas une faute du joueur : pictogramme crème, pas de rouge plein écran.
   return (
     <View style={styles.overlay} pointerEvents="auto">
-      <View style={styles.iconWrap}>
-        <View style={styles.iconHalo} />
-        <View style={styles.iconTile}>
-          <MaterialCommunityIcons name="wifi-off" size={48} color={COLORS.red} />
-        </View>
-      </View>
+      <View style={styles.iconWrap}><Icon name="offline" size={32} color={COLOR.text.secondary} /></View>
 
-      <Text style={styles.eyebrow}>◆ {t('offline.eyebrow')}</Text>
-      <Text style={styles.title}>{t('offline.title')}</Text>
-      <Text style={styles.body}>{t('offline.body')}</Text>
+      <Txt variant="overline">{t('offline.eyebrow')}</Txt>
+      <Txt variant="h2" align="center">{t('offline.title')}</Txt>
+      <Txt variant="body" color={COLOR.text.secondary} align="center" style={styles.body}>{t('offline.body')}</Txt>
 
       <View style={styles.pill}>
         <Animated.View style={[styles.pulseDot, { opacity: pulseAnim }]} />
-        <Text style={styles.pillText}>{t('offline.reconnecting')}</Text>
+        <Txt variant="label" color={COLOR.text.primary}>{t('offline.reconnecting')}</Txt>
       </View>
     </View>
   );
@@ -90,77 +85,35 @@ const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFill,
     zIndex: 9999,
-    backgroundColor: COLORS.abyss,
+    backgroundColor: COLOR.bg.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
+    gap: SPACE.sm,
+    paddingHorizontal: SPACE.xxxl,
   },
   iconWrap: {
-    marginBottom: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 64, height: 64, borderRadius: 32,
+    backgroundColor: COLOR.surface.subtle,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: SPACE.sm,
   },
-  iconHalo: {
-    position: 'absolute',
-    width: 156,
-    height: 156,
-    borderRadius: 78,
-    backgroundColor: 'rgba(255,61,94,0.14)',
-  },
-  iconTile: {
-    width: 100,
-    height: 100,
-    borderRadius: 30,
-    backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: 'rgba(255,61,94,0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  eyebrow: {
-    fontFamily: FONTS.mono.bold,
-    fontSize: 10,
-    letterSpacing: 2.5,
-    color: COLORS.red,
-  },
-  title: {
-    fontFamily: FONTS.display.bold,
-    fontSize: 24,
-    letterSpacing: -0.5,
-    color: COLORS.white,
-    marginTop: 6,
-    textAlign: 'center',
-  },
-  body: {
-    fontFamily: FONTS.display.regular,
-    fontSize: 13,
-    lineHeight: 20,
-    color: COLORS.dim2,
-    maxWidth: 260,
-    marginTop: 8,
-    textAlign: 'center',
-  },
+  body: { maxWidth: 300 },
   pill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: SPACING.sm,
-    marginTop: SPACING.xl,
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    borderRadius: RADIUS.md,
-    backgroundColor: COLORS.surfaceLight,
-    borderWidth: 1,
-    borderColor: COLORS.stroke,
+    gap: SPACE.sm,
+    marginTop: SPACE.lg,
+    paddingVertical: SPACE.sm,
+    paddingHorizontal: SPACE.lg,
+    borderRadius: RADII.pill,
+    backgroundColor: COLOR.surface.card,
+    borderWidth: BORDER.hair,
+    borderColor: COLOR.border.subtle,
   },
   pulseDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.gold,
-  },
-  pillText: {
-    fontFamily: FONTS.display.bold,
-    fontSize: 13,
-    color: COLORS.white,
+    backgroundColor: COLOR.text.secondary,
   },
 });

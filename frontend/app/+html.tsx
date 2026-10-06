@@ -1,4 +1,8 @@
 import { ScrollViewStyleReset } from 'expo-router/html';
+import { COLOR } from '../theme/tokens';
+
+// Fond de l'espace d'administration (hors design system, écran interne)
+const ADMIN_BG = 'black';
 
 export default function Root({ children }: { children: React.ReactNode }) {
   return (
@@ -17,10 +21,13 @@ export default function Root({ children }: { children: React.ReactNode }) {
           html, body {
             margin: 0;
             padding: 0;
-            background: #071F26 !important;
+            background: ${COLOR.bg.primary} !important;
           }
+          /* Aperçu web : pas de contour de focus du navigateur dans les champs (comme sur mobile) ;
+             le champ actif reste signalé par le curseur jaune. */
+          input, textarea { outline: none; }
           [data-testid="admin-bg"], [data-testid="admin-bg"] > div {
-            background-color: #000000 !important;
+            background-color: ${ADMIN_BG} !important;
           }
           #admin-bg,
           #root #admin-bg,
@@ -31,12 +38,12 @@ export default function Root({ children }: { children: React.ReactNode }) {
             right: 0 !important;
             bottom: 0 !important;
             z-index: 9999 !important;
-            background: #000000 !important;
-            background-color: #000000 !important;
+            background: ${ADMIN_BG} !important;
+            background-color: ${ADMIN_BG} !important;
           }
           #admin-bg > div,
           #root #admin-bg > div {
-            background-color: #000000 !important;
+            background-color: ${ADMIN_BG} !important;
           }
         `}} />
       </head>

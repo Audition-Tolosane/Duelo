@@ -10,6 +10,7 @@
  *   fontSize  tailles de police numériques           heavy     fontWeight '800' / '900' (faux gras)
  *   gradient  <LinearGradient> hors design system    iconLib   imports d'autres familles d'icônes
  *   emoji     emoji dans le code (icônes d'interface)
+ *   legacy    jetons de l'ancien système Duelo (COLORS., TYPE., RADIUS., SPACING. — cyan / violet…)
  *
  * Règle stricte (0 toléré) : components/ui/** et tout NOUVEAU fichier d'écran.
  * Un fichier existant peut descendre, jamais monter.
@@ -31,6 +32,7 @@ const RULES = {
   gradient: /<LinearGradient\b/g,
   iconLib: /from\s+['"]@expo\/vector-icons['"]|from\s+['"]react-native-vector-icons/g,
   emoji: /\p{Extended_Pictographic}/gu,
+  legacy: /(?<![\w.])(COLORS|TYPE|RADIUS|SPACING|CATEGORY_COLORS)\.\w/g,
 };
 
 function walk(dir, out = []) {
