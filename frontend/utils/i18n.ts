@@ -143,13 +143,45 @@ const translations: Translations = {
   'pilot.league.ranking_points': { fr: "Points de classement", en: "Ranking points", es: "Puntos de clasificación", de: "Ranglistenpunkte", pt: "Pontos de classificação", it: "Punti classifica", ar: "نقاط التصنيف", ja: "ランキングポイント", ko: "랭킹 포인트", zh: "排名积分" },
   'pilot.league.points_value': { fr: "{n} points de classement", en: "{n} ranking points", es: "{n} puntos de clasificación", de: "{n} Ranglistenpunkte", pt: "{n} pontos de classificação", it: "{n} punti classifica", ar: "{n} نقطة تصنيف", ja: "{n} ランキングポイント", ko: "랭킹 포인트 {n}", zh: "{n} 排名积分" },
   'pilot.onboarding.selection': { fr: "Sélection : {n}/3", en: "Selected: {n}/3", es: "Selección: {n}/3", de: "Auswahl: {n}/3", pt: "Seleção: {n}/3", it: "Selezione: {n}/3", ar: "المحدد: {n}/3", ja: "選択中：{n}/3", ko: "선택: {n}/3", zh: "已选：{n}/3" },
+  'pilot.social.followers': { fr: "Abonnés", en: "Followers", es: "Seguidores", de: "Follower", pt: "Seguidores", it: "Follower", ar: "المتابعون", ja: "フォロワー", ko: "팔로워", zh: "粉丝" },
+  'pilot.social.following': { fr: "Abonnements", en: "Following", es: "Siguiendo", de: "Abonniert", pt: "Seguindo", it: "Seguiti", ar: "يتابع", ja: "フォロー中", ko: "팔로잉", zh: "关注" },
+  'pilot.social.games_one': { fr: "{n} partie", en: "{n} game", es: "{n} partida", de: "{n} Spiel", pt: "{n} partida", it: "{n} partita", ar: "{n} مباراة", ja: "{n} 試合", ko: "{n}판", zh: "{n} 场" },
+  'pilot.social.games_many': { fr: "{n} parties", en: "{n} games", es: "{n} partidas", de: "{n} Spiele", pt: "{n} partidas", it: "{n} partite", ar: "{n} مباريات", ja: "{n} 試合", ko: "{n}판", zh: "{n} 场" },
+  'pilot.challenge.sent': { fr: "Défi envoyé", en: "Challenge sent", es: "Desafío enviado", de: "Herausforderung gesendet", pt: "Desafio enviado", it: "Sfida inviata", ar: "تم إرسال التحدي", ja: "挑戦を送信", ko: "도전 전송됨", zh: "挑战已发送" },
+  'pilot.challenge.declined': { fr: "{name} a refusé", en: "{name} declined", es: "{name} ha rechazado", de: "{name} hat abgelehnt", pt: "{name} recusou", it: "{name} ha rifiutato", ar: "رفض {name}", ja: "{name}が辞退しました", ko: "{name}님이 거절했어요", zh: "{name} 已拒绝" },
+  'pilot.challenge.incoming': { fr: "Nouveau défi", en: "New challenge", es: "Nuevo desafío", de: "Neue Herausforderung", pt: "Novo desafio", it: "Nuova sfida", ar: "تحدٍ جديد", ja: "新しい挑戦", ko: "새로운 도전", zh: "新挑战" },
+  'pilot.challenge.someone': { fr: "Un joueur", en: "A player", es: "Un jugador", de: "Ein Spieler", pt: "Um jogador", it: "Un giocatore", ar: "لاعب", ja: "プレイヤー", ko: "한 플레이어", zh: "一位玩家" },
+  'pilot.challenge.seconds_left': { fr: "{n} s pour répondre", en: "{n}s to respond", es: "{n} s para responder", de: "{n} s zum Antworten", pt: "{n} s para responder", it: "{n} s per rispondere", ar: "{n} ث للرد", ja: "残り{n}秒", ko: "{n}초 남음", zh: "剩余 {n} 秒" },
   'pilot.play.tournament': { fr: "Tournoi du week-end", en: "Weekend tournament", es: "Torneo del fin de semana", de: "Wochenendturnier", pt: "Torneio de fim de semana", it: "Torneo del weekend", ar: "بطولة نهاية الأسبوع", ja: "週末トーナメント", ko: "주말 토너먼트", zh: "周末锦标赛" },
+  // Onglet Social (Lot B)
+  'pilot.social.section_activity': { fr: "Activité", en: "Activity", es: "Actividad", de: "Aktivität", pt: "Atividade", it: "Attività", ar: "النشاط", ja: "アクティビティ", ko: "활동", zh: "动态" },
+  'pilot.social.section_champions': { fr: "Champions", en: "Champions", es: "Campeones", de: "Champions", pt: "Campeões", it: "Campioni", ar: "الأبطال", ja: "チャンピオン", ko: "챔피언", zh: "冠军" },
+  'pilot.social.section_create': { fr: "Créer", en: "Create", es: "Crear", de: "Erstellen", pt: "Criar", it: "Crea", ar: "إنشاء", ja: "作成", ko: "만들기", zh: "创建" },
+  'pilot.social.champion': { fr: "Champion", en: "Champion", es: "Campeón", de: "Champion", pt: "Campeão", it: "Campione", ar: "البطل", ja: "チャンピオン", ko: "챔피언", zh: "冠军" },
+  'pilot.social.no_champion': { fr: "Pas encore de champion", en: "No champion yet", es: "Aún sin campeón", de: "Noch kein Champion", pt: "Ainda sem campeão", it: "Ancora nessun campione", ar: "لا بطل بعد", ja: "まだチャンピオンなし", ko: "아직 챔피언 없음", zh: "暂无冠军" },
+  'pilot.social.quiet_title': { fr: "Rien de neuf pour l'instant", en: "Nothing new yet", es: "Nada nuevo por ahora", de: "Noch nichts Neues", pt: "Nada de novo por enquanto", it: "Ancora niente di nuovo", ar: "لا جديد حاليًا", ja: "まだ新着はありません", ko: "아직 새 소식이 없어요", zh: "暂无新动态" },
+  'pilot.social.quiet_sub': { fr: "Lance un duel pour animer l'activité.", en: "Start a duel to get things going.", es: "Lanza un duelo para animar la actividad.", de: "Starte ein Duell, um Leben reinzubringen.", pt: "Começa um duelo para animar a atividade.", it: "Lancia un duello per animare l'attività.", ar: "ابدأ مبارزة لتنشيط النشاط.", ja: "対戦を始めて盛り上げよう。", ko: "대결을 시작해 활기를 불어넣어요.", zh: "开始一场对决来活跃动态。" },
+  'pilot.social.load_error': { fr: "Impossible de charger l'activité. Vérifie ta connexion.", en: "Couldn't load", es: "No se pudo cargar", de: "Laden fehlgeschlagen", pt: "Não foi possível carregar", it: "Impossibile caricare", ar: "تعذر التحميل", ja: "読み込めませんでした", ko: "불러오지 못했어요", zh: "加载失败" },
+  'pilot.social.create_title': { fr: "Crée ton thème", en: "Create your theme", es: "Crea tu tema", de: "Erstelle dein Thema", pt: "Cria o teu tema", it: "Crea il tuo tema", ar: "أنشئ موضوعك", ja: "テーマを作ろう", ko: "나만의 테마 만들기", zh: "创建你的主题" },
+  'pilot.social.create_cta': { fr: "Créer un thème", en: "Create a theme", es: "Crear un tema", de: "Thema erstellen", pt: "Criar um tema", it: "Crea un tema", ar: "إنشاء موضوع", ja: "テーマを作成", ko: "테마 만들기", zh: "创建主题" },
+  'pilot.social.all': { fr: "Tous", en: "All", es: "Todos", de: "Alle", pt: "Todos", it: "Tutti", ar: "الكل", ja: "すべて", ko: "전체", zh: "全部" },
   // Lot A — messages (réponses rapides sans emoji, nom de repli d'une carte de match)
   'pilot.chat.quick_gg': { fr: "GG !", en: "GG!", es: "¡GG!", de: "GG!", pt: "GG!", it: "GG!", ar: "GG!", ja: "GG！", ko: "GG!", zh: "GG！" },
   'pilot.chat.quick_well_played': { fr: "Bien joué !", en: "Well played!", es: "¡Bien jugado!", de: "Gut gespielt!", pt: "Bem jogado!", it: "Ben giocato!", ar: "أحسنت!", ja: "ナイスプレー！", ko: "잘했어!", zh: "打得好！" },
   'pilot.chat.quick_rematch': { fr: "Revanche ?", en: "Rematch?", es: "¿Revancha?", de: "Revanche?", pt: "Revanche?", it: "Rivincita?", ar: "مباراة ثأرية؟", ja: "リベンジする？", ko: "재대결?", zh: "再来一局？" },
   'pilot.chat.quick_too_good': { fr: "Trop fort !", en: "Too good!", es: "¡Qué crack!", de: "Zu stark!", pt: "Muito bom!", it: "Troppo forte!", ar: "رائع جدًا!", ja: "強すぎ！", ko: "너무 잘해!", zh: "太强了！" },
   'pilot.chat.quiz': { fr: "Quiz", en: "Quiz", es: "Quiz", de: "Quiz", pt: "Quiz", it: "Quiz", ar: "اختبار", ja: "クイズ", ko: "퀴즈", zh: "测验" },
+  // Profil d'un autre joueur (Lot B)
+  'pilot.player.title': { fr: "Profil du joueur", en: "Player profile", es: "Perfil del jugador", de: "Spielerprofil", pt: "Perfil do jogador", it: "Profilo giocatore", ar: "ملف اللاعب", ja: "プレイヤープロフィール", ko: "플레이어 프로필", zh: "玩家资料" },
+  'pilot.player.following': { fr: "Suivi", en: "Following", es: "Siguiendo", de: "Folge ich", pt: "Seguindo", it: "Segui già", ar: "تتابعه", ja: "フォロー中", ko: "팔로잉", zh: "已关注" },
+  'pilot.player.themes': { fr: "Ses thèmes", en: "Their themes", es: "Sus temas", de: "Seine Themen", pt: "Os temas dele", it: "I suoi temi", ar: "مواضيعه", ja: "得意なテーマ", ko: "주요 테마", zh: "TA的主题" },
+  'pilot.player.posts': { fr: "Publications", en: "Posts", es: "Publicaciones", de: "Beiträge", pt: "Publicações", it: "Post", ar: "المنشورات", ja: "投稿", ko: "게시물", zh: "动态" },
+  'pilot.player.champion': { fr: "N° 1 en {theme}", en: "#1 in {theme}", es: "N.º 1 en {theme}", de: "Nr. 1 in {theme}", pt: "N.º 1 em {theme}", it: "N. 1 in {theme}", ar: "الأول في {theme}", ja: "{theme}で1位", ko: "{theme} 1위", zh: "{theme}第一名" },
+  'pilot.player.vs_my_wins': { fr: "Tes victoires", en: "Your wins", es: "Tus victorias", de: "Deine Siege", pt: "Tuas vitórias", it: "Tue vittorie", ar: "انتصاراتك", ja: "あなたの勝利", ko: "내 승리", zh: "你的胜场" },
+  'pilot.player.vs_their_wins': { fr: "Ses victoires", en: "Their wins", es: "Sus victorias", de: "Seine Siege", pt: "Vitórias dele", it: "Sue vittorie", ar: "انتصاراته", ja: "相手の勝利", ko: "상대 승리", zh: "对方胜场" },
+  'pilot.player.vs_total': { fr: "Duels", en: "Challenges", es: "Retos", de: "Duelle", pt: "Desafios", it: "Sfide", ar: "التحديات", ja: "対戦", ko: "도전", zh: "挑战" },
+  'pilot.player.vs_empty': { fr: "Aucun défi entre vous pour l'instant", en: "No challenges between you yet", es: "Aún no hay retos entre vosotros", de: "Noch keine Duelle zwischen euch", pt: "Ainda não há desafios entre vocês", it: "Ancora nessuna sfida tra voi", ar: "لا توجد تحديات بينكما بعد", ja: "まだ対戦していません", ko: "아직 서로 도전한 적이 없어요", zh: "你们之间还没有挑战" },
+  'pilot.player.challenge_title': { fr: "Défier {name}", en: "Challenge {name}", es: "Retar a {name}", de: "{name} herausfordern", pt: "Desafiar {name}", it: "Sfida {name}", ar: "تحدَّ {name}", ja: "{name}に挑戦", ko: "{name}에게 도전", zh: "挑战 {name}" },
   'common.see_all': { fr: 'Voir tout', en: 'See all', es: 'Ver todo', de: 'Alle ansehen', pt: 'Ver tudo', it: 'Vedi tutto', ar: 'عرض الكل', ja: 'すべて見る', ko: '모두 보기', zh: '查看全部' },
   'common.close': { fr: 'Fermer', en: 'Close', es: 'Cerrar', de: 'Schließen', pt: 'Fechar', it: 'Chiudi', ar: 'إغلاق', ja: '閉じる', ko: '닫기', zh: '关闭' },
   'common.cancel': { fr: 'Annuler', en: 'Cancel', es: 'Cancelar', de: 'Abbrechen', pt: 'Cancelar', it: 'Annulla', ar: 'إلغاء', ja: 'キャンセル', ko: '취소', zh: '取消' },
@@ -230,9 +262,9 @@ const translations: Translations = {
   'challenge.async_saved': { fr: 'Score enregistré !', en: 'Score saved!', es: '¡Puntuación guardada!', de: 'Punktzahl gespeichert!', pt: 'Pontuação salva!', it: 'Punteggio salvato!', ar: 'تم حفظ النتيجة!', ja: 'スコアを保存しました！', ko: '점수 저장됨!', zh: '分数已保存！' },
   'challenge.async_will_play': { fr: "jouera plus tard, et tu sauras qui gagne.", en: 'will play later and you will know who wins.', es: 'jugará más tarde y sabrás quién gana.', de: 'wird später spielen und du erfährst wer gewinnt.', pt: 'jogará depois e você saberá quem vence.', it: 'giocherà più tardi e saprai chi vince.', ar: 'سيلعب لاحقًا وستعرف من يفوز.', ja: 'は後でプレイし、誰が勝つか分かります。', ko: '가 나중에 플레이하면 누가 이기는지 알 수 있습니다.', zh: '将稍后游戏，你将知道谁赢了。' },
   // Pulse feed titles (translated client-side)
-  'pulse.perfect_score': { fr: 'Score Parfait 7/7 !', en: 'Perfect Score 7/7!', es: '¡Puntuación Perfecta 7/7!', de: 'Perfekte Punktzahl 7/7!', pt: 'Pontuação Perfeita 7/7!', it: 'Punteggio Perfetto 7/7!', ar: 'نتيجة مثالية 7/7!', ja: 'パーフェクト 7/7！', ko: '퍼펙트 7/7!', zh: '满分 7/7！' },
+  'pulse.perfect_score': { fr: "Sans-faute 7/7 !", en: 'Perfect Score 7/7!', es: '¡Puntuación Perfecta 7/7!', de: 'Perfekte Punktzahl 7/7!', pt: 'Pontuação Perfeita 7/7!', it: 'Punteggio Perfetto 7/7!', ar: 'نتيجة مثالية 7/7!', ja: 'パーフェクト 7/7！', ko: '퍼펙트 7/7!', zh: '满分 7/7！' },
   'pulse.victory': { fr: 'Victoire en', en: 'Victory in', es: 'Victoria en', de: 'Sieg in', pt: 'Vitória em', it: 'Vittoria in', ar: 'فوز في', ja: 'で勝利', ko: '에서 승리', zh: '胜利于' },
-  'pulse.match': { fr: 'Match en', en: 'Match in', es: 'Partido en', de: 'Match in', pt: 'Partida em', it: 'Partita in', ar: 'مباراة في', ja: 'でのマッチ', ko: '에서 경기', zh: '对决于' },
+  'pulse.match': { fr: "Duel en", en: 'Match in', es: 'Partido en', de: 'Match in', pt: 'Partida em', it: 'Partita in', ar: 'مباراة في', ja: 'でのマッチ', ko: '에서 경기', zh: '对决于' },
   'pulse.streak': { fr: 'Série de', en: 'Win streak of', es: 'Racha de', de: 'Siegesserie von', pt: 'Sequência de', it: 'Serie di', ar: 'سلسلة انتصارات', ja: '連勝', ko: '연승', zh: '连胜' },
   'pulse.streak_wins': { fr: 'victoires !', en: 'wins!', es: '¡victorias!', de: 'Siegen!', pt: 'vitórias!', it: 'vittorie!', ar: '!انتصارات', ja: '勝！', ko: '승!', zh: '胜！' },
   // Forge
@@ -312,7 +344,7 @@ const translations: Translations = {
   'themes.arena_title': { fr: "Explore les thèmes", en: "Explore the themes", es: "Explora los temas", de: "Entdecke die Themen", pt: "Explore os temas", it: "Esplora i temi", ar: "استكشف المواضيع", ja: "テーマを探す", ko: "테마 둘러보기", zh: "探索主题" },
   'conversations.count_label': { fr: 'conversations', en: 'conversations', es: 'conversaciones', de: 'Unterhaltungen', pt: 'conversas', it: 'conversazioni', ar: 'محادثات', ja: '件の会話', ko: '개의 대화', zh: '个对话' },
   'notifications.unread_label': { fr: 'non lues', en: 'unread', es: 'sin leer', de: 'ungelesen', pt: 'não lidas', it: 'non lette', ar: 'غير مقروءة', ja: '件未読', ko: '개 안 읽음', zh: '条未读' },
-  'players.header_eyebrow': { fr: 'Joueurs', en: 'Players', es: 'Jugadores', de: 'Spieler', pt: 'Jogadores', it: 'Giocatori', ar: 'اللاعبون', ja: 'プレイヤー', ko: '플레이어', zh: '玩家' },
+  'players.header_eyebrow': { fr: "Social", en: 'Players', es: 'Jugadores', de: 'Spieler', pt: 'Jogadores', it: 'Giocatori', ar: 'اللاعبون', ja: 'プレイヤー', ko: '플레이어', zh: '玩家' },
   'players.header_title': { fr: 'Trouve un rival', en: 'Find a rival', es: 'Encuentra un rival', de: 'Finde einen Rivalen', pt: 'Encontre um rival', it: 'Trova un rivale', ar: 'اعثر على منافس', ja: 'ライバルを探そう', ko: '라이벌을 찾아라', zh: '寻找对手' },
   'followers.community_title': { fr: 'Communauté', en: 'Community', es: 'Comunidad', de: 'Community', pt: 'Comunidade', it: 'Community', ar: 'المجتمع', ja: 'コミュニティ', ko: '커뮤니티', zh: '社区' },
   'play.load_error': { fr: 'Erreur de chargement. Appuyez pour réessayer', en: 'Loading error. Tap to retry', es: 'Error de carga. Toca para reintentar', de: 'Ladefehler. Tippen zum Wiederholen', pt: 'Erro ao carregar. Toque para tentar novamente', it: 'Errore di caricamento. Tocca per riprovare', ar: 'خطأ في التحميل. اضغط لإعادة المحاولة', ja: '読み込みエラー。タップして再試行', ko: '로딩 오류. 탭하여 다시 시도', zh: '加载错误。点击重试' },
@@ -574,7 +606,7 @@ const translations: Translations = {
   'players.create_theme': { fr: 'CRÉER UN THÈME', en: 'CREATE A THEME', es: 'CREAR UN TEMA', de: 'THEMA ERSTELLEN', pt: 'CRIAR UM TEMA', it: 'CREA UN TEMA', ar: 'إنشاء موضوع', ja: 'テーマを作成', ko: '테마 만들기', zh: '创建主题' },
   'players.theme_placeholder': { fr: 'Nom du thème (ex: Dragon Ball, NBA, Harry Potter...)', en: 'Theme name (e.g.: Dragon Ball, NBA, Harry Potter...)', es: 'Nombre del tema (ej: Dragon Ball, NBA, Harry Potter...)', de: 'Themenname (z.B.: Dragon Ball, NBA, Harry Potter...)', pt: 'Nome do tema (ex: Dragon Ball, NBA, Harry Potter...)', it: 'Nome del tema (es: Dragon Ball, NBA, Harry Potter...)', ar: 'اسم الموضوع (مثال: Dragon Ball, NBA, Harry Potter...)', ja: 'テーマ名（例：Dragon Ball、NBA、Harry Potter...）', ko: '테마 이름 (예: Dragon Ball, NBA, Harry Potter...)', zh: '主题名称（例如：Dragon Ball、NBA、Harry Potter...）' },
   'players.generate_ai': { fr: "Générer avec l'IA", en: 'Generate with AI', es: 'Generar con IA', de: 'Mit KI generieren', pt: 'Gerar com IA', it: "Genera con l'IA", ar: 'إنشاء بالذكاء الاصطناعي', ja: 'AIで生成', ko: 'AI로 생성', zh: '用AI生成' },
-  'players.generate_hint': { fr: "L'IA génère 5 questions + un logo pour validation", en: 'AI generates 5 questions + a logo for validation', es: 'La IA genera 5 preguntas + un logo para validación', de: 'KI generiert 5 Fragen + ein Logo zur Validierung', pt: 'A IA gera 5 perguntas + um logo para validação', it: "L'IA genera 5 domande + un logo per la validazione", ar: 'ينشئ الذكاء الاصطناعي 5 أسئلة + شعار للتحقق', ja: 'AIが5つの質問+ロゴを生成します', ko: 'AI가 5개의 질문 + 로고를 생성합니다', zh: 'AI生成5个问题+一个标志供验证' },
+  'players.generate_hint': { fr: "On te propose 5 questions et un logo, tu valides avant publication.", en: 'AI generates 5 questions + a logo for validation', es: 'La IA genera 5 preguntas + un logo para validación', de: 'KI generiert 5 Fragen + ein Logo zur Validierung', pt: 'A IA gera 5 perguntas + um logo para validação', it: "L'IA genera 5 domande + un logo per la validazione", ar: 'ينشئ الذكاء الاصطناعي 5 أسئلة + شعار للتحقق', ja: 'AIが5つの質問+ロゴを生成します', ko: 'AI가 5개의 질문 + 로고를 생성합니다', zh: 'AI生成5个问题+一个标志供验证' },
   'players.all_filter': { fr: 'TOUS', en: 'ALL', es: 'TODOS', de: 'ALLE', pt: 'TODOS', it: 'TUTTI', ar: 'الكل', ja: 'すべて', ko: '전체', zh: '全部' },
   'players.pulse_label': { fr: 'PULSE', en: 'PULSE', es: 'PULSO', de: 'PULS', pt: 'PULSO', it: 'PULSE', ar: 'النبض', ja: 'パルス', ko: '펄스', zh: '脉搏' },
   'players.tribus_label': { fr: 'TRIBUS', en: 'TRIBES', es: 'TRIBUS', de: 'STÄMME', pt: 'TRIBOS', it: 'TRIBÙ', ar: 'القبائل', ja: 'トライブ', ko: '부족', zh: '部落' },
@@ -771,7 +803,7 @@ const translations: Translations = {
   'player.their_themes': { fr: 'SES THEMES', en: 'THEIR THEMES', es: 'SUS TEMAS', de: 'IHRE THEMEN', pt: 'SEUS TEMAS', it: 'I LORO TEMI', ar: 'مواضيعهم', ja: 'テーマ', ko: '테마', zh: '主题' },
   'player.publications': { fr: 'PUBLICATIONS', en: 'POSTS', es: 'PUBLICACIONES', de: 'BEITRÄGE', pt: 'PUBLICAÇÕES', it: 'PUBBLICAZIONI', ar: 'المنشورات', ja: '投稿', ko: '게시물', zh: '帖子' },
   'player.no_posts': { fr: 'Aucune publication', en: 'No posts', es: 'Sin publicaciones', de: 'Keine Beiträge', pt: 'Sem publicações', it: 'Nessuna pubblicazione', ar: 'لا توجد منشورات', ja: '投稿なし', ko: '게시물 없음', zh: '没有帖子' },
-  'player.just_now': { fr: "A l'instant", en: 'Just now', es: 'Ahora', de: 'Gerade', pt: 'Agora', it: 'Adesso', ar: 'الآن', ja: 'たった今', ko: '방금', zh: '刚刚' },
+  'player.just_now': { fr: "À l'instant", en: 'Just now', es: 'Ahora', de: 'Gerade', pt: 'Agora', it: 'Adesso', ar: 'الآن', ja: 'たった今', ko: '방금', zh: '刚刚' },
   'player.level_short': { fr: 'NiV.', en: 'Lv.', es: 'Niv.', de: 'Lv.', pt: 'Nív.', it: 'Liv.', ar: 'مست.', ja: 'Lv.', ko: 'Lv.', zh: '等级' },
   'player.number_one_in': { fr: '#1 en', en: '#1 in', es: '#1 en', de: '#1 in', pt: '#1 em', it: '#1 in', ar: '#1 في', ja: '#1 ', ko: '#1 ', zh: '#1 ' },
 
@@ -936,6 +968,11 @@ const LOCALE_MAP: Record<Language, string> = {
 
 export function getLocale(): string {
   return LOCALE_MAP[currentLanguage] || 'fr-FR';
+}
+
+/** Choisit `${base}_one` ou `${base}_many` selon les règles de la langue (fr : 0 et 1 au singulier). */
+export function pluralKey(base: string, n: number): string {
+  return new Intl.PluralRules(getLocale()).select(n) === 'one' ? `${base}_one` : `${base}_many`;
 }
 
 export function t(key: string, params?: Record<string, string>): string {

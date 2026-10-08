@@ -1,25 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet, Animated, Alert,
-} from 'react-native';
+import { View, StyleSheet, Animated, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SwipeBackPage from '../components/SwipeBackPage';
-import DueloHeader from '../components/DueloHeader';
 import UserAvatar from '../components/UserAvatar';
 import RoundTimer from '../components/RoundTimer';
 import { useWS } from '../contexts/WebSocketContext';
 import { t } from '../utils/i18n';
+import { Txt, Icon, Button, Card, ScreenContainer, ScreenHeader, ThemeIcon } from '../components/ui';
+import { COLOR, SPACE, RADII, BORDER, ICON_SIZE } from '../theme/tokens';
 
 const WAIT_SECONDS = 15;
 
 export default function ChallengeWaitingScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { on: wsOn } = useWS();
 
   const {
@@ -135,229 +130,152 @@ export default function ChallengeWaitingScreen() {
     );
   };
 
+  const declined = phase === 'declined';
+
+  // Attente d'un défi nominatif : moment d'anticipation, sobre (pas de halo).
+  // Moi = jaune, rival = corail ; un seul CTA jaune quand le rival n'a pas répondu.
   return (
     <SwipeBackPage>
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <DueloHeader />
+      <ScreenContainer>
+        <ScreenHeader overline={t('pilot.challenge.sent')} title={opponentName} />
 
         <View style={styles.content}>
 
           {phase === 'waiting' && (
             <>
-              {/* En-tête */}
-              <View style={styles.waitHead}>
-                <Text style={styles.waitEyebrow}>◆ {t('challenge.waiting_for')} ◆</Text>
-                <Text style={styles.waitName}>{opponentName}</Text>
-              </View>
+              <Txt variant="overline" align="center">{t('challenge.waiting_for')}…</Txt>
 
-              {/* Duel : toi VS adversaire (anneaux ping) */}
+              {/* Duel : toi VS adversaire (anneaux d'attente autour du rival) */}
               <View style={styles.duelRow}>
                 <View style={styles.duelSide}>
-                  <UserAvatar avatarSeed="me" pseudo={myPseudo || t('home.you')} size={70} />
-                  <Text style={[styles.duelLabel, { color: '#00E5FF' }]} numberOfLines={1}>
-                    {(myPseudo || t('home.you')).toUpperCase()}
-                  </Text>
+                  <UserAvatar
+                    avatarSeed="me"
+                    pseudo={myPseudo || t('home.you')}
+                    size={72}
+                    borderColor={COLOR.player.self}
+                    borderWidth={BORDER.strong}
+                  />
+                  <Txt variant="label" color={COLOR.player.self} align="center" numberOfLines={1}>
+                    {myPseudo || t('home.you')}
+                  </Txt>
                 </View>
-                <Text style={styles.duelVs}>VS</Text>
+                <Txt variant="moment" color={COLOR.text.secondary}>vs</Txt>
                 <View style={styles.duelSide}>
                   <View>
                     <UserAvatar
                       avatarSeed={opponent_seed || opponentName}
                       pseudo={opponentName}
-                      size={70}
+                      size={72}
+                      borderColor={COLOR.player.opponent}
+                      borderWidth={BORDER.strong}
                     />
                     <Animated.View pointerEvents="none" style={[styles.pingRing, pingStyle(ping1)]} />
                     <Animated.View pointerEvents="none" style={[styles.pingRing, pingStyle(ping2)]} />
                   </View>
-                  <Text style={[styles.duelLabel, { color: '#B366FF' }]} numberOfLines={1}>
-                    {opponentName.toUpperCase()}
-                  </Text>
+                  <Txt variant="label" color={COLOR.player.opponentText} align="center" numberOfLines={1}>
+                    {opponentName}
+                  </Txt>
                 </View>
               </View>
 
-              {/* Chip thème */}
+              {/* Thème du défi */}
               {themeTitleStr ? (
                 <View style={styles.themePill}>
-                  <MaterialCommunityIcons name="star-four-points" size={14} color="#00E5FF" />
-                  <Text style={styles.themeText}>{themeTitleStr}</Text>
+                  <ThemeIcon themeName={themeTitleStr} size={ICON_SIZE.theme.xs} />
+                  <Txt variant="label" color={COLOR.text.primary} numberOfLines={1} style={styles.flexShrink}>{themeTitleStr}</Txt>
                 </View>
               ) : null}
 
-              {/* Anneau décompte or */}
-              <RoundTimer timeLeft={countdown} total={WAIT_SECONDS} size={96} color="#FFB547" />
+              {/* Décompte (anneau crème, corail puis rouge en fin de course) */}
+              <RoundTimer timeLeft={countdown} total={WAIT_SECONDS} size={96} />
 
-              {/* Cancel button */}
-              <TouchableOpacity style={styles.changeBtn} onPress={goChangeOpponent} activeOpacity={0.8}>
-                <MaterialCommunityIcons name="account-switch" size={16} color="#A3A3A3" />
-                <Text style={styles.changeBtnText}>{t('challenge.find_opponent')}</Text>
-              </TouchableOpacity>
+              <Button
+                label={t('challenge.find_opponent')}
+                icon="users"
+                variant="ghost"
+                size="sm"
+                onPress={goChangeOpponent}
+              />
             </>
           )}
 
-          {(phase === 'timeout' || phase === 'declined') && (
+          {(phase === 'timeout' || declined) && (
             <>
-              {/* Timeout / declined state */}
-              <View style={styles.timeoutBox}>
-                <MaterialCommunityIcons
-                  name={phase === 'declined' ? 'close-circle-outline' : 'clock-alert-outline'}
-                  size={36}
-                  color={phase === 'declined' ? '#FF3B5C' : '#FF9F0A'}
-                />
-                <Text style={styles.timeoutTitle}>
-                  {phase === 'declined' ? `${opponentName} a refusé` : t('challenge.timeout_title')}
-                </Text>
-                <Text style={styles.timeoutBody}>{t('challenge.timeout_body')}</Text>
-              </View>
+              <Card style={styles.timeoutBox}>
+                <View style={styles.timeoutIcon}>
+                  <Icon name={declined ? 'error' : 'clock'} size={28} color={COLOR.text.secondary} />
+                </View>
+                <Txt variant="h3" align="center">
+                  {declined ? t('pilot.challenge.declined', { name: opponentName }) : t('challenge.timeout_title')}
+                </Txt>
+                <Txt variant="body" color={COLOR.text.secondary} align="center">{t('challenge.timeout_body')}</Txt>
+              </Card>
 
               <View style={styles.choiceButtons}>
-                {/* Play now with same theme — challenge stays for B */}
-                <TouchableOpacity style={styles.playNowBtn} onPress={goPlayNow} activeOpacity={0.8}>
-                  <LinearGradient
-                    colors={['#8A2BE2', '#BF5FFF']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={styles.playNowGradient}
-                  >
-                    <MaterialCommunityIcons name="lightning-bolt" size={16} color="#FFF" />
-                    <View>
-                      <Text style={styles.playNowTitle}>{t('challenge.play_now')}</Text>
-                      <Text style={styles.playNowSub}>{opponentName} {t('challenge.vs')}</Text>
-                    </View>
-                  </LinearGradient>
-                </TouchableOpacity>
-
-                {/* Find a different opponent */}
-                <TouchableOpacity style={styles.changeBtn2} onPress={goChangeOpponent} activeOpacity={0.8}>
-                  <MaterialCommunityIcons name="account-switch" size={16} color="#A3A3A3" />
-                  <Text style={styles.changeBtnText}>{t('challenge.find_opponent')}</Text>
-                </TouchableOpacity>
+                {/* Jouer tout de suite sur le même thème — le défi reste ouvert pour le rival */}
+                <Button label={t('challenge.play_now')} icon="bolt" size="lg" fullWidth onPress={goPlayNow} />
+                <Txt variant="caption" align="center" numberOfLines={2}>
+                  {opponentName} {t('challenge.async_will_play')}
+                </Txt>
+                <Button
+                  label={t('challenge.find_opponent')}
+                  icon="users"
+                  variant="ghost"
+                  fullWidth
+                  onPress={goChangeOpponent}
+                  style={styles.secondaryBtn}
+                />
               </View>
             </>
           )}
 
         </View>
-      </View>
+      </ScreenContainer>
     </SwipeBackPage>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#050510' },
   content: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
-    gap: 28,
+    paddingHorizontal: SPACE.xxl,
+    gap: SPACE.xxl,
   },
+  flexShrink: { flexShrink: 1 },
 
-  waitHead: { alignItems: 'center', gap: 6 },
-  waitEyebrow: {
-    fontSize: 10, fontFamily: 'JetBrainsMono_700Bold', color: '#FFB547',
-    letterSpacing: 3, textTransform: 'uppercase',
-  },
-  waitName: {
-    fontSize: 26, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold',
-    color: '#FFF', letterSpacing: -0.8, textTransform: 'uppercase',
-  },
-
-  duelRow: { flexDirection: 'row', alignItems: 'center', gap: 20 },
-  duelSide: { alignItems: 'center', gap: 8, maxWidth: 110 },
-  duelLabel: {
-    fontSize: 12, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold',
-  },
-  duelVs: {
-    fontSize: 32, color: '#FFB547', fontFamily: 'Fraunces_500Medium_Italic',
-  },
+  // Colonnes souples (104 px au plus) : la ligne tient dans les 272 px utiles d'un écran de 320
+  duelRow: { alignSelf: 'stretch', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.md },
+  duelSide: { flex: 1, maxWidth: 104, alignItems: 'center', gap: SPACE.sm },
   pingRing: {
     position: 'absolute', top: 0, left: 0,
-    width: 70, height: 70, borderRadius: 35,
-    borderWidth: 2, borderColor: '#B366FF',
+    width: 72, height: 72, borderRadius: 36,
+    borderWidth: BORDER.strong, borderColor: COLOR.player.opponent,
   },
 
   themePill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 9,
-    borderWidth: 1,
-    borderColor: 'rgba(0,229,255,0.30)',
-  },
-  themeText: {
-    color: '#FFF',
-    fontSize: 13,
-    fontWeight: '800',
-    fontFamily: 'SpaceGrotesk_600SemiBold',
+    gap: SPACE.sm,
+    maxWidth: '100%',
+    backgroundColor: COLOR.surface.card,
+    borderRadius: RADII.pill,
+    borderWidth: BORDER.hair,
+    borderColor: COLOR.border.subtle,
+    paddingLeft: SPACE.xs,
+    paddingRight: SPACE.lg,
+    paddingVertical: SPACE.xs,
   },
 
-  changeBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-  },
-  changeBtnText: {
-    color: '#A3A3A3',
-    fontSize: 14,
-    fontWeight: '600',
+  timeoutBox: { width: '100%', alignItems: 'center', gap: SPACE.sm },
+  timeoutIcon: {
+    width: 56, height: 56, borderRadius: 28,
+    backgroundColor: COLOR.surface.subtle,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: SPACE.xs,
   },
 
-  timeoutBox: {
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 20,
-    padding: 24,
-    width: '100%',
-    borderWidth: 1,
-    borderColor: 'rgba(255,159,10,0.2)',
-  },
-  timeoutTitle: {
-    fontSize: 17,
-    fontWeight: '900',
-    color: '#FFF',
-    textAlign: 'center',
-  },
-  timeoutBody: {
-    fontSize: 14,
-    color: '#A3A3A3',
-    textAlign: 'center',
-  },
-
-  choiceButtons: { width: '100%', gap: 12 },
-  playNowBtn: { borderRadius: 16, overflow: 'hidden' },
-  playNowGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    padding: 16,
-    borderRadius: 16,
-  },
-  playNowTitle: {
-    color: '#FFF',
-    fontSize: 15,
-    fontWeight: '800',
-  },
-  playNowSub: {
-    color: 'rgba(255,255,255,0.65)',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  changeBtn2: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    padding: 14,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-  },
+  choiceButtons: { width: '100%', gap: SPACE.sm },
+  secondaryBtn: { marginTop: SPACE.sm },
 });

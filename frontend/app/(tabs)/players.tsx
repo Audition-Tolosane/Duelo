@@ -1,31 +1,23 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
-  Dimensions, FlatList, Modal, Pressable, useWindowDimensions,
-  RefreshControl, Platform,
-} from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, StyleSheet, ScrollView, Pressable, useWindowDimensions, FlatList, RefreshControl } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
-import Animated, {
-  useSharedValue, useAnimatedStyle, withTiming, withSpring,
-  withDelay, withRepeat, withSequence, Easing, FadeIn, FadeInDown,
-  FadeInUp, FadeInLeft, FadeInRight, SlideInRight, interpolate,
-} from 'react-native-reanimated';
-import Svg, { Circle } from 'react-native-svg';
-import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import DueloHeader from '../../components/DueloHeader';
-import CategoryIcon from '../../components/CategoryIcon';
-import { GLASS } from '../../theme/glassTheme';
+import Animated, { useAnimatedStyle, FadeInDown, SlideInRight, interpolate } from 'react-native-reanimated';
 import { useTabBar } from '../../contexts/TabBarContext';
 import UserAvatar from '../../components/UserAvatar';
-import ScalePressable from '../../components/ScalePressable';
 import { t } from '../../utils/i18n';
+import {
+  Txt, Icon, IconName, Button, Card, Chip, ThemeIcon, Loader, EmptyState,
+} from '../../components/ui';
+import { COLOR, SPACE, RADII, BORDER, SIZE, ICON_SIZE } from '../../theme/tokens';
+
+// Onglet Social : Activité (exploits des joueurs + suggestion du coach), Champions (le meilleur
+// joueur de chaque thème) et Créer (renvoi vers la création de thème). Aucune couleur par section :
+// la sélection est jaune, le défi corail, le champion et l'XP en or.
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
-const { width: SCREEN_W } = Dimensions.get('window');
 
 // ── Types ──
 type FeedItem = {
@@ -60,80 +52,14 @@ type CoachSuggestion = {
 
 type SectionTab = 'pulse' | 'tribus' | 'forge';
 
-// ── Aura Ring (prestige level) ──
-const AuraAvatar = ({ letter, level, color, size = 44, avatarUrl, avatarSeed, pseudo }: {
-  letter: string; level: number; color: string; size?: number;
-  avatarUrl?: string; avatarSeed?: string; pseudo?: string;
-}) => {
-  const intensity = Math.min(level / 15, 1);
-  const auraOpacity = 0.2 + intensity * 0.6;
-  return (
-    <View style={[auraStyles.wrap, { width: size + 12, height: size + 12 }]}>
-      {level > 0 && (
-        <View style={[auraStyles.glow, {
-          width: size + 12, height: size + 12, borderRadius: (size + 12) / 2,
-          backgroundColor: color + Math.round(auraOpacity * 255).toString(16).padStart(2, '0'),
-          shadowColor: color,
-          shadowOpacity: auraOpacity,
-          shadowRadius: 8 + intensity * 8,
-        }]} />
-      )}
-      <UserAvatar
-        avatarUrl={avatarUrl}
-        avatarSeed={avatarSeed || pseudo || letter}
-        pseudo={pseudo || letter}
-        size={size}
-        borderColor={level > 0 ? color : '#333'}
-        borderWidth={level > 3 ? 2 : 1}
-      />
-    </View>
-  );
+// Univers : pictogramme Lucide des filtres (les illustrations de thèmes restent sur les cartes)
+const UNIVERSE_ICON: Record<string, IconName> = {
+  screen: 'film', sound: 'music', arena: 'trophy', legends: 'landmark', lab: 'flask',
+  globe: 'globe', art: 'palette', life: 'leaf', mind: 'brain',
 };
+const UNIVERSE_IDS = ['screen', 'sound', 'arena', 'legends', 'lab', 'globe', 'art', 'life', 'mind'];
 
-const auraStyles = StyleSheet.create({
-  wrap: { justifyContent: 'center', alignItems: 'center' },
-  glow: { position: 'absolute', shadowOffset: { width: 0, height: 0 } },
-  avatar: {
-    backgroundColor: '#1A1A1A', justifyContent: 'center', alignItems: 'center',
-  },
-  letter: { color: '#FFF', fontWeight: '900' },
-});
-
-// ── Neon Border Animated (Forge Hero) ──
-const ForgeHeroCard = ({ children }: { children: React.ReactNode }) => {
-  const glowAnim = useSharedValue(0.3);
-  useEffect(() => {
-    glowAnim.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0.3, { duration: 2000, easing: Easing.inOut(Easing.ease) })
-      ), -1, true
-    );
-  }, []);
-  const borderStyle = useAnimatedStyle(() => ({ opacity: glowAnim.value }));
-  return (
-    <View style={forgeHero.wrap}>
-      <Animated.View style={[forgeHero.neonBorder, borderStyle]} />
-      <View style={forgeHero.inner}>{children}</View>
-    </View>
-  );
-};
-
-const forgeHero = StyleSheet.create({
-  wrap: { borderRadius: 20, overflow: 'hidden', position: 'relative', marginHorizontal: 16, marginBottom: 20 },
-  neonBorder: {
-    ...StyleSheet.absoluteFill, borderRadius: 20, borderWidth: 1.5,
-    borderColor: 'rgba(179,102,255,0.6)',
-    shadowColor: '#B366FF', shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5, shadowRadius: 15, elevation: 6,
-  },
-  inner: {
-    borderRadius: 20, backgroundColor: 'rgba(179,102,255,0.06)',
-    borderWidth: 1, borderColor: 'rgba(179,102,255,0.1)',
-  },
-});
-
-// ── Pulse title — translated client-side ──
+// ── Titre d'un exploit, traduit côté client ──
 function getPulseTitle(item: FeedItem): string {
   if (item.type === 'perfect') return t('pulse.perfect_score');
   if (item.type === 'streak') {
@@ -145,277 +71,136 @@ function getPulseTitle(item: FeedItem): string {
   return `${t('pulse.match')} ${cat}`;
 }
 
-// ── Exploit Card (Pulse Feed) ──
+// ── Exploit (fil d'activité) ──
 const ExploitCard = ({ item, index = 0, onChallenge, onProfile }: {
   item: FeedItem; index?: number; onChallenge: (userId: string, category: string, categoryName?: string) => void;
   onProfile: (userId: string) => void;
 }) => {
-  const color = item.pillar_color || item.category_color || '#B366FF';
   const isPerfect = item.type === 'perfect';
   const isStreak = item.type === 'streak';
+  // Sans-faute = récompense (or) ; série = accent chaud ; duel = crème
+  const icon: IconName = isPerfect ? 'star' : isStreak ? 'flame' : 'duel';
+  const iconColor = isPerfect ? COLOR.reward.gold : isStreak ? COLOR.accent.warm : COLOR.text.secondary;
 
   return (
     <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
-      <ScalePressable
-        style={[exploitStyles.card, { borderColor: color + '20' }]}
-        onPress={() => item.user_id && onProfile(item.user_id)}
-      >
-        {/* Glow background for records */}
-        {isPerfect && (
-          <View style={[exploitStyles.cardGlow, {
-            backgroundColor: color + '08',
-            shadowColor: color,
-          }]} />
-        )}
-
-        <View style={exploitStyles.row}>
-          <AuraAvatar
-            letter={item.user_pseudo?.[0]?.toUpperCase() || '?'}
-            level={item.user_level || 0}
-            color={color}
-            size={40}
+      {/* La carte n'est pas cliquable en entier : elle contient le bouton Défier (pas de bouton dans un bouton) */}
+      <Card style={st.exploit}>
+        <Pressable
+          onPress={() => item.user_id && onProfile(item.user_id)}
+          accessibilityRole="button"
+          style={({ pressed }) => [st.exploitRow, pressed && st.pressed]}
+        >
+          <UserAvatar
             avatarUrl={item.user_avatar_url}
-            avatarSeed={item.user_avatar_seed}
+            avatarSeed={item.user_avatar_seed || item.user_pseudo}
             pseudo={item.user_pseudo}
+            size={40}
           />
-          <View style={exploitStyles.content}>
-            <View style={exploitStyles.titleRow}>
-              <MaterialCommunityIcons
-                name={isPerfect ? 'star-circle' : isStreak ? 'fire' : 'sword-cross'}
-                size={15}
-                color={isPerfect ? '#FFB547' : isStreak ? '#FF6B2C' : color}
-              />
-              <Text style={[exploitStyles.title, isPerfect && { color: '#FFB547' }]} numberOfLines={1}>
+          <View style={st.exploitText}>
+            <View style={st.titleRow}>
+              <Icon name={icon} size={ICON_SIZE.sm} color={iconColor} />
+              <Txt variant="cardTitle" color={isPerfect ? COLOR.reward.gold : COLOR.text.primary} numberOfLines={1} style={st.flexShrink}>
                 {getPulseTitle(item)}
-              </Text>
+              </Txt>
             </View>
-            <Text style={exploitStyles.pseudo} numberOfLines={1}>
+            <Txt variant="caption" numberOfLines={1}>
               @{item.user_pseudo}
-              {item.opponent_pseudo && !isStreak ? (
-                <Text style={exploitStyles.vs}> · {t('players.vs').toUpperCase()} {item.opponent_pseudo}</Text>
-              ) : null}
-            </Text>
-            {item.score && (
-              <View style={exploitStyles.statsRow}>
-                <Text style={[exploitStyles.score, { color }]}>{item.score}</Text>
-                {item.xp_earned ? (
-                  <Text style={exploitStyles.xpEarned}>+{item.xp_earned} XP</Text>
-                ) : null}
+              {item.opponent_pseudo && !isStreak ? ` · ${t('players.vs')} ${item.opponent_pseudo}` : ''}
+            </Txt>
+            {item.score ? (
+              <View style={st.statsRow}>
+                <Txt variant="label" color={COLOR.text.primary}>{item.score}</Txt>
+                {item.xp_earned ? <Txt variant="caption" color={COLOR.reward.gold}>+{item.xp_earned} XP</Txt> : null}
                 {item.category_name ? (
-                  <View style={[exploitStyles.catBadge, { backgroundColor: color + '15', borderColor: color + '30' }]}>
-                    <Text style={[exploitStyles.catBadgeText, { color }]}>{item.category_name}</Text>
-                  </View>
+                  <Txt variant="caption" color={COLOR.text.secondary} numberOfLines={1} style={st.flexShrink}>{item.category_name}</Txt>
                 ) : null}
               </View>
-            )}
+            ) : null}
           </View>
+        </Pressable>
 
-          {/* DÉFIER — CTA gradient texte noir (convention charte) */}
-          {item.can_challenge && (
-            <TouchableOpacity
-              style={exploitStyles.challengeBtn}
-              onPress={() => item.user_id && item.category && onChallenge(item.user_id, item.category, item.category_name)}
-              activeOpacity={0.85}
-            >
-              <LinearGradient
-                colors={['#00E5FF', '#B366FF']}
-                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
-              />
-              <Text style={exploitStyles.challengeText}>{t('players.challenge')}</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </ScalePressable>
+        {/* Défi nominatif sur le thème de l'exploit */}
+        {item.can_challenge ? (
+          <Button
+            label={t('players.challenge')}
+            icon="duel"
+            variant="secondary"
+            size="sm"
+            haptic={false}
+            onPress={() => item.user_id && item.category && onChallenge(item.user_id, item.category, item.category_name)}
+            style={st.challengeBtn}
+          />
+        ) : null}
+      </Card>
     </Animated.View>
   );
 };
 
-const exploitStyles = StyleSheet.create({
-  card: {
-    marginHorizontal: 16, marginBottom: 10, borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1,
-    padding: 14, overflow: 'hidden',
-  },
-  cardGlow: {
-    position: 'absolute', top: -20, left: -20, right: -20, bottom: -20,
-    shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.3, shadowRadius: 30,
-  },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  content: { flex: 1 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 3 },
-  title: { color: '#FFF', fontSize: 13, fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.2, flex: 1 },
-  pseudo: {
-    color: 'rgba(255,255,255,0.40)', fontSize: 9,
-    fontFamily: 'JetBrainsMono_400Regular', letterSpacing: 0.5, marginBottom: 5,
-  },
-  vs: { color: 'rgba(255,255,255,0.30)' },
-  statsRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  score: { fontSize: 14, fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.3 },
-  xpEarned: {
-    color: '#32E7A3', fontSize: 9,
-    fontFamily: 'JetBrainsMono_700Bold', letterSpacing: 0.5,
-  },
-  catBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8, borderWidth: 1 },
-  catBadgeText: { fontSize: 8, fontFamily: 'JetBrainsMono_400Regular', letterSpacing: 0.5 },
-  challengeBtn: {
-    paddingHorizontal: 14, paddingVertical: 9, borderRadius: 12, overflow: 'hidden',
-  },
-  challengeText: {
-    fontSize: 11, fontFamily: 'SpaceGrotesk_700Bold', color: '#000',
-    letterSpacing: 0.5, textTransform: 'uppercase',
-  },
-});
-
-// ── Tribe Card ──
-const TribeCard = ({ tribe, onPress, accentColor, index = 0 }: { tribe: Tribe; onPress: () => void; accentColor?: string; index?: number }) => {
-  const color = accentColor || tribe.pillar_color;
-  const hasThrone = !!tribe.throne;
-
+// ── Champion d'un thème ──
+const TribeCard = ({ tribe, onPress, index = 0 }: { tribe: Tribe; onPress: () => void; index?: number }) => {
+  const throne = tribe.throne;
   return (
     <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
-    <ScalePressable
-      style={[tribeStyles.card, { borderColor: color + '20' }]}
-      onPress={onPress}
-    >
-      <LinearGradient colors={[color + '30', color + '08']} style={tribeStyles.pillarBar} />
-      <View style={tribeStyles.content}>
-        <LinearGradient colors={[color + '25', color + '08']} style={tribeStyles.iconCircle}>
-          <CategoryIcon themeId={tribe.id} emoji={tribe.icon} size={22} color={color} type="theme" />
-        </LinearGradient>
-        <Text style={[tribeStyles.name, { color: '#FFF' }]} numberOfLines={1}>{tribe.name}</Text>
-        <Text style={[tribeStyles.pillarLabel, { color: color + 'AA' }]}>{tribe.pillar_name}</Text>
+      <Card onPress={onPress} style={st.tribe}>
+        <ThemeIcon themeName={tribe.name} superCategory={tribe.pillar_id?.toUpperCase()} size={ICON_SIZE.theme.sm} />
+        <Txt variant="cardTitle" align="center" numberOfLines={1}>{tribe.name}</Txt>
 
-        {/* Throne */}
-        {hasThrone ? (
-          <View style={tribeStyles.throneWrap}>
-            <View style={tribeStyles.throneLabelRow}>
-              <MaterialCommunityIcons name="crown" size={14} color="#FFB547" />
-              <Text style={tribeStyles.throneLabel}>{t('players.throne')}</Text>
+        {throne ? (
+          <View style={st.throne}>
+            <View style={st.throneLabel}>
+              <Icon name="crown" size={14} color={COLOR.reward.gold} />
+              <Txt variant="caption" color={COLOR.reward.gold}>{t('pilot.social.champion')}</Txt>
             </View>
-            <AuraAvatar
-              letter={tribe.throne!.pseudo[0]?.toUpperCase() || '?'}
-              level={tribe.throne!.level}
-              color={color}
+            <UserAvatar
+              avatarUrl={throne.avatar_url}
+              avatarSeed={throne.avatar_seed || throne.pseudo}
+              pseudo={throne.pseudo}
               size={32}
-              avatarUrl={tribe.throne!.avatar_url}
-              avatarSeed={tribe.throne!.avatar_seed}
-              pseudo={tribe.throne!.pseudo}
             />
-            <Text style={tribeStyles.thronePseudo} numberOfLines={1}>
-              {tribe.throne!.pseudo}
-            </Text>
-            <Text style={[tribeStyles.throneLevel, { color }]}>
-              {t('players.level_short')} {tribe.throne!.level}
-            </Text>
+            <Txt variant="label" color={COLOR.text.primary} align="center" numberOfLines={1} style={st.thronePseudo}>{throne.pseudo}</Txt>
+            <Txt variant="caption">{t('players.level_short')} {throne.level}</Txt>
           </View>
         ) : (
-          <View style={tribeStyles.throneEmpty}>
-            <MaterialCommunityIcons name="crown-outline" size={24} color="#444" />
-            <Text style={tribeStyles.throneEmptyLabel}>{t('players.throne_vacant')}</Text>
+          <View style={st.throne}>
+            <Icon name="crown" size={24} color={COLOR.text.disabled} />
+            <Txt variant="caption" align="center">{t('pilot.social.no_champion')}</Txt>
           </View>
         )}
 
-        <View style={tribeStyles.memberRow}>
-          <Text style={tribeStyles.memberCount}>
-            {tribe.member_count} {tribe.member_count !== 1 ? t('players.members_plural') : t('players.members')}
-          </Text>
-        </View>
-      </View>
-    </ScalePressable>
+        <Txt variant="caption" align="center">
+          {tribe.member_count} {tribe.member_count !== 1 ? t('players.members_plural') : t('players.members')}
+        </Txt>
+      </Card>
     </Animated.View>
   );
 };
 
-const tribeStyles = StyleSheet.create({
-  card: {
-    width: 160, marginRight: 12, borderRadius: 18,
-    backgroundColor: GLASS.bg, borderWidth: 1,
-    overflow: 'hidden',
-  },
-  pillarBar: { height: 3, width: '100%' },
-  content: { padding: 12, alignItems: 'center' },
-  iconCircle: {
-    width: 44, height: 44, borderRadius: 22,
-    justifyContent: 'center', alignItems: 'center', marginBottom: 6,
-  },
-  name: { fontSize: 12, fontWeight: '700', textAlign: 'center', marginBottom: 2 },
-  pillarLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 1, marginBottom: 10 },
-  throneWrap: { alignItems: 'center', marginBottom: 8 },
-  throneLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6 },
-  throneLabel: { fontSize: 10, fontWeight: '700', color: '#FFB547' },
-  thronePseudo: { color: '#CCC', fontSize: 11, fontWeight: '600', marginTop: 4 },
-  throneLevel: { fontSize: 10, fontWeight: '800', marginTop: 2 },
-  throneEmpty: { alignItems: 'center', marginBottom: 8, paddingVertical: 8, gap: 4 },
-  throneEmptyLabel: { fontSize: 10, color: '#444', fontWeight: '600' },
-  memberRow: { alignItems: 'center' },
-  memberCount: { fontSize: 10, color: '#555', fontWeight: '600' },
-});
-
-// ── Coach Widget ──
+// ── Suggestion du coach ──
 const CoachWidget = ({ suggestions, onAction }: {
   suggestions: CoachSuggestion[];
   onAction: (s: CoachSuggestion) => void;
 }) => {
   if (!suggestions.length) return null;
-  const s = suggestions[0];
-  const color = s.category_color || '#B366FF';
-
+  const sug = suggestions[0];
   return (
     <Animated.View entering={SlideInRight.springify().delay(300)}>
-      <TouchableOpacity
-        style={[coachStyles.widget, { borderColor: color + '30' }]}
-        onPress={() => onAction(s)}
-        activeOpacity={0.8}
-      >
-        {/* Tuile teintée icône colorée (convention charte) */}
-        <View style={[coachStyles.iconWrap, { backgroundColor: color + '20', borderColor: color + '40' }]}>
-          <MaterialCommunityIcons name="robot-outline" size={20} color={color} />
+      <Card style={st.coach}>
+        <View style={st.iconDisc}><Icon name="sparkles" size={ICON_SIZE.md} color={COLOR.text.primary} /></View>
+        <View style={st.coachText}>
+          <Txt variant="overline">{t('players.coach_label')}</Txt>
+          <Txt variant="bodySmall" color={COLOR.text.primary} numberOfLines={3}>{sug.message}</Txt>
         </View>
-        <View style={coachStyles.textWrap}>
-          <Text style={coachStyles.label}>◆ {t('players.coach_label')}</Text>
-          <Text style={coachStyles.message} numberOfLines={2}>{s.message}</Text>
-        </View>
-        <View style={coachStyles.goBtn}>
-          <LinearGradient
-            colors={['#00E5FF', '#B366FF']}
-            start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-            style={StyleSheet.absoluteFill}
-          />
-          <Text style={coachStyles.goBtnText}>{t('players.coach_go')}</Text>
-        </View>
-      </TouchableOpacity>
+        <Button label={t('tab.play')} size="sm" haptic={false} onPress={() => onAction(sug)} />
+      </Card>
     </Animated.View>
   );
 };
 
-const coachStyles = StyleSheet.create({
-  widget: {
-    marginHorizontal: 16, marginBottom: 16, borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1,
-    flexDirection: 'row', alignItems: 'center', padding: 14, gap: 12,
-  },
-  iconWrap: {
-    width: 42, height: 42, borderRadius: 12, borderWidth: 1,
-    justifyContent: 'center', alignItems: 'center',
-  },
-  textWrap: { flex: 1 },
-  label: {
-    fontSize: 9, fontFamily: 'JetBrainsMono_700Bold', color: '#FFB547',
-    letterSpacing: 2, textTransform: 'uppercase', marginBottom: 3,
-  },
-  message: { color: 'rgba(255,255,255,0.85)', fontSize: 12, fontFamily: 'SpaceGrotesk_500Medium', lineHeight: 17 },
-  goBtn: {
-    paddingHorizontal: 16, paddingVertical: 9, borderRadius: 10, overflow: 'hidden',
-  },
-  goBtnText: {
-    color: '#000', fontSize: 12, fontFamily: 'SpaceGrotesk_700Bold',
-    letterSpacing: 0.5, textTransform: 'uppercase',
-  },
-});
-
-// ── Main Screen ──
+// ── Écran ──
 export default function PlayersScreen() {
+  const { width: winW } = useWindowDimensions();
+  const compact = winW < 360;
   const router = useRouter();
   const { onScroll: onTabScroll, hidden: tabHidden } = useTabBar();
   const insets = useSafeAreaInsets();
@@ -430,12 +215,12 @@ export default function PlayersScreen() {
   const [activeSection, setActiveSection] = useState<SectionTab>('pulse');
   const [refreshing, setRefreshing] = useState(false);
 
-  // Pulse
+  // Activité
   const [feed, setFeed] = useState<FeedItem[]>([]);
   const [loadingFeed, setLoadingFeed] = useState(true);
   const [pulseError, setPulseError] = useState(false);
 
-  // Tribes
+  // Champions
   const [tribes, setTribes] = useState<Tribe[]>([]);
   const [loadingTribes, setLoadingTribes] = useState(true);
   const [tribesError, setTribesError] = useState(false);
@@ -445,21 +230,9 @@ export default function PlayersScreen() {
   const [coachSuggestions, setCoachSuggestions] = useState<CoachSuggestion[]>([]);
   const [coachError, setCoachError] = useState(false);
 
-  // Forge
-
-
-  const pillarFilters = [
-    { id: 'all', name: t('players.all_filter'), icon: '🌐', color: '#B366FF' },
-    { id: 'screen', name: 'SCREEN', icon: '🎬', color: '#B366FF' },
-    { id: 'sound', name: 'SOUND', icon: '🎵', color: '#FF6B2C' },
-    { id: 'arena', name: 'ARENA', icon: '⚽', color: '#00FF9D' },
-    { id: 'legends', name: 'LEGENDS', icon: '🏛️', color: '#FFB547' },
-    { id: 'lab', name: 'LAB', icon: '🔬', color: '#1565C0' },
-    { id: 'globe', name: 'GLOBE', icon: '🌍', color: '#4ECDC4' },
-    { id: 'art', name: 'ART', icon: '🎨', color: '#E53935' },
-    { id: 'life', name: 'LIFE', icon: '🌱', color: '#2E7D32' },
-    { id: 'mind', name: 'MIND', icon: '🧠', color: '#FFAB40' },
-  ];
+  // Nom d'univers : celui que renvoie l'API avec les thèmes, sinon le code
+  const pillarName = (id: string) =>
+    tribes.find((tr) => tr.pillar_id.toLowerCase() === id)?.pillar_name || id.toUpperCase();
 
   useEffect(() => {
     init();
@@ -515,7 +288,6 @@ export default function PlayersScreen() {
     }
   };
 
-
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     if (myId) {
@@ -535,10 +307,10 @@ export default function PlayersScreen() {
     router.push(`/player-profile?id=${userId}`);
   }, [router]);
 
-  const handleCoachAction = useCallback((s: CoachSuggestion) => {
+  const handleCoachAction = useCallback((sug: CoachSuggestion) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    if (s.category) {
-      router.push(`/matchmaking?category=${s.category}`);
+    if (sug.category) {
+      router.push(`/matchmaking?category=${sug.category}`);
     }
   }, [router]);
 
@@ -553,73 +325,60 @@ export default function PlayersScreen() {
     ? tribes
     : tribes.filter(tr => tr.pillar_id.toLowerCase() === selectedPillar);
 
-  const sectionColor = activeSection === 'pulse' ? '#B366FF' : activeSection === 'tribus' ? '#FFB547' : '#32E7A3';
+  const sections: { key: SectionTab; label: string; icon: IconName }[] = [
+    { key: 'pulse', label: t('pilot.social.section_activity'), icon: 'bolt' },
+    { key: 'tribus', label: t('pilot.social.section_champions'), icon: 'crown' },
+    { key: 'forge', label: t('pilot.social.section_create'), icon: 'forge' },
+  ];
+
+  const refresh = <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLOR.text.primary} />;
 
   return (
-    <View style={{ flex: 1 }}>
-    <View style={s.container}>
+    <View style={st.container}>
 
-      {/* Header — compensé quand le header global se replie */}
-      <Animated.View style={[s.pageHeader, headerSafeStyle]}>
-        <View style={{ flex: 1 }}>
-          <Text style={s.pageEyebrow}>◆ {t('players.header_eyebrow')}</Text>
-          <Text style={s.pageTitle}>{t('players.header_title')}</Text>
-        </View>
+      {/* En-tête de page — compensé quand le header global se replie */}
+      <Animated.View style={[st.pageHeader, headerSafeStyle]}>
+        <Txt variant="overline">{t('players.header_eyebrow')}</Txt>
+        <Txt variant="h1">{t('players.header_title')}</Txt>
       </Animated.View>
 
-      {/* Section Navigator */}
-      <View style={s.sectionNav}>
-        {(['pulse', 'tribus', 'forge'] as SectionTab[]).map((section) => {
-          const isActive = activeSection === section;
-          const meta = {
-            pulse: { label: t('players.pulse_label'), icon: 'lightning-bolt' as const, color: '#B366FF' },
-            tribus: { label: t('players.tribus_label'), icon: 'crown' as const, color: '#FFB547' },
-            forge: { label: t('players.forge_label'), icon: 'hammer-wrench' as const, color: '#32E7A3' },
-          }[section];
-          return (
-            <TouchableOpacity
-              key={section}
-              style={[s.sectionTab, isActive && { backgroundColor: meta.color + '15', borderColor: meta.color + '40' }]}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setActiveSection(section);
-              }}
-              activeOpacity={0.7}
-            >
-              <MaterialCommunityIcons name={meta.icon} size={16} color={isActive ? meta.color : '#555'} />
-              <Text style={[s.sectionTabLabel, isActive && { color: meta.color }]}>{meta.label}</Text>
-              {isActive && <View style={[s.sectionDot, { backgroundColor: meta.color }]} />}
-            </TouchableOpacity>
-          );
-        })}
-
+      {/* Sections */}
+      <View style={st.sectionNav}>
+        {sections.map((sec) => (
+          <Chip
+            key={sec.key}
+            label={sec.label}
+            // 320 px : sans icône, pour que les 3 libellés tiennent en entier
+            icon={compact ? undefined : sec.icon}
+            selected={activeSection === sec.key}
+            onPress={() => setActiveSection(sec.key)}
+            style={st.sectionChip}
+          />
+        ))}
       </View>
 
-      {/* ─── PULSE SECTION ─── */}
+      {/* ─── ACTIVITÉ ─── */}
       {activeSection === 'pulse' && (
         <ScrollView
-          contentContainerStyle={s.scrollContent}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#B366FF" />}
+          contentContainerStyle={st.scroll}
+          refreshControl={refresh}
           showsVerticalScrollIndicator={false}
           onScroll={onTabScroll}
           scrollEventThrottle={16}
         >
-          {/* Coach Widget */}
           <CoachWidget suggestions={coachSuggestions} onAction={handleCoachAction} />
 
-          {/* Feed */}
           {pulseError ? (
-            <TouchableOpacity onPress={() => { setPulseError(false); if (myId) loadPulse(myId); }} style={{ padding: 20, alignItems: 'center' }}>
-              <Text style={{ color: '#aaa', fontSize: 14 }}>{t('players.load_error')}</Text>
-            </TouchableOpacity>
+            <EmptyState
+              icon="offline"
+              title={t('pilot.social.load_error')}
+              actionLabel={t('common.retry')}
+              onAction={() => { setPulseError(false); if (myId) loadPulse(myId); }}
+            />
           ) : loadingFeed ? (
-            <ActivityIndicator size="large" color="#B366FF" style={{ marginTop: 40 }} />
+            <Loader />
           ) : feed.length === 0 ? (
-            <View style={s.emptyState}>
-              <MaterialCommunityIcons name="lightning-bolt" size={48} color="#B366FF30" />
-              <Text style={s.emptyTitle}>{t('players.pulse_quiet')}</Text>
-              <Text style={s.emptySub}>{t('players.pulse_quiet_sub')}</Text>
-            </View>
+            <EmptyState icon="bolt" title={t('pilot.social.quiet_title')} message={t('pilot.social.quiet_sub')} />
           ) : (
             feed.map((item, feedIndex) => (
               <ExploitCard
@@ -631,49 +390,46 @@ export default function PlayersScreen() {
               />
             ))
           )}
-          <View style={{ height: 120 }} />
         </ScrollView>
       )}
 
-      {/* ─── TRIBUS SECTION ─── */}
+      {/* ─── CHAMPIONS ─── */}
       {activeSection === 'tribus' && (
         <ScrollView
-          contentContainerStyle={s.scrollContent}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFB547" />}
+          contentContainerStyle={[st.scroll, st.scrollFlush]}
+          refreshControl={refresh}
           showsVerticalScrollIndicator={false}
           onScroll={onTabScroll}
           scrollEventThrottle={16}
         >
-          {/* Pillar Filter */}
-          <ScrollView
-            horizontal showsHorizontalScrollIndicator={false}
-            contentContainerStyle={s.pillarFilterScroll}
-          >
-            {pillarFilters.map((pf) => {
-              const isActive = selectedPillar === pf.id;
-              return (
-                <TouchableOpacity
-                  key={pf.id}
-                  style={[s.pillarFilterChip, isActive && { backgroundColor: pf.color + '20', borderColor: pf.color }]}
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setSelectedPillar(pf.id);
-                  }}
-                >
-                  <CategoryIcon emoji={pf.icon} size={14} color={isActive ? pf.color : '#666'} type="super" />
-                  <Text style={[s.pillarFilterName, { color: isActive ? pf.color : '#666' }]}>{pf.name}</Text>
-                </TouchableOpacity>
-              );
-            })}
+          {/* Filtre par univers */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={st.filters}>
+            <Chip
+              label={t('pilot.social.all')}
+              icon="grid"
+              selected={selectedPillar === 'all'}
+              onPress={() => setSelectedPillar('all')}
+            />
+            {UNIVERSE_IDS.map((id) => (
+              <Chip
+                key={id}
+                label={pillarName(id)}
+                icon={UNIVERSE_ICON[id]}
+                selected={selectedPillar === id}
+                onPress={() => setSelectedPillar(id)}
+              />
+            ))}
           </ScrollView>
 
-          {/* Group by pillar */}
           {tribesError ? (
-            <TouchableOpacity onPress={() => { setTribesError(false); loadTribes(); }} style={{ padding: 20, alignItems: 'center' }}>
-              <Text style={{ color: '#aaa', fontSize: 14 }}>{t('players.load_error')}</Text>
-            </TouchableOpacity>
+            <EmptyState
+              icon="offline"
+              title={t('pilot.social.load_error')}
+              actionLabel={t('common.retry')}
+              onAction={() => { setTribesError(false); loadTribes(); }}
+            />
           ) : loadingTribes ? (
-            <ActivityIndicator size="large" color="#FFB547" style={{ marginTop: 40 }} />
+            <Loader />
           ) : (
             (() => {
               const grouped: { [key: string]: Tribe[] } = {};
@@ -681,174 +437,116 @@ export default function PlayersScreen() {
                 if (!grouped[tr.pillar_id]) grouped[tr.pillar_id] = [];
                 grouped[tr.pillar_id].push(tr);
               });
-              return Object.entries(grouped).map(([pillarId, pillarTribes]) => {
-                const pf = pillarFilters.find(p => p.id === pillarId.toLowerCase());
-                return (
-                  <Animated.View key={pillarId} entering={FadeInDown.springify()}>
-                    <View style={s.tribeGroupHeader}>
-                      <CategoryIcon emoji={pf?.icon || '🌐'} size={18} color={pf?.color || '#FFF'} type="super" />
-                      <Text style={[s.tribeGroupName, { color: pf?.color || '#FFF' }]}>{pf?.name || pillarId}</Text>
-                      <View style={[s.tribeGroupLine, { backgroundColor: (pf?.color || '#333') + '30' }]} />
-                    </View>
-                    {/* FlatList virtualisée : monte 3 cartes, le reste au scroll */}
-                    <FlatList
-                      horizontal
-                      data={pillarTribes}
-                      keyExtractor={(tr) => tr.id}
-                      renderItem={({ item, index: tribeIndex }) => (
-                        <TribeCard tribe={item} accentColor={pf?.color} index={tribeIndex} onPress={() => handleTribePress(item)} />
-                      )}
-                      showsHorizontalScrollIndicator={false}
-                      contentContainerStyle={s.tribeCarousel}
-                      initialNumToRender={3}
-                      maxToRenderPerBatch={3}
-                      windowSize={3}
-                      removeClippedSubviews
-                    />
-                  </Animated.View>
-                );
-              });
+              return Object.entries(grouped).map(([pillarId, pillarTribes]) => (
+                <Animated.View key={pillarId} entering={FadeInDown.springify()} style={st.group}>
+                  <View style={st.groupHead}>
+                    <Icon name={UNIVERSE_ICON[pillarId.toLowerCase()] ?? 'compass'} size={ICON_SIZE.sm} color={COLOR.text.secondary} />
+                    <Txt variant="overline" numberOfLines={1}>{pillarTribes[0]?.pillar_name || pillarId}</Txt>
+                    <View style={st.groupRule} />
+                  </View>
+                  {/* FlatList virtualisée : monte 3 cartes, le reste au scroll */}
+                  <FlatList
+                    horizontal
+                    data={pillarTribes}
+                    keyExtractor={(tr) => tr.id}
+                    renderItem={({ item, index: tribeIndex }) => (
+                      <TribeCard tribe={item} index={tribeIndex} onPress={() => handleTribePress(item)} />
+                    )}
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={st.carousel}
+                    initialNumToRender={3}
+                    maxToRenderPerBatch={3}
+                    windowSize={3}
+                    removeClippedSubviews
+                  />
+                </Animated.View>
+              ));
             })()
           )}
-          <View style={{ height: 120 }} />
         </ScrollView>
       )}
 
-      {/* ─── FORGE SECTION ─── */}
+      {/* ─── CRÉER ─── */}
       {activeSection === 'forge' && (
         <ScrollView
-          contentContainerStyle={s.scrollContent}
+          contentContainerStyle={st.scroll}
           showsVerticalScrollIndicator={false}
           onScroll={onTabScroll}
           scrollEventThrottle={16}
         >
-          {/* Forge Hero */}
+          {/* Renvoi vers la page unique /create-theme */}
           <Animated.View entering={FadeInDown.delay(100).springify()}>
-            <ForgeHeroCard>
-              <View style={forgeStyles.hero}>
-                <LinearGradient colors={['rgba(179,102,255,0.25)', 'rgba(179,102,255,0.08)']} style={forgeStyles.heroIconWrap}>
-                  <MaterialCommunityIcons name="hammer-wrench" size={32} color="#B366FF" />
-                </LinearGradient>
-                <Text style={forgeStyles.heroTitle}>{t('players.forge_title')}</Text>
-                <Text style={forgeStyles.heroSub}>
-                  {t('players.forge_subtitle')}
-                </Text>
-              </View>
-            </ForgeHeroCard>
-          </Animated.View>
-
-          {/* CTA vers la Forge — page unique /create-theme (plus de formulaire dupliqué) */}
-          <Animated.View entering={FadeInDown.delay(200).springify()}>
-            <TouchableOpacity
-              style={forgeStyles.forgeCta}
-              activeOpacity={0.85}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-                router.push('/create-theme');
-              }}
-            >
-              <LinearGradient
-                colors={['#00E5FF', '#B366FF']}
-                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
+            <Card style={st.forge}>
+              <View style={st.forgeIcon}><Icon name="forge" size={ICON_SIZE.xl} color={COLOR.text.primary} /></View>
+              <Txt variant="h2" align="center">{t('pilot.social.create_title')}</Txt>
+              <Txt variant="body" color={COLOR.text.secondary} align="center">{t('players.forge_subtitle')}</Txt>
+              <Button
+                label={t('pilot.social.create_cta')}
+                icon="plus"
+                size="lg"
+                fullWidth
+                onPress={() => router.push('/create-theme')}
+                style={st.forgeCta}
               />
-              <MaterialCommunityIcons name="creation" size={18} color="#000" />
-              <Text style={forgeStyles.forgeCtaText}>{t('players.create_theme')}</Text>
-            </TouchableOpacity>
-            <Text style={forgeStyles.generateHint}>{t('players.generate_hint')}</Text>
+              <Txt variant="caption" align="center">{t('players.generate_hint')}</Txt>
+            </Card>
           </Animated.View>
-
-          <View style={{ height: 120 }} />
         </ScrollView>
       )}
-    </View>
     </View>
   );
 }
 
-// ── Forge Styles ──
-const forgeStyles = StyleSheet.create({
-  hero: { alignItems: 'center', padding: 24 },
-  heroIconWrap: {
-    width: 64, height: 64, borderRadius: 22, backgroundColor: 'rgba(179,102,255,0.15)',
-    justifyContent: 'center', alignItems: 'center', marginBottom: 12,
-  },
-  heroTitle: {
-    fontSize: 22, fontFamily: 'SpaceGrotesk_700Bold', color: '#FFF',
-    letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8,
-  },
-  heroSub: {
-    fontSize: 13, fontFamily: 'SpaceGrotesk_400Regular', color: 'rgba(255,255,255,0.60)',
-    textAlign: 'center', lineHeight: 20,
-  },
-
-  // CTA gradient texte noir → /create-theme (page Forge unique)
-  forgeCta: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    marginHorizontal: 16, paddingVertical: 16, borderRadius: 16, overflow: 'hidden',
-    shadowColor: '#00E5FF', shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35, shadowRadius: 18, elevation: 8,
-  },
-  forgeCtaText: {
-    color: '#000', fontSize: 14, fontFamily: 'SpaceGrotesk_700Bold',
-    letterSpacing: 0.5, textTransform: 'uppercase',
-  },
-  generateHint: {
-    fontSize: 11, fontFamily: 'SpaceGrotesk_400Regular',
-    color: 'rgba(255,255,255,0.40)', textAlign: 'center', marginTop: 10,
-  },
-});
-
-// ── Main Styles ──
-const s = StyleSheet.create({
+const st = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
-  scrollContent: { paddingBottom: 20 },
+  flex: { flex: 1, gap: SPACE.xxs },
+  flexShrink: { flexShrink: 1 },
 
-  // Page header
-  pageHeader: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: 16, paddingTop: 14, paddingBottom: 12,
-  },
-  pageEyebrow: {
-    fontSize: 10, fontFamily: 'JetBrainsMono_700Bold', color: '#00E5FF',
-    letterSpacing: 2.5, textTransform: 'uppercase',
-  },
-  pageTitle: {
-    fontSize: 26, fontFamily: 'SpaceGrotesk_700Bold', color: '#FFF',
-    letterSpacing: -1, marginTop: 2, textTransform: 'uppercase',
+  pageHeader: { paddingHorizontal: SPACE.screenX, paddingTop: SPACE.lg, paddingBottom: SPACE.md, gap: SPACE.xs },
+  sectionNav: { flexDirection: 'row', gap: SPACE.sm, paddingHorizontal: SPACE.screenX, paddingBottom: SPACE.lg },
+  // Largeur selon le libellé (« Champions » est plus long) ; l'espace restant est partagé
+  sectionChip: { flexGrow: 1, justifyContent: 'center' },
+
+  // Bas : place réservée à la barre d'onglets flottante
+  scroll: { paddingHorizontal: SPACE.screenX, paddingBottom: 120, gap: SPACE.md },
+  // Champions : carrousels pleine largeur, marges portées par les rangées
+  scrollFlush: { paddingHorizontal: 0, gap: SPACE.xl },
+
+  // Exploit
+  exploit: { gap: SPACE.md },
+  pressed: { opacity: 0.7 },
+  // Pseudo long : coupé à la largeur de la carte (sinon centré et rogné des deux côtés)
+  thronePseudo: { alignSelf: 'stretch' },
+  exploitRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md, minHeight: SIZE.touch },
+  exploitText: { flex: 1, gap: SPACE.xxs },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs },
+  statsRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, marginTop: SPACE.xxs },
+  challengeBtn: { alignSelf: 'flex-start' },
+
+  // Coach
+  // Petit écran : le bouton passe sous le message plutôt que de l'écraser (texte ≥ 170 px)
+  coach: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: SPACE.md },
+  coachText: { flex: 1, minWidth: 170 },
+  iconDisc: {
+    width: SIZE.touch, height: SIZE.touch, borderRadius: RADII.md,
+    backgroundColor: COLOR.surface.subtle, alignItems: 'center', justifyContent: 'center',
   },
 
-  // Section Nav
-  sectionNav: {
-    flexDirection: 'row', paddingHorizontal: 12, paddingBottom: 14, gap: 6, alignItems: 'center',
-  },
-  sectionTab: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 10, borderRadius: 14, gap: 6,
-    backgroundColor: GLASS.bg, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
-  },
-  sectionTabLabel: { fontSize: 11, fontWeight: '900', color: '#555', letterSpacing: 1 },
-  sectionDot: { width: 4, height: 4, borderRadius: 2 },
+  // Champions
+  filters: { gap: SPACE.sm, paddingHorizontal: SPACE.screenX },
+  group: { gap: SPACE.md },
+  groupHead: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.screenX },
+  groupRule: { flex: 1, height: BORDER.hair, backgroundColor: COLOR.border.subtle },
+  carousel: { gap: SPACE.md, paddingHorizontal: SPACE.screenX },
+  tribe: { width: 156, alignItems: 'center', gap: SPACE.sm },
+  throne: { alignSelf: 'stretch', alignItems: 'center', gap: SPACE.xs, minHeight: 104, justifyContent: 'center' },
+  throneLabel: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs },
 
-  // Empty state
-  emptyState: { alignItems: 'center', paddingVertical: 60 },
-  emptyTitle: { color: '#FFF', fontSize: 18, fontWeight: '700', marginBottom: 4, marginTop: 12 },
-  emptySub: { color: '#525252', fontSize: 13, fontWeight: '500' },
-
-  // Pillar filter
-  pillarFilterScroll: { paddingHorizontal: 12, paddingBottom: 16, gap: 6 },
-  pillarFilterChip: {
-    flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 8,
-    borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.03)', borderWidth: 1,
-    borderColor: GLASS.borderSubtle, gap: 4,
+  // Créer
+  forge: { alignItems: 'center', gap: SPACE.md, padding: SPACE.xxl },
+  forgeIcon: {
+    width: 64, height: 64, borderRadius: 32,
+    backgroundColor: COLOR.surface.subtle, alignItems: 'center', justifyContent: 'center',
   },
-  pillarFilterName: { fontSize: 10, fontWeight: '800', letterSpacing: 1 },
-
-  // Tribe groups
-  tribeGroupHeader: {
-    flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginBottom: 10, gap: 8,
-  },
-  tribeGroupName: { fontSize: 14, fontWeight: '800', letterSpacing: 1 },
-  tribeGroupLine: { flex: 1, height: 1, marginLeft: 8 },
-  tribeCarousel: { paddingHorizontal: 12, paddingBottom: 12 },
+  forgeCta: { marginTop: SPACE.sm },
 });

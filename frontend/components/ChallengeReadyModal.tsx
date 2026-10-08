@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet, Modal, Animated, ActivityIndicator, Alert,
-} from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, StyleSheet, Animated, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useWS } from '../contexts/WebSocketContext';
 import { authFetch } from '../utils/api';
 import { t } from '../utils/i18n';
+import { Txt, Button, Dialog, ThemeIcon } from './ui';
+import { COLOR, SPACE, RADII, BORDER, ICON_SIZE } from '../theme/tokens';
 
 const TIMEOUT_SECONDS = 30;
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
@@ -49,7 +47,7 @@ export default function ChallengeReadyModal() {
       // challenge_incoming = Player B receives a real-time challenge from Player A
       on('challenge_incoming', (msg: any) => {
         const data = msg.data || {};
-        setChallengerPseudo(data.challenger_pseudo || 'Joueur');
+        setChallengerPseudo(data.challenger_pseudo || t('pilot.challenge.someone'));
         setThemeName(data.theme_name || '');
         setChallengeId(data.challenge_id || '');
         setThemeId(data.theme_id || '');
@@ -130,194 +128,86 @@ export default function ChallengeReadyModal() {
 
   if (!visible) return null;
 
+  // Défi reçu = événement (corail) : modale unique du kit, un seul CTA jaune « Accepter ».
+  // Pas de fermeture en touchant le voile : refuser doit rester un choix explicite.
   return (
-    <Modal visible transparent animationType="fade" onRequestClose={handleDecline}>
-      <View style={styles.overlay}>
-        <View style={styles.card}>
-          <LinearGradient colors={['#BF5FFF', '#8A2BE2']} style={styles.iconCircle}>
-            <MaterialCommunityIcons name="sword-cross" size={32} color="#FFF" />
-          </LinearGradient>
+    <Dialog
+      visible
+      onClose={handleDecline}
+      dismissable={false}
+      icon="duel"
+      tone="event"
+      title={t('pilot.challenge.incoming')}
+      actions={
+        <>
+          <Button
+            label={t('challenge.accept')}
+            icon="duel"
+            loading={accepting}
+            disabled={accepting}
+            fullWidth
+            haptic={false}
+            onPress={handleAccept}
+          />
+          <Button label={t('challenge.decline')} variant="ghost" fullWidth haptic={false} onPress={handleDecline} />
+        </>
+      }
+    >
+      <Txt variant="body" color={COLOR.text.secondary} align="center">
+        <Txt variant="body" color={COLOR.player.opponentText}>{challengerPseudo}</Txt>
+        {' '}{t('challenge.vs')}
+      </Txt>
 
-          <Text style={styles.title}>{t('challenge.incoming_title')}</Text>
-          <Text style={styles.subtitle}>
-            <Text style={styles.pseudo}>{challengerPseudo}</Text>{' '}
-            {t('challenge.vs')}
-          </Text>
-
-          {themeName ? (
-            <View style={styles.themeBadge}>
-              <MaterialCommunityIcons name="star" size={12} color="#BF5FFF" />
-              <Text style={styles.themeText}>{themeName}</Text>
-            </View>
-          ) : null}
-
-          <View style={styles.progressBg}>
-            <Animated.View
-              style={[
-                styles.progressBar,
-                {
-                  width: progressAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ['0%', '100%'],
-                  }),
-                },
-              ]}
-            />
-          </View>
-          <Text style={styles.countdownText}>{countdown}s</Text>
-
-          <View style={styles.buttons}>
-            <TouchableOpacity style={styles.declineBtn} onPress={handleDecline} activeOpacity={0.8}>
-              <MaterialCommunityIcons name="close" size={18} color="#FF3B30" />
-              <Text style={styles.declineText}>{t('challenge.decline')}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.acceptBtn, accepting && { opacity: 0.6 }]}
-              onPress={handleAccept}
-              disabled={accepting}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={['#BF5FFF', '#8A2BE2']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.acceptGradient}
-              >
-                {/* #42 — spinner while accept API call is in flight */}
-                {accepting
-                  ? <ActivityIndicator size="small" color="#FFF" />
-                  : <MaterialCommunityIcons name="sword-cross" size={18} color="#FFF" />}
-                <Text style={styles.acceptText}>{accepting ? '...' : t('challenge.accept')}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
+      {themeName ? (
+        <View style={styles.themePill}>
+          <ThemeIcon themeName={themeName} size={ICON_SIZE.theme.xs} />
+          <Txt variant="label" color={COLOR.text.primary} numberOfLines={1} style={styles.flexShrink}>{themeName}</Txt>
         </View>
+      ) : null}
+
+      {/* Temps restant pour répondre */}
+      <View style={styles.timer}>
+        <View style={styles.progressBg}>
+          <Animated.View
+            style={[
+              styles.progressBar,
+              { width: progressAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }) },
+            ]}
+          />
+        </View>
+        <Txt variant="caption" align="center">{t('pilot.challenge.seconds_left', { n: String(countdown) })}</Txt>
       </View>
-    </Modal>
+    </Dialog>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.85)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-  },
-  card: {
-    width: '100%',
-    backgroundColor: '#0D0D1A',
-    borderRadius: 24,
-    padding: 28,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(191,95,255,0.3)',
-  },
-  iconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-    shadowColor: '#BF5FFF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#FFF',
-    letterSpacing: 2,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 15,
-    color: '#A3A3A3',
-    fontWeight: '500',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  pseudo: {
-    color: '#BF5FFF',
-    fontWeight: '800',
-  },
-  themeBadge: {
+  flexShrink: { flexShrink: 1 },
+  themePill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    backgroundColor: 'rgba(191,95,255,0.12)',
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginBottom: 16,
+    alignSelf: 'center',
+    gap: SPACE.sm,
+    maxWidth: '100%',
+    backgroundColor: COLOR.surface.subtle,
+    borderRadius: RADII.pill,
+    borderWidth: BORDER.hair,
+    borderColor: COLOR.border.subtle,
+    paddingLeft: SPACE.xs,
+    paddingRight: SPACE.lg,
+    paddingVertical: SPACE.xs,
   },
-  themeText: {
-    color: '#BF5FFF',
-    fontSize: 13,
-    fontWeight: '700',
-  },
+  timer: { gap: SPACE.xs },
   progressBg: {
     width: '100%',
     height: 4,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 2,
+    backgroundColor: COLOR.track,
+    borderRadius: RADII.xs,
     overflow: 'hidden',
-    marginBottom: 6,
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#BF5FFF',
-    borderRadius: 2,
-  },
-  countdownText: {
-    fontSize: 12,
-    color: '#525252',
-    fontWeight: '600',
-    marginBottom: 20,
-  },
-  buttons: {
-    flexDirection: 'row',
-    gap: 12,
-    width: '100%',
-  },
-  declineBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    padding: 14,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255,59,48,0.3)',
-    backgroundColor: 'rgba(255,59,48,0.08)',
-  },
-  declineText: {
-    color: '#FF3B30',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  acceptBtn: {
-    flex: 1.5,
-    borderRadius: 14,
-    overflow: 'hidden',
-  },
-  acceptGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    padding: 14,
-    borderRadius: 14,
-  },
-  acceptText: {
-    color: '#FFF',
-    fontSize: 14,
-    fontWeight: '800',
+    backgroundColor: COLOR.accent.warm,
+    borderRadius: RADII.xs,
   },
 });

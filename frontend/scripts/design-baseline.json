@@ -1,13 +1,12 @@
 {
  "totals": {
-  "gradient": 73,
-  "hex": 659,
-  "rgba": 267,
-  "fontSize": 263,
-  "heavy": 101,
-  "iconLib": 16,
-  "emoji": 63,
-  "legacy": 18
+  "gradient": 52,
+  "hex": 437,
+  "rgba": 200,
+  "fontSize": 173,
+  "heavy": 68,
+  "iconLib": 10,
+  "emoji": 51
  },
  "files": {
   "app/(tabs)/accueil.tsx": {
@@ -16,25 +15,8 @@
   "app/(tabs)/play.tsx": {
    "gradient": 1
   },
-  "app/(tabs)/players.tsx": {
-   "hex": 65,
-   "rgba": 15,
-   "fontSize": 29,
-   "heavy": 6,
-   "gradient": 6,
-   "iconLib": 1,
-   "emoji": 11
-  },
   "app/category-detail.tsx": {
    "gradient": 1
-  },
-  "app/challenge-waiting.tsx": {
-   "hex": 21,
-   "rgba": 7,
-   "fontSize": 10,
-   "heavy": 5,
-   "gradient": 1,
-   "iconLib": 1
   },
   "app/create-theme.tsx": {
    "hex": 40,
@@ -43,15 +25,6 @@
    "heavy": 6,
    "gradient": 5,
    "iconLib": 1
-  },
-  "app/followers.tsx": {
-   "hex": 9,
-   "rgba": 5,
-   "fontSize": 6,
-   "heavy": 4,
-   "gradient": 1,
-   "iconLib": 1,
-   "emoji": 1
   },
   "app/index.tsx": {
    "hex": 4
@@ -66,14 +39,6 @@
   },
   "app/matchmaking.tsx": {
    "gradient": 4
-  },
-  "app/player-profile.tsx": {
-   "hex": 107,
-   "rgba": 34,
-   "fontSize": 34,
-   "heavy": 15,
-   "gradient": 10,
-   "iconLib": 1
   },
   "app/results.tsx": {
    "hex": 145,
@@ -122,28 +87,9 @@
    "iconLib": 1,
    "emoji": 40
   },
-  "components/ChallengeReadyModal.tsx": {
-   "hex": 19,
-   "rgba": 6,
-   "fontSize": 6,
-   "heavy": 3,
-   "gradient": 2,
-   "iconLib": 1
-  },
   "components/CosmicBackground.tsx": {
    "hex": 1,
    "rgba": 1
-  },
-  "components/DuelButton.tsx": {
-   "hex": 1,
-   "fontSize": 2,
-   "gradient": 1,
-   "legacy": 10
-  },
-  "components/EmptyState.tsx": {
-   "fontSize": 3,
-   "iconLib": 1,
-   "legacy": 8
   },
   "components/GlassIconFrame.tsx": {
    "hex": 2,
