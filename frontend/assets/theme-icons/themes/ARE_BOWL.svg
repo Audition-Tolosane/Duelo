@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Bowling Strike">
+  <path d="M154 36C170 36 180 50 178 66C176 82 168 90 168 106C168 122 198 138 198 172C198 196 188 212 182 220H126C120 212 110 196 110 172C110 138 140 122 140 106C140 90 132 82 130 66C128 50 138 36 154 36Z" fill="#12606D"/>
+  <rect x="140" y="92" width="28" height="10" rx="5" fill="#FF6B5B"/>
+  <rect x="140" y="108" width="28" height="10" rx="5" fill="#FF6B5B"/>
+  <circle cx="84" cy="178" r="46" fill="#FF6B5B"/>
+  <circle cx="72" cy="164" r="7" fill="#0B3D4A"/>
+  <circle cx="94" cy="160" r="7" fill="#0B3D4A"/>
+  <circle cx="84" cy="182" r="7" fill="#0B3D4A"/>
+  <path d="M140 56C142 50 146 46 152 44" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

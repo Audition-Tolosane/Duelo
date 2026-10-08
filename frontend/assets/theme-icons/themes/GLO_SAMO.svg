@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Bushido">
+  <g transform="rotate(-40 128 128)">
+  <path d="M18 122Q90 134 156 114V140Q90 162 18 144Q8 133 18 122Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="166" cy="126" rx="12" ry="38" fill="#FF6B5B"/>
+  <g transform="rotate(-8 180 126)"><rect x="180" y="112" width="64" height="28" rx="14" fill="#FFDB3D"/><path d="M192 118L200 134L208 118L216 134L224 118L232 134" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g>
+  <path d="M32 128Q46 131 60 132" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g fill="#FF6B5B"><circle cx="186" cy="174" r="11"/><circle cx="206" cy="188" r="11"/><circle cx="198" cy="210" r="11"/><circle cx="174" cy="210" r="11"/><circle cx="166" cy="188" r="11"/></g>
+  <circle cx="186" cy="194" r="9" fill="#FFDB3D"/>
+</svg>

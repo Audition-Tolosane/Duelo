@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Génétique">
+  <g transform="rotate(20 128 128)">
+  <path d="M103.4 52L152.6 52" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M97.0 76L159.0 76" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M103.4 112L152.6 112" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M97.0 136L159.0 136" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M103.4 172L152.6 172" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M97.0 196L159.0 196" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128.0 36L138.8 40L149.2 44L158.6 48L166.6 52L173.0 56L177.5 60L179.7 64L179.7 68L177.5 72L173.0 76L166.6 80L158.6 84L149.2 88L138.8 92L128.0 96L117.2 100L106.8 104L97.4 108L89.4 112L83.0 116L78.5 120L76.3 124L76.3 128L78.5 132L83.0 136L89.4 140L97.4 144L106.8 148L117.2 152L128.0 156L138.8 160L149.2 164L158.6 168L166.6 172L173.0 176L177.5 180L179.7 184L179.7 188L177.5 192L173.0 196L166.6 200L158.6 204L149.2 208L138.8 212L128.0 216L117.2 220" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128.0 36L117.2 40L106.8 44L97.4 48L89.4 52L83.0 56L78.5 60L76.3 64L76.3 68L78.5 72L83.0 76L89.4 80L97.4 84L106.8 88L117.2 92L128.0 96L138.8 100L149.2 104L158.6 108L166.6 112L173.0 116L177.5 120L179.7 124L179.7 128L177.5 132L173.0 136L166.6 140L158.6 144L149.2 148L138.8 152L128.0 156L117.2 160L106.8 164L97.4 168L89.4 172L83.0 176L78.5 180L76.3 184L76.3 188L78.5 192L83.0 196L89.4 200L97.4 204L106.8 208L117.2 212L128.0 216L138.8 220" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 40L150 46" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

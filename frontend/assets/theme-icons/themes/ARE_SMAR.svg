@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Super Mario Bros">
+  <path d="M84 150H172C182 176 178 212 160 218H96C78 212 74 176 84 150Z" fill="#FFDB3D"/>
+  <rect x="106" y="166" width="14" height="30" rx="7" fill="#0B3D4A"/>
+  <rect x="136" y="166" width="14" height="30" rx="7" fill="#0B3D4A"/>
+  <path d="M38 138C38 82 78 44 128 44C178 44 218 82 218 138C218 152 210 160 196 160H60C46 160 38 152 38 138Z" fill="#12606D"/>
+  <circle cx="128" cy="90" r="24" fill="#E8F1EC"/>
+  <circle cx="66" cy="128" r="16" fill="#E8F1EC"/>
+  <circle cx="190" cy="128" r="16" fill="#E8F1EC"/>
+  <path d="M70 92C76 80 84 72 94 66" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

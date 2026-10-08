@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Tour Eiffel">
+  <path d="M128 34L128 50" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <polygon points="120,54 136,54 146,108 110,108" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="108,124 148,124 162,158 94,158" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M92 174H164L196 220H164C156 194 100 194 92 220H60Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="96" y="106" width="64" height="16" rx="8" fill="#FFDB3D"/>
+  <rect x="80" y="158" width="96" height="18" rx="9" fill="#FFDB3D"/>
+  <circle cx="128" cy="34" r="10" fill="#FF6B5B"/>
+  <path d="M116 132L110 148" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Polar &amp; Thriller">
+  <path d="M112 140V116A16 16 0 0 1 144 116V140" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M92 156V116A36 36 0 0 1 164 116V160" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M72 160V116A56 56 0 0 1 184 116V156" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M52 146V116A76 76 0 0 1 204 116V140" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g transform="rotate(-14 128 178)"><rect x="30" y="160" width="196" height="36" rx="10" fill="#FFDB3D"/><polygon points="74,166 92,166 80,190 62,190" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="4" stroke-linejoin="round"/><polygon points="124,166 142,166 130,190 112,190" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="4" stroke-linejoin="round"/><polygon points="174,166 192,166 180,190 162,190" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="4" stroke-linejoin="round"/></g>
+  <path d="M70 82A76 76 0 0 1 92 58" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

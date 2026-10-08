@@ -248,6 +248,7 @@ export default function SearchScreen() {
       key={item.id}
       layout="row"
       name={item.name}
+      themeId={item.id}
       cluster={item.cluster}
       superCategory={item.super_category}
       level={item.user_level > 0 ? item.user_level : undefined}

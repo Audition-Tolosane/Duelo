@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Vincent van Gogh">
+  <path d="M128 140L128 176" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M84 166H172L162 214C161 220 156 224 150 224H106C100 224 95 220 94 214Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="128.0,36.0 136.5,55.0 152.3,41.5 151.7,62.3 171.8,57.1 162.2,75.5 182.6,79.5 166.0,92.0 182.6,104.5 162.2,108.5 171.8,126.9 151.7,121.7 152.3,142.5 136.5,129.0 128.0,148.0 119.5,129.0 103.7,142.5 104.3,121.7 84.2,126.9 93.8,108.5 73.4,104.5 90.0,92.0 73.4,79.5 93.8,75.5 84.2,57.1 104.3,62.3 103.7,41.5 119.5,55.0" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="92" r="28" fill="#FF6B5B"/>
+  <circle cx="128" cy="92" r="10" fill="#12606D"/>
+  <path d="M96 172L98 182" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

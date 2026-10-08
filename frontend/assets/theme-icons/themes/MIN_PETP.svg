@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Le Petit Prince">
+  <path d="M44 204C64 186 96 178 128 178C160 178 192 186 212 204C212 214 204 220 194 220H62C52 220 44 214 44 204Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M80 182V108C80 72 100 52 128 52C156 52 176 72 176 108V182" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="42" r="10" fill="#12606D"/>
+  <path d="M128 128V178" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 160C112 160 102 150 100 138C114 136 124 144 128 156Z" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M104 96C104 120 114 130 128 130C142 130 152 120 152 96L140 106L128 88L116 106Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="206,40 212,54 226,58 212,62 206,76 200,62 186,58 200,54" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="42" cy="70" r="7" fill="#FFDB3D"/>
+  <path d="M94 112C94 92 102 80 112 74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

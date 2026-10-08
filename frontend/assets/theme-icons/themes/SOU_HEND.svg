@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Jimi Hendrix">
+  <path d="M160 192C158 168 176 156 172 128C192 140 196 158 192 170C202 160 200 146 208 134C226 158 226 194 210 212C194 226 162 222 160 192Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M178 198C178 184 186 176 186 164C200 178 204 194 196 206C190 212 180 210 178 198Z" fill="#FFDB3D"/>
+  <g transform="rotate(40 128 128)"><rect x="118" y="36" width="20" height="100" rx="6" fill="#FFDB3D"/><rect x="112" y="18" width="30" height="34" rx="10" fill="#FFDB3D"/><path d="M100 128C88 112 66 114 66 138C66 156 76 162 76 178C76 204 98 220 128 220C158 220 180 204 180 178C180 162 190 156 190 138C190 116 170 112 158 126L148 136H108Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/><path d="M116 156H140M114 172H142M116 190H140" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M80 140L80 158" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g>
+</svg>

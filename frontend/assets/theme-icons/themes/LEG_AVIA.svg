@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pionniers de l'Air">
+  <path d="M84 80L84 156" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M164 80L164 156" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M148 136L148 184" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="148" cy="190" r="16" fill="#12606D"/>
+  <circle cx="148" cy="190" r="6" fill="#E8F1EC"/>
+  <rect x="44" y="150" width="156" height="18" rx="9" fill="#FFDB3D"/>
+  <path d="M196 102C206 102 210 110 210 120C210 130 206 138 196 138H96L52 126L38 84C36 76 46 72 52 80L74 106Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="56" y="64" width="160" height="20" rx="10" fill="#FFDB3D"/>
+  <ellipse cx="218" cy="120" rx="8" ry="40" fill="#FF6B5B"/>
+  <circle cx="214" cy="120" r="9" fill="#FF6B5B"/>
+  <path d="M98 116L116 114" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Robotique">
+  <path d="M128 70L128 48" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="42" r="12" fill="#FFDB3D"/>
+  <rect x="34" y="112" width="22" height="52" rx="8" fill="#12606D"/>
+  <rect x="200" y="112" width="22" height="52" rx="8" fill="#12606D"/>
+  <rect x="50" y="72" width="156" height="136" rx="32" fill="#12606D"/>
+  <rect x="70" y="96" width="116" height="60" rx="20" fill="#0B3D4A"/>
+  <circle cx="102" cy="126" r="16" fill="#FFDB3D"/>
+  <circle cx="154" cy="126" r="16" fill="#FFDB3D"/>
+  <rect x="96" y="172" width="64" height="16" rx="8" fill="#0B3D4A"/>
+  <path d="M64 106A28 28 0 0 1 76 88" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

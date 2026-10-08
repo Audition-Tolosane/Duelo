@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cafés &amp; Thés">
+  <path d="M174 118C206 114 210 162 176 164" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M50 100H180V136C180 174 156 196 115 196C74 196 50 174 50 136Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="58" y="96" width="114" height="16" rx="8" fill="#0B3D4A"/>
+  <rect x="32" y="198" width="176" height="20" rx="10" fill="#FFDB3D"/>
+  <g transform="rotate(-30 186 58)"><ellipse cx="186" cy="58" rx="22" ry="30" fill="#FFDB3D"/><path d="M186 34C178 50 194 66 186 82" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g>
+  <path d="M72 126V152" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

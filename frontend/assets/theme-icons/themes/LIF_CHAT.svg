@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Chats">
+  <polygon points="54,118 60,42 116,82" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="202,118 196,42 140,82" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="72,94 72,66 96,84" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="184,94 184,66 160,84" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="144" rx="86" ry="70" fill="#12606D"/>
+  <ellipse cx="96" cy="138" rx="17" ry="19" fill="#FFDB3D"/>
+  <ellipse cx="160" cy="138" rx="17" ry="19" fill="#FFDB3D"/>
+  <ellipse cx="96" cy="140" rx="6" ry="13" fill="#12606D"/>
+  <ellipse cx="160" cy="140" rx="6" ry="13" fill="#12606D"/>
+  <polygon points="118,166 138,166 128,176" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M62 132C64 116 74 104 88 96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

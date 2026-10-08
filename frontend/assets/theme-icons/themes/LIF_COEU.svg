@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cœur &amp; Sang">
+  <path d="M128 206C72 170 46 140 46 104C46 76 66 56 92 56C108 56 120 64 128 78C136 64 148 56 164 56C190 56 210 76 210 104C210 140 184 170 128 206Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M32 132H78L94 108L116 160L136 112L150 132H224" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M70 100C70 86 78 78 90 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

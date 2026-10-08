@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Électricité">
+  <path d="M48 64L60 72" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M208 64L196 72" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M128 32L128 36" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M128 46C88 46 64 76 64 108C64 134 80 148 94 162C100 168 102 174 102 180H154C154 174 156 168 162 162C176 148 192 134 192 108C192 76 168 46 128 46Z" fill="#12606D" stroke="#12606D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="138,74 110,120 130,120 118,158 148,110 128,110" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="100" y="186" width="56" height="36" rx="12" fill="#12606D"/>
+  <rect x="100" y="196" width="56" height="8" rx="0" fill="#0B3D4A"/>
+  <path d="M88 104A40 40 0 0 1 106 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

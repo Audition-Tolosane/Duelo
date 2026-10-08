@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Escrime">
+  <path d="M60 196L222 34" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M36 222L56 202" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="62" cy="196" r="18" fill="#FFDB3D"/>
+  <path d="M98 170H158L170 210C172 216 168 220 162 220H94C88 220 84 216 86 210Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="112" rx="58" ry="70" fill="#12606D"/>
+  <ellipse cx="128" cy="114" rx="40" ry="52" fill="#0B3D4A"/>
+  <path d="M112 70V158M128 64V164M144 70V158M92 96H164M90 120H166M94 144H162" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M84 88C88 74 96 62 108 56" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

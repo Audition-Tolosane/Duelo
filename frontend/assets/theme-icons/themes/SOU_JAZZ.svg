@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Géants du Jazz">
+  <path d="M182 92C194 82 208 80 220 84M170 74C176 58 188 48 202 44" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M106 64C106 48 92 40 70 44L52 48" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M96 64V176C96 204 116 220 144 220C172 220 190 204 190 176V150L204 120H146L162 150V176C162 190 156 196 144 196C132 196 124 190 124 176V64Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="175" cy="120" rx="24" ry="7" fill="#12606D"/>
+  <circle cx="110" cy="100" r="9" fill="#12606D"/>
+  <circle cx="110" cy="128" r="9" fill="#12606D"/>
+  <circle cx="110" cy="156" r="9" fill="#12606D"/>
+  <circle cx="176" cy="172" r="9" fill="#12606D"/>
+  <path d="M104 76L104 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="L&#39;Opéra">
+  <path d="M84 118C58 110 44 86 50 50C62 76 78 90 100 98Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M172 118C198 110 212 86 206 50C194 76 178 90 156 98Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="84" cy="174" r="12" fill="#FFDB3D"/>
+  <circle cx="84" cy="196" r="12" fill="#FFDB3D"/>
+  <circle cx="84" cy="216" r="10" fill="#FFDB3D"/>
+  <circle cx="172" cy="174" r="12" fill="#FFDB3D"/>
+  <circle cx="172" cy="196" r="12" fill="#FFDB3D"/>
+  <circle cx="172" cy="216" r="10" fill="#FFDB3D"/>
+  <path d="M74 146C74 98 98 70 128 70C158 70 182 98 182 146Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="62" y="140" width="132" height="26" rx="12" fill="#FF6B5B"/>
+  <path d="M90 153h0M128 153h0M166 153h0" stroke="#E8F1EC" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M92 112C94 98 100 88 110 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

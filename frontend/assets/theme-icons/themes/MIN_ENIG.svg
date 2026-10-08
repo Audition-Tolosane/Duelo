@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Énigmes &amp; Casse-têtes">
+  <path d="M36 64H68A18 18 0 1 1 100 64H132V96A18 18 0 1 1 132 128V160H100A18 18 0 1 0 68 160H36V128A18 18 0 1 0 36 96Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <g transform="rotate(14 164 176)"><path d="M124 136H150A14 14 0 1 1 178 136H204V162A14 14 0 1 1 204 190V216H178A14 14 0 1 0 150 216H124V190A14 14 0 1 0 124 162Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/></g>
+  <path d="M52 96L52 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

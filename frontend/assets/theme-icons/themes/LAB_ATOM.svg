@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Atomes &amp; Particules">
+  <ellipse cx="128" cy="128" rx="94" ry="34" transform="rotate(30 128 128)" fill="none" stroke="#12606D" stroke-width="12"/>
+  <ellipse cx="128" cy="128" rx="94" ry="34" transform="rotate(90 128 128)" fill="none" stroke="#12606D" stroke-width="12"/>
+  <ellipse cx="128" cy="128" rx="94" ry="34" transform="rotate(150 128 128)" fill="none" stroke="#12606D" stroke-width="12"/>
+  <circle cx="128" cy="128" r="24" fill="#FF6B5B"/>
+  <circle cx="206" cy="82" r="12" fill="#FFDB3D"/>
+  <circle cx="50" cy="82" r="12" fill="#FFDB3D"/>
+  <circle cx="128" cy="212" r="12" fill="#FFDB3D"/>
+  <path d="M116 124A13 13 0 0 1 124 114" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

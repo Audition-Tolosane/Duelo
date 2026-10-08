@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="James Bond Themes">
+  <path d="M128 148V204" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="84" y="200" width="88" height="18" rx="9" fill="#12606D"/>
+  <polygon points="52,66 204,66 128,150" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="74,82 182,82 128,138" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M100 36L162 112" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="146" cy="92" r="16" fill="#FF6B5B"/>
+  <circle cx="141" cy="87" r="5" fill="#E8F1EC"/>
+  <path d="M86 92L98 106" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

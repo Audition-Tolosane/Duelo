@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Merveilles Antiques">
+  <polygon points="74,152 182,152 192,218 64,218" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="98,104 158,104 166,140 90,140" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="108" y="70" width="40" height="26" rx="6" fill="#12606D"/>
+  <rect x="54" y="136" width="148" height="16" rx="8" fill="#FFDB3D"/>
+  <rect x="84" y="90" width="88" height="14" rx="7" fill="#FFDB3D"/>
+  <rect x="116" y="182" width="24" height="42" rx="10" fill="#FF6B5B"/>
+  <path d="M128 26C148 44 152 58 140 68H116C104 58 108 44 128 26Z" fill="#FFDB3D"/>
+  <path d="M128 44C136 52 138 60 132 64H124C118 60 120 52 128 44Z" fill="#FF6B5B"/>
+  <path d="M98 46L84 40" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M158 46L172 40" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M84 168L82 190" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

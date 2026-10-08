@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Science-Fiction">
+  <g transform="rotate(-18 128 136)"><ellipse cx="128" cy="136" rx="96" ry="28" fill="none" stroke="#FFDB3D" stroke-width="12"/><circle cx="128" cy="136" r="58" fill="#12606D"/><path d="M32 136A96 28 0 0 0 224 136" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g>
+  <path d="M92 118A40 40 0 0 1 112 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M170 66L210 40L202 80Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="10" stroke-linejoin="round"/>
+  <circle cx="196" cy="62" r="6" fill="#E8F1EC"/>
+  <path d="M156 82L146 90M164 92L156 100" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

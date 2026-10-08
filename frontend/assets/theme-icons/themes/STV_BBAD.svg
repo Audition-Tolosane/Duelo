@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Breaking Bad">
+  <path d="M104 132H152V150L188 204C194 214 188 224 176 224H80C68 224 62 214 68 204L104 150Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M86 192H170L178 206C181 211 178 214 172 214H84C78 214 75 211 78 206Z" fill="#FFDB3D"/>
+  <circle cx="112" cy="176" r="7" fill="#E8F1EC"/>
+  <circle cx="136" cy="164" r="5" fill="#E8F1EC"/>
+  <rect x="96" y="120" width="64" height="16" rx="8" fill="#0B3D4A"/>
+  <path d="M84 96C84 70 100 52 128 52C156 52 172 70 172 96Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="84" y="86" width="88" height="12" fill="#0B3D4A"/>
+  <path d="M50 104C50 98 56 94 64 94H192C200 94 206 98 206 104C206 110 200 114 192 114H64C56 114 50 110 50 104Z" fill="#12606D"/>
+  <path d="M104 66L104 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

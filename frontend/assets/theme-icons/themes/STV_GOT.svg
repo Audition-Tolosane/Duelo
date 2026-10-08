@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Game of Thrones">
+  <path d="M120 96L136 96L128 32ZM98 98L110 96L92 42ZM146 96L158 98L164 42ZM80 102L90 98L60 56ZM166 98L176 102L196 56ZM74 112L80 104L40 86ZM176 104L182 112L216 86Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="76" y="88" width="104" height="90" rx="10" fill="#12606D"/>
+  <path d="M106 108L106 146M128 106L128 146M150 108L150 146" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="40" y="140" width="44" height="24" rx="10" fill="#12606D"/>
+  <rect x="172" y="140" width="44" height="24" rx="10" fill="#12606D"/>
+  <circle cx="44" cy="152" r="12" fill="#FFDB3D"/>
+  <circle cx="212" cy="152" r="12" fill="#FFDB3D"/>
+  <rect x="64" y="158" width="128" height="26" rx="10" fill="#12606D"/>
+  <rect x="80" y="160" width="96" height="14" rx="7" fill="#0B3D4A"/>
+  <path d="M84 184H172L180 214H76Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M88 104L88 124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

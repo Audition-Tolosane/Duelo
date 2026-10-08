@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mythes &amp; Légendes">
+  <path d="M100 146C74 136 50 110 40 64C58 78 72 82 86 80C80 94 84 104 98 108C94 118 98 126 108 130Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M162 194C188 210 214 200 212 176" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="200,170 212,146 224,170" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="122" cy="170" rx="52" ry="44" fill="#12606D"/>
+  <path d="M108 150C104 114 116 86 138 72C156 60 182 60 198 70C214 78 218 96 206 104C196 110 180 108 170 108C160 118 158 136 162 156Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="148,66 156,38 170,64" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="112,116 98,108 116,98" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <polygon points="124,90 112,80 132,76" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="182" cy="84" r="8" fill="#E8F1EC"/>
+  <rect x="86" y="200" width="30" height="18" rx="9" fill="#12606D"/>
+  <rect x="132" y="200" width="30" height="18" rx="9" fill="#12606D"/>
+  <path d="M84 156C86 144 92 136 100 132" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

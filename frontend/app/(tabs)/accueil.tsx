@@ -1429,6 +1429,7 @@ export default function AccueilScreen() {
                   <ThemeCard
                     key={th.id}
                     name={th.name}
+                    themeId={th.id}
                     meta={th.match_count > 0 ? `${th.match_count} ${t('home.duels_label')}` : undefined}
                     onPress={() => router.push(`/category-detail?id=${th.id}`)}
                   />

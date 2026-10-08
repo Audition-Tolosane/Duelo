@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Astérix">
+  <path d="M90 140C70 132 50 108 40 64C56 78 70 82 82 82C76 94 80 102 92 106C88 116 92 124 100 126Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <g transform="translate(256 0) scale(-1 1)"><path d="M90 140C70 132 50 108 40 64C56 78 70 82 82 82C76 94 80 102 92 106C88 116 92 124 100 126Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/></g>
+  <path d="M80 176C80 128 100 102 128 102C156 102 176 128 176 176Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="64" y="168" width="128" height="26" rx="13" fill="#FF6B5B"/>
+  <circle cx="96" cy="181" r="5" fill="#E8F1EC"/>
+  <circle cx="128" cy="181" r="5" fill="#E8F1EC"/>
+  <circle cx="160" cy="181" r="5" fill="#E8F1EC"/>
+  <path d="M100 140C102 128 108 120 116 116" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

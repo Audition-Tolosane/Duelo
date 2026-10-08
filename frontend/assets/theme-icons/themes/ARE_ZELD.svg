@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Zelda">
+  <path d="M110 150V58L128 30L146 58V150Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M54 138C78 156 104 152 128 158C152 152 178 156 202 138C208 158 194 180 172 182H84C62 180 48 158 54 138Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="170" r="11" fill="#FF6B5B"/>
+  <rect x="116" y="184" width="24" height="30" rx="8" fill="#FF6B5B"/>
+  <circle cx="128" cy="218" r="13" fill="#FFDB3D"/>
+  <path d="M122 66V96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

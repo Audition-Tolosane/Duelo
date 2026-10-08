@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Tir à l'arc">
+  <circle cx="116" cy="140" r="82" fill="#12606D"/>
+  <circle cx="116" cy="140" r="60" fill="#FFDB3D"/>
+  <circle cx="116" cy="140" r="40" fill="#12606D"/>
+  <circle cx="116" cy="140" r="20" fill="#FFDB3D"/>
+  <path d="M116 140L200 56" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="196,48 212,32 222,42 210,54" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <polygon points="204,60 220,44 228,56 214,64" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M58 116C64 98 76 84 92 74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

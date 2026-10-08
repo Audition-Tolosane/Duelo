@@ -142,6 +142,7 @@ export default function ThemeListScreen() {
             <ThemeCard
               layout="row"
               name={item.name}
+              themeId={item.id}
               cluster={item.cluster}
               superCategory={item.superCategory}
               level={item.level}

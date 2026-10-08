@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Haute Horlogerie">
+  <rect x="100" y="32" width="56" height="64" rx="12" fill="#12606D"/>
+  <rect x="100" y="160" width="56" height="64" rx="12" fill="#12606D"/>
+  <rect x="184" y="114" width="20" height="28" rx="8" fill="#FFDB3D"/>
+  <circle cx="128" cy="128" r="62" fill="#FFDB3D"/>
+  <circle cx="128" cy="128" r="48" fill="#0B3D4A"/>
+  <polygon points="146.0,150.0 139.1,154.6 140.7,162.7 132.6,161.1 128.0,168.0 123.4,161.1 115.3,162.7 116.9,154.6 110.0,150.0 116.9,145.4 115.3,137.3 123.4,138.9 128.0,132.0 132.6,138.9 140.7,137.3 139.1,145.4" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="128" cy="150" r="5" fill="#0B3D4A"/>
+  <path d="M128 114L128 92" stroke="#E8F1EC" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M128 114L154 104" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M78 108A54 54 0 0 1 102 81" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

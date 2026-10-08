@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dragon Ball Z">
+  <circle cx="128" cy="128" r="86" fill="#FFDB3D"/>
+  <path d="M204.1 92.5A84 84 0 0 1 92.5 204.1A100 100 0 0 0 204.1 92.5Z" fill="#12606D"/>
+  <polygon points="128.0,70.0 133.9,83.9 148.9,85.2 137.5,95.1 140.9,109.8 128.0,102.0 115.1,109.8 118.5,95.1 107.1,85.2 122.1,83.9" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="94.0,106.0 99.9,119.9 114.9,121.2 103.5,131.1 106.9,145.8 94.0,138.0 81.1,145.8 84.5,131.1 73.1,121.2 88.1,119.9" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="162.0,106.0 167.9,119.9 182.9,121.2 171.5,131.1 174.9,145.8 162.0,138.0 149.1,145.8 152.5,131.1 141.1,121.2 156.1,119.9" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="128.0,142.0 133.9,155.9 148.9,157.2 137.5,167.1 140.9,181.8 128.0,174.0 115.1,181.8 118.5,167.1 107.1,157.2 122.1,155.9" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M62 112A68 68 0 0 1 90 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

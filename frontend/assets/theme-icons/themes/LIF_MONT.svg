@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Montagnes">
+  <circle cx="72" cy="70" r="24" fill="#FFDB3D"/>
+  <polygon points="40,200 92,118 144,200" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="84,200 154,64 218,200" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="154,84 138,112 146,108 156,118 166,106 172,112" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M120 134L108 158" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="34" y="196" width="188" height="20" rx="10" fill="#12606D"/>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Trains &amp; Chemins de Fer">
+  <path d="M36 214L220 214" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M66 54H102L94 70V110H74V70Z" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
+  <rect x="40" y="104" width="124" height="60" rx="26" fill="#12606D"/>
+  <rect x="148" y="64" width="64" height="112" rx="12" fill="#12606D"/>
+  <rect x="140" y="56" width="80" height="16" rx="8" fill="#FF6B5B"/>
+  <rect x="164" y="86" width="32" height="36" rx="8" fill="#E8F1EC"/>
+  <rect x="36" y="156" width="184" height="22" rx="10" fill="#12606D"/>
+  <circle cx="84" cy="184" r="22" fill="#FF6B5B"/>
+  <circle cx="136" cy="184" r="22" fill="#FF6B5B"/>
+  <circle cx="188" cy="184" r="22" fill="#FF6B5B"/>
+  <circle cx="84" cy="184" r="8" fill="#FFDB3D"/>
+  <circle cx="136" cy="184" r="8" fill="#FFDB3D"/>
+  <circle cx="188" cy="184" r="8" fill="#FFDB3D"/>
+  <path d="M58 128A22 22 0 0 1 72 116" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

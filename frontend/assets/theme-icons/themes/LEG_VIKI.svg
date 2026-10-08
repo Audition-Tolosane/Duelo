@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="L'Âge des Vikings">
+  <path d="M128 150L128 50" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="78" y="56" width="100" height="78" rx="12" fill="#FFDB3D"/>
+  <rect x="100" y="56" width="18" height="78" fill="#FF6B5B"/>
+  <rect x="138" y="56" width="18" height="78" fill="#FF6B5B"/>
+  <path d="M52 156C40 134 38 112 50 94" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M38 96C34 78 46 66 62 68L80 76C74 84 64 86 58 88L58 100Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M206 156C220 136 222 114 210 104C202 98 194 104 198 112" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M40 148H214C208 182 186 196 160 196H96C70 196 48 182 40 148Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="96" cy="166" r="11" fill="#FFDB3D"/>
+  <circle cx="128" cy="168" r="11" fill="#FFDB3D"/>
+  <circle cx="160" cy="166" r="11" fill="#FFDB3D"/>
+  <path d="M88 72L88 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mythologies">
+  <path d="M36 204C52 190 68 190 84 204S116 218 132 204S164 190 180 204S212 218 220 208" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="116" y="130" width="24" height="94" rx="12" fill="#12606D"/>
+  <path d="M64 64V100C64 120 88 134 116 136H140C168 134 192 120 192 100V64H176V98C176 110 158 116 140 116V64H116V116C98 116 80 110 80 98V64Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="58,66 72,34 86,66" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="114,62 128,28 142,62" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="170,66 184,34 198,66" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="108" y="146" width="40" height="18" rx="9" fill="#FFDB3D"/>
+  <path d="M72 82V102" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

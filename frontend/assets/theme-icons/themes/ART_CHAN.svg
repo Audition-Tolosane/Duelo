@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Maison Chanel">
+  <path d="M68 112C68 48 188 48 188 112" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="40" y="104" width="176" height="114" rx="18" fill="#12606D"/>
+  <path d="M56 204L88 172M88 204L120 172M120 204L152 172M152 204L184 172M184 204L200 188M56 172L88 204M88 172L120 204M120 172L152 204M152 172L184 204M184 172L200 188" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="40" y="150" width="176" height="8" fill="#0B3D4A"/>
+  <circle cx="128" cy="154" r="16" fill="#FFDB3D"/>
+  <circle cx="128" cy="154" r="6" fill="#0B3D4A"/>
+  <path d="M60 124L84 124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

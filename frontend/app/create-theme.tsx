@@ -1,33 +1,34 @@
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView,
-  ActivityIndicator, Animated, Alert, KeyboardAvoidingView, Platform, Dimensions,
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, useWindowDimensions } from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { GLASS } from '../theme/glassTheme';
 import { authFetch } from '../utils/api';
 import { t } from '../utils/i18n';
-import DueloHeader from '../components/DueloHeader';
 import SwipeBackPage from '../components/SwipeBackPage';
-import CategoryIcon from '../components/CategoryIcon';
+import {
+  Txt, Icon, IconName, Button, Card, Chip, Loader, ThemeIcon, ScreenContainer, ScreenHeader,
+} from '../components/ui';
+import { COLOR, SPACE, RADII, SIZE, BORDER, TYPO, ICON_SIZE, PALETTE } from '../theme/tokens';
+
+// Créer un thème : le joueur propose un sujet, le serveur prépare les questions, puis on joue.
+// Étapes : formulaire → préparation (15–30 s) → thème prêt.
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
-// Univers réels chargés depuis /api/explore/super-categories (même source que
-// l'onglet Thèmes) — plus de liste codée en dur avec des univers fictifs.
-type Universe = { id: string; label: string; icon: string; color: string };
+// Univers réels chargés depuis /api/explore/super-categories (même source que l'onglet Thèmes).
+// `color` reste celle de l'univers renvoyée par l'API : elle est transmise telle quelle au serveur.
+type Universe = { id: string; label: string; color: string };
 
-const PRESET_COLORS = [
-  '#8A2BE2', '#FF6B35', '#00FF9D', '#FFD700',
-  '#FF3B5C', '#00BFFF', '#FF69B4', '#4ECDC4',
-  '#E040FB', '#FFAB40', '#2E7D32', '#E53935',
-];
+// Pictogramme Lucide de chaque univers (même correspondance que l'onglet Social)
+const UNIVERSE_ICON: Record<string, IconName> = {
+  SCREEN: 'film', SOUND: 'music', ARENA: 'trophy', LEGENDS: 'landmark', LAB: 'flask',
+  GLOBE: 'globe', ART: 'palette', LIFE: 'leaf', MIND: 'brain',
+};
+
+// Confettis du thème prêt : couleurs de la palette SKILKI
+const CONFETTI = [PALETTE.yellow, PALETTE.coral, PALETTE.gold, PALETTE.green, PALETTE.cream];
 
 type Phase = 'form' | 'generating' | 'done';
 
@@ -40,30 +41,26 @@ type Result = {
 
 export default function CreateThemeScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
 
   const [userId, setUserId] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [universes, setUniverses] = useState<Universe[]>([]);
   const [universe, setUniverse] = useState<Universe | null>(null);
-  const [color, setColor] = useState(PRESET_COLORS[0]);
+  const [color, setColor] = useState('');
   const [phase, setPhase] = useState<Phase>('form');
   const [result, setResult] = useState<Result | null>(null);
   const [error, setError] = useState('');
 
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-
   useEffect(() => {
     AsyncStorage.getItem('duelo_user_id').then(uid => { if (uid) setUserId(uid); });
-    // Univers réels depuis l'API
     (async () => {
       try {
         const res = await fetch(`${API_URL}/api/explore/super-categories`);
         const data = await res.json();
         const list: Universe[] = (Array.isArray(data) ? data : []).map((sc: any) => ({
-          id: sc.id, label: sc.label, icon: sc.icon, color: sc.color,
+          id: sc.id, label: sc.label, color: sc.color,
         }));
         setUniverses(list);
         if (list.length > 0) {
@@ -73,23 +70,6 @@ export default function CreateThemeScreen() {
       } catch {}
     })();
   }, []);
-
-  useEffect(() => {
-    if (phase === 'generating') {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulseAnim, { toValue: 1.1, duration: 800, useNativeDriver: true }),
-          Animated.timing(pulseAnim, { toValue: 1.0, duration: 800, useNativeDriver: true }),
-        ])
-      ).start();
-    } else {
-      pulseAnim.stopAnimation();
-      pulseAnim.setValue(1);
-    }
-    if (phase === 'done') {
-      Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }).start();
-    }
-  }, [phase]);
 
   const validate = (): boolean => {
     if (name.trim().length < 2) {
@@ -155,432 +135,179 @@ export default function CreateThemeScreen() {
 
   return (
     <SwipeBackPage>
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <DueloHeader />
-        <View style={styles.subHeader}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backCircle} activeOpacity={0.6}>
-            <MaterialCommunityIcons name="chevron-left" size={26} color="#FFF" />
-          </TouchableOpacity>
-          <Text style={styles.subHeaderTitle}>{t('forge.title')}</Text>
-          <View style={{ width: 40 }} />
-        </View>
+    <ScreenContainer>
+      <ScreenHeader title={t('pilot.create.title')} />
+      <KeyboardAvoidingView style={s.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
 
         {phase === 'form' && (
           <ScrollView
-            contentContainerStyle={styles.scroll}
+            contentContainerStyle={s.scroll}
             showsVerticalScrollIndicator={false}
             keyboardDismissMode="on-drag"
             keyboardShouldPersistTaps="handled"
           >
-            {/* Header card */}
-            <LinearGradient
-              colors={['rgba(179,102,255,0.15)', 'rgba(0,229,255,0.06)']}
-              style={styles.headerCard}
-            >
-              <View style={styles.headerIconWrap}>
-                <MaterialCommunityIcons name="hammer-wrench" size={28} color="#B366FF" />
-              </View>
-              <Text style={styles.headerTitle}>{t('forge.title')}</Text>
-              <Text style={styles.headerSub}>{t('forge.subtitle')}</Text>
-            </LinearGradient>
-
-            {/* Name */}
-            <Text style={styles.label}>{t('forge.name_label')}</Text>
-            <TextInput
-              style={styles.input}
-              placeholder={t('forge.name_placeholder')}
-              placeholderTextColor="rgba(255,255,255,0.40)"
-              value={name}
-              onChangeText={text => { setName(text); setError(''); }}
-              maxLength={100}
-            />
-
-            {/* Description */}
-            <Text style={styles.label}>{t('forge.desc_label')}</Text>
-            <TextInput
-              style={[styles.input, styles.inputMulti]}
-              placeholder={t('forge.desc_placeholder')}
-              placeholderTextColor="rgba(255,255,255,0.40)"
-              value={description}
-              onChangeText={text => { setDescription(text); setError(''); }}
-              multiline
-              numberOfLines={4}
-              maxLength={500}
-            />
-
-            {/* Universe — liste réelle depuis l'API, icônes CategoryIcon */}
-            <Text style={styles.label}>{t('forge.universe_label')}</Text>
-            {universes.length === 0 ? (
-              <ActivityIndicator size="small" color="#B366FF" style={{ marginVertical: 16 }} />
-            ) : (
-              <View style={styles.universesGrid}>
-                {universes.map(u => {
-                  const isActive = universe?.id === u.id;
-                  return (
-                    <TouchableOpacity
-                      key={u.id}
-                      style={[
-                        styles.universeChip,
-                        isActive && { borderColor: u.color, backgroundColor: u.color + '18' },
-                      ]}
-                      onPress={() => { setUniverse(u); setColor(u.color); Haptics.selectionAsync(); }}
-                      activeOpacity={0.7}
-                    >
-                      <CategoryIcon emoji={u.icon} size={18} color={isActive ? u.color : 'rgba(255,255,255,0.45)'} type="super" />
-                      <Text style={[styles.universeLabel, isActive && { color: u.color }]}>
-                        {u.label}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            )}
-
-            {/* Color */}
-            <Text style={styles.label}>{t('forge.color_label')}</Text>
-            <View style={styles.colorRow}>
-              {PRESET_COLORS.map(c => (
-                <TouchableOpacity
-                  key={c}
-                  style={[styles.colorDot, { backgroundColor: c }, color === c && styles.colorDotActive]}
-                  onPress={() => { setColor(c); Haptics.selectionAsync(); }}
-                  activeOpacity={0.8}
-                />
-              ))}
+            {/* Intro */}
+            <View style={s.intro}>
+              <View style={s.iconDisc}><Icon name="forge" size={ICON_SIZE.xl} color={COLOR.text.primary} /></View>
+              <Txt variant="h2" align="center">{t('pilot.create.intro_title')}</Txt>
+              <Txt variant="body" color={COLOR.text.secondary} align="center">{t('pilot.create.intro_sub')}</Txt>
             </View>
 
-            {/* Error */}
+            {/* Nom */}
+            <View style={s.field}>
+              <Txt variant="overline">{t('forge.name_label')}</Txt>
+              <TextInput
+                style={s.input}
+                placeholder={t('forge.name_placeholder')}
+                placeholderTextColor={COLOR.text.tertiary}
+                selectionColor={COLOR.action.primary}
+                maxFontSizeMultiplier={1.3}
+                value={name}
+                onChangeText={text => { setName(text); setError(''); }}
+                maxLength={100}
+              />
+            </View>
+
+            {/* Description */}
+            <View style={s.field}>
+              <Txt variant="overline">{t('forge.desc_label')}</Txt>
+              <TextInput
+                style={[s.input, s.inputMulti]}
+                placeholder={t('forge.desc_placeholder')}
+                placeholderTextColor={COLOR.text.tertiary}
+                selectionColor={COLOR.action.primary}
+                maxFontSizeMultiplier={1.3}
+                value={description}
+                onChangeText={text => { setDescription(text); setError(''); }}
+                multiline
+                numberOfLines={4}
+                maxLength={500}
+              />
+            </View>
+
+            {/* Univers (liste réelle depuis l'API) */}
+            <View style={s.field}>
+              <Txt variant="overline">{t('forge.universe_label')}</Txt>
+              {universes.length === 0 ? (
+                <Loader />
+              ) : (
+                <View style={s.chips}>
+                  {universes.map(u => (
+                    <Chip
+                      key={u.id}
+                      label={u.label}
+                      icon={UNIVERSE_ICON[u.id] ?? 'compass'}
+                      selected={universe?.id === u.id}
+                      onPress={() => { setUniverse(u); setColor(u.color); }}
+                    />
+                  ))}
+                </View>
+              )}
+            </View>
+
+            {/* Aperçu : l'icône que le thème recevra dans l'app */}
+            {name.trim().length >= 2 && universe ? (
+              <Card style={s.preview}>
+                <ThemeIcon themeName={name.trim()} superCategory={universe.id} size={ICON_SIZE.theme.md} />
+                <View style={s.flex}>
+                  <Txt variant="overline">{t('pilot.create.preview')}</Txt>
+                  <Txt variant="cardTitle" numberOfLines={2}>{name.trim()}</Txt>
+                  <Txt variant="caption" numberOfLines={1}>{universe.label}</Txt>
+                </View>
+              </Card>
+            ) : null}
+
+            {/* Erreur */}
             {!!error && (
-              <View style={styles.errorBox}>
-                <MaterialCommunityIcons name="alert-circle" size={16} color="#FF3B30" />
-                <Text style={styles.errorText}>{error}</Text>
+              <View style={s.errorRow} accessibilityLiveRegion="polite">
+                <Icon name="error" size={ICON_SIZE.sm} color={COLOR.status.errorText} />
+                <Txt variant="bodySmall" color={COLOR.status.errorText} style={s.flex}>{error}</Txt>
               </View>
             )}
 
-            {/* Generate button */}
-            <TouchableOpacity style={styles.generateBtn} onPress={handleGenerate} activeOpacity={0.85}>
-              <LinearGradient
-                colors={[color, color + 'BB']}
-                start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                style={styles.generateGradient}
-              >
-                <MaterialCommunityIcons name="creation" size={20} color="#FFF" />
-                <Text style={styles.generateText}>{t('forge.generate_btn')}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            <View style={{ height: 40 }} />
+            <Button label={t('pilot.create.cta')} icon="sparkles" size="lg" fullWidth onPress={handleGenerate} haptic={false} />
           </ScrollView>
         )}
 
         {phase === 'generating' && (
-          <View style={styles.generatingWrap}>
-            <Animated.View style={[styles.forgeIconBig, { transform: [{ scale: pulseAnim }] }]}>
-              <LinearGradient colors={['#B366FF', '#00E5FF']} style={styles.forgeIconGrad}>
-                <MaterialCommunityIcons name="hammer-wrench" size={42} color="#FFF" />
-              </LinearGradient>
-            </Animated.View>
-            <ActivityIndicator size="large" color="#B366FF" style={{ marginBottom: 20 }} />
-            <Text style={styles.generatingTitle}>{t('forge.generating')}</Text>
-            <Text style={styles.generatingName}>"{name}"</Text>
-            <Text style={styles.generatingDetail}>{t('forge.generating_detail')}</Text>
+          <View style={s.center}>
+            <View style={s.iconDisc}><Icon name="forge" size={ICON_SIZE.xl} color={COLOR.text.primary} /></View>
+            <Loader />
+            <Txt variant="h2" align="center">{t('pilot.create.generating')}</Txt>
+            <Txt variant="cardTitle" align="center" numberOfLines={2}>« {name} »</Txt>
+            <Txt variant="body" color={COLOR.text.secondary} align="center">{t('pilot.create.generating_detail')}</Txt>
           </View>
         )}
 
         {phase === 'done' && result && (
-          <Animated.View style={[styles.doneWrap, { opacity: fadeAnim }]}>
+          <View style={s.center}>
             <ConfettiCannon
               count={80}
-              origin={{ x: Dimensions.get('window').width / 2, y: -10 }}
+              origin={{ x: width / 2, y: -10 }}
               autoStart
               fadeOut
               explosionSpeed={350}
               fallSpeed={2800}
-              colors={['#00E5FF', '#B366FF', '#FFB547', '#32E7A3', '#FF6B2C']}
+              colors={CONFETTI}
             />
-            <LinearGradient
-              colors={[result.color_hex + '30', result.color_hex + '08']}
-              style={styles.doneCard}
-            >
-              <View style={[styles.doneIconWrap, { backgroundColor: result.color_hex }]}>
-                <MaterialCommunityIcons name="check-bold" size={36} color="#FFF" />
+            <Card style={s.doneCard}>
+              <ThemeIcon themeId={result.theme_id} themeName={result.name} superCategory={universe?.id} size={ICON_SIZE.theme.lg} />
+              <View style={s.doneTexts}>
+                <View style={s.successRow}>
+                  <Icon name="success" size={ICON_SIZE.md} color={COLOR.status.success} />
+                  <Txt variant="label" color={COLOR.status.success}>{t('forge.success')}</Txt>
+                </View>
+                <Txt variant="h2" align="center" numberOfLines={2}>{result.name}</Txt>
+                <Txt variant="body" color={COLOR.text.secondary} align="center">
+                  {t('pilot.create.questions_ready', { count: String(result.question_count) })}
+                </Txt>
               </View>
-              <Text style={styles.doneTitle}>{t('forge.success')}</Text>
-              <Text style={styles.doneName}>"{result.name}"</Text>
-              <Text style={[styles.doneCount, { color: result.color_hex }]}>
-                {t('forge.questions_count', { count: String(result.question_count) })}
-              </Text>
-
-              <TouchableOpacity style={styles.playBtn} onPress={handlePlay} activeOpacity={0.85}>
-                <LinearGradient
-                  colors={[result.color_hex, result.color_hex + 'BB']}
-                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                  style={styles.playGradient}
-                >
-                  <MaterialCommunityIcons name="sword-cross" size={20} color="#FFF" />
-                  <Text style={styles.playText}>{t('forge.play_now')}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </LinearGradient>
-          </Animated.View>
+              <Button label={t('forge.play_now')} icon="duel" size="lg" fullWidth onPress={handlePlay} />
+            </Card>
+          </View>
         )}
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </ScreenContainer>
     </SwipeBackPage>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#060611',
+const s = StyleSheet.create({
+  flex: { flex: 1 },
+  scroll: { paddingHorizontal: SPACE.screenX, paddingTop: SPACE.lg, paddingBottom: SPACE.huge, gap: SPACE.xl },
+
+  intro: { alignItems: 'center', gap: SPACE.sm },
+  iconDisc: {
+    width: 64, height: 64, borderRadius: 32,
+    backgroundColor: COLOR.surface.card,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: SPACE.xs,
   },
-  subHeader: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 12, paddingVertical: 10,
-  },
-  backCircle: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    justifyContent: 'center', alignItems: 'center',
-  },
-  subHeaderTitle: {
-    fontSize: 17, fontWeight: '900', color: '#FFF', letterSpacing: 1,
-  },
-  scroll: {
-    padding: 20,
-    paddingTop: 12,
-  },
-  headerCard: {
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    marginBottom: 24,
-    borderWidth: 1,
-    borderColor: 'rgba(138,43,226,0.2)',
-  },
-  headerIconWrap: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: 'rgba(138,43,226,0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
-  },
-  headerTitle: {
-    color: '#FFF',
-    fontSize: 20,
-    fontWeight: '900',
-    fontFamily: 'SpaceGrotesk_700Bold',
-    letterSpacing: -0.5,
-    textTransform: 'uppercase',
-  },
-  headerSub: {
-    color: 'rgba(255,255,255,0.80)',
-    fontSize: 13,
-    marginTop: 4,
-    textAlign: 'center',
-  },
-  label: {
-    color: 'rgba(255,255,255,0.70)',
-    fontSize: 10,
-    fontFamily: 'JetBrainsMono_700Bold',
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-    marginBottom: 8,
-    marginTop: 16,
-  },
+
+  field: { gap: SPACE.sm },
   input: {
-    ...GLASS,
-    color: '#FFF',
-    fontSize: 15,
-    padding: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    minHeight: SIZE.input,
+    borderRadius: RADII.md,
+    backgroundColor: COLOR.surface.input,
+    borderWidth: BORDER.hair,
+    borderColor: COLOR.border.default,
+    paddingHorizontal: SPACE.lg,
+    paddingVertical: SPACE.md,
+    ...TYPO.body,
+    color: COLOR.text.primary,
   },
-  inputMulti: {
-    height: 100,
-    textAlignVertical: 'top',
-  },
-  universesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  universeChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-  },
-  universeLabel: {
-    color: 'rgba(255,255,255,0.80)',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  colorRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  colorDot: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  colorDotActive: {
-    borderColor: '#FFF',
-    transform: [{ scale: 1.2 }],
-  },
-  errorBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 16,
-    padding: 12,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255,59,48,0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,59,48,0.25)',
-  },
-  errorText: {
-    color: '#FF3B30',
-    fontSize: 13,
-    flex: 1,
-  },
-  generateBtn: {
-    marginTop: 28,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  generateGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingVertical: 16,
-    borderRadius: 16,
-  },
-  generateText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-  },
+  inputMulti: { height: 112, textAlignVertical: 'top' },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.sm },
 
-  // Generating
-  generatingWrap: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 32,
-  },
-  forgeIconBig: {
-    marginBottom: 32,
-  },
-  forgeIconGrad: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#8A2BE2',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
-  },
-  generatingTitle: {
-    color: '#FFF',
-    fontSize: 22,
-    fontWeight: '900',
-    fontFamily: 'SpaceGrotesk_700Bold',
-    letterSpacing: -0.5,
-    marginBottom: 8,
-  },
-  generatingName: {
-    color: '#B366FF',
-    fontSize: 16,
-    fontWeight: '700',
-    fontFamily: 'SpaceGrotesk_600SemiBold',
-    marginBottom: 16,
-  },
-  generatingDetail: {
-    color: 'rgba(255,255,255,0.65)',
-    fontSize: 13,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
+  preview: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
 
-  // Done
-  doneWrap: {
-    flex: 1,
-    padding: 24,
-    justifyContent: 'center',
+  errorRow: { flexDirection: 'row', alignItems: 'flex-start', gap: SPACE.sm },
+
+  center: {
+    flex: 1, alignItems: 'center', justifyContent: 'center',
+    paddingHorizontal: SPACE.xxl, gap: SPACE.md,
   },
-  doneCard: {
-    borderRadius: 24,
-    padding: 32,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
-  },
-  doneIconWrap: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
-  },
-  doneTitle: {
-    color: '#FFF',
-    fontSize: 24,
-    fontWeight: '900',
-    fontFamily: 'SpaceGrotesk_700Bold',
-    letterSpacing: -0.5,
-    marginBottom: 8,
-  },
-  doneName: {
-    color: 'rgba(255,255,255,0.85)',
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  doneCount: {
-    fontSize: 14,
-    fontWeight: '700',
-    marginBottom: 32,
-  },
-  playBtn: {
-    width: '100%',
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  playGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingVertical: 16,
-    borderRadius: 16,
-  },
-  playText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '800',
-  },
+  doneCard: { alignSelf: 'stretch', alignItems: 'center', gap: SPACE.xl, padding: SPACE.xxl },
+  doneTexts: { alignItems: 'center', gap: SPACE.sm },
+  successRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs },
 });

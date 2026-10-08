@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="One Piece">
+  <ellipse cx="128" cy="164" rx="94" ry="34" fill="#FFDB3D"/>
+  <ellipse cx="128" cy="164" rx="64" ry="18" fill="#0B3D4A"/>
+  <path d="M72 152C72 98 96 74 128 74C160 74 184 98 184 152Q128 166 72 152Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M76 126Q128 138 180 126L182 150Q128 164 74 150Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M94 110Q100 94 114 86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,12 +1,12 @@
 {
  "totals": {
-  "gradient": 52,
-  "hex": 437,
-  "rgba": 200,
-  "fontSize": 173,
-  "heavy": 68,
-  "iconLib": 10,
-  "emoji": 51
+  "gradient": 41,
+  "hex": 323,
+  "rgba": 156,
+  "fontSize": 123,
+  "heavy": 48,
+  "iconLib": 7,
+  "emoji": 11
  },
  "files": {
   "app/(tabs)/accueil.tsx": {
@@ -18,24 +18,8 @@
   "app/category-detail.tsx": {
    "gradient": 1
   },
-  "app/create-theme.tsx": {
-   "hex": 40,
-   "rgba": 19,
-   "fontSize": 15,
-   "heavy": 6,
-   "gradient": 5,
-   "iconLib": 1
-  },
   "app/index.tsx": {
    "hex": 4
-  },
-  "app/leaderboard.tsx": {
-   "hex": 72,
-   "rgba": 21,
-   "fontSize": 32,
-   "heavy": 13,
-   "gradient": 6,
-   "iconLib": 1
   },
   "app/matchmaking.tsx": {
    "gradient": 4
@@ -83,19 +67,9 @@
   "app/_layout.tsx": {
    "hex": 1
   },
-  "components/CategoryIcon.tsx": {
-   "iconLib": 1,
-   "emoji": 40
-  },
   "components/CosmicBackground.tsx": {
    "hex": 1,
    "rgba": 1
-  },
-  "components/GlassIconFrame.tsx": {
-   "hex": 2,
-   "rgba": 4,
-   "fontSize": 3,
-   "heavy": 1
   },
   "components/RematchModal.tsx": {
    "hex": 16,

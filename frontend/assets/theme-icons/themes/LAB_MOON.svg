@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="La Lune">
+  <path d="M120.2 36.3A92 92 0 1 0 213.8 161.1A78 78 0 0 1 120.2 36.3Z" fill="#12606D" stroke="#12606D" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="72" cy="146" r="16" fill="#0B3D4A"/>
+  <circle cx="112" cy="190" r="11" fill="#0B3D4A"/>
+  <circle cx="150" cy="194" r="8" fill="#0B3D4A"/>
+  <polygon points="186,40 193.0,55.0 208,62 193.0,69.0 186,84 179.0,69.0 164,62 179.0,55.0" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M56.5 108.8A74 74 0 0 1 71.3 80.4" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

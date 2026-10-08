@@ -36,8 +36,8 @@ type Props = ThemeIconSource & {
 };
 
 // Icône de thème : illustration SKILKI centrée sur une plaque crème (squircle) + liseré pétrole léger.
-export default function ThemeIcon({ name, themeName, cluster, superCategory, size = 56, plate = true, style }: Props) {
-  const resolved = name ? { kind: 'illustration' as const, name } : resolveThemeIcon({ themeName, cluster, superCategory });
+export default function ThemeIcon({ name, themeId, themeName, cluster, superCategory, size = 56, plate = true, style }: Props) {
+  const resolved = name ? { kind: 'illustration' as const, name } : resolveThemeIcon({ themeId, themeName, cluster, superCategory });
   const inner = Math.round(size * 0.78);
   const radius = Math.max(8, Math.round(size * (RADII.plate / 56)));
   const content = resolved.kind === 'illustration'

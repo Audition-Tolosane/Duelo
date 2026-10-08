@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Médecine &amp; Pandémies">
+  <g transform="rotate(45 128 128)">
+  <path d="M128 34V62" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="116" y="58" width="24" height="18" rx="6" fill="#12606D"/>
+  <rect x="94" y="72" width="68" height="98" rx="12" fill="#12606D"/>
+  <rect x="104" y="120" width="48" height="40" rx="8" fill="#FFDB3D"/>
+  <path d="M110 86V100" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="74" y="166" width="108" height="18" rx="9" fill="#FF6B5B"/>
+  <rect x="120" y="182" width="16" height="24" rx="0" fill="#12606D"/>
+  <rect x="98" y="202" width="60" height="18" rx="9" fill="#FF6B5B"/>
+  </g>
+  <path d="M192 64C192 72 186 78 180 78C174 78 168 72 168 64C168 56 180 44 180 44C180 44 192 56 192 64Z" fill="#FFDB3D"/>
+</svg>

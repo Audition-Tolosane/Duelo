@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Nombre d'Or">
+  <rect x="32" y="69" width="192" height="118" rx="12" fill="#12606D"/>
+  <path d="M151 75V181M151 142H218M179 142V181M151 159H179" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M38 187A113 113 0 0 1 151 75A67 67 0 0 1 218 142A39 39 0 0 1 179 181A22 22 0 0 1 157 159A11 11 0 0 1 168 148" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M44 104A80 80 0 0 1 60 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

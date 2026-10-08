@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Basketball NBA">
+  <rect x="44" y="34" width="168" height="104" rx="16" fill="#12606D"/>
+  <rect x="100" y="74" width="56" height="40" rx="6" fill="none" stroke="#FFDB3D" stroke-width="8"/>
+  <path d="M82 146L102 212H154L174 146M82 146L154 212M174 146L102 212" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M70 142H186" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M62 62L80 50" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

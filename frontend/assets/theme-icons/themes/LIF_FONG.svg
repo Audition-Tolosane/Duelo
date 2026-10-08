@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Champignons">
+  <path d="M96 128H144L150 202C150 210 144 214 136 214H104C96 214 90 210 90 202Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M30 132C30 84 68 50 120 50C172 50 210 84 210 132Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="104" cy="96" r="14" fill="#E8F1EC"/>
+  <circle cx="150" cy="76" r="10" fill="#E8F1EC"/>
+  <circle cx="170" cy="110" r="13" fill="#E8F1EC"/>
+  <path d="M190 168H206V210C206 214 202 216 198 216C194 216 190 214 190 210Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M172 176C172 158 184 150 198 150C212 150 224 158 224 176Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M54 112C56 94 66 80 82 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

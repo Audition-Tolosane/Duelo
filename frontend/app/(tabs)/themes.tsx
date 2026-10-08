@@ -169,6 +169,7 @@ export default function ThemesScreen() {
                   key={th.id}
                   layout="compact"
                   name={th.name}
+                  themeId={th.id}
                   cluster={th.cluster}
                   superCategory={th.super_category}
                   level={th.level}

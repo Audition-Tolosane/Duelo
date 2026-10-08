@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Carnavals">
+  <path d="M168 100C170 66 190 42 214 32C218 60 204 88 176 106Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M150 98C140 70 144 46 160 30C176 52 174 80 162 102Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M174 96C182 76 194 58 206 44" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M172 168L198 222" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M38 124C38 100 84 96 128 112C172 96 218 100 218 124C218 158 192 176 162 172C146 170 138 156 128 156C118 156 110 170 94 172C64 176 38 158 38 124Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="92" cy="134" rx="22" ry="12" transform="rotate(10 92 134)" fill="#0B3D4A"/>
+  <ellipse cx="164" cy="134" rx="22" ry="12" transform="rotate(-10 164 134)" fill="#0B3D4A"/>
+  <circle cx="128" cy="128" r="8" fill="#FFDB3D"/>
+  <path d="M56 116C62 108 72 104 84 104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Art du Sushi">
+  <path d="M96 66L216 34" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M110 80L222 58" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M44 108V172C44 194 82 212 128 212C174 212 212 194 212 172V108Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="108" rx="84" ry="38" fill="#12606D"/>
+  <ellipse cx="128" cy="108" rx="66" ry="27" fill="#E8F1EC"/>
+  <ellipse cx="120" cy="108" rx="28" ry="13" fill="#FF6B5B"/>
+  <circle cx="160" cy="106" r="9" fill="#FFDB3D"/>
+  <path d="M64 150V170" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

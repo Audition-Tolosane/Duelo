@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mythologie Nordique">
+  <g transform="rotate(-18 128 128)">
+  <rect x="114" y="104" width="28" height="94" rx="10" fill="#FF6B5B"/>
+  <path d="M128 198C108 210 112 226 128 226C144 226 148 210 128 198" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M50 52H206C200 70 200 98 206 116H50C56 98 56 70 50 52Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="76" y="54" width="14" height="60" fill="#FFDB3D"/>
+  <rect x="166" y="54" width="14" height="60" fill="#FFDB3D"/>
+  <circle cx="128" cy="84" r="14" fill="#FFDB3D"/>
+  <path d="M62 66L62 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

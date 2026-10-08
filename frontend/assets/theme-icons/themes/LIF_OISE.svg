@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Oiseaux">
+  <polygon points="38,168 70,128 78,180" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="124" cy="132" r="70" fill="#12606D"/>
+  <polygon points="188,112 220,126 188,140" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M118 50C112 38 120 30 130 34C136 26 148 30 144 42" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="156" cy="112" r="13" fill="#E8F1EC"/>
+  <circle cx="160" cy="112" r="6" fill="#0B3D4A"/>
+  <path d="M78 128C90 172 134 184 166 162C138 160 112 146 100 120Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M108 202V216" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M136 202V216" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M74 108C80 90 92 78 108 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

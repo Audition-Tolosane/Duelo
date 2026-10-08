@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Disco Fever">
+  <path d="M128 32V64" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="140" r="72" fill="#12606D"/>
+  <path d="M60 116H196M56 140H200M60 164H196M72 188H184M76 92H180M128 68V212M98 76C86 100 86 180 98 204M158 76C170 100 170 180 158 204" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="104" y="96" width="16" height="16" rx="3" fill="#FFDB3D"/>
+  <rect x="136" y="120" width="16" height="16" rx="3" fill="#FFDB3D"/>
+  <rect x="164" y="144" width="14" height="16" rx="3" fill="#FFDB3D"/>
+  <rect x="106" y="168" width="16" height="16" rx="3" fill="#FFDB3D"/>
+  <rect x="80" y="120" width="12" height="16" rx="3" fill="#E8F1EC"/>
+  <polygon points="206,52 212,66 226,72 212,78 206,92 200,78 186,72 200,66" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="44,180 49,191 60,196 49,201 44,212 39,201 28,196 39,191" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M84 104C90 92 98 84 108 78" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

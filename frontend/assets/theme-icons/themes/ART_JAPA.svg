@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Estampes Japonaises">
+  <polygon points="150,200 186,150 222,200" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="176,164 186,150 196,164" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M36 216C36 140 80 60 150 52C196 46 222 82 210 114C202 134 178 136 170 120C164 108 172 96 184 100C178 84 154 82 136 98C110 124 108 176 136 200H222V216Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M62 196C64 136 100 82 150 72C176 68 196 80 198 100" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M56 152L70 120" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

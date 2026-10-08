@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Boxe Anglaise">
+  <path d="M206 56L216 42M218 84H232" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g transform="rotate(-28 128 132)">
+  <rect x="84" y="170" width="96" height="52" rx="14" fill="#12606D"/>
+  <path d="M84 196H180" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M50 118C50 74 86 46 134 46C182 46 210 78 210 118C210 150 194 172 170 178H92C66 172 50 150 50 118Z" fill="#FF6B5B"/>
+  <path d="M52 132C52 158 70 176 94 176C116 176 128 160 124 140C120 124 104 118 88 124C76 128 64 132 52 132Z" fill="#FF6B5B"/>
+  <path d="M58 134C72 132 86 124 100 124C116 124 126 138 122 154" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <path d="M92 88C102 74 116 66 130 64" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

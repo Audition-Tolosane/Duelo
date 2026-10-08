@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Voie du Samouraï">
+  <path d="M118 118C96 104 72 80 58 40" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M138 118C160 104 184 80 198 40" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M36 172L64 124H192L220 172C196 184 176 180 166 166H90C80 180 60 184 36 172Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M74 130C74 88 98 66 128 66C158 66 182 88 182 130Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="64" y="124" width="128" height="16" rx="8" fill="#0B3D4A"/>
+  <path d="M60 152H196" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="116" r="14" fill="#FFDB3D"/>
+  <path d="M96 98L108 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Les Dents de la Mer">
+  <g transform="rotate(-12 198 150)"><rect x="178" y="124" width="40" height="52" rx="10" fill="#FFDB3D"/><rect x="178" y="138" width="40" height="8" fill="#0B3D4A"/><rect x="178" y="156" width="40" height="8" fill="#0B3D4A"/></g>
+  <path d="M40 176C60 118 92 70 146 42C130 88 134 138 162 176Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M138 64C126 102 128 140 148 168" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M36 196Q52 184 68 196T100 196T132 196T164 196T196 196T220 196" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M76 138C84 118 94 102 106 88" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

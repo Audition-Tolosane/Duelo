@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Trous Noirs">
+  <circle cx="128" cy="128" r="90" fill="#12606D"/>
+  <path d="M128.0 98.0L131.5 96.2L135.4 94.8L139.7 93.9L144.2 93.6L148.9 93.9L153.7 94.8L158.6 96.4L163.4 98.7L168.1 101.6L172.6 105.3L176.6 109.6L180.3 114.6L183.4 120.1L186.0 126.2L187.8 132.7L188.9 139.6L189.2 146.8L188.6 154.2L187.1 161.7L184.6 169.1L181.3 176.5L176.9 183.5L171.7 190.2L165.6 196.4" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M154.0 143.0L153.8 146.9L153.0 151.0L151.7 155.1L149.7 159.2L147.1 163.2L143.9 166.9L140.1 170.3L135.7 173.4L130.8 175.9L125.4 177.9L119.6 179.3L113.5 180.0L107.1 180.0L100.6 179.1L94.0 177.4L87.5 174.9L81.1 171.6L75.0 167.4L69.3 162.3L64.1 156.5L59.4 149.9L55.5 142.6L52.3 134.8L50.0 126.4" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M102.0 143.0L98.7 140.9L95.6 138.2L92.7 134.9L90.1 131.2L88.0 127.0L86.4 122.3L85.3 117.3L84.9 112.0L85.1 106.4L86.1 100.8L87.8 95.1L90.2 89.4L93.4 83.9L97.4 78.7L102.2 73.8L107.6 69.4L113.7 65.6L120.4 62.4L127.6 60.0L135.3 58.4L143.3 57.7L151.6 57.9L160.0 59.1L168.4 61.3" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="128" r="32" fill="#0B3D4A"/>
+  <path d="M60.2 88.0A78 78 0 0 1 88.0 60.2" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

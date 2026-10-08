@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Neurosciences">
+  <path d="M86 90L48 52M86 90L94 34M86 90L36 120" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M62 66L40 72M66 106L52 92M72 46L62 36" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M104 108L184 188" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="114" y="116" width="36" height="24" rx="12" transform="rotate(45 132 128)" fill="#FF6B5B"/>
+  <rect x="146" y="148" width="36" height="24" rx="12" transform="rotate(45 164 160)" fill="#FF6B5B"/>
+  <path d="M184 188L216 190M184 188L186 220M184 188L210 212" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="216" cy="190" r="11" fill="#FFDB3D"/>
+  <circle cx="186" cy="220" r="11" fill="#FFDB3D"/>
+  <circle cx="210" cy="212" r="10" fill="#FFDB3D"/>
+  <circle cx="86" cy="90" r="38" fill="#FFDB3D"/>
+  <circle cx="90" cy="94" r="15" fill="#12606D"/>
+  <path d="M64 84A24 24 0 0 1 76 68" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

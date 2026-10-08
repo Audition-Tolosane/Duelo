@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Squid Game">
+  <path d="M128 34C182 34 210 78 210 128C210 176 196 206 196 218H60C60 206 46 176 46 128C46 78 74 34 128 34Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="130" rx="50" ry="64" fill="#12606D"/>
+  <polygon points="128,98 158,152 98,152" fill="none" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M74 96Q80 72 98 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

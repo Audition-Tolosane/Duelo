@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Monde Nordique">
+  <path d="M80 38L94 58L108 100H180C194 100 204 110 206 124L204 206H176L170 172H112L106 206H78L80 150C72 134 66 122 58 114L44 108C32 102 32 86 44 80Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M118 100H174V118C164 134 128 134 118 118Z" fill="#FFDB3D"/>
+  <circle cx="146" cy="116" r="9" fill="#FF6B5B"/>
+  <path d="M98 104L84 144" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M48 96L78 62" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="64" y="206" width="156" height="16" rx="8" fill="#12606D"/>
+  <path d="M80 78L88 96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

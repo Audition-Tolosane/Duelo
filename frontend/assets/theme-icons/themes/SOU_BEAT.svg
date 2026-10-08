@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Beatles">
+  <path d="M60 210C76 200 92 200 108 210S140 220 156 210S188 200 204 210" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M148 98V64H168" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="40" cy="152" rx="8" ry="24" fill="#FF6B5B"/>
+  <rect x="44" y="146" width="16" height="12" rx="4" fill="#FF6B5B"/>
+  <rect x="106" y="94" width="60" height="44" rx="12" fill="#FFDB3D"/>
+  <rect x="54" y="120" width="170" height="64" rx="32" fill="#FFDB3D"/>
+  <circle cx="104" cy="152" r="13" fill="#12606D"/>
+  <circle cx="140" cy="152" r="13" fill="#12606D"/>
+  <circle cx="176" cy="152" r="13" fill="#12606D"/>
+  <path d="M74 146C76 140 80 136 86 134" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

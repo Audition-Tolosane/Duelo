@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Alexandre Dumas">
+  <path d="M48 60L196 208" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M174 206L206 174" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M196 208L212 222" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M80 160C80 116 98 92 126 92C154 92 172 116 172 160Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="126" cy="164" rx="96" ry="24" fill="#12606D"/>
+  <rect x="82" y="134" width="88" height="18" rx="8" fill="#FFDB3D"/>
+  <path d="M150 138C196 124 222 78 204 38C184 64 156 70 144 96C138 110 140 126 150 138Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M98 126C98 114 104 106 112 102" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

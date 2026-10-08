@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Friends">
+  <rect x="58" y="72" width="140" height="92" rx="24" fill="#FF6B5B"/>
+  <rect x="32" y="118" width="42" height="82" rx="21" fill="#FF6B5B"/>
+  <rect x="182" y="118" width="42" height="82" rx="21" fill="#FF6B5B"/>
+  <rect x="62" y="156" width="132" height="42" rx="8" fill="#FF6B5B"/>
+  <rect x="74" y="154" width="52" height="18" rx="8" fill="#0B3D4A"/>
+  <rect x="130" y="154" width="52" height="18" rx="8" fill="#0B3D4A"/>
+  <rect x="56" y="196" width="16" height="20" rx="6" fill="#FF6B5B"/>
+  <rect x="184" y="196" width="16" height="20" rx="6" fill="#FF6B5B"/>
+  <path d="M150 118Q168 118 168 132Q168 146 150 146" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M106 108H150V138Q150 152 136 152H120Q106 152 106 138Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="104" y="100" width="48" height="10" rx="5" fill="#0B3D4A"/>
+  <path d="M74 100Q74 88 86 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

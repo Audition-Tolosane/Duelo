@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ennio Morricone">
+  <path d="M176 60C188 66 196 76 198 88M190 38C210 48 222 66 224 86" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g transform="rotate(-14 128 150)"><rect x="40" y="112" width="176" height="76" rx="16" fill="#FFDB3D"/><rect x="34" y="136" width="188" height="28" rx="8" fill="#12606D"/><path d="M56 150H64M80 150H88M104 150H112M128 150H136M152 150H160M176 150H184M200 150H202" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M62 124H92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g>
+</svg>

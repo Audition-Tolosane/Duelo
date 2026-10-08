@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Street Art">
+  <rect x="88" y="54" width="28" height="24" rx="8" fill="#FF6B5B"/>
+  <path d="M60 110C60 86 144 86 144 110Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="54" y="104" width="96" height="118" rx="14" fill="#12606D"/>
+  <rect x="54" y="138" width="96" height="44" fill="#FFDB3D"/>
+  <path d="M78 150L126 150" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M78 168L110 168" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="146" cy="62" r="9" fill="#FFDB3D"/>
+  <circle cx="176" cy="48" r="12" fill="#FF6B5B"/>
+  <circle cx="182" cy="82" r="14" fill="#FFDB3D"/>
+  <circle cx="212" cy="62" r="10" fill="#FF6B5B"/>
+  <circle cx="212" cy="104" r="9" fill="#FF6B5B"/>
+  <path d="M72 118L72 126" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

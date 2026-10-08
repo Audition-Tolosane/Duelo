@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Culture Sneakers">
+  <path d="M44 172L46 104C46 94 54 90 62 94L92 106L108 86C112 82 118 84 120 90L170 130L206 144C216 148 220 160 218 172Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M176 136L206 146C214 150 216 160 216 168H186C180 158 176 148 176 136Z" fill="#FF6B5B"/>
+  <rect x="40" y="96" width="20" height="40" rx="8" fill="#FF6B5B"/>
+  <path d="M34 176H218C226 176 228 194 216 202H44C32 202 30 184 34 176Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M120 108L132 100" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M136 120L148 112" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M152 132L164 124" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M72 116L72 140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

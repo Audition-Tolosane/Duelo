@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Le Roi Lion">
+  <circle cx="122" cy="94" r="60" fill="#FFDB3D"/>
+  <polygon points="36,216 50,178 70,160 82,134 116,118 156,112 214,104 216,114 170,128 152,140 154,168 178,186 220,216" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="160,132 150,140 152,162" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M60 178L76 156" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

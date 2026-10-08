@@ -195,6 +195,7 @@ export default function SuperCategoryScreen() {
                           <ThemeCard
                             key={theme.id}
                             name={theme.name}
+                            themeId={theme.id}
                             cluster={cluster.name}
                             superCategory={data.super_category || id}
                             level={levelOf(theme)}
@@ -210,6 +211,7 @@ export default function SuperCategoryScreen() {
                             key={theme.id}
                             layout="row"
                             name={theme.name}
+                            themeId={theme.id}
                             cluster={cluster.name}
                             superCategory={data.super_category || id}
                             level={levelOf(theme)}

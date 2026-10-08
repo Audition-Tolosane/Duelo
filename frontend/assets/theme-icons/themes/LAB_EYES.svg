@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Télescopes">
+  <path d="M124 150L86 216" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M124 150L166 216" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M124 150L124 210" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <g transform="rotate(-30 128 120)"><rect x="44" y="98" width="156" height="44" rx="14" fill="#12606D"/><rect x="188" y="88" width="26" height="64" rx="10" fill="#FFDB3D"/><rect x="30" y="106" width="22" height="28" rx="6" fill="#FF6B5B"/><rect x="116" y="98" width="16" height="44" rx="4" fill="#FF6B5B"/><path d="M66 110L98 110" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/></g>
+  <circle cx="124" cy="150" r="12" fill="#FF6B5B"/>
+  <polygon points="58,40 63.8,52.2 76,58 63.8,63.8 58,76 52.2,63.8 40,58 52.2,52.2" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+</svg>

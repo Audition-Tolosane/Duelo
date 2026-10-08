@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sherlock Holmes">
+  <rect x="170" y="134" width="30" height="84" rx="15" transform="rotate(-45 185 176)" fill="#12606D"/>
+  <rect x="146" y="140" width="34" height="18" rx="8" transform="rotate(45 163 149)" fill="#FF6B5B"/>
+  <circle cx="108" cy="104" r="68" fill="#12606D"/>
+  <circle cx="108" cy="104" r="48" fill="#FFDB3D"/>
+  <path d="M76 92A36 36 0 0 1 96 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M48 176H84V196C84 206 78 212 66 212C54 212 48 206 48 196Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M84 184C100 190 116 188 130 178" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

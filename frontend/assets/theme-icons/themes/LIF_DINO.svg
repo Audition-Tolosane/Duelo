@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dinosaures">
+  <path d="M64 148C48 158 38 172 34 190C50 180 64 174 80 172Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="72" y="160" width="22" height="54" rx="10" fill="#12606D"/>
+  <rect x="146" y="160" width="22" height="54" rx="10" fill="#12606D"/>
+  <ellipse cx="118" cy="150" rx="66" ry="42" fill="#12606D"/>
+  <path d="M150 128C160 104 166 78 176 62L200 70C190 90 186 116 176 148Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="196" cy="60" rx="26" ry="17" fill="#12606D"/>
+  <circle cx="202" cy="54" r="6" fill="#0B3D4A"/>
+  <circle cx="100" cy="138" r="9" fill="#FFDB3D"/>
+  <circle cx="126" cy="128" r="9" fill="#FFDB3D"/>
+  <circle cx="122" cy="158" r="9" fill="#FFDB3D"/>
+  <path d="M72 140C76 126 86 116 100 112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M110 182H130" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Conquête Spatiale">
+  <rect x="72" y="178" width="112" height="36" rx="14" fill="#FF6B5B"/>
+  <circle cx="128" cy="114" r="80" fill="#12606D"/>
+  <rect x="66" y="82" width="124" height="68" rx="34" fill="#FFDB3D"/>
+  <circle cx="208" cy="118" r="12" fill="#FF6B5B"/>
+  <path d="M88 116A28 28 0 0 1 104 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M84 56L98 46" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

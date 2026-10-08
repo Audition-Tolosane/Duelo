@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Magnétisme">
+  <g transform="translate(0 10)"><path d="M52 92V128A76 76 0 0 0 204 128V92H164V128A36 36 0 0 1 92 128V92Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/><rect x="46" y="52" width="52" height="40" rx="8" fill="#FFDB3D"/><rect x="158" y="52" width="52" height="40" rx="8" fill="#FFDB3D"/><path d="M60 150A70 70 0 0 0 76 180" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g>
+  <path d="M72 32L72 48" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M42 38L52 50" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M184 32L184 48" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M214 38L204 50" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Tennis Master">
+  <g transform="rotate(35 128 128)">
+  <rect x="118" y="150" width="20" height="72" rx="8" fill="#12606D"/>
+  <path d="M120 186L136 194M120 202L136 210" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="94" rx="56" ry="68" fill="#12606D"/>
+  <ellipse cx="128" cy="94" rx="40" ry="52" fill="#0B3D4A"/>
+  <path d="M108 50V138M128 44V144M148 50V138M90 74H166M88 94H168M90 114H166" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <circle cx="196" cy="192" r="26" fill="#FFDB3D"/>
+  <path d="M176 180C188 186 196 198 194 214" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M58 112C58 96 64 82 74 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

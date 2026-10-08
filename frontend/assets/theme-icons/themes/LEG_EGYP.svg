@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mythologie Égyptienne">
+  <path d="M66 78L44 140M66 78L88 140M190 78L168 140M190 78L212 140" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="120" y="70" width="16" height="130" rx="6" fill="#12606D"/>
+  <rect x="80" y="196" width="96" height="20" rx="10" fill="#12606D"/>
+  <rect x="56" y="70" width="144" height="16" rx="8" fill="#12606D"/>
+  <circle cx="128" cy="50" r="16" fill="#FFDB3D"/>
+  <path d="M38 140H94C94 156 82 166 66 166C50 166 38 156 38 140Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M162 140H218C218 156 206 166 190 166C174 166 162 156 162 140Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M66 136C52 128 44 116 50 104C56 94 66 98 66 106C66 98 76 94 82 104C88 116 80 128 66 136Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M190 138C176 118 176 96 188 82C200 74 204 92 202 108C200 122 196 130 190 138Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M86 74L100 74" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Flibustiers">
+  <path d="M66 104L78 56H178L190 104Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="80" y="58" width="16" height="44" fill="#FF6B5B"/>
+  <rect x="160" y="58" width="16" height="44" fill="#FF6B5B"/>
+  <path d="M58 126C58 104 74 96 90 102C98 86 118 82 128 92C140 82 160 86 166 102C182 96 198 104 198 126Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="48" y="122" width="160" height="92" rx="14" fill="#12606D"/>
+  <rect x="80" y="122" width="16" height="92" fill="#FF6B5B"/>
+  <rect x="160" y="122" width="16" height="92" fill="#FF6B5B"/>
+  <rect x="114" y="138" width="28" height="34" rx="8" fill="#FFDB3D"/>
+  <circle cx="128" cy="152" r="6" fill="#12606D"/>
+  <circle cx="110" cy="106" r="7" fill="#E8F1EC"/>
+  <path d="M64 140L64 160" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

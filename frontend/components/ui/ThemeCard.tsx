@@ -8,6 +8,8 @@ import { t } from '../../utils/i18n';
 
 type Props = {
   name: string;
+  /** Id du thème : clé de son icône personnalisée (deux thèmes peuvent porter le même nom). */
+  themeId?: string | null;
   cluster?: string | null;
   superCategory?: string | null;
   /** Ligne secondaire : « Niv. 12 », « 500 questions »… */
@@ -26,7 +28,7 @@ type Props = {
 };
 
 // Carte de thème : icône sur plaque crème, nom, une seule méta. Pas de cartouche dans la carte.
-export default function ThemeCard({ name, cluster, superCategory, meta, level, layout = 'tile', onPress, testID, style }: Props) {
+export default function ThemeCard({ name, themeId, cluster, superCategory, meta, level, layout = 'tile', onPress, testID, style }: Props) {
   const compact = layout === 'compact';
   const tile = layout === 'tile' || compact;
   const containerStyle = compact ? styles.compact : tile ? styles.tile : styles.row;
@@ -39,7 +41,7 @@ export default function ThemeCard({ name, cluster, superCategory, meta, level, l
       onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onPress?.(); }}
       style={({ pressed }) => [containerStyle, pressed && styles.pressed, style]}
     >
-      <ThemeIcon themeName={name} cluster={cluster} superCategory={superCategory} size={iconSize} />
+      <ThemeIcon themeId={themeId} themeName={name} cluster={cluster} superCategory={superCategory} size={iconSize} />
       <View style={compact ? styles.compactTexts : tile ? styles.tileTexts : styles.rowTexts}>
         <Txt
           variant={compact ? 'label' : 'cardTitle'}

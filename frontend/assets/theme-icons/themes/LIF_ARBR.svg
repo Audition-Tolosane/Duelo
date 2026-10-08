@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Arbres">
+  <path d="M112 150L106 208H150L144 150Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="76" y="204" width="104" height="16" rx="8" fill="#FF6B5B"/>
+  <circle cx="128" cy="84" r="54" fill="#12606D"/>
+  <circle cx="80" cy="116" r="42" fill="#12606D"/>
+  <circle cx="176" cy="116" r="42" fill="#12606D"/>
+  <circle cx="128" cy="128" r="48" fill="#12606D"/>
+  <circle cx="96" cy="100" r="10" fill="#FFDB3D"/>
+  <circle cx="156" cy="86" r="10" fill="#FFDB3D"/>
+  <circle cx="170" cy="136" r="10" fill="#FFDB3D"/>
+  <path d="M84 82C90 64 104 50 120 44" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

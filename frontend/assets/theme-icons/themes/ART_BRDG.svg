@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ponts &amp; Viaducs">
+  <path d="M34 146C58 140 72 100 82 60C96 120 112 140 128 140C144 140 160 120 174 60C184 100 198 140 222 146" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="72" y="52" width="20" height="150" rx="8" fill="#12606D"/>
+  <rect x="164" y="52" width="20" height="150" rx="8" fill="#12606D"/>
+  <rect x="30" y="146" width="196" height="22" rx="10" fill="#FFDB3D"/>
+  <path d="M40 214C56 204 68 204 84 212C100 220 112 220 128 212C144 204 156 204 172 212C188 220 200 220 216 210" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M82 70L82 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

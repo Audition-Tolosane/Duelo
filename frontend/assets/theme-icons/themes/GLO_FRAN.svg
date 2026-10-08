@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="La France">
+  <g transform="rotate(-22 128 176)">
+  <rect x="28" y="156" width="200" height="40" rx="20" fill="#FFDB3D"/>
+  <path d="M64 166L78 186M100 166L114 186M136 166L150 186M172 166L186 186" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g transform="rotate(-10 128 100)">
+  <path d="M128 52V40" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M46 112C46 76 84 56 128 56C172 56 210 76 210 104C210 118 198 124 182 124H70C54 124 46 120 46 112Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="64" y="112" width="128" height="12" rx="6" fill="#0B3D4A"/>
+  <path d="M70 92C78 80 92 72 108 68" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

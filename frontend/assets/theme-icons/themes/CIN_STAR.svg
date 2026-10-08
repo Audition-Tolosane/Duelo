@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Star Wars">
+  <g transform="rotate(45 128 128)">
+  <rect x="114" y="26" width="28" height="128" rx="14" fill="#FF6B5B"/>
+  <rect x="104" y="148" width="48" height="18" rx="6" fill="#12606D"/>
+  <rect x="110" y="160" width="36" height="66" rx="8" fill="#12606D"/>
+  <rect x="110" y="190" width="36" height="8" fill="#0B3D4A"/>
+  <rect x="110" y="206" width="36" height="8" fill="#0B3D4A"/>
+  <path d="M121 44L121 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

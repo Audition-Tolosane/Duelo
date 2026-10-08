@@ -1,29 +1,29 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, FlatList
-} from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, StyleSheet, ScrollView, FlatList, Pressable } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import SwipeBackPage from '../components/SwipeBackPage';
-import DueloHeader from '../components/DueloHeader';
 import UserAvatar from '../components/UserAvatar';
-import ScalePressable from '../components/ScalePressable';
 import { authFetch } from '../utils/api';
-import { t } from '../utils/i18n';
+import { t, pluralKey, getLocale } from '../utils/i18n';
+import {
+  Txt, Icon, IconName, Button, Badge, Card, Chip, ScreenContainer, ScreenHeader, ThemeIcon, Loader, EmptyState,
+} from '../components/ui';
+import { COLOR, SPACE, RADII, BORDER, SIZE, ICON_SIZE } from '../theme/tokens';
+
+// Classement global ou d'un thème (/leaderboard?themeId=…&themeName=…).
+// Rôles : 1er = or (récompense), moi = jaune (ma ligne surlignée), rival à dépasser = corail.
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 const SCOPES = [
-  { id: 'world', labelKey: 'leaderboard.scope_world', icon: 'earth' as const },
-  { id: 'friends', labelKey: 'leaderboard.scope_friends', icon: 'account-group' as const },
-  { id: 'continent', labelKey: 'leaderboard.scope_continent', icon: 'map' as const },
-  { id: 'country', labelKey: 'leaderboard.scope_country', icon: 'flag' as const },
-  { id: 'region', labelKey: 'leaderboard.scope_region', icon: 'map-marker' as const },
-  { id: 'city', labelKey: 'leaderboard.scope_city', icon: 'city' as const },
+  { id: 'world', labelKey: 'leaderboard.scope_world' },
+  { id: 'friends', labelKey: 'leaderboard.scope_friends' },
+  { id: 'continent', labelKey: 'leaderboard.scope_continent' },
+  { id: 'country', labelKey: 'leaderboard.scope_country' },
+  { id: 'region', labelKey: 'leaderboard.scope_region' },
+  { id: 'city', labelKey: 'leaderboard.scope_city' },
 ];
 
 const VIEWS = [
@@ -31,104 +31,14 @@ const VIEWS = [
   { id: 'seasonal', labelKey: 'leaderboard.view_seasonal' },
 ];
 
-const CYAN = '#00E5FF';
-const GOLD = '#FFB547';
-
-const RANK_COLORS = ['#FFD700', '#C0C0C0', '#CD7F32'];
-const RANK_GRADIENTS: [string, string][] = [
-  ['#FFD700', '#FFA500'],
-  ['#C0C0C0', '#8A8A8A'],
-  ['#CD7F32', '#8B4513'],
-];
-
-// ── Podium (top 3) ──
-function Podium({ entries, myId, router }: { entries: LeaderEntry[]; myId: string; router: ReturnType<typeof useRouter> }) {
-  if (entries.length < 2) return null;
-  // Columns: left=2nd, center=1st, right=3rd
-  const slots = [entries[1], entries[0], entries.length > 2 ? entries[2] : null];
-  const blockHeights = [110, 150, 80];
-  const colColors: [string, string][] = [
-    ['#9E9E9E', '#616161'],
-    ['#FFB547', '#FF8C00'],
-    ['#A1724F', '#6D4C41'],
-  ];
-  const rankLabels = ['2', '1', '3'];
-  const avatarSizes = [44, 56, 40];
-
-  return (
-    <View style={podiumStyles.container}>
-      <Text style={podiumStyles.eyebrow}>◆ TOP JOUEURS</Text>
-      <View style={podiumStyles.columns}>
-        {slots.map((entry, colIdx) => {
-          if (!entry) return <View key={colIdx} style={{ flex: 1 }} />;
-          const isCenter = colIdx === 1;
-          const isMe = entry.id === myId;
-          return (
-            <TouchableOpacity
-              key={colIdx}
-              style={podiumStyles.column}
-              onPress={() => entry.id && router.push(`/player-profile?id=${entry.id}` as any)}
-              activeOpacity={0.8}
-            >
-              <UserAvatar
-                avatarUrl={entry.avatar_url}
-                avatarSeed={entry.avatar_seed}
-                pseudo={entry.pseudo}
-                size={avatarSizes[colIdx]}
-                borderColor={isCenter ? GOLD : isMe ? CYAN : 'transparent'}
-                borderWidth={isCenter ? 3 : isMe ? 2 : 0}
-              />
-              <Text style={[podiumStyles.pseudo, isCenter && { fontSize: 13 }]} numberOfLines={1}>
-                {entry.pseudo}
-              </Text>
-              {isMe && <Text style={podiumStyles.youBadge}>TOI</Text>}
-              <LinearGradient
-                colors={colColors[colIdx]}
-                start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
-                style={[podiumStyles.block, { height: blockHeights[colIdx] }]}
-              >
-                <Text style={[podiumStyles.rankNum, isCenter && { fontSize: 26 }]}>{rankLabels[colIdx]}</Text>
-                <Text style={podiumStyles.xpVal}>{(entry.total_xp ?? entry.xp ?? 0).toLocaleString()}</Text>
-                <Text style={podiumStyles.xpLabel}>XP</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-    </View>
-  );
-}
-
-const podiumStyles = StyleSheet.create({
-  container: { marginHorizontal: 16, marginBottom: 20, marginTop: 8 },
-  eyebrow: {
-    fontSize: 9, fontWeight: '900', fontFamily: 'JetBrainsMono_700Bold',
-    color: 'rgba(255,181,71,0.7)',
-    letterSpacing: 3, textAlign: 'center', marginBottom: 16,
-  },
-  columns: { flexDirection: 'row', alignItems: 'flex-end', gap: 6 },
-  column: { flex: 1, alignItems: 'center', gap: 4 },
-  pseudo: {
-    fontSize: 11, fontWeight: '800', color: '#FFF',
-    textAlign: 'center', marginTop: 4,
-  },
-  youBadge: {
-    fontSize: 8, fontWeight: '900', color: CYAN, letterSpacing: 1,
-  },
-  block: {
-    width: '100%', borderTopLeftRadius: 10, borderTopRightRadius: 10,
-    alignItems: 'center', justifyContent: 'center', gap: 2, paddingTop: 12,
-  },
-  rankNum: { fontSize: 22, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', color: '#FFF', opacity: 0.9 },
-  xpVal: { fontSize: 10, fontWeight: '800', color: 'rgba(255,255,255,0.8)' },
-  xpLabel: { fontSize: 8, fontWeight: '700', color: 'rgba(255,255,255,0.5)', letterSpacing: 1 },
-});
-
-const BADGE_ICON_MAP: Record<string, { name: string; color: string }> = {
-  fire: { name: 'fire', color: '#FF6B35' },
-  bolt: { name: 'lightning-bolt', color: '#FFD700' },
-  glow: { name: 'shimmer', color: '#00FFFF' },
+// Badges de série : flamme corail (série), éclair et étincelles or (paliers)
+const BADGE_ICON_MAP: Record<string, { name: IconName; color: string }> = {
+  fire: { name: 'flame', color: COLOR.accent.warm },
+  bolt: { name: 'bolt', color: COLOR.reward.gold },
+  glow: { name: 'sparkles', color: COLOR.reward.gold },
 };
+
+const fmt = (n: number) => n.toLocaleString(getLocale());
 
 type LeaderEntry = {
   id?: string;
@@ -162,12 +72,89 @@ type LeaderMeta = {
   suggestions?: CitySuggestion[];
 };
 
+const getXp = (item: LeaderEntry) => item.total_xp ?? item.xp ?? 0;
+
+// ── Podium (top 3) : 2e à gauche, 1er au centre (or), 3e à droite ──
+function Podium({ entries, myId, onOpen }: { entries: LeaderEntry[]; myId: string; onOpen: (id?: string) => void }) {
+  if (entries.length < 2) return null;
+  const slots = [entries[1], entries[0], entries.length > 2 ? entries[2] : null];
+  const blockHeights = [96, 128, 72];
+  const avatarSizes = [44, 56, 40];
+
+  return (
+    <View style={pd.container}>
+      <Txt variant="overline" align="center">{t('search.top_players')}</Txt>
+      <View style={pd.columns}>
+        {slots.map((entry, col) => {
+          if (!entry) return <View key={col} style={pd.column} />;
+          const first = col === 1;
+          const isMe = entry.id === myId;
+          return (
+            <Pressable
+              key={col}
+              accessibilityRole="button"
+              onPress={() => onOpen(entry.id)}
+              style={({ pressed }) => [pd.column, pressed && pd.pressed]}
+            >
+              <UserAvatar
+                avatarUrl={entry.avatar_url}
+                avatarSeed={entry.avatar_seed}
+                pseudo={entry.pseudo}
+                size={avatarSizes[col]}
+                borderColor={isMe ? COLOR.player.self : first ? COLOR.reward.gold : undefined}
+                borderWidth={isMe || first ? BORDER.strong : 0}
+              />
+              <Txt variant="label" color={COLOR.text.primary} align="center" numberOfLines={1} style={pd.pseudo}>
+                {entry.pseudo}
+              </Txt>
+              {isMe ? <Badge label={t('pilot.leaderboard.you')} tone="action" /> : null}
+              <View style={[pd.block, first && pd.blockFirst, { height: blockHeights[col] }]}>
+                {first ? <Icon name="trophy" size={ICON_SIZE.md} color={COLOR.reward.gold} /> : null}
+                <Txt variant={first ? 'statMedium' : 'h3'} color={first ? COLOR.reward.gold : COLOR.text.secondary}>
+                  {first ? 1 : col === 0 ? 2 : 3}
+                </Txt>
+                <Txt variant="caption" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>
+                  {fmt(getXp(entry))} XP
+                </Txt>
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+const pd = StyleSheet.create({
+  container: { gap: SPACE.lg, marginBottom: SPACE.lg },
+  columns: { flexDirection: 'row', alignItems: 'flex-end', gap: SPACE.sm },
+  column: { flex: 1, minWidth: 0, alignItems: 'center', gap: SPACE.xs },
+  pressed: { opacity: 0.7 },
+  pseudo: { alignSelf: 'stretch' },
+  block: {
+    alignSelf: 'stretch',
+    borderTopLeftRadius: RADII.md,
+    borderTopRightRadius: RADII.md,
+    backgroundColor: COLOR.surface.card,
+    borderWidth: BORDER.hair,
+    borderBottomWidth: 0,
+    borderColor: COLOR.border.subtle,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: SPACE.md,
+    paddingHorizontal: SPACE.xs,
+    gap: SPACE.xxs,
+    marginTop: SPACE.xs,
+  },
+  blockFirst: { backgroundColor: COLOR.tint.gold, borderColor: COLOR.reward.gold },
+});
+
 export default function LeaderboardScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { themeId, themeName } = useLocalSearchParams<{ themeId?: string; themeName?: string }>();
 
   const isThemeMode = !!themeId;
+  const decodedThemeName = themeName ? decodeURIComponent(themeName) : '';
 
   const [scope, setScope] = useState('world');
   const [view, setView] = useState('alltime');
@@ -224,206 +211,152 @@ export default function LeaderboardScreen() {
     setLoading(false);
   };
 
-  const getXp = (item: LeaderEntry) => item.total_xp ?? item.xp ?? 0;
+  const openProfile = (id?: string) => { if (id) router.push(`/player-profile?id=${id}` as any); };
 
-  // Rival: joueur juste au-dessus dans le classement actuel
+  // Rival : joueur juste au-dessus de moi dans le classement actuel
   const myEntry = myUserId ? entries.find(e => e.id === myUserId) : undefined;
   const rivalEntry = myEntry ? entries.find(e => e.rank === myEntry.rank - 1) : undefined;
   const xpGap = (myEntry && rivalEntry) ? (getXp(rivalEntry) - getXp(myEntry)) : 0;
 
   const renderEntry = useCallback(({ item, index }: { item: LeaderEntry; index: number }) => {
-    const isTop3 = item.rank <= 3 && item.rank >= 1;
-    const top3Index = item.rank - 1;
+    const first = item.rank === 1;
     const badgeInfo = item.streak_badge ? BADGE_ICON_MAP[item.streak_badge] : null;
-    const isGlow = item.streak_badge === 'glow';
     const isMe = item.id === myUserId;
+    const stats = [
+      `${t('leaderboard.level_short')} ${item.level}`,
+      item.title || null,
+      item.matches_won != null ? `${fmt(item.matches_won)} ${t('leaderboard.wins_short')}` : null,
+    ].filter(Boolean).join(' · ');
 
     return (
       <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 80).duration(450)}>
-      <ScalePressable
-        testID={`leaderboard-entry-${index}`}
-        style={[styles.entry, isTop3 && styles.entryTop, isMe && styles.entryMe]}
-        onPress={() => {
-          if (item.id) router.push(`/player-profile?id=${item.id}`);
-        }}
-        activeOpacity={item.id ? 1 : 1}
-      >
-        {isTop3 ? (
-          <LinearGradient
-            colors={RANK_GRADIENTS[top3Index]}
-            style={styles.rankBadge}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <MaterialCommunityIcons
-              name={top3Index === 0 ? 'trophy' : top3Index === 1 ? 'medal' : 'medal-outline'}
-              size={18}
-              color="#FFF"
-            />
-          </LinearGradient>
-        ) : (
-          <View style={styles.rankBadge}>
-            <Text style={styles.rankText}>{item.rank}</Text>
+        <Card
+          testID={`leaderboard-entry-${index}`}
+          onPress={() => openProfile(item.id)}
+          accent={isMe ? 'selected' : 'none'}
+          style={[styles.entry, isMe && styles.entryMe]}
+        >
+          <View style={styles.rank}>
+            {first
+              ? <Icon name="trophy" size={ICON_SIZE.md} color={COLOR.reward.gold} />
+              : <Txt variant="label" color={COLOR.text.secondary} numberOfLines={1} adjustsFontSizeToFit>{item.rank}</Txt>}
           </View>
-        )}
-        <View style={styles.avatarCircle}>
           <UserAvatar avatarUrl={item.avatar_url} avatarSeed={item.avatar_seed} pseudo={item.pseudo} size={40} />
-        </View>
-        <View style={styles.entryInfo}>
-          <View style={styles.pseudoRow}>
-            <Text style={[styles.entryPseudo, isGlow && styles.glowText]}>{item.pseudo}</Text>
-            {badgeInfo ? (
-              <MaterialCommunityIcons
-                name={badgeInfo.name as any}
-                size={16}
-                color={badgeInfo.color}
-              />
-            ) : null}
+          <View style={styles.entryInfo}>
+            <View style={styles.pseudoRow}>
+              <Txt variant="cardTitle" color={isMe ? COLOR.player.self : COLOR.text.primary} numberOfLines={1} style={styles.shrink}>
+                {item.pseudo}
+              </Txt>
+              {badgeInfo ? <Icon name={badgeInfo.name} size={ICON_SIZE.sm} color={badgeInfo.color} /> : null}
+            </View>
+            <Txt variant="caption" numberOfLines={1}>{stats}</Txt>
           </View>
-          <Text style={styles.entryStats}>
-            {t('leaderboard.level_short')} {item.level} {item.title ? `\u2022 ${item.title}` : ''}
-            {item.matches_won != null ? ` \u2022 ${item.matches_won} ${t('leaderboard.wins_short')}` : ''}
-          </Text>
-        </View>
-        <View style={styles.xpContainer}>
-          <Text style={styles.xpValue}>{getXp(item).toLocaleString()}</Text>
-          <Text style={styles.xpLabel}>XP</Text>
-        </View>
-      </ScalePressable>
+          <View style={styles.xp}>
+            <Txt variant="label" color={first ? COLOR.reward.gold : COLOR.text.primary} numberOfLines={1}>{fmt(getXp(item))}</Txt>
+            <Txt variant="caption">XP</Txt>
+          </View>
+        </Card>
       </Animated.View>
     );
-  }, [router]);
+  }, [router, myUserId]);
 
-  const headerTitle = isThemeMode
-    ? `${t('leaderboard.theme_ranking')} ${themeName ? decodeURIComponent(themeName) : ''}`
-    : t('leaderboard.title');
+  const header = isThemeMode ? (
+    <ScreenHeader
+      overline={t('leaderboard.theme_ranking')}
+      title={decodedThemeName || t('leaderboard.title')}
+      right={<ThemeIcon themeId={themeId} themeName={decodedThemeName} size={ICON_SIZE.theme.sm} />}
+    />
+  ) : (
+    <ScreenHeader title={t('leaderboard.title')} />
+  );
 
   return (
     <SwipeBackPage>
-      <View style={styles.container}>
-        <View style={{ paddingTop: insets.top, backgroundColor: '#050510' }}>
-          <DueloHeader />
-        </View>
+      <ScreenContainer>
+        {header}
 
-        {/* Back button + titre sur la même ligne */}
-        <View style={styles.headerRow}>
-          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-            <LinearGradient
-              colors={['rgba(255,255,255,0.10)', 'rgba(255,255,255,0.04)']}
-              style={styles.backCircle}
-            >
-              <MaterialCommunityIcons name="chevron-left" size={22} color="#A3A3A3" />
-            </LinearGradient>
-          </TouchableOpacity>
-          <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit>{headerTitle}</Text>
-        </View>
-
-        {/* View Toggle — global mode only */}
+        {/* Période — classement global seulement */}
         {!isThemeMode && (
           <View style={styles.viewToggle}>
             {VIEWS.map((v) => (
-              <TouchableOpacity
+              <Chip
                 testID={`view-${v.id}`}
                 key={v.id}
-                style={styles.viewBtn}
+                label={t(v.labelKey)}
+                selected={view === v.id}
                 onPress={() => setView(v.id)}
-              >
-                {view === v.id && (
-                  <LinearGradient
-                    colors={['#00E5FF', '#B366FF']}
-                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                    style={StyleSheet.absoluteFill}
-                  />
-                )}
-                <Text style={view === v.id ? styles.viewTextActive : styles.viewText}>{t(v.labelKey)}</Text>
-              </TouchableOpacity>
+                style={styles.viewChip}
+              />
             ))}
           </View>
         )}
 
-        {/* Scope Filters — always visible */}
+        {/* Zone géographique */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scopeScroll} contentContainerStyle={styles.scopeContainer}>
-          {SCOPES.map((s) => {
-            const isActive = scope === s.id;
-            return (
-              <TouchableOpacity
-                testID={`scope-${s.id}`}
-                key={s.id}
-                style={[styles.scopeBtn, isActive && styles.scopeBtnActive]}
-                onPress={() => setScope(s.id)}
-                activeOpacity={0.7}
-              >
-                {/* Gradient en fond absolu : le layout est porté par scopeInner */}
-                {isActive && (
-                  <LinearGradient
-                    colors={['#00E5FF', '#B366FF']}
-                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                    style={StyleSheet.absoluteFill}
-                  />
-                )}
-                <View style={styles.scopeInner}>
-                  <MaterialCommunityIcons name={s.icon} size={16} color={isActive ? '#000' : '#525252'} />
-                  <Text style={isActive ? styles.scopeTextActive : styles.scopeText}>{t(s.labelKey)}</Text>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
+          {SCOPES.map((s) => (
+            <Chip
+              testID={`scope-${s.id}`}
+              key={s.id}
+              label={t(s.labelKey)}
+              selected={scope === s.id}
+              onPress={() => setScope(s.id)}
+            />
+          ))}
         </ScrollView>
 
         {!isThemeMode && view === 'seasonal' && (
-          <View style={styles.seasonInfo}>
-            <Text style={styles.seasonText}>{t('leaderboard.season_info')}</Text>
-          </View>
+          <Txt variant="caption" style={styles.seasonInfo}>{t('leaderboard.season_info')}</Txt>
         )}
 
         {loading ? (
-          <View style={styles.loadingContainer}><ActivityIndicator size="large" color="#8A2BE2" /></View>
+          <Loader fill />
         ) : scope === 'friends' && entries.length <= 1 ? (
-          <View style={styles.emptyContainer}>
-            <MaterialCommunityIcons name="account-group-outline" size={56} color="#525252" />
-            <Text style={styles.emptyText}>{t('leaderboard.friends_empty')}</Text>
-            <Text style={styles.emptySubtext}>{t('leaderboard.friends_empty_hint')}</Text>
-          </View>
+          <EmptyState icon="users" title={t('leaderboard.friends_empty')} message={t('leaderboard.friends_empty_hint')} />
         ) : noLocation ? (
-          <View style={styles.emptyContainer}>
-            <MaterialCommunityIcons name="map-marker-off" size={56} color="#525252" />
-            <Text style={styles.emptyText}>{t('leaderboard.no_location')}</Text>
-            <Text style={styles.emptySubtext}>{t('leaderboard.set_location_hint')}</Text>
-          </View>
+          <EmptyState icon="globe" title={t('leaderboard.no_location')} message={t('leaderboard.set_location_hint')} />
         ) : meta?.too_small && meta.suggestions && meta.suggestions.length > 0 ? (
-          <View style={styles.suggestionsContainer}>
-            <MaterialCommunityIcons name="map-marker-question" size={40} color="#525252" />
-            <Text style={styles.emptyText}>{t('leaderboard.city_too_small', { city: meta.city_name ?? '', count: String(meta.city_player_count ?? 0) })}</Text>
-            <Text style={styles.emptySubtext}>{t('leaderboard.nearby_cities')}</Text>
-            {meta.suggestions.map((s) => (
-              <TouchableOpacity
-                key={s.city}
-                style={styles.suggestionBtn}
-                onPress={() => fetchCityLeaderboard(s.city)}
-                activeOpacity={0.7}
-              >
-                <View style={styles.suggestionLeft}>
-                  <MaterialCommunityIcons name="city" size={18} color="#00E5FF" />
-                  <Text style={styles.suggestionCity}>{s.city}</Text>
-                </View>
-                <View style={styles.suggestionRight}>
-                  <Text style={styles.suggestionCount}>{s.player_count} joueurs</Text>
-                  <Text style={styles.suggestionDist}>{s.distance_km} km</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <ScrollView contentContainerStyle={styles.suggestions}>
+            <EmptyState
+              icon="home"
+              title={t(pluralKey('pilot.leaderboard.city_too_small', meta.city_player_count ?? 0), {
+                city: meta.city_name ?? '', count: fmt(meta.city_player_count ?? 0),
+              })}
+              message={t('leaderboard.nearby_cities')}
+            />
+            <Card padded={false} style={styles.suggestionCard}>
+              {meta.suggestions.map((s, i) => (
+                <Pressable
+                  key={s.city}
+                  accessibilityRole="button"
+                  onPress={() => fetchCityLeaderboard(s.city)}
+                  style={({ pressed }) => [styles.suggestionRow, i > 0 && styles.divider, pressed && styles.pressed]}
+                >
+                  <Icon name="home" size={ICON_SIZE.md} color={COLOR.text.secondary} />
+                  <Txt variant="cardTitle" numberOfLines={1} style={styles.flex}>{s.city}</Txt>
+                  <View style={styles.xp}>
+                    <Txt variant="label" color={COLOR.text.primary}>
+                      {t(pluralKey('pilot.leaderboard.players', s.player_count), { n: fmt(s.player_count) })}
+                    </Txt>
+                    <Txt variant="caption">{fmt(s.distance_km)} km</Txt>
+                  </View>
+                  <Icon name="chevronRight" size={18} color={COLOR.text.disabled} />
+                </Pressable>
+              ))}
+            </Card>
+          </ScrollView>
         ) : meta?.too_small && meta.fallback ? (
           <View style={styles.fallbackBanner}>
-            <MaterialCommunityIcons name="information-outline" size={16} color="#A3A3A3" />
-            <Text style={styles.fallbackText}>{t('leaderboard.city_fallback', { city: meta.city_name ?? '', country: meta.country_name ?? '' })}</Text>
+            <Icon name="info" size={ICON_SIZE.sm} color={COLOR.text.secondary} />
+            <Txt variant="bodySmall" style={styles.flex}>
+              {t('leaderboard.city_fallback', { city: meta.city_name ?? '', country: meta.country_name ?? '' })}
+            </Txt>
           </View>
         ) : null}
 
-        {/* Liste unique scrollable : carte rival + podium en en-tête, joueurs ensuite */}
+        {/* Liste : carte rival + podium en en-tête, joueurs à partir du 4e ensuite */}
         {!loading && entries.length > 0 && (
           <FlatList
-            style={{ flex: 1 }}
+            style={styles.flex}
             data={entries.length >= 3 ? entries.slice(3) : entries}
             renderItem={renderEntry}
             keyExtractor={(item) => item.pseudo + item.rank}
@@ -432,43 +365,38 @@ export default function LeaderboardScreen() {
             ListHeaderComponent={
               <>
                 {rivalEntry && myEntry && xpGap > 0 && (
-                  <View style={styles.rivalCard}>
-                    <View style={styles.rivalHeader}>
-                      <MaterialCommunityIcons name="sword-cross" size={16} color="#FF9F0A" />
-                      <Text style={styles.rivalTitle}>{t('leaderboard.your_rival')}</Text>
-                    </View>
+                  <Card accent="event" style={styles.rivalCard}>
+                    <Txt variant="overline" color={COLOR.player.opponentText}>{t('leaderboard.your_rival')}</Txt>
                     <View style={styles.rivalBody}>
-                      <View style={styles.rivalAvatarWrap}>
-                        <UserAvatar avatarUrl={rivalEntry.avatar_url} avatarSeed={rivalEntry.avatar_seed} pseudo={rivalEntry.pseudo} size={40} />
-                        <View style={styles.rivalRankBadge}>
-                          <Text style={styles.rivalRankText}>#{rivalEntry.rank}</Text>
-                        </View>
-                      </View>
-                      <View style={styles.rivalInfo}>
-                        <Text style={styles.rivalPseudo}>{rivalEntry.pseudo}</Text>
-                        <Text style={styles.rivalLevel}>{t('leaderboard.level_short')} {rivalEntry.level}</Text>
-                        <View style={styles.rivalGapRow}>
-                          <MaterialCommunityIcons name="arrow-up" size={13} color="#FF9F0A" />
-                          <Text style={styles.rivalGap}>
-                            {xpGap.toLocaleString()} XP {t('leaderboard.to_overtake')}
-                          </Text>
-                        </View>
-                      </View>
-                      <TouchableOpacity
-                        style={styles.rivalDefiBtn}
-                        onPress={() => router.push(`/player-profile?id=${rivalEntry.id}&challenge=1`)}
-                        activeOpacity={0.8}
+                      <Pressable
+                        accessibilityRole="button"
+                        onPress={() => openProfile(rivalEntry.id)}
+                        style={({ pressed }) => [styles.rivalWho, pressed && styles.pressed]}
                       >
-                        <LinearGradient colors={['#FF9F0A', '#FF6B00']} style={styles.rivalDefiBtnGrad}>
-                          <MaterialCommunityIcons name="sword" size={15} color="#FFF" />
-                          <Text style={styles.rivalDefiText}>{t('leaderboard.challenge')}</Text>
-                        </LinearGradient>
-                      </TouchableOpacity>
+                        <UserAvatar avatarUrl={rivalEntry.avatar_url} avatarSeed={rivalEntry.avatar_seed} pseudo={rivalEntry.pseudo} size={40} />
+                        <View style={styles.flex}>
+                          <Txt variant="cardTitle" numberOfLines={1}>
+                            #{rivalEntry.rank} {rivalEntry.pseudo}
+                          </Txt>
+                          <View style={styles.gapRow}>
+                            <Icon name="arrowUp" size={ICON_SIZE.sm} color={COLOR.player.opponentText} />
+                            <Txt variant="caption" color={COLOR.player.opponentText} numberOfLines={2} style={styles.shrink}>
+                              {fmt(xpGap)} {t('leaderboard.to_overtake')}
+                            </Txt>
+                          </View>
+                        </View>
+                      </Pressable>
+                      <Button
+                        label={t('leaderboard.challenge')}
+                        icon="duel"
+                        size="sm"
+                        onPress={() => router.push(`/player-profile?id=${rivalEntry.id}&challenge=1` as any)}
+                      />
                     </View>
-                  </View>
+                  </Card>
                 )}
                 {entries.length >= 2 && (
-                  <Podium entries={entries} myId={myUserId} router={router} />
+                  <Podium entries={entries} myId={myUserId} onOpen={openProfile} />
                 )}
               </>
             }
@@ -476,138 +404,51 @@ export default function LeaderboardScreen() {
         )}
 
         {!loading && entries.length === 0 && !noLocation && !meta?.too_small && (
-          <View style={styles.emptyContainer}>
-            <MaterialCommunityIcons name="trophy-outline" size={56} color="#525252" />
-            <Text style={styles.emptyText}>{t('leaderboard.empty')}</Text>
-            <Text style={styles.emptySubtext}>{t('leaderboard.be_first')}</Text>
-          </View>
+          <EmptyState icon="trophy" title={t('leaderboard.empty')} message={t('leaderboard.be_first')} />
         )}
-      </View>
+      </ScreenContainer>
     </SwipeBackPage>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#050510' },
-  headerRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8 },
-  title: { flex: 1, fontSize: 24, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.5, color: '#FFF', paddingRight: 20 },
+  flex: { flex: 1 },
+  shrink: { flexShrink: 1 },
+  pressed: { opacity: 0.7 },
+  divider: { borderTopWidth: BORDER.hair, borderTopColor: COLOR.border.subtle },
 
-  // Back
-  backBtn: { paddingHorizontal: 16, paddingVertical: 4 },
-  backCircle: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
+  viewToggle: { flexDirection: 'row', gap: SPACE.sm, paddingHorizontal: SPACE.screenX, paddingTop: SPACE.md },
+  viewChip: { flexGrow: 1, justifyContent: 'center' },
 
-  // View Toggle
-  viewToggle: {
-    flexDirection: 'row', marginHorizontal: 20, marginTop: 4,
-    backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: 3,
-  },
-  viewBtn: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10, overflow: 'hidden' },
-  viewText: { color: '#525252', fontSize: 14, fontWeight: '700' },
-  viewTextActive: { color: '#000', fontSize: 14, fontWeight: '700', fontFamily: 'SpaceGrotesk_700Bold' },
+  // flexShrink: 0 obligatoire : sinon le ScrollView horizontal est écrasé par la liste
+  scopeScroll: { flexGrow: 0, flexShrink: 0, marginVertical: SPACE.md },
+  scopeContainer: { paddingHorizontal: SPACE.screenX, gap: SPACE.sm, alignItems: 'center', minHeight: SIZE.touch },
 
-  // Season info
-  seasonInfo: { paddingHorizontal: 20, paddingTop: 8 },
-  seasonText: { color: '#525252', fontSize: 11, fontWeight: '600', fontStyle: 'italic' },
+  seasonInfo: { paddingHorizontal: SPACE.screenX, marginBottom: SPACE.sm },
 
-  // Rival Card
-  rivalCard: {
-    marginHorizontal: 16, marginBottom: 16, borderRadius: 16,
-    backgroundColor: 'rgba(255,159,10,0.07)', borderWidth: 1, borderColor: 'rgba(255,159,10,0.25)',
-    padding: 14,
-  },
-  rivalHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
-  rivalTitle: { fontSize: 11, fontWeight: '800', color: '#FF9F0A', letterSpacing: 1.5, textTransform: 'uppercase' },
-  rivalBody: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  rivalAvatarWrap: { position: 'relative' },
-  rivalRankBadge: {
-    position: 'absolute', bottom: -4, right: -6,
-    backgroundColor: '#FF9F0A', borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1,
-  },
-  rivalRankText: { fontSize: 9, fontWeight: '900', color: '#FFF' },
-  rivalInfo: { flex: 1, gap: 2 },
-  rivalPseudo: { fontSize: 15, fontWeight: '800', color: '#FFF' },
-  rivalLevel: { fontSize: 11, color: '#A3A3A3', fontWeight: '600' },
-  rivalGapRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 },
-  rivalGap: { fontSize: 11, color: '#FF9F0A', fontWeight: '700' },
-  rivalDefiBtn: { borderRadius: 12, overflow: 'hidden' },
-  rivalDefiBtnGrad: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 10 },
-  rivalDefiText: { color: '#FFF', fontSize: 13, fontWeight: '900' },
+  listContent: { paddingHorizontal: SPACE.screenX, paddingBottom: SPACE.xxxl, gap: SPACE.sm },
 
-  // Scope — le padding vit dans scopeInner pour que le gradient actif
-  // remplisse toute la pastille (pas seulement le texte)
-  // flexShrink: 0 obligatoire : sinon le ScrollView est le seul enfant
-  // compressible de la colonne et se fait écraser par la liste
-  scopeScroll: { flexGrow: 0, flexShrink: 0, height: 46, marginVertical: 12 },
-  scopeContainer: { paddingHorizontal: 16, gap: 8, alignItems: 'center' },
-  scopeBtn: {
-    borderRadius: 20, overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
-  },
-  scopeBtnActive: { borderColor: 'transparent' },
-  scopeInner: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 16, paddingVertical: 10,
-  },
-  scopeText: { color: '#525252', fontSize: 13, fontWeight: '600' },
-  scopeTextActive: { color: '#000', fontSize: 13, fontWeight: '700', fontFamily: 'SpaceGrotesk_700Bold' },
+  rivalCard: { gap: SPACE.sm, marginBottom: SPACE.lg },
+  // Petit écran : « Défier » passe sous le joueur plutôt que de tronquer pseudo et écart d'XP
+  rivalBody: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: SPACE.md },
+  rivalWho: { flex: 1, minWidth: 190, flexDirection: 'row', alignItems: 'center', gap: SPACE.md, minHeight: SIZE.touch },
+  gapRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs },
 
-  // States
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 80, gap: 8 },
-  emptyText: { fontSize: 18, fontWeight: '700', color: '#FFF' },
-  emptySubtext: { fontSize: 14, color: '#525252', marginTop: 4 },
+  entry: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md, paddingVertical: SPACE.md, paddingHorizontal: SPACE.md, minHeight: SIZE.listRow },
+  entryMe: { backgroundColor: COLOR.action.selectedFill },
+  rank: { width: 32, alignItems: 'center' },
+  entryInfo: { flex: 1, minWidth: 0, gap: SPACE.xxs },
+  pseudoRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs },
+  xp: { alignItems: 'flex-end' },
 
-  // List
-  listContent: { paddingHorizontal: 16, paddingBottom: 20, gap: 8 },
-  entry: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 14, padding: 14,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
-  },
-  entryTop: { borderColor: 'rgba(138,43,226,0.2)', backgroundColor: 'rgba(138,43,226,0.06)' },
-  entryMe: { borderColor: 'rgba(0,229,255,0.5)', backgroundColor: 'rgba(0,229,255,0.06)', borderWidth: 2 },
-  rankBadge: {
-    width: 36, height: 36, borderRadius: 10, justifyContent: 'center', alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)', marginRight: 12, overflow: 'hidden',
-  },
-  rankText: { fontSize: 16, fontWeight: '800', color: '#A3A3A3' },
-  avatarCircle: {
-    width: 40, height: 40, borderRadius: 20, backgroundColor: '#8A2BE2',
-    justifyContent: 'center', alignItems: 'center', marginRight: 12,
-  },
-  avatarText: { color: '#FFF', fontSize: 18, fontWeight: '800' },
-  entryInfo: { flex: 1 },
-  pseudoRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  entryPseudo: { fontSize: 16, fontWeight: '700', color: '#FFF' },
-  glowText: { color: '#00FFFF', textShadowColor: '#00FFFF', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 8 },
-  entryStats: { fontSize: 11, color: '#525252', marginTop: 2 },
-  xpContainer: { alignItems: 'flex-end' },
-  xpValue: { fontSize: 16, fontWeight: '800', color: '#00FFFF' },
-  xpLabel: { fontSize: 10, color: '#525252', fontWeight: '600' },
+  suggestions: { paddingHorizontal: SPACE.screenX, paddingBottom: SPACE.xxxl },
+  suggestionCard: { paddingHorizontal: SPACE.cardPad },
+  suggestionRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md, minHeight: SIZE.listRow, paddingVertical: SPACE.sm },
 
-  // Suggestions
-  suggestionsContainer: {
-    flex: 1, alignItems: 'center', paddingHorizontal: 20, paddingTop: 24, gap: 10,
-  },
-  suggestionBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    width: '100%', backgroundColor: 'rgba(0,229,255,0.06)',
-    borderRadius: 14, borderWidth: 1, borderColor: 'rgba(0,229,255,0.15)',
-    paddingHorizontal: 16, paddingVertical: 14, marginTop: 4,
-  },
-  suggestionLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  suggestionCity: { color: '#FFF', fontSize: 15, fontWeight: '700' },
-  suggestionRight: { alignItems: 'flex-end' },
-  suggestionCount: { color: '#00E5FF', fontSize: 13, fontWeight: '700' },
-  suggestionDist: { color: '#525252', fontSize: 11, fontWeight: '600', marginTop: 2 },
-
-  // Fallback banner
   fallbackBanner: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    marginHorizontal: 20, marginBottom: 12,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 10,
-    paddingHorizontal: 14, paddingVertical: 10,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.sm,
+    marginHorizontal: SPACE.screenX, marginBottom: SPACE.md,
+    backgroundColor: COLOR.surface.subtle, borderRadius: RADII.md,
+    paddingHorizontal: SPACE.lg, paddingVertical: SPACE.md,
   },
-  fallbackText: { color: '#A3A3A3', fontSize: 12, fontWeight: '600', flex: 1 },
 });

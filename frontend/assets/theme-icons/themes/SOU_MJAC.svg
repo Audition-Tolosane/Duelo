@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Michael Jackson">
+  <rect x="84" y="180" width="96" height="40" rx="12" fill="#FFDB3D"/>
+  <rect x="66" y="110" width="26" height="76" rx="13" fill="#12606D" transform="rotate(-34 90 184)"/>
+  <rect x="80" y="104" width="98" height="88" rx="26" fill="#12606D"/>
+  <rect x="80" y="54" width="22" height="80" rx="11" fill="#12606D"/>
+  <rect x="106" y="40" width="22" height="90" rx="11" fill="#12606D"/>
+  <rect x="132" y="46" width="22" height="86" rx="11" fill="#12606D"/>
+  <rect x="158" y="66" width="20" height="70" rx="10" fill="#12606D"/>
+  <path d="M108 144V170M130 144V172M152 144V170" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M96 120h0M118 110h0M142 112h0M164 122h0M120 132h0" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M108 200h0M132 200h0M156 200h0" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="206,44 212,56 224,62 212,68 206,80 200,68 188,62 200,56" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M91 66L91 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

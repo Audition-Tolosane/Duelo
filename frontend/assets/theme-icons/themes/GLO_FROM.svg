@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fromages du Monde">
+  <g transform="translate(0 -12)">
+  <polygon points="176,96 220,118 220,206 176,196" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="36,196 176,196 176,96" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="112" cy="174" r="13" fill="#0B3D4A"/>
+  <circle cx="146" cy="150" r="10" fill="#0B3D4A"/>
+  <circle cx="158" cy="182" r="9" fill="#0B3D4A"/>
+  <circle cx="198" cy="152" r="9" fill="#0B3D4A"/>
+  <path d="M78 176L104 156" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

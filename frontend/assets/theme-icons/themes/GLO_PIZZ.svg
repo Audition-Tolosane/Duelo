@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pasta &amp; Pizza">
+  <path d="M60 80L128 218L196 80Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M40 76Q128 26 216 76L208 98Q128 56 48 98Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="106" cy="112" r="15" fill="#FF6B5B"/>
+  <circle cx="152" cy="118" r="15" fill="#FF6B5B"/>
+  <circle cx="128" cy="164" r="13" fill="#FF6B5B"/>
+  <path d="M66 70Q82 60 98 54" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Naruto">
+  <path d="M90 66L204 40M90 82L206 64" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M112 120C104 104 116 92 110 74M132 120C124 104 136 92 130 72M150 120C144 106 154 94 150 76" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M42 122H214C214 172 180 200 128 200C76 200 42 172 42 122Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="96" y="194" width="64" height="24" rx="8" fill="#12606D"/>
+  <ellipse cx="128" cy="122" rx="92" ry="22" fill="#12606D"/>
+  <ellipse cx="128" cy="122" rx="78" ry="13" fill="#0B3D4A"/>
+  <circle cx="174" cy="120" r="16" fill="#E8F1EC"/>
+  <path d="M174 120a4 4 0 1 1 4 4a9 9 0 1 1 -9 -9" stroke="#0B3D4A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M62 146Q68 166 84 178" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

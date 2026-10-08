@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Harry Potter">
+  <polygon points="142,34 106,78 130,78 114,112 158,64 134,64 150,34" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M44 150L34 138" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M212 150L222 138" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="84" cy="160" r="36" fill="#0B3D4A" stroke="#12606D" stroke-width="12"/>
+  <circle cx="172" cy="160" r="36" fill="#0B3D4A" stroke="#12606D" stroke-width="12"/>
+  <path d="M120 152Q128 140 136 152" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M64 152A22 22 0 0 1 76 140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

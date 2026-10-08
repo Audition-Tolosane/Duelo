@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Gravité">
+  <path d="M80 40L80 72" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M176 48L176 72" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M128 34L128 44" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M128 120C102 98 62 104 62 150C62 190 92 220 112 218C120 217 124 214 128 214C132 214 136 217 144 218C164 220 194 190 194 150C194 104 154 98 128 120Z" fill="#FF6B5B"/>
+  <path d="M128 120L134 86" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="156" cy="90" rx="22" ry="11" transform="rotate(-24 156 90)" fill="#FFDB3D"/>
+  <path d="M80 150A46 46 0 0 1 96 124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

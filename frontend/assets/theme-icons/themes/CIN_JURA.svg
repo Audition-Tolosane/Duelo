@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Jurassic Park">
+  <rect x="116" y="170" width="24" height="52" rx="8" fill="#12606D"/>
+  <rect x="94" y="156" width="68" height="26" rx="12" fill="#12606D"/>
+  <path d="M128 36C164 36 188 66 188 104C188 140 162 164 128 164C94 164 68 140 68 104C68 66 92 36 128 36Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="162" cy="90" rx="24" ry="10" transform="rotate(-25 162 90)" fill="#E8F1EC"/>
+  <ellipse cx="158" cy="114" rx="22" ry="9" transform="rotate(20 158 114)" fill="#E8F1EC"/>
+  <path d="M124 106L100 118L94 136M132 116L118 138L118 150M118 94L96 94L86 82" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="132" cy="106" rx="11" ry="28" transform="rotate(-35 132 106)" fill="#0B3D4A"/>
+  <circle cx="112" cy="78" r="10" fill="#0B3D4A"/>
+  <path d="M106 74L92 62" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M84 82Q88 64 102 54" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pagodes &amp; Temples">
+  <path d="M128 40L128 66" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="108" y="84" width="40" height="40" fill="#FFDB3D"/>
+  <rect x="98" y="136" width="60" height="40" fill="#FFDB3D"/>
+  <rect x="88" y="190" width="80" height="32" rx="6" fill="#FFDB3D"/>
+  <path d="M78 82Q96 86 103 68H153Q160 86 178 82Q180 94 166 94H90Q76 94 78 82Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M58 134Q76 138 93 120H163Q180 138 198 134Q200 146 186 146H70Q56 146 58 134Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M38 186Q56 190 83 172H173Q200 190 218 186Q220 198 206 198H50Q36 198 38 186Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="118" y="202" width="20" height="20" rx="6" fill="#12606D"/>
+  <circle cx="128" cy="40" r="10" fill="#FF6B5B"/>
+  <path d="M88 80L104 74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

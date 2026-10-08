@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Hans Zimmer">
+  <path d="M92 224H164" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M56 100C42 114 42 136 56 152M200 100C214 114 214 136 200 152" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M38 88C22 110 22 142 38 164M218 88C234 110 234 142 218 164" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="116" y="56" width="24" height="70" rx="10" fill="#12606D"/>
+  <circle cx="128" cy="54" r="14" fill="#FFDB3D"/>
+  <path d="M128 208L72 140C66 132 70 120 82 118H174C186 120 190 132 184 140Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="70" y="114" width="116" height="20" rx="10" fill="#FFDB3D"/>
+  <path d="M90 146L102 160" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
