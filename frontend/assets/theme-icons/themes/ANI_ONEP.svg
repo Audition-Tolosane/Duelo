@@ -1,10 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="One Punch Man">
-  <path d="M38 222Q46 186 88 180H168Q210 186 218 222Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M70 186L104 212M186 186L152 212" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
-  <circle cx="68" cy="124" r="13" fill="#FFDB3D"/>
-  <circle cx="188" cy="124" r="13" fill="#FFDB3D"/>
-  <ellipse cx="128" cy="112" rx="60" ry="74" fill="#FFDB3D"/>
-  <path d="M96 122H114M142 122H160" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
-  <path d="M120 162H136" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
-  <path d="M88 82Q96 60 116 52" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M122 124L88 62" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M88 62L58 36M88 62L84 28M88 62L112 38" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M86 120Q86 88 110 88M170 120Q170 88 146 88" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M56 120H200L188 218H68Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="146" y="102" width="50" height="34" rx="10" fill="#FF6B5B"/>
+  <path d="M152 136H192V184Q192 196 180 196H164Q152 196 152 184Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M152 152Q132 150 130 170Q132 182 148 176" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M166 172V188M180 172V188" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M74 140L72 176" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

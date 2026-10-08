@@ -1,8 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Avengers">
-  <circle cx="128" cy="128" r="88" fill="#FF6B5B"/>
-  <circle cx="128" cy="128" r="68" fill="#12606D"/>
-  <circle cx="128" cy="128" r="52" fill="#FF6B5B"/>
-  <circle cx="128" cy="128" r="40" fill="#12606D"/>
-  <polygon points="128,96 135.6,117.5 158.4,118.1 140.4,132 146.8,153.9 128,141 109.2,153.9 115.6,132 97.6,118.1 120.4,117.5" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M60 88A79 79 0 0 1 88 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="58" rx="76" ry="28" fill="#12606D" stroke="#FF6B5B" stroke-width="12"/>
+  <path d="M128 66C108 66 100 56 114 50C134 44 158 52 150 62C144 68 126 62 132 58" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 112V62" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M38 224V180H66V224ZM190 224V168H218V224Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="108,224 148,224 142,134 114,134" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M92 116H164L150 136H106Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M146 158H184" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="112" r="10" fill="#FFDB3D"/>
+  <path d="M128 160V206" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M118 150V164" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

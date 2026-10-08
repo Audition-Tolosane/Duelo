@@ -1,11 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="PlayStation">
-  <path d="M74 72H182C206 72 220 90 224 112L234 180C238 206 212 218 194 200L170 176H86L62 200C44 218 18 206 22 180L32 112C36 90 50 72 74 72Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <circle cx="102" cy="160" r="13" fill="none" stroke="#E8F1EC" stroke-width="10"/>
-  <circle cx="154" cy="160" r="13" fill="none" stroke="#E8F1EC" stroke-width="10"/>
-  <polygon points="186,88 198,106 174,106" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
-  <circle cx="212" cy="124" r="10" fill="none" stroke="#FF6B5B" stroke-width="8"/>
-  <path d="M178 138L194 154M194 138L178 154" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <rect x="150" y="114" width="20" height="20" rx="3" fill="#FF6B5B"/>
-  <path d="M52 112H88M70 94V130" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M48 82L60 74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="32" y="120" width="192" height="84" rx="18" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="62" y="114" width="132" height="16" rx="8" fill="#0B3D4A"/>
+  <path d="M76.2 122A58 58 0 1 1 179.8 122Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="92" r="15" fill="#0B3D4A"/>
+  <path d="M90 94Q94 70 114 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M44 158H212" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="60" y="172" width="30" height="14" rx="7" fill="#0B3D4A"/>
+  <rect x="102" y="172" width="30" height="14" rx="7" fill="#0B3D4A"/>
+  <circle cx="194" cy="179" r="9" fill="#FFDB3D"/>
+  <path d="M48 140V146" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

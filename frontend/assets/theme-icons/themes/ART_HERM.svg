@@ -1,11 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Maison Hermès">
-  <path d="M84 104V82C84 62 108 62 108 82V104" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M148 104V82C148 62 172 62 172 82V104" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M60 104H196L208 212H48Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M60 104H196V140H60Z" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M92 140L128 156L164 140" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M120 158V150C120 140 136 140 136 150V158" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <rect x="112" y="156" width="32" height="30" rx="8" fill="#FFDB3D"/>
-  <circle cx="128" cy="170" r="5" fill="#12606D"/>
-  <path d="M66 160L72 148" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <g transform="rotate(-8 128 128)">
+    <path d="M52 52H204V156Q186 176 158 204H52Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M76 76H180V146L146 180H76Z" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
+    <path d="M204 156Q170 150 158 204Q150 166 160 152Q174 142 204 156Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M84 112Q106 92 128 112Q150 132 172 112" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M84 146Q106 126 128 146Q144 160 158 152" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M64 100V64H100" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
 </svg>
