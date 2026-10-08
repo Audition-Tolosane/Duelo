@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, StyleSheet, Animated, ScrollView, useWindowDimensions,
-  Platform, UIManager, Easing, Alert, AppState, BackHandler,
+  Platform, UIManager, Easing, AppState, BackHandler,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,6 +13,7 @@ import Icon from '../components/ui/Icon';
 import Button from '../components/ui/Button';
 import IconButton from '../components/ui/IconButton';
 import Loader from '../components/ui/Loader';
+import Dialog from '../components/ui/Dialog';
 import ScreenContainer from '../components/ui/ScreenContainer';
 import AnswerButton, { AnswerState, ANSWER_ROW_MIN_HEIGHT } from '../components/ui/AnswerButton';
 import { useWS } from '../contexts/WebSocketContext';
@@ -232,19 +233,12 @@ export default function GameScreen() {
 
   // Abandon volontaire (bouton ✕ ou retour Android) : même forfait, mais confirmé.
   // Le swipe-retour est désactivé en match : on ne quitte plus une partie par accident.
+  // Confirmation dans la modale du kit (plus d'Alert natif ni de window.confirm sur le web).
+  const [forfeitAsk, setForfeitAsk] = useState(false);
   const confirmForfeit = () => {
     if (matchEndedRef.current) return;
     if (questionsRef.current.length === 0) { router.back(); return; }
-    const title = t('game.forfeit_title');
-    const body = t('game.forfeit_body');
-    if (Platform.OS === 'web') {
-      if (typeof window !== 'undefined' && window.confirm(`${title}\n\n${body}`)) forfeit();
-      return;
-    }
-    Alert.alert(title, body, [
-      { text: t('common.cancel'), style: 'cancel' },
-      { text: t('game.forfeit'), style: 'destructive', onPress: forfeit },
-    ]);
+    setForfeitAsk(true);
   };
 
   useEffect(() => {
@@ -763,8 +757,20 @@ export default function GameScreen() {
   if (loading || questions.length === 0) {
     // Invalid params — guard after all hooks
     if (!themeId) {
-      Alert.alert(t('common.error'), t('game.invalid_game'), [{ text: t('common.ok'), onPress: () => router.replace('/(tabs)/play') }]);
-      return null;
+      // Paramètres invalides : même gabarit que l'erreur de chargement (plus d'Alert pendant le rendu)
+      return (
+        <SwipeBackPage>
+        <ScreenContainer safeTop safeBottom>
+          <View style={styles.stateView}>
+            <Icon name="error" size={40} color={COLOR.status.error} />
+            <Txt variant="h2" align="center">{t('game.invalid_game')}</Txt>
+            <View style={styles.stateActions}>
+              <Button label={t('common.ok')} onPress={() => router.replace('/(tabs)/play')} haptic={false} fullWidth />
+            </View>
+          </View>
+        </ScreenContainer>
+        </SwipeBackPage>
+      );
     }
 
     // Show error state
@@ -957,6 +963,27 @@ export default function GameScreen() {
           </Animated.View>
         </View>
       )}
+
+      {/* Abandon volontaire : confirmation explicite, le duel continue si on referme */}
+      <Dialog
+        visible={forfeitAsk}
+        onClose={() => setForfeitAsk(false)}
+        icon="warning"
+        title={t('game.forfeit_title')}
+        message={t('game.forfeit_body')}
+        actions={
+          <>
+            <Button
+              label={t('game.forfeit')}
+              variant="danger"
+              fullWidth
+              testID="forfeit-confirm"
+              onPress={() => { setForfeitAsk(false); forfeit(); }}
+            />
+            <Button label={t('pilot.game.keep_playing')} variant="ghost" fullWidth onPress={() => setForfeitAsk(false)} />
+          </>
+        }
+      />
     </ScreenContainer>
     </SwipeBackPage>
   );

@@ -19,7 +19,7 @@ export default function ResultState({ outcome, subtitle }: Props) {
   const title = outcome === 'victory' ? t('results.victory')
     : outcome === 'defeat' ? t('results.defeat')
     : outcome === 'draw' ? t('results.draw')
-    : 'FLAWLESS';
+    : t('pilot.results.flawless');
   const color = outcome === 'victory' ? COLOR.action.primary : outcome === 'flawless' ? COLOR.accent.rare : COLOR.text.primary;
   return (
     <View style={styles.root}>

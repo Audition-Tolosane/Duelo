@@ -1,12 +1,12 @@
 {
  "totals": {
-  "gradient": 41,
-  "hex": 323,
-  "rgba": 156,
-  "fontSize": 123,
-  "heavy": 48,
-  "iconLib": 7,
-  "emoji": 11
+  "gradient": 24,
+  "hex": 159,
+  "emoji": 11,
+  "rgba": 61,
+  "fontSize": 55,
+  "heavy": 18,
+  "iconLib": 5
  },
  "files": {
   "app/(tabs)/accueil.tsx": {
@@ -25,12 +25,6 @@
    "gradient": 4
   },
   "app/results.tsx": {
-   "hex": 145,
-   "rgba": 90,
-   "fontSize": 63,
-   "heavy": 27,
-   "gradient": 14,
-   "iconLib": 1,
    "emoji": 2
   },
   "app/shop.tsx": {
@@ -71,14 +65,6 @@
    "hex": 1,
    "rgba": 1
   },
-  "components/RematchModal.tsx": {
-   "hex": 16,
-   "rgba": 5,
-   "fontSize": 5,
-   "heavy": 3,
-   "gradient": 2,
-   "iconLib": 1
-  },
   "components/SpinWheelModal.tsx": {
    "hex": 38,
    "rgba": 4,
@@ -91,10 +77,6 @@
   "components/SwipeBackPage.tsx": {
    "hex": 2,
    "rgba": 1
-  },
-  "components/SwordMark.tsx": {
-   "hex": 3,
-   "gradient": 1
   },
   "components/UserAvatar.tsx": {
    "hex": 18,

@@ -1,29 +1,34 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, Animated, Share, Modal, ActivityIndicator,
-  ScrollView, TextInput, KeyboardAvoidingView, Platform, Keyboard, Dimensions,
+  View, StyleSheet, Animated, Share, Pressable, ScrollView, TextInput, Keyboard, Dimensions,
 } from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { GLASS } from '../theme/glassTheme';
 import { authFetch } from '../utils/api';
 import { playSound } from '../utils/sounds';
 import SwipeBackPage from '../components/SwipeBackPage';
-import DueloHeader from '../components/DueloHeader';
+import UserAvatar from '../components/UserAvatar';
 import { useWS } from '../contexts/WebSocketContext';
-import { t } from '../utils/i18n';
+import { t, pluralKey } from '../utils/i18n';
+import {
+  Txt, Icon, IconName, Button, Badge, Card, Loader, Dialog, BottomSheet,
+  ScreenContainer, ScreenHeader, ThemeIcon, ResultState,
+} from '../components/ui';
+import { COLOR, SPACE, RADII, SIZE, BORDER, ICON_SIZE, TYPO, PALETTE } from '../theme/tokens';
+
+// Fin de duel SKILKI : en-tête ResultState (victoire = halo jaune, défaite = pétrole sobre,
+// sans-faute = violet rare), score moi (jaune) / rival (corail), XP en or, révision des erreurs,
+// actions (revanche jaune, partage, accueil). Logique, API et WebSocket inchangés.
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const CATEGORY_NAMES: Record<string, string> = {};
 
-const CATEGORY_ICONS: Record<string, string> = {};
+// Confettis de victoire / montée de niveau : couleurs de la palette SKILKI
+const CONFETTI = [PALETTE.yellow, PALETTE.gold, PALETTE.coral, PALETTE.green, PALETTE.cream];
 
 type XpBreakdown = {
   base: number;
@@ -47,17 +52,16 @@ type Reward =
   | { type: 'title'; title: string; category: string; level: number }
   | { type: 'achievement'; name: string; description: string; icon: string };
 
-const REPORT_REASONS = [
-  { id: 'wrong_answer', labelKey: 'report.reason_wrong_answer', icon: 'close-circle' as const },
-  { id: 'unclear_question', labelKey: 'report.reason_unclear', icon: 'help-circle' as const },
-  { id: 'typo', labelKey: 'report.reason_typo', icon: 'pencil' as const },
-  { id: 'outdated', labelKey: 'report.reason_outdated', icon: 'calendar-clock' as const },
-  { id: 'other', labelKey: 'report.reason_other', icon: 'message-text' as const },
+const REPORT_REASONS: { id: string; labelKey: string; icon: IconName }[] = [
+  { id: 'wrong_answer', labelKey: 'report.reason_wrong_answer', icon: 'error' },
+  { id: 'unclear_question', labelKey: 'report.reason_unclear', icon: 'help' },
+  { id: 'typo', labelKey: 'report.reason_typo', icon: 'edit' },
+  { id: 'outdated', labelKey: 'report.reason_outdated', icon: 'calendar' },
+  { id: 'other', labelKey: 'report.reason_other', icon: 'message' },
 ];
 
 export default function ResultsScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { send, on } = useWS();
   const params = useLocalSearchParams<{
     playerScore: string; opponentScore: string; opponentPseudo: string;
@@ -444,13 +448,6 @@ export default function ResultsScreen() {
     });
   };
 
-  // Fond teinté selon le résultat : or/feu = victoire, violet = défaite, cyan×violet = égalité
-  const bgTint: [string, string, string] = won
-    ? ['rgba(255,181,71,0.26)', 'rgba(255,107,44,0.10)', '#050510']
-    : draw
-      ? ['rgba(0,229,255,0.16)', 'rgba(179,102,255,0.10)', '#050510']
-      : ['rgba(179,102,255,0.18)', '#151028', '#050510'];
-
   // Near-miss: lost (or drew) by 1 point and has at least one missed question
   const scoreGap = oScore - pScore;
   const isNearMiss = !won && scoreGap >= 0 && scoreGap <= 1 && playerAnswers.length > 0;
@@ -460,1055 +457,531 @@ export default function ResultsScreen() {
     .map((q, i) => ({ q, i, playerAnswer: playerAnswers[i] ?? -1 }))
     .filter(({ q, playerAnswer }) => playerAnswer !== q.correct_option);
 
+  const goBack = () => {
+    if (router.canGoBack()) { router.back(); } else { router.replace(category ? `/category-detail?id=${category}` : '/(tabs)/play'); }
+  };
+
+  const outcome = won ? (correctCount >= 7 ? 'flawless' : 'victory') : draw ? 'draw' : 'defeat';
+  const opponentName = params.opponentPseudo || t('game.opponent');
+
+  type XpRow = { key: string; label: string; value: number; icon?: IconName };
+  const xpRows: XpRow[] = xpBreakdown ? ([
+    { key: 'base', label: t('pilot.results.base'), value: xpBreakdown.base },
+    { key: 'victory', label: t('pilot.results.victory_bonus'), value: xpBreakdown.victory, icon: 'trophy' },
+    { key: 'perfection', label: t('pilot.results.perfection'), value: xpBreakdown.perfection, icon: 'star' },
+    { key: 'giant', label: t('pilot.results.giant_slayer'), value: xpBreakdown.giant_slayer, icon: 'duel' },
+    { key: 'streak', label: t('pilot.results.streak_bonus'), value: xpBreakdown.streak, icon: 'flame' },
+  ] as XpRow[]).filter((r) => r.key === 'base' || r.value > 0) : [];
+
   return (
     <SwipeBackPage>
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <LinearGradient colors={bgTint} locations={[0, 0.32, 0.7]} style={StyleSheet.absoluteFill} />
-      <DueloHeader />
-      <View style={styles.subHeader}>
-        <TouchableOpacity onPress={() => { if (router.canGoBack()) { router.back(); } else { router.replace(category ? `/category-detail?id=${category}` : '/(tabs)/play'); } }} style={styles.backCircle} activeOpacity={0.6}>
-          <MaterialCommunityIcons name="chevron-left" size={26} color="#FFF" />
-        </TouchableOpacity>
-      </View>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <ScreenContainer ambient={false}>
+      <ScreenHeader
+        title={t('pilot.results.title')}
+        onBack={goBack}
+        right={category ? <ThemeIcon themeId={category} size={ICON_SIZE.theme.sm} /> : undefined}
+      />
+      <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
 
-        {/* Async challenge banner */}
+        {/* Défi asynchrone : score enregistré, l'autre joueur jouera plus tard */}
         {isAsyncChallenge && (
-          <View style={styles.asyncBanner}>
-            <MaterialCommunityIcons name="clock-outline" size={16} color="#BF5FFF" />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.asyncBannerTitle}>{t('challenge.async_saved')}</Text>
+          <Card style={s.bannerRow}>
+            <Icon name="clock" size={ICON_SIZE.md} color={COLOR.text.secondary} />
+            <View style={s.flex}>
+              <Txt variant="cardTitle">{t('challenge.async_saved')}</Txt>
               {challengeOpponentName ? (
-                <Text style={styles.asyncBannerSub}>
-                  {challengeOpponentName} {t('challenge.async_will_play')}
-                </Text>
+                <Txt variant="bodySmall">{challengeOpponentName} {t('challenge.async_will_play')}</Txt>
               ) : null}
             </View>
-          </View>
+          </Card>
         )}
 
-        {/* Adversaire parti — bandeau forfait (écran 29) */}
+        {/* Adversaire parti : victoire par forfait */}
         {opponentLeft && (
-          <View style={styles.forfeitBanner}>
-            <Text style={styles.forfeitEyebrow}>◆ {t('results.forfeit_eyebrow')}</Text>
-            <Text style={styles.forfeitTitle}>
-              {t('results.forfeit_title', { name: params.opponentPseudo || t('game.opponent') })}
-            </Text>
-            <Text style={styles.forfeitBody}>{t('results.forfeit_body')}</Text>
-            <View style={styles.forfeitChip}>
-              <MaterialCommunityIcons name="trophy" size={16} color="#32E7A3" />
-              <Text style={styles.forfeitChipText}>{t('results.forfeit_chip')}</Text>
-            </View>
-          </View>
+          <Card accent="event" style={s.forfeit}>
+            <Txt variant="overline">{t('results.forfeit_eyebrow')}</Txt>
+            <Txt variant="h3">{t('results.forfeit_title', { name: opponentName })}</Txt>
+            <Txt variant="bodySmall">{t('results.forfeit_body')}</Txt>
+            <Badge label={t('results.forfeit_chip')} tone="success" />
+          </Card>
         )}
 
-        {/* Result Header */}
-        <Animated.View style={[styles.resultHeader, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
-          {correctCount >= 7 && (
-            <View style={styles.flawlessPill}>
-              <MaterialCommunityIcons name="star-four-points" size={12} color="#050510" />
-              <Text style={styles.flawlessPillText}>FLAWLESS</Text>
-            </View>
-          )}
-          {/* Taille calculée selon la longueur (adjustsFontSizeToFit faisait
-              disparaître le texte à la fin de l'animation scale sur Android) */}
-          {(() => {
-            const label = won ? t('results.victory') : draw ? t('results.draw') : t('results.defeat');
-            const size = draw ? 48 : label.length > 10 ? 40 : label.length > 8 ? 48 : 60;
-            return (
-              <Text
-                style={[
-                  styles.resultTitle,
-                  won ? styles.winText : draw ? styles.drawText : styles.lossText,
-                  { fontSize: size, lineHeight: size + 6 },
-                ]}
-                numberOfLines={1}
-              >
-                {label}
-              </Text>
-            );
-          })()}
-          <LinearGradient
-            colors={['rgba(138,43,226,0.25)', 'rgba(0,255,255,0.1)']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.correctBadgeGradient}
-          >
-            <MaterialCommunityIcons name="check-circle" size={14} color="#00FF9D" />
-            <Text style={styles.correctBadge}>{correctCount}/7 {t('results.correct_answers')}</Text>
-          </LinearGradient>
-          {newLevel && (
-            <LinearGradient
-              colors={['rgba(138,43,226,0.3)', 'rgba(138,43,226,0.1)']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.levelUpBadge}
-            >
-              <MaterialCommunityIcons name="arrow-up-bold" size={16} color="#8A2BE2" />
-              <Text style={styles.levelUpText}>{t('results.level_up')} {newLevel} !</Text>
-            </LinearGradient>
-          )}
-          {isNearMiss && (
-            <LinearGradient
-              colors={['rgba(255,159,10,0.28)', 'rgba(255,107,53,0.12)']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.nearMissBadge}
-            >
-              <MaterialCommunityIcons name="fire" size={16} color="#FF9F0A" />
-              <Text style={styles.nearMissText}>{t('results.near_miss')}</Text>
-            </LinearGradient>
-          )}
-        </Animated.View>
-
-        {/* Score Card */}
-        <Animated.View style={[styles.scoreCard, { opacity: fadeAnim, transform: [{ translateY: cardSlide }] }]}>
-          <View style={styles.scoreCardDuo}>
-            {/* Player half */}
-            <View style={[styles.scoreHalfCard, won || draw ? styles.scoreHalfCyan : styles.scoreHalfDim]}>
-              <LinearGradient
-                colors={won || draw ? ['rgba(0,229,255,0.30)', 'rgba(0,229,255,0.06)'] : ['rgba(255,255,255,0.04)', 'rgba(255,255,255,0.02)']}
-                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
-              />
-              <View style={[styles.scoreHalfAvatar, { borderColor: won || draw ? 'rgba(0,229,255,0.55)' : 'rgba(0,229,255,0.2)' }]}>
-                <Text style={styles.scoreHalfAvatarText}>{playerPseudo[0]?.toUpperCase()}</Text>
-              </View>
-              <Text style={styles.scoreHalfName} numberOfLines={1}>{playerPseudo}</Text>
-              <Text style={styles.scoreHalfScore}>{pScore}</Text>
-              {won && <Text style={[styles.scoreHalfBadge, { color: '#00E5FF' }]}>VAINQUEUR</Text>}
-            </View>
-
-            {/* Séparateur VS / = */}
-            <View style={styles.scoreVsWrap}>
-              {draw
-                ? <Text style={styles.scoreEq}>=</Text>
-                : <Text style={styles.scoreVs}>VS</Text>}
-            </View>
-
-            {/* Opponent half */}
-            <View style={[styles.scoreHalfCard, !won ? styles.scoreHalfViolet : styles.scoreHalfDim]}>
-              <LinearGradient
-                colors={!won ? ['rgba(179,102,255,0.30)', 'rgba(179,102,255,0.06)'] : ['rgba(255,255,255,0.04)', 'rgba(255,255,255,0.02)']}
-                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
-              />
-              <View style={[styles.scoreHalfAvatar, { borderColor: !won ? 'rgba(179,102,255,0.55)' : 'rgba(179,102,255,0.2)' }]}>
-                <Text style={styles.scoreHalfAvatarText}>{(params.opponentPseudo || 'B')[0].toUpperCase()}</Text>
-              </View>
-              {params.opponentId ? (
-                <TouchableOpacity onPress={() => router.push(`/player-profile?id=${params.opponentId}`)}>
-                  <Text style={[styles.scoreHalfName, { textDecorationLine: 'underline' }]} numberOfLines={1}>
-                    {params.opponentPseudo?.slice(0, 12)}
-                  </Text>
-                </TouchableOpacity>
-              ) : (
-                <Text style={styles.scoreHalfName} numberOfLines={1}>{params.opponentPseudo?.slice(0, 12)}</Text>
-              )}
-              <Text style={styles.scoreHalfScore}>{oScore}</Text>
-              {!won && !draw && <Text style={[styles.scoreHalfBadge, { color: '#B366FF' }]}>VAINQUEUR</Text>}
-            </View>
-          </View>
-        </Animated.View>
-
-        {/* XP Breakdown */}
-        <Animated.View style={[styles.xpCard, won && styles.xpCardWin, { opacity: fadeAnim, transform: [{ translateY: xpSlide }] }]}>
-          {submitting ? (
-            <ActivityIndicator color="#8A2BE2" />
-          ) : xpBreakdown ? (
-            <>
-              <View style={styles.xpTitleRow}>
-                <MaterialCommunityIcons name="lightning-bolt" size={14} color="#525252" />
-                <Text style={styles.xpTitle}>{t('results.xp_title')}</Text>
-              </View>
-              <View style={styles.xpRow}>
-                <Text style={styles.xpLabel}>{t('results.base_score')}</Text>
-                <Text style={styles.xpValue}>+{xpBreakdown.base}</Text>
-              </View>
-              {xpBreakdown.victory > 0 && (
-                <View style={styles.xpRow}>
-                  <View style={styles.xpLabelRow}>
-                    <MaterialCommunityIcons name="trophy" size={14} color="#FFD700" />
-                    <Text style={styles.xpLabel}>{t('results.victory_bonus')}</Text>
-                  </View>
-                  <Text style={[styles.xpValue, styles.xpGold]}>+{xpBreakdown.victory}</Text>
+        {/* En-tête du résultat (moment émotionnel : halo du kit) */}
+        <Animated.View style={[s.resultShell, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+          <ResultState
+            outcome={outcome}
+            subtitle={t('pilot.results.correct_count', { n: String(correctCount) })}
+          />
+          {(draw && correctCount >= 7) || newLevel || isNearMiss ? (
+            <View style={s.resultBadges}>
+              {draw && correctCount >= 7 ? <Badge label={t('pilot.results.flawless')} tone="rare" /> : null}
+              {newLevel ? <Badge label={t('pilot.results.level_up', { n: String(newLevel) })} tone="reward" /> : null}
+              {isNearMiss ? (
+                <View style={s.nearMiss}>
+                  <Icon name="flame" size={ICON_SIZE.sm} color={COLOR.accent.warm} />
+                  <Txt variant="bodySmall" color={COLOR.text.primary} style={s.flexShrink}>{t('results.near_miss')}</Txt>
                 </View>
-              )}
-              {xpBreakdown.perfection > 0 && (
-                <View style={styles.xpRow}>
-                  <View style={styles.xpLabelRow}>
-                    <MaterialCommunityIcons name="star" size={14} color="#00FFFF" />
-                    <Text style={styles.xpLabel}>{t('results.perfection_bonus')}</Text>
-                  </View>
-                  <Text style={[styles.xpValue, styles.xpCyan]}>+{xpBreakdown.perfection}</Text>
-                </View>
-              )}
-              {xpBreakdown.giant_slayer > 0 && (
-                <View style={styles.xpRow}>
-                  <View style={styles.xpLabelRow}>
-                    <MaterialCommunityIcons name="sword-cross" size={14} color="#8A2BE2" />
-                    <Text style={styles.xpLabel}>{t('results.giant_slayer')}</Text>
-                  </View>
-                  <Text style={[styles.xpValue, styles.xpPurple]}>+{xpBreakdown.giant_slayer}</Text>
-                </View>
-              )}
-              {xpBreakdown.streak > 0 && (
-                <View style={styles.xpRow}>
-                  <View style={styles.xpLabelRow}>
-                    <MaterialCommunityIcons name="fire" size={14} color="#FF6B35" />
-                    <Text style={styles.xpLabel}>{t('results.streak_bonus')}</Text>
-                  </View>
-                  <Text style={[styles.xpValue, styles.xpOrange]}>+{xpBreakdown.streak}</Text>
-                </View>
-              )}
-              <View style={styles.xpDivider} />
-              <View style={styles.xpRow}>
-                <Text style={styles.xpTotalLabel}>{t('results.total')}</Text>
-                <Text style={styles.xpTotalValue}>+{displayXp} XP</Text>
-              </View>
-            </>
-          ) : submitError ? (
-            /* Échec d'enregistrement VISIBLE — plus de score perdu en silence */
-            <View style={styles.submitErrorWrap}>
-              <MaterialCommunityIcons
-                name={submitError.kind === 'auth' ? 'account-alert' : 'wifi-off'}
-                size={22} color="#FF3D5E"
-              />
-              <Text style={styles.submitErrorText}>
-                {submitError.kind === 'auth' ? t('results.submit_error_auth') : t('results.submit_error_network')}
-              </Text>
-              {/* Détail technique — permet de diagnostiquer sans les logs Metro */}
-              <Text style={styles.submitErrorDetail}>
-                {submitError.status ? `HTTP ${submitError.status}` : 'AUCUNE RÉPONSE DU SERVEUR'}
-              </Text>
-              {submitError.kind === 'network' && (
-                <TouchableOpacity style={styles.submitRetryBtn} onPress={submitMatch} activeOpacity={0.8}>
-                  <Text style={styles.submitRetryText}>{t('common.retry')}</Text>
-                </TouchableOpacity>
-              )}
+              ) : null}
             </View>
           ) : null}
         </Animated.View>
 
-        {/* Review missed questions */}
-        {missedQuestions.length > 0 && (
-          <Animated.View style={[styles.reviewCard, { opacity: fadeAnim }]}>
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setReviewExpanded(v => !v);
-              }}
-              activeOpacity={0.7}
-              style={styles.reviewHeader}
-            >
-              <MaterialCommunityIcons name="book-open-variant" size={18} color="#00FFFF" />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.reviewTitle}>{t('results.review_title')}</Text>
-                <Text style={styles.reviewSub}>
-                  {t('results.review_sub', { n: String(missedQuestions.length) })}
-                </Text>
-              </View>
-              <MaterialCommunityIcons
-                name={reviewExpanded ? 'chevron-up' : 'chevron-down'}
-                size={20}
-                color="#A3A3A3"
-              />
-            </TouchableOpacity>
-            {reviewExpanded && (
-              <View style={styles.reviewList}>
-                {missedQuestions.map(({ q, i, playerAnswer }) => {
-                  const correctText = q.options[q.correct_option];
-                  const yourText = playerAnswer >= 0 ? q.options[playerAnswer] : null;
-                  return (
-                    <View key={q.id || i} style={styles.reviewItem}>
-                      <Text style={styles.reviewQuestion}>{q.question_text}</Text>
-                      {yourText && (
-                        <View style={styles.reviewAnswerRow}>
-                          <MaterialCommunityIcons name="close-circle" size={14} color="#FF3B30" />
-                          <Text style={styles.reviewWrongText} numberOfLines={2}>{yourText}</Text>
-                        </View>
-                      )}
-                      {!yourText && (
-                        <View style={styles.reviewAnswerRow}>
-                          <MaterialCommunityIcons name="timer-off" size={14} color="#A3A3A3" />
-                          <Text style={styles.reviewTimeoutText}>{t('results.review_timeout')}</Text>
-                        </View>
-                      )}
-                      <View style={styles.reviewAnswerRow}>
-                        <MaterialCommunityIcons name="check-circle" size={14} color="#00FF9D" />
-                        <Text style={styles.reviewCorrectText} numberOfLines={2}>{correctText}</Text>
-                      </View>
+        {/* Score : moi (jaune) / rival (corail) */}
+        <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: cardSlide }] }}>
+          <Card style={s.scoreCard}>
+            <View style={s.scoreSide}>
+              <UserAvatar pseudo={playerPseudo} size={56} borderColor={COLOR.player.self} borderWidth={BORDER.strong} />
+              <Txt variant="label" color={COLOR.text.primary} align="center" numberOfLines={1} style={s.stretch}>{playerPseudo}</Txt>
+              <Txt variant="score" color={COLOR.player.self}>{pScore}</Txt>
+              {won ? <Badge label={t('pilot.results.winner')} tone="action" /> : <View style={s.badgeSpacer} />}
+            </View>
+
+            <Txt variant="overline" style={s.vs}>{draw ? '=' : 'VS'}</Txt>
+
+            <View style={s.scoreSide}>
+              <UserAvatar pseudo={opponentName} size={56} borderColor={COLOR.player.opponent} borderWidth={BORDER.strong} />
+              {params.opponentId ? (
+                <Pressable
+                  onPress={() => router.push(`/player-profile?id=${params.opponentId}`)}
+                  accessibilityRole="link"
+                  hitSlop={8}
+                  style={s.stretch}
+                >
+                  <Txt variant="label" color={COLOR.player.opponentText} align="center" numberOfLines={1} style={s.underline}>
+                    {opponentName}
+                  </Txt>
+                </Pressable>
+              ) : (
+                <Txt variant="label" color={COLOR.player.opponentText} align="center" numberOfLines={1} style={s.stretch}>{opponentName}</Txt>
+              )}
+              <Txt variant="score" color={COLOR.player.opponentText}>{oScore}</Txt>
+              {!won && !draw ? <Badge label={t('pilot.results.winner')} tone="warm" /> : <View style={s.badgeSpacer} />}
+            </View>
+          </Card>
+        </Animated.View>
+
+        {/* XP gagnés (récompense : or) */}
+        <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: xpSlide }] }}>
+          <Card accent={won ? 'reward' : 'none'} style={s.xpCard}>
+            {submitting ? (
+              <Loader />
+            ) : xpBreakdown ? (
+              <>
+                <View style={s.rowCenter}>
+                  <Icon name="bolt" size={ICON_SIZE.sm} color={COLOR.reward.gold} />
+                  <Txt variant="overline">{t('pilot.results.xp_title')}</Txt>
+                </View>
+                {xpRows.map((r) => (
+                  <View key={r.key} style={s.xpRow}>
+                    <View style={[s.rowCenter, s.flexShrink]}>
+                      {r.icon ? <Icon name={r.icon} size={ICON_SIZE.sm} color={COLOR.reward.gold} /> : null}
+                      <Txt variant="bodySmall" numberOfLines={1} style={s.flexShrink}>{r.label}</Txt>
                     </View>
-                  );
-                })}
+                    <Txt variant="label" color={r.key === 'base' ? COLOR.text.primary : COLOR.reward.gold}>
+                      +{r.value.toLocaleString()}
+                    </Txt>
+                  </View>
+                ))}
+                <View style={[s.xpRow, s.xpTotal]}>
+                  <Txt variant="cardTitle">{t('pilot.results.total')}</Txt>
+                  <Txt variant="statMedium" color={COLOR.reward.gold}>+{displayXp.toLocaleString()} XP</Txt>
+                </View>
+              </>
+            ) : submitError ? (
+              /* Échec d'enregistrement VISIBLE — plus de score perdu en silence */
+              <View style={s.submitError}>
+                <Icon name={submitError.kind === 'auth' ? 'user' : 'offline'} size={ICON_SIZE.lg} color={COLOR.status.errorText} />
+                <Txt variant="body" color={COLOR.text.primary} align="center">
+                  {submitError.kind === 'auth' ? t('results.submit_error_auth') : t('results.submit_error_network')}
+                </Txt>
+                {/* Détail technique — permet de diagnostiquer sans les logs Metro */}
+                <Txt variant="caption" align="center">
+                  {submitError.status ? `HTTP ${submitError.status}` : t('pilot.results.no_response')}
+                </Txt>
+                {submitError.kind === 'network' && (
+                  <Button label={t('common.retry')} icon="refresh" variant="secondary" size="sm" onPress={submitMatch} />
+                )}
               </View>
-            )}
+            ) : null}
+          </Card>
+        </Animated.View>
+
+        {/* Révision des erreurs (dépliable) */}
+        {missedQuestions.length > 0 && (
+          <Animated.View style={{ opacity: fadeAnim }}>
+            <Card padded={false}>
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setReviewExpanded(v => !v);
+                }}
+                accessibilityRole="button"
+                accessibilityState={{ expanded: reviewExpanded }}
+                style={({ pressed }) => [s.reviewHeader, pressed && s.pressed]}
+              >
+                <Icon name="book" size={ICON_SIZE.md} color={COLOR.text.secondary} />
+                <View style={s.flex}>
+                  <Txt variant="cardTitle">{t('pilot.results.review_title')}</Txt>
+                  <Txt variant="caption">
+                    {t(pluralKey('pilot.results.review', missedQuestions.length), { n: String(missedQuestions.length) })}
+                  </Txt>
+                </View>
+                <View style={reviewExpanded ? s.chevronUp : undefined}>
+                  <Icon name="chevronDown" size={ICON_SIZE.md} color={COLOR.text.tertiary} />
+                </View>
+              </Pressable>
+              {reviewExpanded && (
+                <View style={s.reviewList}>
+                  {missedQuestions.map(({ q, i, playerAnswer }) => {
+                    const correctText = q.options[q.correct_option];
+                    const yourText = playerAnswer >= 0 ? q.options[playerAnswer] : null;
+                    return (
+                      <View key={q.id || i} style={s.reviewItem}>
+                        <Txt variant="body">{q.question_text}</Txt>
+                        {yourText ? (
+                          <View style={s.answerRow}>
+                            <Icon name="error" size={ICON_SIZE.sm} color={COLOR.status.errorText} />
+                            <Txt variant="bodySmall" color={COLOR.status.errorText} numberOfLines={2} style={s.flexShrink}>{yourText}</Txt>
+                          </View>
+                        ) : (
+                          <View style={s.answerRow}>
+                            <Icon name="timer" size={ICON_SIZE.sm} color={COLOR.text.tertiary} />
+                            <Txt variant="bodySmall" color={COLOR.text.tertiary} style={s.flexShrink}>{t('results.review_timeout')}</Txt>
+                          </View>
+                        )}
+                        <View style={s.answerRow}>
+                          <Icon name="success" size={ICON_SIZE.sm} color={COLOR.status.success} />
+                          <Txt variant="bodySmall" color={COLOR.status.success} numberOfLines={2} style={s.flexShrink}>{correctText}</Txt>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
+            </Card>
           </Animated.View>
         )}
 
-        {/* Actions */}
-        <Animated.View style={[styles.actions, { opacity: fadeAnim }]}>
-          <TouchableOpacity testID="share-result-btn" style={styles.shareButton} onPress={shareResult} activeOpacity={0.8}>
-            <LinearGradient
-              colors={['rgba(0,255,255,0.12)', 'rgba(0,255,255,0.03)']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.shareGradient}
-            >
-              <MaterialCommunityIcons name="share-variant" size={18} color="#00FFFF" />
-              <Text style={styles.shareText}>{t('results.share_score')}</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-          <View style={styles.actionRow}>
-            <TouchableOpacity testID="go-home-btn" style={styles.homeButton} onPress={() => router.replace('/(tabs)/accueil')}>
-              <Text style={styles.homeText}>{t('results.back_home')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              testID="play-again-btn"
-              onPress={playAgain}
-              activeOpacity={0.8}
-              style={styles.playAgainTouchable}
-              disabled={rematchState === 'waiting' || rematchState === 'accepted'}
-            >
-              <LinearGradient
-                colors={
-                  rematchState === 'declined'
-                    ? ['#FF3D5E', '#CC2D26']
-                    : rematchState === 'accepted'
-                      ? ['#32E7A3', '#00C97A']
-                      : ['#00E5FF', '#B366FF']
-                }
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.playAgainButton}
-              >
-                {rematchState === 'waiting' ? (
-                  <>
-                    <ActivityIndicator color="#050510" size="small" />
-                    <Text style={styles.playAgainText}>{t('results.waiting')}</Text>
-                  </>
-                ) : rematchState === 'declined' ? (
-                  <>
-                    <MaterialCommunityIcons name="refresh" size={18} color="#FFF" />
-                    <Text style={[styles.playAgainText, { color: '#FFF' }]}>{t('results.declined')}</Text>
-                  </>
-                ) : rematchState === 'accepted' ? (
-                  <>
-                    <MaterialCommunityIcons name="check-circle" size={18} color="#050510" />
-                    <Text style={styles.playAgainText}>{t('results.accepted')}</Text>
-                  </>
-                ) : (
-                  <>
-                    <MaterialCommunityIcons name="sword-cross" size={18} color="#050510" />
-                    <Text style={styles.playAgainText}>{t('results.rematch')}</Text>
-                  </>
-                )}
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
+        {/* Actions : un seul CTA jaune (revanche) */}
+        <Animated.View style={[s.actions, { opacity: fadeAnim }]}>
+          {rematchState === 'waiting' ? (
+            <>
+              <Button testID="play-again-btn" label={t('pilot.results.rematch')} loading fullWidth size="lg" onPress={playAgain} />
+              <Txt variant="caption" align="center">{t('pilot.results.waiting_rematch')}</Txt>
+            </>
+          ) : rematchState === 'declined' ? (
+            <Button testID="play-again-btn" label={t('pilot.results.declined')} icon="replay" variant="secondary" fullWidth size="lg" onPress={playAgain} />
+          ) : rematchState === 'accepted' ? (
+            <Button testID="play-again-btn" label={t('pilot.results.accepted')} icon="check" fullWidth size="lg" disabled onPress={playAgain} />
+          ) : (
+            <Button testID="play-again-btn" label={t('pilot.results.rematch')} icon="duel" fullWidth size="lg" onPress={playAgain} />
+          )}
+          <Button testID="share-result-btn" label={t('pilot.results.share')} icon="share" variant="secondary" fullWidth onPress={shareResult} />
+          <Button testID="go-home-btn" label={t('results.back_home')} icon="home" variant="ghost" fullWidth onPress={() => router.replace('/(tabs)/accueil')} />
 
           {quizQuestions.length > 0 && (
-            <TouchableOpacity testID="report-error-btn" style={styles.reportButton} onPress={openReportModal} activeOpacity={0.7}>
-              <MaterialCommunityIcons name="alert-circle-outline" size={16} color="#FFA500" />
-              <Text style={styles.reportButtonText}>{t('results.report_error')}</Text>
-            </TouchableOpacity>
+            <Pressable
+              testID="report-error-btn"
+              onPress={openReportModal}
+              accessibilityRole="button"
+              style={({ pressed }) => [s.reportLink, pressed && s.pressed]}
+            >
+              <Icon name="warning" size={ICON_SIZE.sm} color={COLOR.text.secondary} />
+              <Txt variant="label">{t('results.report_error')}</Txt>
+            </Pressable>
           )}
         </Animated.View>
       </ScrollView>
 
-      {/* Unified Rewards Modal (Duolingo-style) */}
-      <Modal visible={showRewardsModal} transparent animationType="fade" onRequestClose={closeRewardsModal}>
-        <View style={rewardsStyles.overlay}>
-          <View style={rewardsStyles.card}>
-            <Text style={rewardsStyles.header}>{t('results.rewards_title')}</Text>
-            <ScrollView style={{ maxHeight: 420, width: '100%' }} contentContainerStyle={{ paddingVertical: 4 }} showsVerticalScrollIndicator={false}>
-              {rewards.map((r, i) => (
-                <RewardRow
-                  key={`${r.type}-${i}`}
-                  reward={r}
-                  delay={i * 500}
-                  streakRestored={streakRestored}
-                  adWatching={adWatching}
-                  adCountdown={adCountdown}
-                  onWatchAd={watchAdAndRestoreStreak}
-                />
-              ))}
-            </ScrollView>
-            <RewardContinueBtn delay={rewards.length * 500 + 200} onPress={closeRewardsModal} />
-          </View>
-          {rewards.some(r => r.type === 'level' || r.type === 'title') && (
-            <ConfettiCannon
-              count={120}
-              origin={{ x: SCREEN_WIDTH / 2, y: -10 }}
-              autoStart
-              fadeOut
-              explosionSpeed={350}
-              fallSpeed={2800}
-              colors={['#FFD700', '#00FF9D', '#8A2BE2', '#00E5FF', '#FF3E9D']}
+      {/* Récompenses (montée de niveau, titre, succès, bouclier de série) */}
+      <Dialog
+        visible={showRewardsModal}
+        onClose={closeRewardsModal}
+        title={t('pilot.results.rewards_title')}
+        icon="gift"
+        tone="reward"
+        actions={<Button label={t('pilot.results.continue')} fullWidth onPress={closeRewardsModal} />}
+      >
+        <ScrollView style={s.rewardsScroll} contentContainerStyle={s.rewardsList} showsVerticalScrollIndicator={false}>
+          {rewards.map((r, i) => (
+            <RewardRow
+              key={`${r.type}-${i}`}
+              reward={r}
+              streakRestored={streakRestored}
+              adWatching={adWatching}
+              adCountdown={adCountdown}
+              onWatchAd={watchAdAndRestoreStreak}
             />
-          )}
+          ))}
+        </ScrollView>
+      </Dialog>
+      {showRewardsModal && rewards.some(r => r.type === 'level' || r.type === 'title') && (
+        <View style={StyleSheet.absoluteFill} pointerEvents="none">
+          <ConfettiCannon count={120} origin={{ x: SCREEN_WIDTH / 2, y: -10 }} autoStart fadeOut explosionSpeed={350} fallSpeed={2800} colors={CONFETTI} />
         </View>
-      </Modal>
-
-      {/* Report Question Modal */}
-      <Modal visible={reportModalVisible} transparent animationType="slide" onRequestClose={() => setReportModalVisible(false)}>
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-          <View style={styles.reportOverlay}>
-            <View style={styles.reportModal}>
-              {/* Header */}
-              <View style={styles.reportHeader}>
-                <View style={styles.reportHeaderLeft}>
-                  {reportSuccess ? (
-                    <MaterialCommunityIcons name="check-circle" size={20} color="#00FF9D" />
-                  ) : reportStep === 'select' ? (
-                    <MaterialCommunityIcons name="alert-circle-outline" size={20} color="#FFA500" />
-                  ) : (
-                    <MaterialCommunityIcons name="pencil-box-outline" size={20} color="#00FFFF" />
-                  )}
-                  <Text style={styles.reportHeaderText}>
-                    {reportSuccess ? t('report.thanks') : reportStep === 'select' ? t('report.title') : t('report.details')}
-                  </Text>
-                </View>
-                <TouchableOpacity onPress={() => setReportModalVisible(false)} style={styles.reportClose}>
-                  <MaterialCommunityIcons name="close" size={18} color="#A3A3A3" />
-                </TouchableOpacity>
-              </View>
-
-              {reportSuccess ? (
-                /* Success State */
-                <View style={styles.reportSuccessContainer}>
-                  <LinearGradient
-                    colors={['#00FF9D', '#00C97A']}
-                    style={styles.reportSuccessIconCircle}
-                  >
-                    <MaterialCommunityIcons name="check-bold" size={36} color="#FFF" />
-                  </LinearGradient>
-                  <Text style={styles.reportSuccessTitle}>{t('report.sent')}</Text>
-                  <Text style={styles.reportSuccessDesc}>
-                    {t('report.thanks_desc')}
-                  </Text>
-                  <TouchableOpacity style={styles.reportSuccessBtn} onPress={() => setReportModalVisible(false)} activeOpacity={0.8}>
-                    <LinearGradient
-                      colors={['#8A2BE2', '#6A1FB0']}
-                      style={styles.reportSuccessBtnGradient}
-                    >
-                      <Text style={styles.reportSuccessBtnText}>{t('report.close')}</Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </View>
-              ) : reportStep === 'select' ? (
-                /* Step 1: Select Question */
-                <ScrollView style={styles.reportScroll} showsVerticalScrollIndicator={false}>
-                  <Text style={styles.reportSubtitle}>{t('report.which_question')}</Text>
-                  {quizQuestions.map((q, idx) => (
-                    <TouchableOpacity
-                      key={q.id || idx.toString()}
-                      style={styles.reportQuestionItem}
-                      onPress={() => selectQuestionForReport(q)}
-                      activeOpacity={0.7}
-                    >
-                      <LinearGradient
-                        colors={['rgba(138,43,226,0.3)', 'rgba(138,43,226,0.15)']}
-                        style={styles.reportQuestionNumber}
-                      >
-                        <Text style={styles.reportQuestionNumberText}>{idx + 1}</Text>
-                      </LinearGradient>
-                      <Text style={styles.reportQuestionText} numberOfLines={2}>
-                        {q.question_text}
-                      </Text>
-                      <MaterialCommunityIcons name="chevron-right" size={20} color="#525252" />
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              ) : (
-                /* Step 2: Reason + Description */
-                <ScrollView style={styles.reportScroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-                  {/* Selected question preview */}
-                  <View style={styles.reportSelectedPreview}>
-                    <Text style={styles.reportSelectedLabel}>{t('report.selected_question')}</Text>
-                    <Text style={styles.reportSelectedText} numberOfLines={2}>{selectedQuestion?.question_text}</Text>
-                  </View>
-
-                  <Text style={styles.reportSubtitle}>{t('report.error_type')}</Text>
-                  {REPORT_REASONS.map((r) => (
-                    <TouchableOpacity
-                      key={r.id}
-                      style={[styles.reportReasonItem, selectedReason === r.id && styles.reportReasonSelected]}
-                      onPress={() => { setSelectedReason(r.id); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
-                      activeOpacity={0.7}
-                    >
-                      <MaterialCommunityIcons name={r.icon} size={18} color={selectedReason === r.id ? '#00FFFF' : '#A3A3A3'} style={{ marginRight: 12 }} />
-                      <Text style={[styles.reportReasonLabel, selectedReason === r.id && styles.reportReasonLabelSelected]}>
-                        {t(r.labelKey)}
-                      </Text>
-                      {selectedReason === r.id && <MaterialCommunityIcons name="check-circle" size={18} color="#00FFFF" />}
-                    </TouchableOpacity>
-                  ))}
-
-                  <Text style={[styles.reportSubtitle, { marginTop: 16 }]}>{t('report.description_optional')}</Text>
-                  <TextInput
-                    style={styles.reportInput}
-                    placeholder={t('report.describe_error')}
-                    placeholderTextColor="#525252"
-                    value={reportDescription}
-                    onChangeText={setReportDescription}
-                    multiline
-                    maxLength={500}
-                    textAlignVertical="top"
-                  />
-                  <Text style={styles.reportCharCount}>{reportDescription.length}/500</Text>
-
-                  {reportError && (
-                    <View style={styles.reportErrorBanner}>
-                      <MaterialCommunityIcons name="alert-circle" size={16} color="#FF3B30" />
-                      <Text style={styles.reportErrorText}>{reportError}</Text>
-                    </View>
-                  )}
-
-                  <View style={styles.reportActions}>
-                    <TouchableOpacity style={styles.reportBackBtn} onPress={() => setReportStep('select')} activeOpacity={0.7}>
-                      <MaterialCommunityIcons name="chevron-left" size={18} color="#A3A3A3" />
-                      <Text style={styles.reportBackText}>{t('common.back')}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.reportSubmitBtn, (!selectedReason || reportSubmitting) && styles.reportSubmitDisabled]}
-                      onPress={submitReport}
-                      disabled={!selectedReason || reportSubmitting}
-                      activeOpacity={0.8}
-                    >
-                      {reportSubmitting ? (
-                        <ActivityIndicator color="#FFF" size="small" />
-                      ) : (
-                        <LinearGradient
-                          colors={(!selectedReason || reportSubmitting) ? ['rgba(255,165,0,0.3)', 'rgba(255,165,0,0.2)'] : ['#FFA500', '#E69500']}
-                          style={styles.reportSubmitGradient}
-                        >
-                          <Text style={styles.reportSubmitText}>{t('report.send')}</Text>
-                        </LinearGradient>
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                </ScrollView>
-              )}
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
-
-      {/* Confetti — victoire */}
-      {won && (
-        <ConfettiCannon
-          ref={confettiRef}
-          count={140}
-          origin={{ x: SCREEN_WIDTH / 2, y: -10 }}
-          autoStart={false}
-          fadeOut={true}
-          explosionSpeed={350}
-          fallSpeed={2800}
-          colors={['#FFD700', '#00FF9D', '#8A2BE2', '#00E5FF', '#FF3E9D']}
-        />
       )}
 
-    </View>
+      {/* Signalement d'une question */}
+      <BottomSheet
+        visible={reportModalVisible}
+        onClose={() => setReportModalVisible(false)}
+        title={reportSuccess ? t('report.thanks') : reportStep === 'select' ? t('report.title') : t('pilot.results.report_details')}
+        subtitle={!reportSuccess && reportStep === 'select' ? t('report.which_question') : undefined}
+        footer={
+          reportSuccess ? (
+            <Button label={t('pilot.results.close')} variant="secondary" fullWidth onPress={() => setReportModalVisible(false)} />
+          ) : reportStep === 'reason' ? (
+            <View style={s.reportActions}>
+              <Button label={t('common.back')} icon="back" variant="ghost" onPress={() => setReportStep('select')} style={s.flex} />
+              <Button
+                label={t('pilot.results.send')}
+                icon="send"
+                onPress={submitReport}
+                loading={reportSubmitting}
+                disabled={!selectedReason || reportSubmitting}
+                style={s.flex}
+              />
+            </View>
+          ) : undefined
+        }
+      >
+        {reportSuccess ? (
+          <View style={s.reportSuccess}>
+            <View style={s.successDisc}><Icon name="success" size={ICON_SIZE.xl} color={COLOR.status.success} /></View>
+            <Txt variant="h3" align="center">{t('pilot.results.report_sent')}</Txt>
+            <Txt variant="bodySmall" align="center">{t('pilot.results.report_thanks')}</Txt>
+          </View>
+        ) : reportStep === 'select' ? (
+          quizQuestions.map((q, idx) => (
+            <Pressable
+              key={q.id || idx.toString()}
+              onPress={() => selectQuestionForReport(q)}
+              accessibilityRole="button"
+              style={({ pressed }) => [s.questionRow, pressed && s.pressed]}
+            >
+              <View style={s.questionNumber}><Txt variant="label" color={COLOR.text.primary}>{idx + 1}</Txt></View>
+              <Txt variant="bodySmall" color={COLOR.text.primary} numberOfLines={2} style={s.flex}>{q.question_text}</Txt>
+              <Icon name="chevronRight" size={ICON_SIZE.sm} color={COLOR.text.disabled} />
+            </Pressable>
+          ))
+        ) : (
+          <>
+            <View style={s.selectedPreview}>
+              <Txt variant="overline">{t('pilot.results.report_selected')}</Txt>
+              <Txt variant="bodySmall" color={COLOR.text.primary} numberOfLines={2}>{selectedQuestion?.question_text}</Txt>
+            </View>
+
+            <Txt variant="overline" style={s.sectionLabel}>{t('report.error_type')}</Txt>
+            {REPORT_REASONS.map((r) => {
+              const active = selectedReason === r.id;
+              return (
+                <Pressable
+                  key={r.id}
+                  onPress={() => { setSelectedReason(r.id); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: active }}
+                  style={({ pressed }) => [s.reasonRow, active && s.reasonActive, pressed && s.pressed]}
+                >
+                  <Icon name={r.icon} size={ICON_SIZE.sm} color={active ? COLOR.action.primary : COLOR.text.secondary} />
+                  <Txt variant="body" color={active ? COLOR.text.primary : COLOR.text.secondary} style={s.flex}>{t(r.labelKey)}</Txt>
+                  {active ? <Icon name="check" size={ICON_SIZE.sm} color={COLOR.action.primary} /> : null}
+                </Pressable>
+              );
+            })}
+
+            <Txt variant="overline" style={s.sectionLabel}>{t('report.description_optional')}</Txt>
+            <TextInput
+              style={s.input}
+              placeholder={t('report.describe_error')}
+              placeholderTextColor={COLOR.text.tertiary}
+              selectionColor={COLOR.action.primary}
+              value={reportDescription}
+              onChangeText={setReportDescription}
+              multiline
+              maxLength={500}
+              maxFontSizeMultiplier={1.3}
+              textAlignVertical="top"
+            />
+            <Txt variant="caption" align="right">{reportDescription.length}/500</Txt>
+
+            {reportError && (
+              <View style={s.answerRow}>
+                <Icon name="error" size={ICON_SIZE.sm} color={COLOR.status.errorText} />
+                <Txt variant="bodySmall" color={COLOR.status.errorText} style={s.flexShrink}>{reportError}</Txt>
+              </View>
+            )}
+          </>
+        )}
+      </BottomSheet>
+
+      {/* Confettis — victoire (animation existante, couleurs de la palette) */}
+      {won && (
+        <View style={StyleSheet.absoluteFill} pointerEvents="none">
+          <ConfettiCannon
+            ref={confettiRef}
+            count={140}
+            origin={{ x: SCREEN_WIDTH / 2, y: -10 }}
+            autoStart={false}
+            fadeOut={true}
+            explosionSpeed={350}
+            fallSpeed={2800}
+            colors={CONFETTI}
+          />
+        </View>
+      )}
+    </ScreenContainer>
     </SwipeBackPage>
   );
 }
 
 type RewardRowProps = {
   reward: Reward;
-  delay: number;
   streakRestored: boolean;
   adWatching: boolean;
   adCountdown: number;
   onWatchAd: () => void;
 };
 
-function RewardRow({ reward, delay, streakRestored, adWatching, adCountdown, onWatchAd }: RewardRowProps) {
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(20)).current;
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      Animated.parallel([
-        Animated.timing(opacity, { toValue: 1, duration: 380, useNativeDriver: true }),
-        Animated.spring(translateY, { toValue: 0, tension: 80, friction: 9, useNativeDriver: true }),
-      ]).start();
-    }, delay);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const content = (() => {
-    switch (reward.type) {
-      case 'level':
-        return (
-          <>
-            <View style={[rewardsStyles.iconCircle, { backgroundColor: 'rgba(179,102,255,0.18)', borderColor: 'rgba(179,102,255,0.40)' }]}>
-              <MaterialCommunityIcons name="arrow-up-bold-circle" size={24} color="#B366FF" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={rewardsStyles.rowLabel}>{t('results.new_level_reached')}</Text>
-              <Text style={rewardsStyles.rowValueBig}>{t('results.level_up')} {reward.level}</Text>
-            </View>
-          </>
-        );
-      case 'title':
-        return (
-          <>
-            <View style={[rewardsStyles.iconCircle, { backgroundColor: 'rgba(255,181,71,0.18)', borderColor: 'rgba(255,181,71,0.40)' }]}>
-              <MaterialCommunityIcons name="star-four-points" size={24} color="#FFB547" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={rewardsStyles.rowLabel}>{t('results.new_title_unlocked')}</Text>
-              <Text style={rewardsStyles.rowValueBig}>{reward.title}</Text>
-              <Text style={rewardsStyles.rowSub}>{t('results.level_up')} {reward.level}</Text>
-            </View>
-          </>
-        );
-      case 'achievement':
-        return (
-          <>
-            <View style={[rewardsStyles.iconCircle, { backgroundColor: 'rgba(179,102,255,0.18)', borderColor: 'rgba(179,102,255,0.40)' }]}>
-              <MaterialCommunityIcons name="trophy-variant" size={24} color="#B366FF" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={rewardsStyles.rowLabel}>{t('results.achievement_unlocked')}</Text>
-              <Text style={rewardsStyles.rowValue}>{reward.name}</Text>
-              <Text style={rewardsStyles.rowSub}>{reward.description}</Text>
-            </View>
-          </>
-        );
-      case 'shield':
-        return (
-          <>
-            <View style={[rewardsStyles.iconCircle, { backgroundColor: 'rgba(255,107,44,0.18)', borderColor: 'rgba(255,107,44,0.40)' }]}>
-              <MaterialCommunityIcons
-                name={streakRestored ? 'fire' : adWatching ? 'television-play' : 'shield-half-full'}
-                size={24} color="#FF6B2C"
-              />
-            </View>
-            <View style={{ flex: 1 }}>
-              {streakRestored ? (
-                <>
-                  <Text style={rewardsStyles.rowLabel}>{t('results.streak_restored')}</Text>
-                  <Text style={rewardsStyles.rowValue}>{t('results.streak_restored_sub', { n: String(reward.streakBefore) })}</Text>
-                </>
-              ) : adWatching ? (
-                <>
-                  <Text style={rewardsStyles.rowLabel}>{t('results.ad_watching')}</Text>
-                  <Text style={rewardsStyles.rowValueBig}>{adCountdown}</Text>
-                </>
-              ) : (
-                <>
-                  <Text style={rewardsStyles.rowLabel}>{t('results.shield_title', { n: String(reward.streakBefore) })}</Text>
-                  <Text style={rewardsStyles.rowSub}>{t('results.shield_sub')}</Text>
-                  <TouchableOpacity style={rewardsStyles.adBtn} onPress={onWatchAd} activeOpacity={0.8}>
-                    <LinearGradient colors={['#FFB547', '#FF6B2C']} style={rewardsStyles.adBtnGrad}>
-                      <MaterialCommunityIcons name="play-circle" size={16} color="#000" />
-                      <Text style={rewardsStyles.adBtnText}>{t('results.watch_ad')}</Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </>
-              )}
-            </View>
-          </>
-        );
-    }
-  })();
-
-  return (
-    <Animated.View style={[rewardsStyles.row, { opacity, transform: [{ translateY }] }]}>
-      {content}
-    </Animated.View>
+function RewardRow({ reward, streakRestored, adWatching, adCountdown, onWatchAd }: RewardRowProps) {
+  const disc = (name: IconName, color: string) => (
+    <View style={s.rewardDisc}><Icon name={name} size={ICON_SIZE.lg} color={color} /></View>
   );
+  switch (reward.type) {
+    case 'level':
+      return (
+        <View style={s.rewardRow}>
+          {disc('trend', COLOR.reward.gold)}
+          <View style={s.flex}>
+            <Txt variant="overline" color={COLOR.reward.gold}>{t('results.new_level_reached')}</Txt>
+            <Txt variant="h3">{t('pilot.results.level_up', { n: String(reward.level) })}</Txt>
+          </View>
+        </View>
+      );
+    case 'title':
+      return (
+        <View style={s.rewardRow}>
+          {disc('crown', COLOR.reward.gold)}
+          <View style={s.flex}>
+            <Txt variant="overline" color={COLOR.reward.gold}>{t('results.new_title_unlocked')}</Txt>
+            <Txt variant="h3" numberOfLines={2}>{reward.title}</Txt>
+            <Txt variant="caption">{t('pilot.results.level_up', { n: String(reward.level) })}</Txt>
+          </View>
+        </View>
+      );
+    case 'achievement':
+      return (
+        <View style={s.rewardRow}>
+          {disc('medal', COLOR.reward.gold)}
+          <View style={s.flex}>
+            <Txt variant="overline" color={COLOR.reward.gold}>{t('results.achievement_unlocked')}</Txt>
+            <Txt variant="cardTitle">{reward.name}</Txt>
+            <Txt variant="caption">{reward.description}</Txt>
+          </View>
+        </View>
+      );
+    case 'shield':
+      return (
+        <View style={s.rewardRow}>
+          {disc(streakRestored ? 'flame' : adWatching ? 'tv' : 'shield', COLOR.accent.warm)}
+          <View style={s.flex}>
+            {streakRestored ? (
+              <>
+                <Txt variant="cardTitle">{t('pilot.results.streak_restored')}</Txt>
+                <Txt variant="caption">{t('pilot.results.streak_restored_sub', { n: String(reward.streakBefore) })}</Txt>
+              </>
+            ) : adWatching ? (
+              <>
+                <Txt variant="overline">{t('results.ad_watching')}</Txt>
+                <Txt variant="statMedium">{adCountdown}</Txt>
+              </>
+            ) : (
+              <>
+                <Txt variant="cardTitle">{t('pilot.results.shield_title', { n: String(reward.streakBefore) })}</Txt>
+                <Txt variant="caption">{t('pilot.results.shield_sub')}</Txt>
+                <Button label={t('results.watch_ad')} icon="tv" variant="secondary" size="sm" onPress={onWatchAd} style={s.adBtn} />
+              </>
+            )}
+          </View>
+        </View>
+      );
+  }
 }
 
-function RewardContinueBtn({ delay, onPress }: { delay: number; onPress: () => void }) {
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(12)).current;
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      Animated.parallel([
-        Animated.timing(opacity, { toValue: 1, duration: 320, useNativeDriver: true }),
-        Animated.spring(translateY, { toValue: 0, tension: 80, friction: 9, useNativeDriver: true }),
-      ]).start();
-    }, delay);
-    return () => clearTimeout(timer);
-  }, []);
-  return (
-    <Animated.View style={{ opacity, transform: [{ translateY }], width: '100%', marginTop: 16 }}>
-      <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={rewardsStyles.continueBtnTouchable}>
-        <LinearGradient colors={['#8A2BE2', '#6A1FB0']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={rewardsStyles.continueBtn}>
-          <Text style={rewardsStyles.continueBtnText}>{t('results.continue')}</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-    </Animated.View>
-  );
-}
+const s = StyleSheet.create({
+  content: { paddingHorizontal: SPACE.screenX, paddingTop: SPACE.lg, paddingBottom: SPACE.huge, gap: SPACE.lg },
+  flex: { flex: 1 },
+  flexShrink: { flexShrink: 1 },
+  stretch: { alignSelf: 'stretch' },
+  pressed: { opacity: 0.7 },
+  rowCenter: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm },
 
-const rewardsStyles = StyleSheet.create({
-  overlay: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.88)', justifyContent: 'center', alignItems: 'center', padding: 24,
-  },
-  card: {
-    backgroundColor: '#10102A', borderRadius: 24, padding: 24, width: '100%',
-    borderWidth: 1, borderColor: 'rgba(138,43,226,0.35)', alignItems: 'center',
-    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.4, shadowRadius: 20,
-  },
-  header: {
-    color: '#FFD700', fontSize: 13, fontWeight: '900', letterSpacing: 4,
-    marginBottom: 18, textAlign: 'center',
-  },
-  row: {
-    flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 10,
-    paddingHorizontal: 4, width: '100%',
-  },
-  // Tuile teintée (convention charte) — bordure colorée passée en inline
-  iconCircle: {
-    width: 48, height: 48, borderRadius: 14, borderWidth: 1,
-    justifyContent: 'center', alignItems: 'center',
-  },
-  rowLabel: { color: 'rgba(255,255,255,0.60)', fontSize: 11, fontWeight: '800', letterSpacing: 1.5, marginBottom: 2 },
-  rowValue: { color: '#FFF', fontSize: 15, fontWeight: '800' },
-  rowValueBig: { color: '#FFF', fontSize: 20, fontWeight: '900' },
-  rowSub: { color: '#A3A3A3', fontSize: 12, fontWeight: '500', marginTop: 2 },
-  adBtn: { marginTop: 8, borderRadius: 12, overflow: 'hidden', alignSelf: 'flex-start' },
-  adBtnGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 8, paddingHorizontal: 14, gap: 6 },
-  adBtnText: { color: '#000', fontSize: 13, fontWeight: '800' },
-  continueBtnTouchable: { borderRadius: 14, overflow: 'hidden' },
-  continueBtn: {
-    borderRadius: 14, paddingVertical: 14, alignItems: 'center',
-    shadowColor: '#8A2BE2', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.6, shadowRadius: 12,
-  },
-  continueBtnText: { color: '#FFF', fontSize: 15, fontWeight: '900', letterSpacing: 3 },
-});
+  bannerRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md },
+  forfeit: { gap: SPACE.sm },
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#050510' },
-  subHeader: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: 12, paddingVertical: 6,
-  },
-  asyncBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    padding: 12,
-    borderRadius: 14,
-    backgroundColor: 'rgba(191,95,255,0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(191,95,255,0.25)',
-  },
-  asyncBannerTitle: {
-    color: '#BF5FFF',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  asyncBannerSub: {
-    color: 'rgba(191,95,255,0.7)',
-    fontSize: 12,
-    fontWeight: '500',
-    marginTop: 1,
-  },
-  backCircle: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    justifyContent: 'center', alignItems: 'center',
-  },
-  content: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 24, paddingBottom: 24 },
-  // Result Header
-  resultHeader: { alignItems: 'center', marginBottom: 20 },
-  resultTitle: { fontSize: 60, fontWeight: '900', letterSpacing: -2, lineHeight: 66, fontFamily: 'SpaceGrotesk_700Bold' },
-  winText: {
-    color: '#FFFFFF',
-    textShadowColor: 'rgba(255,181,71,0.9)', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 24,
-  },
-  drawText: { fontFamily: 'Fraunces_500Medium_Italic', color: '#FFFFFF', fontSize: 48, letterSpacing: -1 },
-  lossText: { color: 'rgba(255,255,255,0.85)' },
-  // Échec d'enregistrement
-  submitErrorWrap: { alignItems: 'center', gap: 8, paddingVertical: 6 },
-  submitErrorText: {
-    color: 'rgba(255,255,255,0.75)', fontSize: 13, textAlign: 'center',
-    fontFamily: 'SpaceGrotesk_500Medium', lineHeight: 18,
-  },
-  submitErrorDetail: {
-    color: 'rgba(255,255,255,0.40)', fontSize: 9,
-    fontFamily: 'JetBrainsMono_400Regular', letterSpacing: 1,
-  },
-  submitRetryBtn: {
-    marginTop: 4, paddingHorizontal: 18, paddingVertical: 8, borderRadius: 12,
-    backgroundColor: 'rgba(255,61,94,0.12)', borderWidth: 1, borderColor: 'rgba(255,61,94,0.40)',
-  },
-  submitRetryText: { color: '#FF3D5E', fontSize: 13, fontFamily: 'SpaceGrotesk_700Bold' },
+  // Coque : le halo de ResultState est rogné par la carte
+  resultShell: { borderRadius: RADII.xl, overflow: 'hidden', backgroundColor: COLOR.surface.subtle },
+  resultBadges: { alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.lg, paddingBottom: SPACE.xl, marginTop: -SPACE.lg },
+  nearMiss: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, maxWidth: '100%' },
 
-  forfeitBanner: {
-    alignItems: 'center', marginBottom: 18, paddingHorizontal: 8,
-  },
-  forfeitEyebrow: {
-    fontFamily: 'JetBrainsMono_700Bold', fontSize: 10, letterSpacing: 2.5, color: '#FFB547',
-  },
-  forfeitTitle: {
-    fontFamily: 'SpaceGrotesk_700Bold', fontSize: 24, letterSpacing: -0.5,
-    color: '#FFFFFF', marginTop: 6, textAlign: 'center',
-  },
-  forfeitBody: {
-    fontFamily: 'SpaceGrotesk_400Regular', fontSize: 13, lineHeight: 20,
-    color: 'rgba(255,255,255,0.60)', maxWidth: 280, marginTop: 8, textAlign: 'center',
-  },
-  forfeitChip: {
-    flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 16,
-    paddingVertical: 10, paddingHorizontal: 18, borderRadius: 12,
-    backgroundColor: 'rgba(50,231,163,0.13)', borderWidth: 1, borderColor: 'rgba(50,231,163,0.40)',
-  },
-  forfeitChipText: {
-    fontFamily: 'SpaceGrotesk_700Bold', fontSize: 13, color: '#32E7A3',
-  },
-  flawlessPill: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    backgroundColor: '#FFB547', borderRadius: 20,
-    paddingHorizontal: 16, paddingVertical: 6, marginBottom: 10,
-  },
-  flawlessPillText: { color: '#050510', fontSize: 10, fontWeight: '900', letterSpacing: 3, fontFamily: 'SpaceGrotesk_700Bold' },
-  correctBadgeGradient: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    marginTop: 8, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 6,
-  },
-  correctBadge: { color: '#A3A3A3', fontSize: 14, fontWeight: '600' },
-  levelUpBadge: {
-    marginTop: 8, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 4,
-    paddingHorizontal: 14, paddingVertical: 6, borderWidth: 1, borderColor: 'rgba(138,43,226,0.3)',
-  },
-  levelUpText: { color: '#8A2BE2', fontSize: 14, fontWeight: '800' },
-  nearMissBadge: {
-    marginTop: 8, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 14, paddingVertical: 6, borderWidth: 1, borderColor: 'rgba(255,159,10,0.35)',
-  },
-  nearMissText: { color: '#FF9F0A', fontSize: 13, fontWeight: '700' },
-  // Review missed questions
-  reviewCard: {
-    backgroundColor: 'rgba(0,255,255,0.04)', borderRadius: 16, marginBottom: 16,
-    borderWidth: 1, borderColor: 'rgba(0,255,255,0.18)', overflow: 'hidden',
-  },
-  reviewHeader: {
-    flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14,
-  },
-  reviewTitle: { color: '#00FFFF', fontSize: 13, fontWeight: '800', letterSpacing: 2 },
-  reviewSub: { color: '#A3A3A3', fontSize: 12, fontWeight: '500', marginTop: 2 },
-  reviewList: {
-    paddingHorizontal: 14, paddingBottom: 14, gap: 10,
-    borderTopWidth: 1, borderTopColor: 'rgba(0,255,255,0.1)', paddingTop: 10,
-  },
-  reviewItem: {
-    backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: 12, padding: 12, gap: 6,
-  },
-  reviewQuestion: { color: '#E5E5E5', fontSize: 13, fontWeight: '600', lineHeight: 18, marginBottom: 4 },
-  reviewAnswerRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  reviewWrongText: { color: '#FF3B30', fontSize: 12, fontWeight: '500', flex: 1, textDecorationLine: 'line-through' },
-  reviewTimeoutText: { color: '#A3A3A3', fontSize: 12, fontWeight: '500', fontStyle: 'italic' },
-  reviewCorrectText: { color: '#00FF9D', fontSize: 12, fontWeight: '700', flex: 1 },
-  // Score Card
-  scoreCard: { marginBottom: 16 },
-  scoreCardInner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  playerColumn: { alignItems: 'center', flex: 1 },
-  avatarCircle: {
-    width: 48, height: 48, borderRadius: 24,
-    justifyContent: 'center', alignItems: 'center', marginBottom: 6,
-  },
-  avatarText: { color: '#FFF', fontSize: 22, fontWeight: '900' },
-  playerName: { color: '#A3A3A3', fontSize: 11, fontWeight: '600', marginBottom: 2 },
-  playerScore: { fontSize: 28, fontWeight: '900', color: '#FFF' },
-  winScore: { color: '#00FF9D' },
-  vsContainer: { alignItems: 'center', paddingHorizontal: 10 },
-  vsText: { fontSize: 14, fontWeight: '900', color: '#525252' },
-  categoryBadge: { fontSize: 9, color: '#525252', fontWeight: '600', textAlign: 'center', marginTop: 2 },
-  // XP Card
-  xpCard: {
-    backgroundColor: 'rgba(0,0,0,0.35)', borderRadius: 16, padding: 16,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)', marginBottom: 16,
-  },
-  xpCardWin: { borderColor: 'rgba(255,181,71,0.40)' },
-  xpTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
-  xpTitle: {
-    fontSize: 9, fontWeight: '400', color: 'rgba(255,255,255,0.40)',
-    letterSpacing: 2, fontFamily: 'JetBrainsMono_400Regular', textTransform: 'uppercase',
-  },
-  xpRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 5 },
-  xpLabelRow: { flexDirection: 'row', alignItems: 'center' },
-  xpLabel: { color: 'rgba(255,255,255,0.60)', fontSize: 13, fontWeight: '500' },
-  xpValue: { color: '#FFF', fontSize: 14, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold' },
-  xpGold: { color: '#FFB547' },
-  xpCyan: { color: '#32E7A3' },
-  xpPurple: { color: '#B366FF' },
-  xpOrange: { color: '#FF6B2C' },
-  xpDivider: { height: 1, backgroundColor: 'rgba(255,181,71,0.30)', marginVertical: 8 },
-  xpTotalLabel: { color: '#FFF', fontSize: 14, fontWeight: '900', letterSpacing: 0.5, fontFamily: 'SpaceGrotesk_700Bold' },
-  xpTotalValue: { color: '#FFB547', fontSize: 22, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold' },
-  // Actions
-  actions: { gap: 10 },
-  actionRow: { flexDirection: 'row', gap: 8 },
-  shareButton: {
-    borderRadius: 14, overflow: 'hidden',
-    borderWidth: 1, borderColor: 'rgba(0,255,255,0.2)',
-  },
-  shareGradient: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    padding: 14, borderRadius: 14,
-  },
-  shareText: { color: '#00FFFF', fontSize: 14, fontWeight: '800', letterSpacing: 2 },
-  playAgainTouchable: {
-    flex: 2, borderRadius: 16, overflow: 'hidden',
-    shadowColor: '#00E5FF', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.4, shadowRadius: 16, elevation: 8,
-  },
-  playAgainButton: {
-    borderRadius: 16, padding: 16, alignItems: 'center',
-    flexDirection: 'row', justifyContent: 'center', gap: 8,
-  },
-  playAgainText: {
-    color: '#050510', fontSize: 14, fontWeight: '900',
-    letterSpacing: 1, textTransform: 'uppercase', fontFamily: 'SpaceGrotesk_700Bold',
-  },
-  homeButton: {
-    flex: 1, padding: 16, alignItems: 'center', justifyContent: 'center',
-    borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)',
-  },
-  homeText: { color: '#FFF', fontSize: 13, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold' },
-  // Report Button
-  reportButton: {
-    marginTop: 6, padding: 12, alignItems: 'center', borderRadius: 12,
-    borderWidth: 1, borderColor: 'rgba(255,165,0,0.2)', backgroundColor: 'rgba(255,165,0,0.05)',
-    flexDirection: 'row', justifyContent: 'center', gap: 6,
-  },
-  reportButtonText: { color: '#FFA500', fontSize: 12, fontWeight: '600' },
-  // Report Modal
-  reportOverlay: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end',
-  },
-  reportModal: {
-    backgroundColor: '#0D0D1A', borderTopLeftRadius: 24, borderTopRightRadius: 24,
-    maxHeight: '85%', minHeight: 300,
-    borderTopWidth: 1, borderLeftWidth: 1, borderRightWidth: 1,
-    borderColor: 'rgba(0,255,255,0.15)',
-  },
-  reportHeader: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 20, paddingTop: 20, paddingBottom: 12,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.06)',
-  },
-  reportHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  reportHeaderText: { color: '#FFF', fontSize: 16, fontWeight: '800', letterSpacing: 1 },
-  reportClose: {
-    width: 32, height: 32, borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.08)', justifyContent: 'center', alignItems: 'center',
-  },
-  reportScroll: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 24 },
-  reportSubtitle: { color: '#A3A3A3', fontSize: 13, fontWeight: '600', marginBottom: 12 },
-  // Question list item
-  reportQuestionItem: {
-    flexDirection: 'row', alignItems: 'center', padding: 14, marginBottom: 8,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 14,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
-  },
-  reportQuestionNumber: {
-    width: 28, height: 28, borderRadius: 10,
-    justifyContent: 'center', alignItems: 'center', marginRight: 12,
-  },
-  reportQuestionNumberText: { color: '#FFF', fontSize: 13, fontWeight: '800' },
-  reportQuestionText: { flex: 1, color: '#E5E5E5', fontSize: 13, fontWeight: '500', lineHeight: 18 },
-  // Selected question preview
-  reportSelectedPreview: {
-    backgroundColor: 'rgba(138,43,226,0.08)', borderRadius: 12, padding: 14, marginBottom: 16,
-    borderWidth: 1, borderColor: 'rgba(138,43,226,0.2)',
-  },
-  reportSelectedLabel: { color: '#8A2BE2', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 6 },
-  reportSelectedText: { color: '#E5E5E5', fontSize: 13, fontWeight: '500', lineHeight: 18 },
-  // Reason items
-  reportReasonItem: {
-    flexDirection: 'row', alignItems: 'center', padding: 14, marginBottom: 6,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)',
-  },
-  reportReasonSelected: {
-    backgroundColor: 'rgba(0,255,255,0.06)', borderColor: 'rgba(0,255,255,0.25)',
-  },
-  reportReasonLabel: { flex: 1, color: '#A3A3A3', fontSize: 14, fontWeight: '600' },
-  reportReasonLabelSelected: { color: '#FFF' },
-  // Description input
-  reportInput: {
-    backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: 14,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', color: '#FFF',
-    fontSize: 14, fontWeight: '500', height: 90, textAlignVertical: 'top',
-  },
-  reportCharCount: { color: '#525252', fontSize: 11, fontWeight: '500', textAlign: 'right', marginTop: 4 },
-  // Error banner
-  reportErrorBanner: {
-    backgroundColor: 'rgba(255,59,48,0.1)', borderRadius: 10, padding: 12, marginTop: 12,
-    borderWidth: 1, borderColor: 'rgba(255,59,48,0.2)',
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-  },
-  reportErrorText: { color: '#FF3B30', fontSize: 13, fontWeight: '600', textAlign: 'center' },
-  // Action buttons
-  reportActions: {
-    flexDirection: 'row', gap: 10, marginTop: 20, paddingBottom: 20,
-  },
-  reportBackBtn: {
-    flex: 1, padding: 14, borderRadius: 14, alignItems: 'center',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
-    flexDirection: 'row', justifyContent: 'center', gap: 4,
-  },
-  reportBackText: { color: '#A3A3A3', fontSize: 14, fontWeight: '700' },
-  reportSubmitBtn: {
-    flex: 2, borderRadius: 14, overflow: 'hidden',
-  },
-  reportSubmitDisabled: { opacity: 0.5 },
-  reportSubmitGradient: {
-    padding: 14, borderRadius: 14, alignItems: 'center',
-  },
-  reportSubmitText: { color: '#FFF', fontSize: 14, fontWeight: '800', letterSpacing: 1 },
-  // Success state
-  reportSuccessContainer: {
-    alignItems: 'center', paddingVertical: 40, paddingHorizontal: 20,
-  },
-  reportSuccessIconCircle: {
-    width: 72, height: 72, borderRadius: 36,
-    justifyContent: 'center', alignItems: 'center', marginBottom: 16,
-  },
-  reportSuccessTitle: { color: '#00FF9D', fontSize: 20, fontWeight: '800', marginBottom: 8 },
-  reportSuccessDesc: { color: '#A3A3A3', fontSize: 14, fontWeight: '500', textAlign: 'center', lineHeight: 20, marginBottom: 24 },
-  reportSuccessBtn: { borderRadius: 14, overflow: 'hidden' },
-  reportSuccessBtnGradient: {
-    borderRadius: 14, paddingHorizontal: 40, paddingVertical: 14,
-  },
-  reportSuccessBtnText: { color: '#FFF', fontSize: 14, fontWeight: '800', letterSpacing: 2 },
+  scoreCard: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm },
+  scoreSide: { flex: 1, minWidth: 0, alignItems: 'center', gap: SPACE.xs },
+  vs: { paddingHorizontal: SPACE.xs },
+  underline: { textDecorationLine: 'underline' },
+  badgeSpacer: { height: 20 },
 
-  // Redesigned score card — two side-by-side halves
-  scoreCardDuo: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  scoreHalfCard: {
-    flex: 1, borderRadius: 20, overflow: 'hidden',
-    padding: 14, alignItems: 'center', borderWidth: 2,
+  xpCard: { gap: SPACE.sm },
+  xpRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.md, minHeight: 24 },
+  xpTotal: { borderTopWidth: BORDER.hair, borderTopColor: COLOR.border.subtle, paddingTop: SPACE.md, marginTop: SPACE.xs },
+  submitError: { alignItems: 'center', gap: SPACE.sm, paddingVertical: SPACE.sm },
+
+  reviewHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md, padding: SPACE.cardPad, minHeight: SIZE.listRow },
+  chevronUp: { transform: [{ rotate: '180deg' }] },
+  reviewList: { paddingHorizontal: SPACE.cardPad, paddingBottom: SPACE.cardPad, gap: SPACE.lg },
+  reviewItem: { gap: SPACE.xs, borderTopWidth: BORDER.hair, borderTopColor: COLOR.border.subtle, paddingTop: SPACE.md },
+  answerRow: { flexDirection: 'row', alignItems: 'flex-start', gap: SPACE.sm },
+
+  actions: { gap: SPACE.md },
+  reportLink: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.sm, minHeight: SIZE.touch },
+
+  rewardsScroll: { maxHeight: 360 },
+  rewardsList: { gap: SPACE.md },
+  rewardRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md },
+  rewardDisc: {
+    width: 48, height: 48, borderRadius: RADII.md,
+    backgroundColor: COLOR.surface.subtle,
+    alignItems: 'center', justifyContent: 'center',
   },
-  scoreHalfCyan: { borderColor: '#00E5FF' },
-  scoreHalfViolet: { borderColor: '#B366FF' },
-  scoreHalfDim: { borderColor: 'rgba(255,255,255,0.08)', opacity: 0.65 },
-  scoreVsWrap: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 2 },
-  scoreVs: { color: '#FFB547', fontSize: 20, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold' },
-  scoreEq: { color: '#FFB547', fontSize: 26, fontFamily: 'Fraunces_500Medium_Italic' },
-  scoreHalfAvatar: {
-    width: 52, height: 52, borderRadius: 26,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    justifyContent: 'center', alignItems: 'center',
-    borderWidth: 2, marginBottom: 8,
+  adBtn: { alignSelf: 'flex-start', marginTop: SPACE.sm },
+
+  reportActions: { flexDirection: 'row', gap: SPACE.sm },
+  reportSuccess: { alignItems: 'center', gap: SPACE.sm, paddingVertical: SPACE.lg },
+  successDisc: {
+    width: 64, height: 64, borderRadius: 32,
+    backgroundColor: COLOR.status.successFill,
+    alignItems: 'center', justifyContent: 'center', marginBottom: SPACE.xs,
   },
-  scoreHalfAvatarText: { color: '#FFF', fontSize: 22, fontWeight: '900' },
-  scoreHalfName: {
-    color: 'rgba(255,255,255,0.65)', fontSize: 12, fontWeight: '700',
-    marginBottom: 4, textAlign: 'center',
+  questionRow: {
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.md,
+    minHeight: SIZE.listRow, paddingVertical: SPACE.sm,
+    borderBottomWidth: BORDER.hair, borderBottomColor: COLOR.border.subtle,
   },
-  scoreHalfScore: { color: '#FFF', fontSize: 38, fontWeight: '900', lineHeight: 44, letterSpacing: -2, fontFamily: 'SpaceGrotesk_700Bold' },
-  scoreHalfBadge: {
-    fontSize: 9, fontWeight: '700', fontFamily: 'JetBrainsMono_700Bold',
-    letterSpacing: 1.5, marginTop: 4, textAlign: 'center',
+  questionNumber: {
+    width: 32, height: 32, borderRadius: RADII.sm,
+    backgroundColor: COLOR.surface.elevated,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  selectedPreview: { gap: SPACE.xs, padding: SPACE.md, borderRadius: RADII.md, backgroundColor: COLOR.surface.subtle },
+  sectionLabel: { marginTop: SPACE.md },
+  reasonRow: {
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.md,
+    minHeight: SIZE.touch, paddingHorizontal: SPACE.md,
+    borderRadius: RADII.md, borderWidth: BORDER.hair, borderColor: COLOR.border.default,
+  },
+  reasonActive: { borderColor: COLOR.border.active, backgroundColor: COLOR.action.selectedFill },
+  input: {
+    minHeight: 96, ...TYPO.body, color: COLOR.text.primary,
+    backgroundColor: COLOR.surface.input,
+    borderRadius: RADII.md, borderWidth: BORDER.hair, borderColor: COLOR.border.default,
+    padding: SPACE.md,
   },
 });
