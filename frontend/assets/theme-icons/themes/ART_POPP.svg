@@ -1,9 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pop Art">
-  <polygon points="192,32 198.5,46.3 213.2,40.8 207.7,55.5 222,62 207.7,68.5 213.2,83.2 198.5,77.7 192,92 185.5,77.7 170.8,83.2 176.3,68.5 162,62 176.3,55.5 170.8,40.8 185.5,46.3" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
-  <rect x="60" y="56" width="136" height="164" rx="16" fill="#12606D"/>
-  <rect x="52" y="44" width="152" height="22" rx="11" fill="#12606D"/>
-  <rect x="84" y="78" width="88" height="54" rx="8" fill="#FF6B5B"/>
-  <rect x="84" y="142" width="88" height="56" rx="8" fill="#E8F1EC"/>
-  <circle cx="128" cy="170" r="14" fill="#FFDB3D"/>
-  <path d="M72 84V108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="40" y="40" width="176" height="176" rx="28" fill="#FF6B5B"/>
+  <path d="M64 64h0M86 64h0M108 64h0M130 64h0M152 64h0M174 64h0M196 64h0M64 86h0M86 86h0M108 86h0M130 86h0M152 86h0M174 86h0M196 86h0M64 108h0M86 108h0M108 108h0M130 108h0M152 108h0M174 108h0M196 108h0M64 130h0M86 130h0M108 130h0M130 130h0M152 130h0M174 130h0M196 130h0M64 152h0M86 152h0M108 152h0M130 152h0M152 152h0M174 152h0M196 152h0M64 174h0M86 174h0M108 174h0M130 174h0M152 174h0M174 174h0M196 174h0M64 196h0M86 196h0M108 196h0M130 196h0M152 196h0M174 196h0M196 196h0" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M72 80C70 150 118 198 200 178C146 172 104 140 100 78Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M72 80C70 150 118 198 200 178C146 172 104 140 100 78Z" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="76" y="56" width="20" height="26" rx="6" fill="#0B3D4A"/>
+  <path d="M84 100L84 120" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
 </svg>

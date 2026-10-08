@@ -1,12 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sols">
-  <path d="M76 92L68 66M96 92V60M116 92L124 68" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
-  <path d="M164 92L156 70M184 92L194 64" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
-  <rect x="38" y="92" width="180" height="130" rx="24" fill="#12606D"/>
-  <path d="M52 146H204V188C204 198 196 208 186 208H70C60 208 52 198 52 188Z" fill="#0B3D4A"/>
-  <circle cx="74" cy="186" r="9" fill="#E8F1EC"/>
-  <circle cx="186" cy="190" r="7" fill="#E8F1EC"/>
-  <circle cx="176" cy="118" r="7" fill="#0B3D4A"/>
-  <path d="M84 150C96 126 116 126 122 150C128 174 148 182 164 162C172 152 172 140 166 130" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <circle cx="166" cy="128" r="3" fill="#0B3D4A"/>
-  <path d="M54 136V118C54 110 58 106 64 106" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 96V64" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 80C110 80 96 70 94 52C112 52 124 62 128 80Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M128 72C134 54 148 46 166 46C164 64 148 72 128 72Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M64 96L58 78M78 96L82 76M184 96L180 78M198 96L204 80" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M40 112C40 104 46 98 54 98H202C210 98 216 104 216 112V196Q216 220 192 220H64Q40 220 40 196Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 100V150M128 118L104 140M128 124L154 146M104 140L96 160" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M72 188C82 170 100 170 108 186C116 202 134 202 144 186" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <circle cx="182" cy="176" r="10" fill="#E8F1EC"/>
+  <circle cx="190" cy="202" r="6" fill="#E8F1EC"/>
+  <circle cx="72" cy="140" r="7" fill="#E8F1EC"/>
+  <path d="M54 150V124C54 118 56 114 62 112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

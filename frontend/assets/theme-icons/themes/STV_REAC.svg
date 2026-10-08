@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Reacher">
-  <g transform="rotate(-40 128 128)">
-  <rect x="34" y="132" width="188" height="28" rx="14" fill="#12606D"/>
-  <rect x="158" y="126" width="64" height="40" rx="16" fill="#12606D"/>
-  <rect x="162" y="90" width="56" height="42" rx="6" fill="#FF6B5B"/>
-  <path d="M180 98V122M200 98V122" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
-  <circle cx="112" cy="146" r="18" fill="#FFDB3D"/>
-  <circle cx="112" cy="146" r="7" fill="#12606D"/>
-  <path d="M54 146L74 146" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <g transform="rotate(-32 128 128)">
+  <rect x="30" y="144" width="150" height="24" rx="12" fill="#12606D"/>
+  <rect x="160" y="140" width="66" height="32" rx="14" fill="#12606D"/>
+  <rect x="164" y="104" width="58" height="40" rx="8" fill="#FFDB3D"/>
+  <path d="M178 112V136M193 112V136M208 112V136" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M160 100C170 84 184 98 194 86C204 74 218 88 226 80" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="58" y="150" width="70" height="12" rx="6" fill="#FF6B5B"/>
+  <path d="M42 156L48 156" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
   </g>
 </svg>

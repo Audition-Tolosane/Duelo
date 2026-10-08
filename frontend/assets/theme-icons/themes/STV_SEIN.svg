@@ -1,8 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Seinfeld">
-  <path d="M158 49A88 88 0 1 0 211 102A16 16 0 0 1 192 84A16 16 0 0 1 176 66A16 16 0 0 1 158 49Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M128 54A78 78 0 0 0 128 210Z" fill="#0B3D4A"/>
-  <path d="M128 54A78 78 0 0 1 148 57Q170 92 203 112A78 78 0 0 1 128 210Z" fill="#E8F1EC"/>
-  <circle cx="214" cy="62" r="7" fill="#FFDB3D"/>
-  <circle cx="198" cy="44" r="6" fill="#FFDB3D"/>
-  <path d="M80 120A52 52 0 0 1 96 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M40 126H216C216 178 178 210 128 210C78 210 40 178 40 126Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="94" y="204" width="68" height="18" rx="9" fill="#12606D"/>
+  <ellipse cx="128" cy="126" rx="82" ry="16" fill="#FF6B5B"/>
+  <path d="M112 124L176 46" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <ellipse cx="104" cy="126" rx="22" ry="10" fill="#FFDB3D"/>
+  <circle cx="180" cy="42" r="10" fill="#FFDB3D"/>
+  <path d="M80 104C72 92 88 84 80 70M136 100C128 88 144 80 136 66" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M62 148Q68 168 84 182" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
 </svg>

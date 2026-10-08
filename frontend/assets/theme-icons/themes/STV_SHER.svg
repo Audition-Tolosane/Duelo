@@ -1,14 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sherlock">
-  <rect x="52" y="200" width="152" height="20" rx="10" fill="#12606D"/>
-  <path d="M76 98A52 52 0 0 1 180 98Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M128 98V56M128 98L98 70M128 98L158 70" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <rect x="74" y="100" width="108" height="104" rx="6" fill="#12606D"/>
-  <rect x="88" y="114" width="32" height="36" rx="4" fill="#0B3D4A"/>
-  <rect x="136" y="114" width="32" height="36" rx="4" fill="#0B3D4A"/>
-  <rect x="88" y="160" width="32" height="32" rx="4" fill="#0B3D4A"/>
-  <rect x="136" y="160" width="32" height="32" rx="4" fill="#0B3D4A"/>
-  <circle cx="128" cy="150" r="12" fill="none" stroke="#FFDB3D" stroke-width="6"/>
-  <circle cx="128" cy="132" r="6" fill="#FFDB3D"/>
-  <circle cx="172" cy="156" r="6" fill="#FFDB3D"/>
-  <path d="M86 84Q92 70 106 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M36 218V182C36 154 58 138 90 132H166C198 138 220 154 220 182V218Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M98 138L70 66L104 60L128 104L152 60L186 66L158 138Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M106 70L128 110L150 70L146 128H110Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M98 140L128 210L158 140" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M100 112H156V132H100Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M114 134L104 192L126 188L130 134Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M134 134L150 180L130 184L124 134Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M54 180Q56 158 78 146" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

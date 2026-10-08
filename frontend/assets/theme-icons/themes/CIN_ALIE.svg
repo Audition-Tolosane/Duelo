@@ -1,8 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Alien">
-  <path d="M74 162L124 168L116 200C112 212 94 214 88 204Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M60 150L126 162L120 176L66 170Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M56 146C56 112 84 92 118 86C156 80 192 62 222 38C220 80 202 118 172 140C150 156 126 162 104 162L60 152Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M118 112C148 106 176 90 202 66" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M66 156L74 166L82 159L90 169L98 162L106 172L114 165" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M72 124Q82 104 104 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="104" y="176" width="48" height="48" rx="12" fill="#12606D"/>
+  <rect x="48" y="44" width="160" height="144" rx="24" fill="#12606D"/>
+  <rect x="64" y="60" width="128" height="104" rx="12" fill="#0B3D4A"/>
+  <path d="M76 152A52 52 0 0 1 180 152M106 152A22 22 0 0 1 150 152" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 152L88 82M128 152L168 82" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="152" cy="94" r="14" fill="#FFDB3D"/>
+  <path d="M60 76Q62 56 82 54" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

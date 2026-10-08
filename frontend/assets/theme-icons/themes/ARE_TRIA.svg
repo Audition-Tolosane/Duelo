@@ -1,8 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Triathlon">
-  <polygon points="84,32 122,32 140,108 106,108" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
-  <polygon points="134,32 172,32 150,108 116,108" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <circle cx="128" cy="162" r="58" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12"/>
-  <circle cx="128" cy="162" r="40" fill="#12606D"/>
-  <path d="M108 180V168M128 180V152M148 180V136" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
-  <path d="M96 132L104 120" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="104" r="62" fill="none" stroke="#FFDB3D" stroke-width="20"/>
+  <circle cx="128" cy="104" r="12" fill="#FF6B5B"/>
+  <path d="M128 50V158M74 104H182M90 66L166 142M166 66L90 142" stroke="#FFDB3D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M34 196C46 184 58 184 70 196C82 208 94 208 106 196" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M34 222C46 210 58 210 70 222C82 234 94 234 106 222" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M140 210V184C140 176 148 172 156 176L172 186L208 194C218 196 222 202 222 210Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M140 222H222" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M80 80A56 56 0 0 1 104 56" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

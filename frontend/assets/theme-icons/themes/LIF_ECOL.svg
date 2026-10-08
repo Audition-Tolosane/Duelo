@@ -1,11 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Écologie">
-  <rect x="88" y="36" width="80" height="30" rx="10" fill="#FFDB3D"/>
-  <rect x="52" y="62" width="152" height="160" rx="44" fill="#12606D"/>
-  <rect x="68" y="80" width="120" height="126" rx="32" fill="#0B3D4A"/>
-  <path d="M68 172H188V178C188 194 176 206 160 206H96C80 206 68 194 68 178Z" fill="#12606D"/>
-  <path d="M128 174V118" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
-  <path d="M128 156C110 156 96 146 94 128C112 128 124 138 128 156Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M128 138C134 120 148 110 166 110C164 128 148 138 128 138Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
-  <circle cx="128" cy="112" r="8" fill="#FFDB3D"/>
-  <path d="M84 146V108C84 100 88 96 94 96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="150" r="70" fill="#12606D"/>
+  <path d="M82 116C96 108 110 114 110 128C110 142 96 144 98 158C100 170 110 178 104 192C94 190 82 180 74 166C66 150 68 124 82 116Z" fill="#FFDB3D"/>
+  <path d="M152 112C168 108 184 118 190 132C194 146 184 152 174 152C162 152 160 166 168 178C160 188 148 184 144 172C140 158 142 146 136 136C132 124 140 114 152 112Z" fill="#FFDB3D"/>
+  <path d="M128 84V54" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 70C106 70 90 58 88 36C110 36 126 48 128 70Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M128 60C134 42 150 34 172 34C170 54 152 62 128 60Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M120 84C124 90 132 90 136 84" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M76.1 135.1A54 54 0 0 1 94.8 107.4" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

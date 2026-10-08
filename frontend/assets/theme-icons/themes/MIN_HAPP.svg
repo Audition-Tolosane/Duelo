@@ -1,10 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Psychologie Positive">
-  <path d="M64 52H180L166 214H78Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M78 66H166L160 126H84Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M84 130H160L152 200H92Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
-  <circle cx="112" cy="170" r="7" fill="#E8F1EC"/>
-  <circle cx="134" cy="150" r="5" fill="#E8F1EC"/>
-  <circle cx="130" cy="186" r="4" fill="#E8F1EC"/>
-  <polygon points="200,42 207,60 224,66 207,72 200,90 193,72 176,66 193,60" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M84 74L88 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128.0 56.0L128.0 36.0M178.9 77.1L193.1 62.9M200.0 128.0L220.0 128.0M178.9 178.9L193.1 193.1M128.0 200.0L128.0 220.0M77.1 178.9L62.9 193.1M56.0 128.0L36.0 128.0M77.1 77.1L62.9 62.9" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="128" r="58" fill="#FFDB3D"/>
+  <path d="M98 116Q106 104 114 116M142 116Q150 104 158 116" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M100 140Q128 172 156 140" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="92" cy="142" r="9" fill="#FF6B5B"/>
+  <circle cx="164" cy="142" r="9" fill="#FF6B5B"/>
+  <path d="M90 96L100 86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
 </svg>

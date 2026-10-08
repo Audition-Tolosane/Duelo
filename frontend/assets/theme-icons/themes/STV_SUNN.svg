@@ -1,9 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="It's Always Sunny in Philadelphia">
-  <ellipse cx="128" cy="194" rx="96" ry="24" fill="#12606D"/>
-  <path d="M156 160L190 194" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" fill="none"/>
-  <circle cx="200" cy="188" r="11" fill="#FFDB3D"/>
-  <circle cx="184" cy="206" r="11" fill="#FFDB3D"/>
-  <path d="M50 140C42 96 78 60 122 62C160 64 180 94 174 124C170 140 162 150 156 158L148 166C128 184 62 190 50 140Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M84 94L136 146M112 78L158 124M76 132L126 82M100 154L152 102" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
-  <path d="M74 112C78 96 88 84 100 78" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M176 104V70H168V38H200V70H192V104C206 110 212 120 212 134V196H156V134C156 120 162 110 176 104Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="164" y="142" width="40" height="34" rx="6" fill="#FFDB3D"/>
+  <ellipse cx="124" cy="204" rx="96" ry="20" fill="#12606D"/>
+  <path d="M44 184C36 140 64 102 104 92L126 86C150 82 172 104 168 138C164 170 140 192 104 196C74 198 50 196 44 184Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M120 90L136 60" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="130" cy="48" r="13" fill="#FFDB3D"/>
+  <circle cx="150" cy="58" r="13" fill="#FFDB3D"/>
+  <path d="M120 90L136 60" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="130" cy="48" r="5" fill="#E8F1EC"/>
+  <circle cx="150" cy="58" r="5" fill="#E8F1EC"/>
+  <path d="M76 124L132 180M104 112L156 164M70 160L122 108M92 184L150 126" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 148C62 128 74 112 90 106" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

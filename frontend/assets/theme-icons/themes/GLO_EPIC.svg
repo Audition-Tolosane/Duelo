@@ -1,14 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Route des Épices">
-  <path d="M52 186L204 52" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M70 206L218 76" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <polygon points="124,58 139.7,90.1 177.7,80.3 165.6,113.9 196,138 165.6,162.1 177.7,195.7 139.7,185.9 124,218 108.3,185.9 70.3,195.7 82.4,162.1 52,138 82.4,113.9 70.3,80.3 108.3,90.1" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <circle cx="124" cy="138" r="12" fill="#FFDB3D"/>
-  <ellipse cx="124" cy="92" rx="8" ry="13" fill="#FFDB3D"/>
-  <ellipse cx="124" cy="92" rx="8" ry="13" transform="rotate(45 124 138)" fill="#FFDB3D"/>
-  <ellipse cx="124" cy="92" rx="8" ry="13" transform="rotate(90 124 138)" fill="#FFDB3D"/>
-  <ellipse cx="124" cy="92" rx="8" ry="13" transform="rotate(135 124 138)" fill="#FFDB3D"/>
-  <ellipse cx="124" cy="92" rx="8" ry="13" transform="rotate(180 124 138)" fill="#FFDB3D"/>
-  <ellipse cx="124" cy="92" rx="8" ry="13" transform="rotate(225 124 138)" fill="#FFDB3D"/>
-  <ellipse cx="124" cy="92" rx="8" ry="13" transform="rotate(270 124 138)" fill="#FFDB3D"/>
-  <path d="M84 98L96 110" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M146 112L170 70C172 66 178 66 180 70L206 112Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M146 120C134 150 136 184 150 204H200C214 184 216 150 204 120Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M140 112L156 106L172 114L188 106L210 112L204 130H146Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M44 128L92 70C96 66 104 66 108 70L156 128Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="92" cy="104" r="5" fill="#FF6B5B"/>
+  <circle cx="112" cy="94" r="5" fill="#FF6B5B"/>
+  <path d="M48 140C30 168 34 202 58 216H142C166 202 170 168 152 140Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M36 126L56 116L78 128L100 116L122 128L144 116L164 126L156 150H44Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M62 132L48 66" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="66" cy="122" rx="11" ry="18" transform="rotate(-12 66 122)" fill="#FF6B5B"/>
+  <path d="M56 166C50 180 52 194 60 204" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

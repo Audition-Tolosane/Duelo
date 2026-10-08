@@ -1,9 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Hunger Games">
-  <path d="M48 72C54 118 92 108 120 106L184 98V198L120 186C76 178 38 140 48 72Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M100 110C92 140 96 164 108 182M146 104C138 136 140 166 150 190" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <ellipse cx="184" cy="148" rx="26" ry="54" fill="#FFDB3D"/>
-  <ellipse cx="186" cy="148" rx="16" ry="42" fill="#0B3D4A"/>
-  <circle cx="186" cy="128" r="13" fill="#FF6B5B"/>
-  <circle cx="184" cy="164" r="12" fill="#FF6B5B"/>
-  <path d="M58 96Q70 112 92 116" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="84" y="190" width="88" height="40" rx="14" fill="#12606D"/>
+  <rect x="86" y="48" width="28" height="104" rx="14" fill="#FF6B5B"/>
+  <rect x="114" y="36" width="28" height="116" rx="14" fill="#FF6B5B"/>
+  <rect x="142" y="46" width="28" height="106" rx="14" fill="#FF6B5B"/>
+  <path d="M86 120H170V168C170 184 160 196 144 196H112C96 196 86 184 86 168Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M114 90V120M142 90V120" stroke="#12606D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M92 158C108 150 124 152 150 150" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M172 128C186 128 190 140 184 152C178 160 170 158 170 150Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M198 56C184 78 190 100 206 106C222 100 226 78 212 54C210 68 204 70 198 56Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M94 62L94 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
 </svg>

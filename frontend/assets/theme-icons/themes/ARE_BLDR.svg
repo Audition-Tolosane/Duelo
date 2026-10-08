@@ -1,10 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Baldur's Gate 3">
-  <path d="M134 120C164 98 154 66 186 56C204 50 216 60 218 42" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M56 146C56 116 80 100 108 102C138 106 152 130 144 156C136 180 108 188 84 182C66 176 56 162 56 146Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M62 160L38 170" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M66 176L44 196" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M82 186L72 212" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <circle cx="112" cy="134" r="13" fill="#E8F1EC"/>
-  <circle cx="115" cy="136" r="6" fill="#0B3D4A"/>
-  <path d="M74 126L84 114" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="128,40 207.7,86 207.7,178 128,224 48.3,178 48.3,86" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 40L128 76L207.7 86 M48.3 86L128 76 M207.7 86L176 160L207.7 178 M128 224L176 160M128 224L80 160 M48.3 178L80 160L48.3 86" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="128,76 176,160 80,160" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="128,110 133.9,123.9 148.9,125.2 137.5,135.1 140.9,149.8 128,142 115.1,149.8 118.5,135.1 107.1,125.2 122.1,123.9" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M52 96L76 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

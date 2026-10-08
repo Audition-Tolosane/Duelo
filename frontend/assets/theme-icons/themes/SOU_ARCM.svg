@@ -1,10 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Arctic Monkeys">
-  <path d="M52 118C46 70 102 36 164 42C204 46 222 74 212 104C206 120 190 126 178 118C188 104 182 88 166 86C134 84 96 104 70 126Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M80 96C110 74 146 64 178 66M98 104C122 92 148 86 172 86" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <g transform="rotate(-10 128 168)">
-  <rect x="40" y="140" width="176" height="30" rx="12" fill="#FFDB3D"/>
-  <path d="M58 170V206M78 170V206M98 170V206M118 170V206M138 170V206M158 170V206M178 170V206M198 170V206" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  </g>
-  <circle cx="188" cy="102" r="8" fill="#FF6B5B"/>
-  <path d="M62 102C64 86 72 72 84 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="56" cy="142" r="24" fill="#12606D"/>
+  <circle cx="200" cy="142" r="24" fill="#12606D"/>
+  <circle cx="128" cy="140" r="72" fill="#12606D"/>
+  <path d="M128 210C96 210 80 192 80 168C80 150 92 136 104 136C114 136 120 142 128 142C136 142 142 136 152 136C164 136 176 150 176 168C176 192 160 210 128 210Z" fill="#E8F1EC"/>
+  <circle cx="108" cy="154" r="9" fill="#12606D"/>
+  <circle cx="148" cy="154" r="9" fill="#12606D"/>
+  <path d="M114 188Q128 196 142 188" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M64 116C64 74 92 52 128 52C164 52 192 74 192 116Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="54" y="106" width="148" height="24" rx="12" fill="#FFDB3D"/>
+  <circle cx="128" cy="44" r="16" fill="#FFDB3D"/>
+  <path d="M92 80L104 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
 </svg>

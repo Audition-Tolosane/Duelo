@@ -1,0 +1,15 @@
+[
+ {"id": "ARE_INTM", "symbole": "biscione dressé enroulé sur un ballon, langue fourchue, étoile"},
+ {"id": "ARE_NEYM", "symbole": "maillot jaune auriverde à col pétrole et ballon en lob"},
+ {"id": "ARE_TRIA", "symbole": "trio vague, roue de vélo à rayons et chaussure de course"},
+ {"id": "ARE_MASS", "symbole": "Moissonneur dressé sur ses pattes, œil rouge"},
+ {"id": "ARE_LOL", "symbole": "poro à petites cornes, langue pendante"},
+ {"id": "ARE_SLEN", "symbole": "sirène d'alerte sur poteau dans le brouillard"},
+ {"id": "ARE_BLDR", "symbole": "dé à vingt faces (d20) en coup critique"},
+ {"id": "ARE_TPRL", "symbole": "idole dorée trapue à bandeau sur socle, lignes de course"},
+ {"id": "ARE_OVER", "symbole": "charge à escorter à cœur lumineux sur chenilles, chevrons"},
+ {"id": "ARE_PLAY", "symbole": "manette à longues poignées et boutons triangle, rond, croix, carré stylisés"},
+ {"id": "LEG_HIND", "symbole": "tête de Ganesh couronnée, grandes oreilles et trompe"},
+ {"id": "LEG_SAIN", "symbole": "tiare pontificale à trois couronnes et fanons, auréole"},
+ {"id": "LEG_BEST", "symbole": "hydre à trois têtes, gueules ouvertes"}
+]

@@ -1,9 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="J Balvin">
-  <polygon points="202.8,118.1 176.0,146.6 184.0,184.9 145.0,181.8 120.0,211.9 98.2,179.4 59.0,178.7 70.8,141.4 47.0,110.3 83.5,96.3 92.9,58.3 126.7,78.1 162.3,61.7 167.8,100.5" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="20" stroke-linejoin="round"/>
-  <polygon points="157.8,144.3 137.4,151.9 122.7,168.0 109.2,150.9 89.4,141.9 101.4,123.8 103.9,102.2 124.8,108.0 146.2,103.6 147.1,125.4" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
-  <circle cx="204" cy="60" r="14" fill="#12606D"/>
-  <circle cx="48" cy="200" r="12" fill="#12606D"/>
-  <circle cx="206" cy="196" r="10" fill="#FFDB3D"/>
-  <circle cx="46" cy="66" r="9" fill="#FFDB3D"/>
-  <path d="M76 108C80 92 90 80 104 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128.0" cy="62.0" r="30" fill="#FF6B5B"/>
+  <circle cx="174.7" cy="81.3" r="30" fill="#12606D"/>
+  <circle cx="194.0" cy="128.0" r="30" fill="#FF6B5B"/>
+  <circle cx="174.7" cy="174.7" r="30" fill="#12606D"/>
+  <circle cx="128.0" cy="194.0" r="30" fill="#FF6B5B"/>
+  <circle cx="81.3" cy="174.7" r="30" fill="#12606D"/>
+  <circle cx="62.0" cy="128.0" r="30" fill="#FF6B5B"/>
+  <circle cx="81.3" cy="81.3" r="30" fill="#12606D"/>
+  <circle cx="128" cy="128" r="50" fill="#FFDB3D"/>
+  <ellipse cx="110" cy="118" rx="7" ry="11" fill="#12606D"/>
+  <ellipse cx="146" cy="118" rx="7" ry="11" fill="#12606D"/>
+  <path d="M104 142Q128 166 152 142" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M100 96L112 88" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
 </svg>

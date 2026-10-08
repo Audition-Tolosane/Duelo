@@ -1,10 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Stoïcisme">
-  <path d="M112 216L122 128L150 76L196 60L218 98L222 216Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M134 150L210 138M128 184L214 176" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M30 216C30 168 60 130 106 130C128 130 142 140 142 154C128 146 112 148 106 162C100 178 110 196 114 216Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M52 196C56 170 72 152 94 148" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <circle cx="150" cy="128" r="8" fill="#FF6B5B"/>
-  <circle cx="126" cy="114" r="6" fill="#FF6B5B"/>
-  <path d="M30 214H226" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
-  <path d="M150 96Q160 80 180 74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="74" y="206" width="108" height="20" rx="10" fill="#FFDB3D"/>
+  <path d="M68 206C68 188 94 180 128 180C162 180 188 188 188 206Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="112" y="150" width="32" height="40" rx="10" fill="#12606D"/>
+  <circle cx="90" cy="108" r="11" fill="#12606D"/>
+  <circle cx="166" cy="108" r="11" fill="#12606D"/>
+  <path d="M92 96C90 66 106 46 128 46C150 46 166 66 164 96V116C166 140 156 156 146 164C140 172 134 176 128 176C122 176 116 172 110 164C100 156 90 140 92 116Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M94 84Q102 72 112 80Q120 68 128 76Q136 68 144 80Q154 72 162 84" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M106 104Q113 110 120 104M136 104Q143 110 150 104" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M98 128Q102 144 112 148Q116 160 128 162Q140 160 144 148Q154 144 158 128" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M114 136Q128 130 142 136" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M176 60C176 48 186 42 196 46C200 36 216 36 220 48C228 50 228 62 220 64H182C176 64 176 62 176 60Z" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
+  <polygon points="200,74 190,96 200,96 194,116 214,88 204,88 208,74" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M100 96L100 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
 </svg>

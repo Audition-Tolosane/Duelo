@@ -1,18 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mythologie Hindoue">
-  <g fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round">
-  <path d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
-  <path transform="rotate(45 128 128)" d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
-  <path transform="rotate(90 128 128)" d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
-  <path transform="rotate(135 128 128)" d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
-  <path transform="rotate(180 128 128)" d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
-  <path transform="rotate(225 128 128)" d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
-  <path transform="rotate(270 128 128)" d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
-  <path transform="rotate(315 128 128)" d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
-  </g>
-  <circle cx="128" cy="128" r="64" stroke="#12606D" stroke-width="20" fill="none"/>
-  <path d="M128 128Q120 146 108 156M128 128Q136 146 148 156" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
-  <polygon points="96,102 96,146 128,124 160,102 160,146 128,124" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M92 98V150M164 98V150" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
-  <path d="M97 160A9 9 0 1 0 115 160A9 9 0 1 0 97 160ZM141 160A9 9 0 1 0 159 160A9 9 0 1 0 141 160Z" fill="#FFDB3D"/>
-  <path d="M74 96A64 64 0 0 1 96 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M88 104C52 84 30 106 34 142C38 172 64 184 92 168Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M168 104C204 84 226 106 222 142C218 172 192 184 164 168Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M88 104C88 78 104 70 128 70C152 70 168 78 168 104V156C168 172 156 178 144 182C144 200 148 214 162 214C170 214 172 206 168 200" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M92 74L102 40L116 60L128 30L140 60L154 40L164 74Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="92" r="6" fill="#FF6B5B"/>
+  <circle cx="108" cy="118" r="8" fill="#E8F1EC"/>
+  <circle cx="148" cy="118" r="8" fill="#E8F1EC"/>
+  <path d="M112 170C104 178 94 182 84 182" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M100 96C102 88 108 82 116 80" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

@@ -1,9 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Michel-Ange">
-  <path d="M44 216V140L80 116H134L124 136L152 122H212V216Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M126 116L144 100L156 114L138 130Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M150 106L182 70" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <rect x="176" y="30" width="26" height="50" rx="12" transform="rotate(42 189 55)" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
-  <circle cx="108" cy="98" r="7" fill="#FFDB3D"/>
-  <circle cx="166" cy="128" r="6" fill="#FFDB3D"/>
-  <path d="M58 156V180" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g transform="translate(122 146) rotate(-14) scale(0.74)"><rect x="-128" y="-26" width="66" height="86" rx="28" fill="#FF6B5B"/><rect x="-76" y="-10" width="76" height="20" rx="10" fill="#FF6B5B"/><rect x="-84" y="14" width="52" height="20" rx="10" fill="#FF6B5B"/><rect x="-90" y="38" width="44" height="18" rx="9" fill="#FF6B5B"/><rect x="-104" y="-32" width="50" height="18" rx="9" fill="#FF6B5B"/></g>
+  <g transform="translate(134 110) rotate(166) scale(1 -1) scale(0.74)"><rect x="-128" y="-26" width="66" height="86" rx="28" fill="#12606D"/><rect x="-76" y="-10" width="76" height="20" rx="10" fill="#12606D"/><rect x="-84" y="14" width="52" height="20" rx="10" fill="#12606D"/><rect x="-90" y="38" width="44" height="18" rx="9" fill="#12606D"/><rect x="-104" y="-32" width="50" height="18" rx="9" fill="#12606D"/></g>
+  <polygon points="128,118 132,126 140,129 132,132 128,140 124,132 116,129 124,126" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M42 152L48 140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
 </svg>

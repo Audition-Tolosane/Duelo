@@ -1,11 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Jujutsu Kaisen">
-  <rect x="96" y="120" width="64" height="98" rx="30" fill="#12606D"/>
-  <g transform="rotate(-30 128 132)">
-  <rect x="98" y="42" width="60" height="104" rx="30" fill="#12606D"/>
-  <path d="M110 76V62Q128 38 146 62V76Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M112 90V112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g transform="rotate(-18 128 128)">
+  <path d="M106 204V72C106 50 116 38 130 38C144 38 154 50 154 72V100C158 108 158 120 154 128V148C158 156 158 168 154 176V204C154 216 144 222 130 222C116 222 106 216 106 204Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M118 62C118 54 122 50 130 50C138 50 142 54 142 62V76C142 80 138 82 130 82C122 82 118 80 118 76Z" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M112 112H124M112 122H122M112 160H124M112 170H122" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </g>
-  <path d="M106 136Q122 148 146 140" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <rect x="84" y="166" width="88" height="30" rx="6" fill="#FFDB3D"/>
-  <path d="M110 174V188M128 172V190M146 174V188" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M70 150L188 196" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="20" stroke-linejoin="round"/>
+  <path d="M78 196L190 140" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="20" stroke-linejoin="round"/>
+  <circle cx="136" cy="170" r="10" fill="#FF6B5B"/>
 </svg>

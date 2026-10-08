@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Adaptation">
-  <rect x="64" y="150" width="24" height="50" rx="12" fill="#12606D"/>
-  <rect x="104" y="154" width="24" height="50" rx="12" fill="#12606D"/>
-  <rect x="144" y="154" width="24" height="50" rx="12" fill="#12606D"/>
-  <rect x="184" y="150" width="24" height="50" rx="12" fill="#12606D"/>
-  <path d="M52 128C52 92 84 72 128 72C176 72 216 92 216 128C216 160 184 176 128 176C80 176 52 160 52 128Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M110 80C104 104 104 148 110 170M150 80C156 104 156 148 150 170" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <circle cx="54" cy="128" r="13" fill="#FF6B5B"/>
-  <circle cx="80" cy="108" r="8" fill="#0B3D4A"/>
-  <path d="M72 194H80M112 198H120M152 198H160M192 194H200" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M70 112C76 98 88 88 102 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="56,32 116,100 72,128" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="200,32 140,100 184,128" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="68,56 100,94 80,112" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="188,56 156,94 176,112" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M62 122C62 102 92 94 128 94C164 94 194 102 194 122C194 158 160 200 128 212C96 200 62 158 62 122Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M70 150C88 168 108 170 128 168C148 170 168 168 186 150C176 180 152 202 128 210C104 202 80 180 70 150Z" fill="#E8F1EC"/>
+  <circle cx="102" cy="134" r="11" fill="#0B3D4A"/>
+  <circle cx="154" cy="134" r="11" fill="#0B3D4A"/>
+  <path d="M118 176H138L128 188Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M78 120C82 110 92 104 102 102" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

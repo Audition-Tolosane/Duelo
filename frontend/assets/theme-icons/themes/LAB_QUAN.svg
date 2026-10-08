@@ -1,11 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Informatique Quantique">
-  <circle cx="128" cy="132" r="76" fill="#12606D"/>
-  <ellipse cx="128" cy="132" rx="70" ry="22" stroke="#0B3D4A" stroke-width="8" fill="none"/>
-  <path d="M128 72V192" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
-  <path d="M128 132L170 90" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
-  <circle cx="174" cy="86" r="13" fill="#FFDB3D"/>
-  <circle cx="128" cy="132" r="10" fill="#FFDB3D"/>
-  <circle cx="128" cy="56" r="12" fill="#FFDB3D"/>
-  <circle cx="128" cy="208" r="12" fill="#FFDB3D"/>
-  <path d="M74 112A58 58 0 0 1 99 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="88" y="44" width="80" height="48" fill="#12606D"/>
+  <rect x="100" y="100" width="56" height="44" fill="#12606D"/>
+  <rect x="112" y="152" width="32" height="40" fill="#12606D"/>
+  <path d="M110 54V84M146 54V84M118 108V136M138 108V136M128 160V184" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M96 106C80 118 80 132 92 142M160 106C176 118 176 132 164 142" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="64" y="32" width="128" height="18" rx="9" fill="#FFDB3D"/>
+  <rect x="56" y="88" width="144" height="18" rx="9" fill="#FFDB3D"/>
+  <rect x="76" y="140" width="104" height="18" rx="9" fill="#FFDB3D"/>
+  <rect x="96" y="188" width="64" height="16" rx="8" fill="#FFDB3D"/>
+  <rect x="110" y="206" width="36" height="16" rx="5" fill="#12606D"/>
+  <path d="M98 60V78" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

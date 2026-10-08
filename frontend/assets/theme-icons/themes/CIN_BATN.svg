@@ -1,8 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Dark Knight">
-  <path d="M196 48Q216 62 220 86M36 170Q40 194 60 208" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
-  <path d="M128 46A82 82 0 0 0 128 210Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M128 46A82 82 0 0 1 128 210Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
-  <circle cx="128" cy="128" r="60" fill="none" stroke="#0B3D4A" stroke-width="6"/>
-  <path d="M150 84L168 104M144 122L176 128M148 156L168 178" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M68 112Q74 86 96 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M176 60C186 40 200 38 204 26C214 44 210 58 200 70Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M200 96C212 84 222 84 228 72C232 92 222 104 210 110Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 44A84 84 0 0 0 128 212Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 44A84 84 0 0 1 128 212Z" fill="#0B3D4A" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 50L140 72L122 98L142 124L120 152L140 180L128 206Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M110 70A58 58 0 0 0 110 186" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M164 90L182 108M158 134L188 140M164 168L180 184" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M66 116Q72 88 96 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

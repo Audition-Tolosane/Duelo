@@ -1,8 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Silo">
-  <path d="M32 72Q80 56 128 66Q176 76 224 62V224H32Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M112 66Q128 46 144 66Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
-  <rect x="70" y="80" width="116" height="144" rx="24" fill="#0B3D4A"/>
-  <path d="M84 96H104V112H124V128H144V144H172" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M172 152V160H152V176H132V192H112V208H84" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M48 92V112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M34 128Q128 56 222 128V208Q222 222 208 222H48Q34 222 34 208Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M176 92V40M176 58L198 42M176 70L154 54" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M82 104Q128 88 174 104V202Q174 214 162 214H94Q82 214 82 202Z" fill="#0B3D4A"/>
+  <path d="M164 126Q128 114 92 146M164 160Q128 148 92 180" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="120" y="98" width="16" height="116" fill="#12606D"/>
+  <path d="M92 114Q128 138 164 126M92 146Q128 172 164 160M92 180Q128 206 164 194" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M56 136Q66 120 80 110" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
 </svg>

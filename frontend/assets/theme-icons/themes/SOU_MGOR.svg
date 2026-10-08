@@ -1,7 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mick Gordon (Doom)">
-  <path d="M58 122C40 92 58 62 72 42C80 66 92 72 100 60C104 44 116 36 128 30C138 48 150 58 160 44C170 60 178 70 188 52C204 78 214 102 198 124Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M92 116C86 98 98 84 108 72C114 86 124 88 130 74C140 88 148 94 156 82C168 98 166 112 160 120Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M60 112C60 96 196 96 196 112C196 152 150 196 128 214C106 196 60 152 60 112Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <circle cx="128" cy="132" r="10" fill="#FFDB3D"/>
-  <path d="M78 126C80 142 88 156 98 168" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 90C48 70 46 50 54 34C66 52 80 66 96 80Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M196 90C208 70 210 50 202 34C190 52 176 66 160 80Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="50" y="84" width="156" height="140" rx="22" fill="#12606D"/>
+  <rect x="64" y="98" width="128" height="22" rx="11" fill="#0B3D4A"/>
+  <circle cx="84" cy="109" r="6" fill="#FF6B5B"/>
+  <circle cx="110" cy="109" r="6" fill="#FF6B5B"/>
+  <circle cx="136" cy="109" r="6" fill="#FF6B5B"/>
+  <circle cx="128" cy="170" r="40" fill="#0B3D4A"/>
+  <circle cx="128" cy="170" r="16" fill="#FF6B5B"/>
+  <path d="M64 140L64 152" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
 </svg>

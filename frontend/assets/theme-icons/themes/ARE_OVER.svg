@@ -1,10 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Overwatch">
-  <path d="M36 214H220" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <rect x="52" y="124" width="152" height="56" rx="14" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <circle cx="86" cy="186" r="18" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6"/>
-  <circle cx="170" cy="186" r="18" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6"/>
-  <polygon points="128,36 158,53 158,87 128,104 98,87 98,53" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M110 140L128 152L146 140" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M110 66L120 56" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M70 142H86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="36" y="180" width="164" height="32" rx="16" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="62" cy="196" r="7" fill="#FFDB3D"/>
+  <circle cx="100" cy="196" r="7" fill="#FFDB3D"/>
+  <circle cx="138" cy="196" r="7" fill="#FFDB3D"/>
+  <circle cx="174" cy="196" r="7" fill="#FFDB3D"/>
+  <path d="M46 168L60 128H176L190 168Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="118" cy="92" r="38" fill="#FF6B5B"/>
+  <circle cx="118" cy="92" r="22" fill="#FFDB3D"/>
+  <path d="M76 124C70 104 74 80 90 64M160 124C166 104 162 80 146 64" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M208 92L224 110L208 128M208 138L224 156L208 174" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M90 152H110" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

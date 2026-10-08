@@ -1,0 +1,14 @@
+[
+ {"id": "LIF_MANG", "symbole": "palétuvier perché sur ses racines-échasses au-dessus des vagues"},
+ {"id": "LIF_SOLS", "symbole": "coupe de terre : pousse et racines, ver de terre et cailloux"},
+ {"id": "LIF_ECOL", "symbole": "planète Terre d'où sort une jeune pousse"},
+ {"id": "LIF_SENS", "symbole": "visage de face : yeux, nez, oreilles et langue tirée"},
+ {"id": "LIF_ADAP", "symbole": "tête de fennec aux immenses oreilles"},
+ {"id": "LAB_DARK", "symbole": "galaxie dans un halo sombre plein, arcs de lumière déviée"},
+ {"id": "LAB_CONZ", "symbole": "Grande Ourse en traits jaunes épais et étoile Polaire"},
+ {"id": "LAB_ROKT", "symbole": "base d'étage de fusée à ailerons, trois tuyères en flammes"},
+ {"id": "LAB_QUAN", "symbole": "lustre doré à étages du cryostat d'ordinateur quantique"},
+ {"id": "GLO_DRAP", "symbole": "trois drapeaux génériques sur leurs mâts"},
+ {"id": "GLO_THAI", "symbole": "wok de nouilles sautées, baguettes et piment"},
+ {"id": "GLO_EPIC", "symbole": "deux sacs de jute coiffés de tas d'épices et pelle doseuse"}
+]

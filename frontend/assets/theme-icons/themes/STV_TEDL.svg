@@ -1,11 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ted Lasso">
-  <g transform="rotate(-7 128 128)">
-  <rect x="40" y="70" width="176" height="116" rx="10" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
-  <rect x="62" y="112" width="132" height="28" rx="14" fill="#12606D"/>
-  <rect x="62" y="152" width="84" height="16" rx="8" fill="#FF6B5B"/>
-  <g transform="rotate(-30 52 66)"><rect x="30" y="56" width="44" height="20" rx="4" fill="#12606D"/></g>
-  <g transform="rotate(30 204 66)"><rect x="182" y="56" width="44" height="20" rx="4" fill="#12606D"/></g>
-  <g transform="rotate(30 52 190)"><rect x="30" y="180" width="44" height="20" rx="4" fill="#12606D"/></g>
-  <path d="M58 92H86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  </g>
+  <path d="M128 90C110 68 76 64 52 80C40 88 34 100 36 110C56 102 76 110 96 114C112 116 122 110 128 102C134 110 144 116 160 114C180 110 200 102 220 110C222 100 216 88 204 80C180 64 146 68 128 90Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="92" y="136" width="100" height="26" rx="10" fill="#FFDB3D"/>
+  <circle cx="184" cy="172" r="32" fill="#FFDB3D"/>
+  <rect x="150" y="136" width="22" height="10" rx="4" fill="#12606D"/>
+  <path d="M96 160Q70 190 94 212Q130 236 190 214" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M60 86Q74 78 90 78" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
 </svg>

@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="NCIS">
-  <rect x="32" y="206" width="192" height="16" rx="8" fill="#12606D"/>
-  <rect x="80" y="174" width="28" height="36" rx="6" fill="#12606D"/>
-  <rect x="156" y="174" width="28" height="36" rx="6" fill="#12606D"/>
-  <path d="M30 76Q96 106 216 100L212 146Q208 170 186 170H102Q58 164 30 76Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M30 76Q96 106 216 100" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M60 136Q130 144 210 132" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M54 96L70 104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M78 222L94 166L110 222M152 222L168 166L184 222" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M74 166H198" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M34 100Q128 112 224 72Q216 126 168 156H74Q48 154 40 132Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M34 100Q128 112 224 72" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M42 122Q128 132 212 104M56 142Q128 148 194 130" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M224 72L230 58" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M54 112L70 114" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
 </svg>

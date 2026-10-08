@@ -1,16 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Empire">
-  <path d="M80 84Q58 92 54 122L46 204Q46 214 58 214H198Q210 214 210 204L202 122Q198 92 176 84Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M128 104V210" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <circle cx="84" cy="148" r="10" fill="#0B3D4A"/>
-  <circle cx="110" cy="178" r="10" fill="#0B3D4A"/>
-  <circle cx="170" cy="146" r="10" fill="#0B3D4A"/>
-  <circle cx="184" cy="190" r="10" fill="#0B3D4A"/>
-  <circle cx="80" cy="196" r="10" fill="#0B3D4A"/>
-  <circle cx="150" cy="196" r="10" fill="#0B3D4A"/>
-  <circle cx="90" cy="82" r="22" fill="#FFDB3D"/>
-  <circle cx="110" cy="98" r="18" fill="#FFDB3D"/>
-  <circle cx="146" cy="98" r="18" fill="#FFDB3D"/>
-  <circle cx="166" cy="82" r="22" fill="#FFDB3D"/>
-  <ellipse cx="128" cy="76" rx="22" ry="10" fill="#0B3D4A"/>
-  <path d="M64 128L60 156" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 66V50C128 40 138 34 146 38C154 42 152 52 146 54" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M46 92L128 64L210 92" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M84 84L64 96Q52 104 52 122L44 210Q44 222 56 222H200Q212 222 212 210L204 122Q204 104 192 96L172 84Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 112V218" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M74 140A10 10 0 1 1 90 148M92 186A10 10 0 1 1 108 194M66 196A9 9 0 1 1 80 204M164 136A10 10 0 1 1 180 144M150 178A10 10 0 1 1 166 186M180 200A9 9 0 1 1 194 208" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M80 80C70 82 66 94 74 100C68 108 74 120 84 118C86 128 100 130 106 122C112 128 122 124 128 116C134 124 144 128 150 122C156 130 170 128 172 118C182 120 188 108 182 100C190 94 186 82 176 80Q128 104 80 80Z" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M62 134L58 160" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
 </svg>

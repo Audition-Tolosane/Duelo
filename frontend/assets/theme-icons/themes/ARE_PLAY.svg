@@ -1,8 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="PlayStation">
-  <circle cx="128" cy="128" r="92" fill="#12606D" stroke="#12606D" stroke-width="12"/>
-  <circle cx="128" cy="68" r="22" fill="#FFDB3D"/>
-  <circle cx="128" cy="188" r="22" fill="#FFDB3D"/>
-  <circle cx="68" cy="128" r="22" fill="#FF6B5B"/>
-  <circle cx="188" cy="128" r="22" fill="#FF6B5B"/>
-  <path d="M56 84A82 82 0 0 1 84 56" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M74 72H182C206 72 220 90 224 112L234 180C238 206 212 218 194 200L170 176H86L62 200C44 218 18 206 22 180L32 112C36 90 50 72 74 72Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="102" cy="160" r="13" fill="none" stroke="#E8F1EC" stroke-width="10"/>
+  <circle cx="154" cy="160" r="13" fill="none" stroke="#E8F1EC" stroke-width="10"/>
+  <polygon points="186,88 198,106 174,106" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="212" cy="124" r="10" fill="none" stroke="#FF6B5B" stroke-width="8"/>
+  <path d="M178 138L194 154M194 138L178 154" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="150" y="114" width="20" height="20" rx="3" fill="#FF6B5B"/>
+  <path d="M52 112H88M70 94V130" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M48 82L60 74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

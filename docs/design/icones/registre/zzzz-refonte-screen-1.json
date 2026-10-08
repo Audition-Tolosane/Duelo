@@ -1,0 +1,10 @@
+[
+ {"id": "CIN_ALIE", "symbole": "détecteur de mouvement à écran radar et point jaune"},
+ {"id": "ANI_JUJU", "symbole": "doigt maudit à ongle, scellé par deux bandes de talisman en croix"},
+ {"id": "CIN_JUMA", "symbole": "plateau de jeu en perspective à hublot central, dé et feuilles de jungle"},
+ {"id": "CIN_BATN", "symbole": "pièce de Double-Face, moitié dorée nette, moitié calcinée en flammes"},
+ {"id": "CIN_INTE", "symbole": "trou noir Gargantua à halo et disque d'accrétion"},
+ {"id": "STV_SHER", "symbole": "manteau à col relevé et écharpe nouée"},
+ {"id": "STV_BOYS", "symbole": "verre de lait frappé par deux rayons laser"},
+ {"id": "STV_SUNN", "symbole": "jambon au rhum à os sur plat et bouteille de rhum"}
+]

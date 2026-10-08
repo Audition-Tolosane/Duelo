@@ -1,7 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Délices Thaï">
-  <path d="M62 194C62 208 74 214 88 214H168C182 214 194 208 194 194C198 164 196 138 186 118L152 66H104L70 118C60 138 58 164 62 194Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M104 72L90 118M152 72L166 118M128 128V200" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <ellipse cx="128" cy="66" rx="24" ry="9" fill="#12606D"/>
-  <path d="M136 64L152 38L180 34" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M80 132C76 150 76 168 78 184" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M150 100L196 36M164 106L214 50" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 112C76 88 100 78 128 78C156 78 180 88 196 112Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M78 104C92 92 104 104 118 92C132 104 144 92 158 104C168 96 176 100 182 104" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M40 116H216C212 168 176 200 128 200C80 200 44 168 40 116Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M200 140L230 128" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M26 128L40 136" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M124 70C120 54 128 40 142 36C142 52 136 64 124 70Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M64 138C70 158 82 172 98 180" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

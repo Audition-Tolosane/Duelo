@@ -1,15 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Interstellar">
-  <rect x="52" y="36" width="140" height="184" rx="12" fill="#12606D"/>
-  <rect x="66" y="50" width="112" height="156" rx="4" fill="#0B3D4A"/>
-  <path d="M66 50L96 80M178 50L148 80M66 206L96 176M178 206L148 176" stroke="#12606D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <rect x="66" y="122" width="112" height="12" rx="0" fill="#12606D"/>
-  <rect x="76" y="82" width="14" height="40" rx="4" fill="#FFDB3D"/>
-  <rect x="94" y="90" width="14" height="32" rx="4" fill="#E8F1EC"/>
-  <rect x="112" y="78" width="14" height="44" rx="4" fill="#FFDB3D"/>
-  <rect x="130" y="88" width="14" height="34" rx="4" fill="#FFDB3D"/>
-  <rect x="80" y="134" width="14" height="40" rx="4" fill="#E8F1EC"/>
-  <rect x="98" y="142" width="14" height="32" rx="4" fill="#FFDB3D"/>
-  <rect x="134" y="138" width="14" height="36" rx="4" fill="#E8F1EC"/>
-  <rect x="178" y="150" width="22" height="48" rx="6" fill="#FFDB3D" transform="rotate(28 189 174)"/>
-  <path d="M66 66V58H82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 54C178 54 206 88 204 128H52C50 88 78 54 128 54Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M60 140C64 176 92 200 128 200C164 200 192 176 196 140Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="134" r="56" fill="#0B3D4A"/>
+  <path d="M24 134C24 126 74 120 128 120C182 120 232 126 232 134C232 142 182 148 128 148C74 148 24 142 24 134Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M48 134C84 130 172 130 208 134" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M92 106Q100 94 114 90" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

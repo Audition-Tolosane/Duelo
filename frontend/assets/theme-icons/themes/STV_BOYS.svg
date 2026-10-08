@@ -1,9 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Boys">
-  <rect x="90" y="34" width="76" height="48" rx="10" fill="#FF6B5B"/>
-  <path d="M96 82H160V196Q160 216 140 216H116Q96 216 96 196Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M108 132H148V192Q148 204 136 204H120Q108 204 108 192Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
-  <circle cx="124" cy="168" r="6" fill="#E8F1EC"/>
-  <circle cx="136" cy="150" r="4" fill="#E8F1EC"/>
-  <path d="M110 98V116" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M196 148Q206 164 206 172A10 10 0 0 1 186 172Q186 164 196 148Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M26 100L86 126M26 136L84 144" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M96 56H192L182 208C181 216 176 220 168 220H120C112 220 107 216 106 208Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M110 96Q128 86 144 96Q162 106 180 96L172 200C172 204 170 206 166 206H122C118 206 116 204 116 200Z" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M96 120L104 130L118 128L108 138L112 152L100 144L88 150L92 136L82 128L94 128Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M112 72V80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

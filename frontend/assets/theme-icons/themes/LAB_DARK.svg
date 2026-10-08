@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Matière Noire">
-  <path d="M215.8 134.1A88 88 0 0 1 207.1 166.6M195.4 184.6A88 88 0 0 1 169.3 205.7M149.3 213.4A88 88 0 0 1 115.8 215.1M95.0 209.6A88 88 0 0 1 66.9 191.3M53.4 174.6A88 88 0 0 1 41.3 143.3M40.2 121.9A88 88 0 0 1 48.9 89.4M60.6 71.4A88 88 0 0 1 86.7 50.3M106.7 42.6A88 88 0 0 1 140.2 40.9M161.0 46.4A88 88 0 0 1 189.1 64.7M202.6 81.4A88 88 0 0 1 214.7 112.7" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <ellipse cx="116" cy="112" rx="34" ry="16" transform="rotate(-25 116 112)" fill="#FFDB3D"/>
-  <circle cx="116" cy="112" r="7" fill="#E8F1EC"/>
-  <ellipse cx="160" cy="154" rx="22" ry="11" transform="rotate(30 160 154)" fill="#FF6B5B"/>
-  <ellipse cx="104" cy="164" rx="16" ry="8" transform="rotate(-10 104 164)" fill="#FFDB3D"/>
-  <circle cx="166" cy="94" r="6" fill="#FFDB3D"/>
-  <path d="M60.6 71.4A88 88 0 0 1 78.8 55.0" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="128" r="92" fill="#12606D"/>
+  <circle cx="128" cy="128" r="60" fill="#0B3D4A"/>
+  <path d="M160.1 59.1A76 76 0 0 1 201.4 108.3" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M95.9 196.9A76 76 0 0 1 54.6 147.7" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="128" rx="44" ry="16" transform="rotate(-25 128 128)" fill="#FFDB3D"/>
+  <circle cx="128" cy="128" r="9" fill="#E8F1EC"/>
+  <path d="M56.6 102.0A76 76 0 0 1 81.2 68.1" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>
