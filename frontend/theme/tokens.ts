@@ -93,6 +93,9 @@ export const COLOR = {
     fill:      PALETTE.cream,
     border:    'rgba(11,61,74,0.18)',
   },
+  // Fond des avatars sans photo, choisi par graine : tons sourds de la famille pétrole (validé au pilote).
+  // Jamais jaune (moi / action) ni corail (rival) : un avatar ne doit pas brouiller les rôles.
+  avatar:      ['#12606D', '#2E7D86', '#3E6B5C', '#5E7F86', '#7A6A55', '#4F5D8A'] as const,
   // Teintes « douces » pour fonds de puces / halos (jamais pour du texte)
   tint: {
     self:      'rgba(255,219,61,0.14)',

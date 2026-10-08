@@ -7,6 +7,7 @@ import {
   Camera, Pencil, Send, Hammer, LayoutGrid, Bookmark, CircleHelp, FileText, Languages, Image as ImageIcon, Headphones, Gem, Dumbbell,
   WifiOff, CheckCheck, UserPlus, BellRing, Lightbulb, Moon, SlidersHorizontal, ArrowUp, ArrowRight, Pin,
   UtensilsCrossed, Tv, Sprout, ClipboardList, TriangleAlert, Mail, Eye, EyeOff, Microscope, Inbox, RefreshCw,
+  Coins,
 } from 'lucide-react-native';
 import { COLOR, ICON_SIZE } from '../../theme/tokens';
 
@@ -28,6 +29,8 @@ const REGISTRY = {
   sliders: SlidersHorizontal, arrowUp: ArrowUp, arrowRight: ArrowRight, pin: Pin, food: UtensilsCrossed, tv: Tv,
   sprout: Sprout, clipboard: ClipboardList, warning: TriangleAlert, mail: Mail, eye: Eye, eyeOff: EyeOff,
   microscope: Microscope, inbox: Inbox, refresh: RefreshCw,
+  // Lot E (boutique)
+  coins: Coins,
 } as const;
 
 export type IconName = keyof typeof REGISTRY;

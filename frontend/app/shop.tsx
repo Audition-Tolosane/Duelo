@@ -1,322 +1,194 @@
 import React, { useState } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SwipeBackPage from '../components/SwipeBackPage';
-import DueloHeader from '../components/DueloHeader';
-import CosmicBackground from '../components/CosmicBackground';
-import { GLASS } from '../theme/glassTheme';
+import { t } from '../utils/i18n';
+import { Txt, Icon, IconName, Button, Badge, Card, Dialog, ScreenContainer, ScreenHeader } from '../components/ui';
+import { COLOR, SPACE, RADII, BORDER, GRADIENTS } from '../theme/tokens';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// Boutique SKILKI : pièces, boosts, Premium. Les achats ne sont pas encore actifs : chaque achat
+// ouvre une modale « disponible prochainement ». Prix = or (récompense) ; Premium = violet rare,
+// seul moment « rare » de l'écran ; un CTA jaune par article.
 
 interface ShopItem {
   id: string;
-  title: string;
-  description: string;
+  /** Clés i18n pilot.shop.<id>_title / _desc */
+  icon: IconName;
   price: string;
-  icon: string;
-  color: string;
-  gradient: [string, string];
-  badge?: string;
+  badgeKey?: string;
 }
 
-// ── Données produits ──────────────────────────────────────────────────────────
+// ── Données produits (prix affichés tels quels) ───────────────────────────────
 
 const COIN_PACKS: ShopItem[] = [
-  {
-    id: 'coins_small',
-    title: '500 Pièces',
-    description: 'Idéal pour débuter',
-    price: '0,99 €',
-    icon: 'currency-usd',
-    color: '#FFB800',
-    gradient: ['#FFB800', '#FF8C00'],
-  },
-  {
-    id: 'coins_medium',
-    title: '1 200 Pièces',
-    description: '+20% bonus',
-    price: '1,99 €',
-    icon: 'cash-multiple',
-    color: '#FFB800',
-    gradient: ['#FFD700', '#FFB800'],
-    badge: 'POPULAIRE',
-  },
-  {
-    id: 'coins_large',
-    title: '3 000 Pièces',
-    description: '+50% bonus',
-    price: '3,99 €',
-    icon: 'treasure-chest',
-    color: '#FFB800',
-    gradient: ['#FFA500', '#FF6B00'],
-    badge: 'MEILLEURE OFFRE',
-  },
+  { id: 'coins_small', icon: 'coins', price: '0,99 €' },
+  { id: 'coins_medium', icon: 'coins', price: '1,99 €', badgeKey: 'pilot.shop.badge_popular' },
+  { id: 'coins_large', icon: 'coins', price: '3,99 €', badgeKey: 'pilot.shop.badge_best' },
 ];
 
 const BOOSTS: ShopItem[] = [
-  {
-    id: 'boost_xp_2x',
-    title: 'Boost XP ×2',
-    description: 'Double ton XP pendant 24h',
-    price: '1,99 €',
-    icon: 'lightning-bolt',
-    color: '#00E5FF',
-    gradient: ['#00E5FF', '#0077FF'],
-  },
-  {
-    id: 'boost_shield',
-    title: 'Bouclier de Série',
-    description: 'Protège ta série 1 jour',
-    price: '0,99 €',
-    icon: 'shield-star',
-    color: '#BF5FFF',
-    gradient: ['#BF5FFF', '#7B22E2'],
-  },
-  {
-    id: 'boost_reroll',
-    title: 'Pack Rerolls ×5',
-    description: 'Renouvelle 5 missions',
-    price: '0,99 €',
-    icon: 'refresh',
-    color: '#00FF9D',
-    gradient: ['#00FF9D', '#00CC7A'],
-  },
+  { id: 'boost_xp_2x', icon: 'bolt', price: '1,99 €' },
+  { id: 'boost_shield', icon: 'shield', price: '0,99 €' },
+  { id: 'boost_reroll', icon: 'refresh', price: '0,99 €' },
 ];
 
-const PREMIUM: ShopItem[] = [
-  {
-    id: 'premium_monthly',
-    title: 'SKILKI Premium',
-    description: 'XP ×1.5, pas de pubs, missions bonus',
-    price: '4,99 € / mois',
-    icon: 'crown',
-    color: '#FFD700',
-    gradient: ['#FFD700', '#FFB800'],
-    badge: 'LE PLUS AVANTAGEUX',
-  },
-];
+const PREMIUM: ShopItem = { id: 'premium_monthly', icon: 'crown', price: '4,99 € / mois', badgeKey: 'pilot.shop.badge_value' };
 
-// ── Sub-components ─────────────────────────────────────────────────────────────
+const title = (it: ShopItem) => t(`pilot.shop.${it.id}_title`);
 
-function SectionTitle({ title, icon }: { title: string; icon: string }) {
+// ── Ligne d'article : pas cliquable en entier (le bouton d'achat est à l'intérieur) ──
+
+function ShopRow({ item, onBuy, first }: { item: ShopItem; onBuy: () => void; first: boolean }) {
+  const { width } = useWindowDimensions();
+  const compact = width < 360;   // 320 px : prix et bouton passent sous le texte
   return (
-    <View style={styles.sectionTitle}>
-      <MaterialCommunityIcons name={icon as any} size={16} color="#FFB800" />
-      <Text style={styles.sectionTitleText}>{title}</Text>
+    <View style={[s.row, !first && s.rowDivider, compact && s.rowCompact]}>
+      <View style={s.iconDisc}><Icon name={item.icon} size={22} color={COLOR.reward.gold} /></View>
+      <View style={s.rowText}>
+        {item.badgeKey ? <Badge label={t(item.badgeKey)} tone="reward" /> : null}
+        <Txt variant="cardTitle" numberOfLines={2}>{title(item)}</Txt>
+        <Txt variant="caption" numberOfLines={2}>{t(`pilot.shop.${item.id}_desc`)}</Txt>
+      </View>
+      <View style={[s.buy, compact && s.buyCompact]}>
+        <Txt variant="cardTitle" color={COLOR.reward.gold} align="right" numberOfLines={1}>{item.price}</Txt>
+        {/* Achat en secondaire : un seul CTA jaune par écran (l'abonnement Premium) */}
+        <Button label={t('pilot.shop.buy')} variant="secondary" size="sm" haptic={false} onPress={onBuy} />
+      </View>
     </View>
   );
 }
 
-function ShopCard({ item, onPress }: { item: ShopItem; onPress: () => void }) {
+function Group({ titleKey, hintKey, children }: { titleKey: string; hintKey?: string; children: React.ReactNode }) {
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.82}>
-      <LinearGradient
-        colors={[item.gradient[0] + '22', item.gradient[1] + '11']}
-        style={styles.cardGradient}
-      >
-        {item.badge && (
-          <View style={[styles.badge, { backgroundColor: item.color + '33', borderColor: item.color + '66' }]}>
-            <Text style={[styles.badgeText, { color: item.color }]}>{item.badge}</Text>
-          </View>
-        )}
-        <View style={styles.cardBody}>
-          <LinearGradient colors={item.gradient} style={[styles.iconBox, { shadowColor: item.gradient[0] }]}>
-            <MaterialCommunityIcons name={item.icon as any} size={26} color="#FFF" />
-          </LinearGradient>
-          <View style={styles.cardInfo}>
-            <Text style={styles.cardTitle}>{item.title}</Text>
-            <Text style={styles.cardDesc}>{item.description}</Text>
-          </View>
-          <View style={[styles.priceBox, { borderColor: item.color + '55', backgroundColor: item.color + '15' }]}>
-            <Text style={[styles.priceText, { color: item.color }]}>{item.price}</Text>
-          </View>
-        </View>
-      </LinearGradient>
-    </TouchableOpacity>
+    <View style={s.group}>
+      <Txt variant="overline">{t(titleKey)}</Txt>
+      {hintKey ? <Txt variant="caption">{t(hintKey)}</Txt> : null}
+      <Card padded={false} style={s.groupCard}>{children}</Card>
+    </View>
   );
 }
 
-// ── Screen ────────────────────────────────────────────────────────────────────
+// ── Écran ─────────────────────────────────────────────────────────────────────
 
 export default function ShopScreen() {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
+  const [pending, setPending] = useState<ShopItem | null>(null);
 
   const handlePurchase = (item: ShopItem) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    Alert.alert(
-      'Achat in-app',
-      `Les achats in-app seront disponibles prochainement.\n\n(${item.title} — ${item.price})`,
-      [{ text: 'OK' }],
-    );
+    setPending(item);
   };
 
   return (
     <SwipeBackPage>
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        <CosmicBackground />
-        <DueloHeader />
+      <ScreenContainer>
+        <ScreenHeader title={t('pilot.shop.title')} />
+        <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
 
-        {/* Sub-header */}
-        <View style={styles.subHeader}>
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }}
-            activeOpacity={0.7}
-          >
-            <MaterialCommunityIcons name="chevron-left" size={26} color="#FFF" />
-          </TouchableOpacity>
-          <View style={styles.subHeaderCenter}>
-            <Text style={styles.subHeaderEyebrow}>◆ SHOP</Text>
-            <Text style={styles.subHeaderTitle}>Boutique</Text>
+          {/* Intro sobre (écran de navigation : pas de dégradé) */}
+          <Card style={s.intro}>
+            <View style={s.introDisc}><Icon name="shop" size={26} color={COLOR.action.primary} /></View>
+            <View style={s.flex}>
+              <Txt variant="h2">{t('pilot.shop.hero_title')}</Txt>
+              <Txt variant="bodySmall">{t('pilot.shop.hero_sub')}</Txt>
+            </View>
+          </Card>
+
+          <Group titleKey="pilot.shop.section_coins" hintKey="pilot.shop.coins_hint">
+            {COIN_PACKS.map((item, i) => (
+              <ShopRow key={item.id} item={item} first={i === 0} onBuy={() => handlePurchase(item)} />
+            ))}
+          </Group>
+
+          <Group titleKey="pilot.shop.section_boosts">
+            {BOOSTS.map((item, i) => (
+              <ShopRow key={item.id} item={item} first={i === 0} onBuy={() => handlePurchase(item)} />
+            ))}
+          </Group>
+
+          {/* Premium : seul moment « rare » (violet) */}
+          <View style={s.group}>
+            <Txt variant="overline">{t('pilot.shop.section_premium')}</Txt>
+            <View style={s.premium}>
+              <LinearGradient colors={GRADIENTS.rare.colors} style={StyleSheet.absoluteFill} pointerEvents="none" />
+              <View style={s.premiumHead}>
+                <View style={s.premiumDisc}><Icon name="crown" size={26} color={COLOR.accent.rare} /></View>
+                <View style={s.flex}>
+                  <Badge label={t(PREMIUM.badgeKey!)} tone="rare" />
+                  <Txt variant="h3">{title(PREMIUM)}</Txt>
+                </View>
+              </View>
+              <Txt variant="bodySmall" color={COLOR.text.secondary}>{t('pilot.shop.premium_monthly_desc')}</Txt>
+              <View style={s.premiumFoot}>
+                <Txt variant="statMedium" color={COLOR.reward.gold} numberOfLines={1} style={s.flexShrink}>{PREMIUM.price}</Txt>
+                <Button label={t('pilot.shop.subscribe')} haptic={false} onPress={() => handlePurchase(PREMIUM)} />
+              </View>
+            </View>
           </View>
-        </View>
 
-        <ScrollView
-          contentContainerStyle={styles.scroll}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Hero — carte gradient or→feu pleine (style deal de la maquette) */}
-          <View style={styles.hero}>
-            <LinearGradient
-              colors={['#FFB547', '#FF6B2C']}
-              start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-              style={StyleSheet.absoluteFill}
-            />
-            <Text style={styles.heroWatermark}>◉</Text>
-            <Text style={styles.heroEyebrow}>◆ BOOSTS · SKINS · PREMIUM</Text>
-            <Text style={styles.heroTitle}>BOOSTE TON JEU</Text>
-            <Text style={styles.heroSub}>XP doublé, séries protégées, missions bonus</Text>
-          </View>
-
-          {/* Coins */}
-          <SectionTitle title="Pièces" icon="currency-usd-circle" />
-          {COIN_PACKS.map(item => (
-            <ShopCard key={item.id} item={item} onPress={() => handlePurchase(item)} />
-          ))}
-
-          {/* Boosts */}
-          <SectionTitle title="Boosts & Power-ups" icon="lightning-bolt-circle" />
-          {BOOSTS.map(item => (
-            <ShopCard key={item.id} item={item} onPress={() => handlePurchase(item)} />
-          ))}
-
-          {/* Premium */}
-          <SectionTitle title="Premium" icon="crown-circle" />
-          {PREMIUM.map(item => (
-            <ShopCard key={item.id} item={item} onPress={() => handlePurchase(item)} />
-          ))}
-
-          <Text style={styles.legal}>
-            Les achats sont traités par l'App Store / Google Play.{'\n'}
-            Abonnements résiliables à tout moment.
-          </Text>
+          <Txt variant="caption" align="center" style={s.legal}>{t('pilot.shop.legal')}</Txt>
         </ScrollView>
-      </View>
+
+        {/* Achat factice : même message qu'avant, dans la modale du kit */}
+        <Dialog
+          visible={!!pending}
+          onClose={() => setPending(null)}
+          icon="shop"
+          tone="reward"
+          title={t('pilot.shop.purchase_title')}
+          message={pending ? t('pilot.shop.purchase_body', { item: title(pending), price: pending.price }) : undefined}
+          actions={<Button label={t('pilot.shop.got_it')} onPress={() => setPending(null)} />}
+        />
+      </ScreenContainer>
     </SwipeBackPage>
   );
 }
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#050510' },
+const s = StyleSheet.create({
+  scroll: { paddingHorizontal: SPACE.screenX, paddingTop: SPACE.lg, paddingBottom: SPACE.huge, gap: SPACE.xl },
+  flex: { flex: 1, gap: SPACE.xxs },
+  flexShrink: { flexShrink: 1 },
 
-  subHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  backBtn: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    justifyContent: 'center', alignItems: 'center',
-  },
-  subHeaderCenter: { flex: 1, marginLeft: 12 },
-  subHeaderEyebrow: {
-    fontSize: 9, fontFamily: 'JetBrainsMono_700Bold', color: '#FFB547',
-    letterSpacing: 2, textTransform: 'uppercase',
-  },
-  subHeaderTitle: {
-    fontSize: 24, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold',
-    color: '#FFF', letterSpacing: -0.8, textTransform: 'uppercase',
+  intro: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md },
+  introDisc: {
+    width: 52, height: 52, borderRadius: 26,
+    backgroundColor: COLOR.surface.subtle,
+    alignItems: 'center', justifyContent: 'center',
   },
 
-  scroll: { paddingHorizontal: 16, paddingBottom: 40 },
+  group: { gap: SPACE.sm },
+  groupCard: { paddingHorizontal: SPACE.cardPad },
 
-  hero: {
-    padding: 20,
-    borderRadius: 20,
-    marginVertical: 16,
+  row: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md, paddingVertical: SPACE.md },
+  rowDivider: { borderTopWidth: BORDER.hair, borderTopColor: COLOR.border.subtle },
+  iconDisc: {
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: COLOR.tint.gold,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  rowCompact: { flexWrap: 'wrap' },
+  rowText: { flex: 1, gap: SPACE.xxs },
+  buy: { alignItems: 'flex-end', gap: SPACE.xs },
+  buyCompact: { flexBasis: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 44 + SPACE.md },
+
+  premium: {
+    backgroundColor: COLOR.surface.card,
+    borderRadius: RADII.lg,
+    borderWidth: BORDER.default,
+    borderColor: COLOR.accent.rare,
+    padding: SPACE.cardPad,
+    gap: SPACE.md,
     overflow: 'hidden',
   },
-  heroWatermark: {
-    position: 'absolute', top: -22, right: -6,
-    fontSize: 110, color: 'rgba(0,0,0,0.15)',
+  premiumHead: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md },
+  premiumDisc: {
+    width: 52, height: 52, borderRadius: 26,
+    backgroundColor: COLOR.tint.rare,
+    alignItems: 'center', justifyContent: 'center',
   },
-  heroEyebrow: {
-    fontSize: 9, fontFamily: 'JetBrainsMono_700Bold', color: 'rgba(0,0,0,0.70)',
-    letterSpacing: 2,
-  },
-  heroTitle: {
-    fontSize: 28, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold',
-    color: '#000', letterSpacing: -1, marginTop: 4,
-  },
-  heroSub: { fontSize: 12, fontWeight: '700', fontFamily: 'SpaceGrotesk_600SemiBold', color: 'rgba(0,0,0,0.65)', marginTop: 4 },
+  premiumFoot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: SPACE.md, flexWrap: 'wrap' },
 
-  sectionTitle: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    marginTop: 20, marginBottom: 10,
-  },
-  sectionTitleText: {
-    fontSize: 11, fontFamily: 'JetBrainsMono_700Bold', color: '#FFB547',
-    letterSpacing: 2, textTransform: 'uppercase',
-  },
-
-  card: {
-    borderRadius: 16,
-    marginBottom: 10,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-  },
-  cardGradient: { padding: 14 },
-  badge: {
-    alignSelf: 'flex-start',
-    borderRadius: 6,
-    borderWidth: 1,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    marginBottom: 8,
-  },
-  badgeText: { fontSize: 8, fontFamily: 'JetBrainsMono_700Bold', letterSpacing: 1 },
-  cardBody: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  iconBox: {
-    width: 52, height: 52, borderRadius: 14,
-    justifyContent: 'center', alignItems: 'center',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5, shadowRadius: 10,
-  },
-  cardInfo: { flex: 1 },
-  cardTitle: { fontSize: 15, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold', color: '#FFF' },
-  cardDesc: { fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 2 },
-  priceBox: {
-    borderRadius: 10, borderWidth: 1,
-    paddingHorizontal: 12, paddingVertical: 8,
-    alignItems: 'center',
-  },
-  priceText: { fontSize: 13, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold' },
-
-  legal: {
-    fontSize: 10, color: 'rgba(255,255,255,0.3)',
-    textAlign: 'center', marginTop: 24, lineHeight: 16,
-  },
+  legal: { marginTop: SPACE.sm },
 });

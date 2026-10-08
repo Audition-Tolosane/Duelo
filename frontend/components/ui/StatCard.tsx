@@ -31,9 +31,9 @@ export default function StatCard({ value, label, icon, tone = 'neutral', size = 
     <View style={[styles.base, appearance === 'card' && styles.card, style]}>
       <View style={styles.valueRow}>
         {icon ? <Icon name={icon} size={18} color={TONE[tone]} /> : null}
-        <Txt variant={size === 'lg' ? 'statLarge' : 'statMedium'} color={TONE[tone]} numberOfLines={1}>{value}</Txt>
+        <Txt variant={size === 'lg' ? 'statLarge' : 'statMedium'} color={TONE[tone]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{value}</Txt>
       </View>
-      <Txt variant="overline" numberOfLines={1}>{label}</Txt>
+      <Txt variant="overline" numberOfLines={2}>{label}</Txt>
     </View>
   );
 }

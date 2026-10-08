@@ -1,12 +1,12 @@
 {
  "totals": {
-  "gradient": 24,
-  "hex": 159,
-  "emoji": 11,
-  "rgba": 61,
-  "fontSize": 55,
-  "heavy": 18,
-  "iconLib": 5
+  "gradient": 17,
+  "hex": 38,
+  "emoji": 2,
+  "rgba": 35,
+  "fontSize": 19,
+  "heavy": 4,
+  "iconLib": 2
  },
  "files": {
   "app/(tabs)/accueil.tsx": {
@@ -28,12 +28,7 @@
    "emoji": 2
   },
   "app/shop.tsx": {
-   "hex": 32,
-   "rgba": 7,
-   "fontSize": 12,
-   "heavy": 4,
-   "gradient": 3,
-   "iconLib": 1
+   "gradient": 1
   },
   "app/support.tsx": {
    "hex": 26,
@@ -50,36 +45,17 @@
    "heavy": 2,
    "iconLib": 1
   },
-  "app/tournament.tsx": {
-   "hex": 32,
-   "rgba": 14,
-   "fontSize": 15,
-   "heavy": 6,
-   "gradient": 4,
-   "iconLib": 1
-  },
   "app/_layout.tsx": {
    "hex": 1
   },
-  "components/CosmicBackground.tsx": {
-   "hex": 1,
-   "rgba": 1
-  },
   "components/SpinWheelModal.tsx": {
-   "hex": 38,
-   "rgba": 4,
-   "fontSize": 9,
-   "heavy": 4,
-   "gradient": 2,
-   "iconLib": 1,
-   "emoji": 9
+   "gradient": 1
   },
   "components/SwipeBackPage.tsx": {
    "hex": 2,
    "rgba": 1
   },
   "components/UserAvatar.tsx": {
-   "hex": 18,
    "gradient": 1
   }
  }

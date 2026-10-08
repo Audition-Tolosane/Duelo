@@ -2,14 +2,15 @@ import React from 'react';
 import { View, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Txt from './ui/Txt';
-import { COLOR } from '../theme/tokens';
+import { COLOR, PALETTE } from '../theme/tokens';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 function getAvatarColor(seed: string): string {
-  // Teintes de repli SKILKI (pas de néon) : pétrole clair, corail, or, vert, pétrole foncé, crème grisée
-  // jamais jaune (mon camp / action) ni corail (adversaire) : un avatar ne doit pas brouiller les rôles
-  const colors = ['#12606D', '#2E7D86', '#3E6B5C', '#5E7F86', '#7A6A55', '#4F5D8A'];
+  // Teintes de repli SKILKI validées au pilote : pétroles et tons sourds, jamais jaune (mon camp /
+  // action) ni corail (adversaire) — un avatar ne doit pas brouiller les rôles. Les 5 tons sourds
+  // n'existent pas comme rôles du design system : ils restent propres aux avatars.
+  const colors = COLOR.avatar;
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
     hash = seed.charCodeAt(i) + ((hash << 5) - hash);
@@ -17,12 +18,13 @@ function getAvatarColor(seed: string): string {
   return colors[Math.abs(hash) % colors.length];
 }
 
-// Frame definitions: gradient colors for each cosmetic frame
+// Cadres cosmétiques (boutique / récompenses) : moment de prestige, dégradé entre deux teintes de la
+// MÊME famille de la palette SKILKI (jamais cyan→violet). Diamant = rare (violet), seul usage du violet.
 const FRAME_GRADIENTS: Record<string, [string, string, string]> = {
-  gold_frame:     ['#FFD700', '#FF9F0A', '#FFD700'],
-  fire_frame:     ['#FF6B35', '#FF0000', '#FF6B35'],
-  diamond_frame:  ['#00D4FF', '#8A2BE2', '#00D4FF'],
-  champion_frame: ['#E8D5FF', '#8A2BE2', '#E8D5FF'],
+  gold_frame:     [PALETTE.gold, PALETTE.yellow, PALETTE.gold],
+  fire_frame:     [PALETTE.coral, PALETTE.gold, PALETTE.coral],
+  diamond_frame:  [PALETTE.violet, PALETTE.cream, PALETTE.violet],
+  champion_frame: [PALETTE.yellow, PALETTE.gold, PALETTE.yellow],
 };
 
 type Props = {

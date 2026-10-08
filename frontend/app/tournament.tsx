@@ -1,18 +1,20 @@
-﻿import React, { useState, useEffect } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet, FlatList, ActivityIndicator,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, FlatList } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import SwipeBackPage from '../components/SwipeBackPage';
-import DueloHeader from '../components/DueloHeader';
 import UserAvatar from '../components/UserAvatar';
 import { authFetch } from '../utils/api';
 import { t } from '../utils/i18n';
+import {
+  Txt, Icon, Button, Badge, Card, ListRow, Loader, EmptyState, StatCard, ScreenContainer, ScreenHeader, ThemeIcon,
+} from '../components/ui';
+import { COLOR, SPACE, RADII, BORDER, ICON_SIZE } from '../theme/tokens';
+
+// Tournoi du week-end : en-tête (thème, temps restant, mes stats, CTA jaune unique) puis classement.
+// Rôles : récompense / rang = or, moi = jaune, « En direct » = corail (événement).
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -46,22 +48,24 @@ function formatCountdown(endAt: string): string {
   const h = Math.floor(diff / 3600000);
   const m = Math.floor((diff % 3600000) / 60000);
   const s = Math.floor((diff % 60000) / 1000);
-  if (h > 0) return `${h}h ${m.toString().padStart(2, '0')}m`;
-  return `${m}:${s.toString().padStart(2, '0')}`;
+  if (h > 0) return t('pilot.tournament.hours', { h: String(h), m: m.toString().padStart(2, '0') });
+  return t('pilot.tournament.minutes', { m: String(Math.max(1, m + (s > 0 ? 1 : 0))) });
 }
 
 export default function TournamentScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { tournamentId } = useLocalSearchParams<{ tournamentId: string }>();
 
   const [info, setInfo] = useState<TournamentInfo | null>(null);
   const [entries, setEntries] = useState<TournamentEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [countdown, setCountdown] = useState('');
+  const [myId, setMyId] = useState<string | null>(null);
 
   useEffect(() => {
     load();
+    // Ma ligne du classement est surlignée en jaune
+    AsyncStorage.getItem('duelo_user_id').then(setMyId).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -93,56 +97,51 @@ export default function TournamentScreen() {
     router.push(`/matchmaking?category=${info.theme_id}&themeName=${encodeURIComponent(info.theme_name)}`);
   };
 
-  const RANK_GRADIENTS: [string, string][] = [['#FFB547', '#FFA500'], ['#C0C0C0', '#8A8A8A'], ['#CD7F32', '#8B4513']];
+  const maxGames = info?.max_games || 3;
+
+  const RankMark = ({ rank }: { rank: number }) => (
+    <View style={[st.rankBadge, rank === 1 && st.rankFirst]}>
+      {rank === 1 ? <Icon name="trophy" size={ICON_SIZE.sm} color={COLOR.reward.gold} />
+        : rank <= 3 ? <Icon name="medal" size={ICON_SIZE.sm} color={COLOR.text.secondary} />
+        : <Txt variant="label" color={COLOR.text.secondary}>{rank}</Txt>}
+    </View>
+  );
 
   const renderEntry = ({ item, index }: { item: TournamentEntry; index: number }) => {
-    const isTop3 = item.rank <= 3;
+    const isMe = !!myId && item.user_id === myId;
     return (
       <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 60).duration(400)}>
-        <TouchableOpacity
-          style={[st.entry, isTop3 && st.entryTop]}
-          onPress={() => router.push(`/player-profile?id=${item.user_id}`)}
-          activeOpacity={0.8}
-        >
-          {isTop3 ? (
-            <LinearGradient colors={RANK_GRADIENTS[item.rank - 1]} style={st.rankBadge}>
-              <MaterialCommunityIcons name={item.rank === 1 ? 'trophy' : 'medal'} size={16} color="#FFF" />
-            </LinearGradient>
-          ) : (
-            <View style={st.rankBadge}><Text style={st.rankText}>{item.rank}</Text></View>
+        <ListRow
+          leading={(
+            <View style={st.leading}>
+              <RankMark rank={item.rank} />
+              <UserAvatar avatarUrl={item.avatar_url} avatarSeed={item.avatar_seed} pseudo={item.pseudo} size={36} />
+            </View>
           )}
-          <UserAvatar avatarUrl={item.avatar_url} avatarSeed={item.avatar_seed} pseudo={item.pseudo} size={36} />
-          <View style={st.entryInfo}>
-            <Text style={st.entryPseudo}>{item.pseudo}</Text>
-            <Text style={st.entryGames}>{item.games_played}/{3} {t('tournament.games')}</Text>
-          </View>
-          <View style={st.scoreBox}>
-            <Text style={st.scoreVal}>{item.score}</Text>
-            <Text style={st.scoreLabel}>pts</Text>
-          </View>
-        </TouchableOpacity>
+          title={item.pseudo}
+          subtitle={t('pilot.tournament.duels', { n: String(item.games_played), max: String(maxGames) })}
+          trailing={(
+            <View style={st.score}>
+              <Txt variant="cardTitle" color={isMe ? COLOR.action.primary : COLOR.reward.gold}>{item.score.toLocaleString()}</Txt>
+              <Txt variant="caption">{t('pilot.tournament.pts')}</Txt>
+            </View>
+          )}
+          onPress={() => router.push(`/player-profile?id=${item.user_id}`)}
+          style={[st.row, isMe && st.rowMe]}
+        />
       </Animated.View>
     );
   };
 
   return (
     <SwipeBackPage>
-      <View style={[st.container, { paddingTop: insets.top }]}>
-        <DueloHeader />
-        <TouchableOpacity style={st.backBtn} onPress={() => router.back()}>
-          <LinearGradient colors={['rgba(255,255,255,0.10)', 'rgba(255,255,255,0.04)']} style={st.backCircle}>
-            <MaterialCommunityIcons name="chevron-left" size={22} color="#A3A3A3" />
-          </LinearGradient>
-        </TouchableOpacity>
+      <ScreenContainer>
+        <ScreenHeader title={t('pilot.play.tournament')} />
 
         {loading ? (
-          <View style={st.center}><ActivityIndicator size="large" color="#FFB547" /></View>
+          <Loader fill />
         ) : !info ? (
-          <View style={st.center}>
-            <MaterialCommunityIcons name="trophy-outline" size={56} color="#525252" />
-            <Text style={st.noTournamentText}>{t('tournament.no_active')}</Text>
-            <Text style={st.noTournamentSub}>{t('tournament.weekend_hint')}</Text>
-          </View>
+          <EmptyState icon="trophy" title={t('tournament.no_active')} message={t('tournament.weekend_hint')} />
         ) : (
           <FlatList
             data={entries}
@@ -151,130 +150,79 @@ export default function TournamentScreen() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={st.listContent}
             ListHeaderComponent={() => (
-              <>
-                {/* Tournament Header Card */}
-                <LinearGradient
-                  colors={['rgba(255,215,0,0.15)', 'rgba(255,159,10,0.05)']}
-                  style={st.headerCard}
-                >
-                  <View style={st.headerTop}>
-                    <View style={st.trophyCircle}>
-                      <MaterialCommunityIcons name="trophy" size={32} color="#FFB547" />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={st.tourneyLabel}>{t('tournament.weekend_title')}</Text>
-                      <Text style={st.themeName}>{info.theme_name}</Text>
-                    </View>
-                    <View style={st.countdownBox}>
-                      <MaterialCommunityIcons name="clock-outline" size={13} color="#FFB547" />
-                      <Text style={st.countdownText}>{countdown}</Text>
+              <View style={st.header}>
+                <Card accent="reward" style={st.hero}>
+                  <View style={st.heroTop}>
+                    <ThemeIcon themeId={info.theme_id} themeName={info.theme_name} size={56} />
+                    <View style={st.flex}>
+                      <Txt variant="overline" color={COLOR.reward.gold}>{t('pilot.play.tournament')}</Txt>
+                      <Txt variant="h2" numberOfLines={2}>{info.theme_name}</Txt>
                     </View>
                   </View>
 
-                  {/* User stats row */}
-                  <View style={st.statsRow}>
-                    <View style={st.statItem}>
-                      <Text style={[st.statVal, { color: '#00E5FF' }]}>{info.rank ?? '—'}</Text>
-                      <Text style={st.statLabel}>{t('tournament.rank')}</Text>
-                    </View>
-                    <View style={st.statDivider} />
-                    <View style={st.statItem}>
-                      <Text style={[st.statVal, { color: '#FFB547' }]}>{info.score}</Text>
-                      <Text style={st.statLabel}>{t('tournament.score')}</Text>
-                    </View>
-                    <View style={st.statDivider} />
-                    <View style={st.statItem}>
-                      <Text style={[st.statVal, info.games_remaining === 0 && { color: '#525252' }]}>{info.games_remaining}</Text>
-                      <Text style={st.statLabel}>{t('tournament.remaining')}</Text>
-                    </View>
-                    <View style={st.statDivider} />
-                    <View style={st.statItem}>
-                      <Text style={st.statVal}>{info.total_players}</Text>
-                      <Text style={st.statLabel}>{t('tournament.players')}</Text>
+                  <View style={st.metaRow}>
+                    <Badge label={t('pilot.tournament.live')} tone="warm" />
+                    <View style={st.countdown}>
+                      <Icon name="clock" size={ICON_SIZE.sm} color={COLOR.text.secondary} />
+                      <Txt variant="label" color={COLOR.text.secondary} numberOfLines={1}>
+                        {t('pilot.tournament.ends_in', { t: countdown })}
+                      </Txt>
                     </View>
                   </View>
 
-                  {/* Play button */}
+                  {/* Mes stats : rang en jaune (moi), score en or (récompense) */}
+                  <View style={st.stats}>
+                    <StatCard appearance="plain" tone="action" value={info.rank ?? '—'} label={t('pilot.tournament.your_rank')} style={st.stat} />
+                    <StatCard appearance="plain" tone="reward" value={info.score.toLocaleString()} label={t('pilot.tournament.score')} style={st.stat} />
+                    <StatCard appearance="plain" value={info.games_remaining} label={t('pilot.tournament.remaining')} style={st.stat} />
+                    <StatCard appearance="plain" value={info.total_players.toLocaleString()} label={t('pilot.tournament.players')} style={st.stat} />
+                  </View>
+
                   {info.games_remaining > 0 ? (
-                    <TouchableOpacity style={st.playBtn} onPress={handlePlay} activeOpacity={0.8}>
-                      <LinearGradient colors={['#FFB547', '#FF9F0A']} style={st.playGrad}>
-                        <MaterialCommunityIcons name="play" size={18} color="#000" />
-                        <Text style={st.playText}>{t('tournament.play_now')} ({info.games_remaining} {t('tournament.left')})</Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
+                    <Button label={t('pilot.tournament.play')} icon="duel" size="lg" fullWidth haptic={false} onPress={handlePlay} />
                   ) : (
-                    <View style={st.doneRow}>
-                      <MaterialCommunityIcons name="check-circle" size={16} color="#00FF9D" />
-                      <Text style={st.doneText}>{t('tournament.done')}</Text>
+                    <View style={st.done}>
+                      <Icon name="success" size={ICON_SIZE.sm} color={COLOR.status.success} />
+                      <Txt variant="label" color={COLOR.status.success} style={st.flexShrink}>{t('pilot.tournament.done')}</Txt>
                     </View>
                   )}
-                </LinearGradient>
+                </Card>
 
-                <Text style={st.lbTitle}>{t('tournament.leaderboard')}</Text>
-              </>
+                <Txt variant="overline" style={st.lbTitle}>{t('tournament.leaderboard')}</Txt>
+              </View>
             )}
           />
         )}
-      </View>
+      </ScreenContainer>
     </SwipeBackPage>
   );
 }
 
 const st = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#050510' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 12 },
-  backBtn: { paddingHorizontal: 16, paddingVertical: 10 },
-  backCircle: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
-
-  noTournamentText: { color: '#FFF', fontSize: 18, fontWeight: '700' },
-  noTournamentSub: { color: '#525252', fontSize: 13 },
-
-  listContent: { paddingBottom: 40 },
-
-  headerCard: {
-    marginHorizontal: 16, marginBottom: 20, borderRadius: 20,
-    borderWidth: 1, borderColor: 'rgba(255,215,0,0.25)', padding: 18,
+  flex: { flex: 1, gap: SPACE.xxs },
+  flexShrink: { flexShrink: 1 },
+  listContent: { paddingBottom: SPACE.huge },
+  header: { paddingHorizontal: SPACE.screenX, paddingTop: SPACE.lg, gap: SPACE.lg },
+  hero: { gap: SPACE.lg },
+  heroTop: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md },
+  metaRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: SPACE.md },
+  countdown: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs, flexShrink: 1 },
+  stats: {
+    flexDirection: 'row', flexWrap: 'wrap', rowGap: SPACE.md,
+    paddingTop: SPACE.md, borderTopWidth: BORDER.hair, borderTopColor: COLOR.border.subtle,
   },
-  headerTop: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 16 },
-  trophyCircle: {
-    width: 52, height: 52, borderRadius: 16,
-    backgroundColor: 'rgba(255,215,0,0.15)', justifyContent: 'center', alignItems: 'center',
-  },
-  tourneyLabel: { fontSize: 9, color: '#FFB547', fontFamily: 'JetBrainsMono_700Bold', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 3 },
-  themeName: { fontSize: 22, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.8, color: '#FFF' },
-  countdownBox: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(0,0,0,0.4)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10 },
-  countdownText: { color: '#FFB547', fontSize: 13, fontWeight: '800', fontFamily: 'SpaceGrotesk_700Bold' },
-
-  statsRow: { flexDirection: 'row', marginBottom: 16 },
-  statItem: { flex: 1, alignItems: 'center' },
-  statVal: { fontSize: 22, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: -0.5, color: '#FFF' },
-  statLabel: { fontSize: 8, color: 'rgba(255,255,255,0.40)', fontFamily: 'JetBrainsMono_400Regular', letterSpacing: 1, textTransform: 'uppercase', marginTop: 2 },
-  statDivider: { width: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginVertical: 4 },
-
-  playBtn: { borderRadius: 14, overflow: 'hidden' },
-  playGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14 },
-  playText: { fontSize: 14, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold', letterSpacing: 0.5, textTransform: 'uppercase', color: '#000' },
-  doneRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10 },
-  doneText: { color: '#00FF9D', fontSize: 14, fontWeight: '700' },
-
-  lbTitle: { fontSize: 11, fontFamily: 'JetBrainsMono_700Bold', color: 'rgba(255,255,255,0.40)', letterSpacing: 2, textTransform: 'uppercase', paddingHorizontal: 20, marginBottom: 8 },
-
-  entry: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    paddingHorizontal: 16, paddingVertical: 12,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.04)',
-  },
-  entryTop: { backgroundColor: 'rgba(255,215,0,0.04)' },
+  // 4 chiffres en 2 × 2 : en ligne, les grands nombres et « Duels restants » sont à l'étroit
+  stat: { flexGrow: 1, flexBasis: '45%', alignItems: 'center' },
+  done: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.sm, minHeight: 44 },
+  lbTitle: { marginBottom: SPACE.xs },
+  row: { paddingHorizontal: SPACE.screenX, borderBottomWidth: BORDER.hair, borderBottomColor: COLOR.border.subtle },
+  rowMe: { backgroundColor: COLOR.action.selectedFill, borderLeftWidth: BORDER.selected, borderLeftColor: COLOR.action.primary },
+  leading: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md },
   rankBadge: {
-    width: 32, height: 32, borderRadius: 10,
-    justifyContent: 'center', alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    width: 32, height: 32, borderRadius: RADII.sm,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: COLOR.surface.subtle,
   },
-  rankText: { color: '#A3A3A3', fontSize: 13, fontWeight: '800' },
-  entryInfo: { flex: 1 },
-  entryPseudo: { color: '#FFF', fontSize: 14, fontWeight: '700', fontFamily: 'SpaceGrotesk_600SemiBold' },
-  entryGames: { color: 'rgba(255,255,255,0.35)', fontSize: 9, fontFamily: 'JetBrainsMono_400Regular', marginTop: 2 },
-  scoreBox: { alignItems: 'flex-end' },
-  scoreVal: { color: '#FFB547', fontSize: 18, fontWeight: '900', fontFamily: 'SpaceGrotesk_700Bold' },
-  scoreLabel: { color: '#525252', fontSize: 10, fontWeight: '600' },
+  rankFirst: { backgroundColor: COLOR.tint.gold },
+  score: { alignItems: 'flex-end' },
 });
