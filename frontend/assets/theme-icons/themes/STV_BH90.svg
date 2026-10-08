@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Beverly Hills, 90210">
+  <circle cx="196" cy="188" r="30" fill="#FFDB3D"/>
+  <path d="M118 226C126 184 124 148 128 112H142C142 150 146 190 154 226Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M126 150H144M124 188H148" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round">
+    <path d="M134 104Q170 60 214 98Q170 90 134 104Z" transform="rotate(-125 134 104)"/>
+    <path d="M134 104Q170 60 214 98Q170 90 134 104Z" transform="rotate(-55 134 104)"/>
+    <path d="M134 104Q170 60 214 98Q170 90 134 104Z" transform="rotate(5 134 104)"/>
+    <path d="M134 104Q170 60 214 98Q170 90 134 104Z" transform="rotate(180 134 104)"/>
+    <path d="M134 104Q170 60 214 98Q170 90 134 104Z" transform="rotate(50 134 104)"/>
+  </g>
+  <circle cx="124" cy="120" r="10" fill="#FF6B5B"/>
+  <circle cx="146" cy="122" r="10" fill="#FF6B5B"/>
+  <path d="M80 92L94 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Atlanta">
+  <path d="M130 66C80 50 34 98 54 152C68 194 108 224 130 218C152 224 190 194 204 152C222 98 178 50 130 66Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M134 66C142 36 176 28 202 38C198 66 168 84 134 66Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 84C112 130 116 176 136 204" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M130 66L124 48" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M74 126Q78 104 98 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

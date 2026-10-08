@@ -14,8 +14,9 @@ Reprise : relancer la même commande — les thèmes qui ont déjà leur SVG son
 Pour chaque lot de 10 thèmes d'un même cluster, le script :
   1. lance `claude -p` (mode dontAsk : seuls Read / Write / Edit / Glob / Grep et les deux scripts
      python d'icônes sont autorisés) avec le brief, la liste des thèmes et les symboles déjà pris ;
-  2. vérifie le lot (`build-theme-icons.py --check`) ; une icône en erreur est déplacée dans
-     assets/theme-icons/rejets/ et sera retentée au prochain passage ;
+  2. vérifie le lot (`build-theme-icons.py --check`) ; en cas d'erreur OU si la session n'a pas fait
+     sa planche de relecture, relance UNE session de réparation (erreurs exactes + planche à relire) ;
+     une icône encore en erreur est déplacée dans assets/theme-icons/rejets/ (retentée au passage suivant) ;
   3. note le résultat dans docs/design/icones/journal.csv.
 Si Claude signale une limite d'utilisation, le pilote attend puis reprend le même lot.
 À la fin : génération du module TS et planche globale docs/design/icones/catalogue.html.
@@ -46,8 +47,11 @@ CLAUDE = shutil.which("claude") or "claude"
 
 ALLOWED_TOOLS = [
     "Read", "Write", "Edit", "Glob", "Grep",
-    "Bash(python scripts/build-theme-icons.py --check)",
+    # préfixes : une session qui ajoute un argument ou une redirection n'est pas refusée
+    "Bash(python scripts/build-theme-icons.py --check:*)",
     "Bash(python scripts/theme-icons-preview.py:*)",
+    "Bash(python3 scripts/build-theme-icons.py --check:*)",
+    "Bash(python3 scripts/theme-icons-preview.py:*)",
 ]
 LIMIT_PATTERNS = re.compile(r"usage limit|rate limit|limit reached|quota|overloaded|429|529", re.I)
 
@@ -164,59 +168,99 @@ def journal(row):
         w.writerow(row)
 
 
+def call_claude(prompt, log_name, args):
+    """Lance une session claude -p. Renvoie (code, sortie) ; code None = délai dépassé."""
+    cmd = [CLAUDE, "-p", "--permission-mode", "dontAsk", "--output-format", "json",
+           "--allowedTools", *ALLOWED_TOOLS, "--disallowedTools", "PowerShell"]
+    if args.model:
+        cmd += ["--model", args.model]
+    try:
+        r = subprocess.run(cmd, input=prompt, cwd=ROOT, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", timeout=args.timeout * 60)
+        code, out = r.returncode, r.stdout + r.stderr
+    except subprocess.TimeoutExpired:
+        code, out = None, "TIMEOUT"
+    os.makedirs(SESSIONS_DIR, exist_ok=True)
+    with open(os.path.join(SESSIONS_DIR, f"{log_name}.txt"), "w", encoding="utf-8") as fh:
+        fh.write(out)
+    return code, out
+
+
+def wait_limit(lot_name, args):
+    log(f"⏸ limite d'utilisation détectée ({lot_name}) — attente {args.pause} min puis reprise")
+    for _ in range(args.pause * 6):
+        if os.path.exists(STOP_FILE):
+            return False
+        time.sleep(10)
+    return True
+
+
+def repair_prompt(lot, lot_name, ko, planche):
+    lines = chr(10).join(f"- {i} ({next(t['name'] for t in lot if t['id'] == i)}) : {'; '.join(e)}" for i, e in ko.items())
+    ids = ",".join(t["id"] for t in lot)
+    return f"""Tu reprends un lot d'icônes SVG SKILKI (dossier courant : frontend/). Lis d'abord ../docs/design/icones/BRIEF.md.
+
+Le contrôle automatique a trouvé ces problèmes dans le lot {lot_name} :
+{lines or '(aucune erreur bloquante)'}
+
+Rappels fréquents : 2 à 4 couleurs par icône (le crème #E8F1EC compte comme une couleur) ; ≤ 18 formes ; pas de text/clipPath/mask ;
+`&` doit être écrit `&amp;` dans aria-label.
+
+1. Corrige chaque SVG fautif (assets/theme-icons/themes/<ID>.svg) ; un SVG « absent » est à dessiner (voir le thème dans scripts/theme-catalogue.json).
+2. Avec l'outil Bash (jamais PowerShell) : `python scripts/build-theme-icons.py --check` jusqu'à ce que tes fichiers passent.
+3. `python scripts/theme-icons-preview.py --ids {ids} --out {os.path.relpath(planche, ROOT).replace(os.sep, '/')}` puis Read du PNG :
+   relis CHAQUE icône du lot (reconnaissable ? lisible à 32 px ? silhouette sur fond nuit ?) et corrige les faibles.
+Ne modifie aucun autre fichier. Termine par : FIN {lot_name}.
+"""
+
+
 def run_lot(lot, lot_name, by_id, args):
-    attempts = 0
+    waits = 0
+    t0 = time.time()
+    planche = os.path.join(LOTS_DIR, lot_name)
+    phase, notes = "creation", []
     while True:
         if os.path.exists(STOP_FILE):
             return "stop"
-        prompt = build_prompt(lot, lot_name, by_id, registre())
-        cmd = [CLAUDE, "-p", "--permission-mode", "dontAsk", "--output-format", "json",
-               "--allowedTools", *ALLOWED_TOOLS, "--disallowedTools", "PowerShell"]
-        if args.model:
-            cmd += ["--model", args.model]
-        t0 = time.time()
-        log(f"▶ {lot_name} ({len(lot)} thèmes : {', '.join(t['name'] for t in lot)})")
-        try:
-            r = subprocess.run(cmd, input=prompt, cwd=ROOT, capture_output=True, text=True,
-                               encoding="utf-8", errors="replace", timeout=args.timeout * 60)
-            out = r.stdout + r.stderr
-        except subprocess.TimeoutExpired:
-            out, r = "TIMEOUT", None
-        duree = int(time.time() - t0)
-        os.makedirs(SESSIONS_DIR, exist_ok=True)
-        with open(os.path.join(SESSIONS_DIR, f"{lot_name}.txt"), "w", encoding="utf-8") as fh:
-            fh.write(out)
-        if r is not None and r.returncode != 0 and LIMIT_PATTERNS.search(out):
-            attempts += 1
-            log(f"⏸ limite d'utilisation détectée ({lot_name}) — attente {args.pause} min puis reprise")
-            journal([dt.datetime.now().isoformat(timespec="seconds"), lot_name, lot[0]["universe"], lot[0]["cluster"],
-                     len(lot), 0, 0, duree, "limite d'utilisation, attente"])
-            for _ in range(args.pause * 6):
-                if os.path.exists(STOP_FILE):
-                    return "stop"
-                time.sleep(10)
-            if attempts > args.max_attente:
+        if phase == "creation":
+            log(f"▶ {lot_name} ({len(lot)} thèmes : {', '.join(t['name'] for t in lot)})")
+            code, out = call_claude(build_prompt(lot, lot_name, by_id, registre()), lot_name, args)
+        else:
+            log(f"↻ {lot_name} : passe de réparation ({len(ko)} erreur(s){', relecture manquante' if not reviewed else ''})")
+            code, out = call_claude(repair_prompt(lot, lot_name, ko, planche), lot_name + ".reparation", args)
+        if code not in (0, None) and LIMIT_PATTERNS.search(out):
+            waits += 1
+            if waits > args.max_attente or not wait_limit(lot_name, args):
                 return "limite"
             continue
+        if code is None:
+            notes.append(f"délai dépassé ({phase})")
         ok, ko = check_lot(lot)
-        os.makedirs(REJETS_DIR, exist_ok=True)
-        for i in ko:
-            p = os.path.join(THEMES_DIR, i + ".svg")
-            if os.path.exists(p):
-                shutil.move(p, os.path.join(REJETS_DIR, f"{i}.{dt.datetime.now():%Y%m%d%H%M%S}.svg"))
-        detail = " | ".join(f"{i}: {', '.join(e)}" for i, e in ko.items())[:500]
-        planche = os.path.join(LOTS_DIR, lot_name)
-        if not os.path.exists(planche + ".png") and ok:
-            # La session n'a pas fait sa relecture : planche générée ici pour la relecture humaine
-            subprocess.run([sys.executable, "scripts/theme-icons-preview.py", "--ids", ",".join(ok), "--out", planche],
-                           cwd=ROOT, capture_output=True)
-            detail = ("SANS RELECTURE (planche absente) " + detail).strip()
-        if r is None:
-            detail = "session interrompue (délai dépassé) " + detail
-        journal([dt.datetime.now().isoformat(timespec="seconds"), lot_name, lot[0]["universe"], lot[0]["cluster"],
-                 len(lot), len(ok), len(ko), duree, detail])
-        log(f"{'✓' if not ko else '⚠'} {lot_name} : {len(ok)}/{len(lot)} conformes, {len(ko)} rejet(s) — {duree} s")
-        return "ok"
+        reviewed = os.path.exists(planche + ".png")
+        if phase == "creation" and (ko or not reviewed) and args.reparation:
+            if not reviewed and ok:
+                notes.append("relecture absente à la création")
+            phase = "reparation"
+            # planche des icônes valides, pour que la session de réparation les relise aussi
+            subprocess.run([sys.executable, "scripts/theme-icons-preview.py", "--ids", ",".join(t["id"] for t in lot),
+                            "--out", planche], cwd=ROOT, capture_output=True)
+            continue
+        break
+
+    os.makedirs(REJETS_DIR, exist_ok=True)
+    for i in ko:
+        p = os.path.join(THEMES_DIR, i + ".svg")
+        if os.path.exists(p):
+            shutil.move(p, os.path.join(REJETS_DIR, f"{i}.{dt.datetime.now():%Y%m%d%H%M%S}.svg"))
+    if ok:
+        subprocess.run([sys.executable, "scripts/theme-icons-preview.py", "--ids", ",".join(ok), "--out", planche],
+                       cwd=ROOT, capture_output=True)
+    duree = int(time.time() - t0)
+    detail = "; ".join(notes + [f"{i}: {', '.join(e)}" for i, e in ko.items()])[:500]
+    journal([dt.datetime.now().isoformat(timespec="seconds"), lot_name, lot[0]["universe"], lot[0]["cluster"],
+             len(lot), len(ok), len(ko), duree, detail])
+    log(f"{'✓' if not ko else '⚠'} {lot_name} : {len(ok)}/{len(lot)} conformes, {len(ko)} rejet(s) — {duree} s")
+    return "ok"
 
 
 def finish():
@@ -239,6 +283,8 @@ def main():
     ap.add_argument("--timeout", type=int, default=40, help="minutes max par session (défaut 40)")
     ap.add_argument("--pause", type=int, default=20, help="minutes d'attente sur limite d'utilisation (défaut 20)")
     ap.add_argument("--max-attente", type=int, default=12, help="nombre max d'attentes successives (défaut 12)")
+    ap.add_argument("--sans-reparation", dest="reparation", action="store_false",
+                    help="ne pas lancer de passe de réparation après une session fautive")
     ap.add_argument("--dry-run", action="store_true", help="afficher les lots sans rien lancer")
     args = ap.parse_args()
 
@@ -251,7 +297,8 @@ def main():
         lots = lots[: args.max_lots]
     names = []
     for lot in lots:
-        base = f"{lot[0]['universe'].lower()}-{slug(lot[0]['cluster'])}-{lot[0]['id'].lower()}"
+        # horodaté : un lot repris plus tard ne réécrit ni la planche ni le registre du précédent
+        base = f"{lot[0]['universe'].lower()}-{slug(lot[0]['cluster'])}-{lot[0]['id'].lower()}-{dt.datetime.now():%m%d%H%M}"
         names.append(base)
     total = sum(len(l) for l in lots)
     log(f"{total} icônes à produire en {len(lots)} sessions de {args.taille} max "

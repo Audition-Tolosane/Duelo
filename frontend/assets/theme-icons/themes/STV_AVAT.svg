@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Avatar: The Last Airbender">
+  <circle cx="128" cy="128" r="84" fill="#12606D"/>
+  <polygon points="128,60 174,114 146,114 146,160 110,160 110,114 82,114" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polyline points="102,194 128,176 154,194" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M70 104A62 62 0 0 1 96 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

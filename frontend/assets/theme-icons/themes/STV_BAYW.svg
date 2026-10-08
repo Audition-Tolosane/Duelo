@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Baywatch">
+  <circle cx="128" cy="128" r="88" fill="#FF6B5B"/>
+  <rect x="108" y="48" width="40" height="46" rx="6" fill="#E8F1EC"/>
+  <rect x="108" y="162" width="40" height="46" rx="6" fill="#E8F1EC"/>
+  <g transform="rotate(90 128 128)"><rect x="108" y="48" width="40" height="46" rx="6" fill="#E8F1EC"/><rect x="108" y="162" width="40" height="46" rx="6" fill="#E8F1EC"/></g>
+  <circle cx="128" cy="128" r="38" fill="#0B3D4A" stroke="#FFDB3D" stroke-width="6"/>
+  <path d="M78 98L92 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,12 @@
+[
+  {"id": "STV_13RW", "symbole": "cassette audio"},
+  {"id": "STV_24HR", "symbole": "chronomètre"},
+  {"id": "STV_ALCH", "symbole": "lanterne à flamme d'âme"},
+  {"id": "STV_AIBL", "symbole": "cartes à jouer, cœur"},
+  {"id": "STV_AUAD", "symbole": "main de zombie sortant du sol"},
+  {"id": "STV_AMHS", "symbole": "maison hantée"},
+  {"id": "STV_ARRE", "symbole": "banane"},
+  {"id": "STV_ATLA", "symbole": "pêche de Géorgie"},
+  {"id": "STV_AVAT", "symbole": "flèche d'Aang dans un disque"},
+  {"id": "STV_BATE", "symbole": "porte-clé de chambre de motel"}
+]
