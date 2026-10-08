@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Prince">
+  <path d="M128 128C142 94 168 70 206 62C200 96 182 122 156 136Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M52 134C74 116 104 116 132 128C160 140 188 140 212 120C206 152 176 174 136 174C102 174 76 160 60 148Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="68" cy="124" r="24" fill="#12606D"/>
+  <polygon points="48,118 32,128 48,134" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M98 130C92 94 108 62 148 44C154 76 156 104 146 132Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="70" cy="118" r="6" fill="#E8F1EC"/>
+  <path d="M88 196L82 214M132 194L126 212M176 190L170 208" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M110 108C110 90 118 74 132 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

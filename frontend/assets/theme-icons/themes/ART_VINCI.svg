@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Léonard de Vinci">
+  <circle cx="128" cy="126" r="90" fill="#12606D"/>
+  <rect x="64" y="80" width="128" height="128" rx="4" stroke="#FFDB3D" stroke-width="10" fill="none"/>
+  <circle cx="128" cy="92" r="14" fill="#FF6B5B"/>
+  <path d="M128 112V160M76 128H180M84 92L128 120L172 92M128 160L128 206M128 160L94 200M128 160L162 200" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 104A76 76 0 0 1 80 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

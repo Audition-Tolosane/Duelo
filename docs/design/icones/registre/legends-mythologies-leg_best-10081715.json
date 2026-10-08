@@ -1,0 +1,12 @@
+[
+  {"id": "LEG_BEST", "symbole": "hydre à trois têtes"},
+  {"id": "LEG_VATI", "symbole": "clés de saint Pierre croisées"},
+  {"id": "LEG_EGLI", "symbole": "mitre d'évêque et crosse"},
+  {"id": "LEG_ATLA", "symbole": "arche engloutie sous la vague"},
+  {"id": "LEG_JAPA", "symbole": "masque de kitsune"},
+  {"id": "LEG_JESU", "symbole": "poisson et pain rond"},
+  {"id": "LEG_PELE", "symbole": "coquille Saint-Jacques"},
+  {"id": "LEG_AMER", "symbole": "attrape-rêves à plumes"},
+  {"id": "LEG_POLY", "symbole": "statue tiki à couronne de flammes"},
+  {"id": "LEG_MAYA", "symbole": "pyramide maya à degrés"}
+]

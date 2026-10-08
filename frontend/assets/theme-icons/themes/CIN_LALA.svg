@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="La La Land">
+  <polygon points="64,56 69,67 80,72 69,77 64,88 59,77 48,72 59,67" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="200,92 204,101 213,105 204,109 200,118 196,109 187,105 196,101" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="190" cy="54" r="8" fill="#FF6B5B"/>
+  <path d="M136 150Q176 146 178 112" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="118" y="100" width="20" height="108" rx="6" fill="#12606D"/>
+  <rect x="96" y="198" width="64" height="24" rx="10" fill="#12606D"/>
+  <polygon points="106,70 150,70 142,108 114,108" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="98,66 128,42 158,66" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="108" y="108" width="40" height="12" rx="6" fill="#12606D"/>
+  <path d="M116 78L118 96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

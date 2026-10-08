@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Renaissance Italienne">
+  <rect x="44" y="190" width="168" height="26" rx="8" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="68" y="150" width="120" height="44" rx="0" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="96" cy="172" r="9" fill="#FFDB3D"/>
+  <circle cx="128" cy="172" r="9" fill="#FFDB3D"/>
+  <circle cx="160" cy="172" r="9" fill="#FFDB3D"/>
+  <path d="M72 148Q72 84 128 66Q184 84 184 148Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 76V146M104 146Q104 102 124 78M152 146Q152 102 132 78" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="116" y="46" width="24" height="22" rx="4" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="36" r="7" fill="#FFDB3D"/>
+  <path d="M88 128Q90 108 100 94" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

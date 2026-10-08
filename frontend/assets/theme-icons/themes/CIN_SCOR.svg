@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Les Films de Scorsese">
+  <path d="M40 212C48 176 80 164 128 164C176 164 208 176 216 212Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M70 196Q128 180 186 196" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <polygon points="78,152 178,152 164,82 92,82" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="80,136 176,136 178,152 78,152" fill="#E8F1EC"/>
+  <rect x="84" y="136" width="14" height="14" fill="#0B3D4A"/><rect x="112" y="136" width="14" height="14" fill="#0B3D4A"/><rect x="140" y="136" width="14" height="14" fill="#0B3D4A"/><rect x="168" y="136" width="14" height="14" fill="#0B3D4A"/>
+  <path d="M116 108H140" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M58 70L44 58M198 70L212 58M128 54V38" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M100 96L96 118" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Stefan Zweig">
+  <rect x="56" y="196" width="112" height="22" rx="11" fill="#12606D"/>
+  <rect x="68" y="176" width="88" height="22" rx="9" fill="#12606D"/>
+  <path d="M84 176L92 114H132L140 176Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="76" y="100" width="72" height="16" rx="8" fill="#12606D"/>
+  <path d="M84 100C84 76 96 64 112 64C128 64 140 76 140 100Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M112 32V58M100 44H124" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="160" y="136" width="60" height="44" rx="6" fill="#FF6B5B"/>
+  <path d="M166 142L190 160L214 142" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M96 86Q100 74 110 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

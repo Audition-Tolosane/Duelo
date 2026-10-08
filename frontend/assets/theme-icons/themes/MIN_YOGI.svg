@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Yogi l'Ours">
+  <path d="M76 116C76 46 180 46 180 116" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M50 118C66 96 96 104 126 98C156 92 186 100 206 118Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="94" y="100" width="18" height="14" rx="4" fill="#E8F1EC"/>
+  <rect x="148" y="98" width="18" height="16" rx="4" fill="#E8F1EC"/>
+  <path d="M48 132H208L194 206C193 212 188 214 182 214H74C68 214 63 212 62 206Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="36" y="112" width="184" height="24" rx="12" fill="#12606D"/>
+  <path d="M68 164H188M74 192H182" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M108 148V206M148 148V206" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M56 152L60 176" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

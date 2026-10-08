@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Salsa &amp; Danses Latines">
+  <path d="M50 104H122L112 202H60Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M134 92H210L198 202H146Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="86" cy="104" rx="38" ry="12" fill="#FFDB3D"/>
+  <ellipse cx="172" cy="92" rx="40" ry="13" fill="#FFDB3D"/>
+  <rect x="114" y="136" width="28" height="24" rx="6" fill="#FF6B5B"/>
+  <path d="M58 182H114M144 182H200" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M66 64C76 52 92 48 104 52M150 50C162 38 178 34 192 38" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M64 126L62 150" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

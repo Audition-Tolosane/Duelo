@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Shutter Island">
+  <path d="M96 66L48 54M160 66L208 54" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M36 214C44 192 70 184 96 188H160C186 184 212 192 220 214Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="108,88 148,88 158,192 98,192" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="104" y="126" width="48" height="18" fill="#0B3D4A"/>
+  <rect x="118" y="160" width="20" height="30" rx="10" fill="#0B3D4A"/>
+  <rect x="94" y="80" width="68" height="14" rx="7" fill="#12606D"/>
+  <rect x="108" y="50" width="40" height="32" rx="6" fill="#FFDB3D"/>
+  <rect x="124" y="54" width="8" height="24" rx="4" fill="#0B3D4A"/>
+  <polygon points="102,48 128,30 154,48" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M114 104L112 118" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

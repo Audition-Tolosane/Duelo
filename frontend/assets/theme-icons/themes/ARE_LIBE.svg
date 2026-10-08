@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Copa Libertadores">
+  <path d="M80 52H176V100C176 130 154 148 128 148C102 148 80 130 80 100Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M80 70C42 70 42 120 86 124M176 70C214 70 214 120 170 124" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M90 90H166" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="118" y="148" width="20" height="36" rx="6" fill="#12606D"/>
+  <rect x="84" y="182" width="88" height="30" rx="10" fill="#FF6B5B"/>
+  <path d="M98 64V76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

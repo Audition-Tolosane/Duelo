@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Gomorra">
+  <circle cx="186" cy="70" r="26" fill="#FFDB3D"/>
+  <path d="M46 210L112 44Q117 36 122 44L134 66H148V94H164V122H180V150H196V178H212V210Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M104 104H140M94 132H158M82 160H174M72 188H190" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="116" y="124" width="16" height="16" rx="4" fill="#FFDB3D"/>
+  <rect x="140" y="180" width="16" height="16" rx="4" fill="#FFDB3D"/>
+  <rect x="32" y="204" width="192" height="16" rx="8" fill="#12606D"/>
+  <path d="M112 64L106 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

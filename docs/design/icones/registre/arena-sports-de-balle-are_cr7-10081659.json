@@ -1,0 +1,12 @@
+[
+  {"id": "ARE_CR7", "symbole": "soulier d'or à crampons"},
+  {"id": "ARE_BARC", "symbole": "maillot rayé blaugrana"},
+  {"id": "ARE_USFT", "symbole": "casque de football américain"},
+  {"id": "ARE_FOOT", "symbole": "ballon de football pentagonal"},
+  {"id": "ARE_FOSA", "symbole": "grosse caisse et baguettes"},
+  {"id": "ARE_GOLF", "symbole": "drapeau de trou sur green"},
+  {"id": "ARE_HAND", "symbole": "cage de handball et filet"},
+  {"id": "ARE_HOCK", "symbole": "crosse de hockey et balle"},
+  {"id": "ARE_HGLA", "symbole": "palet de hockey sur glace"},
+  {"id": "ARE_INTM", "symbole": "écharpe rayée et étoile"}
+]

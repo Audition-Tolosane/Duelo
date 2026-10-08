@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Moi, Moche et Méchant">
+  <rect x="34" y="92" width="188" height="72" rx="36" fill="#FFDB3D"/>
+  <rect x="40" y="120" width="176" height="16" rx="8" fill="#0B3D4A"/>
+  <circle cx="128" cy="128" r="62" fill="#12606D"/>
+  <circle cx="128" cy="128" r="46" fill="#E8F1EC"/>
+  <circle cx="128" cy="128" r="34" fill="#0B3D4A"/>
+  <circle cx="128" cy="76" r="6" fill="#0B3D4A"/>
+  <circle cx="128" cy="180" r="6" fill="#0B3D4A"/>
+  <path d="M106 120A24 24 0 0 1 120 106" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

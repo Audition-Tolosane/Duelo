@@ -1,0 +1,11 @@
+[
+  {"id": "GLO_LANG", "symbole": "deux bulles de dialogue"},
+  {"id": "GLO_BOLL", "symbole": "micro à main et étincelles"},
+  {"id": "GLO_RELI", "symbole": "cierge allumé rayonnant"},
+  {"id": "GLO_ETIQ", "symbole": "nœud papillon"},
+  {"id": "GLO_ESPO", "symbole": "pierre de curling"},
+  {"id": "GLO_SYMB", "symbole": "sceau de cire étoilé à rubans"},
+  {"id": "GLO_TIKT", "symbole": "anneau lumineux et smartphone"},
+  {"id": "GLO_YTUB", "symbole": "écran lecteur vidéo et barre de progression"},
+  {"id": "GLO_ECRI", "symbole": "pinceau de calligraphie et trait d'encre"}
+]

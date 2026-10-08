@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Canada">
+  <rect x="120" y="164" width="16" height="58" rx="8" fill="#12606D"/>
+  <polygon points="128,32 146,66 168,58 160,104 186,80 192,96 222,90 210,124 222,132 176,166 182,182 136,174 120,174 74,182 80,166 34,132 46,124 34,90 64,96 70,80 96,104 88,58 110,66" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 168V70M128 150L184 104M128 150L72 104" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M92 76L100 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

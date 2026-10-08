@@ -1,0 +1,12 @@
+[
+  {"id": "ARE_OVER", "symbole": "chariot de convoi et hexagone"},
+  {"id": "ARE_PUBE", "symbole": "poêle avec œuf au plat"},
+  {"id": "ARE_PSNA", "symbole": "télé cathodique à œil"},
+  {"id": "ARE_PLAY", "symbole": "quatre boutons de manette"},
+  {"id": "ARE_PKMN", "symbole": "sphère de capture bicolore"},
+  {"id": "ARE_PKGO", "symbole": "épingle de carte et disque"},
+  {"id": "ARE_PRTL", "symbole": "deux portails ovales"},
+  {"id": "ARE_RSIX", "symbole": "mur de briques et réticule"},
+  {"id": "ARE_RDRD", "symbole": "cactus devant soleil couchant"},
+  {"id": "ARE_RESV", "symbole": "porte entrouverte et lumière"}
+]

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Supernatural">
+  <path d="M84 36L118 102M172 36L138 102" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="108" r="12" stroke="#12606D" stroke-width="8" fill="none"/>
+  <path d="M96 136L76 98L116 124ZM160 136L180 98L140 124Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="168" rx="46" ry="52" fill="#FFDB3D"/>
+  <rect x="98" y="148" width="24" height="12" rx="6" fill="#0B3D4A"/>
+  <rect x="134" y="148" width="24" height="12" rx="6" fill="#0B3D4A"/>
+  <path d="M128 162L128 178" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <rect x="108" y="190" width="40" height="12" rx="6" fill="#0B3D4A"/>
+  <path d="M96 150Q98 136 106 128" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

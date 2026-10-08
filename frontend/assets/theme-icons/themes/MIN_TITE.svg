@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Titeuf">
+  <path d="M106 104C92 64 116 36 168 28C146 48 158 76 150 104Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="60" cy="158" r="16" fill="#12606D"/>
+  <circle cx="196" cy="158" r="16" fill="#12606D"/>
+  <circle cx="128" cy="154" r="64" fill="#12606D"/>
+  <ellipse cx="106" cy="144" rx="15" ry="19" fill="#E8F1EC"/>
+  <ellipse cx="150" cy="144" rx="15" ry="19" fill="#E8F1EC"/>
+  <circle cx="111" cy="148" r="7" fill="#12606D"/>
+  <circle cx="145" cy="148" r="7" fill="#12606D"/>
+  <path d="M104 178C116 196 140 196 152 178Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M82 130A52 52 0 0 1 96 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

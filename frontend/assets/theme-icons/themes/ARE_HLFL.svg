@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Half-Life">
+  <polygon points="128,36 200,78 200,178 128,220 56,178 56,78" fill="#0B3D4A" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M76 190L172 96C186 82 184 66 168 60" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M80 92L100 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

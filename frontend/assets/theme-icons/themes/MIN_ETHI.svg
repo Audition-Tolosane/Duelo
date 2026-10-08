@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Éthique &amp; Morale">
+  <path d="M92 212H148M92 190H148M92 168H148M70 116L98 104M58 88L84 76M158 104L186 116M172 76L198 88" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M104 222V160C104 120 80 84 52 48M136 222V160C136 120 112 84 84 44" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M104 160C104 120 144 84 172 44M136 160C136 120 176 84 204 48" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="162" y="204" width="44" height="16" rx="8" fill="#12606D"/>
+  <path d="M184 210L202 170" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="202" cy="166" r="13" fill="#FF6B5B"/>
+  <path d="M60 58L70 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

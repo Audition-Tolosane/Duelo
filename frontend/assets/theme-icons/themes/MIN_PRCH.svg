@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Preacher">
+  <path d="M36 216C36 172 62 146 98 136V100C98 90 110 84 128 84C146 84 158 90 158 100V136C194 146 220 172 220 216Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="98" rx="26" ry="9" fill="#0B3D4A"/>
+  <path d="M98 140L128 204L158 140" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="114" y="112" width="28" height="22" rx="5" fill="#E8F1EC"/>
+  <path d="M184 164V196M172 176H196" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M58 196C60 182 68 170 80 162" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

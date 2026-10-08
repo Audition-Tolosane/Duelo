@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Justin Bieber">
+  <g transform="rotate(-24 128 128)">
+  <ellipse cx="128" cy="64" rx="26" ry="38" fill="#12606D"/>
+  <rect x="114" y="88" width="28" height="30" rx="8" fill="#12606D"/>
+  <ellipse cx="128" cy="128" rx="88" ry="34" fill="#FF6B5B"/>
+  <ellipse cx="82" cy="128" rx="12" ry="8" fill="#12606D"/>
+  <ellipse cx="174" cy="128" rx="12" ry="8" fill="#12606D"/>
+  <circle cx="128" cy="136" r="20" fill="#FFDB3D"/>
+  <circle cx="128" cy="190" r="30" fill="none" stroke="#FFDB3D" stroke-width="20"/>
+  <path d="M62 116C70 106 82 100 96 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

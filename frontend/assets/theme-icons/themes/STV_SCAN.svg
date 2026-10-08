@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Scandal">
+  <g transform="rotate(-8 128 132)">
+  <path d="M78 44H178C184 100 170 140 128 146C86 140 72 100 78 44Z" fill="#0B3D4A" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M80 92H176C172 122 156 136 128 138C100 136 84 122 80 92Z" fill="#FF6B5B"/>
+  <rect x="118" y="146" width="20" height="56" rx="8" fill="#12606D"/>
+  <ellipse cx="128" cy="208" rx="50" ry="13" fill="#12606D"/>
+  <path d="M94 56L96 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

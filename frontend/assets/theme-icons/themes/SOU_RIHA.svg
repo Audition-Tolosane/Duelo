@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Rihanna">
+  <rect x="88" y="140" width="80" height="80" rx="14" fill="#12606D"/>
+  <rect x="92" y="114" width="72" height="34" rx="10" fill="#FFDB3D"/>
+  <polygon points="104,114 104,84 152,48 152,114" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M110 170V200M128 170V200M146 170V200" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M104 134H152" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="196,44 201,56 213,61 201,66 196,78 191,66 179,61 191,56" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M108 100L108 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Franz Kafka">
+  <path d="M96 128L74 96L92 68H102M138 120L134 82L156 60H166M176 132L206 112L210 80H220" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M46 148L32 120M58 140L56 108" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="58" cy="160" r="20" fill="#FF6B5B"/>
+  <ellipse cx="142" cy="164" rx="80" ry="48" transform="rotate(-8 142 164)" fill="#12606D"/>
+  <path d="M100 136C92 152 92 172 100 190M130 128C122 148 122 176 130 198M160 126C152 146 152 174 160 194" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M82 160C82 148 88 138 96 132" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Surréalisme">
+  <path d="M78 116C78 62 178 62 178 116Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="80" y="98" width="96" height="16" rx="6" fill="#FF6B5B"/>
+  <path d="M40 122C60 108 196 108 216 122C200 140 56 140 40 122Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 162C108 148 84 160 86 186C88 210 108 222 128 214C148 222 168 210 170 186C172 160 148 148 128 162Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 160L132 146" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <ellipse cx="148" cy="148" rx="14" ry="7" transform="rotate(-20 148 148)" fill="#FFDB3D"/>
+  <path d="M90 90C94 80 102 74 112 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

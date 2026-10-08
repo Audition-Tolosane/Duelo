@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Biodiversité">
+  <path d="M56 212L80 186" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 196C48 120 96 52 212 44C210 156 150 208 60 196Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="132" cy="140" rx="24" ry="19" fill="#FFDB3D"/>
+  <circle cx="102" cy="116" r="10" fill="#FFDB3D"/>
+  <circle cx="120" cy="98" r="10" fill="#FFDB3D"/>
+  <circle cx="146" cy="96" r="10" fill="#FFDB3D"/>
+  <circle cx="164" cy="112" r="10" fill="#FFDB3D"/>
+  <path d="M84 140C88 112 104 88 128 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

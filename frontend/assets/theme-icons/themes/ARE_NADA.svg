@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Rafael Nadal">
+  <path d="M90 84C58 84 40 66 40 40M166 84C198 84 216 66 216 40" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="68" cy="112" rx="22" ry="12" transform="rotate(20 68 112)" fill="#12606D"/>
+  <ellipse cx="188" cy="112" rx="22" ry="12" transform="rotate(-20 188 112)" fill="#12606D"/>
+  <path d="M84 84C84 64 172 64 172 84C180 128 166 166 150 190L106 190C90 166 76 128 84 84Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="172" rx="36" ry="24" fill="#FF6B5B"/>
+  <circle cx="116" cy="174" r="6" fill="#12606D"/>
+  <circle cx="140" cy="174" r="6" fill="#12606D"/>
+  <circle cx="106" cy="118" r="8" fill="#E8F1EC"/>
+  <circle cx="150" cy="118" r="8" fill="#E8F1EC"/>
+  <path d="M94 98C96 90 100 86 106 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

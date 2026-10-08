@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Roblox">
+  <polygon points="128,40 204,84 204,172 128,216 52,172 52,84" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="128,84 166,106 166,150 128,172 90,150 90,106" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="128" r="14" fill="#FF6B5B"/>
+  <path d="M78 92L98 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

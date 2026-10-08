@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dr. Stone">
+  <path d="M46 204C38 166 50 118 88 96C122 78 166 82 192 112C212 136 214 176 204 204Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M110 92L100 120L118 138L104 168L114 200" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M118 138L146 150L156 178" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g transform="rotate(24 184 100)">
+  <rect x="166" y="34" width="36" height="128" rx="18" fill="#E8F1EC" stroke="#FF6B5B" stroke-width="8"/>
+  <path d="M166 104H202V144C202 154 194 162 184 162C174 162 166 154 166 144Z" fill="#FF6B5B"/>
+  <rect x="160" y="30" width="48" height="14" rx="7" fill="#FF6B5B"/>
+  </g>
+  <path d="M66 150Q70 126 84 112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

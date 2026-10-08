@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pokémon">
+  <path d="M46 70L68 84L52 98L76 112" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M188 150L206 166L190 176L210 192" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="68,200 96,214 124,196 116,170 166,150 152,120 208,98 214,40 146,52 162,84 110,104 122,134 80,152 90,182" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="68,200 96,214 124,196 118,178 88,184" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M164 60L192 56" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Michel-Ange">
+  <path d="M44 216V140L80 116H134L124 136L152 122H212V216Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M126 116L144 100L156 114L138 130Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M150 106L182 70" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="176" y="30" width="26" height="50" rx="12" transform="rotate(42 189 55)" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="108" cy="98" r="7" fill="#FFDB3D"/>
+  <circle cx="166" cy="128" r="6" fill="#FFDB3D"/>
+  <path d="M58 156V180" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Genshin Impact">
+  <polygon points="128,32 212,128 128,224 44,128" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="128" r="54" fill="#0B3D4A"/>
+  <circle cx="128" cy="128" r="36" fill="#FF6B5B"/>
+  <path d="M112 116L124 106" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M92 70L108 54" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

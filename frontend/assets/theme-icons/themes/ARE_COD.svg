@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Call of Duty">
+  <path d="M96 112L126 34L164 106" stroke="#12606D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="108" cy="82" r="6" fill="#12606D"/>
+  <circle cx="118" cy="56" r="6" fill="#12606D"/>
+  <circle cx="136" cy="56" r="6" fill="#12606D"/>
+  <circle cx="148" cy="82" r="6" fill="#12606D"/>
+  <rect x="56" y="100" width="76" height="108" rx="22" transform="rotate(-12 94 154)" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="122" y="94" width="76" height="108" rx="22" transform="rotate(12 160 148)" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M74 138L114 130" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M78 158L118 150" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M82 178L110 172" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M144 130L184 138" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M140 150L180 158" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M146 170L174 176" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M68 116L70 128" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

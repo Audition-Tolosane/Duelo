@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Columbo">
+  <path d="M76 56H180Q204 60 208 86L214 216H42L48 86Q52 60 76 56Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M104 56L128 112L152 56Z" fill="#0B3D4A"/>
+  <path d="M104 56L88 80L128 128L168 80L152 56" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="44" y="150" width="168" height="18" fill="#0B3D4A"/>
+  <rect x="116" y="146" width="24" height="26" rx="4" stroke="#FF6B5B" stroke-width="6" fill="none"/>
+  <circle cx="108" cy="136" r="6" fill="#FF6B5B"/>
+  <circle cx="148" cy="136" r="6" fill="#FF6B5B"/>
+  <path d="M128 176V214" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <g transform="rotate(-28 184 186)">
+  <rect x="136" y="176" width="92" height="22" rx="11" fill="#FF6B5B"/>
+  <rect x="210" y="176" width="18" height="22" rx="9" fill="#E8F1EC"/>
+  <rect x="154" y="176" width="10" height="22" fill="#0B3D4A"/>
+  </g>
+  <path d="M64 92L60 116" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

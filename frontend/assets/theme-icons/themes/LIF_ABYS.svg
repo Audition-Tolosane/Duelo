@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Abysses">
+  <polygon points="58,142 36,112 36,174" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M140 82C140 46 196 36 204 64" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="204" cy="78" r="16" fill="#FFDB3D"/>
+  <path d="M200 120C190 88 158 74 122 76C78 78 52 108 52 142C52 178 80 204 122 204C160 204 188 190 200 166L162 146Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="174,128 192,122 184,140" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="174,162 192,170 186,152" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="148" cy="110" r="13" fill="#FFDB3D"/>
+  <circle cx="150" cy="110" r="6" fill="#12606D"/>
+  <path d="M96 150C104 170 124 176 138 168" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M72 132C76 114 88 102 104 96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

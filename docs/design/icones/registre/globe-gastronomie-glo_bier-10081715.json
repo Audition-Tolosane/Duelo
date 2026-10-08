@@ -1,0 +1,12 @@
+[
+  {"id": "GLO_BIER", "symbole": "chope de bière mousseuse"},
+  {"id": "GLO_PAIN", "symbole": "miche grignée et épi de blé"},
+  {"id": "GLO_MAGH", "symbole": "tajine fumant"},
+  {"id": "GLO_SUCR", "symbole": "cupcake à la cerise"},
+  {"id": "GLO_THAI", "symbole": "noix de coco à paille et piment"},
+  {"id": "GLO_FRUI", "symbole": "pitaya coupée en deux"},
+  {"id": "GLO_VEGE", "symbole": "demi-avocat et noyau"},
+  {"id": "GLO_GRIL", "symbole": "barbecue boule et steak"},
+  {"id": "GLO_GAST", "symbole": "toque de chef étoilée"},
+  {"id": "GLO_COCK", "symbole": "shaker et rondelle d'agrume"}
+]

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Olivia Rodrigo">
+  <rect x="32" y="66" width="192" height="128" rx="22" fill="#12606D"/>
+  <rect x="54" y="92" width="64" height="76" rx="12" fill="#0B3D4A"/>
+  <circle cx="86" cy="116" r="15" fill="#FFDB3D"/>
+  <path d="M62 168C62 140 110 140 110 168Z" fill="#FFDB3D"/>
+  <path d="M136 104H200" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M136 132H184" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M136 160H168" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="208,28 214,42 228,48 214,54 208,68 202,54 188,48 202,42" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M52 82H74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

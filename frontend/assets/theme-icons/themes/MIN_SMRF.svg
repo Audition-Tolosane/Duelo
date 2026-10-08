@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Les Schtroumpfs">
+  <circle cx="66" cy="156" r="16" fill="#12606D"/>
+  <circle cx="190" cy="156" r="16" fill="#12606D"/>
+  <circle cx="128" cy="150" r="62" fill="#12606D"/>
+  <path d="M68 130C64 78 96 42 140 42C180 42 204 70 198 104C194 118 180 118 178 106C174 94 168 90 160 90C176 104 184 118 188 130Z" fill="#E8F1EC" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="110" cy="152" rx="12" ry="15" fill="#E8F1EC"/>
+  <ellipse cx="146" cy="152" rx="12" ry="15" fill="#E8F1EC"/>
+  <circle cx="114" cy="156" r="6" fill="#0B3D4A"/>
+  <circle cx="142" cy="156" r="6" fill="#0B3D4A"/>
+  <ellipse cx="128" cy="178" rx="22" ry="15" fill="#12606D" stroke="#0B3D4A" stroke-width="6"/>
+  <path d="M110 198Q128 208 146 198" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M80 164L84 182" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

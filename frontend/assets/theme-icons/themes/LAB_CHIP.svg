@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Hardware &amp; Puces">
+  <path d="M94 40V60M128 40V60M162 40V60M94 196V216M128 196V216M162 196V216M40 94H60M40 128H60M40 162H60M196 94H216M196 128H216M196 162H216" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="60" y="60" width="136" height="136" rx="22" fill="#12606D"/>
+  <rect x="88" y="88" width="80" height="80" rx="14" fill="#0B3D4A"/>
+  <rect x="106" y="106" width="44" height="44" rx="8" fill="#FFDB3D"/>
+  <path d="M76 98L76 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

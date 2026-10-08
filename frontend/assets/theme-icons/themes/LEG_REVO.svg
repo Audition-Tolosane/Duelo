@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Révolution Française">
+  <polygon points="108,160 84,212 100,204 112,218 130,170" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="148,160 172,212 156,204 144,218 126,170" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M200 116A20 20 0 0 1 190.4 152A20 20 0 0 1 164 178.4A20 20 0 0 1 128 188A20 20 0 0 1 92 178.4A20 20 0 0 1 65.6 152A20 20 0 0 1 56 116A20 20 0 0 1 65.6 80A20 20 0 0 1 92 53.6A20 20 0 0 1 128 44A20 20 0 0 1 164 53.6A20 20 0 0 1 190.4 80A20 20 0 0 1 200 116Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="116" r="46" fill="#E8F1EC"/>
+  <circle cx="128" cy="116" r="26" fill="#12606D"/>
+  <path d="M72 100A60 60 0 0 1 94 71" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

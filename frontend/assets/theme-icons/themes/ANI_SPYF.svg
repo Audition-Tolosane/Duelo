@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Spy x Family">
+  <g transform="rotate(-35 128 130)">
+  <path d="M128 44C156 44 170 64 168 88C166 110 152 118 156 132C162 148 176 152 174 176C172 202 152 216 128 216C104 216 84 202 82 176C80 152 94 148 100 132C104 118 90 110 88 88C86 64 100 44 128 44Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M110 66Q100 88 112 114M146 66Q156 88 144 114M106 152Q96 176 110 204M150 152Q160 176 146 204" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M104 132Q128 140 152 132" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M100 90Q102 70 116 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <polygon points="190,48 195.3,62.7 210.9,63.2 198.6,72.8 202.9,87.8 190,79 177.1,87.8 181.4,72.8 169.1,63.2 184.7,62.7" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+</svg>

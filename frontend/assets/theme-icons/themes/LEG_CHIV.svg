@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Chevalerie">
+  <path d="M148 150H212V176C212 198 196 212 180 218C164 212 148 198 148 176Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M166 168L180 184L194 168" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M80 176L46 210" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <polygon points="66,140 104,178 212,40" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M108 128L124 144M138 98L150 110M166 70L174 78" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <ellipse cx="80" cy="168" rx="14" ry="48" transform="rotate(-45 80 168)" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12"/>
+  <path d="M84 136L98 122" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

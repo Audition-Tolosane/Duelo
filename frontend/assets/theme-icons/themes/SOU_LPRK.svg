@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Linkin Park">
+  <rect x="38" y="108" width="34" height="44" rx="10" fill="#FF6B5B"/>
+  <polygon points="72,110 72,150 170,196 170,64" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="172" cy="130" rx="14" ry="66" fill="#FFDB3D"/>
+  <path d="M104 158L98 196" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M196 100C206 118 206 142 196 160M214 82C230 110 230 150 214 178" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M86 112L120 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

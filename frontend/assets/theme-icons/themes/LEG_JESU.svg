@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Jésus &amp; les Apôtres">
+  <polygon points="160,94 208,64 208,124" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M40 94C76 48 140 48 174 94C140 140 76 140 40 94Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="72" cy="92" r="9" fill="#FFDB3D"/>
+  <path d="M90 68Q106 60 124 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="180" rx="60" ry="36" fill="#FFDB3D"/>
+  <path d="M96 172L108 192M122 164L134 196M148 168L160 188" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" fill="none"/>
+</svg>

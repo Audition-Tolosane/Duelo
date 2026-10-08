@@ -1,0 +1,12 @@
+[
+  {"id": "LAB_DATA", "symbole": "base de données cylindrique empilée"},
+  {"id": "LAB_BIOH", "symbole": "chromosome et ciseaux"},
+  {"id": "LAB_BLOC", "symbole": "cubes reliés par maillons"},
+  {"id": "LAB_CLOD", "symbole": "nuage et flèche montante"},
+  {"id": "LAB_DEEP", "symbole": "iceberg et ligne d'eau"},
+  {"id": "LAB_CHIP", "symbole": "puce électronique à broches"},
+  {"id": "LAB_PRNT", "symbole": "imprimante 3D à portique"},
+  {"id": "LAB_QUAN", "symbole": "sphère de Bloch et vecteur"},
+  {"id": "LAB_INTA", "symbole": "réseau de neurones en couches"},
+  {"id": "LAB_CODE", "symbole": "fenêtre d'éditeur à chevrons"}
+]

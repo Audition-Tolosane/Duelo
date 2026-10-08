@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Uncharted">
+  <rect x="112" y="26" width="32" height="26" rx="8" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="140" r="80" fill="#12606D" stroke="#12606D" stroke-width="12"/>
+  <circle cx="128" cy="140" r="58" fill="#0B3D4A"/>
+  <g transform="rotate(40 128 140)">
+    <polygon points="128,84 144,140 112,140" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="12" stroke-linejoin="round"/>
+    <polygon points="128,196 144,140 112,140" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  </g>
+  <circle cx="128" cy="140" r="8" fill="#E8F1EC"/>
+  <path d="M60 104A80 80 0 0 1 92 74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

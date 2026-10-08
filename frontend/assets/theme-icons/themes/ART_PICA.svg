@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Picasso &amp; Cubisme">
+  <polygon points="74,58 150,40 196,96 184,180 140,216 84,196 60,128" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="140,44 196,96 184,180 140,216 136,140" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="102" cy="96" rx="16" ry="10" fill="#E8F1EC"/>
+  <circle cx="102" cy="96" r="6" fill="#12606D"/>
+  <circle cx="166" cy="112" r="16" fill="#FFDB3D"/>
+  <circle cx="166" cy="112" r="7" fill="#12606D"/>
+  <polygon points="124,104 100,152 132,152" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M108 180H150" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M74 104L80 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Rocket League">
+  <polygon points="150,98 224,34 216,100 194,142" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="172,110 208,66 204,106 190,128" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="108" cy="152" r="60" fill="#12606D" stroke="#12606D" stroke-width="12"/>
+  <polygon points="108,128 129,140 129,164 108,176 87,164 87,140" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="10" stroke-linejoin="round"/>
+</svg>

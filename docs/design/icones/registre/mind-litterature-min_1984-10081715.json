@@ -1,0 +1,12 @@
+[
+  {"id": "MIN_1984", "symbole": "caméra de surveillance à œil"},
+  {"id": "MIN_CHRI", "symbole": "moustache de Poirot et fiole de poison"},
+  {"id": "MIN_CAMU", "symbole": "rocher de Sisyphe sur pente"},
+  {"id": "MIN_ALIC", "symbole": "montre à gousset à oreilles de lapin"},
+  {"id": "MIN_NOTH", "symbole": "grand chapeau noir et plume-stylo"},
+  {"id": "MIN_COIL", "symbole": "casquette deerstalker à nœud"},
+  {"id": "MIN_BALZ", "symbole": "pile de livres et plume d'oie"},
+  {"id": "MIN_BATM", "symbole": "buste à cagoule devant la lune"},
+  {"id": "MIN_BKSD", "symbole": "fedora à oreilles de chat"},
+  {"id": "MIN_BLAK", "symbole": "avion Espadon à ailes delta"}
+]

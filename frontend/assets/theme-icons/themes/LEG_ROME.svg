@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mythologie Romaine">
+  <path d="M60 98C62 54 104 34 128 34C152 34 194 54 196 98C182 76 156 64 128 64C100 64 74 76 60 98Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M92 70L84 52M128 62V42M164 70L172 52" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M184 136L220 160Q224 172 210 172L176 166Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M68 146C68 102 94 76 130 76C166 76 192 102 192 146Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M82 148H116L110 194Q106 208 94 202L80 154Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="58" y="134" width="140" height="18" rx="9" fill="#FFDB3D"/>
+  <circle cx="98" cy="176" r="8" fill="#FFDB3D"/>
+  <path d="M88 122C88 108 94 98 104 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

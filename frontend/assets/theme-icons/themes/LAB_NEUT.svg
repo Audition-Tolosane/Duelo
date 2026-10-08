@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Étoiles à Neutrons">
+  <g transform="rotate(-30 128 128)">
+  <polygon points="128,128 116,36 140,36" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="128,128 116,220 140,220" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M118 98C34 54 34 202 118 158M138 98C222 54 222 202 138 158" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M120 104C78 92 78 164 120 152M136 104C178 92 178 164 136 152" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  </g>
+  <circle cx="128" cy="128" r="30" fill="#FF6B5B"/>
+  <path d="M108 122A21 21 0 0 1 122 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Tubes de l'été">
+  <polygon points="88,138 168,138 128,224" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M104 160L148 160M116 186L140 186M104 146L132 210M152 146L124 210" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="126" r="46" fill="#FF6B5B"/>
+  <circle cx="128" cy="82" r="38" fill="#12606D"/>
+  <circle cx="128" cy="42" r="12" fill="#FFDB3D"/>
+  <rect x="100" y="120" width="16" height="8" rx="4" fill="#E8F1EC"/>
+  <rect x="136" y="136" width="16" height="8" rx="4" fill="#E8F1EC"/>
+  <polygon points="212,60 218,74 232,80 218,86 212,100 206,86 192,80 206,74" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="44,90 49,101 60,106 49,111 44,122 39,111 28,106 39,101" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M104 80C106 70 112 64 120 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

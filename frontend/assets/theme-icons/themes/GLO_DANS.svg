@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Danses du Monde">
+  <path d="M136 72Q170 50 204 66M156 100Q182 88 208 98" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M58 124L82 132L74 210H62Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M48 98C68 88 90 102 106 128C122 152 150 160 192 162C212 164 222 176 216 188C212 196 202 198 190 198H148C124 198 108 186 96 170C84 154 66 144 52 138C40 132 38 104 48 98Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M58 108C72 104 86 116 96 132C84 136 70 132 58 124Z" fill="#12606D"/>
+  <path d="M88 122L118 100" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M134 168C150 176 172 180 196 180" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M120 150C128 158 138 162 148 164" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

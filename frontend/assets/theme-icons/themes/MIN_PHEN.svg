@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Phénoménologie">
+  <path d="M66 62C38 96 38 160 66 194M190 62C218 96 218 160 190 194" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M76 128C96 92 160 92 180 128C160 164 96 164 76 128Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="128" r="26" fill="#FFDB3D"/>
+  <circle cx="128" cy="128" r="11" fill="#12606D"/>
+  <circle cx="138" cy="118" r="5" fill="#E8F1EC"/>
+  <path d="M92 116L104 106" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

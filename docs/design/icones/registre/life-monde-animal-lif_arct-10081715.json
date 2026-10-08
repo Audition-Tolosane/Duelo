@@ -1,0 +1,10 @@
+[
+  {"id": "LIF_ARCT", "symbole": "manchot debout sur banquise"},
+  {"id": "LIF_OCEA", "symbole": "tortue marine vue de dessus"},
+  {"id": "LIF_PRIM", "symbole": "tête de chimpanzé de face"},
+  {"id": "LIF_PRED", "symbole": "orque de profil et vague"},
+  {"id": "LIF_REPT", "symbole": "serpent enroulé langue fourchue"},
+  {"id": "LIF_SAVA", "symbole": "tête et cou de girafe"},
+  {"id": "LIF_SYMB", "symbole": "poisson-clown et anémone"},
+  {"id": "LIF_NOCT", "symbole": "chauve-souris et croissant de lune"}
+]

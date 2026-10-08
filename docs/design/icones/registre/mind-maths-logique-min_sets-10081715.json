@@ -1,0 +1,6 @@
+[
+  {"id": "MIN_SETS", "symbole": "accolades et éléments"},
+  {"id": "MIN_GAME", "symbole": "matrice des gains étoilée"},
+  {"id": "MIN_TOPO", "symbole": "tore quadrillé"},
+  {"id": "MIN_TRIGO", "symbole": "triangle rectangle et sinusoïde"}
+]

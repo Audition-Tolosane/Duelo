@@ -1,0 +1,12 @@
+[
+  {"id": "GLO_ESPA", "symbole": "robe de flamenco à volants"},
+  {"id": "GLO_NORD", "symbole": "igloo sous aurore boréale"},
+  {"id": "GLO_FLEU", "symbole": "bateau à roue à aubes"},
+  {"id": "GLO_ITAL", "symbole": "tour de Pise penchée"},
+  {"id": "GLO_MONU", "symbole": "moaï de l'île de Pâques"},
+  {"id": "GLO_OCEN", "symbole": "boomerang en vol"},
+  {"id": "GLO_OCEA", "symbole": "ancre marine et cordage"},
+  {"id": "GLO_PARC", "symbole": "tente et sapin"},
+  {"id": "GLO_ROYA", "symbole": "tour de Big Ben"},
+  {"id": "GLO_SUMM", "symbole": "piolet planté au sommet"}
+]

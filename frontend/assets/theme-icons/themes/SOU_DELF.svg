@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Danny Elfman">
+  <path d="M128 78C128 58 140 46 158 44" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="142" rx="86" ry="68" fill="#FF6B5B"/>
+  <path d="M128 76C102 104 102 180 128 208" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="82,118 112,130 90,98" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="8" stroke-linejoin="round"/>
+  <polygon points="174,118 144,130 166,98" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M84 168L102 182L116 164L128 184L140 164L154 182L172 168" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 122C64 106 74 94 88 86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

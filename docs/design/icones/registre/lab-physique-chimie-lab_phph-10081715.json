@@ -1,0 +1,12 @@
+[
+  {"id": "LAB_PHPH", "symbole": "bandelette de pH et goutte"},
+  {"id": "LAB_ORGA", "symbole": "cycle benzénique hexagonal"},
+  {"id": "LAB_CRYG", "symbole": "flocon de neige"},
+  {"id": "LAB_DYNA", "symbole": "profil d'aile et lignes de courant"},
+  {"id": "LAB_FUSE", "symbole": "soleil à noyaux fusionnés"},
+  {"id": "LAB_MOLE", "symbole": "molécule boules et bâtonnets"},
+  {"id": "LAB_NUKE", "symbole": "trèfle radioactif"},
+  {"id": "LAB_WAVE", "symbole": "diapason qui vibre"},
+  {"id": "LAB_PHOT", "symbole": "prisme décomposant la lumière"},
+  {"id": "LAB_PQUA", "symbole": "boîte de Schrödinger et chat"}
+]

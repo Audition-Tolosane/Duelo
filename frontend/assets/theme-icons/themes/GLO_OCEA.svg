@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Océans &amp; Mers">
+  <circle cx="128" cy="54" r="18" stroke="#12606D" stroke-width="12" fill="none"/>
+  <rect x="118" y="70" width="20" height="132" rx="8" fill="#12606D"/>
+  <path d="M60 144C60 186 92 210 128 210C164 210 196 186 196 144" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="42,156 60,122 78,156" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="178,156 196,122 214,156" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="78" y="84" width="100" height="20" rx="10" fill="#FFDB3D"/>
+  <path d="M138 64C176 72 180 112 150 128C122 144 96 150 104 182" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M90 94H100" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

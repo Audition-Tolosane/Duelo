@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pokémon">
+  <rect x="62" y="42" width="132" height="172" rx="18" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M62 104H194" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="100" cy="76" r="24" fill="#E8F1EC"/>
+  <circle cx="100" cy="76" r="16" fill="#12606D"/>
+  <circle cx="140" cy="62" r="7" fill="#E8F1EC"/>
+  <circle cx="160" cy="62" r="7" fill="#12606D"/>
+  <circle cx="180" cy="62" r="7" fill="#0B3D4A"/>
+  <rect x="84" y="122" width="88" height="56" rx="8" fill="#0B3D4A"/>
+  <path d="M100 150H140" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="160" cy="196" r="8" fill="#0B3D4A"/>
+  <path d="M94 70L100 64" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

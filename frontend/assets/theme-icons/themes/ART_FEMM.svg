@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Femmes Artistes">
+  <circle cx="112" cy="98" r="50" stroke="#12606D" stroke-width="20" fill="none"/>
+  <path d="M112 158V214M82 188H142" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M216 40L168 88" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M170 74L182 86L156 112C144 124 130 130 116 130C116 116 122 102 134 90Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M74 84A44 44 0 0 1 90 64" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

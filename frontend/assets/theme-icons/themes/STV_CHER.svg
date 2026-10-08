@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Chernobyl">
+  <path d="M84 68V56Q84 44 96 44H160Q172 44 172 56V68" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="48" y="64" width="160" height="152" rx="24" fill="#12606D"/>
+  <path d="M78 140A50 50 0 0 1 178 140Z" fill="#FFDB3D"/>
+  <path d="M128 140L162 116" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="140" r="9" fill="#0B3D4A"/>
+  <circle cx="128" cy="184" r="24" fill="#FFDB3D"/>
+  <path d="M131 178.8L137 168.4A18 18 0 0 1 146 184L134 184A6 6 0 0 0 131 178.8ZM122 184L110 184A18 18 0 0 1 119 168.4L125 178.8A6 6 0 0 0 122 184ZM131 189.2L137 199.6A18 18 0 0 1 119 199.6L125 189.2A6 6 0 0 0 131 189.2Z" fill="#0B3D4A"/>
+  <path d="M66 88L66 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

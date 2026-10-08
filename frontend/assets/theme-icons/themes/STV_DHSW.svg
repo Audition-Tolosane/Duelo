@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Desperate Housewives">
+  <polygon points="36,214 36,174 46,164 56,174 56,214" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="76,214 76,174 86,164 96,174 96,214" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="160,214 160,174 170,164 180,174 180,214" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="200,214 200,174 210,164 220,174 220,214" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="32" y="186" width="192" height="12" rx="6" fill="#FFDB3D"/>
+  <rect x="116" y="132" width="24" height="86" rx="8" fill="#12606D"/>
+  <path d="M164 128L164 50" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="164" y="42" width="40" height="28" rx="6" fill="#FF6B5B"/>
+  <path d="M52 140V102C52 86 62 76 80 76H176C192 76 204 86 204 102V140Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="182" y="88" width="14" height="46" rx="6" fill="#FFDB3D"/>
+  <circle cx="164" cy="116" r="8" fill="#FF6B5B"/>
+  <path d="M70 120L70 100Q70 92 80 90" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

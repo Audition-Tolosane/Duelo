@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Lionel Messi">
+  <path d="M110 84C96 54 80 40 62 38M146 84C160 54 176 40 194 38" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="72" cy="116" rx="28" ry="11" transform="rotate(15 72 116)" fill="#12606D"/>
+  <ellipse cx="184" cy="116" rx="28" ry="11" transform="rotate(-15 184 116)" fill="#12606D"/>
+  <polygon points="118,196 128,228 138,196" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M98 92C108 84 148 84 158 92L150 180C148 198 108 198 106 180Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="114" cy="124" r="6" fill="#E8F1EC"/>
+  <circle cx="142" cy="124" r="6" fill="#E8F1EC"/>
+  <ellipse cx="128" cy="172" rx="14" ry="10" fill="#E8F1EC"/>
+  <path d="M110 98V108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Le Loup de Wall Street">
+  <ellipse cx="200" cy="54" rx="13" ry="18" transform="rotate(30 200 54)" fill="#FF6B5B"/>
+  <path d="M214 82L224 86M190 34L186 26M218 62L226 58" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <g transform="rotate(30 128 140)">
+  <path d="M100 206L100 136C100 116 116 106 118 90L118 60L138 60L138 90C140 106 156 116 156 136L156 206Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="112" y="50" width="32" height="48" rx="8" fill="#FFDB3D"/>
+  <rect x="104" y="160" width="48" height="36" rx="6" fill="#FF6B5B"/>
+  <rect x="116" y="172" width="24" height="12" rx="6" fill="#FFDB3D"/>
+  <path d="M112 128L112 146" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

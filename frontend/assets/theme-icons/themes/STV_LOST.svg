@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Lost">
+  <path d="M128 140V44" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M98 142L72 62" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M158 142L184 62" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <ellipse cx="128" cy="172" rx="90" ry="38" fill="#12606D"/>
+  <ellipse cx="128" cy="170" rx="70" ry="26" fill="#0B3D4A"/>
+  <ellipse cx="128" cy="168" rx="54" ry="16" fill="#FFDB3D"/>
+  <circle cx="52" cy="176" r="6" fill="#0B3D4A"/>
+  <circle cx="204" cy="176" r="6" fill="#0B3D4A"/>
+  <circle cx="128" cy="204" r="6" fill="#0B3D4A"/>
+  <path d="M56 160Q66 146 86 140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

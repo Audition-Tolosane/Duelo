@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Country Music">
+  <path d="M84 44H150V128C150 144 170 148 194 156C214 162 220 176 218 196H84Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="78" y="34" width="78" height="24" rx="10" fill="#FFDB3D"/>
+  <circle cx="117" cy="104" r="12" fill="#FFDB3D"/>
+  <rect x="72" y="196" width="154" height="18" rx="9" fill="#FF6B5B"/>
+  <rect x="72" y="206" width="44" height="24" rx="8" fill="#FF6B5B"/>
+  <circle cx="60" cy="190" r="10" fill="#FFDB3D"/>
+  <path d="M100 74V84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

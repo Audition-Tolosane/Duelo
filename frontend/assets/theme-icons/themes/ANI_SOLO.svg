@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Solo Leveling">
+  <path d="M36 84V48H72M184 48H220V84M220 176V212H184M72 212H36V176" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="52" y="64" width="152" height="132" rx="18" fill="#12606D"/>
+  <rect x="64" y="76" width="128" height="22" rx="10" fill="#0B3D4A"/>
+  <circle cx="80" cy="87" r="5" fill="#FFDB3D"/>
+  <rect x="96" y="83" width="60" height="8" rx="4" fill="#12606D"/>
+  <rect x="118" y="110" width="20" height="44" rx="10" fill="#FFDB3D"/>
+  <circle cx="128" cy="176" r="11" fill="#FFDB3D"/>
+  <path d="M72 118V150" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Blake et Mortimer">
+  <g transform="rotate(45 128 128)">
+  <path d="M120 216L128 234L136 216Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <polygon points="128,96 200,176 56,176" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 32C140 52 144 80 144 120V200C144 212 136 218 128 218C120 218 112 212 112 200V120C112 80 116 52 128 32Z" fill="#12606D"/>
+  <ellipse cx="128" cy="78" rx="8" ry="16" fill="#E8F1EC"/>
+  <path d="M168 168H188" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M100 140L80 162" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

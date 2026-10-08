@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Grillades &amp; BBQ">
+  <path d="M82 184L62 222M174 184L194 222M128 192V222" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M40 120H216C216 168 178 194 128 194C78 194 40 168 40 120Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M48 56C60 68 64 78 58 92" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M208 56C196 68 192 78 198 92" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M74 100C70 80 86 64 108 66C132 54 168 58 184 76C194 88 188 100 176 100Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M100 76L116 92M132 70L150 90M162 74L174 88" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="30" y="102" width="196" height="16" rx="8" fill="#FFDB3D"/>
+  <path d="M60 134C62 146 68 156 78 164" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

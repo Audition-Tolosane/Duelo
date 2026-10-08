@@ -1,0 +1,7 @@
+[
+  {"id": "LAB_REAC", "symbole": "tube à essai et explosion"},
+  {"id": "LAB_SUPR", "symbole": "cube en lévitation sur disque"},
+  {"id": "LAB_PERI", "symbole": "grille du tableau périodique"},
+  {"id": "LAB_THER", "symbole": "thermomètre et flocon"},
+  {"id": "LAB_PLAS", "symbole": "glaçon, goutte et nuage"}
+]

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Overwatch">
+  <path d="M36 214H220" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="52" y="124" width="152" height="56" rx="14" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="86" cy="186" r="18" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6"/>
+  <circle cx="170" cy="186" r="18" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6"/>
+  <polygon points="128,36 158,53 158,87 128,104 98,87 98,53" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M110 140L128 152L146 140" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M110 66L120 56" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M70 142H86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

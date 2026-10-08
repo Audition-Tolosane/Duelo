@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Chanson Française">
+  <rect x="78" y="80" width="100" height="96" rx="12" fill="#12606D"/>
+  <path d="M98 94V162M118 94V162M138 94V162M158 94V162" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="30" y="56" width="52" height="144" rx="16" fill="#FFDB3D"/>
+  <rect x="174" y="56" width="52" height="144" rx="16" fill="#FFDB3D"/>
+  <path d="M56 92h0M56 120h0M56 148h0M56 176h0M200 92h0M200 120h0M200 148h0M200 176h0" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M44 74V88" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

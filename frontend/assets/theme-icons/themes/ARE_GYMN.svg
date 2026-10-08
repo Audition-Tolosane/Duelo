@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Gymnastique">
+  <rect x="40" y="32" width="176" height="24" rx="12" fill="#FF6B5B"/>
+  <path d="M84 56V116M172 56V116" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="84" cy="164" r="44" fill="#0B3D4A" stroke="#FFDB3D" stroke-width="12"/>
+  <circle cx="172" cy="164" r="44" fill="#0B3D4A" stroke="#FFDB3D" stroke-width="12"/>
+  <path d="M62 148C66 138 72 132 80 128" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

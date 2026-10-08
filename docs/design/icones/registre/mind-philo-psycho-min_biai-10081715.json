@@ -1,0 +1,12 @@
+[
+  {"id": "MIN_BIAI", "symbole": "illusion de Müller-Lyer"},
+  {"id": "MIN_BEHA", "symbole": "clochette de Pavlov"},
+  {"id": "MIN_EMOT", "symbole": "visages joie et tristesse"},
+  {"id": "MIN_META", "symbole": "symbole infini et étoile"},
+  {"id": "MIN_NIHI", "symbole": "grosse moustache et marteau"},
+  {"id": "MIN_POLI", "symbole": "parchemin du contrat scellé"},
+  {"id": "MIN_PHEN", "symbole": "œil entre parenthèses"},
+  {"id": "MIN_HAPP", "symbole": "arc-en-ciel entre nuages"},
+  {"id": "MIN_SOCI", "symbole": "groupe de trois silhouettes"},
+  {"id": "MIN_DEVE", "symbole": "escalier et sphères croissantes"}
+]

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Constellations">
+  <path d="M40 84L78 94L106 112L130 134L138 180L196 190L210 142Z" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M208 120L206 108M203 94L201 82" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="40.0,70.0 44.2,79.8 54.0,84.0 44.2,88.2 40.0,98.0 35.8,88.2 26.0,84.0 35.8,79.8" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="78.0,80.0 82.2,89.8 92.0,94.0 82.2,98.2 78.0,108.0 73.8,98.2 64.0,94.0 73.8,89.8" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="106.0,98.0 110.2,107.8 120.0,112.0 110.2,116.2 106.0,126.0 101.8,116.2 92.0,112.0 101.8,107.8" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="130.0,115.0 136.4,127.6 149.0,134.0 136.4,140.4 130.0,153.0 123.6,140.4 111.0,134.0 123.6,127.6" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="138.0,166.0 142.2,175.8 152.0,180.0 142.2,184.2 138.0,194.0 133.8,184.2 124.0,180.0 133.8,175.8" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="196.0,176.0 200.2,185.8 210.0,190.0 200.2,194.2 196.0,204.0 191.8,194.2 182.0,190.0 191.8,185.8" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="210.0,123.0 216.4,135.6 229.0,142.0 216.4,148.4 210.0,161.0 203.6,148.4 191.0,142.0 203.6,135.6" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="196.0,38.0 201.7,52.3 216.0,58.0 201.7,63.7 196.0,78.0 190.3,63.7 176.0,58.0 190.3,52.3" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="210" cy="142" r="5" fill="#E8F1EC"/>
+</svg>

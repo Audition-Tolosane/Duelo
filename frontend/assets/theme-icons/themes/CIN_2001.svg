@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="2001: A Space Odyssey">
+  <path d="M164 30L164 40M200 48L192 56M216 82L206 82" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="160" cy="84" r="32" fill="#FFDB3D"/>
+  <path d="M36 222Q128 186 220 222" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="88" y="62" width="58" height="146" rx="6" fill="#12606D"/>
+  <rect x="104" y="76" width="30" height="120" rx="4" fill="#0B3D4A"/>
+  <path d="M96 78L96 112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

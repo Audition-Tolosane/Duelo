@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Prison Break">
+  <path d="M52 216V112C52 70 86 40 128 40C170 40 204 70 204 112V216Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M76 200V114C76 84 98 62 128 62C158 62 180 84 180 114V200Z" fill="#0B3D4A"/>
+  <path d="M102 70V200M154 70V200" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M128 64V108M128 156V200" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <g transform="rotate(35 128 132)"><path d="M120 110H136V150L128 166L120 150Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/><rect x="108" y="96" width="40" height="16" rx="8" fill="#FFDB3D"/><path d="M120 124L136 120M120 138L136 134" stroke="#0B3D4A" stroke-width="4" stroke-linecap="round" fill="none"/></g>
+  <path d="M64 120C64 100 70 84 82 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

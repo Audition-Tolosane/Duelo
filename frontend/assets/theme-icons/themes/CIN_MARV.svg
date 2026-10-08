@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Univers Marvel">
+  <rect x="52" y="112" width="24" height="62" rx="12" transform="rotate(-22 64 174)" fill="#FFDB3D"/>
+  <rect x="72" y="56" width="22" height="70" rx="11" fill="#FFDB3D"/>
+  <rect x="100" y="42" width="22" height="80" rx="11" fill="#FFDB3D"/>
+  <rect x="128" y="46" width="22" height="76" rx="11" fill="#FFDB3D"/>
+  <rect x="156" y="64" width="22" height="62" rx="11" fill="#FFDB3D"/>
+  <rect x="70" y="100" width="112" height="84" rx="22" fill="#FFDB3D"/>
+  <rect x="80" y="176" width="92" height="46" rx="12" fill="#12606D"/>
+  <circle cx="126" cy="142" r="18" fill="#FF6B5B"/>
+  <circle cx="83" cy="98" r="7" fill="#12606D"/>
+  <circle cx="111" cy="96" r="7" fill="#FF6B5B"/>
+  <circle cx="139" cy="96" r="7" fill="#12606D"/>
+  <circle cx="167" cy="98" r="7" fill="#FF6B5B"/>
+  <path d="M83 66L83 78" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

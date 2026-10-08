@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Shrinking">
+  <path d="M94 116C90 96 96 78 106 62C114 74 124 74 130 58C138 72 148 70 158 56C164 78 164 98 160 116Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="44" y="112" width="168" height="104" rx="18" fill="#12606D"/>
+  <path d="M128 194C98 176 92 158 106 148C114 142 124 146 128 154C132 146 142 142 150 148C164 158 158 176 128 194Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M64 138L64 158" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

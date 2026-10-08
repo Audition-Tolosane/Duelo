@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Rick et Morty">
+  <path d="M84 150L72 204Q70 214 80 214H100Q108 214 110 204L122 150Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="78" y="60" width="92" height="36" rx="18" fill="#FFDB3D"/>
+  <rect x="94" y="90" width="16" height="20" fill="#12606D"/>
+  <rect x="140" y="90" width="16" height="20" fill="#12606D"/>
+  <rect x="40" y="104" width="152" height="54" rx="20" fill="#12606D"/>
+  <path d="M190 116L214 106V156L190 146Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="160" cy="122" r="9" fill="#FF6B5B"/>
+  <circle cx="148" cy="78" r="7" fill="#E8F1EC"/>
+  <path d="M58 128L66 116" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

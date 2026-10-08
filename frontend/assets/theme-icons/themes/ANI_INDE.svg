@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Les Indestructibles">
+  <path d="M50 100C50 76 76 64 104 60Q128 80 152 60C180 64 206 76 206 100L190 206Q128 220 66 206Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M104 60Q128 84 152 60" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="124" rx="34" ry="26" fill="#FFDB3D"/>
+  <ellipse cx="128" cy="124" rx="21" ry="14" stroke="#0B3D4A" stroke-width="8" fill="none"/>
+  <rect x="66" y="174" width="124" height="22" rx="6" fill="#0B3D4A"/>
+  <rect x="116" y="174" width="24" height="22" rx="4" fill="#FFDB3D"/>
+  <path d="M74 98L70 124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

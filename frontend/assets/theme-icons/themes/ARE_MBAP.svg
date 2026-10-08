@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Kylian Mbappé">
+  <polygon points="122,62 196,134 52,206" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M46 156L80 124M100 214L132 182" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="162" cy="96" r="52" fill="#FFDB3D"/>
+  <polygon points="162,80 177,91 171,109 153,109 147,91" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M162 80V50M177 91L206 82M171 109L188 136M153 109L136 136M147 91L118 82" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M126 80A40 40 0 0 1 140 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

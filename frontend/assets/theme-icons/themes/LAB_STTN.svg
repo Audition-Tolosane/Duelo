@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Stations Spatiales">
+  <path d="M70 108V148M186 108V148" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="40" y="120" width="176" height="16" rx="8" fill="#12606D"/>
+  <rect x="46" y="48" width="48" height="62" rx="6" fill="#FFDB3D"/>
+  <rect x="46" y="146" width="48" height="62" rx="6" fill="#FFDB3D"/>
+  <rect x="162" y="48" width="48" height="62" rx="6" fill="#FFDB3D"/>
+  <rect x="162" y="146" width="48" height="62" rx="6" fill="#FFDB3D"/>
+  <path d="M70 56V102M70 154V200M186 56V102M186 154V200" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="104" y="72" width="48" height="112" rx="22" fill="#12606D"/>
+  <rect x="114" y="180" width="28" height="20" rx="6" fill="#FF6B5B"/>
+  <circle cx="128" cy="136" r="12" fill="#FF6B5B"/>
+  <path d="M116 92L116 110" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

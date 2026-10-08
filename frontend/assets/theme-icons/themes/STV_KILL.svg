@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Killing Eve">
+  <path d="M112 58L114 38M144 58L142 38" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M104 100H152C172 130 200 160 212 204C214 214 208 220 198 220H58C48 220 42 214 44 204C56 160 84 130 104 100Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M108 56H148L152 104H104Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M80 160Q94 172 108 160Q122 172 136 160Q150 172 164 160Q172 168 178 162M56 194Q72 206 88 194Q104 206 120 194Q136 206 152 194Q168 206 184 194Q192 202 200 196" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 104L100 88L100 120ZM128 104L156 88L156 120Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="98" y="96" width="60" height="16" rx="8" fill="#12606D"/>
+  <circle cx="128" cy="104" r="10" fill="#FFDB3D"/>
+  <path d="M116 68L116 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

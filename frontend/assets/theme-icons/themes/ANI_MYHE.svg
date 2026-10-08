@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="My Hero Academia">
+  <path d="M40 222Q48 194 86 188H170Q208 194 216 222Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M72 146C58 118 60 96 78 82Q90 68 106 64L66 26L124 58H132L190 26L150 64Q166 68 178 82C196 96 198 118 184 146L176 190Q168 212 128 212Q88 212 80 190Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M86 112L122 120L118 140L90 134Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M170 112L134 120L138 140L166 134Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="106" cy="128" r="5" fill="#E8F1EC"/>
+  <circle cx="150" cy="128" r="5" fill="#E8F1EC"/>
+  <path d="M90 158Q128 174 166 158Q162 194 128 196Q94 194 90 158Z" fill="#E8F1EC" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M94 176Q128 186 162 176" stroke="#0B3D4A" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M80 112Q80 96 90 86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

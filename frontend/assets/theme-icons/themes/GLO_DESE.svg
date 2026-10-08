@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Déserts">
+  <circle cx="62" cy="58" r="22" fill="#FF6B5B"/>
+  <path d="M64 128L52 154" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M60 128C64 104 80 92 100 92C112 70 140 66 152 92C160 102 166 104 170 98L178 70C180 58 196 56 204 62L216 70C222 74 220 82 212 82H200L194 112C190 130 178 140 168 142V200H154L150 150H108L104 200H90L86 146C72 144 62 138 60 128Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M32 210C80 188 168 184 224 206V224H32Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M106 102C112 90 120 84 130 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

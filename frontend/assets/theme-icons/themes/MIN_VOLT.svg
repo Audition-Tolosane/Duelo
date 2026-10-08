@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Voltaire">
+  <ellipse cx="54" cy="194" rx="18" ry="12" stroke="#FFDB3D" stroke-width="12" fill="none"/>
+  <rect x="70" y="188" width="30" height="12" rx="6" fill="#FFDB3D"/>
+  <path d="M116 184H110C102 184 98 188 98 194C98 200 102 204 110 204H116" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M140 184H146C154 184 158 188 158 194C158 200 154 204 146 204H140" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="156" y="188" width="30" height="12" rx="6" fill="#FFDB3D"/>
+  <ellipse cx="202" cy="194" rx="18" ry="12" stroke="#FFDB3D" stroke-width="12" fill="none"/>
+  <path d="M132 150C124 104 158 56 214 34C212 88 184 128 132 150Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M140 138L198 58" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M132 150L128 172" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M144 106C150 92 160 80 172 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

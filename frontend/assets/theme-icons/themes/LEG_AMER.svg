@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mythes Amérindiens">
+  <path d="M120 98C98 72 68 58 38 60C42 74 50 82 60 86L54 96C64 98 74 98 82 98L78 106C94 110 108 106 120 106Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <g transform="translate(256 0) scale(-1 1)"><path d="M120 98C98 72 68 58 38 60C42 74 50 82 60 86L54 96C64 98 74 98 82 98L78 106C94 110 108 106 120 106Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/></g>
+  <rect x="90" y="98" width="76" height="62" rx="10" fill="#12606D"/>
+  <ellipse cx="110" cy="122" rx="11" ry="9" fill="#E8F1EC"/>
+  <ellipse cx="146" cy="122" rx="11" ry="9" fill="#E8F1EC"/>
+  <rect x="108" y="140" width="40" height="10" rx="5" fill="#FF6B5B"/>
+  <rect x="90" y="166" width="76" height="58" rx="10" fill="#12606D"/>
+  <circle cx="110" cy="190" r="10" fill="#FFDB3D"/>
+  <circle cx="146" cy="190" r="10" fill="#FFDB3D"/>
+  <circle cx="128" cy="68" r="26" fill="#12606D"/>
+  <path d="M146 62C166 60 172 78 162 90C158 80 152 76 146 76Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="124" cy="64" r="7" fill="#E8F1EC"/>
+  <path d="M108 58C110 50 116 46 122 44" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

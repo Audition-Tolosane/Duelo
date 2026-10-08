@@ -1,0 +1,12 @@
+[
+  {"id": "MIN_ALGO", "symbole": "organigramme à losange de décision"},
+  {"id": "MIN_ANAL", "symbole": "courbe et rectangles d'intégrale"},
+  {"id": "MIN_CRYP", "symbole": "disque de chiffrement et clé"},
+  {"id": "MIN_FRAC", "symbole": "triangle de Sierpinski"},
+  {"id": "MIN_HIST", "symbole": "boulier à perles"},
+  {"id": "MIN_LOGI", "symbole": "diagramme de Venn"},
+  {"id": "MIN_ARTI", "symbole": "réseau de neurones artificiels"},
+  {"id": "MIN_ASTR", "symbole": "orbite elliptique autour du soleil"},
+  {"id": "MIN_PRIM", "symbole": "grille du crible d'Ératosthène"},
+  {"id": "MIN_PHYS", "symbole": "espace-temps courbé et bille"}
+]

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Stoïcisme">
+  <path d="M112 216L122 128L150 76L196 60L218 98L222 216Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M134 150L210 138M128 184L214 176" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M30 216C30 168 60 130 106 130C128 130 142 140 142 154C128 146 112 148 106 162C100 178 110 196 114 216Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M52 196C56 170 72 152 94 148" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="150" cy="128" r="8" fill="#FF6B5B"/>
+  <circle cx="126" cy="114" r="6" fill="#FF6B5B"/>
+  <path d="M30 214H226" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M150 96Q160 80 180 74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,12 @@
+[
+  {"id": "CIN_BOND", "symbole": "vue du canon en spirale"},
+  {"id": "CIN_JOHN", "symbole": "crayon et pièce d'or"},
+  {"id": "CIN_JOKE", "symbole": "bonnet de bouffon à grelots"},
+  {"id": "CIN_JUMA", "symbole": "plateau de jeu à hublot"},
+  {"id": "CIN_KILL", "symbole": "combinaison jaune à bandes noires"},
+  {"id": "CIN_LALA", "symbole": "lampadaire et étoiles"},
+  {"id": "CIN_WOLF", "symbole": "bouteille de champagne qui saute"},
+  {"id": "CIN_PARR", "symbole": "fils de marionnettiste et rose"},
+  {"id": "CIN_SILE", "symbole": "tête à masque-muselière"},
+  {"id": "CIN_SCOR", "symbole": "taxi jaune de face"}
+]

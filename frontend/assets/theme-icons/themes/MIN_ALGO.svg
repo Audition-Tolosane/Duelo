@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Algorithmique">
+  <path d="M128 66V92M90 128H64V172M166 128H192V172" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="84" y="32" width="88" height="38" rx="19" fill="#12606D"/>
+  <polygon points="128,88 172,128 128,168 84,128" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="34" y="172" width="64" height="48" rx="12" fill="#12606D"/>
+  <rect x="158" y="172" width="64" height="48" rx="12" fill="#FF6B5B"/>
+  <path d="M104 120L116 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

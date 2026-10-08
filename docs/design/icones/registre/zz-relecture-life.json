@@ -1,0 +1,58 @@
+[
+ {
+  "id": "LIF_VISI",
+  "symbole": "œil en amande et rayons de lumière"
+ },
+ {
+  "id": "LIF_SENS",
+  "symbole": "nez de face et volutes d'odeur"
+ },
+ {
+  "id": "LIF_ADAP",
+  "symbole": "tardigrade"
+ },
+ {
+  "id": "LIF_BIOD",
+  "symbole": "feuille et empreinte de patte"
+ },
+ {
+  "id": "LIF_MIGR",
+  "symbole": "vol d'oiseaux et trajectoire"
+ },
+ {
+  "id": "LIF_SAVA",
+  "symbole": "éléphant de profil et soleil"
+ },
+ {
+  "id": "LIF_CHIE",
+  "symbole": "chien de profil, oreille tombante et collier"
+ },
+ {
+  "id": "LIF_CANI",
+  "symbole": "loup assis qui hurle"
+ },
+ {
+  "id": "LIF_REPT",
+  "symbole": "gecko vu de dessus"
+ },
+ {
+  "id": "LIF_PRED",
+  "symbole": "crocodile à fleur d'eau"
+ },
+ {
+  "id": "LIF_NOCT",
+  "symbole": "chauve-souris suspendue et croissant de lune"
+ },
+ {
+  "id": "LIF_MUSC",
+  "symbole": "haltère"
+ },
+ {
+  "id": "LIF_MEMO",
+  "symbole": "hippocampe (animal) de profil, redessiné"
+ },
+ {
+  "id": "LIF_LONG",
+  "symbole": "fontaine de jouvence"
+ }
+]

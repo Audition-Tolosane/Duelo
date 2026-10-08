@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ratatouille">
+  <circle cx="70" cy="80" r="36" fill="#12606D"/>
+  <circle cx="186" cy="80" r="36" fill="#12606D"/>
+  <circle cx="70" cy="80" r="20" fill="#FF6B5B"/>
+  <circle cx="186" cy="80" r="20" fill="#FF6B5B"/>
+  <path d="M128 210C100 198 62 160 62 128C62 92 92 70 128 70C164 70 194 92 194 128C194 160 156 198 128 210Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M110 186L60 176M110 196L62 208M146 186L196 176M146 196L194 208" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="104" cy="132" r="11" fill="#0B3D4A"/>
+  <circle cx="152" cy="132" r="11" fill="#0B3D4A"/>
+  <circle cx="128" cy="200" r="13" fill="#FF6B5B"/>
+  <path d="M84 120Q86 104 98 94" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

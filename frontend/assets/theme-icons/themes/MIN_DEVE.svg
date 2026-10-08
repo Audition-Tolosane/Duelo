@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Psychologie du Développement">
+  <path d="M38 216V178H94V138H150V98H218V216Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="66" cy="156" r="14" fill="#FF6B5B"/>
+  <circle cx="122" cy="108" r="22" fill="#FFDB3D"/>
+  <circle cx="184" cy="58" r="32" fill="#FFDB3D"/>
+  <path d="M54 194L74 194" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

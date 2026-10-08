@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cyclisme Piste">
+  <path d="M24 176C70 170 76 98 132 66C184 42 226 86 216 138C212 164 190 176 170 176H40C28 176 20 178 24 176Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M154 96C190 90 210 102 212 130H154Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M60 156H200" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M100 192C100 214 140 214 156 192" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M100 118C108 100 122 88 138 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

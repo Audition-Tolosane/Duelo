@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ligue 1">
+  <path d="M84 150C40 140 26 92 44 56C66 84 88 98 108 110Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M82 184C46 184 30 158 30 134C54 146 74 154 94 158Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M118 208L110 226M148 206L154 226" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M96 136C100 108 136 100 150 90C148 60 190 52 196 84C200 100 180 112 186 138C194 170 164 202 124 198C88 192 84 160 96 136Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="160" cy="46" r="10" fill="#FF6B5B"/>
+  <circle cx="176" cy="38" r="10" fill="#FF6B5B"/>
+  <circle cx="192" cy="48" r="10" fill="#FF6B5B"/>
+  <polygon points="200,68 228,80 200,92" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="200" cy="108" r="9" fill="#FF6B5B"/>
+  <circle cx="178" cy="70" r="6" fill="#E8F1EC"/>
+  <ellipse cx="136" cy="156" rx="30" ry="20" transform="rotate(-20 136 156)" fill="#FF6B5B"/>
+  <path d="M106 128L116 114" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

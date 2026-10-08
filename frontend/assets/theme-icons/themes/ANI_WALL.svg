@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Wall-E">
+  <path d="M98 84V48" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M98 58C80 58 66 48 64 34C80 34 94 42 98 58Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M98 50C110 38 126 34 140 38C132 52 114 58 98 50Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M64 84H132V136C168 138 206 152 208 184V196H60V92Q60 84 64 84Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M112 112L136 118M112 132L140 138" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="48" y="192" width="168" height="24" rx="12" fill="#FF6B5B"/>
+  <path d="M78 110V150" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

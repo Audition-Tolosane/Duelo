@@ -1,0 +1,12 @@
+[
+  {"id": "MIN_TOLK", "symbole": "porte ronde de hobbit"},
+  {"id": "MIN_AUST", "symbole": "capote Régence à ruban"},
+  {"id": "MIN_SATR", "symbole": "lunettes épaisses et tasse de café"},
+  {"id": "MIN_BVRG", "symbole": "labyrinthe circulaire et fil"},
+  {"id": "MIN_JUDG", "symbole": "casque de juge à visière"},
+  {"id": "MIN_VERN", "symbole": "montgolfière à nacelle"},
+  {"id": "MIN_ALCH", "symbole": "cornue d'alchimiste et goutte d'or"},
+  {"id": "MIN_LWCH", "symbole": "mallette d'affaires"},
+  {"id": "MIN_MNTE", "symbole": "forteresse du château d'If sur îlot"},
+  {"id": "MIN_NROS", "symbole": "rose sur livre fermé à fermoir"}
+]

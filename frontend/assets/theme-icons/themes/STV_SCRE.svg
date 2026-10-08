@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Scrubs">
+  <path d="M84 52L106 44C112 70 144 70 150 44L172 52L216 84L196 124L180 114V212H76V114L60 124L40 84Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M108 50L128 92L148 50Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="88" y="150" width="34" height="30" rx="6" fill="#0B3D4A"/>
+  <path d="M104 52C98 94 110 118 128 128C146 118 158 94 152 52M128 128C128 160 140 176 156 178" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="162" cy="180" r="17" fill="#FFDB3D"/>
+  <circle cx="162" cy="180" r="7" fill="#E8F1EC"/>
+  <path d="M58 94L72 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

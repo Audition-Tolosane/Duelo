@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Hockey sur Glace">
+  <path d="M52 120V164C52 190 84 204 128 204C172 204 204 190 204 164V120Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="120" rx="76" ry="34" fill="#0B3D4A" stroke="#12606D" stroke-width="12"/>
+  <path d="M92 70V50M128 66V38M164 70V50" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M82 118C90 108 100 102 112 100" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

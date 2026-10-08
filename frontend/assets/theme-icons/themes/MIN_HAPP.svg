@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Psychologie Positive">
+  <path d="M64 52H180L166 214H78Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M78 66H166L160 126H84Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M84 130H160L152 200H92Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="112" cy="170" r="7" fill="#E8F1EC"/>
+  <circle cx="134" cy="150" r="5" fill="#E8F1EC"/>
+  <circle cx="130" cy="186" r="4" fill="#E8F1EC"/>
+  <polygon points="200,42 207,60 224,66 207,72 200,90 193,72 176,66 193,60" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M84 74L88 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

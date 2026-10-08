@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Catholicisme, Vatican &amp; Traditions">
+  <g transform="rotate(-36 128 128)">
+  <rect x="118" y="38" width="20" height="124" rx="8" fill="#12606D"/>
+  <path d="M118 44H84V62H100V78H84V96H118Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="186" r="34" fill="#12606D"/>
+  <circle cx="128" cy="186" r="13" fill="#FF6B5B"/>
+  <path d="M104 182A26 26 0 0 1 114 166" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+  <g transform="rotate(36 128 128)">
+  <rect x="118" y="38" width="20" height="124" rx="8" fill="#FFDB3D"/>
+  <path d="M138 44H172V62H156V78H172V96H138Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="186" r="34" fill="#FFDB3D"/>
+  <circle cx="128" cy="186" r="13" fill="#12606D"/>
+  </g>
+</svg>

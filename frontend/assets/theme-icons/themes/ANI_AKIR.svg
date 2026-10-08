@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Akira">
+  <circle cx="66" cy="172" r="30" fill="#12606D"/>
+  <circle cx="66" cy="172" r="13" fill="#FFDB3D"/>
+  <circle cx="192" cy="172" r="30" fill="#12606D"/>
+  <circle cx="192" cy="172" r="13" fill="#FFDB3D"/>
+  <path d="M34 150C32 120 50 96 80 92L104 132L198 128C214 128 224 138 222 150Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M112 124L150 110L168 126Z" fill="#12606D" stroke="#12606D" stroke-width="10" stroke-linejoin="round"/>
+  <circle cx="48" cy="128" r="10" fill="#FFDB3D"/>
+  <path d="M60 104L76 100" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

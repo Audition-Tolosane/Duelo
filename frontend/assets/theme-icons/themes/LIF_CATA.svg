@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Forces Naturelles">
+  <path d="M54 50H204" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M72 80H198" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M94 110H186" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M110 140H170" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M118 170H150" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M124 200H134" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <polygon points="66,112 92,112 80,142 100,142 62,200 70,160 52,160" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="186" cy="176" r="10" fill="#FF6B5B"/>
+  <circle cx="206" cy="148" r="7" fill="#FF6B5B"/>
+  <path d="M66 50L94 50" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

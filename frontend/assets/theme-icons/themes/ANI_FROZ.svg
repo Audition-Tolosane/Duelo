@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="La Reine des Neiges">
+  <path d="M100 130L62 108M70 113L58 96M156 130L194 108M186 113L198 96M128 52V36M128 44L118 36" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="180" r="44" fill="#12606D"/>
+  <circle cx="128" cy="132" r="30" fill="#12606D"/>
+  <ellipse cx="128" cy="82" rx="40" ry="32" fill="#12606D"/>
+  <circle cx="112" cy="74" r="11" fill="#E8F1EC"/>
+  <circle cx="144" cy="74" r="11" fill="#E8F1EC"/>
+  <circle cx="114" cy="76" r="5" fill="#0B3D4A"/>
+  <circle cx="142" cy="76" r="5" fill="#0B3D4A"/>
+  <polygon points="126,88 126,100 166,96" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="128" cy="130" r="7" fill="#0B3D4A"/>
+  <circle cx="128" cy="170" r="7" fill="#0B3D4A"/>
+  <path d="M100 168Q102 152 114 144" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

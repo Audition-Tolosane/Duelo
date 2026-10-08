@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Festivals du Monde">
+  <path d="M128 108L90 214M128 108L166 214" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M76 220H180" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="108" r="70" fill="none" stroke="#12606D" stroke-width="12"/>
+  <path d="M128 38V178M58 108H198M78 58L178 158M178 58L78 158" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="108" r="14" fill="#FFDB3D"/>
+  <circle cx="198" cy="108" r="12" fill="#FFDB3D"/>
+  <circle cx="163" cy="47" r="12" fill="#FF6B5B"/>
+  <circle cx="93" cy="47" r="12" fill="#FFDB3D"/>
+  <circle cx="58" cy="108" r="12" fill="#FF6B5B"/>
+  <circle cx="93" cy="169" r="12" fill="#FFDB3D"/>
+  <circle cx="163" cy="169" r="12" fill="#FF6B5B"/>
+  <path d="M72 82Q76 68 88 58" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

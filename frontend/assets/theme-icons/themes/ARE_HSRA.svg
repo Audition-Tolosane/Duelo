@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Honkai: Star Rail">
+  <path d="M128 28C132 62 144 74 178 78C144 82 132 94 128 128C124 94 112 82 78 78C112 74 124 62 128 28Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M114 140L68 218" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M142 140L188 218" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M92 166H164" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M76 198H180" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M96 78H110" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

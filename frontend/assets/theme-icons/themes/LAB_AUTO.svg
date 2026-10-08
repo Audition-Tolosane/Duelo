@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Véhicules Autonomes">
+  <rect x="80" y="94" width="16" height="34" rx="6" fill="#12606D"/>
+  <rect x="160" y="94" width="16" height="34" rx="6" fill="#12606D"/>
+  <rect x="80" y="160" width="16" height="34" rx="6" fill="#12606D"/>
+  <rect x="160" y="160" width="16" height="34" rx="6" fill="#12606D"/>
+  <rect x="90" y="64" width="76" height="152" rx="30" fill="#12606D"/>
+  <path d="M104 118L110 94H146L152 118Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M108 184H148L144 198H112Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="128" cy="150" r="14" fill="#FFDB3D"/>
+  <rect x="100" y="68" width="16" height="10" rx="5" fill="#FFDB3D"/>
+  <rect x="140" y="68" width="16" height="10" rx="5" fill="#FFDB3D"/>
+  <path d="M72 126A28 28 0 0 0 72 174M54 106A52 52 0 0 0 54 194M184 126A28 28 0 0 1 184 174M202 106A52 52 0 0 1 202 194" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M104 132V150" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

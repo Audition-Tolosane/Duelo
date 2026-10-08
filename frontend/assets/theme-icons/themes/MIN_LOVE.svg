@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="H.P. Lovecraft">
+  <polygon points="60,50 66,64 80,68 66,72 60,86 54,72 40,68 54,64" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="98" cy="42" r="7" fill="#FFDB3D"/>
+  <path d="M88 204C84 150 104 100 148 80C180 66 206 84 196 110C188 128 162 126 164 106C150 110 138 130 136 156C134 176 142 194 156 204Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M126 186h0M126 158h0M134 132h0M152 112h0" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M40 210Q51 198 62 210T84 210T106 210T128 210T150 210T172 210T194 210T216 210" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M106 140L116 116" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

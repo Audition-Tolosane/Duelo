@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Rap US Classics">
+  <path d="M44 36C48 100 90 124 128 124C166 124 208 100 212 36" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M42 82L64 72M65 113L81 95M95 131L103 109M214 82L192 72M191 113L175 95M161 131L153 109" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="174" r="46" fill="#FF6B5B"/>
+  <polygon points="128,146 136,164 156,166 141,179 146,198 128,188 110,198 115,179 100,166 120,164" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M98 158C102 150 108 144 116 140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

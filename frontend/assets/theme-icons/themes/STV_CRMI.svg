@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Esprits criminels">
+  <rect x="36" y="48" width="184" height="160" rx="14" fill="#12606D"/>
+  <rect x="58" y="72" width="44" height="54" rx="4" fill="#FFDB3D"/>
+  <rect x="150" y="70" width="48" height="42" rx="4" fill="#FFDB3D"/>
+  <rect x="104" y="134" width="50" height="50" rx="4" fill="#FFDB3D"/>
+  <path d="M80 84L174 80L130 144Z" fill="none" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="80" cy="84" r="9" fill="#FF6B5B"/>
+  <circle cx="174" cy="80" r="9" fill="#FF6B5B"/>
+  <circle cx="130" cy="144" r="9" fill="#FF6B5B"/>
+  <path d="M46 150L46 186" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

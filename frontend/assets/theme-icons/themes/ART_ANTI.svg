@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sculpture Antique">
+  <circle cx="146" cy="50" r="11" fill="#12606D"/>
+  <circle cx="128" cy="60" r="21" fill="#12606D"/>
+  <rect x="118" y="72" width="20" height="18" rx="6" fill="#12606D"/>
+  <path d="M104 88C114 82 142 82 152 88L162 104L150 112C150 124 152 134 154 140L166 196H90L102 140C104 132 106 122 104 112L94 104Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M98 148L152 134L166 196H90Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M116 160L110 190M140 156L146 190" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="68" y="196" width="120" height="24" rx="10" fill="#FFDB3D"/>
+  <path d="M114 98L112 120" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

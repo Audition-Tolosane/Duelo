@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Garfield">
+  <path d="M176 140C212 130 222 96 202 72C194 62 196 50 208 46" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M206 92L222 86M200 116L216 116" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M58 92C70 78 82 92 94 80C106 92 118 78 130 90C142 78 154 92 166 80C178 92 190 78 198 88V106H58Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="52" y="106" width="152" height="14" rx="6" fill="#FF6B5B"/>
+  <rect x="52" y="120" width="152" height="18" rx="6" fill="#FFDB3D"/>
+  <rect x="32" y="134" width="192" height="22" rx="11" fill="#12606D"/>
+  <path d="M48 150H208L198 200C196 208 190 214 182 214H74C66 214 60 208 58 200Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M68 166L72 190" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

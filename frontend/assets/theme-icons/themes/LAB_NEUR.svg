@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Réseaux de Neurones">
+  <path d="M56 80L128 56M56 80L128 104M56 80L128 152M56 80L128 200M56 128L128 56M56 128L128 104M56 128L128 152M56 128L128 200M56 176L128 56M56 176L128 104M56 176L128 152M56 176L128 200M128 56L200 104M128 104L200 104M128 152L200 104M128 200L200 104M128 56L200 152M128 104L200 152M128 152L200 152M128 200L200 152" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="56" cy="80" r="18" fill="#FF6B5B"/>
+  <circle cx="56" cy="128" r="18" fill="#FF6B5B"/>
+  <circle cx="56" cy="176" r="18" fill="#FF6B5B"/>
+  <circle cx="128" cy="56" r="22" fill="#12606D"/>
+  <circle cx="128" cy="104" r="22" fill="#12606D"/>
+  <circle cx="128" cy="152" r="22" fill="#12606D"/>
+  <circle cx="128" cy="200" r="22" fill="#12606D"/>
+  <circle cx="200" cy="104" r="22" fill="#FFDB3D"/>
+  <circle cx="200" cy="152" r="22" fill="#FFDB3D"/>
+  <path d="M116 56A12 12 0 0 1 124 45" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

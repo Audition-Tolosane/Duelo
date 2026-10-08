@@ -1,0 +1,12 @@
+[
+  {"id": "ART_ABST", "symbole": "toile à grille Mondrian"},
+  {"id": "ART_BARO", "symbole": "colonne torse baroque"},
+  {"id": "ART_CONT", "symbole": "chien en ballons sur socle"},
+  {"id": "ART_RODI", "symbole": "Penseur assis sur socle"},
+  {"id": "ART_PIGM", "symbole": "palette de peintre et couleurs"},
+  {"id": "ART_FEMM", "symbole": "symbole féminin et pinceau"},
+  {"id": "ART_KAHLO", "symbole": "couronne de fleurs sur chevelure"},
+  {"id": "ART_IMPR", "symbole": "chevalet et soleil levant"},
+  {"id": "ART_VINCI", "symbole": "Homme de Vitruve"},
+  {"id": "ART_MICH", "symbole": "mains de la Création d'Adam"}
+]

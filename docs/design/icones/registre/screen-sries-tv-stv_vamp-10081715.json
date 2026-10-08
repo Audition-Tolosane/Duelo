@@ -1,0 +1,12 @@
+[
+  {"id": "STV_VAMP", "symbole": "bague de jour à pierre"},
+  {"id": "STV_WALK", "symbole": "arbalète armée d'un carreau"},
+  {"id": "STV_WWIN", "symbole": "façade de la Maison Blanche"},
+  {"id": "STV_WHIT", "symbole": "transat sous parasol rayé"},
+  {"id": "STV_WIRE", "symbole": "bipeur et fil torsadé"},
+  {"id": "STV_WITC", "symbole": "deux épées croisées et potion"},
+  {"id": "STV_XFIL", "symbole": "lampe torche et tête d'alien"},
+  {"id": "STV_THIS", "symbole": "mijoteuse Crock-Pot fumante"},
+  {"id": "STV_TOPB", "symbole": "tour HLM couronnée"},
+  {"id": "STV_TRUE", "symbole": "treillis de brindilles et spirale"}
+]

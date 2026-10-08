@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="NASCAR &amp; Sport Auto US">
+  <rect x="32" y="148" width="28" height="64" rx="8" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="196" y="148" width="28" height="64" rx="8" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M84 100L100 54H156L172 100Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M104 94L112 66H144L152 94Z" fill="#0B3D4A"/>
+  <path d="M60 104H196C204 104 208 110 208 118V186C208 196 202 202 194 202H62C54 202 48 196 48 186V118C48 110 52 104 60 104Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="82" cy="140" r="14" fill="#E8F1EC"/>
+  <circle cx="174" cy="140" r="14" fill="#E8F1EC"/>
+  <rect x="100" y="156" width="56" height="24" rx="8" fill="#0B3D4A"/>
+  <path d="M68 120L90 114" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

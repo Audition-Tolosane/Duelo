@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Australie">
+  <path d="M40 94L58 52L100 42" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="160" cy="46" rx="8" ry="20" transform="rotate(-18 160 46)" fill="#12606D"/>
+  <path d="M150 66C152 52 168 46 182 52L204 66C210 70 208 78 200 78H186C180 90 178 104 180 118C186 140 184 160 174 176L196 196C210 198 212 210 200 212H150C140 212 136 204 140 196L142 192C128 196 112 196 100 188L44 214C34 218 28 208 36 202L92 166C88 146 96 118 116 100C130 88 146 82 150 66Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M182 122L198 140" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M110 176C128 172 142 160 146 142" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="180" cy="62" r="6" fill="#0B3D4A"/>
+  <path d="M106 128C110 116 118 108 128 102" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

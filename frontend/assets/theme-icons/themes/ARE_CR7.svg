@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cristiano Ronaldo">
+  <path d="M52 62H116V108C132 122 168 128 198 148C216 160 214 182 198 184H52Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="46" y="186" width="168" height="18" rx="8" fill="#FF6B5B"/>
+  <rect x="60" y="200" width="16" height="18" rx="4" fill="#FF6B5B"/>
+  <rect x="118" y="200" width="16" height="18" rx="4" fill="#FF6B5B"/>
+  <rect x="176" y="200" width="16" height="18" rx="4" fill="#FF6B5B"/>
+  <path d="M128 118L144 108M148 126L164 116M168 134L184 124" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M66 90V130" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

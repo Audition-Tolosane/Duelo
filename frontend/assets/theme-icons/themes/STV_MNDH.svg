@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mindhunter">
+  <path d="M42 66C42 60 46 56 52 56H96L110 70H202C208 70 212 74 212 80V196C212 202 208 206 202 206H52C46 206 42 202 42 196Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <g transform="rotate(-8 128 110)">
+    <rect x="72" y="50" width="112" height="112" rx="6" fill="#FFDB3D"/>
+    <circle cx="112" cy="84" r="14" fill="#12606D"/>
+    <path d="M88 120C88 104 98 98 112 98C126 98 136 104 136 120Z" fill="#12606D"/>
+    <path d="M148 80H168M148 100H168" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  </g>
+  <path d="M38 122C38 116 42 112 48 112H208C214 112 218 116 218 122L212 206C212 212 208 216 202 216H54C48 216 44 212 44 206Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="80" y="148" width="96" height="26" rx="8" fill="#FF6B5B"/>
+  <path d="M60 134L60 154" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

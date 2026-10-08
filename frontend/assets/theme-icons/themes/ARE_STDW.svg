@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Stardew Valley">
+  <path d="M128 86C100 76 84 54 90 44C116 48 130 66 128 86Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 86C156 76 172 54 166 44C140 48 126 66 128 86Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 86C112 64 116 48 128 40C140 48 144 64 128 86Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 84C178 84 204 112 196 142C190 172 156 196 128 218C100 196 66 172 60 142C52 112 78 84 128 84Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M82 122C104 106 152 106 174 122" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M82 156L90 138" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

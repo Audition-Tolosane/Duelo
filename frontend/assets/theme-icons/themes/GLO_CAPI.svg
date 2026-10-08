@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Capitales">
+  <polygon points="40,64 96,48 160,64 216,48 216,192 160,208 96,192 40,208" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M96 52V188M160 68V204" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M66 178C80 160 94 172 108 152" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="186" cy="168" r="10" fill="#FFDB3D"/>
+  <polygon points="128,90 137.4,111.1 160.3,113.5 143.2,128.9 148,151.5 128,140 108,151.5 112.8,128.9 95.7,113.5 118.6,111.1" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M58 94L58 114" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

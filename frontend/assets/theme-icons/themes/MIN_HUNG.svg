@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Hunger Games">
+  <path d="M48 72C54 118 92 108 120 106L184 98V198L120 186C76 178 38 140 48 72Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M100 110C92 140 96 164 108 182M146 104C138 136 140 166 150 190" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="184" cy="148" rx="26" ry="54" fill="#FFDB3D"/>
+  <ellipse cx="186" cy="148" rx="16" ry="42" fill="#0B3D4A"/>
+  <circle cx="186" cy="128" r="13" fill="#FF6B5B"/>
+  <circle cx="184" cy="164" r="12" fill="#FF6B5B"/>
+  <path d="M58 96Q70 112 92 116" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

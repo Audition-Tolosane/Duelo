@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Western Classics">
+  <rect x="32" y="76" width="16" height="148" rx="8" fill="#12606D"/>
+  <rect x="208" y="76" width="16" height="148" rx="8" fill="#12606D"/>
+  <g transform="rotate(7 60 96)"><rect x="56" y="96" width="68" height="100" rx="12" fill="#FF6B5B"/><path d="M68 140H112M68 164H112" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M68 116H82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g>
+  <g transform="rotate(-7 196 96)"><rect x="132" y="96" width="68" height="100" rx="12" fill="#FF6B5B"/><path d="M144 140H188M144 164H188" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g>
+  <rect x="28" y="58" width="200" height="24" rx="12" fill="#FFDB3D"/>
+</svg>

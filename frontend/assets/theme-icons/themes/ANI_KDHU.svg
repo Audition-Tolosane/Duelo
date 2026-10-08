@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="KPop Demon Hunters">
+  <circle cx="64" cy="94" r="22" fill="#12606D"/>
+  <circle cx="192" cy="94" r="22" fill="#12606D"/>
+  <ellipse cx="128" cy="144" rx="88" ry="70" fill="#12606D"/>
+  <path d="M128 80V98M104 86L110 102M152 86L146 102M42 140H62M194 140H214" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <circle cx="100" cy="128" r="16" fill="#E8F1EC"/>
+  <circle cx="156" cy="128" r="16" fill="#E8F1EC"/>
+  <path d="M97 130a7 7 0 1 0 14 0a7 7 0 1 0 -14 0ZM145 130a7 7 0 1 0 14 0a7 7 0 1 0 -14 0Z" fill="#0B3D4A"/>
+  <ellipse cx="128" cy="158" rx="13" ry="9" fill="#FF6B5B"/>
+  <path d="M90 170Q128 204 166 170" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <ellipse cx="146" cy="64" rx="24" ry="14" fill="#FF6B5B"/>
+  <circle cx="124" cy="56" r="12" fill="#FF6B5B"/>
+  <polygon points="112,54 100,60 112,64" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M106 42H142M118 40V30H130V40" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 132Q64 108 78 96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

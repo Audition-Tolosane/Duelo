@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Iznogoud">
+  <path d="M136 32A14 14 0 1 0 136 58A11 11 0 1 1 136 32Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M128 66V56" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M80 176V116C80 96 104 86 128 64C152 86 176 96 176 116V176Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M100 160V122C100 110 116 102 128 90C140 102 156 110 156 122V160Z" fill="#FFDB3D"/>
+  <path d="M84 196V220M172 196V220" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M60 148V176M196 148V176" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <rect x="62" y="166" width="132" height="32" rx="14" fill="#FF6B5B"/>
+  <path d="M60 148h0M196 148h0" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M94 116C98 106 106 100 114 94" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Vins &amp; Terroirs">
+  <path d="M128 84C128 66 124 54 116 42" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M136 72C140 52 160 40 178 46C184 38 200 38 206 48C214 58 208 68 200 72C210 76 212 90 202 96C190 102 176 94 172 86C160 90 144 86 136 72Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M146 72L190 62" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="68" cy="106" r="18" fill="#12606D"/>
+  <circle cx="108" cy="106" r="18" fill="#12606D"/>
+  <circle cx="148" cy="106" r="18" fill="#12606D"/>
+  <circle cx="188" cy="106" r="18" fill="#12606D"/>
+  <circle cx="88" cy="142" r="18" fill="#12606D"/>
+  <circle cx="128" cy="142" r="18" fill="#12606D"/>
+  <circle cx="168" cy="142" r="18" fill="#12606D"/>
+  <circle cx="108" cy="178" r="18" fill="#12606D"/>
+  <circle cx="148" cy="178" r="18" fill="#12606D"/>
+  <circle cx="128" cy="212" r="18" fill="#12606D"/>
+  <path d="M60 104A10 10 0 0 1 68 96" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

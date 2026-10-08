@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fléau des Huns">
+  <path d="M160 46L160 210" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M172 50C160 36 140 38 130 54C96 92 96 164 130 202C140 218 160 220 172 206" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M104 112V144" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M66 128H210" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <polygon points="38,128 66,112 66,144" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M196 128L214 108M196 128L214 148" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M116 80C112 90 110 98 110 106" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

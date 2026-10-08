@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Street Fighter">
+  <circle cx="128" cy="128" r="86" fill="#12606D" stroke="#12606D" stroke-width="12"/>
+  <path d="M96 78V118A46 46 0 0 0 142 164H150" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="148,144 148,184 182,164" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="176" cy="92" r="24" fill="#FF6B5B"/>
+  <path d="M52 124C52 100 62 82 78 68" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

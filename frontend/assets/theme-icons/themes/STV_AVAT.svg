@@ -1,6 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Avatar: The Last Airbender">
-  <circle cx="128" cy="128" r="84" fill="#12606D"/>
-  <polygon points="128,60 174,114 146,114 146,160 110,160 110,114 82,114" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
-  <polyline points="102,194 128,176 154,194" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M70 104A62 62 0 0 1 96 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M52 224C52 190 84 170 128 170C172 170 204 190 204 224Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="176" rx="46" ry="14" fill="#FF6B5B"/>
+  <circle cx="62" cy="120" r="14" fill="#FF6B5B"/>
+  <circle cx="194" cy="120" r="14" fill="#FF6B5B"/>
+  <circle cx="128" cy="112" r="66" fill="#FF6B5B"/>
+  <path d="M128 50V100" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="104,102 152,102 128,128" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M98 146Q108 154 118 146" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M138 146Q148 154 158 146" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M80 98Q84 78 100 66" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Disney">
+  <polygon points="200,34 206,46 218,52 206,58 200,70 194,58 182,52 194,46" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="74,84 58,126 90,126" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="182,84 166,126 198,126" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="128,40 108,94 148,94" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="56" y="128" width="36" height="86" rx="6" fill="#12606D"/>
+  <rect x="164" y="128" width="36" height="86" rx="6" fill="#12606D"/>
+  <rect x="104" y="96" width="48" height="118" rx="6" fill="#12606D"/>
+  <rect x="40" y="166" width="176" height="48" rx="10" fill="#12606D"/>
+  <path d="M110 214V192C110 180 118 172 128 172C138 172 146 180 146 192V214Z" fill="#FFDB3D"/>
+  <rect x="120" y="112" width="16" height="28" rx="8" fill="#FFDB3D"/>
+  <path d="M66 142L66 160" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

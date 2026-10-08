@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Musée du Louvre">
+  <polygon points="44,198 128,50 212,198" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 50L102 198M128 50L154 198M88 120H168M66 160H190" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="32" y="198" width="192" height="22" rx="11" fill="#FF6B5B"/>
+  <path d="M80 150L94 128" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

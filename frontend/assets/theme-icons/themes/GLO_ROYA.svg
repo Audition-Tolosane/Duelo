@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Royaume-Uni">
+  <polygon points="128,32 110,74 146,74" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="104" y="72" width="48" height="32" rx="4" fill="#12606D"/>
+  <rect x="118" y="80" width="20" height="16" rx="6" fill="#FFDB3D"/>
+  <rect x="90" y="100" width="76" height="76" rx="8" fill="#12606D"/>
+  <circle cx="128" cy="138" r="25" fill="#FFDB3D"/>
+  <path d="M128 138V122M128 138L140 146" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="100" y="172" width="56" height="40" rx="4" fill="#12606D"/>
+  <path d="M116 182V202M140 182V202" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="80" y="206" width="96" height="16" rx="8" fill="#12606D"/>
+  <path d="M98 112V122" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

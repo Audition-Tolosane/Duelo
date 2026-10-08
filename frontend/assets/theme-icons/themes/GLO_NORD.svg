@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Grand Nord">
+  <path d="M36 72C68 44 92 88 128 60C160 36 188 72 220 46" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M52 100C78 78 102 108 132 88C160 70 182 96 206 80" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M40 210C40 150 78 112 128 112C178 112 216 150 216 210Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M86 140H178M58 174H198M128 118V140M100 140V174M156 140V174" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M100 212V194C100 172 156 172 156 194V212Z" fill="#0B3D4A"/>
+  <path d="M62 156C68 140 78 128 92 122" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

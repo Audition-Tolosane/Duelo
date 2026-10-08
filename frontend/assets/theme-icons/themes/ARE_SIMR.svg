@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sim Racing">
+  <circle cx="128" cy="128" r="84" stroke="#12606D" stroke-width="20" fill="none"/>
+  <path d="M46 132H100M156 132H210M128 156V212" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="128" r="28" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12"/>
+  <path d="M128 38V54" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M62 86L74 64" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

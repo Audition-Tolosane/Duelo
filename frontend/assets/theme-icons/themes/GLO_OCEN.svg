@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Océanie">
+  <path d="M128 204V128M128 172L92 142L84 96M92 142L58 124L54 84M128 146L164 116L170 72M164 116L198 102L202 66M128 128L118 76" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M56 216C70 194 186 194 200 216Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="78" cy="176" rx="20" ry="12" fill="#FFDB3D"/>
+  <path d="M96 176L110 166V186Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M54 96L56 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

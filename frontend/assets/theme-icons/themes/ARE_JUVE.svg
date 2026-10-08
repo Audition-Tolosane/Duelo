@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Juventus">
+  <path d="M56 48H200V130C200 178 164 204 128 220C92 204 56 178 56 130Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="82" y="72" width="22" height="84" rx="4" fill="#0B3D4A"/>
+  <rect x="117" y="72" width="22" height="84" rx="4" fill="#E8F1EC"/>
+  <rect x="152" y="72" width="22" height="84" rx="4" fill="#0B3D4A"/>
+  <polygon points="128,160 132.7,171.5 145.1,172.4 135.6,180.5 138.6,192.6 128,186 117.4,192.6 120.4,180.5 110.9,172.4 123.3,171.5" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M70 66V108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

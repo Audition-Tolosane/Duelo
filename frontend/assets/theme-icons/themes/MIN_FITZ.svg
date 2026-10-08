@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="F. Scott Fitzgerald">
+  <circle cx="104" cy="62" r="9" fill="#FFDB3D"/>
+  <circle cx="134" cy="40" r="7" fill="#FFDB3D"/>
+  <circle cx="156" cy="64" r="11" fill="#FF6B5B"/>
+  <path d="M44 86H212C212 130 176 146 128 146C80 146 44 130 44 86Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M58 96H198C194 122 166 134 128 134C90 134 62 122 58 96Z" fill="#FFDB3D"/>
+  <rect x="120" y="144" width="16" height="54" rx="6" fill="#12606D"/>
+  <ellipse cx="128" cy="204" rx="54" ry="14" fill="#12606D"/>
+  <path d="M74 104C78 114 84 120 94 124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

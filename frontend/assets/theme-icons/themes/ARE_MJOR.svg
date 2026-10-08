@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Michael Jordan">
+  <path d="M62 60H112L120 118C148 122 184 134 202 154C210 162 210 172 202 176H56C52 140 54 98 62 60Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="46" y="174" width="170" height="30" rx="12" fill="#FFDB3D"/>
+  <path d="M150 138C170 142 188 150 198 164H150Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M60 124H90V170H58Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M110 92L126 88M114 112L132 108M122 132L140 128" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="180" cy="76" r="30" fill="#FFDB3D"/>
+  <path d="M150 76H210M180 46V106M160 54C170 66 170 86 160 98M200 54C190 66 190 86 200 98" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M74 76V100" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

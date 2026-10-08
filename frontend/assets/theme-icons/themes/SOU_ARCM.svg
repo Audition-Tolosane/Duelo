@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Arctic Monkeys">
+  <path d="M52 118C46 70 102 36 164 42C204 46 222 74 212 104C206 120 190 126 178 118C188 104 182 88 166 86C134 84 96 104 70 126Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M80 96C110 74 146 64 178 66M98 104C122 92 148 86 172 86" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g transform="rotate(-10 128 168)">
+  <rect x="40" y="140" width="176" height="30" rx="12" fill="#FFDB3D"/>
+  <path d="M58 170V206M78 170V206M98 170V206M118 170V206M138 170V206M158 170V206M178 170V206M198 170V206" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <circle cx="188" cy="102" r="8" fill="#FF6B5B"/>
+  <path d="M62 102C64 86 72 72 84 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

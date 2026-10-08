@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mythes Polynésiens">
+  <path d="M68 66L86 38L106 60L128 34L150 60L170 38L188 66Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M78 56H178C190 56 196 64 196 76V148C196 174 184 196 172 216H84C72 196 60 174 60 148V76C60 64 66 56 78 56Z" fill="#12606D"/>
+  <ellipse cx="100" cy="112" rx="24" ry="17" transform="rotate(14 100 112)" fill="#FFDB3D"/>
+  <ellipse cx="156" cy="112" rx="24" ry="17" transform="rotate(-14 156 112)" fill="#FFDB3D"/>
+  <circle cx="102" cy="112" r="8" fill="#12606D"/>
+  <circle cx="154" cy="112" r="8" fill="#12606D"/>
+  <rect x="80" y="158" width="96" height="30" rx="15" fill="#FFDB3D"/>
+  <path d="M84 173H172" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M114 176H142V198C142 212 114 212 114 198Z" fill="#FF6B5B"/>
+  <path d="M76 76L76 96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

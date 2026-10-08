@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Lucha Libre">
+  <path d="M128 28C82 28 62 76 66 128C68 172 92 214 128 218C164 214 188 172 190 128C194 76 174 28 128 28Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 44V92" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="86,108 118,126 108,142 84,132" fill="#0B3D4A" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="170,108 138,126 148,142 172,132" fill="#0B3D4A" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="106" y="170" width="44" height="26" rx="13" fill="#0B3D4A"/>
+  <path d="M86 78C92 66 100 58 110 52" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

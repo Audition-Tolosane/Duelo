@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Doraemon">
+  <path d="M36 82Q128 124 220 82L220 104Q128 146 36 104Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="164" r="56" fill="#FFDB3D"/>
+  <rect x="76" y="138" width="104" height="14" rx="7" fill="#0B3D4A"/>
+  <circle cx="128" cy="180" r="11" fill="#0B3D4A"/>
+  <path d="M128 186L128 216" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M94 128Q102 116 114 112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

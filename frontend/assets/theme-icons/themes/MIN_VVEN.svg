@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="V pour Vendetta">
+  <path d="M128 34C178 34 202 70 202 110C202 160 168 212 128 220C88 212 54 160 54 110C54 70 78 34 128 34Z" fill="#FFDB3D"/>
+  <path d="M80 94C92 82 108 82 118 92M138 92C148 82 164 82 176 94" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M86 116C94 106 108 106 116 116M140 116C148 106 162 106 170 116" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <circle cx="88" cy="140" r="10" fill="#FF6B5B"/>
+  <circle cx="168" cy="140" r="10" fill="#FF6B5B"/>
+  <path d="M128 152C112 140 92 148 78 132C82 160 110 166 128 158C146 166 174 160 178 132C164 148 144 140 128 152Z" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M110 174C122 182 134 182 146 174" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <polygon points="122,184 134,184 128,206" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M76 84A60 60 0 0 1 96 54" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

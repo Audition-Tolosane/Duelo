@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="James Bond">
+  <circle cx="128" cy="128" r="94" fill="#12606D"/>
+  <circle cx="128" cy="128" r="64" fill="#0B3D4A"/>
+  <path d="M128 98Q164 92 184 120" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 98Q164 92 184 120" transform="rotate(90 128 128)" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 98Q164 92 184 120" transform="rotate(180 128 128)" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 98Q164 92 184 120" transform="rotate(270 128 128)" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="128" r="16" fill="#E8F1EC"/>
+  <path d="M58 90A80 80 0 0 1 88 58" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

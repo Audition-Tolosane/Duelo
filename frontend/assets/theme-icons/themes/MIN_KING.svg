@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Stephen King">
+  <path d="M128 156C116 166 140 172 128 186" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="52" y="180" width="152" height="40" rx="16" fill="#12606D"/>
+  <circle cx="110" cy="200" r="8" fill="#FFDB3D"/>
+  <circle cx="146" cy="200" r="8" fill="#FFDB3D"/>
+  <ellipse cx="128" cy="90" rx="52" ry="58" fill="#FF6B5B"/>
+  <polygon points="128,146 120,156 136,156" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M96 84A36 40 0 0 1 112 54" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Gossip Girl">
+  <path d="M40 168A88 88 0 0 1 216 168L190 168A62 62 0 0 0 66 168Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="183" cy="122" r="10" fill="#FFDB3D"/>
+  <circle cx="158" cy="103" r="10" fill="#FFDB3D"/>
+  <circle cx="128" cy="96" r="10" fill="#FFDB3D"/>
+  <circle cx="98" cy="103" r="10" fill="#FFDB3D"/>
+  <circle cx="73" cy="122" r="10" fill="#FFDB3D"/>
+  <path d="M96 184C106 170 120 172 128 180C136 172 150 170 160 184C148 206 108 206 96 184Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M104 186Q128 196 152 186" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M56 154L62 138" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Villes du Monde">
+  <rect x="120" y="50" width="16" height="164" rx="8" fill="#12606D"/>
+  <rect x="84" y="206" width="88" height="16" rx="8" fill="#12606D"/>
+  <circle cx="128" cy="44" r="11" fill="#FF6B5B"/>
+  <polygon points="62,66 180,66 206,84 180,102 62,102" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="196,118 78,118 52,136 78,154 196,154" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="78,170 164,170 188,184 164,198 78,198" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M104 84H168" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M90 136H160" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M96 184H150" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M68 80L80 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

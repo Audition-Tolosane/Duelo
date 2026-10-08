@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Maison Hermès">
+  <path d="M52 118Q48 166 70 186H186Q206 164 202 112Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M44 92Q46 70 64 78Q80 108 128 108Q170 106 192 86Q206 78 212 92Q210 116 186 126Q128 146 70 128Q44 118 44 92Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M156 116V186" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M138 214Q138 190 156 188Q174 190 174 214Z" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M56 98Q56 88 64 86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

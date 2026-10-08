@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sud-América">
+  <path d="M84 168V208M106 168V208M150 168V208M172 168V208" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M68 136C56 132 52 120 58 110" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="62" y="120" width="124" height="56" rx="28" fill="#12606D"/>
+  <rect x="150" y="62" width="34" height="90" rx="17" fill="#12606D"/>
+  <rect x="150" y="54" width="58" height="34" rx="17" fill="#12606D"/>
+  <path d="M160 58L156 34M176 58L178 34" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="86" y="112" width="64" height="44" rx="10" fill="#FFDB3D"/>
+  <path d="M94 136L104 126L114 136L124 126L134 136L142 128" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="182" cy="68" r="6" fill="#E8F1EC"/>
+  <path d="M162 100V120" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

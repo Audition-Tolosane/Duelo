@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Shining">
+  <rect x="32" y="176" width="192" height="44" rx="12" fill="#FF6B5B"/>
+  <path d="M44 192L56 184L72 184L84 192L100 192L112 184L128 184L140 192L156 192L168 184L184 184L196 192L212 192M56 184V176M84 192V206M112 184V176M140 192V206M168 184V176M196 192V206" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M76 164L96 110H154L160 146" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M154 110L146 76M132 76H164" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="80" y="98" width="36" height="14" rx="7" fill="#FF6B5B"/>
+  <circle cx="76" cy="164" r="18" fill="#12606D"/>
+  <circle cx="76" cy="164" r="6" fill="#FF6B5B"/>
+  <circle cx="160" cy="146" r="36" fill="#12606D"/>
+  <circle cx="160" cy="146" r="22" fill="#0B3D4A"/>
+  <circle cx="160" cy="146" r="8" fill="#FF6B5B"/>
+  <path d="M133 136A29 29 0 0 1 145 121" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

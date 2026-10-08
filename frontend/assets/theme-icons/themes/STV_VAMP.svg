@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Vampire Diaries">
+  <ellipse cx="128" cy="164" rx="70" ry="46" stroke="#FFDB3D" stroke-width="20" fill="none"/>
+  <path d="M100 122L156 122L148 140L108 140Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="100" rx="48" ry="38" fill="#12606D"/>
+  <ellipse cx="128" cy="100" rx="32" ry="24" fill="#0B3D4A"/>
+  <path d="M116 100L128 86L140 100L128 114Z" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M96 92A34 28 0 0 1 108 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

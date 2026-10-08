@@ -1,0 +1,12 @@
+[
+  {"id": "LIF_HORM", "symbole": "molécule stéroïde à quatre cycles"},
+  {"id": "LIF_IMMU", "symbole": "anticorps en Y et virus"},
+  {"id": "LIF_SENS", "symbole": "œil en amande à cinq cils"},
+  {"id": "LIF_LONG", "symbole": "chromosome aux télomères jaunes"},
+  {"id": "LIF_MICR", "symbole": "bactérie bâtonnet à flagelles"},
+  {"id": "LIF_MUSC", "symbole": "bras fléchi et biceps"},
+  {"id": "LIF_MEMO", "symbole": "hippocampe (animal) de profil"},
+  {"id": "LIF_NUTR", "symbole": "avocat coupé et noyau"},
+  {"id": "LIF_PEAU", "symbole": "pansement adhésif"},
+  {"id": "LIF_PSYC", "symbole": "tête de profil et spirale"}
+]

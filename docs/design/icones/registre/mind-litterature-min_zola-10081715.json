@@ -1,0 +1,12 @@
+[
+  {"id": "MIN_ZOLA", "symbole": "lampe de mineur"},
+  {"id": "MIN_HEMI", "symbole": "machine à écrire"},
+  {"id": "MIN_FITZ", "symbole": "coupe de champagne et bulles"},
+  {"id": "MIN_FOND", "symbole": "livre à galaxie spirale"},
+  {"id": "MIN_KAFK", "symbole": "insecte sur le dos"},
+  {"id": "MIN_GARC", "symbole": "petit poisson d'or"},
+  {"id": "MIN_GARF", "symbole": "plat de lasagnes et queue"},
+  {"id": "MIN_GAST", "symbole": "mouette rieuse ailes déployées"},
+  {"id": "MIN_ORWE", "symbole": "tête de cochon"},
+  {"id": "MIN_GRRM", "symbole": "corbeau messager et parchemin"}
+]

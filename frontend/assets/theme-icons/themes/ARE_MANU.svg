@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Manchester United">
+  <path d="M82 112C58 92 60 60 74 40C90 66 112 80 118 100Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M174 112C198 92 196 60 182 40C166 66 144 80 138 100Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="152" r="64" fill="#FF6B5B"/>
+  <polygon points="128,128 150,144 142,170 114,170 106,144" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 128V92M150 144L180 134M142 170L160 196M114 170L96 196M106 144L76 134" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M84 126A50 50 0 0 1 100 104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

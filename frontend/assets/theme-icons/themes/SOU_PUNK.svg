@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Punk Rock">
+  <polygon points="82,120 90,66 108,116" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="104,116 116,42 140,116" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="136,116 154,60 170,120" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="152" r="56" fill="#FFDB3D"/>
+  <rect x="86" y="138" width="84" height="26" rx="10" fill="#0B3D4A"/>
+  <path d="M110 186Q128 196 146 186" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="72" cy="170" r="9" fill="#FF6B5B"/>
+  <path d="M80 130L84 122" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

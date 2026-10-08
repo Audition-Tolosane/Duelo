@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Zootopie">
+  <path d="M84 92A58 58 0 0 1 116 52" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M60 80A84 84 0 0 1 94 38" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <g transform="translate(-6 8) rotate(35 128 128)">
+    <ellipse cx="108" cy="40" rx="12" ry="25" transform="rotate(-24 108 40)" fill="#12606D"/>
+    <ellipse cx="148" cy="40" rx="12" ry="25" transform="rotate(24 148 40)" fill="#12606D"/>
+    <ellipse cx="128" cy="32" rx="12" ry="27" fill="#12606D"/>
+    <path d="M90 74Q90 58 108 58H148Q166 58 166 74L135 216Q128 228 121 216Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M138 120H156M102 148H118M128 178H142" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+    <circle cx="128" cy="84" r="14" fill="#FFDB3D"/>
+    <path d="M102 82L102 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

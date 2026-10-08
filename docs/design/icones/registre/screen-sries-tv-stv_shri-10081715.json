@@ -1,0 +1,12 @@
+[
+  {"id": "STV_SHRI", "symbole": "boîte de mouchoirs et cœur"},
+  {"id": "STV_SILO", "symbole": "puits enterré à escalier"},
+  {"id": "STV_SKIN", "symbole": "radiocassette boombox"},
+  {"id": "STV_SLOH", "symbole": "dossier et fer à cheval"},
+  {"id": "STV_SMAL", "symbole": "grange rouge et météorite"},
+  {"id": "STV_SONS", "symbole": "gilet de biker à écussons"},
+  {"id": "STV_TREK", "symbole": "vaisseau à soucoupe et nacelles"},
+  {"id": "STV_STHR", "symbole": "gaufre ronde et ampoule"},
+  {"id": "STV_SUCC", "symbole": "fauteuil de direction"},
+  {"id": "STV_SUIT", "symbole": "revers de costume et cravate"}
+]

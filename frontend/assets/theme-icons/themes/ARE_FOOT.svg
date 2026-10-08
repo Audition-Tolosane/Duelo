@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Football Mondial">
+  <rect x="28" y="110" width="14" height="36" rx="6" fill="#FFDB3D"/>
+  <rect x="214" y="110" width="14" height="36" rx="6" fill="#FFDB3D"/>
+  <rect x="40" y="58" width="176" height="140" rx="14" fill="#12606D"/>
+  <path d="M128 68V188M52 100H76V156H52M204 100H180V156H204" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="128" r="30" fill="none" stroke="#0B3D4A" stroke-width="8"/>
+  <circle cx="128" cy="128" r="18" fill="#FFDB3D"/>
+  <polygon points="128,121 135,126 132,134 124,134 121,126" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M58 76H84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

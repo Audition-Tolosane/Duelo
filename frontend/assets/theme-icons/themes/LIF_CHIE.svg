@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Chiens">
+  <path d="M76 150C70 186 76 208 80 222H168C166 198 158 174 148 156Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="112" cy="104" r="54" fill="#12606D"/>
+  <rect x="128" y="98" width="86" height="52" rx="24" fill="#12606D"/>
+  <path d="M168 146C166 168 176 180 188 178C198 176 200 162 196 146Z" fill="#FF6B5B"/>
+  <circle cx="204" cy="110" r="12" fill="#FF6B5B"/>
+  <circle cx="146" cy="90" r="11" fill="#FFDB3D"/>
+  <circle cx="148" cy="90" r="5" fill="#12606D"/>
+  <path d="M86 62C58 66 50 112 60 148C66 166 88 164 92 146L100 92Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="74" y="176" width="92" height="18" rx="9" fill="#FFDB3D" transform="rotate(6 120 185)"/>
+  <circle cx="140" cy="202" r="10" fill="#FFDB3D"/>
+  <path d="M106 64C116 56 130 54 142 58" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Destiny">
+  <circle cx="116" cy="112" r="70" fill="#12606D"/>
+  <path d="M150 112L186 120L180 160L150 178L132 156L140 132Z" fill="#0B3D4A"/>
+  <polygon points="196,166 210,174 202,186" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="176,198 192,200 184,214" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="212,138 222,144 214,152" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M76 92L92 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

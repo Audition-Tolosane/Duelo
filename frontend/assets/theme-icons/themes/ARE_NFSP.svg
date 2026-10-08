@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Need for Speed">
+  <path d="M34 192C34 108 76 52 128 52C180 52 222 108 222 192Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M62 176C64 124 92 84 128 84C164 84 192 124 194 176Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 176L172 104" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="176" r="18" fill="#FFDB3D"/>
+  <path d="M168 84L180 98M88 84L76 98" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 80L80 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

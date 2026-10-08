@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Young Sheldon">
+  <path d="M84 170L64 218M172 170L192 218" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="36" y="40" width="184" height="136" rx="14" fill="#FFDB3D"/>
+  <rect x="52" y="56" width="152" height="104" rx="6" fill="#12606D"/>
+  <ellipse cx="100" cy="108" rx="30" ry="14" transform="rotate(-30 100 108)" stroke="#E8F1EC" stroke-width="8" fill="none"/>
+  <circle cx="100" cy="108" r="7" fill="#E8F1EC"/>
+  <path d="M144 92Q156 74 168 92T190 92M146 128H184M146 144H184" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M104 180L104 208L128 194L152 208L152 180L128 194Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="10" stroke-linejoin="round"/>
+  <circle cx="128" cy="194" r="9" fill="#FF6B5B"/>
+  <path d="M66 70L66 88" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

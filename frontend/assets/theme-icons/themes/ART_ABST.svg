@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Art Abstrait">
+  <rect x="36" y="36" width="184" height="184" rx="18" fill="#12606D"/>
+  <rect x="50" y="50" width="98" height="94" rx="6" fill="#FFDB3D"/>
+  <rect x="160" y="50" width="46" height="94" rx="6" fill="#E8F1EC"/>
+  <rect x="50" y="156" width="52" height="50" rx="6" fill="#FF6B5B"/>
+  <rect x="160" y="156" width="46" height="50" rx="6" fill="#FFDB3D"/>
+  <path d="M66 66L66 88" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

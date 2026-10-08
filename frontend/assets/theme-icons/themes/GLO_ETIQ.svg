@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Savoir-Vivre">
+  <path d="M116 110L58 72C44 64 34 72 34 86V170C34 184 44 192 58 184L116 146Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M140 110L198 72C212 64 222 72 222 86V170C222 184 212 192 198 184L140 146Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <g fill="#FF6B5B"><circle cx="60" cy="168" r="9"/><circle cx="196" cy="88" r="9"/></g>
+  <rect x="102" y="98" width="52" height="60" rx="18" fill="#FFDB3D"/>
+  <path d="M116 112V144" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M48 112V92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

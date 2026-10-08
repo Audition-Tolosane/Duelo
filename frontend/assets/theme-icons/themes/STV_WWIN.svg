@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The West Wing">
+  <path d="M90 104A38 30 0 0 1 166 104Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="40" y="104" width="176" height="90" rx="8" fill="#12606D"/>
+  <rect x="32" y="94" width="192" height="18" rx="9" fill="#12606D"/>
+  <rect x="98" y="114" width="12" height="70" rx="5" fill="#FFDB3D"/>
+  <rect x="116" y="114" width="12" height="70" rx="5" fill="#FFDB3D"/>
+  <rect x="134" y="114" width="12" height="70" rx="5" fill="#FFDB3D"/>
+  <rect x="152" y="114" width="12" height="70" rx="5" fill="#FFDB3D"/>
+  <rect x="62" y="124" width="18" height="24" rx="4" fill="#0B3D4A"/>
+  <rect x="62" y="158" width="18" height="24" rx="4" fill="#0B3D4A"/>
+  <rect x="176" y="124" width="18" height="24" rx="4" fill="#0B3D4A"/>
+  <rect x="176" y="158" width="18" height="24" rx="4" fill="#0B3D4A"/>
+  <rect x="28" y="190" width="200" height="22" rx="11" fill="#12606D"/>
+  <path d="M48 124L48 140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

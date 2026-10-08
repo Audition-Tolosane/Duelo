@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Les Gardiens de la Galaxie">
+  <path d="M84 84V74C84 50 104 36 128 36C152 36 172 50 172 74V84" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="84" cy="92" r="20" fill="#FF6B5B"/>
+  <circle cx="172" cy="92" r="20" fill="#FF6B5B"/>
+  <path d="M172 112Q184 120 180 132" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="60" y="128" width="26" height="16" rx="6" fill="#FF6B5B"/>
+  <rect x="96" y="128" width="26" height="16" rx="6" fill="#FF6B5B"/>
+  <rect x="40" y="138" width="176" height="84" rx="16" fill="#12606D"/>
+  <rect x="88" y="152" width="112" height="56" rx="8" fill="#FFDB3D"/>
+  <path d="M120 190H168" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="120" cy="174" r="12" fill="#12606D"/>
+  <circle cx="168" cy="174" r="12" fill="#12606D"/>
+  <path d="M62 158L62 196" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Big Bang Theory">
+  <g transform="rotate(-8 112 140)">
+    <rect x="76" y="52" width="24" height="96" rx="12" fill="#12606D"/>
+    <rect x="102" y="40" width="24" height="108" rx="12" fill="#12606D"/>
+  </g>
+  <g transform="rotate(8 144 140)">
+    <rect x="138" y="44" width="24" height="104" rx="12" fill="#12606D"/>
+    <rect x="164" y="60" width="22" height="88" rx="11" fill="#12606D"/>
+  </g>
+  <rect x="38" y="118" width="26" height="70" rx="13" transform="rotate(-38 51 153)" fill="#12606D"/>
+  <rect x="74" y="116" width="114" height="88" rx="28" fill="#12606D"/>
+  <path d="M110 60L106 100M154 62L156 100" stroke="#0B3D4A" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <rect x="80" y="196" width="102" height="26" rx="10" fill="#FFDB3D"/>
+  <path d="M92 132L92 152" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

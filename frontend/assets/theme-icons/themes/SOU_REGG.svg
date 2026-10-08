@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Reggae &amp; Marley">
+  <path d="M44 168C30 110 78 50 146 50C206 50 234 98 220 142C214 162 196 172 170 174H66C54 174 46 172 44 168Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M44 140C90 120 174 112 226 120" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M54 104C96 86 162 80 214 90" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="150" cy="46" r="14" fill="#FF6B5B"/>
+  <rect x="54" y="164" width="150" height="34" rx="17" fill="#FFDB3D"/>
+  <path d="M80 181H178" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M70 76C84 64 100 58 116 56" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

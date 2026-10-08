@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Immunité">
+  <g transform="rotate(-40 128 144)">
+    <rect x="110" y="56" width="36" height="96" rx="18" fill="#12606D"/>
+    <rect x="110" y="56" width="36" height="30" rx="15" fill="#FFDB3D"/>
+    <path d="M118 98L118 120" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+  <g transform="rotate(40 128 144)">
+    <rect x="110" y="56" width="36" height="96" rx="18" fill="#12606D"/>
+    <rect x="110" y="56" width="36" height="30" rx="15" fill="#FFDB3D"/>
+  </g>
+  <rect x="110" y="128" width="36" height="88" rx="18" fill="#12606D"/>
+  <path d="M128 34V44M128 84V94M108 64H98M148 64H158M114 50L107 43M142 50L149 43" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="64" r="20" fill="#FF6B5B"/>
+  <circle cx="122" cy="58" r="6" fill="#E8F1EC"/>
+</svg>

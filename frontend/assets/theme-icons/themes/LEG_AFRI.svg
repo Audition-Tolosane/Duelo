@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mythologies Africaines">
+  <path d="M128 70V30" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M112 94L78 72L66 44M106 106L64 96L44 72M104 130L60 138L40 162M108 150L74 176L66 208M144 94L178 72L190 44M150 106L192 96L212 72M152 130L196 138L216 162M148 150L182 176L190 208" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="150" rx="38" ry="44" fill="#12606D"/>
+  <circle cx="128" cy="94" r="24" fill="#12606D"/>
+  <path d="M106 140L117 151L128 140L139 151L150 140" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M110 166L119 175L128 166L137 175L146 166" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="120" cy="90" r="5" fill="#FFDB3D"/>
+  <circle cx="136" cy="90" r="5" fill="#FFDB3D"/>
+  <path d="M104 120A30 34 0 0 1 116 110" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

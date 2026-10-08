@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Les Carnets de l'Apothicaire">
+  <path d="M160 74C160 60 164 50 172 42" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M162 58C150 58 142 50 140 40C152 40 160 48 162 58Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M168 52C178 46 188 48 194 54C184 60 174 58 168 52Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="58" y="84" width="140" height="130" rx="10" fill="#12606D"/>
+  <rect x="44" y="72" width="168" height="20" rx="10" fill="#12606D"/>
+  <path d="M72 104H122V130H72ZM72 140H122V166H72ZM134 140H184V166H134ZM72 176H122V202H72ZM134 176H184V202H134Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="130" y="104" width="64" height="32" rx="6" fill="#FFDB3D"/>
+  <path d="M97 117h0M97 153h0M159 153h0M97 189h0M159 189h0" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M162 120h0" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M58 82H80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

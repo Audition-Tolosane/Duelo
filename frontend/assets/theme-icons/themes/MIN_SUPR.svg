@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Superman">
+  <path d="M84 60C64 112 56 168 40 212C76 200 100 214 128 204C156 214 180 200 216 212C200 168 192 112 172 60Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="88,52 168,52 200,90 128,180 56,90" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="96,70 160,70 180,92 128,156 76,92" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <polygon points="128,92 144,110 128,130 112,110" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M60 128L48 168" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

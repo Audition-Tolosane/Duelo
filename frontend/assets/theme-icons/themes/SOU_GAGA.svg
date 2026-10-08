@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Lady Gaga">
+  <path d="M112 92C92 80 84 70 80 60M144 92C164 80 172 70 176 60" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M104 120L80 128M104 140L80 152M152 120L176 128M152 140L176 152" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="66" cy="62" rx="24" ry="30" transform="rotate(-25 66 62)" fill="#FF6B5B"/>
+  <ellipse cx="190" cy="62" rx="24" ry="30" transform="rotate(25 190 62)" fill="#FF6B5B"/>
+  <path d="M60 38L68 62M196 38L188 62" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="126" rx="30" ry="44" fill="#FF6B5B"/>
+  <path d="M110 166H146L164 214H92Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M104 190H152" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="116" cy="104" r="6" fill="#0B3D4A"/>
+  <circle cx="140" cy="104" r="6" fill="#0B3D4A"/>
+  <path d="M118 84C108 62 96 50 84 44M138 84C148 62 160 50 172 44" stroke="#FFDB3D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="214.0,142.0 217.8,152.2 228.0,156.0 217.8,159.8 214.0,170.0 210.2,159.8 200.0,156.0 210.2,152.2" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M110 116C110 106 114 98 120 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

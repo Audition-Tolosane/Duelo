@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Black Mirror">
+  <rect x="68" y="32" width="120" height="192" rx="24" fill="#12606D"/>
+  <rect x="82" y="54" width="92" height="150" rx="10" fill="#0B3D4A"/>
+  <rect x="112" y="40" width="32" height="8" rx="4" fill="#0B3D4A"/>
+  <path d="M148 98L116 124L130 148L100 186M148 98L174 122M148 98L136 58M148 98L174 80M116 124L82 116" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="148" cy="98" r="10" fill="#FFDB3D"/>
+  <path d="M96 70L96 88" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

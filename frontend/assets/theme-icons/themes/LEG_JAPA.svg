@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Folklore Japonais">
+  <path d="M128 214C110 214 72 170 60 136L52 46L100 86C118 80 138 80 156 86L204 46L196 136C184 170 146 214 128 214Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="66,66 90,88 70,106" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <polygon points="190,66 166,88 186,106" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M80 118Q102 120 116 136Q94 142 80 118Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M176 118Q154 120 140 136Q162 142 176 118Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M128 92C138 104 136 116 128 124C120 116 118 104 128 92Z" fill="#FF6B5B"/>
+  <ellipse cx="128" cy="196" rx="13" ry="9" fill="#FF6B5B"/>
+  <path d="M76 162Q70 152 68 140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

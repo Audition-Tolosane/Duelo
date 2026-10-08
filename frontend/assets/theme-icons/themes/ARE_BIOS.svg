@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="BioShock">
+  <rect x="108" y="28" width="40" height="24" rx="10" fill="#FFDB3D"/>
+  <rect x="26" y="100" width="28" height="44" rx="10" fill="#FFDB3D"/>
+  <rect x="202" y="100" width="28" height="44" rx="10" fill="#FFDB3D"/>
+  <circle cx="128" cy="118" r="82" fill="#12606D"/>
+  <circle cx="128" cy="122" r="44" fill="#FFDB3D"/>
+  <circle cx="128" cy="122" r="30" fill="#0B3D4A"/>
+  <rect x="62" y="192" width="132" height="30" rx="14" fill="#FFDB3D"/>
+  <path d="M112 112L124 102" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M80 80C86 68 96 60 108 56" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

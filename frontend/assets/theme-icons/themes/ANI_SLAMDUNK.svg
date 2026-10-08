@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Slam Dunk">
+  <path d="M88 40H104Q110 64 128 64Q146 64 152 40H168Q170 72 196 84V212Q196 218 188 218H68Q60 218 60 212V84Q86 72 88 40Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M108 50Q114 78 128 78Q142 78 148 50" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M60 196H196" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M94 122L106 114V176" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="150" cy="146" rx="20" ry="30" stroke="#FFDB3D" stroke-width="20" fill="none"/>
+  <path d="M74 104V128" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

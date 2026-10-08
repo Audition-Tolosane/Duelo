@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mob Psycho 100">
+  <path d="M46 176C28 136 36 86 70 54M210 176C228 136 220 86 186 54M100 36Q128 22 156 36" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M38 98L28 88M218 98L228 88" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <ellipse cx="128" cy="146" rx="56" ry="64" fill="#FFDB3D"/>
+  <path d="M66 148C62 86 90 54 128 54C166 54 194 86 190 148H178L174 118H82L78 148Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="108" cy="146" rx="6" ry="9" fill="#12606D"/>
+  <ellipse cx="148" cy="146" rx="6" ry="9" fill="#12606D"/>
+  <path d="M118 184H138" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M86 98Q92 80 108 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

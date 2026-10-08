@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Photosynthèse">
+  <path d="M176 38V44M206 50L202 54M218 80H212M206 110L202 106M176 122V116" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="176" cy="80" r="26" fill="#FFDB3D"/>
+  <path d="M102 208C102 176 104 150 108 124" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M104 152C78 152 48 136 40 98C74 92 100 114 104 152Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M108 124C114 100 128 86 150 88C146 112 130 126 108 124Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M40 214C44 190 164 190 168 214Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="146" cy="158" r="7" fill="#E8F1EC"/>
+  <circle cx="162" cy="140" r="5" fill="#E8F1EC"/>
+  <path d="M56 110C66 112 76 118 84 126" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

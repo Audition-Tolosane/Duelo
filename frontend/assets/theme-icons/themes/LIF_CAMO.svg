@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Camouflage">
+  <rect x="32" y="182" width="192" height="18" rx="9" fill="#FF6B5B"/>
+  <path d="M72 160C44 160 36 192 54 204C70 214 88 200 78 188" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="92" y="156" width="20" height="34" rx="9" fill="#12606D"/>
+  <rect x="156" y="156" width="20" height="34" rx="9" fill="#12606D"/>
+  <polygon points="150,96 182,70 196,114" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M66 168C64 120 100 92 146 92C184 92 212 116 212 144C212 160 198 168 184 166H66Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M112 108L104 154M140 100L134 154" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <circle cx="178" cy="128" r="17" fill="#FFDB3D"/>
+  <circle cx="182" cy="128" r="7" fill="#12606D"/>
+  <path d="M84 134C88 118 98 108 112 102" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

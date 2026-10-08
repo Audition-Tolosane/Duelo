@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Apex Legends">
+  <path d="M128 186V214" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="52" cy="124" r="18" fill="#12606D"/>
+  <circle cx="204" cy="124" r="18" fill="#12606D"/>
+  <rect x="60" y="62" width="136" height="124" rx="40" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="80" y="84" width="96" height="80" rx="20" fill="#0B3D4A"/>
+  <circle cx="108" cy="114" r="9" fill="#FFDB3D"/>
+  <circle cx="148" cy="114" r="9" fill="#FFDB3D"/>
+  <path d="M106 138C118 150 138 150 150 138" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M76 92L88 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

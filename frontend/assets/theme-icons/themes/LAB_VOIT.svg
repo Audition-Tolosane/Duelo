@@ -1,11 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Automobile &amp; Voitures">
-  <path d="M44 170V146C44 138 50 132 58 130L90 124L114 96C118 92 124 90 130 90H162C170 90 176 94 180 100L198 128C208 132 214 140 214 150V170Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
-  <path d="M98 126L118 104H140V126Z" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
-  <path d="M152 104H166L180 126H152Z" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
-  <circle cx="88" cy="176" r="26" fill="#12606D"/>
-  <circle cx="176" cy="176" r="26" fill="#12606D"/>
-  <circle cx="88" cy="176" r="10" fill="#FFDB3D"/>
-  <circle cx="176" cy="176" r="10" fill="#FFDB3D"/>
-  <rect x="198" y="138" width="16" height="12" rx="6" fill="#FFDB3D"/>
-  <path d="M58 146L80 140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="128" r="82" stroke="#12606D" stroke-width="20" fill="none"/>
+  <path d="M52 124C84 132 104 140 128 140C152 140 172 132 204 124" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 140V204" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="136" r="30" fill="#12606D"/>
+  <circle cx="128" cy="136" r="13" fill="#FFDB3D"/>
+  <rect x="119" y="34" width="18" height="24" rx="6" fill="#FF6B5B"/>
+  <path d="M53.7 93.3A82 82 0 0 1 84.5 58.5" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

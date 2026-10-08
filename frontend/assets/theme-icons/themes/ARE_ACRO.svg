@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Animal Crossing">
+  <path d="M128 36C190 60 214 120 178 172C162 194 142 202 128 202C114 202 94 194 78 172C42 120 66 60 128 36Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 76V200M128 120L98 96M128 120L158 96M128 160L100 138M128 160L156 138" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 202V224" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="186" cy="64" r="16" fill="#FFDB3D"/>
+  <path d="M86 98C90 84 98 72 108 64" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Chefs d&#39;Orchestre">
+  <path d="M34 124C38 80 72 46 118 40" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M92 164L204 52" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="72" cy="184" r="20" fill="#FF6B5B"/>
+  <path d="M148 218A32 32 0 0 1 212 218" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="180" cy="224" r="9" fill="#FF6B5B"/>
+  <path d="M148 108L164 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

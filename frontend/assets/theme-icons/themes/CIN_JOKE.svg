@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Joker">
+  <path d="M66 172C62 132 56 108 46 90C80 98 106 124 112 172Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M190 172C194 132 200 108 210 90C176 98 150 124 144 172Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M94 172C94 124 108 88 128 62C148 88 162 124 162 172Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="44" cy="84" r="14" fill="#FFDB3D"/>
+  <circle cx="212" cy="84" r="14" fill="#FFDB3D"/>
+  <circle cx="128" cy="52" r="14" fill="#FFDB3D"/>
+  <rect x="52" y="166" width="152" height="40" rx="18" fill="#12606D"/>
+  <polygon points="92,176 102,186 92,196 82,186" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="128,176 138,186 128,196 118,186" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="164,176 174,186 164,196 154,186" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M112 150Q112 124 120 104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

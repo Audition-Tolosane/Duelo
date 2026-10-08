@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Opéras du Monde">
+  <path d="M120 196C124 150 140 118 190 98C216 130 216 170 210 196Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M44 196C44 120 90 76 148 68C132 110 130 160 134 196Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="30" y="196" width="196" height="26" rx="13" fill="#FF6B5B"/>
+  <path d="M68 150Q72 120 98 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

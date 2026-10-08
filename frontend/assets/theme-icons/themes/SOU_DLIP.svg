@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dua Lipa">
+  <path d="M72 56H120V108C160 110 196 124 196 156V172H72Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="66" y="42" width="60" height="22" rx="10" fill="#FFDB3D"/>
+  <rect x="60" y="172" width="148" height="18" rx="9" fill="#FFDB3D"/>
+  <circle cx="94" cy="208" r="16" fill="#FF6B5B"/>
+  <circle cx="176" cy="208" r="16" fill="#FF6B5B"/>
+  <path d="M134 122L156 130M134 142L164 150" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="206,52 212,66 226,72 212,78 206,92 200,78 186,72 200,66" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M90 84V110" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

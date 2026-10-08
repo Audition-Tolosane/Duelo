@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Siècle des Lumières">
+  <circle cx="128" cy="110" r="42" fill="#FFDB3D"/>
+  <path d="M75 91L58 85M96 64L86 49M128 54L128 36M160 64L170 49M181 91L198 85" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="50" y="108" width="36" height="104" rx="6" fill="#12606D"/>
+  <rect x="90" y="100" width="36" height="112" rx="6" fill="#FF6B5B"/>
+  <rect x="130" y="104" width="36" height="108" rx="6" fill="#12606D"/>
+  <rect x="170" y="112" width="36" height="100" rx="6" fill="#12606D"/>
+  <path d="M60 130H76M60 188H76M100 122H116M100 188H116M140 126H156M140 188H156M180 134H196M180 188H196" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="38" y="208" width="180" height="16" rx="8" fill="#12606D"/>
+  <path d="M62 124V140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

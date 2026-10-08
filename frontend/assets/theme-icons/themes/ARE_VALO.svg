@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Valorant">
+  <path d="M128 36V84M128 172V220M36 128H84M172 128H220" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="128" r="70" fill="#0B3D4A" stroke="#FF6B5B" stroke-width="12"/>
+  <circle cx="128" cy="128" r="16" fill="#FFDB3D"/>
+  <path d="M60 110A70 70 0 0 1 88 71" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

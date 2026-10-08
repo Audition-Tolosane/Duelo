@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ocean's Eleven">
+  <circle cx="128" cy="128" r="88" fill="#12606D"/>
+  <rect x="116" y="44" width="24" height="20" rx="6" fill="#FF6B5B"/>
+  <rect x="116" y="44" width="24" height="20" rx="6" transform="rotate(60 128 128)" fill="#FF6B5B"/>
+  <rect x="116" y="44" width="24" height="20" rx="6" transform="rotate(120 128 128)" fill="#FF6B5B"/>
+  <rect x="116" y="44" width="24" height="20" rx="6" transform="rotate(180 128 128)" fill="#FF6B5B"/>
+  <rect x="116" y="44" width="24" height="20" rx="6" transform="rotate(240 128 128)" fill="#FF6B5B"/>
+  <rect x="116" y="44" width="24" height="20" rx="6" transform="rotate(300 128 128)" fill="#FF6B5B"/>
+  <circle cx="128" cy="128" r="50" fill="#FFDB3D"/>
+  <polygon points="128,100 150,128 128,156 106,128" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M74 80A76 76 0 0 1 106 56" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

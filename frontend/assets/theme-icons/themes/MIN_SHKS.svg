@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Shakespeare">
+  <circle cx="116" cy="104" r="64" fill="#12606D"/>
+  <rect x="84" y="136" width="64" height="56" rx="18" fill="#12606D"/>
+  <ellipse cx="92" cy="114" rx="17" ry="19" fill="#0B3D4A"/>
+  <ellipse cx="140" cy="114" rx="17" ry="19" fill="#0B3D4A"/>
+  <path d="M116 136L108 152H124Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M102 168V184M116 168V186M130 168V184" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M188 214L182 180" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M184 196C198 186 212 190 214 200C202 208 192 206 184 196Z" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="182" cy="164" r="24" fill="#FF6B5B"/>
+  <path d="M182 156C190 156 192 166 184 170C174 172 170 160 178 152" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M76 80A46 46 0 0 1 96 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

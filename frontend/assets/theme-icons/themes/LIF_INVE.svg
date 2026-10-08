@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Invertébrés">
+  <path d="M84 124C70 150 50 160 48 184C46 200 64 206 70 192M110 132C106 160 96 186 100 204C104 218 120 216 116 204M146 132C150 160 160 186 156 204C152 218 136 216 140 204M172 124C186 150 206 160 208 184C210 200 192 206 186 192" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M68 128C64 76 92 40 128 40C164 40 192 76 188 128C188 146 68 146 68 128Z" fill="#12606D"/>
+  <circle cx="106" cy="104" r="14" fill="#FFDB3D"/>
+  <circle cx="150" cy="104" r="14" fill="#FFDB3D"/>
+  <circle cx="108" cy="106" r="6" fill="#12606D"/>
+  <circle cx="152" cy="106" r="6" fill="#12606D"/>
+  <circle cx="146" cy="62" r="8" fill="#FF6B5B"/>
+  <circle cx="168" cy="80" r="7" fill="#FF6B5B"/>
+  <path d="M86 98C86 78 96 64 110 56" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

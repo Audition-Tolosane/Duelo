@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Nanotechnologies">
+  <polygon points="90,52 128,74 128,118 90,140 52,118 52,74" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="166,52 204,74 204,118 166,140 128,118 128,74" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="128,118 166,140 166,184 128,206 90,184 90,140" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M90 52L128 74L166 52L204 74V118L166 140V184L128 206L90 184V140L52 118V74ZM128 74V118L90 140M128 118L166 140" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M80 52a10 10 0 1 0 20 0a10 10 0 1 0 -20 0M156 52a10 10 0 1 0 20 0a10 10 0 1 0 -20 0M118 74a10 10 0 1 0 20 0a10 10 0 1 0 -20 0M42 74a10 10 0 1 0 20 0a10 10 0 1 0 -20 0M194 74a10 10 0 1 0 20 0a10 10 0 1 0 -20 0M42 118a10 10 0 1 0 20 0a10 10 0 1 0 -20 0M118 118a10 10 0 1 0 20 0a10 10 0 1 0 -20 0M194 118a10 10 0 1 0 20 0a10 10 0 1 0 -20 0M80 140a10 10 0 1 0 20 0a10 10 0 1 0 -20 0M156 140a10 10 0 1 0 20 0a10 10 0 1 0 -20 0M80 184a10 10 0 1 0 20 0a10 10 0 1 0 -20 0M156 184a10 10 0 1 0 20 0a10 10 0 1 0 -20 0M118 206a10 10 0 1 0 20 0a10 10 0 1 0 -20 0" fill="#FFDB3D"/>
+  <path d="M70 98V84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

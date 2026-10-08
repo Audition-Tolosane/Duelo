@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Théorie des Ensembles">
+  <path d="M92 44C70 44 64 56 64 76V104C64 118 56 126 40 128C56 130 64 138 64 152V180C64 200 70 212 92 212" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M164 44C186 44 192 56 192 76V104C192 118 200 126 216 128C200 130 192 138 192 152V180C192 200 186 212 164 212" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="90" r="26" fill="#FFDB3D"/>
+  <circle cx="102" cy="160" r="22" fill="#FF6B5B"/>
+  <circle cx="154" cy="160" r="22" fill="#FFDB3D"/>
+  <path d="M112 86A18 18 0 0 1 122 74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Knight Rider">
+  <rect x="50" y="176" width="36" height="36" rx="10" fill="#12606D"/>
+  <rect x="170" y="176" width="36" height="36" rx="10" fill="#12606D"/>
+  <path d="M36 150C36 128 52 116 72 112L94 80C98 74 104 70 112 70H144C152 70 158 74 162 80L184 112C204 116 220 128 220 150V176C220 186 214 192 204 192H52C42 192 36 186 36 176Z" fill="#12606D"/>
+  <path d="M108 86H148L164 108H92Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="58" y="136" width="140" height="30" rx="15" fill="#0B3D4A"/>
+  <rect x="122" y="142" width="48" height="18" rx="9" fill="#FF6B5B"/>
+  <rect x="98" y="144" width="16" height="14" rx="7" fill="#FF6B5B"/>
+  <rect x="78" y="146" width="10" height="10" rx="5" fill="#FF6B5B"/>
+  <path d="M52 140L62 124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

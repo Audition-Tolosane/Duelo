@@ -1,0 +1,12 @@
+[
+  {"id": "LAB_INTA", "symbole": "cerveau mi-organique, mi-circuit imprimé"},
+  {"id": "LAB_VOIT", "symbole": "volant sport à trois branches"},
+  {"id": "LAB_AUTO", "symbole": "voiture vue de dessus et ondes de capteurs"},
+  {"id": "LAB_DARK", "symbole": "halo en pointillé autour de galaxies"},
+  {"id": "LAB_CONZ", "symbole": "Grande Ourse et étoile Polaire"},
+  {"id": "LAB_SATE", "symbole": "Spoutnik à quatre antennes et bip radio"},
+  {"id": "LAB_THER", "symbole": "thermomètre et flamme"},
+  {"id": "LAB_DYNA", "symbole": "profil d'aile et lignes de courant"},
+  {"id": "LAB_MARS", "symbole": "planète rouge à calotte polaire et canyon"},
+  {"id": "LAB_DEEP", "symbole": "iceberg à pointe émergée et masse immergée"}
+]

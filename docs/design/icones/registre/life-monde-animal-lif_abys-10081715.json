@@ -1,0 +1,12 @@
+[
+  {"id": "LIF_ABYS", "symbole": "baudroie abyssale à leurre lumineux"},
+  {"id": "LIF_AMPH", "symbole": "grenouille de face"},
+  {"id": "LIF_ARAC", "symbole": "araignée suspendue à son fil"},
+  {"id": "LIF_CAMO", "symbole": "caméléon sur une branche"},
+  {"id": "LIF_CANI", "symbole": "loup qui hurle de profil"},
+  {"id": "LIF_CHIE", "symbole": "tête de chien à oreilles tombantes"},
+  {"id": "LIF_FELI", "symbole": "tête de lion à crinière"},
+  {"id": "LIF_INSE", "symbole": "coccinelle vue de dessus"},
+  {"id": "LIF_INVE", "symbole": "pieuvre aux tentacules enroulés"},
+  {"id": "LIF_MIGR", "symbole": "papillon monarque et trajectoire"}
+]

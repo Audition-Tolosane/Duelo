@@ -1,0 +1,12 @@
+[
+  {"id": "LIF_ADAP", "symbole": "caméléon sur une branche"},
+  {"id": "LIF_BIOD", "symbole": "coccinelle vue de dessus"},
+  {"id": "LIF_CLIM", "symbole": "thermomètre et nuage"},
+  {"id": "LIF_CATA", "symbole": "tornade et éclair"},
+  {"id": "LIF_FORA", "symbole": "deux sapins"},
+  {"id": "LIF_JUNG", "symbole": "toucan au grand bec"},
+  {"id": "LIF_MANG", "symbole": "palétuvier sur racines-échasses"},
+  {"id": "LIF_PHOT", "symbole": "jeune pousse et soleil"},
+  {"id": "LIF_PHAR", "symbole": "mortier, pilon et herbes"},
+  {"id": "LIF_POLL", "symbole": "papillon et grains de pollen"}
+]

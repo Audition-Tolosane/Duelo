@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Aladdin">
+  <path d="M214 92C224 74 202 66 212 44" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M66 146C38 146 34 114 60 116" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="80" y="184" width="76" height="20" rx="10" fill="#12606D"/>
+  <rect x="104" y="168" width="28" height="22" fill="#12606D"/>
+  <path d="M58 148C58 122 90 114 124 114C156 114 168 124 186 114L216 98C210 118 198 142 182 154C166 168 144 174 120 174C86 174 58 166 58 148Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M76 150Q118 162 166 148" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M92 114C92 92 144 92 144 114Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="118" cy="86" r="10" fill="#FF6B5B"/>
+  <path d="M78 134Q90 126 104 124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

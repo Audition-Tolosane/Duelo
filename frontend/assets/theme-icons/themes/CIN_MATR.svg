@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Matrix">
+  <path d="M80 40V52M80 70V94M128 34V58M128 76V90M176 44V60M176 78V100" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <g transform="rotate(30 164 172)">
+  <rect x="116" y="148" width="96" height="48" rx="24" fill="#12606D"/>
+  <path d="M164 148H188A24 24 0 0 1 188 196H164Z" fill="#0B3D4A"/>
+  </g>
+  <g transform="rotate(-30 92 172)">
+  <rect x="44" y="148" width="96" height="48" rx="24" fill="#FF6B5B"/>
+  <path d="M64 162H92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Studio Ghibli">
+  <polygon points="204,138 190.8,150.5 198.2,167.1 181.2,173.6 181.7,191.7 163.6,191.2 157.1,208.2 140.5,200.8 128,214 115.5,200.8 98.9,208.2 92.4,191.2 74.3,191.7 74.8,173.6 57.8,167.1 65.2,150.5 52,138 65.2,125.5 57.8,108.9 74.8,102.4 74.3,84.3 92.4,84.8 98.9,67.8 115.5,75.2 128,62 140.5,75.2 157.1,67.8 163.6,84.8 181.7,84.3 181.2,102.4 198.2,108.9 190.8,125.5" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="138" r="54" fill="#0B3D4A"/>
+  <circle cx="106" cy="136" r="17" fill="#E8F1EC"/>
+  <circle cx="150" cy="136" r="17" fill="#E8F1EC"/>
+  <circle cx="109" cy="139" r="8" fill="#0B3D4A"/>
+  <circle cx="153" cy="139" r="8" fill="#0B3D4A"/>
+  <polygon points="54,40 60,54 74,60 60,66 54,80 48,66 34,60 48,54" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="204,40 209,52 221,56 209,60 204,72 199,60 187,56 199,52" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M86 116A46 46 0 0 1 102 96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

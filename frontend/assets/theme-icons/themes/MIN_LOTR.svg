@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Le Seigneur des Anneaux">
+  <path d="M60 214C54 188 70 172 80 152C90 170 98 174 102 160C106 142 116 132 128 120C140 132 150 142 154 160C158 174 166 170 176 152C186 172 202 188 196 214Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M94 214C94 198 104 188 110 176C116 186 120 190 128 176C136 190 140 186 146 176C152 188 162 198 162 214Z" fill="#FFDB3D"/>
+  <ellipse cx="128" cy="96" rx="44" ry="58" fill="none" stroke="#FFDB3D" stroke-width="20"/>
+  <path d="M150 58C160 72 164 86 164 100C164 116 158 132 146 144" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M94 80Q98 56 114 44" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

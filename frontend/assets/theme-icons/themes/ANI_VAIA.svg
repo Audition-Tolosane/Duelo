@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Vaiana">
+  <path d="M190 48L202 36M212 82L224 78M164 36L166 32" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M124 56C172 50 204 86 202 132C200 180 164 210 122 208C78 206 46 172 50 126C54 84 84 60 124 56Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 130C128 120 142 120 142 132C142 148 118 150 112 134C104 114 126 98 148 106C170 116 172 146 158 164C142 184 104 182 90 158" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="176" cy="186" r="8" fill="#FF6B5B"/>
+  <path d="M72 116Q78 90 98 78" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

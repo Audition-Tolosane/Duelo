@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Orphan Black">
+  <g transform="translate(10 0)">
+  <g transform="translate(-44 -28)"><path d="M108 216V188C92 176 84 158 84 138C84 104 108 80 140 80C170 80 190 100 190 128L202 146C204 150 202 154 198 154H190V168C190 176 184 180 176 180H164V216Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/></g>
+  <g transform="translate(-22 -14)"><path d="M108 216V188C92 176 84 158 84 138C84 104 108 80 140 80C170 80 190 100 190 128L202 146C204 150 202 154 198 154H190V168C190 176 184 180 176 180H164V216Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/></g>
+  <path d="M108 216V188C92 176 84 158 84 138C84 104 108 80 140 80C170 80 190 100 190 128L202 146C204 150 202 154 198 154H190V168C190 176 184 180 176 180H164V216Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M100 136C100 120 108 106 120 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

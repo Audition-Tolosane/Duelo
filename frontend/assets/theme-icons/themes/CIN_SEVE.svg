@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Seven">
+  <path d="M62 36L52 58" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M120 34L112 52" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M182 36L172 58" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M220 64L210 86" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M42 96L34 114" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <polygon points="168,208 206,194 176,84 148,80" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="56,208 168,208 148,80 88,80" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M108 116H144L120 180" stroke="#0B3D4A" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M94 96L88 124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

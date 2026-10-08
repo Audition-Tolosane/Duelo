@@ -1,0 +1,12 @@
+[
+  {"id": "CIN_PRED", "symbole": "masque de Predator à dreadlocks"},
+  {"id": "CIN_PSYC", "symbole": "pommeau de douche et rideau"},
+  {"id": "CIN_PULP", "symbole": "mallette ouverte lumineuse"},
+  {"id": "CIN_RETO", "symbole": "convecteur temporel en Y"},
+  {"id": "CIN_ROCK", "symbole": "escalier de Philadelphie et gant"},
+  {"id": "CIN_GHOS", "symbole": "piège à fantôme ouvert"},
+  {"id": "CIN_SCAR", "symbole": "globe doré à bandeau"},
+  {"id": "CIN_SCRE", "symbole": "masque Ghostface sous capuche"},
+  {"id": "CIN_SDAN", "symbole": "Œil de Sauron sur tour"},
+  {"id": "CIN_SEVE", "symbole": "marqueur de preuve 7 sous pluie"}
+]

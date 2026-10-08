@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="L'Ère Atomique">
+  <circle cx="136" cy="84" r="14" fill="#12606D"/>
+  <circle cx="162" cy="64" r="20" fill="#12606D"/>
+  <circle cx="194" cy="52" r="20" fill="#12606D"/>
+  <path d="M74 218C94 180 98 140 86 106H170C158 140 162 180 182 218Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M96 124H160" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="172" rx="30" ry="11" fill="none" stroke="#FFDB3D" stroke-width="8"/>
+  <ellipse cx="128" cy="172" rx="30" ry="11" fill="none" stroke="#FFDB3D" stroke-width="8" transform="rotate(60 128 172)"/>
+  <ellipse cx="128" cy="172" rx="30" ry="11" fill="none" stroke="#FFDB3D" stroke-width="8" transform="rotate(-60 128 172)"/>
+  <circle cx="128" cy="172" r="8" fill="#FF6B5B"/>
+  <path d="M100 122C100 136 100 146 98 158" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

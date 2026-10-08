@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Alexander McQueen">
+  <path d="M72 44H184C188 90 168 108 168 128C168 150 192 170 192 212H64C64 170 88 150 88 128C88 108 68 90 72 44Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="108" y="56" width="40" height="148" rx="8" fill="#0B3D4A"/>
+  <path d="M116 68L140 88L116 108L140 128L116 148L140 168L116 188" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M82 44H174" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M74 208H182" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M90 64L92 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mass Effect">
+  <path d="M86 136C120 104 158 72 190 40" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M120 170C152 136 184 98 216 66" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="88" cy="168" rx="22" ry="54" transform="rotate(45 88 168)" fill="none" stroke="#FF6B5B" stroke-width="12"/>
+  <circle cx="88" cy="168" r="24" fill="#FFDB3D"/>
+  <circle cx="88" cy="168" r="9" fill="#E8F1EC"/>
+  <path d="M154 106L174 86" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M70 152L64 160" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

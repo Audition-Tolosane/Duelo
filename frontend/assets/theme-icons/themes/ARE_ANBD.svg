@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Angry Birds">
+  <path d="M118 70L110 42M130 66L132 36M142 70L156 46" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="140" r="82" fill="#FF6B5B"/>
+  <ellipse cx="128" cy="184" rx="42" ry="26" fill="#E8F1EC"/>
+  <circle cx="102" cy="132" r="15" fill="#E8F1EC"/>
+  <circle cx="154" cy="132" r="15" fill="#E8F1EC"/>
+  <circle cx="106" cy="136" r="7" fill="#0B3D4A"/>
+  <circle cx="150" cy="136" r="7" fill="#0B3D4A"/>
+  <path d="M88 104L122 120M168 104L134 120" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="112,148 144,148 128,172" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M68 150C66 140 68 130 72 122" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

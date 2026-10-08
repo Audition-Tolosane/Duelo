@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Argentine">
+  <path d="M140 108L178 46H200" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M84 108H172C196 128 204 154 192 182C180 208 156 220 128 220C100 220 76 208 64 182C52 154 60 128 84 108Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M70 160C100 172 156 172 186 160" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <rect x="74" y="94" width="108" height="22" rx="11" fill="#FF6B5B"/>
+  <path d="M78 150C78 136 84 126 94 120" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

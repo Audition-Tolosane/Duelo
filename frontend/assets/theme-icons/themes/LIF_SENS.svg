@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Les 5 Sens">
+  <path d="M40 64C56 56 60 80 76 72C92 64 96 88 112 80" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M40 100C56 92 60 116 76 108" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M132 40H158C166 76 176 110 186 136H118C124 108 128 76 132 40Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="110" cy="170" r="28" fill="#12606D"/>
+  <circle cx="194" cy="170" r="28" fill="#12606D"/>
+  <ellipse cx="152" cy="160" rx="40" ry="38" fill="#12606D"/>
+  <ellipse cx="126" cy="186" rx="11" ry="8" fill="#0B3D4A"/>
+  <ellipse cx="178" cy="186" rx="11" ry="8" fill="#0B3D4A"/>
+  <path d="M136 60L128 118" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

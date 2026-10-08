@@ -1,0 +1,12 @@
+[
+  {"id": "SOU_ACDC", "symbole": "cloche Hells Bells et éclair"},
+  {"id": "SOU_ARCM", "symbole": "forme d'onde sonore carrée"},
+  {"id": "SOU_BEET", "symbole": "cornet acoustique"},
+  {"id": "SOU_ORCH", "symbole": "baguette de chef et point d'orgue"},
+  {"id": "SOU_CHOP", "symbole": "clavier de piano et croissant"},
+  {"id": "SOU_COUN", "symbole": "botte de cow-boy à éperon"},
+  {"id": "SOU_BOWI", "symbole": "éclair sur disque"},
+  {"id": "SOU_GNR", "symbole": "rose rouge à tige"},
+  {"id": "SOU_IRON", "symbole": "main cornes de métal"},
+  {"id": "SOU_IMDR", "symbole": "baguettes de batterie croisées"}
+]

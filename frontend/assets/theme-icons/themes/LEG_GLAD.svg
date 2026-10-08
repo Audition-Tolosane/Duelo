@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Gladiateurs">
+  <path d="M100 74C100 44 156 44 156 74Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M64 160C64 98 92 72 128 72C164 72 192 98 192 160Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M40 176C40 160 70 150 128 150C186 150 216 160 216 176C216 188 200 194 186 186C164 176 92 176 70 186C56 194 40 188 40 176Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="94" y="102" width="68" height="84" rx="20" fill="#0B3D4A"/>
+  <path d="M117 106V182M139 106V182M98 132H158M98 158H158" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="94" y="102" width="68" height="84" rx="20" fill="none" stroke="#FFDB3D" stroke-width="8"/>
+  <path d="M78 128C80 112 86 100 96 90" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

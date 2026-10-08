@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Boardwalk Empire">
+  <rect x="148" y="58" width="36" height="36" rx="8" fill="#12606D"/>
+  <rect x="140" y="36" width="52" height="28" rx="10" fill="#FF6B5B"/>
+  <path d="M44 120C44 100 58 86 78 86H178C198 86 212 100 212 120V186C212 206 198 220 178 220H78C58 220 44 206 44 186Z" fill="#12606D"/>
+  <rect x="68" y="108" width="120" height="90" rx="18" fill="#0B3D4A"/>
+  <path d="M128 166L128 188M128 180C138 176 146 178 150 184" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="116" cy="140" r="14" fill="#FF6B5B"/>
+  <circle cx="140" cy="140" r="14" fill="#FF6B5B"/>
+  <circle cx="128" cy="126" r="14" fill="#FF6B5B"/>
+  <circle cx="128" cy="152" r="14" fill="#FF6B5B"/>
+  <path d="M60 112L60 132" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

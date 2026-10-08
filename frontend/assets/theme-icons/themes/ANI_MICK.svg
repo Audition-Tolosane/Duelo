@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mickey Mouse">
+  <path d="M188 74C210 66 222 50 214 38" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M58 70H198L214 186Q184 202 152 192L128 140L104 192Q72 202 42 186Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M58 82H198" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M52 182Q74 192 98 186M158 186Q182 192 204 182" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <ellipse cx="98" cy="114" rx="13" ry="18" fill="#E8F1EC"/>
+  <ellipse cx="158" cy="114" rx="13" ry="18" fill="#E8F1EC"/>
+  <path d="M68 100L62 130" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

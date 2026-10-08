@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Power Rangers">
+  <circle cx="58" cy="146" r="18" fill="#12606D"/>
+  <circle cx="198" cy="146" r="18" fill="#12606D"/>
+  <path d="M128 36C80 36 58 70 58 116V172C58 196 76 214 100 216H156C180 214 198 196 198 172V116C198 70 176 36 128 36Z" fill="#FF6B5B"/>
+  <path d="M76 102H180L170 132C160 140 150 144 142 150V176H114V150C106 144 96 140 86 132Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="104" y="188" width="48" height="16" rx="8" fill="#E8F1EC"/>
+  <path d="M128 46V76" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M80 86L90 66" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

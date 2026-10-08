@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mandalorian">
+  <path d="M194 122L212 66" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="212" cy="62" r="9" fill="#FFDB3D"/>
+  <path d="M128 36C84 36 60 66 60 108V176C60 192 70 204 86 208L108 214V184H148V214L170 208C186 204 196 192 196 176V108C196 66 172 36 128 36Z" fill="#12606D"/>
+  <rect x="72" y="104" width="112" height="26" rx="8" fill="#0B3D4A"/>
+  <path d="M116 120H140V178L148 196H108L116 178Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="60" cy="150" r="14" fill="#FFDB3D"/>
+  <circle cx="196" cy="150" r="14" fill="#FFDB3D"/>
+  <path d="M80 92Q86 70 104 58" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

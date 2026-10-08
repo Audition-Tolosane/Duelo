@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Rock Legends">
+  <path d="M70.0 194.0L60.1 203.9M50.0 161.3L36.7 165.7M47.0 123.2L33.2 121.0M61.7 87.8L50.3 79.6M90.8 62.9L84.4 50.5M128.0 54.0L128.0 40.0M165.2 62.9L171.6 50.5M194.3 87.8L205.7 79.6" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M209.0 123.2L222.8 121.0M206.0 161.3L219.3 165.7M186.0 194.0L195.9 203.9" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="136" r="66" fill="#12606D"/>
+  <circle cx="128" cy="136" r="46" fill="#FFDB3D"/>
+  <path d="M128 136L143.5 183.6" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="136" r="8" fill="#FF6B5B"/>
+  <path d="M80 112C86 98 96 88 108 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

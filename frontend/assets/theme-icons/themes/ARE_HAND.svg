@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Handball Pro">
+  <rect x="50" y="82" width="156" height="130" fill="#12606D"/>
+  <path d="M84 92V208M118 92V208M152 92V208M186 92V208M58 120H198M58 154H198M58 188H198" stroke="#E8F1EC" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M44 212V76H212V212" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M44 196V180M44 148V132M44 100V84M76 76H92M120 76H136M164 76H180M212 100V84M212 148V132M212 196V180" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="146" cy="152" r="28" fill="#FFDB3D"/>
+  <path d="M124 144C138 148 148 158 150 178" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M68 104V124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

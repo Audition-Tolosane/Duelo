@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Topologie">
+  <ellipse cx="128" cy="128" rx="96" ry="74" fill="#12606D"/>
+  <path d="M74 116C102 150 154 150 182 116C154 92 102 92 74 116Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M66 112C96 82 160 82 190 112" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M40 140C64 196 192 196 216 140" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 140V200" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M128 56V96" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <ellipse cx="200" cy="128" rx="12" ry="42" fill="none" stroke="#FFDB3D" stroke-width="8"/>
+  <ellipse cx="56" cy="128" rx="12" ry="42" fill="none" stroke="#FFDB3D" stroke-width="8"/>
+  <path d="M58 92C68 76 84 66 104 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

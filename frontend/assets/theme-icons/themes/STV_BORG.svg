@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Borgen">
+  <path d="M120 32H184L176 108H112Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M130 74L142 88L166 54" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M48 108H208L200 214H56Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="84" y="100" width="88" height="16" rx="8" fill="#0B3D4A"/>
+  <rect x="84" y="140" width="88" height="48" rx="8" fill="#0B3D4A"/>
+  <rect x="108" y="156" width="40" height="16" rx="8" fill="#FFDB3D"/>
+  <path d="M66 126V146" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

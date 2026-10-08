@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Nobuo Uematsu (FF)">
+  <ellipse cx="94" cy="62" rx="12" ry="26" transform="rotate(-30 94 62)" fill="#FFDB3D"/>
+  <ellipse cx="122" cy="50" rx="12" ry="28" fill="#FFDB3D"/>
+  <ellipse cx="150" cy="58" rx="12" ry="26" transform="rotate(30 150 58)" fill="#FFDB3D"/>
+  <circle cx="118" cy="134" r="72" fill="#FFDB3D"/>
+  <polygon points="178,122 220,140 178,160" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="134" cy="116" r="11" fill="#0B3D4A"/>
+  <circle cx="98" cy="160" r="14" fill="#FF6B5B"/>
+  <path d="M68 118C72 104 82 94 94 88" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

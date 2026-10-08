@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Soul Eater">
+  <path d="M166 46L104 216" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M164 52C120 36 64 52 40 112C76 84 120 80 160 92Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M60 90L74 78L84 88L98 72L110 82L124 66L138 76L150 64" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M92 60Q104 54 118 52" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

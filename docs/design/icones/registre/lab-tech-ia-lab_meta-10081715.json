@@ -1,0 +1,10 @@
+[
+  {"id": "LAB_META", "symbole": "casque VR à pixels"},
+  {"id": "LAB_NANO", "symbole": "réseau hexagonal de graphène"},
+  {"id": "LAB_CONN", "symbole": "frigo connecté et Wi-Fi"},
+  {"id": "LAB_AUGM", "symbole": "cube holographique en cadre"},
+  {"id": "LAB_NEUR", "symbole": "réseau de nœuds en couches"},
+  {"id": "LAB_CYBG", "symbole": "main ouverte à puce"},
+  {"id": "LAB_AUTO", "symbole": "voiture de face à lidar"},
+  {"id": "LAB_ETIK", "symbole": "balance puce et humain"}
+]

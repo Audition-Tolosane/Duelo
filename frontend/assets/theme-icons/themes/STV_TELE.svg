@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Telenovelas">
+  <path d="M112 216C52 172 32 142 32 114C32 86 52 68 76 68C92 68 104 76 112 88L102 112L120 136L104 160L116 186Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M132 220L122 186L136 160L120 136L138 112L130 90C138 78 150 70 166 70C190 70 210 88 210 116C210 144 192 174 132 220Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M206 30C216 48 224 58 224 70A18 18 0 0 1 188 70C188 58 196 48 206 30Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M52 112Q54 96 68 90" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

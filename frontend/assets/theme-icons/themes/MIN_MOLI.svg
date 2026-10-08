@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Moliere">
+  <rect x="32" y="40" width="192" height="176" rx="16" fill="#12606D"/>
+  <rect x="52" y="72" width="152" height="124" rx="6" fill="#0B3D4A"/>
+  <ellipse cx="128" cy="184" rx="44" ry="10" fill="#E8F1EC"/>
+  <path d="M52 72H108C104 112 88 136 70 146C80 160 82 180 72 196H52Z" fill="#FF6B5B"/>
+  <path d="M204 72H148C152 112 168 136 186 146C176 160 174 180 184 196H204Z" fill="#FF6B5B"/>
+  <path d="M46 56H210V80Q192 96 174 80Q156 96 138 80Q120 96 102 80Q84 96 66 80Q56 92 46 80Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="72" cy="146" r="8" fill="#12606D"/>
+  <circle cx="184" cy="146" r="8" fill="#12606D"/>
+  <path d="M42 104L42 132" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

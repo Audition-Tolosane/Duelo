@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Blockchain">
+  <polygon points="68,144 98,162 98,198 68,216 38,198 38,162" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="68,144 98,162 68,180 38,162" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="128,92 158,110 158,146 128,164 98,146 98,110" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="128,92 158,110 128,128 98,110" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="188,40 218,58 218,94 188,112 158,94 158,58" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="188,40 218,58 188,76 158,58" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <ellipse cx="98" cy="154" rx="22" ry="11" transform="rotate(-42 98 154)" stroke="#FF6B5B" stroke-width="8" fill="none"/>
+  <ellipse cx="158" cy="102" rx="22" ry="11" transform="rotate(-42 158 102)" stroke="#FF6B5B" stroke-width="8" fill="none"/>
+  <path d="M106 124L106 140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

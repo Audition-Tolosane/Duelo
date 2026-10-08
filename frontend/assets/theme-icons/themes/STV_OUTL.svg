@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Outlander">
+  <polygon points="200,44 205,57 218,62 205,67 200,80 195,67 182,62 195,57" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polyline points="132,60 124,108 138,148 128,196" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="72,204 64,124 80,66 112,52 110,204" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="152,48 176,60 192,122 186,204 148,204" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M90 112L98 150M170 100L176 148" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M40 216C64 196 192 196 216 216Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M78 116L86 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

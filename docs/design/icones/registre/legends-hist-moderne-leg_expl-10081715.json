@@ -1,0 +1,12 @@
+[
+  {"id": "LEG_EXPL", "symbole": "longue-vue de marin déployée"},
+  {"id": "LEG_COLD", "symbole": "téléphone rouge à cadran"},
+  {"id": "LEG_VIET", "symbole": "hélicoptère à patins"},
+  {"id": "LEG_ATOM", "symbole": "trèfle de radioactivité"},
+  {"id": "LEG_BEPP", "symbole": "moulin rouge de Montmartre"},
+  {"id": "LEG_WWUN", "symbole": "casque Adrian et coquelicot"},
+  {"id": "LEG_RENA", "symbole": "palette de peintre et pinceau"},
+  {"id": "LEG_WWDE", "symbole": "hérisson tchèque sur la plage"},
+  {"id": "LEG_RESI", "symbole": "croix de Lorraine nocturne"},
+  {"id": "LEG_INDU", "symbole": "deux engrenages"}
+]

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Insectes">
+  <path d="M116 52C110 42 100 36 90 36M140 52C146 42 156 36 166 36" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M74 114L48 100M66 148L40 148M74 182L50 200M182 114L208 100M190 148L216 148M182 182L206 200" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="72" r="28" fill="#12606D"/>
+  <circle cx="116" cy="62" r="6" fill="#E8F1EC"/>
+  <circle cx="140" cy="62" r="6" fill="#E8F1EC"/>
+  <circle cx="128" cy="148" r="72" fill="#FF6B5B"/>
+  <path d="M128 80V218" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <circle cx="96" cy="126" r="14" fill="#0B3D4A"/>
+  <circle cx="160" cy="126" r="14" fill="#0B3D4A"/>
+  <circle cx="94" cy="176" r="12" fill="#0B3D4A"/>
+  <circle cx="162" cy="176" r="12" fill="#0B3D4A"/>
+  <path d="M74 146C76 126 86 110 100 100" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

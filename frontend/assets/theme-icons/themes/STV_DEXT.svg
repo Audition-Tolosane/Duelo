@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dexter">
+  <g transform="rotate(-12 128 168)">
+  <rect x="36" y="140" width="184" height="56" rx="10" fill="#12606D"/>
+  <rect x="170" y="148" width="42" height="40" rx="6" fill="#E8F1EC"/>
+  <rect x="76" y="148" width="56" height="40" rx="4" stroke="#0B3D4A" stroke-width="4" fill="none"/>
+  <ellipse cx="104" cy="168" rx="18" ry="10" fill="#FF6B5B"/>
+  <path d="M52 156L52 178" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+  <path d="M128 36C128 36 156 72 156 92C156 108 144 120 128 120C112 120 100 108 100 92C100 72 128 36 128 36Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+</svg>

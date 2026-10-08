@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fight Club">
+  <rect x="32" y="176" width="192" height="36" rx="18" fill="#12606D"/>
+  <rect x="44" y="98" width="168" height="94" rx="40" fill="#FF6B5B"/>
+  <rect x="72" y="116" width="112" height="52" rx="24" fill="none" stroke="#0B3D4A" stroke-width="6"/>
+  <circle cx="178" cy="62" r="20" fill="none" stroke="#12606D" stroke-width="8"/>
+  <circle cx="138" cy="56" r="12" fill="none" stroke="#12606D" stroke-width="8"/>
+  <circle cx="212" cy="96" r="10" fill="none" stroke="#12606D" stroke-width="8"/>
+  <path d="M60 136Q62 116 80 110" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

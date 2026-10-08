@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ère Victorienne">
+  <rect x="114" y="136" width="28" height="72" rx="10" fill="#12606D"/>
+  <path d="M88 168H168" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="84" y="198" width="88" height="24" rx="12" fill="#12606D"/>
+  <polygon points="80,74 176,74 156,144 100,144" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="96,86 160,86 146,132 110,132" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="114" rx="9" ry="13" fill="#FF6B5B"/>
+  <polygon points="66,70 190,70 128,40" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M98 62L114 53" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Indiana Jones">
+  <path d="M196 156C216 168 198 188 208 200" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="210,190 214,200 222,204 214,208 210,218 206,208 198,204 206,200" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <ellipse cx="132" cy="158" rx="72" ry="48" fill="none" stroke="#12606D" stroke-width="12"/>
+  <ellipse cx="126" cy="152" rx="56" ry="36" fill="none" stroke="#12606D" stroke-width="12"/>
+  <ellipse cx="136" cy="162" rx="42" ry="26" fill="none" stroke="#12606D" stroke-width="12"/>
+  <g transform="rotate(-40 92 92)">
+  <rect x="78" y="34" width="28" height="92" rx="12" fill="#FF6B5B"/>
+  <rect x="78" y="56" width="28" height="10" fill="#FFDB3D"/>
+  <rect x="78" y="96" width="28" height="10" fill="#FFDB3D"/>
+  <path d="M88 76V88" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" fill="none"/>
+  </g>
+  <path d="M74 140Q82 122 100 116" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

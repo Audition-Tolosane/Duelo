@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Rainbow Six Siege">
+  <rect x="40" y="52" width="176" height="152" rx="18" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M52 104H204M52 154H204M96 62V104M160 62V104M64 104V154M128 104V154M192 104V154M96 154V194M160 154V194" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="128" r="46" fill="#0B3D4A"/>
+  <circle cx="128" cy="128" r="26" stroke="#FFDB3D" stroke-width="10" fill="none"/>
+  <circle cx="128" cy="128" r="8" fill="#FFDB3D"/>
+  <path d="M128 66V90M128 166V190M66 128H90M166 128H190" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M54 80H76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

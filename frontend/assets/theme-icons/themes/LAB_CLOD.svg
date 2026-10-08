@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cloud Computing">
+  <circle cx="84" cy="146" r="38" fill="#12606D"/>
+  <circle cx="138" cy="116" r="50" fill="#12606D"/>
+  <circle cx="184" cy="150" r="34" fill="#12606D"/>
+  <rect x="40" y="136" width="176" height="64" rx="32" fill="#12606D"/>
+  <polygon points="128,104 158,136 98,136" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="116" y="128" width="24" height="52" rx="8" fill="#FFDB3D"/>
+  <circle cx="72" cy="172" r="8" fill="#FF6B5B"/>
+  <circle cx="186" cy="172" r="8" fill="#FF6B5B"/>
+  <path d="M104 104A36 36 0 0 1 120 85" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

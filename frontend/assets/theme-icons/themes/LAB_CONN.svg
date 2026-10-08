@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Objets Connectés (IoT)">
+  <rect x="44" y="60" width="104" height="164" rx="18" fill="#12606D"/>
+  <rect x="44" y="116" width="104" height="8" fill="#0B3D4A"/>
+  <rect x="124" y="76" width="10" height="28" rx="5" fill="#FFDB3D"/>
+  <rect x="124" y="136" width="10" height="48" rx="5" fill="#FFDB3D"/>
+  <rect x="60" y="140" width="48" height="34" rx="8" fill="#0B3D4A"/>
+  <path d="M72 158L80 164L96 150" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="160" cy="94" r="10" fill="#FFDB3D"/>
+  <path d="M160 70A24 24 0 0 1 184 94" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M160 50A44 44 0 0 1 204 94" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M160 30A64 64 0 0 1 224 94" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M62 98V78" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

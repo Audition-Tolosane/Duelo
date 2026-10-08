@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fairy Tail">
+  <path d="M92 120C72 86 48 70 36 80C32 102 58 130 90 142Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M164 120C184 86 208 70 220 80C224 102 198 130 166 142Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M88 154C66 158 46 174 48 190C60 198 82 182 94 166Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M168 154C190 158 210 174 208 190C196 198 174 182 162 166Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 36C160 76 180 104 180 148C180 186 156 212 128 212C100 212 76 186 76 148C76 116 92 98 104 78C110 98 118 106 126 108C120 84 120 62 128 36Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 116C146 140 156 154 156 172C156 190 144 200 128 200C112 200 100 190 100 172C100 154 112 140 128 116Z" fill="#FFDB3D"/>
+  <path d="M94 146Q96 126 106 112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

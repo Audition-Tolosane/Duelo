@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="How I Met Your Mother">
+  <rect x="122" y="30" width="12" height="24" rx="6" fill="#12606D"/>
+  <path d="M128 128L128 192C128 214 160 214 160 192" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M40 128C40 80 80 50 128 50C176 50 216 80 216 128Q194 112 172 128Q150 112 128 128Q106 112 84 128Q62 112 40 128Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 56L128 120M126 56Q96 74 86 120M130 56Q160 74 170 120" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M62 106C66 90 76 78 90 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

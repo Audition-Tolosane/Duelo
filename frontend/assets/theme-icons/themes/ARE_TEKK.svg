@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Tekken">
+  <polygon points="200,66 208,88 230,84 216,102 232,118 210,118 206,140 192,122 176,134 182,110 164,100 186,94" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round" transform="translate(-18 -10) scale(.9)"/>
+  <g transform="translate(112 134) rotate(-35) translate(-19 13)">
+    <path d="M-44 -84H8V-6H34C66 -2 82 18 82 40V58H-44Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+    <rect x="-44" y="42" width="126" height="16" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M-28 -64V-28" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

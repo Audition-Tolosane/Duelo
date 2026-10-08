@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Post Malone">
+  <g transform="rotate(40 128 128)">
+    <rect x="116" y="50" width="24" height="96" rx="10" fill="#FFDB3D"/>
+    <rect x="108" y="14" width="40" height="44" rx="12" fill="#FFDB3D"/>
+    <circle cx="128" cy="176" r="56" fill="#12606D"/>
+    <circle cx="128" cy="176" r="38" fill="#E8F1EC"/>
+    <rect x="110" y="190" width="36" height="10" rx="5" fill="#0B3D4A"/>
+    <path d="M128 140V190" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M86 150C92 138 100 130 110 126" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <polygon points="52,44 58,58 72,64 58,70 52,84 46,70 32,64 46,58" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+</svg>

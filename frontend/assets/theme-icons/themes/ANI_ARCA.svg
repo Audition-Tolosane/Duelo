@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Arcane">
+  <g transform="rotate(-16 128 128)">
+  <polygon points="104,102 126,70 140,102" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="96" y="150" width="22" height="42" rx="8" fill="#12606D"/>
+  <rect x="30" y="110" width="20" height="40" rx="8" fill="#FF6B5B"/>
+  <rect x="40" y="100" width="130" height="60" rx="22" fill="#12606D"/>
+  <path d="M156 94C196 94 214 110 214 130C214 150 196 166 156 166Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="70" y="100" width="14" height="60" fill="#FFDB3D"/>
+  <path d="M214 132L174 140L206 160Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <polyline points="182,140 188,149 194,138 200,151" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="180" cy="116" r="10" fill="#FFDB3D"/>
+  <path d="M100 116L136 114" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

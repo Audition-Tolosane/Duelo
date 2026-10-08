@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Billard &amp; Pool">
+  <polygon points="128,40 216,196 40,196" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="128,72 188,184 68,184" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="106" r="12" fill="#FF6B5B"/>
+  <circle cx="114" cy="134" r="12" fill="#FFDB3D"/>
+  <circle cx="142" cy="134" r="12" fill="#E8F1EC"/>
+  <circle cx="100" cy="162" r="12" fill="#E8F1EC"/>
+  <circle cx="128" cy="162" r="12" fill="#FF6B5B"/>
+  <circle cx="156" cy="162" r="12" fill="#FFDB3D"/>
+  <path d="M113 84L101 104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

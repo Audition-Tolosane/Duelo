@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Maluma">
+  <path d="M120 150Q112 190 124 222" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M118 214Q72 210 52 176Q88 172 118 200Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="70" rx="20" ry="40" fill="#FF6B5B"/>
+  <ellipse cx="82" cy="148" rx="18" ry="40" fill="#FF6B5B" transform="rotate(-62 82 148)"/>
+  <ellipse cx="174" cy="148" rx="18" ry="40" fill="#FF6B5B" transform="rotate(62 174 148)"/>
+  <ellipse cx="90" cy="104" rx="30" ry="22" fill="#FFDB3D" transform="rotate(-25 90 104)"/>
+  <ellipse cx="166" cy="104" rx="30" ry="22" fill="#FFDB3D" transform="rotate(25 166 104)"/>
+  <path d="M110 120Q128 112 146 120Q150 154 128 168Q106 154 110 120Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="120" r="12" fill="#E8F1EC"/>
+  <circle cx="128" cy="136" r="7" fill="#12606D"/>
+  <ellipse cx="196" cy="200" rx="14" ry="11" fill="#12606D" transform="rotate(-20 196 200)"/>
+  <path d="M208 198V154Q226 160 230 176" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M80 98Q86 90 96 88" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

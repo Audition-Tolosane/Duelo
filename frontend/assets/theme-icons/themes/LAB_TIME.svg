@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Temps &amp; Relativité">
+  <rect x="116" y="30" width="24" height="16" rx="8" fill="#FF6B5B"/>
+  <path d="M58 110A70 70 0 0 1 198 110C198 134 196 152 192 178C188 206 170 216 162 200C156 188 160 172 150 166C140 160 128 168 118 180C110 190 96 196 90 184C84 172 92 160 80 150C66 138 58 128 58 110Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M78 112A50 50 0 0 1 178 112C178 130 177 146 174 164C172 178 168 184 164 178C160 172 162 158 150 150C138 142 124 150 112 162C106 168 102 168 100 162C98 154 100 146 92 138C84 130 78 124 78 112Z" fill="#FFDB3D"/>
+  <path d="M128 112L128 80M128 112L152 126" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="112" r="9" fill="#FF6B5B"/>
+  <path d="M71.6 89.5A60 60 0 0 1 89.4 64.0" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

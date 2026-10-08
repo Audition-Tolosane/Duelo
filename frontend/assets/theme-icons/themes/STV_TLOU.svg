@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Last of Us">
+  <g transform="rotate(28 128 132)">
+  <path d="M120 64Q108 42 90 40M136 64Q148 42 166 40" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M82 198L70 208M174 198L186 208M128 220V226" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <ellipse cx="128" cy="178" rx="28" ry="34" fill="#FFDB3D"/>
+  <path d="M110 192H146" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <ellipse cx="106" cy="130" rx="24" ry="52" transform="rotate(14 106 130)" fill="#12606D"/>
+  <ellipse cx="150" cy="130" rx="24" ry="52" transform="rotate(-14 150 130)" fill="#12606D"/>
+  <path d="M98 94C98 74 110 62 128 62C146 62 158 74 158 94Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M96 110L92 128" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

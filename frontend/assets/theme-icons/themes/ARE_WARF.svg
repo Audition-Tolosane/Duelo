@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Warframe">
+  <path d="M128 36Q152 104 220 128Q152 152 128 220Q104 152 36 128Q104 104 128 36Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="128" r="22" fill="#0B3D4A"/>
+  <circle cx="128" cy="128" r="9" fill="#FFDB3D"/>
+  <path d="M170 66C188 74 200 86 208 102" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M46 170C54 184 66 194 82 200" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M122 64L120 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

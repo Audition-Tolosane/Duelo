@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Physique Théorique">
+  <path d="M64 72C100 72 112 84 128 84C144 84 156 72 192 72M50 112C90 112 104 144 128 144C152 144 166 112 206 112M40 152C86 152 104 186 128 186C152 186 170 152 216 152M32 192C84 192 104 202 128 202C152 202 172 192 224 192M64 72C54 110 44 150 32 192M96 72C98 112 106 160 84 196M128 84V202M160 72C158 112 150 160 172 196M192 72C202 110 212 150 224 192" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="138" r="32" fill="#FFDB3D"/>
+  <circle cx="192" cy="46" r="14" fill="#FF6B5B"/>
+  <path d="M110 128A20 20 0 0 1 120 118" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

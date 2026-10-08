@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Canidés">
+  <path d="M200 44L214 30M210 70L226 64" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="36" y="206" width="184" height="16" rx="8" fill="#FF6B5B"/>
+  <path d="M74 196C46 196 34 170 48 150" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M68 206C64 168 74 140 94 122L96 70L118 94C130 88 142 80 152 68L182 44C190 38 198 46 192 54L170 86C172 94 166 102 158 104C150 124 154 150 166 176C172 190 172 200 170 206Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M104 86L106 102L116 98Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <ellipse cx="140" cy="92" rx="9" ry="6" fill="#FFDB3D" transform="rotate(-30 140 92)"/>
+  <path d="M84 168C86 148 92 134 102 122" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

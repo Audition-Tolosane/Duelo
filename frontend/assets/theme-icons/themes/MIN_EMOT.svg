@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Intelligence Émotionnelle">
+  <circle cx="162" cy="94" r="56" fill="#FF6B5B"/>
+  <circle cx="150" cy="84" r="8" fill="#12606D"/>
+  <circle cx="182" cy="84" r="8" fill="#12606D"/>
+  <path d="M152 122Q168 106 184 122" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="98" cy="158" r="62" fill="#FFDB3D"/>
+  <circle cx="80" cy="146" r="9" fill="#12606D"/>
+  <circle cx="116" cy="146" r="9" fill="#12606D"/>
+  <path d="M74 174Q98 198 122 174" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M56 150C56 134 64 120 78 112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

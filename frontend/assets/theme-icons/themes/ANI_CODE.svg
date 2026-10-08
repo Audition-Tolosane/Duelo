@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Code Geass">
+  <path d="M128 34L148 70C184 80 204 110 206 150L208 190Q208 208 190 208H66Q48 208 48 190L50 150C52 110 72 80 108 70Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 52V96" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M128 100L142 116C164 120 180 134 180 156L178 176H78L76 156C76 134 92 120 114 116Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 136L150 146L174 138L158 158L128 166L98 158L82 138L106 146Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="62" y="190" width="132" height="16" rx="8" fill="#FF6B5B"/>
+  <path d="M68 140Q72 112 92 96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

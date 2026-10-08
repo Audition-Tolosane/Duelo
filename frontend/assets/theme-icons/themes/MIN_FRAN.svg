@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Littérature française">
+  <path d="M118 150C130 104 160 62 210 40C206 92 172 132 126 148Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M124 144C148 110 174 78 204 48" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="92" y="128" width="56" height="28" rx="8" fill="#12606D"/>
+  <path d="M70 150H170C178 150 184 156 184 164V204C184 212 178 218 170 218H70C62 218 56 212 56 204V164C56 156 62 150 70 150Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="88" y="172" width="64" height="26" rx="8" fill="#FF6B5B"/>
+  <path d="M68 166V186" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

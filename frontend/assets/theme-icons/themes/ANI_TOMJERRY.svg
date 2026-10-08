@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Tom &amp; Jerry">
+  <rect x="36" y="40" width="184" height="176" rx="18" fill="#12606D"/>
+  <rect x="36" y="184" width="184" height="32" rx="12" fill="#FFDB3D"/>
+  <path d="M84 216V146A44 44 0 0 1 172 146V216Z" fill="#0B3D4A"/>
+  <ellipse cx="112" cy="160" rx="11" ry="14" fill="#E8F1EC"/>
+  <ellipse cx="144" cy="160" rx="11" ry="14" fill="#E8F1EC"/>
+  <circle cx="115" cy="164" r="6" fill="#0B3D4A"/>
+  <circle cx="147" cy="164" r="6" fill="#0B3D4A"/>
+  <path d="M58 104L58 68" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mythologie Celtique">
+  <circle cx="128" cy="128" r="92" fill="#12606D"/>
+  <g transform="translate(128 128)" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none">
+  <path d="M0 0C0 -30 16 -52 38 -50C60 -48 64 -22 48 -12C36 -5 26 -16 34 -26"/>
+  <path transform="rotate(120)" d="M0 0C0 -30 16 -52 38 -50C60 -48 64 -22 48 -12C36 -5 26 -16 34 -26"/>
+  <path transform="rotate(240)" d="M0 0C0 -30 16 -52 38 -50C60 -48 64 -22 48 -12C36 -5 26 -16 34 -26"/>
+  </g>
+  <circle cx="128" cy="128" r="14" fill="#FF6B5B"/>
+  <path d="M60 104A72 72 0 0 1 76 78" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

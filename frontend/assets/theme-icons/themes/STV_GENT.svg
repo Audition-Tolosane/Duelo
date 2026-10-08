@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Gentlemen">
+  <circle cx="128" cy="154" r="58" stroke="#FFDB3D" stroke-width="20" fill="none"/>
+  <path d="M86 196A58 58 0 0 0 170 196" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="76" y="36" width="104" height="86" rx="24" fill="#FFDB3D"/>
+  <rect x="90" y="50" width="76" height="58" rx="14" fill="#12606D"/>
+  <path d="M112 62H144V82Q144 96 128 102Q112 96 112 82Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M90 140L90 160" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

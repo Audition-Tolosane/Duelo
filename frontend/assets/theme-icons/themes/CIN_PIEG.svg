@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Piège de Cristal">
+  <polygon points="40,214 58,150 80,214" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="176,214 202,136 220,214" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="188,112 212,92 216,124" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M58 172L58 196" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M120 220C96 220 88 196 92 172C96 148 92 132 96 112C100 92 116 84 136 88C156 92 164 108 160 128C156 148 148 160 150 180C152 204 144 220 120 220Z" fill="#FF6B5B"/>
+  <circle cx="108" cy="66" r="13" fill="#FF6B5B"/>
+  <circle cx="133" cy="58" r="10" fill="#FF6B5B"/>
+  <circle cx="153" cy="62" r="9" fill="#FF6B5B"/>
+  <circle cx="168" cy="74" r="8" fill="#FF6B5B"/>
+  <path d="M104 124Q104 106 116 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

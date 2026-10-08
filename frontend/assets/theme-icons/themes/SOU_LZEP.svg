@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Led Zeppelin">
+  <g transform="translate(0 10)">
+    <polygon points="70,92 36,48 90,68" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+    <polygon points="70,116 36,160 90,140" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M126 148L126 172M156 148L156 172" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <ellipse cx="144" cy="104" rx="88" ry="48" fill="#FFDB3D"/>
+    <path d="M130 70V138M158 66V142M186 74V134" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <rect x="104" y="168" width="76" height="36" rx="16" fill="#12606D"/>
+    <path d="M126 186h0M142 186h0M158 186h0" stroke="#E8F1EC" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M100 82C104 74 110 68 118 64" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Narnia">
+  <path d="M40 216C56 194 96 186 128 190C160 186 200 194 216 216Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="120" y="120" width="16" height="80" rx="6" fill="#12606D"/>
+  <path d="M110 198H146L140 178H116Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="34" r="8" fill="#12606D"/>
+  <polygon points="84,66 172,66 128,42" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="94" y="66" width="68" height="50" rx="6" fill="#FFDB3D"/>
+  <path d="M128 70V112" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="88" y="112" width="80" height="14" rx="7" fill="#12606D"/>
+  <rect x="112" y="138" width="32" height="16" rx="7" fill="#FF6B5B"/>
+  <path d="M138 148L150 176" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M70 206Q94 196 114 198" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M106 76L106 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

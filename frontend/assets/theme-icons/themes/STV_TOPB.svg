@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Top Boy">
+  <path d="M104 76L96 46L116 60L128 40L140 60L160 46L152 76Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="72" y="84" width="112" height="128" rx="10" fill="#12606D"/>
+  <rect x="98" y="102" width="74" height="12" rx="6" fill="#0B3D4A"/>
+  <rect x="98" y="128" width="74" height="12" rx="6" fill="#0B3D4A"/>
+  <rect x="98" y="154" width="74" height="12" rx="6" fill="#0B3D4A"/>
+  <rect x="98" y="180" width="74" height="12" rx="6" fill="#0B3D4A"/>
+  <rect x="146" y="126" width="16" height="16" rx="4" fill="#FFDB3D"/>
+  <rect x="110" y="178" width="16" height="16" rx="4" fill="#FFDB3D"/>
+  <rect x="36" y="204" width="184" height="16" rx="8" fill="#12606D"/>
+  <path d="M86 100L86 120" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

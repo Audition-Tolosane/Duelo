@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Billie Eilish">
+  <rect x="48" y="32" width="160" height="192" rx="34" fill="#12606D"/>
+  <circle cx="128" cy="150" r="58" fill="#0B3D4A"/>
+  <circle cx="128" cy="150" r="38" fill="none" stroke="#12606D" stroke-width="8"/>
+  <circle cx="128" cy="150" r="16" fill="#FFDB3D"/>
+  <circle cx="128" cy="80" r="16" fill="#FFDB3D"/>
+  <path d="M70 62V80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

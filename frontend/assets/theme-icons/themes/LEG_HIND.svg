@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mythologie Hindoue">
+  <g fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round">
+  <path d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
+  <path transform="rotate(45 128 128)" d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
+  <path transform="rotate(90 128 128)" d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
+  <path transform="rotate(135 128 128)" d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
+  <path transform="rotate(180 128 128)" d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
+  <path transform="rotate(225 128 128)" d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
+  <path transform="rotate(270 128 128)" d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
+  <path transform="rotate(315 128 128)" d="M114 62Q112 46 132 34Q128 48 142 62Z"/>
+  </g>
+  <circle cx="128" cy="128" r="64" stroke="#12606D" stroke-width="20" fill="none"/>
+  <path d="M128 128Q120 146 108 156M128 128Q136 146 148 156" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <polygon points="96,102 96,146 128,124 160,102 160,146 128,124" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M92 98V150M164 98V150" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M97 160A9 9 0 1 0 115 160A9 9 0 1 0 97 160ZM141 160A9 9 0 1 0 159 160A9 9 0 1 0 141 160Z" fill="#FFDB3D"/>
+  <path d="M74 96A64 64 0 0 1 96 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

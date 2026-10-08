@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Marvelous Mrs. Maisel">
+  <path d="M72 104V118C72 150 98 174 128 174C158 174 184 150 184 118V104" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="120" y="172" width="16" height="34" rx="6" fill="#FFDB3D"/>
+  <rect x="76" y="202" width="104" height="18" rx="9" fill="#FFDB3D"/>
+  <rect x="86" y="40" width="84" height="120" rx="40" fill="#12606D"/>
+  <path d="M110 70H160M104 92H162M104 114H162M110 136H156" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M98 70L98 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

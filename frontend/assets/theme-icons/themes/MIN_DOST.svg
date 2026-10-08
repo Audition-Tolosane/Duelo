@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dostoievski">
+  <circle cx="128" cy="128" r="88" fill="#12606D"/>
+  <circle cx="128" cy="128" r="72" fill="#FFDB3D"/>
+  <path d="M128.0 66.0A62 62 0 0 1 159.0 74.3M181.7 97.0A62 62 0 0 1 190.0 128.0M181.7 159.0A62 62 0 0 1 159.0 181.7M128.0 190.0A62 62 0 0 1 97.0 181.7M74.3 159.0A62 62 0 0 1 66.0 128.0M74.3 97.0A62 62 0 0 1 97.0 74.3" stroke="#FF6B5B" stroke-width="20" fill="none"/>
+  <circle cx="128" cy="128" r="40" fill="#12606D"/>
+  <polygon points="128,98 140,128 128,158 116,128" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="170" cy="90" r="9" fill="#E8F1EC"/>
+  <path d="M60 92Q68 70 90 58" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

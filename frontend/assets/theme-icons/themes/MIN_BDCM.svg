@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="BD &amp; Comics">
+  <polygon points="172,36 181,55 200,45 196,66 218,69 202,84 218,99 196,102 200,123 181,113 172,132 163,113 144,123 148,102 126,99 142,84 126,69 148,66 144,45 163,55" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="180" cy="80" r="14" fill="#FF6B5B"/>
+  <path d="M58 104H156C170 104 180 114 180 128V170C180 184 170 194 156 194H104L62 220L74 194H58C44 194 34 184 34 170V128C34 114 44 104 58 104Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="74" cy="150" r="12" fill="#FFDB3D"/>
+  <circle cx="107" cy="150" r="12" fill="#FFDB3D"/>
+  <circle cx="140" cy="150" r="12" fill="#FFDB3D"/>
+  <path d="M50 142L50 124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

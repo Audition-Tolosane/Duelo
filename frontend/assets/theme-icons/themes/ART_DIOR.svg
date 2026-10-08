@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Christian Dior">
+  <path d="M104 44L152 44L146 108C190 130 216 176 218 212H38C40 176 66 130 110 108Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="114,52 142,52 128,76" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="106" y="100" width="44" height="14" rx="6" fill="#FF6B5B"/>
+  <path d="M90 150L70 204M166 150L186 204" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="148" r="13" fill="#FFDB3D"/>
+  <circle cx="128" cy="192" r="13" fill="#FFDB3D"/>
+  <circle cx="106" cy="170" r="13" fill="#FFDB3D"/>
+  <circle cx="150" cy="170" r="13" fill="#FFDB3D"/>
+  <circle cx="128" cy="170" r="11" fill="#FF6B5B"/>
+</svg>

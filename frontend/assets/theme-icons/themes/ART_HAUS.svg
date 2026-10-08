@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Style Haussmannien">
+  <rect x="62" y="104" width="132" height="112" rx="6" fill="#FFDB3D"/>
+  <polygon points="52,100 76,56 180,56 204,100" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="148" y="32" width="20" height="30" rx="4" fill="#FFDB3D"/>
+  <rect x="112" y="68" width="32" height="24" rx="6" fill="#0B3D4A"/>
+  <rect x="76" y="116" width="26" height="30" rx="6" fill="#0B3D4A"/>
+  <rect x="115" y="116" width="26" height="30" rx="6" fill="#0B3D4A"/>
+  <rect x="154" y="116" width="26" height="30" rx="6" fill="#0B3D4A"/>
+  <rect x="56" y="152" width="144" height="12" rx="6" fill="#0B3D4A"/>
+  <rect x="76" y="170" width="26" height="46" rx="6" fill="#0B3D4A"/>
+  <rect x="115" y="170" width="26" height="46" rx="6" fill="#0B3D4A"/>
+  <rect x="154" y="170" width="26" height="46" rx="6" fill="#0B3D4A"/>
+  <path d="M74 78L92 66" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

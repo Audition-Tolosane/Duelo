@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Predator">
+  <path d="M84 72Q54 112 50 184" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M92 100Q68 144 68 210" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M172 72Q202 112 206 184" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M164 100Q188 144 188 210" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 44C168 44 188 66 188 100L182 148C178 172 158 192 128 204C98 192 78 172 74 148L68 100C68 66 88 44 128 44Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="88,112 118,124 114,140 92,132" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="168,112 138,124 142,140 164,132" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M106 162H150L138 184H118Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="62" r="9" fill="#FF6B5B"/>
+  <circle cx="114" cy="86" r="9" fill="#FF6B5B"/>
+  <circle cx="142" cy="86" r="9" fill="#FF6B5B"/>
+  <path d="M84 96Q84 76 98 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

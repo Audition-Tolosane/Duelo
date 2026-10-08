@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Guns N&#39;Roses">
+  <path d="M128 140C128 172 120 192 124 224" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M126 184C100 172 82 180 78 202C104 210 120 204 126 184Z" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M126 168C150 156 170 160 176 180C152 190 134 186 126 168Z" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
+  <polygon points="136,196 152,202 136,212" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="92" cy="96" r="30" fill="#FF6B5B"/>
+  <circle cx="164" cy="96" r="30" fill="#FF6B5B"/>
+  <circle cx="128" cy="62" r="32" fill="#FF6B5B"/>
+  <circle cx="128" cy="108" r="40" fill="#FF6B5B"/>
+  <path d="M106 100C106 78 150 74 154 102C156 124 126 128 116 114C110 104 124 92 136 100" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M78 74C82 62 92 54 102 50" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

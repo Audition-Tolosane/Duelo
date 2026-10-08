@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Taylor Swift">
+  <circle cx="206" cy="128" r="15" fill="#FF6B5B"/>
+  <circle cx="195" cy="167" r="15" fill="#FFDB3D"/>
+  <circle cx="167" cy="195" r="15" fill="#12606D"/>
+  <circle cx="128" cy="206" r="15" fill="#FF6B5B"/>
+  <circle cx="89" cy="195" r="15" fill="#FFDB3D"/>
+  <circle cx="61" cy="167" r="15" fill="#12606D"/>
+  <circle cx="50" cy="128" r="15" fill="#FF6B5B"/>
+  <circle cx="61" cy="89" r="15" fill="#FFDB3D"/>
+  <circle cx="89" cy="61" r="15" fill="#12606D"/>
+  <circle cx="128" cy="50" r="15" fill="#FF6B5B"/>
+  <circle cx="167" cy="61" r="15" fill="#FFDB3D"/>
+  <circle cx="195" cy="89" r="15" fill="#12606D"/>
+  <polygon points="128,88 139,117 168,128 139,139 128,168 117,139 88,128 117,117" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M85 60h0" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

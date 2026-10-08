@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sommeil">
+  <path d="M44 124C60 70 196 70 212 124" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M40 128C40 102 80 94 128 110C176 94 216 102 216 128C216 168 184 188 150 176C140 172 134 166 128 166C122 166 116 172 106 176C72 188 40 168 40 128Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M70 136C80 152 100 152 110 136" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M146 136C156 152 176 152 186 136" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="190,36 196,50 210,54 196,58 190,72 184,58 170,54 184,50" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M58 124C60 116 68 110 78 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

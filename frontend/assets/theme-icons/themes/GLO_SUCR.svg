@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Douceurs &amp; Sucre">
+  <path d="M132 46C134 38 140 32 150 30" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M66 136H190L174 210C173 216 168 220 162 220H94C88 220 83 216 82 210Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M108 156L111 204M128 156V204M148 156L145 204" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <ellipse cx="128" cy="128" rx="80" ry="20" fill="#FFDB3D"/>
+  <ellipse cx="128" cy="104" rx="62" ry="18" fill="#FFDB3D"/>
+  <ellipse cx="128" cy="82" rx="42" ry="16" fill="#FFDB3D"/>
+  <circle cx="128" cy="58" r="15" fill="#FF6B5B"/>
+  <path d="M84 154L88 186" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

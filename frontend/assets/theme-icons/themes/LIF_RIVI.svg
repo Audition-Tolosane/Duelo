@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Rivières">
+  <path d="M144 38C116 52 90 70 92 92C94 112 140 118 142 142C144 166 96 184 56 218H206C178 196 176 170 178 148C180 120 124 108 120 92C118 78 136 60 160 38Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M140 204C150 196 160 186 164 172" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M120 128C128 132 134 136 136 140" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <g transform="rotate(-35 192 84)">
+    <ellipse cx="192" cy="84" rx="28" ry="14" fill="#FF6B5B"/>
+    <polygon points="216,84 230,72 230,96" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+    <circle cx="178" cy="82" r="4" fill="#12606D"/>
+  </g>
+  <path d="M90 204C100 194 112 186 124 178" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

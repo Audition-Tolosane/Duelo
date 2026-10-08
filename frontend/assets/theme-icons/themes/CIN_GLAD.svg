@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Gladiator">
+  <g transform="rotate(-45 128 128)">
+  <path d="M128 222V82" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <ellipse cx="128" cy="62" rx="10" ry="18" fill="#FFDB3D"/>
+  <ellipse cx="116" cy="94" rx="10" ry="18" transform="rotate(-25 116 94)" fill="#FFDB3D"/>
+  <ellipse cx="140" cy="94" rx="10" ry="18" transform="rotate(25 140 94)" fill="#FFDB3D"/>
+  <ellipse cx="116" cy="124" rx="10" ry="18" transform="rotate(-25 116 124)" fill="#FFDB3D"/>
+  <ellipse cx="140" cy="124" rx="10" ry="18" transform="rotate(25 140 124)" fill="#FFDB3D"/>
+  <ellipse cx="116" cy="154" rx="10" ry="18" transform="rotate(-25 116 154)" fill="#FFDB3D"/>
+  <ellipse cx="140" cy="154" rx="10" ry="18" transform="rotate(25 140 154)" fill="#FFDB3D"/>
+  </g>
+  <g transform="rotate(45 128 128)">
+  <path d="M128 32L146 58V150H110V58Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="90" y="150" width="76" height="18" rx="9" fill="#FF6B5B"/>
+  <rect x="116" y="166" width="24" height="40" rx="8" fill="#12606D"/>
+  <circle cx="128" cy="212" r="14" fill="#FF6B5B"/>
+  <path d="M114 74V100" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

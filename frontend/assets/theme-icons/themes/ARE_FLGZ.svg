@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fall Guys">
+  <path d="M84 126L50 92" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M172 126L206 88" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M108 186L94 220" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M148 186L166 214" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="82" y="40" width="92" height="148" rx="46" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="110" cy="98" r="14" fill="#E8F1EC"/>
+  <circle cx="146" cy="98" r="14" fill="#E8F1EC"/>
+  <circle cx="110" cy="102" r="6" fill="#0B3D4A"/>
+  <circle cx="146" cy="102" r="6" fill="#0B3D4A"/>
+  <ellipse cx="128" cy="146" rx="14" ry="16" fill="#0B3D4A"/>
+  <path d="M222 150V176" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M34 150V176" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M100 76L106 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

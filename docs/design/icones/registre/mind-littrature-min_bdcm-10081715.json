@@ -1,0 +1,12 @@
+[
+  {"id": "MIN_BDCM", "symbole": "bulle de BD et onomatopée"},
+  {"id": "MIN_BEAT", "symbole": "machine à écrire et rouleau"},
+  {"id": "MIN_BEST", "symbole": "pile de livres étoilée"},
+  {"id": "MIN_CLAS", "symbole": "livre ouvert à signet"},
+  {"id": "MIN_MANG", "symbole": "veine de colère et goutte"},
+  {"id": "MIN_EXIS", "symbole": "panneau indicateur à deux directions"},
+  {"id": "MIN_FANT", "symbole": "chapeau de magicien étoilé"},
+  {"id": "MIN_KIDS", "symbole": "carrosse-citrouille"},
+  {"id": "MIN_FRAN", "symbole": "plume d'oie et encrier"},
+  {"id": "MIN_RUSS", "symbole": "samovar"}
+]

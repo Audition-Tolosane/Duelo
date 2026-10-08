@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Nintendo">
+  <rect x="38" y="34" width="72" height="188" rx="34" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="146" y="34" width="72" height="188" rx="34" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="74" cy="84" r="16" fill="#E8F1EC"/>
+  <circle cx="182" cy="168" r="16" fill="#E8F1EC"/>
+  <circle cx="182" cy="82" r="10" fill="#FFDB3D"/>
+  <circle cx="74" cy="170" r="10" fill="#FFDB3D"/>
+  <path d="M52 60L64 48" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

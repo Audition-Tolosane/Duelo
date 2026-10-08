@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Barbie">
+  <g transform="translate(0 -12)">
+  <polygon points="62,152 88,152 76,214 68,214" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M56 100C64 100 70 104 74 112C90 140 120 152 150 150C178 150 206 168 214 186C216 194 212 198 204 198L170 198C140 198 112 176 96 156L66 156C56 156 50 148 50 136Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M100 162C116 180 142 200 172 200L204 200" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M150 150L132 138L134 162Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M150 150L168 138L166 162Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="150" cy="150" r="8" fill="#FFDB3D"/>
+  <path d="M60 114L60 134" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

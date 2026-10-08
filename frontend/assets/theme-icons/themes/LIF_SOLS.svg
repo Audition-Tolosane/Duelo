@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sols">
+  <path d="M76 92L68 66M96 92V60M116 92L124 68" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M164 92L156 70M184 92L194 64" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="38" y="92" width="180" height="130" rx="24" fill="#12606D"/>
+  <path d="M52 146H204V188C204 198 196 208 186 208H70C60 208 52 198 52 188Z" fill="#0B3D4A"/>
+  <circle cx="74" cy="186" r="9" fill="#E8F1EC"/>
+  <circle cx="186" cy="190" r="7" fill="#E8F1EC"/>
+  <circle cx="176" cy="118" r="7" fill="#0B3D4A"/>
+  <path d="M84 150C96 126 116 126 122 150C128 174 148 182 164 162C172 152 172 140 166 130" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="166" cy="128" r="3" fill="#0B3D4A"/>
+  <path d="M54 136V118C54 110 58 106 64 106" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,12 @@
+[
+  {"id": "ARE_CATC", "symbole": "ceinture de champion"},
+  {"id": "ARE_CROS", "symbole": "kettlebell"},
+  {"id": "ARE_PIST", "symbole": "casque aéro de pistard"},
+  {"id": "ARE_ESCA", "symbole": "mousqueton d'escalade"},
+  {"id": "ARE_GYMN", "symbole": "anneaux de gymnastique suspendus"},
+  {"id": "ARE_HALT", "symbole": "barre avec disques"},
+  {"id": "ARE_OLYM", "symbole": "podium et flamme"},
+  {"id": "ARE_JUDO", "symbole": "judogi et ceinture noire"},
+  {"id": "ARE_KARA", "symbole": "poing et planches brisées"},
+  {"id": "ARE_LUCH", "symbole": "masque de lucha libre"}
+]

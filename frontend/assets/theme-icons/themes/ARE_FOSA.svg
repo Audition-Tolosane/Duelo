@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Football Sud-Américain">
+  <path d="M100 110L170 50M156 110L86 50" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="172" cy="48" r="14" fill="#FFDB3D"/>
+  <circle cx="84" cy="48" r="14" fill="#FFDB3D"/>
+  <path d="M52 124V190A76 20 0 0 0 204 190V124Z" fill="#12606D"/>
+  <polyline points="70,148 99,194 128,148 157,194 186,148" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M52 190A76 20 0 0 0 204 190" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="124" rx="76" ry="22" fill="#FFDB3D" stroke="#FF6B5B" stroke-width="12"/>
+  <path d="M84 118Q96 111 112 110" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

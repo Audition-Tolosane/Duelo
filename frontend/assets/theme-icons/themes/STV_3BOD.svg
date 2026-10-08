@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Le Problème à trois corps">
+  <path d="M128 136C96 96 104 44 128 44C152 44 160 96 128 136C176 128 216 154 204 178C192 198 146 186 128 136C110 186 64 198 52 178C40 154 80 128 128 136Z" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="86" r="26" fill="#FFDB3D"/>
+  <circle cx="174" cy="166" r="22" fill="#FF6B5B"/>
+  <circle cx="82" cy="166" r="18" fill="#FFDB3D"/>
+  <circle cx="128" cy="138" r="16" fill="#12606D"/>
+  <path d="M112 84A16 16 0 0 1 120 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

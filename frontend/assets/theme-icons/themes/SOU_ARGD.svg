@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ariana Grande">
+  <path d="M92 66C150 22 230 66 204 140C192 168 160 190 152 224C128 190 148 160 160 132C174 92 130 84 92 90Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M150 64C196 84 190 130 160 186" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="60" y="56" width="44" height="44" rx="18" fill="#FFDB3D" transform="rotate(-20 82 78)"/>
+  <circle cx="82" cy="78" r="9" fill="#FF6B5B"/>
+  <polygon points="60,176 66,190 80,196 66,202 60,216 54,202 40,196 54,190" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="208,184 212,194 222,198 212,202 208,212 204,202 194,198 204,194" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M128 54C146 44 164 46 178 54" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

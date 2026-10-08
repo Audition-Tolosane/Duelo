@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mercredi">
+  <path d="M58 224V198C58 178 82 166 104 166H152C174 166 198 178 198 198V224Z" fill="#12606D"/>
+  <path d="M70 114C70 72 94 46 128 46C162 46 186 72 186 114V146H70Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M92 98H164V124C164 148 148 162 128 162C108 162 92 148 92 124Z" fill="#E8F1EC"/>
+  <path d="M110 122L110 130M146 122L146 130" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <ellipse cx="78" cy="150" rx="15" ry="17" fill="#12606D" stroke="#0B3D4A" stroke-width="6"/>
+  <ellipse cx="78" cy="180" rx="15" ry="17" fill="#12606D" stroke="#0B3D4A" stroke-width="6"/>
+  <ellipse cx="78" cy="208" rx="12" ry="14" fill="#12606D" stroke="#0B3D4A" stroke-width="6"/>
+  <ellipse cx="178" cy="150" rx="15" ry="17" fill="#12606D" stroke="#0B3D4A" stroke-width="6"/>
+  <ellipse cx="178" cy="180" rx="15" ry="17" fill="#12606D" stroke="#0B3D4A" stroke-width="6"/>
+  <ellipse cx="178" cy="208" rx="12" ry="14" fill="#12606D" stroke="#0B3D4A" stroke-width="6"/>
+  <path d="M128 170H98C94 184 106 198 128 186Z" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M128 170H158C162 184 150 198 128 186Z" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="184" r="7" fill="#FF6B5B"/>
+  <path d="M88 86C92 72 100 62 112 58" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

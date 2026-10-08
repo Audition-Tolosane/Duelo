@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Spider-Verse">
+  <path d="M116 44C160 44 184 80 184 124C184 176 152 212 116 212C80 212 48 176 48 124C48 80 72 44 116 44Z" fill="#FFDB3D"/>
+  <path d="M140 44C184 44 208 80 208 124C208 176 176 212 140 212C104 212 72 176 72 124C72 80 96 44 140 44Z" fill="#12606D"/>
+  <path d="M128 44C172 44 196 80 196 124C196 176 164 212 128 212C92 212 60 176 60 124C60 80 84 44 128 44Z" fill="#FF6B5B"/>
+  <path d="M128 52V206M68 154Q128 140 188 154M76 190Q128 174 180 190M88 74Q128 64 168 74" stroke="#12606D" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M76 106C96 102 114 116 118 138C100 142 80 132 76 106Z" fill="#E8F1EC" stroke="#12606D" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M180 106C160 102 142 116 138 138C156 142 176 132 180 106Z" fill="#E8F1EC" stroke="#12606D" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M78 88Q86 70 100 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

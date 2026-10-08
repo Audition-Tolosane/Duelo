@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dune">
+  <path d="M94 214C98 176 102 146 96 116L160 116C154 146 158 176 162 214Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M100 152Q128 162 156 152M100 184Q128 194 158 184" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="90" r="56" fill="#12606D"/>
+  <circle cx="128" cy="90" r="42" fill="#E8F1EC"/>
+  <polygon points="128.0,48.0 135.2,63.0 149.0,53.6 147.8,70.2 164.4,69.0 155.0,82.8 170.0,90.0 155.0,97.2 164.4,111.0 147.8,109.8 149.0,126.4 135.2,117.0 128.0,132.0 120.8,117.0 107.0,126.4 108.2,109.8 91.6,111.0 101.0,97.2 86.0,90.0 101.0,82.8 91.6,69.0 108.2,70.2 107.0,53.6 120.8,63.0" fill="#0B3D4A"/>
+  <path d="M32 214C62 190 96 190 128 204C160 190 196 190 224 214Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M80 74Q86 56 102 46" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

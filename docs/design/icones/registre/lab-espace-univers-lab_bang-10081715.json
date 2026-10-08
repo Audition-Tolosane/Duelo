@@ -1,0 +1,12 @@
+[
+  {"id": "LAB_BANG", "symbole": "explosion en étoile rayonnante"},
+  {"id": "LAB_COME", "symbole": "comète à queue et astéroïde"},
+  {"id": "LAB_CONZ", "symbole": "Grande Ourse sur disque céleste"},
+  {"id": "LAB_EXOP", "symbole": "planète à continents et naine rouge"},
+  {"id": "LAB_ROKT", "symbole": "tuyère de moteur-fusée en flammes"},
+  {"id": "LAB_MILK", "symbole": "galaxie spirale inclinée"},
+  {"id": "LAB_MARS", "symbole": "planète rouge à canyon"},
+  {"id": "LAB_DARK", "symbole": "halo pointillé et galaxies"},
+  {"id": "LAB_NEBU", "symbole": "nuage nébuleux et étoile naissante"},
+  {"id": "LAB_SATE", "symbole": "satellite à panneaux et antenne"}
+]

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Écritures">
+  <path d="M60 212C96 226 128 190 162 204C178 210 192 210 206 200" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g transform="rotate(45 128 128)">
+  <rect x="114" y="22" width="28" height="118" rx="14" fill="#12606D"/>
+  <path d="M110 158H146C150 184 140 204 128 222C116 204 106 184 110 158Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="106" y="132" width="44" height="28" rx="10" fill="#FFDB3D"/>
+  <path d="M124 56V92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

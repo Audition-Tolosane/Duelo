@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Isaac Asimov">
+  <rect x="100" y="182" width="64" height="40" rx="10" fill="#FF6B5B"/>
+  <path d="M96 120V64M124 116V48M152 116V54M178 124V76" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M90 156L60 128L56 104" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="80" y="110" width="108" height="80" rx="24" fill="#12606D"/>
+  <path d="M96 92h0M124 82h0M152 86h0M178 100h0M60 128h0" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="138" cy="150" r="20" fill="#FFDB3D"/>
+  <circle cx="138" cy="150" r="9" fill="#FF6B5B"/>
+  <path d="M96 136L104 124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

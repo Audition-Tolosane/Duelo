@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="X-Men">
+  <path d="M90 122C88 86 92 60 100 34C106 62 108 88 106 122Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/><path d="M120 122C118 86 122 60 130 34C136 62 138 88 136 122Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/><path d="M150 122C148 86 152 60 160 34C166 62 168 88 166 122Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="100" y="190" width="56" height="34" rx="10" fill="#12606D"/>
+  <rect x="62" y="124" width="132" height="80" rx="30" fill="#12606D"/>
+  <circle cx="82" cy="132" r="18" fill="#12606D"/><circle cx="113" cy="132" r="18" fill="#12606D"/><circle cx="143" cy="132" r="18" fill="#12606D"/><circle cx="174" cy="132" r="18" fill="#12606D"/>
+  <path d="M98 132V160M128 132V160M158 132V160" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M76 180Q120 164 172 182" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M78 160Q78 140 90 130" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

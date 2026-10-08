@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Marathon &amp; Fond">
+  <path d="M44 196V116C44 106 56 102 64 110L92 138H118L150 152C190 160 212 172 212 196Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="38" y="190" width="180" height="28" rx="14" fill="#FFDB3D"/>
+  <path d="M96 166L176 176" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M60 126L64 156" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M104 74H168M128 50H190" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

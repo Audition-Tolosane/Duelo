@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Hollow Knight">
+  <path d="M96 104C70 84 68 56 86 38" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M160 104C186 84 188 56 170 38" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M64 150C64 112 90 92 128 92C166 92 192 112 192 150C192 192 164 220 128 220C92 220 64 192 64 150Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="100" cy="158" rx="14" ry="26" transform="rotate(12 100 158)" fill="#0B3D4A"/>
+  <ellipse cx="156" cy="158" rx="14" ry="26" transform="rotate(-12 156 158)" fill="#0B3D4A"/>
+  <path d="M128 106V124" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M88 124L98 110" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

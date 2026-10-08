@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mad Max">
+  <rect x="160" y="58" width="24" height="30" rx="6" transform="rotate(45 172 88)" fill="#12606D"/>
+  <rect x="160" y="48" width="24" height="16" rx="6" transform="rotate(45 172 88)" fill="#FF6B5B"/>
+  <path d="M84 72V50Q84 44 90 44H138Q144 44 144 50V72M114 44V72" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M76 72H156L188 104V208Q188 220 176 220H76Q64 220 64 208V84Q64 72 76 72Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="88" y="96" width="76" height="104" rx="10" fill="none" stroke="#0B3D4A" stroke-width="8"/>
+  <path d="M96 104L156 192M156 104L96 192" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M76 98L76 122" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Charles Dickens">
+  <ellipse cx="128" cy="208" rx="90" ry="14" fill="#FFDB3D"/>
+  <path d="M48 200C48 134 84 100 128 100C172 100 208 134 208 200Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M66 142C78 116 100 100 128 100C156 100 178 116 190 142C180 138 174 152 164 148C156 144 152 158 142 152C134 148 128 160 118 152C108 146 102 158 94 150C86 142 78 152 66 142Z" fill="#FFDB3D"/>
+  <circle cx="92" cy="178" r="6" fill="#FF6B5B"/>
+  <circle cx="128" cy="172" r="6" fill="#FF6B5B"/>
+  <circle cx="164" cy="182" r="6" fill="#FF6B5B"/>
+  <circle cx="112" cy="192" r="6" fill="#FF6B5B"/>
+  <path d="M126 94C116 80 98 78 88 86C100 92 112 98 126 94Z" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M130 94C140 80 158 78 168 86C156 92 144 98 130 94Z" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="122" cy="86" r="9" fill="#FF6B5B"/>
+  <circle cx="136" cy="82" r="9" fill="#FF6B5B"/>
+  <path d="M62 180Q62 164 70 152" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Halo">
+  <path d="M56 190V120C56 70 88 40 128 40C168 40 200 70 200 120V190C200 200 190 210 180 210H76C66 210 56 200 56 190Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="72,100 184,100 168,152 88,152" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="92" y="176" width="72" height="22" rx="8" fill="#FF6B5B"/>
+  <path d="M84 78L100 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

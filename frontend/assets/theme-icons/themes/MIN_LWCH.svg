@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Largo Winch">
+  <path d="M100 90V72C100 64 106 58 114 58H142C150 58 156 64 156 72V90" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="40" y="86" width="176" height="122" rx="18" fill="#12606D"/>
+  <path d="M54 132H202" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="68" y="120" width="26" height="24" rx="6" fill="#FFDB3D"/>
+  <rect x="162" y="120" width="26" height="24" rx="6" fill="#FFDB3D"/>
+  <path d="M60 110L60 160" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

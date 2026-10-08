@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Among Us">
+  <rect x="38" y="104" width="40" height="76" rx="14" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M78 82C78 56 100 42 130 42C160 42 182 56 182 82V194C182 204 176 210 166 210H150C142 210 138 204 138 196V178H122V196C122 204 118 210 110 210H94C84 210 78 204 78 194Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="104" y="72" width="84" height="50" rx="25" fill="#0B3D4A"/>
+  <path d="M120 90H142" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M96 62C100 56 106 52 112 50" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

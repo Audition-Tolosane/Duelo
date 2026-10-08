@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Jumanji">
+  <g transform="rotate(-38 128 110)"><path d="M128 104C104 84 108 56 128 36C148 56 152 84 128 104Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/></g>
+  <g transform="rotate(38 128 110)"><path d="M128 104C104 84 108 56 128 36C148 56 152 84 128 104Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/></g>
+  <path d="M128 104C104 84 108 56 128 36C148 56 152 84 128 104Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 98V54" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="44" y="104" width="168" height="112" rx="20" fill="#FFDB3D"/>
+  <path d="M66 126L92 146M190 126L164 146M66 196L92 178M190 196L164 178" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="160" r="34" fill="#0B3D4A" stroke="#12606D" stroke-width="12"/>
+  <path d="M112 152A18 18 0 0 1 126 140" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M60 122V146" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

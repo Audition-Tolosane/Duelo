@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Smallville">
+  <path d="M206 50L220 36" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <circle cx="194" cy="62" r="13" fill="#FFDB3D"/>
+  <path d="M48 214V130L72 90L128 62L184 90L208 130V214Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="112" y="94" width="32" height="28" rx="4" fill="#12606D"/>
+  <rect x="88" y="140" width="80" height="80" rx="4" fill="#12606D"/>
+  <path d="M96 148L160 212M160 148L96 212" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M66 138L66 158" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

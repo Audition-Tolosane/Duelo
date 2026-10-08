@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Water Polo">
+  <path d="M62 140C62 84 92 44 128 44C164 44 194 84 194 140Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M66 146C78 190 178 190 190 146" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="62" cy="142" r="20" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12"/>
+  <circle cx="194" cy="142" r="20" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12"/>
+  <circle cx="62" cy="142" r="6" fill="#E8F1EC"/>
+  <circle cx="194" cy="142" r="6" fill="#E8F1EC"/>
+  <path d="M92 100C96 82 106 70 118 64" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M36 218Q58 198 80 218T124 218T168 218T212 218" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

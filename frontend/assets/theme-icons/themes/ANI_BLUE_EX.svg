@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Blue Exorcist">
+  <path d="M84 104C76 80 86 60 98 50C98 64 104 68 110 60C112 46 120 34 128 22C136 34 144 46 146 60C152 68 158 64 158 50C170 60 180 80 172 104Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="96" r="34" fill="#FFDB3D"/>
+  <circle cx="128" cy="96" r="14" fill="#12606D"/>
+  <rect x="120" y="124" width="16" height="96" rx="6" fill="#FFDB3D"/>
+  <rect x="136" y="184" width="30" height="14" rx="4" fill="#FFDB3D"/>
+  <rect x="136" y="204" width="22" height="12" rx="4" fill="#FFDB3D"/>
+  <rect x="106" y="134" width="44" height="14" rx="7" fill="#FF6B5B"/>
+  <path d="M104 90A26 26 0 0 1 116 74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

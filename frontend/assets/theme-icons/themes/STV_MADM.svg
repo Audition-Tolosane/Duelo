@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mad Men">
+  <path d="M64 94H192L180 204C179 212 172 216 164 216H92C84 216 77 212 76 204Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M72 140H184L178 196C177 202 172 204 166 204H90C84 204 79 202 78 196Z" fill="#FFDB3D"/>
+  <rect x="96" y="118" width="36" height="36" rx="8" transform="rotate(-14 114 136)" fill="#E8F1EC"/>
+  <circle cx="152" cy="176" r="14" fill="#FF6B5B"/>
+  <path d="M152 162Q156 146 168 140" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M168 94C170 70 196 60 212 74" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M82 110L86 130" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

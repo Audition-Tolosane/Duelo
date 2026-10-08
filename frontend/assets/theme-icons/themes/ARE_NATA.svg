@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Natation">
+  <path d="M60 112L28 88M196 112L228 88" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="84" cy="128" r="48" fill="#12606D" stroke="#12606D" stroke-width="12"/>
+  <circle cx="172" cy="128" r="48" fill="#12606D" stroke="#12606D" stroke-width="12"/>
+  <circle cx="84" cy="128" r="30" fill="#0B3D4A"/>
+  <circle cx="172" cy="128" r="30" fill="#0B3D4A"/>
+  <path d="M120 120H136" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M70 116L80 106" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M60 204C80 190 100 218 128 204C156 190 176 218 196 204" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

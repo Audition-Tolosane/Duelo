@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Îles de Rêve">
+  <rect x="40" y="212" width="176" height="12" rx="6" fill="#FFDB3D"/>
+  <g transform="rotate(-16 128 124)">
+  <path d="M128 36Q138 76 158.6 81.9Q200 84 211.7 96.8Q190 120 177.5 140.1Q184 170 179.7 195.2Q150 186 128 176Q106 186 76.3 195.2Q72 170 78.5 140.1Q66 120 44.3 96.8Q56 84 97.4 81.9Q118 76 128 36Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="124" r="15" fill="#FF6B5B"/>
+  <circle cx="128" cy="76" r="7" fill="#FFDB3D"/>
+  <circle cx="175" cy="109" r="7" fill="#FFDB3D"/>
+  <circle cx="157" cy="163" r="7" fill="#FFDB3D"/>
+  <circle cx="99" cy="163" r="7" fill="#FFDB3D"/>
+  <circle cx="81" cy="109" r="7" fill="#FFDB3D"/>
+  <path d="M108 98L116 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

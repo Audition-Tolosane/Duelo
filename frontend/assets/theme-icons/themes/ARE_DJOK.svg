@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Novak Djokovic">
+  <polygon points="46,206 42,124 76,206" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="70,206 82,70 108,206" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="100,206 130,46 146,206" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="138,206 176,92 178,206" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="170,206 212,136 206,206" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="36" y="196" width="184" height="24" rx="12" fill="#12606D"/>
+  <circle cx="150" cy="170" r="34" fill="#FFDB3D"/>
+  <path d="M124 148Q140 170 124 192M176 148Q160 170 176 192" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M196 58C196 50 206 46 212 54C218 46 228 50 226 60C224 70 212 76 212 80C212 76 198 68 196 58Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M80 118L84 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

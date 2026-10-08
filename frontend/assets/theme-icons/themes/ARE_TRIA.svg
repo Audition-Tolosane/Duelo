@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Triathlon">
+  <polygon points="84,32 122,32 140,108 106,108" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="134,32 172,32 150,108 116,108" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="162" r="58" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12"/>
+  <circle cx="128" cy="162" r="40" fill="#12606D"/>
+  <path d="M108 180V168M128 180V152M148 180V136" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M96 132L104 120" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" fill="none"/>
+</svg>

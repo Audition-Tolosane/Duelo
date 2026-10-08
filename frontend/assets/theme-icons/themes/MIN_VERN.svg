@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Jules Verne">
+  <path d="M110 176L114 196" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M146 176L142 196" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M128 32C176 32 204 66 204 104C204 140 172 160 152 176H104C84 160 52 140 52 104C52 66 80 32 128 32Z" fill="#12606D"/>
+  <path d="M128 32C148 52 152 120 140 176H116C104 120 108 52 128 32Z" fill="#FFDB3D"/>
+  <path d="M58 118C100 132 156 132 198 118" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="104" y="192" width="48" height="30" rx="8" fill="#FF6B5B"/>
+  <path d="M70 92C74 72 88 56 104 48" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

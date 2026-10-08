@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Yellowjackets">
+  <path d="M100 178C80 146 70 112 76 60M78 126L48 108M76 90L50 64M90 154L116 128" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M156 178C176 146 186 112 180 60M178 126L208 108M180 90L206 64M166 154L140 128" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="56" y="172" width="144" height="36" rx="18" fill="#FF6B5B"/>
+  <circle cx="98" cy="190" r="8" fill="#FFDB3D"/>
+  <circle cx="128" cy="190" r="8" fill="#FFDB3D"/>
+  <circle cx="158" cy="190" r="8" fill="#FFDB3D"/>
+  <path d="M76 80L76 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Art Déco">
+  <path d="M36 200A92 92 0 0 1 220 200Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M62 200A66 66 0 0 1 194 200Z" fill="#FFDB3D"/>
+  <path d="M94 200A34 34 0 0 1 162 200Z" fill="#0B3D4A"/>
+  <path d="M100.5 180L74.6 161.2M117.5 167.7L107.6 137.2M138.5 167.7L148.4 137.2M155.5 180L181.4 161.2" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="32" y="200" width="192" height="22" rx="10" fill="#FFDB3D"/>
+  <path d="M58.7 160A80 80 0 0 1 82 134.5" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

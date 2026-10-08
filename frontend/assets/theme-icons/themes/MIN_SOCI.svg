@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Psychologie Sociale">
+  <circle cx="66" cy="96" r="22" fill="#12606D"/>
+  <path d="M30 200C30 152 46 130 66 130C86 130 102 152 102 200Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="190" cy="96" r="22" fill="#12606D"/>
+  <path d="M154 200C154 152 170 130 190 130C210 130 226 152 226 200Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="76" r="30" fill="#FFDB3D"/>
+  <path d="M82 214C82 158 102 120 128 120C154 120 174 158 174 214Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M110 66C112 58 116 54 122 52" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

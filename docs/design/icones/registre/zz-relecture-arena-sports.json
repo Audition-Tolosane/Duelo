@@ -1,0 +1,66 @@
+[
+ {
+  "id": "ARE_UFC",
+  "symbole": "gant de MMA à doigts ouverts"
+ },
+ {
+  "id": "ARE_KARA",
+  "symbole": "planche brisée et étoile d'impact"
+ },
+ {
+  "id": "ARE_THAI",
+  "symbole": "short de muay thaï à large ceinture"
+ },
+ {
+  "id": "ARE_NFL",
+  "symbole": "trophée au ballon ovale dressé"
+ },
+ {
+  "id": "ARE_ACMI",
+  "symbole": "fourche du diable rouge et noire"
+ },
+ {
+  "id": "ARE_INTM",
+  "symbole": "serpent biscione et étoile"
+ },
+ {
+  "id": "ARE_PREM",
+  "symbole": "trophée surmonté d'une couronne"
+ },
+ {
+  "id": "ARE_LALI",
+  "symbole": "éventail espagnol et ballon"
+ },
+ {
+  "id": "ARE_FOOT",
+  "symbole": "terrain de football vu du dessus et ballon"
+ },
+ {
+  "id": "ARE_DJOK",
+  "symbole": "bonnet de bouffon à balles de tennis"
+ },
+ {
+  "id": "ARE_SQUA",
+  "symbole": "mur frontal de squash et rebond"
+ },
+ {
+  "id": "ARE_NEYM",
+  "symbole": "arc-en-ciel (rainbow flick) et ballon"
+ },
+ {
+  "id": "ARE_MBAP",
+  "symbole": "ballon-comète à traînée de vitesse"
+ },
+ {
+  "id": "ARE_MJOR",
+  "symbole": "basket montante et ballon de basket"
+ },
+ {
+  "id": "ARE_LACR",
+  "symbole": "crosse de lacrosse à poche et balle"
+ },
+ {
+  "id": "ARE_HAND",
+  "symbole": "cage de handball aux poteaux rayés"
+ }
+]

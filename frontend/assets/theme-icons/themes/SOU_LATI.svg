@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Latino &amp; Reggaeton">
+  <path d="M112 122L148 190" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="152" cy="198" r="12" fill="#FFDB3D"/>
+  <circle cx="92" cy="88" r="38" fill="#12606D"/>
+  <path d="M68 108L112 68" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M144 122L108 190" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="104" cy="198" r="12" fill="#FFDB3D"/>
+  <circle cx="164" cy="88" r="38" fill="#FFDB3D"/>
+  <path d="M142 70L186 108" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M158 80h0M174 94h0" stroke="#E8F1EC" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M72 78Q76 66 88 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

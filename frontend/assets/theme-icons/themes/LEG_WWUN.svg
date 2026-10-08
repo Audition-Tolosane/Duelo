@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="La Grande Guerre">
+  <path d="M128 150C134 176 130 198 118 218" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M126 196C146 174 172 172 188 182C176 202 150 210 126 196Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="72" r="40" fill="#FF6B5B"/>
+  <circle cx="90" cy="98" r="44" fill="#FF6B5B"/>
+  <circle cx="166" cy="98" r="44" fill="#FF6B5B"/>
+  <circle cx="100" cy="146" r="38" fill="#FF6B5B"/>
+  <circle cx="156" cy="146" r="38" fill="#FF6B5B"/>
+  <circle cx="128" cy="116" r="26" fill="#0B3D4A"/>
+  <path d="M62 100A32 32 0 0 1 80 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

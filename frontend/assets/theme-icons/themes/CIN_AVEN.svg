@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Avengers">
+  <circle cx="128" cy="128" r="88" fill="#FF6B5B"/>
+  <circle cx="128" cy="128" r="68" fill="#12606D"/>
+  <circle cx="128" cy="128" r="52" fill="#FF6B5B"/>
+  <circle cx="128" cy="128" r="40" fill="#12606D"/>
+  <polygon points="128,96 135.6,117.5 158.4,118.1 140.4,132 146.8,153.9 128,141 109.2,153.9 115.6,132 97.6,118.1 120.4,117.5" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M60 88A79 79 0 0 1 88 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Marcel Proust">
+  <path d="M148 80C140 68 156 60 148 44" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M176 80C168 68 184 60 176 44" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M206 108C228 108 228 148 200 152" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M120 96H208V136C208 168 188 188 164 188C140 188 120 168 120 136Z" fill="#12606D"/>
+  <rect x="32" y="190" width="192" height="18" rx="9" fill="#12606D"/>
+  <path d="M38 186C36 152 62 130 94 130C126 130 152 152 150 186Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M94 182V146M66 182L74 154M122 182L114 154" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M54 166Q60 150 74 142" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Sopranos">
+  <path d="M36 190Q56 178 76 190T116 190T156 190T196 190T220 186" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 214Q80 202 100 214T140 214T180 214T204 212" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M64 150C64 128 88 120 116 122H168C184 114 202 108 214 98C212 132 196 172 152 172H88C72 172 64 162 64 150Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M112 142C132 132 162 132 180 142C162 158 130 158 112 142Z" fill="#12606D"/>
+  <path d="M68 96L40 104C38 112 44 116 52 114L72 108Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="94" cy="98" r="30" fill="#12606D"/>
+  <path d="M72 124Q94 134 116 124" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="98" cy="90" r="6" fill="#FFDB3D"/>
+  <path d="M76 86Q78 78 86 74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fusion Stellaire">
+  <polygon points="128,40 145.1,64.3 172,51.8 174.7,81.3 204.2,84 191.7,110.9 216,128 191.7,145.1 204.2,172 174.7,174.7 172,204.2 145.1,191.7 128,216 110.9,191.7 84,204.2 81.3,174.7 51.8,172 64.3,145.1 40,128 64.3,110.9 51.8,84 81.3,81.3 84,51.8 110.9,64.3" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="128" r="48" fill="#FF6B5B"/>
+  <circle cx="144" cy="122" r="18" fill="#12606D"/>
+  <circle cx="120" cy="138" r="18" fill="#12606D"/>
+  <path d="M96 116A34 34 0 0 1 110 96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

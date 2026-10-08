@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Euphoria">
+  <path d="M120 42C108 64 72 114 72 152C72 188 98 214 128 214C158 214 184 188 184 152C184 114 148 64 136 42C132 34 124 34 120 42Z" fill="#12606D"/>
+  <polygon points="128,112 137,137 162,146 137,155 128,180 119,155 94,146 119,137" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="102" cy="186" r="7" fill="#FF6B5B"/>
+  <circle cx="156" cy="186" r="7" fill="#FFDB3D"/>
+  <circle cx="152" cy="112" r="6" fill="#E8F1EC"/>
+  <polygon points="196,40 203,61 224,68 203,75 196,96 189,75 168,68 189,61" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="52,84 56,96 68,100 56,104 52,116 48,104 36,100 48,96" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M92 146C92 132 98 118 106 106" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

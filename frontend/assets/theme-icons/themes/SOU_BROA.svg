@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Broadway &amp; Comédies">
+  <rect x="36" y="40" width="184" height="176" rx="28" fill="#12606D"/>
+  <rect x="62" y="68" width="132" height="120" rx="14" fill="#0B3D4A"/>
+  <circle cx="86" cy="52" r="7" fill="#FFDB3D"/>
+  <circle cx="128" cy="52" r="7" fill="#FFDB3D"/>
+  <circle cx="170" cy="52" r="7" fill="#FFDB3D"/>
+  <circle cx="86" cy="204" r="7" fill="#FFDB3D"/>
+  <circle cx="128" cy="204" r="7" fill="#FFDB3D"/>
+  <circle cx="170" cy="204" r="7" fill="#FFDB3D"/>
+  <circle cx="48" cy="128" r="7" fill="#FFDB3D"/>
+  <circle cx="208" cy="128" r="7" fill="#FFDB3D"/>
+  <polygon points="128,80 140.9,112.2 175.6,114.5 148.9,136.8 157.4,170.5 128,152 98.6,170.5 107.1,136.8 80.4,114.5 115.1,112.2" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M52 76L52 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

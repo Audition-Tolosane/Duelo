@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Système Solaire">
+  <circle cx="128" cy="128" r="90" stroke="#12606D" stroke-width="12" fill="none"/>
+  <circle cx="128" cy="128" r="62" stroke="#12606D" stroke-width="12" fill="none"/>
+  <path d="M128 86V94M128 162V170M86 128H94M162 128H170M98 98L104 104M152 152L158 158M98 158L104 152M152 104L158 98" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="128" r="27" fill="#FFDB3D"/>
+  <circle cx="175.5" cy="88.1" r="13" fill="#FF6B5B"/>
+  <circle cx="59.1" cy="185.9" r="20" fill="#FF6B5B"/>
+  <circle cx="52.1" cy="185.9" r="6" fill="#E8F1EC"/>
+  <circle cx="213" cy="156" r="12" fill="#FFDB3D"/>
+  <path d="M45.1 90.0A90 90 0 0 1 75.1 55.2" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

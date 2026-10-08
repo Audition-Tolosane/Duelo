@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Virtuoses du Piano">
+  <polygon points="98,40 158,40 198,212 58,212" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="110,62 146,62 166,160 90,160" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="58" y="180" width="140" height="16" rx="8" fill="#FFDB3D"/>
+  <path d="M128 170L92 58" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="92" y="88" width="30" height="20" rx="6" transform="rotate(-18 107 98)" fill="#FFDB3D"/>
+  <path d="M178 64C190 76 196 90 196 104" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M88 76L76 128" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

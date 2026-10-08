@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Assassin's Creed">
+  <g transform="rotate(28 128 128)">
+    <polygon points="96,150 128,26 160,150" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+    <rect x="60" y="150" width="136" height="62" rx="18" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M104 164V198M152 164V198" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="128" cy="181" r="11" fill="#FFDB3D"/>
+    <path d="M122 128L126 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Raiponce">
+  <rect x="40" y="56" width="26" height="32" rx="8" fill="#FFDB3D"/>
+  <circle cx="53" cy="80" r="5" fill="#FF6B5B"/>
+  <rect x="88" y="92" width="72" height="124" rx="8" fill="#12606D"/>
+  <polygon points="76,98 124,32 172,98" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M110 142V124A14 14 0 0 1 138 124V142Z" fill="#FFDB3D"/>
+  <path d="M132 140C176 146 206 166 202 194C200 208 190 216 178 218" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M166 152L172 166M190 168L188 184" stroke="#12606D" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <circle cx="178" cy="218" r="6" fill="#FF6B5B"/>
+  <path d="M100 160V186" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Watchmen">
+  <circle cx="128" cy="132" r="90" fill="#12606D"/>
+  <circle cx="128" cy="132" r="72" fill="#FFDB3D"/>
+  <ellipse cx="102" cy="114" rx="10" ry="18" fill="#12606D"/>
+  <ellipse cx="154" cy="114" rx="10" ry="18" fill="#12606D"/>
+  <path d="M86 150Q128 196 170 150" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M152 76C166 72 182 80 180 96C178 108 164 112 156 104L138 118L146 98C138 88 140 78 152 76Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M52 104A82 82 0 0 1 82 64" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

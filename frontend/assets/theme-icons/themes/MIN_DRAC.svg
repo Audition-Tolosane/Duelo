@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dracula et les Vampires Gothiques">
+  <polygon points="100,36 156,36 184,84 164,220 92,220 72,84" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="106,54 150,54 168,88 152,204 104,204 88,88" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="112" cy="110" r="9" fill="#FFDB3D"/>
+  <circle cx="144" cy="110" r="9" fill="#FFDB3D"/>
+  <polygon points="114,140 124,140 119,158" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="132,140 142,140 137,158" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M90 52L80 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

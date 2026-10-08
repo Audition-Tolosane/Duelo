@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Synthwave &amp; Cyberpunk">
+  <circle cx="128" cy="92" r="52" fill="#FFDB3D"/>
+  <path d="M96 56C104 50 112 46 122 44" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="30" y="100" width="196" height="108" rx="20" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="66" cy="126" r="10" fill="#FFDB3D"/>
+  <circle cx="98" cy="126" r="10" fill="#FFDB3D"/>
+  <rect x="136" y="116" width="60" height="20" rx="10" fill="#0B3D4A"/>
+  <circle cx="156" cy="126" r="8" fill="#FFDB3D"/>
+  <rect x="50" y="148" width="156" height="44" rx="8" fill="#E8F1EC"/>
+  <rect x="78" y="148" width="14" height="26" rx="4" fill="#0B3D4A"/>
+  <rect x="114" y="148" width="14" height="26" rx="4" fill="#0B3D4A"/>
+  <rect x="150" y="148" width="14" height="26" rx="4" fill="#0B3D4A"/>
+  <rect x="186" y="148" width="14" height="26" rx="4" fill="#FFDB3D"/>
+</svg>

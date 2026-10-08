@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Les Miserables">
+  <g>
+  <path d="M86 34C98 48 98 58 86 58C74 58 74 48 86 34Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <rect x="74" y="62" width="24" height="48" rx="6" fill="#FFDB3D"/>
+  <path d="M60 106H112L102 122H70Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="78" y="118" width="16" height="80" rx="6" fill="#12606D"/>
+  <ellipse cx="86" cy="156" rx="16" ry="10" fill="#12606D"/>
+  <path d="M56 212H116L104 194H68Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(84 0)">
+  <path d="M86 34C98 48 98 58 86 58C74 58 74 48 86 34Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <rect x="74" y="62" width="24" height="48" rx="6" fill="#FFDB3D"/>
+  <path d="M60 106H112L102 122H70Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="78" y="118" width="16" height="80" rx="6" fill="#12606D"/>
+  <ellipse cx="86" cy="156" rx="16" ry="10" fill="#12606D"/>
+  <path d="M56 212H116L104 194H68Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  </g>
+  <path d="M82 72L82 90" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

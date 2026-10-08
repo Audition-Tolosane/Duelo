@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Twin Peaks">
+  <rect x="40" y="36" width="176" height="144" rx="14" fill="#FF6B5B"/>
+  <path d="M84 48Q76 108 84 168M128 48Q120 108 128 168M172 48Q164 108 172 168" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="32" y="160" width="192" height="60" rx="12" fill="#12606D"/>
+  <polyline points="48,178 64,202 80,178 96,202 112,178 128,202 144,178 160,202 176,178 192,202 208,178" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M58 56L58 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

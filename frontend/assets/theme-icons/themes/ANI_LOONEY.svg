@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Looney Tunes">
+  <path d="M84 38V60M128 32V60M172 38V60" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M40 90H200V132H178L166 158H190Q198 158 198 166V200H70V166Q70 158 78 158H102L92 132Q58 126 40 90Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="106" y="140" width="52" height="12" rx="6" fill="#0B3D4A"/>
+  <path d="M84 178H184" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M62 104H104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M212 176Q217.04 188.96 230 194Q217.04 199.04 212 212Q206.96 199.04 194 194Q206.96 188.96 212 176Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+</svg>

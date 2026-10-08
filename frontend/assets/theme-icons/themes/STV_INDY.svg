@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Industry">
+  <rect x="116" y="172" width="24" height="30" fill="#12606D"/>
+  <rect x="80" y="196" width="96" height="18" rx="9" fill="#12606D"/>
+  <rect x="32" y="44" width="192" height="134" rx="16" fill="#12606D"/>
+  <rect x="48" y="60" width="160" height="102" rx="8" fill="#0B3D4A"/>
+  <path d="M84 112L84 150M140 84L140 128M172 70L172 112" stroke="#FFDB3D" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M112 102L112 140" stroke="#FFDB3D" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <rect x="76" y="120" width="16" height="24" rx="4" fill="#FFDB3D"/>
+  <rect x="106" y="110" width="12" height="20" rx="3" fill="#0B3D4A" stroke="#FFDB3D" stroke-width="4"/>
+  <rect x="132" y="92" width="16" height="28" rx="4" fill="#FFDB3D"/>
+  <rect x="164" y="76" width="16" height="28" rx="4" fill="#FFDB3D"/>
+  <path d="M60 76L60 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

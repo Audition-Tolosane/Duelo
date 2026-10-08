@@ -1,0 +1,12 @@
+[
+  {"id": "SOU_BACH", "symbole": "orgue à tuyaux"},
+  {"id": "SOU_LZEP", "symbole": "dirigeable zeppelin rayé"},
+  {"id": "SOU_LPRK", "symbole": "platine vinyle et bras"},
+  {"id": "SOU_META", "symbole": "mur d'amplis et haut-parleur"},
+  {"id": "SOU_NIRV", "symbole": "hameçon et pièce d'appât"},
+  {"id": "SOU_PFLO", "symbole": "éclipse et couronne de rayons"},
+  {"id": "SOU_PUNK", "symbole": "tête à crête et lunettes noires"},
+  {"id": "SOU_RHCP", "symbole": "piment rouge"},
+  {"id": "SOU_STON", "symbole": "pierre qui roule fissurée"},
+  {"id": "SOU_PIAN", "symbole": "clavier de piano"}
+]

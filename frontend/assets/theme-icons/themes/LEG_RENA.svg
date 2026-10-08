@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="La Renaissance">
+  <polygon points="40,212 216,212 174,144 82,144" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M40 212L216 212M64 182H192M76 160H180M86 212L108 144M128 212V144M170 212L148 144" stroke="#E8F1EC" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M120 66L88 190M136 66L168 190" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="120" y="26" width="16" height="30" rx="8" fill="#FFDB3D"/>
+  <circle cx="128" cy="62" r="16" fill="#FF6B5B"/>
+  <circle cx="128" cy="62" r="6" fill="#E8F1EC"/>
+  <path d="M98 132L104 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

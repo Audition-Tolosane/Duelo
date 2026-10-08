@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Doja Cat">
+  <path d="M88 102Q66 80 76 52M168 102Q190 80 180 52" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="46" cy="124" rx="26" ry="14" fill="#12606D" transform="rotate(-20 46 124)"/>
+  <ellipse cx="210" cy="124" rx="26" ry="14" fill="#12606D" transform="rotate(20 210 124)"/>
+  <ellipse cx="128" cy="140" rx="62" ry="58" fill="#12606D"/>
+  <circle cx="152" cy="106" r="16" fill="#0B3D4A"/>
+  <ellipse cx="128" cy="178" rx="40" ry="28" fill="#FF6B5B"/>
+  <path d="M114 178h0M142 178h0M100 136h0M156 136h0" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="214,44 219,56 231,61 219,66 214,78 209,66 197,61 209,56" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M84 112Q90 98 104 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

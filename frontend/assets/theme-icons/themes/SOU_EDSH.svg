@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ed Sheeran">
+  <rect x="48" y="40" width="160" height="176" rx="26" fill="#12606D"/>
+  <circle cx="80" cy="68" r="10" fill="#FFDB3D"/>
+  <circle cx="176" cy="68" r="10" fill="#FFDB3D"/>
+  <path d="M142 86A26 26 0 1 0 154 108" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="154,96 166,116 142,116" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="128" cy="170" r="30" fill="#0B3D4A"/>
+  <circle cx="128" cy="170" r="18" fill="#FFDB3D"/>
+  <path d="M64 108V134" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

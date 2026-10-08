@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Allemagne">
+  <path d="M102 204C118 168 146 128 166 100C182 76 220 68 222 108C224 156 182 204 128 204C74 204 32 156 34 108C36 68 74 76 90 100C110 128 138 168 154 204" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="122" y="198" width="12" height="12" rx="3" transform="rotate(20 128 204)" fill="#FFDB3D"/>
+  <rect x="206" y="140" width="12" height="12" rx="3" transform="rotate(-15 212 146)" fill="#FFDB3D"/>
+  <rect x="40" y="140" width="12" height="12" rx="3" transform="rotate(30 46 146)" fill="#FFDB3D"/>
+  <rect x="188" y="78" width="12" height="12" rx="3" transform="rotate(10 194 84)" fill="#FFDB3D"/>
+  <path d="M42 108C44 98 50 90 58 86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

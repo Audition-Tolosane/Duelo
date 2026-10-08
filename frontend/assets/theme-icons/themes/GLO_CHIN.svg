@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Chine">
+  <path d="M128 34V62" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M120 194V222M136 194V222M128 194V226" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <ellipse cx="128" cy="128" rx="80" ry="60" fill="#FF6B5B"/>
+  <path d="M128 72V184M96 74C74 100 74 156 96 182M160 74C182 100 182 156 160 182" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="90" y="58" width="76" height="22" rx="8" fill="#12606D"/>
+  <rect x="90" y="176" width="76" height="22" rx="8" fill="#12606D"/>
+  <path d="M66 126C66 112 72 102 80 94" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

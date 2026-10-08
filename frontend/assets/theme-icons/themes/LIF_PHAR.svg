@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Plantes Médicinales">
+  <path d="M96 118C90 94 80 72 64 52" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="72" cy="90" rx="10" ry="20" fill="#FFDB3D" transform="rotate(-55 72 90)"/>
+  <ellipse cx="100" cy="74" rx="10" ry="20" fill="#FFDB3D" transform="rotate(35 100 74)"/>
+  <ellipse cx="60" cy="50" rx="10" ry="18" fill="#FFDB3D" transform="rotate(-30 60 50)"/>
+  <path d="M142 116L184 54" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <circle cx="188" cy="50" r="15" fill="#FF6B5B"/>
+  <rect x="92" y="190" width="72" height="24" rx="10" fill="#12606D"/>
+  <path d="M48 124H208C208 170 176 202 128 202C80 202 48 170 48 124Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 140V176M110 158H146" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M66 140C70 156 78 168 90 178" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cuisine du Maghreb">
+  <path d="M36 174H220C216 194 196 206 170 206H86C60 206 40 194 36 174Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M54 168C94 160 114 130 120 80H136C142 130 162 160 202 168Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="120" y="62" width="16" height="20" rx="6" fill="#FFDB3D"/>
+  <circle cx="128" cy="52" r="14" fill="#FFDB3D"/>
+  <path d="M78 156C110 150 146 150 178 156" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M104 134L116 124L128 134L140 124L152 134" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M112 100C110 116 104 128 96 138" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

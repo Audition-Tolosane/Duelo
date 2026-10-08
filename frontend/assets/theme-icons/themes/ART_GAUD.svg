@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Antoni Gaudí">
+  <path d="M54 206V156Q58 100 72 76Q86 100 90 156V206Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M166 206V156Q170 100 184 76Q198 100 202 156V206Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M90 206V136Q94 70 110 44Q126 70 130 136V206Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M126 206V136Q130 70 146 44Q162 70 166 136V206Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="110" cy="38" r="9" fill="#FFDB3D"/>
+  <circle cx="146" cy="38" r="9" fill="#FFDB3D"/>
+  <circle cx="72" cy="70" r="8" fill="#FFDB3D"/>
+  <circle cx="184" cy="70" r="8" fill="#FFDB3D"/>
+  <rect x="104" y="108" width="12" height="44" rx="6" fill="#0B3D4A"/>
+  <rect x="140" y="108" width="12" height="44" rx="6" fill="#0B3D4A"/>
+  <rect x="40" y="196" width="176" height="24" rx="10" fill="#FFDB3D"/>
+  <path d="M98 124L101 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

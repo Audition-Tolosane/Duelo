@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="TikTok">
+  <path d="M128 164V202M128 202L94 222M128 202L162 222" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="96" r="66" fill="#FFDB3D"/>
+  <circle cx="128" cy="96" r="44" fill="#12606D"/>
+  <rect x="108" y="64" width="40" height="66" rx="10" fill="#FF6B5B"/>
+  <circle cx="128" cy="116" r="7" fill="#FFDB3D"/>
+  <rect x="116" y="158" width="24" height="18" rx="6" fill="#12606D"/>
+  <path d="M206 170C186 156 186 138 198 138C204 138 206 144 206 146C206 144 208 138 214 138C226 138 226 156 206 170Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M79 68A56 56 0 0 1 100 48" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

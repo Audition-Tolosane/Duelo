@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Félins">
+  <polygon points="128,40 146.6,58.5 172,51.8 178.9,77.1 204.2,84 197.5,109.4 216,128 197.5,146.6 204.2,172 178.9,178.9 172,204.2 146.6,197.5 128,216 109.4,197.5 84,204.2 77.1,178.9 51.8,172 58.5,146.6 40,128 58.5,109.4 51.8,84 77.1,77.1 84,51.8 109.4,58.5" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="90" cy="90" r="16" fill="#12606D"/>
+  <circle cx="166" cy="90" r="16" fill="#12606D"/>
+  <circle cx="128" cy="134" r="54" fill="#12606D"/>
+  <ellipse cx="108" cy="124" rx="10" ry="12" fill="#FFDB3D"/>
+  <ellipse cx="148" cy="124" rx="10" ry="12" fill="#FFDB3D"/>
+  <ellipse cx="108" cy="125" rx="4" ry="9" fill="#12606D"/>
+  <ellipse cx="148" cy="125" rx="4" ry="9" fill="#12606D"/>
+  <polygon points="118,150 138,150 128,162" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M128 162V170M128 170Q118 180 110 172M128 170Q138 180 146 172" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M86 132C86 116 94 102 106 94" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

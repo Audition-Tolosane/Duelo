@@ -1,0 +1,12 @@
+[
+  {"id": "STV_DWHO", "symbole": "cabine de police bleue"},
+  {"id": "STV_DOWN", "symbole": "château à tour centrale"},
+  {"id": "STV_HOUS", "symbole": "flacon de pilules et canne"},
+  {"id": "STV_ELTE", "symbole": "cravate rayée d'uniforme"},
+  {"id": "STV_EMIL", "symbole": "croissant et petit cœur"},
+  {"id": "STV_EMPI", "symbole": "disque d'or encadré"},
+  {"id": "STV_CRMI", "symbole": "tableau d'enquête à fils rouges"},
+  {"id": "STV_EUPH", "symbole": "larme pailletée et étoiles"},
+  {"id": "STV_FALL", "symbole": "porte d'abri en engrenage"},
+  {"id": "STV_FGuy", "symbole": "pistolet à rayons rétro"}
+]

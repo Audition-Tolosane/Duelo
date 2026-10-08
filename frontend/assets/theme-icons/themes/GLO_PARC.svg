@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Parcs Nationaux">
+  <polygon points="58,46 84,98 72,98 90,150 26,150 44,98 32,98" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="52" y="148" width="12" height="40" rx="4" fill="#FFDB3D"/>
+  <path d="M144 64V46" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <polygon points="146,40 170,50 146,60" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <polygon points="144,66 216,204 72,204" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M144 96L116 206H170Z" fill="#0B3D4A"/>
+  <polygon points="144,96 188,198 166,206" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="32" y="204" width="192" height="16" rx="8" fill="#12606D"/>
+  <path d="M128 116L118 136" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

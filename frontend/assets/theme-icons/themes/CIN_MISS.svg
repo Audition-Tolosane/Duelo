@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mission: Impossible">
+  <path d="M44 212C44 164 112 180 120 132C128 88 166 104 180 82" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M56 186Q66 168 90 166" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <polygon points="192,34 198,56 220,48 206,66 224,78 202,80 204,102 190,86 176,100 178,78 158,72 178,62" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="191" cy="70" r="12" fill="#FF6B5B"/>
+  <circle cx="150" cy="44" r="6" fill="#FF6B5B"/>
+  <circle cx="222" cy="112" r="6" fill="#FF6B5B"/>
+</svg>

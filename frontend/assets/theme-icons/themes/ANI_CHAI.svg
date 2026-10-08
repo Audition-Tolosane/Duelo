@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Chainsaw Man">
+  <path d="M126 116L134 106L142 116L150 106L158 116L166 106L174 116L182 106L190 116L198 106L206 116M126 164L134 174L142 164L150 174L158 164L166 174L174 164L182 174L190 164L198 174L206 164" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="118" y="116" width="102" height="48" rx="24" fill="#12606D"/>
+  <path d="M60 104V86Q60 72 74 72H110Q124 72 124 86V104" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="38" y="100" width="94" height="80" rx="22" fill="#FF6B5B"/>
+  <path d="M42 162Q24 178 36 202" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="40" cy="210" r="9" fill="#FFDB3D"/>
+  <path d="M56 120V146" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

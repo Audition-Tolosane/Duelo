@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Supraconductivité">
+  <path d="M44 184V198A84 22 0 0 0 212 198V184Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="184" rx="84" ry="22" fill="#12606D"/>
+  <polygon points="90,72 128,94 166,72 166,116 128,138 90,116" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="128,50 166,72 128,94 90,72" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M112 66L126 58" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M52 152C40 120 44 88 62 62M204 152C216 120 212 88 194 62" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M104 160L152 160" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" fill="none"/>
+</svg>

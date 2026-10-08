@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Égypte des Pharaons">
+  <path d="M176 88C200 94 210 112 210 136M176 88C202 86 218 98 222 116M176 88C192 104 194 126 188 148" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M72 214L168 86" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M85.2 186.4L94.8 193.6M107.2 157.4L116.8 164.6" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="172" cy="84" r="12" fill="#FFDB3D"/>
+  <path d="M184 214L100 98C86 78 64 78 56 94C50 106 58 118 70 116" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M158.1 188.5L167.9 181.5M137.1 159.5L146.9 152.5M112.1 124.5L121.9 117.5" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M60 92C64 86 70 84 76 85" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

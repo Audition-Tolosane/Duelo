@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Éthique &amp; IA">
+  <rect x="72" y="198" width="112" height="20" rx="10" fill="#12606D"/>
+  <rect x="120" y="66" width="16" height="140" rx="6" fill="#12606D"/>
+  <path d="M60 86L36 144M60 86L84 144M196 86L172 144M196 86L220 144" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="44" y="70" width="168" height="18" rx="9" fill="#12606D"/>
+  <circle cx="128" cy="60" r="14" fill="#FFDB3D"/>
+  <path d="M34 144H86C86 160 74 170 60 170C46 170 34 160 34 144Z" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M170 144H222C222 160 210 170 196 170C182 170 170 160 170 144Z" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
+  <rect x="44" y="108" width="32" height="32" rx="6" fill="#FFDB3D"/>
+  <rect x="53" y="117" width="14" height="14" rx="4" fill="#12606D"/>
+  <circle cx="196" cy="106" r="13" fill="#FF6B5B"/>
+  <path d="M178 140C178 122 214 122 214 140Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M62 79H84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Harlan Coben">
+  <polygon points="52,44 130,44 116,84 136,120 114,160 126,212 52,212" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="70,60 124,60 116,84 136,120 114,160 116,170 70,170" fill="#FFDB3D"/>
+  <circle cx="92" cy="104" r="13" fill="#12606D"/>
+  <path d="M74 170C74 140 110 140 110 170Z" fill="#12606D"/>
+  <g transform="translate(16 2) rotate(6 160 128)">
+  <polygon points="130,44 204,44 204,212 126,212 114,160 136,120 116,84" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="124,60 188,60 188,170 116,170 114,160 136,120 116,84" fill="#FFDB3D"/>
+  <circle cx="162" cy="100" r="13" fill="#12606D"/>
+  <path d="M144 170C144 136 180 136 180 170Z" fill="#12606D"/>
+  <circle cx="150" cy="138" r="9" fill="#FF6B5B"/>
+  <path d="M138 170C138 152 162 152 162 170Z" fill="#FF6B5B"/>
+  </g>
+  <path d="M60 64V88" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pop Art">
+  <polygon points="192,32 198.5,46.3 213.2,40.8 207.7,55.5 222,62 207.7,68.5 213.2,83.2 198.5,77.7 192,92 185.5,77.7 170.8,83.2 176.3,68.5 162,62 176.3,55.5 170.8,40.8 185.5,46.3" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="60" y="56" width="136" height="164" rx="16" fill="#12606D"/>
+  <rect x="52" y="44" width="152" height="22" rx="11" fill="#12606D"/>
+  <rect x="84" y="78" width="88" height="54" rx="8" fill="#FF6B5B"/>
+  <rect x="84" y="142" width="88" height="56" rx="8" fill="#E8F1EC"/>
+  <circle cx="128" cy="170" r="14" fill="#FFDB3D"/>
+  <path d="M72 84V108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

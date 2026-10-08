@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="It's Always Sunny in Philadelphia">
+  <ellipse cx="128" cy="194" rx="96" ry="24" fill="#12606D"/>
+  <path d="M156 160L190 194" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <circle cx="200" cy="188" r="11" fill="#FFDB3D"/>
+  <circle cx="184" cy="206" r="11" fill="#FFDB3D"/>
+  <path d="M50 140C42 96 78 60 122 62C160 64 180 94 174 124C170 140 162 150 156 158L148 166C128 184 62 190 50 140Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M84 94L136 146M112 78L158 124M76 132L126 82M100 154L152 102" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M74 112C78 96 88 84 100 78" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

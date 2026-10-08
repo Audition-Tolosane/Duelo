@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dr House">
+  <path d="M178 216L200 74C204 44 166 38 160 60" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="64" y="92" width="94" height="126" rx="14" fill="#FF6B5B"/>
+  <rect x="56" y="62" width="110" height="34" rx="10" fill="#12606D"/>
+  <rect x="88" y="128" width="58" height="60" rx="8" fill="#FFDB3D"/>
+  <path d="M100 148H134M100 168H122" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M76 110L76 126" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

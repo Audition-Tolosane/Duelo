@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pulp Fiction">
+  <polygon points="66,62 190,62 210,132 46,132" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="80,76 176,76 190,122 66,122" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M58 142Q128 82 198 142Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 96V82" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M94 104L84 92" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M162 104L172 92" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="40" y="136" width="176" height="76" rx="14" fill="#12606D"/>
+  <rect x="74" y="144" width="22" height="16" rx="5" fill="#FFDB3D"/>
+  <rect x="160" y="144" width="22" height="16" rx="5" fill="#FFDB3D"/>
+  <path d="M74 116L82 88" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

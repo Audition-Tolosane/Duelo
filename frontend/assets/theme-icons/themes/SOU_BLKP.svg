@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="BLACKPINK">
+  <path d="M128 212L54 140C26 110 34 66 74 60C102 56 120 72 128 90C136 72 154 56 182 60C222 66 230 110 202 140Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 84V206M44 118H212" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="128,102 134,112 144,118 134,124 128,134 122,124 112,118 122,112" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="214,34 218,44 228,48 218,52 214,62 210,52 200,48 210,44" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M70 92C74 84 80 80 88 78" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

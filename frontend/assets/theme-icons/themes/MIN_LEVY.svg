@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Marc Levy">
+  <polygon points="40,128 212,52 156,204 120,148" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="120,148 212,52 146,186" fill="#0B3D4A"/>
+  <circle cx="104" cy="178" r="6" fill="#FF6B5B"/>
+  <circle cx="92" cy="196" r="6" fill="#FF6B5B"/>
+  <path d="M60 220C38 206 32 192 38 182C44 172 56 174 60 184C64 174 76 172 82 182C88 192 82 206 60 220Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M72 124L100 112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

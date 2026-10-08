@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Évolution Végétale">
+  <ellipse cx="88" cy="186" rx="26" ry="11" transform="rotate(-25 88 186)" fill="#FFDB3D"/>
+  <ellipse cx="148" cy="170" rx="26" ry="11" transform="rotate(25 148 170)" fill="#FFDB3D"/>
+  <ellipse cx="90" cy="148" rx="24" ry="10" transform="rotate(-30 90 148)" fill="#FFDB3D"/>
+  <ellipse cx="146" cy="132" rx="22" ry="10" transform="rotate(30 146 132)" fill="#FFDB3D"/>
+  <path d="M118 220C114 170 110 130 128 96C144 66 186 64 192 96C196 120 172 136 156 126C144 118 150 100 164 104" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="192" cy="172" r="12" fill="#FF6B5B"/>
+  <circle cx="208" cy="188" r="12" fill="#FF6B5B"/>
+  <circle cx="192" cy="204" r="12" fill="#FF6B5B"/>
+  <circle cx="176" cy="188" r="12" fill="#FF6B5B"/>
+  <circle cx="192" cy="188" r="9" fill="#FFDB3D"/>
+  <path d="M132 76C140 66 152 60 164 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

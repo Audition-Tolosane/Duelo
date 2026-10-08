@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Épopées Antiques">
+  <path d="M192 118C210 122 214 140 206 154" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="84" y="150" width="16" height="44" rx="6" fill="#12606D"/>
+  <rect x="112" y="150" width="16" height="44" rx="6" fill="#12606D"/>
+  <rect x="148" y="150" width="16" height="44" rx="6" fill="#12606D"/>
+  <rect x="172" y="150" width="16" height="44" rx="6" fill="#12606D"/>
+  <path d="M72 104H178C186 104 192 110 192 118V148C192 156 186 160 178 160H86C78 160 72 154 72 146Z" fill="#12606D"/>
+  <polygon points="72,126 106,108 98,56 84,40 72,46 36,72 42,90 66,82" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M96 50L106 104" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="138" y="116" width="32" height="30" rx="4" fill="#FFDB3D"/>
+  <circle cx="68" cy="64" r="7" fill="#FFDB3D"/>
+  <rect x="52" y="188" width="160" height="18" rx="9" fill="#FF6B5B"/>
+  <circle cx="80" cy="210" r="12" fill="#FFDB3D"/>
+  <circle cx="184" cy="210" r="12" fill="#FFDB3D"/>
+  <path d="M48 76L58 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

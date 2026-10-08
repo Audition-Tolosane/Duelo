@@ -1,0 +1,12 @@
+[
+  {"id": "ARE_JUVE", "symbole": "écusson rayé à étoile"},
+  {"id": "ARE_MBAP", "symbole": "chaussure à crampons et traits de vitesse"},
+  {"id": "ARE_LALI", "symbole": "but de football et ballon en lucarne"},
+  {"id": "ARE_LACR", "symbole": "crosse de lacrosse et balle"},
+  {"id": "ARE_LEBR", "symbole": "ballon de basket couronné"},
+  {"id": "ARE_LIG1", "symbole": "coq gaulois"},
+  {"id": "ARE_LDC", "symbole": "projecteur de stade"},
+  {"id": "ARE_MESS", "symbole": "tête de chèvre à cornes"},
+  {"id": "ARE_LIVE", "symbole": "écharpe de supporter à franges"},
+  {"id": "ARE_MCIT", "symbole": "abeille de Manchester"}
+]

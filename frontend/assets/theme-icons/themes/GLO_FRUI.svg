@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fruits Exotiques">
+  <g transform="rotate(-24 128 132)">
+  <polygon points="114,56 128,30 142,56" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="70,104 46,94 66,130" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="186,104 210,94 190,130" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="70,164 48,178 76,190" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="186,164 208,178 180,190" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="136" rx="66" ry="84" fill="#FF6B5B"/>
+  <ellipse cx="128" cy="140" rx="46" ry="64" fill="#E8F1EC"/>
+  <path d="M110 106m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0M144 112m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0M124 136m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0M102 156m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0M152 152m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0M128 178m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" fill="#0B3D4A"/>
+  <path d="M74 104Q82 82 98 68" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

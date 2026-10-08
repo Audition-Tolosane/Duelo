@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Lucifer">
+  <path d="M128 116C128 160 160 168 160 192" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="146,194 174,194 160,214" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M122 112C104 72 72 56 36 58C34 74 40 86 50 94L38 104C46 114 58 118 68 118L58 132C70 140 84 140 94 134L90 152C104 154 116 142 122 128Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M134 112C152 72 184 56 220 58C222 74 216 86 206 94L218 104C210 114 198 118 188 118L198 132C186 140 172 140 162 134L166 152C152 154 140 142 134 128Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="126" rx="14" ry="24" fill="#12606D"/>
+  <ellipse cx="128" cy="54" rx="36" ry="12" transform="rotate(-12 128 54)" stroke="#FFDB3D" stroke-width="12" fill="none"/>
+  <path d="M56 74L74 78" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

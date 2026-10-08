@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Primates">
+  <circle cx="56" cy="122" r="22" fill="#12606D"/>
+  <circle cx="200" cy="122" r="22" fill="#12606D"/>
+  <circle cx="56" cy="122" r="11" fill="#FF6B5B"/>
+  <circle cx="200" cy="122" r="11" fill="#FF6B5B"/>
+  <ellipse cx="128" cy="120" rx="70" ry="72" fill="#12606D"/>
+  <path d="M128 92C116 80 84 80 82 106C80 124 92 132 96 140C88 156 90 190 128 196C166 190 168 156 160 140C164 132 176 124 174 106C172 80 140 80 128 92Z" fill="#FFDB3D"/>
+  <circle cx="108" cy="112" r="9" fill="#12606D"/>
+  <circle cx="148" cy="112" r="9" fill="#12606D"/>
+  <ellipse cx="119" cy="150" rx="5" ry="6" fill="#12606D"/>
+  <ellipse cx="137" cy="150" rx="5" ry="6" fill="#12606D"/>
+  <path d="M106 172Q128 184 150 172" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M74 96C78 80 88 68 104 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

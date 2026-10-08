@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="PlayStation">
+  <circle cx="128" cy="128" r="92" fill="#12606D" stroke="#12606D" stroke-width="12"/>
+  <circle cx="128" cy="68" r="22" fill="#FFDB3D"/>
+  <circle cx="128" cy="188" r="22" fill="#FFDB3D"/>
+  <circle cx="68" cy="128" r="22" fill="#FF6B5B"/>
+  <circle cx="188" cy="128" r="22" fill="#FF6B5B"/>
+  <path d="M56 84A82 82 0 0 1 84 56" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

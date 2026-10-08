@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Jujutsu Kaisen">
+  <rect x="96" y="120" width="64" height="98" rx="30" fill="#12606D"/>
+  <g transform="rotate(-30 128 132)">
+  <rect x="98" y="42" width="60" height="104" rx="30" fill="#12606D"/>
+  <path d="M110 76V62Q128 38 146 62V76Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M112 90V112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <path d="M106 136Q122 148 146 140" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="84" y="166" width="88" height="30" rx="6" fill="#FFDB3D"/>
+  <path d="M110 174V188M128 172V190M146 174V188" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

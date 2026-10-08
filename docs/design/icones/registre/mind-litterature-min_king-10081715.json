@@ -1,0 +1,12 @@
+[
+  {"id": "MIN_KING", "symbole": "ballon rouge et bouche d'égout"},
+  {"id": "MIN_SUPR", "symbole": "cape rouge et écusson losange"},
+  {"id": "MIN_WKDD", "symbole": "portes barricadées et cadenas"},
+  {"id": "MIN_THOR", "symbole": "bouclier viking rond et étoile"},
+  {"id": "MIN_TINT", "symbole": "fusée à damier"},
+  {"id": "MIN_TITE", "symbole": "tête à mèche blonde dressée"},
+  {"id": "MIN_TOLS", "symbole": "épée et rameau d'olivier"},
+  {"id": "MIN_TWIG", "symbole": "pomme dans mains jointes"},
+  {"id": "MIN_VVEN", "symbole": "masque de Guy Fawkes"},
+  {"id": "MIN_VALA", "symbole": "astronef ovoïde à trois pieds"}
+]

@@ -113,9 +113,11 @@ def main():
 
     os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
     open(a.out + ".html", "w", encoding="utf-8").write(build_html(have, missing, title))
-    if have:
+    # Au-delà de 200 icônes, l'image d'une seule page devient énorme et très lente : HTML seul
+    png = 0 < len(have) <= 200
+    if png:
         build_png(have, a.out + ".png")
-    print(f"{len(have)} icônes, {len(missing)} manquantes → {a.out}.html" + (f" + .png" if have else ""))
+    print(f"{len(have)} icônes, {len(missing)} manquantes → {a.out}.html" + (" + .png" if png else ""))
 
 
 if __name__ == "__main__":

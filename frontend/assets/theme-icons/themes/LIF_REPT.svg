@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Reptiles">
+  <path d="M104 100L74 88L66 64" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M152 100L182 88L190 64" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M104 148L74 160L66 186" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M152 148L182 160L190 186" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 160C128 204 170 216 186 196C196 182 180 170 168 180" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="124" rx="32" ry="52" fill="#12606D"/>
+  <ellipse cx="128" cy="60" rx="28" ry="26" fill="#12606D"/>
+  <circle cx="66" cy="60" r="10" fill="#FFDB3D"/>
+  <circle cx="190" cy="60" r="10" fill="#FFDB3D"/>
+  <circle cx="66" cy="190" r="10" fill="#FFDB3D"/>
+  <circle cx="190" cy="190" r="10" fill="#FFDB3D"/>
+  <circle cx="110" cy="52" r="8" fill="#FF6B5B"/>
+  <circle cx="146" cy="52" r="8" fill="#FF6B5B"/>
+  <path d="M108 104C110 92 116 84 124 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

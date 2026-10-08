@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Tableau Périodique">
+  <path d="M37 74h22v22h-22zM37 106h22v22h-22zM37 138h22v22h-22zM69 74h22v22h-22zM69 106h22v22h-22zM69 138h22v22h-22zM101 106h22v22h-22zM101 138h22v22h-22zM133 106h22v22h-22zM133 138h22v22h-22zM165 74h22v22h-22zM165 106h22v22h-22zM165 138h22v22h-22zM197 42h22v22h-22zM197 74h22v22h-22zM197 106h22v22h-22zM197 138h22v22h-22z" fill="#12606D" stroke="#12606D" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="37" y="42" width="22" height="22" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M53 182h22v22h-22zM85 182h22v22h-22zM117 182h22v22h-22zM149 182h22v22h-22zM181 182h22v22h-22z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M44 81L44 89" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" fill="none"/>
+</svg>

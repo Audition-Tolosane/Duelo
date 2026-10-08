@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Witcher">
+  <path d="M128 132L184 70" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M184 70L204 84" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g transform="rotate(-42 100 160)"><path d="M100 92C130 92 146 130 146 162C146 196 126 216 100 216C74 216 54 196 54 162C54 130 70 92 100 92Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/></g>
+  <circle cx="100" cy="160" r="16" fill="#12606D"/>
+  <path d="M72 196L88 180" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M84 184L176 82" stroke="#E8F1EC" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="194" cy="174" r="24" fill="#FFDB3D"/>
+  <circle cx="194" cy="174" r="11" fill="none" stroke="#12606D" stroke-width="6"/>
+  <path d="M178 206L168 216" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M206 210L210 222" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M66 140Q70 124 84 114" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

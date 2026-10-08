@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Arsenal">
+  <g transform="rotate(-18 120 113)">
+  <rect x="48" y="88" width="148" height="50" rx="22" fill="#12606D"/>
+  <rect x="168" y="82" width="26" height="62" rx="10" fill="#FFDB3D"/>
+  <path d="M72 102H112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <circle cx="102" cy="170" r="46" fill="#FF6B5B"/>
+  <circle cx="102" cy="170" r="26" fill="#12606D"/>
+  <circle cx="102" cy="170" r="8" fill="#FFDB3D"/>
+  <circle cx="210" cy="52" r="16" fill="#FFDB3D"/>
+</svg>

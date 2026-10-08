@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Tour de France">
+  <path d="M92 44H164L214 84L190 124L172 112V210H84V112L66 124L42 84Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="108,50 148,50 128,80" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M128 84V150" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="84" y="176" width="88" height="22" fill="#12606D"/>
+  <path d="M54 92L72 106M202 92L184 106" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M96 100L100 138" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

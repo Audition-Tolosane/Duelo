@@ -1,0 +1,12 @@
+[
+  {"id": "STV_ROME", "symbole": "poignard pugio et laurier doré"},
+  {"id": "STV_SCAN", "symbole": "grand verre de vin rouge"},
+  {"id": "STV_SCRE", "symbole": "blouse médicale et stéthoscope"},
+  {"id": "STV_SEIN", "symbole": "biscuit noir et blanc croqué"},
+  {"id": "STV_SEVE", "symbole": "terminal rétro à nuée de points"},
+  {"id": "STV_SEXE", "symbole": "casier de lycée et lettre"},
+  {"id": "STV_SATC", "symbole": "ordinateur portable et cœur"},
+  {"id": "STV_SHAM", "symbole": "canette de bière cabossée"},
+  {"id": "STV_SHER", "symbole": "violon et archet"},
+  {"id": "STV_SHOG", "symbole": "galion à voiles carrées"}
+]

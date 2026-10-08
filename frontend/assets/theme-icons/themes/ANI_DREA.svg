@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="DreamWorks">
+  <path d="M181 120V170" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M181 170Q186.6 184.4 201 190Q186.6 195.6 181 210Q175.4 195.6 161 190Q175.4 184.4 181 170Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M116.0 34.0A66 66 0 1 0 180.8 120.4A54 54 0 1 1 116.0 34.0Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M66 112A54 54 0 0 1 80 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="38" y="176" width="124" height="40" rx="20" fill="#12606D"/>
+  <circle cx="74" cy="174" r="26" fill="#12606D"/>
+  <circle cx="118" cy="166" r="32" fill="#12606D"/>
+
+</svg>

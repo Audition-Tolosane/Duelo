@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Titanic">
+  <polygon points="80,132 100,132 110,74 90,74" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="112,132 132,132 142,74 122,74" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="144,132 164,132 174,74 154,74" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="176,132 196,132 206,74 186,74" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="89,84 109,84 110,72 91,72" fill="#12606D"/>
+  <polygon points="121,84 141,84 142,72 123,72" fill="#12606D"/>
+  <polygon points="153,84 173,84 174,72 155,72" fill="#12606D"/>
+  <polygon points="185,84 205,84 206,72 187,72" fill="#12606D"/>
+  <rect x="64" y="128" width="140" height="24" rx="6" fill="#12606D"/>
+  <path d="M36 150H222L206 196Q202 204 192 204H60Q50 204 46 196Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M50 186H212L206 196Q202 204 192 204H60Q50 204 46 196Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M54 164L76 164" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

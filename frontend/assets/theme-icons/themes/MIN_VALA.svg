@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Valerian et Laureline">
+  <polygon points="60,44 66,58 80,62 66,66 60,80 54,66 40,62 54,58" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M96 150L76 196M160 150L180 196M128 160V204" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="62" y="192" width="28" height="14" rx="7" fill="#FF6B5B"/>
+  <rect x="166" y="192" width="28" height="14" rx="7" fill="#FF6B5B"/>
+  <rect x="114" y="200" width="28" height="14" rx="7" fill="#FF6B5B"/>
+  <path d="M48 112L32 100V140L48 128Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="132" cy="120" rx="84" ry="52" fill="#12606D"/>
+  <path d="M52 132C90 146 174 146 212 132" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <ellipse cx="164" cy="104" rx="30" ry="20" fill="#FFDB3D"/>
+  <path d="M84 98A60 40 0 0 1 108 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

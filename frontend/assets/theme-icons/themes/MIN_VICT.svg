@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Littérature victorienne">
+  <path d="M100 132C88 166 64 194 50 212C80 222 176 222 206 212C192 194 168 166 156 132Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M66 198Q128 212 190 198M82 172Q128 184 174 172" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M100 66H156L148 112L152 132H104L108 112Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="96" y="124" width="64" height="14" rx="7" fill="#FFDB3D"/>
+  <rect x="120" y="46" width="16" height="18" rx="4" fill="#12606D"/>
+  <circle cx="128" cy="40" r="10" fill="#FFDB3D"/>
+  <path d="M80 178Q88 160 98 148" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

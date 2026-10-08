@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Blacksad">
+  <g transform="translate(0 16)">
+  <polygon points="92,98 84,44 122,82" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="164,98 172,44 134,82" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="94,86 91,62 108,80" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="162,86 165,62 148,80" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M80 160C80 120 86 90 98 84C110 80 118 92 128 92C138 92 146 80 158 84C170 90 176 120 176 160Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M32 158C48 176 80 184 128 184C176 184 208 176 224 158C208 152 190 156 176 158H80C66 156 48 152 32 158Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M80 134H176L177 156H79Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M94 124C94 112 96 104 100 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

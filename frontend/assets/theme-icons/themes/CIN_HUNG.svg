@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Hunger Games">
+  <path d="M44 132L210 108" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <polygon points="214,107 200,100 202,116" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M50 122L42 132L52 140" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="128" r="82" fill="none" stroke="#FFDB3D" stroke-width="20"/>
+  <path d="M150 108C138 80 114 62 80 58C92 74 96 90 112 102C100 98 90 100 78 96C92 118 116 124 138 120Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M168 98C180 98 188 106 184 112L170 114C162 136 140 150 116 156L84 176L96 152C104 132 130 110 156 102Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="170" cy="104" r="4" fill="#E8F1EC"/>
+  <path d="M92 66Q104 70 112 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

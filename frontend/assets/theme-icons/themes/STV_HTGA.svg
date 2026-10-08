@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="How to Get Away with Murder">
+  <path d="M70 44L194 186M56 56L84 32" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g transform="rotate(-41 194 186)"><path d="M174 176H214V202C214 216 204 226 194 230C184 226 174 216 174 202Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/></g>
+  <path d="M82 100V84C82 76 88 72 96 72H128C136 72 142 76 142 84V100" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="36" y="100" width="148" height="100" rx="16" fill="#12606D"/>
+  <rect x="36" y="136" width="148" height="10" fill="#0B3D4A"/>
+  <rect x="98" y="128" width="24" height="26" rx="6" fill="#FFDB3D"/>
+  <path d="M54 118L54 130" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

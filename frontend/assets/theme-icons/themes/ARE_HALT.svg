@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Haltérophilie">
+  <path d="M20 128H236" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="48" y="40" width="36" height="176" rx="14" fill="#FF6B5B"/>
+  <rect x="172" y="40" width="36" height="176" rx="14" fill="#FF6B5B"/>
+  <rect x="88" y="68" width="26" height="120" rx="12" fill="#12606D"/>
+  <rect x="142" y="68" width="26" height="120" rx="12" fill="#12606D"/>
+  <rect x="114" y="116" width="28" height="24" rx="8" fill="#FFDB3D"/>
+  <path d="M60 70V92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Catch &amp; WWE">
+  <rect x="24" y="92" width="208" height="72" rx="20" fill="#12606D"/>
+  <rect x="38" y="108" width="40" height="40" rx="12" fill="#FFDB3D"/>
+  <rect x="178" y="108" width="40" height="40" rx="12" fill="#FFDB3D"/>
+  <ellipse cx="128" cy="128" rx="54" ry="64" fill="#FFDB3D"/>
+  <circle cx="128" cy="128" r="30" fill="#FF6B5B"/>
+  <path d="M92 96C98 84 108 76 120 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

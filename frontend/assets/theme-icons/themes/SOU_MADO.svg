@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Madonna">
+  <path d="M62 140C62 60 194 60 194 140" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="40" y="124" width="48" height="76" rx="22" fill="#FFDB3D"/>
+  <rect x="168" y="124" width="48" height="76" rx="22" fill="#FFDB3D"/>
+  <rect x="54" y="146" width="20" height="34" rx="10" fill="#0B3D4A"/>
+  <rect x="182" y="146" width="20" height="34" rx="10" fill="#0B3D4A"/>
+  <path d="M192 200C192 228 156 232 126 224" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="108" cy="222" r="17" fill="#FFDB3D"/>
+  <polygon points="128,22 134,36 148,42 134,48 128,62 122,48 108,42 122,36" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M86 108C92 94 102 86 114 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

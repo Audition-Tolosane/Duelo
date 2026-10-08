@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pink Floyd">
+  <path d="M128 36V50M128 206V220M36 128H50M206 128H220M63 63L73 73M183 183L193 193M193 63L183 73M73 183L63 193" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="128" r="72" fill="#FFDB3D"/>
+  <circle cx="136" cy="136" r="60" fill="#0B3D4A"/>
+  <path d="M92 134C94 118 102 106 114 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

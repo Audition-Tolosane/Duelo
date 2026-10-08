@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Rosalía">
+  <path d="M98 116C98 60 158 60 158 116" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="92" cy="156" rx="46" ry="58" fill="#FF6B5B" transform="rotate(-18 92 156)"/>
+  <ellipse cx="164" cy="156" rx="46" ry="58" fill="#FFDB3D" transform="rotate(18 164 156)"/>
+  <ellipse cx="96" cy="162" rx="26" ry="36" fill="#0B3D4A" transform="rotate(-18 96 162)"/>
+  <ellipse cx="160" cy="162" rx="26" ry="36" fill="#0B3D4A" transform="rotate(18 160 162)"/>
+  <circle cx="98" cy="116" r="8" fill="#E8F1EC"/>
+  <circle cx="158" cy="116" r="8" fill="#E8F1EC"/>
+  <path d="M96 170V190M160 170V190" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 138C62 128 66 122 72 118" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

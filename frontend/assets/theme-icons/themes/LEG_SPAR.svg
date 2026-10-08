@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Guerriers Sparte">
+  <path d="M52 212L200 64" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <polygon points="218,38 190,58 198,74" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="120" cy="142" r="80" fill="#FFDB3D"/>
+  <circle cx="120" cy="142" r="66" fill="#12606D"/>
+  <polyline points="86,180 120,100 154,180" fill="none" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M76 132A46 46 0 0 1 92 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

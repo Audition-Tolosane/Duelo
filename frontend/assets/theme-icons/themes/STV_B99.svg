@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Brooklyn Nine-Nine">
+  <rect x="36" y="52" width="168" height="164" rx="14" fill="#12606D"/>
+  <path d="M50 82H66M50 112H66M50 142H66M50 172H66" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="96" cy="96" r="16" fill="#FFDB3D"/>
+  <path d="M74 216V150Q74 124 96 124Q118 124 118 150V216Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="144" cy="104" r="16" fill="#FF6B5B"/>
+  <path d="M122 216V158Q122 132 144 132Q166 132 166 158V216Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="186" cy="92" r="14" fill="#FFDB3D"/>
+  <path d="M170 216V140Q170 116 186 116Q202 116 202 140V216Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <ellipse cx="196" cy="74" rx="14" ry="11" fill="#FF6B5B" transform="rotate(-20 196 74)"/>
+  <path d="M208 72V28Q226 34 230 50" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M50 68V62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

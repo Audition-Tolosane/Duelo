@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Skyrim">
+  <path d="M66 150C56 176 58 200 72 218H112C100 196 100 176 108 158Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M74 84C58 66 48 56 34 50" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M92 74C82 56 76 46 68 36" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M50 122C50 88 80 70 112 74L166 96C176 100 176 112 166 114L124 122L158 136C164 140 160 148 152 148L102 152C78 170 50 156 50 122Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="112" cy="96" r="9" fill="#FFDB3D"/>
+  <path d="M186 104C198 116 198 136 186 148" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M208 90C226 110 226 142 208 162" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M66 100L76 90" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

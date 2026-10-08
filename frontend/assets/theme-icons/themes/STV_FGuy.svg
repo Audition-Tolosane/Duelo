@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Family Guy">
+  <path d="M76 76L90 46H108L114 76Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M84 136H116L108 200C107 208 100 212 92 210L82 208C74 206 70 200 72 192Z" fill="#FF6B5B"/>
+  <path d="M120 140C126 154 124 164 114 168" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="146" y="90" width="56" height="32" rx="8" fill="#12606D"/>
+  <path d="M44 108C44 84 64 72 96 72H136C152 72 160 84 160 100V116C160 132 152 142 136 142H72C56 142 44 130 44 108Z" fill="#12606D"/>
+  <rect x="160" y="82" width="12" height="48" rx="6" fill="#FFDB3D"/>
+  <rect x="180" y="84" width="12" height="44" rx="6" fill="#FFDB3D"/>
+  <path d="M200 94L218 82V130L200 118Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="108" cy="106" r="16" fill="#FFDB3D"/>
+  <circle cx="108" cy="106" r="6" fill="#12606D"/>
+  <path d="M58 104C60 94 66 88 74 86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

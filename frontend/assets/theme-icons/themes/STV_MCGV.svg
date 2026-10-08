@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="MacGyver">
+  <g transform="rotate(-35 128 128)">
+  <path d="M150 116H216C212 98 196 88 174 88H150Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="52" y="74" width="16" height="50" rx="8" fill="#12606D"/>
+  <rect x="40" y="112" width="124" height="44" rx="22" fill="#FF6B5B"/>
+  <circle cx="148" cy="134" r="7" fill="#E8F1EC"/>
+  <path d="M60 126L78 122" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+  <path d="M192 160V198A9 9 0 0 0 210 198V150A18 18 0 0 0 174 150V208" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Gratte-ciels">
+  <rect x="40" y="152" width="44" height="66" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="172" y="128" width="44" height="90" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M92 218V112H106V80H120V54H136V80H150V112H164V218Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 24V44" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M124 126V196" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M146 126V196" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M104 128V158" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

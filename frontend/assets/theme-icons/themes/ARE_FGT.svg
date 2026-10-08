@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fighting Games">
+  <path d="M128 100V176" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <rect x="44" y="164" width="168" height="56" rx="16" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="74" r="40" fill="#FF6B5B"/>
+  <circle cx="82" cy="192" r="11" fill="#FFDB3D"/>
+  <circle cx="128" cy="192" r="11" fill="#FFDB3D"/>
+  <circle cx="174" cy="192" r="11" fill="#FF6B5B"/>
+  <path d="M104 58L114 46" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

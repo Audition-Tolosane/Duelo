@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Eurovision">
+  <polygon transform="translate(6.4 6.4) scale(0.95)" points="128,34 145.6,62.3 175,46.6 176.1,79.9 209.4,81 193.7,110.4 222,128 193.7,145.6 209.4,175 176.1,176.1 175,209.4 145.6,193.7 128,222 110.4,193.7 81,209.4 79.9,176.1 46.6,175 62.3,145.6 34,128 62.3,110.4 46.6,81 79.9,79.9 81,46.6 110.4,62.3" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="128" r="46" fill="#12606D"/>
+  <path d="M128 152C100 132 100 108 114 106C122 105 128 112 128 116C128 112 134 105 142 106C156 108 156 132 128 152Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M84 96L96 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

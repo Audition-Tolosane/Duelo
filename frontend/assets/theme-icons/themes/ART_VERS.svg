@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Château de Versailles">
+  <circle cx="128" cy="80" r="26" fill="#FFDB3D"/>
+  <path d="M128 28V38" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M166 42L158 50" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M90 42L98 50" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M184 80H174" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M72 80H82" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M60 136V208" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M94 136V208" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M128 136V208" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M162 136V208" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M196 136V208" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="46" y="166" width="164" height="16" rx="8" fill="#FF6B5B"/>
+  <rect x="46" y="204" width="164" height="16" rx="8" fill="#FF6B5B"/>
+  <path d="M114 70L120 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

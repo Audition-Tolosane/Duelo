@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Réalité Augmentée">
+  <path d="M40 84V54C40 46 46 40 54 40H84M172 40H202C210 40 216 46 216 54V84M216 172V202C216 210 210 216 202 216H172M84 216H54C46 216 40 210 40 202V172" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="128,74 178,103 128,132 78,103" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="78,103 128,132 128,190 78,161" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="128,132 178,103 178,161 128,190" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M92 132V148" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

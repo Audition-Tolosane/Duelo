@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cryogénie">
+  <path d="M128 40V216M51.8 84L204.2 172M51.8 172L204.2 84" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <polyline points="150.5,63 128,76 105.5,63" fill="none" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="195.5,115 173,102 173,76" fill="none" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="173,180 173,154 195.5,141" fill="none" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="105.5,193 128,180 150.5,193" fill="none" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="60.5,141 83,154 83,180" fill="none" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="83,76 83,102 60.5,115" fill="none" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="128" cy="128" r="28" fill="#FFDB3D"/>
+  <circle cx="138" cy="138" r="8" fill="#FF6B5B"/>
+  <path d="M112 128A16 16 0 0 1 122 113" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

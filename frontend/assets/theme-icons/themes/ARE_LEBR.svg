@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="LeBron James">
+  <circle cx="128" cy="150" r="68" fill="#FF6B5B"/>
+  <path d="M128 84V218M60 150H196M92 100C110 122 110 178 92 200M164 100C146 122 146 178 164 200" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="92,76 88,40 110,58 128,32 146,58 168,40 164,76" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M76 124V138" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

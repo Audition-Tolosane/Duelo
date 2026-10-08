@@ -1,0 +1,12 @@
+[
+  {"id": "CIN_SHER", "symbole": "violon et archet"},
+  {"id": "CIN_SHUT", "symbole": "phare sur rocher d'île"},
+  {"id": "CIN_TERM", "symbole": "main métallique pouce levé dans l'acier en fusion"},
+  {"id": "CIN_AVEN", "symbole": "bouclier rond étoilé à anneaux"},
+  {"id": "CIN_BATM", "symbole": "masque à oreilles pointues sur lune rouge"},
+  {"id": "CIN_BATN", "symbole": "projecteur et chauve-souris sur nuage"},
+  {"id": "CIN_HUNG", "symbole": "geai moqueur dans un anneau et flèche"},
+  {"id": "CIN_SHIN", "symbole": "tricycle sur moquette hexagonale"},
+  {"id": "CIN_TITA", "symbole": "paquebot à quatre cheminées"},
+  {"id": "CIN_TOPG", "symbole": "lunettes aviateur et avion de chasse"}
+]

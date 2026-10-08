@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Downton Abbey">
+  <path d="M40 212V112H56V128H78V112H96V212Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M216 212V112H200V128H178V112H160V212Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M98 212V82H88V44H108V64H148V44H168V82H158V212Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M116 108C116 94 140 94 140 108V140H116Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M112 212V190C112 172 144 172 144 190V212Z" fill="#0B3D4A"/>
+  <rect x="50" y="146" width="14" height="28" rx="5" fill="#FFDB3D"/>
+  <rect x="74" y="146" width="14" height="28" rx="5" fill="#FFDB3D"/>
+  <rect x="168" y="146" width="14" height="28" rx="5" fill="#FFDB3D"/>
+  <rect x="192" y="146" width="14" height="28" rx="5" fill="#FFDB3D"/>
+  <path d="M104 96L104 114" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

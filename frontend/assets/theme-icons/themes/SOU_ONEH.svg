@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="One-Hit Wonders">
+  <rect x="110" y="34" width="40" height="96" rx="20" fill="#FF6B5B"/>
+  <rect x="74" y="100" width="116" height="84" rx="30" fill="#FF6B5B"/>
+  <ellipse cx="72" cy="128" rx="18" ry="30" transform="rotate(-25 72 128)" fill="#FF6B5B"/>
+  <path d="M150 124H170M150 146H174M150 166H168" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="90" y="178" width="84" height="42" rx="10" fill="#FFDB3D"/>
+  <path d="M106 198H158" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="196.0,40.0 200.3,51.7 212.0,56.0 200.3,60.3 196.0,72.0 191.7,60.3 180.0,56.0 191.7,51.7" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M124 50V76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

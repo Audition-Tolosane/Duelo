@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Le Silence des Agneaux">
+  <ellipse cx="128" cy="124" rx="68" ry="88" fill="#12606D"/>
+  <path d="M68 150L92 140M188 150L164 140M128 112L128 40" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M88 124Q128 110 168 124L164 176Q128 214 92 176Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="102" y="140" width="12" height="40" rx="6" fill="#0B3D4A"/>
+  <rect x="122" y="140" width="12" height="48" rx="6" fill="#0B3D4A"/>
+  <rect x="142" y="140" width="12" height="40" rx="6" fill="#0B3D4A"/>
+  <path d="M82 92A70 80 0 0 1 100 58" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Vinland Saga">
+  <g transform="rotate(45 112 144)">
+  <path d="M106 66V22L112 2L118 22V66Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="84" y="62" width="56" height="14" rx="7" fill="#FF6B5B"/>
+  <rect x="105" y="204" width="14" height="30" rx="6" fill="#12606D"/>
+  <circle cx="112" cy="234" r="11" fill="#FF6B5B"/>
+  </g>
+  <circle cx="112" cy="144" r="72" fill="#12606D"/>
+  <path d="M112 144V86A58 58 0 0 1 170 144Z" fill="#FF6B5B"/>
+  <path d="M112 144V202A58 58 0 0 1 54 144Z" fill="#FF6B5B"/>
+  <circle cx="112" cy="144" r="20" fill="#FFDB3D"/>
+  <path d="M51 122A65 65 0 0 1 79.5 87.7" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

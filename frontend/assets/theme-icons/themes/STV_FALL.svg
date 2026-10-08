@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fallout">
+  <rect x="115" y="38" width="26" height="180" rx="6" fill="#12606D"/>
+  <rect x="115" y="38" width="26" height="180" rx="6" fill="#12606D" transform="rotate(36 128 128)"/>
+  <rect x="115" y="38" width="26" height="180" rx="6" fill="#12606D" transform="rotate(72 128 128)"/>
+  <rect x="115" y="38" width="26" height="180" rx="6" fill="#12606D" transform="rotate(108 128 128)"/>
+  <rect x="115" y="38" width="26" height="180" rx="6" fill="#12606D" transform="rotate(144 128 128)"/>
+  <circle cx="128" cy="128" r="78" fill="#12606D"/>
+  <circle cx="128" cy="128" r="58" fill="#0B3D4A"/>
+  <circle cx="128" cy="128" r="42" fill="#12606D" stroke="#FFDB3D" stroke-width="12"/>
+  <circle cx="128" cy="128" r="16" fill="#0B3D4A"/>
+  <path d="M66 99A68 68 0 0 1 99 66" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

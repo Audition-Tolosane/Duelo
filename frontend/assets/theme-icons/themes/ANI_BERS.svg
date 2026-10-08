@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Berserk">
+  <g transform="rotate(42 128 124)">
+  <path d="M100 40L148 20Q160 16 160 30V156H100Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="124" y="50" width="12" height="96" rx="6" fill="#0B3D4A"/>
+  <rect x="74" y="158" width="112" height="18" rx="9" fill="#FFDB3D"/>
+  <rect x="118" y="176" width="24" height="32" rx="8" fill="#12606D"/>
+  <path d="M118 186H142M118 198H142" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="130" cy="214" r="10" fill="#FFDB3D"/>
+  <path d="M110 56V112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

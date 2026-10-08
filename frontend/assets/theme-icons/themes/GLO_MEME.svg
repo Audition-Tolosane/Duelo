@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Culture Internet &amp; Mèmes">
+  <path d="M60 40H196C212 40 224 52 224 68V156C224 172 212 184 196 184H124L84 216L90 184H60C44 184 32 172 32 156V68C32 52 44 40 60 40Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="112" r="52" fill="#FFDB3D"/>
+  <path d="M98 104Q108 90 118 104M138 104Q148 90 158 104" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M100 120H156C156 142 144 152 128 152C112 152 100 142 100 120Z" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M112 144C118 136 138 136 144 144C138 150 118 150 112 144Z" fill="#FF6B5B"/>
+  <path d="M70 104C70 116 60 124 60 132A10 10 0 0 0 80 132C80 124 70 116 70 104Z" fill="#E8F1EC"/>
+  <path d="M186 104C186 116 176 124 176 132A10 10 0 0 0 196 132C196 124 186 116 186 104Z" fill="#E8F1EC"/>
+  <path d="M48 70C50 62 56 56 66 54" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

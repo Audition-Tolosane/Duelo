@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Thermodynamique">
+  <path d="M80 56A20 20 0 0 1 120 56V156A32 32 0 1 1 80 156Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="92" y="52" width="16" height="116" rx="8" fill="#E8F1EC"/>
+  <rect x="92" y="130" width="16" height="44" rx="8" fill="#FF6B5B"/>
+  <circle cx="100" cy="181" r="20" fill="#FF6B5B"/>
+  <path d="M88 184A13 13 0 0 1 96 172" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M182 62C196 90 214 106 214 140C214 166 198 182 178 182C158 182 142 166 142 142C142 122 152 112 160 96C168 108 170 118 172 126C178 110 182 90 182 62Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M178 170C166 170 158 162 158 150C158 140 166 132 170 122C180 136 196 142 196 152C196 162 188 170 178 170Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+</svg>

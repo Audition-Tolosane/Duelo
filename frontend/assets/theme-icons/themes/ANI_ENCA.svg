@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Encanto">
+  <ellipse cx="128" cy="200" rx="84" ry="20" fill="#12606D"/>
+  <rect x="94" y="170" width="68" height="26" rx="8" fill="#12606D"/>
+  <rect x="96" y="100" width="64" height="80" rx="10" fill="#FF6B5B"/>
+  <path d="M128 100L128 88" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M128 30C150 56 156 72 146 86Q128 98 110 86C100 72 106 56 128 30Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <ellipse cx="180" cy="72" rx="13" ry="20" transform="rotate(-30 180 72)" fill="#FFDB3D"/>
+  <ellipse cx="204" cy="76" rx="13" ry="20" transform="rotate(30 204 76)" fill="#FFDB3D"/>
+  <path d="M192 64L192 92" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M110 116L110 138" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

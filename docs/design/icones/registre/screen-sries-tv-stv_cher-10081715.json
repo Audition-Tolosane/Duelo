@@ -1,0 +1,12 @@
+[
+  {"id": "STV_CHER", "symbole": "dosimètre à aiguille et trèfle radioactif"},
+  {"id": "STV_COBR", "symbole": "cobra dressé à capuche"},
+  {"id": "STV_COLU", "symbole": "imperméable ceinturé et cigare"},
+  {"id": "STV_COMM", "symbole": "fanion de collège taché de paintball"},
+  {"id": "STV_DALS", "symbole": "derrick pétrolier jaillissant"},
+  {"id": "STV_DARK", "symbole": "ciré jaune à capuche"},
+  {"id": "STV_DAWS", "symbole": "échelle contre une fenêtre"},
+  {"id": "STV_DHSW", "symbole": "boîte aux lettres et palissade"},
+  {"id": "STV_DEXT", "symbole": "lame de microscope et goutte"},
+  {"id": "STV_DIPC", "symbole": "signe pour cent étoilé"}
+]

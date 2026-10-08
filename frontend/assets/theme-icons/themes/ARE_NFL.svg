@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="NFL">
+  <path d="M116 140H140L160 194H96Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="72" y="192" width="112" height="30" rx="10" fill="#12606D"/>
+  <rect x="104" y="200" width="48" height="14" rx="7" fill="#0B3D4A"/>
+  <g transform="translate(140 88) rotate(-64)">
+  <path d="M-62 0C-40 -46 40 -46 62 0C40 46 -40 46 -62 0Z" fill="#FFDB3D"/>
+  <path d="M-24 4H24M-14 -4V12M0 -4V12M14 -4V12" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M-32 -16C-22 -24 -10 -27 2 -27" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

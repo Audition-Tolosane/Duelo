@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="K-Dramas">
+  <path d="M80 44H112V76C112 88 132 92 132 112V204C132 214 126 220 116 220H76C66 220 60 214 60 204V112C60 92 80 88 80 76Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="74" y="30" width="44" height="22" rx="8" fill="#FF6B5B"/>
+  <rect x="68" y="136" width="56" height="52" rx="8" fill="#FFDB3D"/>
+  <path d="M96 174C86 168 82 162 82 156C82 151 86 148 90 148C93 148 95 150 96 152C97 150 99 148 102 148C106 148 110 151 110 156C110 162 106 168 96 174Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M152 156H208L200 216H160Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M160 176H200L195 206H165Z" fill="#E8F1EC"/>
+  <path d="M74 104L74 120" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

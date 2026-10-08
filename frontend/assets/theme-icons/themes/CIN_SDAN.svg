@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Seigneur des Anneaux">
+  <path d="M110 172C98 132 74 112 48 60C92 82 118 120 126 172Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M146 172C158 132 182 112 208 60C164 82 138 120 130 172Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="96,218 160,218 152,164 104,164" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M40 104Q84 56 128 56Q172 56 216 104Q172 150 128 150Q84 150 40 104Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M72 104Q100 76 128 76Q156 76 184 104Q156 130 128 130Q100 130 72 104Z" fill="#FFDB3D"/>
+  <ellipse cx="128" cy="104" rx="8" ry="26" fill="#12606D"/>
+  <path d="M68 92Q84 74 104 66" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

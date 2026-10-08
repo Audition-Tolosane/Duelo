@@ -1,0 +1,12 @@
+[
+  {"id": "CIN_GARD", "symbole": "baladeur cassette et casque orange"},
+  {"id": "CIN_MADM", "symbole": "jerrican d'essence"},
+  {"id": "CIN_MATR", "symbole": "pilules rouge et bleue"},
+  {"id": "CIN_MIB_", "symbole": "lunettes noires et flash"},
+  {"id": "CIN_MISS", "symbole": "mèche allumée qui crépite"},
+  {"id": "CIN_OCEA", "symbole": "jeton de casino"},
+  {"id": "CIN_OPPE", "symbole": "chapeau porkpie et pipe"},
+  {"id": "CIN_PARA", "symbole": "pierre de lettré sur socle"},
+  {"id": "CIN_PIRA", "symbole": "tricorne et bandana rouge"},
+  {"id": "CIN_PIEG", "symbole": "pied nu et éclats de verre"}
+]

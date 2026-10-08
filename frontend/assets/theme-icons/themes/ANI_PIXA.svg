@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pixar">
+  <rect x="38" y="200" width="84" height="20" rx="10" fill="#12606D"/>
+  <path d="M80 204L104 134L150 96" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="104" cy="134" r="10" fill="#FF6B5B"/>
+  <g transform="rotate(40 166 82)">
+  <path d="M146 44H186L208 108H124Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="166" cy="112" rx="40" ry="9" fill="#FFDB3D"/>
+  <path d="M150 62L144 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+  <circle cx="186" cy="188" r="34" fill="#FFDB3D"/>
+  <path d="M153 196Q186 208 219 196" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <polygon points="186,160 190.7,170.5 202.2,171.4 193.5,178.9 196.1,190.1 186,184.2 175.9,190.1 178.5,178.9 169.8,171.4 181.3,170.5" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="4" stroke-linejoin="round"/>
+</svg>

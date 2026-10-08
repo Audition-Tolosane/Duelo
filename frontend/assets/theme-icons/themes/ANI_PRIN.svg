@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Disney Princesses">
+  <polygon points="46,186 60,132 94,158 128,68 162,158 196,132 210,186" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M44 198Q128 172 212 198" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M84 178Q106 150 128 166Q150 150 172 178" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 112C140 126 146 136 146 146C146 156 138 162 128 162C118 162 110 156 110 146C110 136 116 126 128 112Z" fill="#FF6B5B"/>
+  <circle cx="128" cy="60" r="12" fill="#FF6B5B"/>
+  <circle cx="58" cy="124" r="10" fill="#FF6B5B"/>
+  <circle cx="198" cy="124" r="10" fill="#FF6B5B"/>
+  <path d="M76 168L88 154" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

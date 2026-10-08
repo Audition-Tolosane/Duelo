@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="George Orwell">
+  <polygon points="64,100 58,42 110,72" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="192,100 198,42 146,72" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="72,86 68,60 92,74" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="184,86 188,60 164,74" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="136" rx="84" ry="72" fill="#FF6B5B"/>
+  <circle cx="96" cy="114" r="10" fill="#12606D"/>
+  <circle cx="160" cy="114" r="10" fill="#12606D"/>
+  <ellipse cx="128" cy="164" rx="42" ry="28" fill="#12606D"/>
+  <ellipse cx="112" cy="164" rx="7" ry="11" fill="#FFDB3D"/>
+  <ellipse cx="144" cy="164" rx="7" ry="11" fill="#FFDB3D"/>
+  <path d="M64 126A66 66 0 0 1 78 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

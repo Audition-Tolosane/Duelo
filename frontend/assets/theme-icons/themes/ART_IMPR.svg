@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Impressionnisme">
+  <path d="M96 160L76 218M160 160L180 218M128 160V212" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="48" y="36" width="160" height="120" rx="14" fill="#12606D"/>
+  <circle cx="150" cy="80" r="20" fill="#FF6B5B"/>
+  <path d="M136 116H164M142 136H158" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M72 116H104M84 136H120" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <rect x="40" y="150" width="176" height="18" rx="9" fill="#FFDB3D"/>
+  <path d="M64 56L64 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

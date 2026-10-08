@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Godzilla">
+  <polygon points="102,58 118,72 126,42" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="122,76 140,94 152,60" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="144,102 160,124 178,90" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="162,132 172,152 194,128" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M54 66C64 52 90 46 104 56C124 70 150 100 168 140C176 160 186 176 210 182C222 184 226 196 216 200C196 208 172 206 160 200L160 220H112L108 196C96 180 90 150 92 120C92 108 86 100 76 96L56 92C50 90 50 84 56 82L72 80C66 78 56 76 54 66Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M100 132L84 144" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="80" cy="66" r="7" fill="#FF6B5B"/>
+  <path d="M66 60Q76 50 92 50" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

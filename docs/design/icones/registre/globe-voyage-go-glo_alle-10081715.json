@@ -1,0 +1,12 @@
+[
+  {"id": "GLO_ALLE", "symbole": "bretzel salé"},
+  {"id": "GLO_ARGE", "symbole": "calebasse de maté et bombilla"},
+  {"id": "GLO_AUST", "symbole": "kangourou et boomerang"},
+  {"id": "GLO_BRES", "symbole": "toucan sur une branche"},
+  {"id": "GLO_CANA", "symbole": "feuille d'érable"},
+  {"id": "GLO_CAPI", "symbole": "carte pliée et étoile de capitale"},
+  {"id": "GLO_CHIN", "symbole": "lanterne chinoise rouge"},
+  {"id": "GLO_CORE", "symbole": "hanbok à nœud"},
+  {"id": "GLO_DRAP", "symbole": "drapeau flottant sur mât"},
+  {"id": "GLO_DESE", "symbole": "dromadaire sur une dune"}
+]

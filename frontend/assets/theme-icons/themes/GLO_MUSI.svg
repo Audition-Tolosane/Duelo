@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Musique du Monde">
+  <path d="M68 70H188C188 114 162 132 148 140L158 212H98L108 140C94 132 68 114 68 70Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M80 76L98 124L116 76L134 124L152 76L170 124L182 84" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="52" rx="66" ry="20" fill="#FFDB3D"/>
+  <rect x="58" y="58" width="140" height="18" rx="9" fill="#FF6B5B"/>
+  <rect x="88" y="202" width="80" height="18" rx="9" fill="#FF6B5B"/>
+  <path d="M82 46C92 40 104 38 116 38" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

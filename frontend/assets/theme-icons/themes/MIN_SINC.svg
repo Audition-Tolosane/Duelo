@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sin City">
+  <path d="M60 36L48 64M100 36L88 64M204 52L192 80M226 92L214 120" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <rect x="40" y="100" width="56" height="116" rx="8" fill="#12606D"/>
+  <rect x="160" y="128" width="56" height="88" rx="8" fill="#12606D"/>
+  <path d="M104 60H152V216H104Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="134" y="104" width="12" height="16" rx="3" fill="#FFDB3D"/>
+  <rect x="114" y="150" width="12" height="16" rx="3" fill="#FFDB3D"/>
+  <rect x="72" y="154" width="12" height="16" rx="3" fill="#FFDB3D"/>
+  <rect x="180" y="150" width="12" height="16" rx="3" fill="#FFDB3D"/>
+  <path d="M112 76L112 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Existentialisme">
+  <rect x="118" y="44" width="20" height="164" rx="8" fill="#FF6B5B"/>
+  <rect x="84" y="202" width="88" height="18" rx="9" fill="#12606D"/>
+  <polygon points="66,70 180,70 210,92 180,114 66,114" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="190,132 76,132 46,154 76,176 190,176" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M80 84H104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

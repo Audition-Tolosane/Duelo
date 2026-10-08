@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Twilight">
+  <path d="M128 70L136 46" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <ellipse cx="156" cy="48" rx="18" ry="9" transform="rotate(-20 156 48)" fill="#FFDB3D"/>
+  <path d="M128 78C108 62 70 68 70 110C70 146 98 172 128 164C158 172 186 146 186 110C186 68 148 62 128 78Z" fill="#FF6B5B"/>
+  <path d="M40 150C62 136 92 146 112 162L124 174V216C94 216 62 204 44 182C34 170 32 158 40 150Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M216 150C194 136 164 146 144 162L132 174V216C162 216 194 204 212 182C222 170 224 158 216 150Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M90 108A34 34 0 0 1 102 86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

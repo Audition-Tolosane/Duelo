@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Comédies Françaises Cultes">
+  <g transform="rotate(-10 128 128)">
+    <path d="M82 76L174 76L182 166L74 166Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+    <ellipse cx="128" cy="74" rx="48" ry="14" fill="#12606D"/>
+    <ellipse cx="128" cy="74" rx="36" ry="7" fill="#0B3D4A"/>
+    <rect x="72" y="138" width="112" height="24" rx="6" fill="#FFDB3D"/>
+    <path d="M136 90C150 104 148 122 136 126C124 122 122 104 136 90Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M56 166Q128 218 200 166Q128 186 56 166Z" fill="#0B3D4A" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M92 96Q94 86 102 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

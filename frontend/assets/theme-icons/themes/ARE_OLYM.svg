@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Jeux Olympiques">
+  <path d="M128 20C152 46 164 64 156 82C152 90 144 94 140 94H116C110 94 104 90 100 82C92 64 106 46 128 20Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M128 58C138 70 140 78 136 84H120C116 78 118 70 128 58Z" fill="#FFDB3D"/>
+  <rect x="30" y="140" width="64" height="76" rx="12" fill="#12606D"/>
+  <rect x="96" y="112" width="64" height="104" rx="12" fill="#FFDB3D"/>
+  <rect x="162" y="164" width="64" height="52" rx="12" fill="#FF6B5B"/>
+  <path d="M112 128V142" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

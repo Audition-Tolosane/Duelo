@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Clash Royale">
+  <path d="M128 40C112 70 72 106 72 150A56 56 0 0 0 184 150C184 106 144 70 128 40Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 104C118 124 102 136 102 156A26 26 0 0 0 154 156C154 136 138 124 128 104Z" fill="#0B3D4A"/>
+  <circle cx="128" cy="160" r="9" fill="#FFDB3D"/>
+  <path d="M90 142L98 122" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="George R.R. Martin">
+  <path d="M60 216C56 178 64 142 82 114L90 66L110 94C122 88 134 86 146 88L194 44C202 38 212 46 206 54L184 104C190 112 188 122 180 126L158 138C168 162 176 190 176 216Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M184 104L160 118" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="200" cy="50" r="7" fill="#0B3D4A"/>
+  <polygon points="130,104 146,100 140,112" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M100 82L96 98" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="196.0,150.0 201.3,162.7 215.0,163.8 204.6,172.8 207.8,186.2 196.0,179.0 184.2,186.2 187.4,172.8 177.0,163.8 190.7,162.7" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M72 168Q74 138 88 118" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

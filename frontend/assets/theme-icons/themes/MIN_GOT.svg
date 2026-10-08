@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Le Trone de Fer">
+  <path d="M50 216C36 196 46 172 62 158C62 178 74 188 82 206Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M206 216C220 196 210 172 194 158C194 178 182 188 174 206Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 40C174 40 194 118 194 150C194 192 166 214 128 214C90 214 62 192 62 150C62 118 82 40 128 40Z" fill="#12606D"/>
+  <path d="M92 104Q104 116 116 104Q128 116 140 104Q152 116 164 104" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M74 142Q86 154 98 142Q110 154 122 142Q134 154 146 142Q158 154 170 142Q182 154 186 146" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M78 180Q90 192 102 180Q114 192 126 180Q138 192 150 180Q162 192 174 180" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M90 92C94 74 102 62 112 56" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

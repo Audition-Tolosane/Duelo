@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Transformers">
+  <rect x="38" y="40" width="22" height="84" rx="11" fill="#12606D"/>
+  <rect x="196" y="40" width="22" height="84" rx="11" fill="#12606D"/>
+  <rect x="104" y="36" width="48" height="44" rx="12" fill="#12606D"/>
+  <rect x="112" y="50" width="32" height="10" rx="5" fill="#E8F1EC"/>
+  <rect x="80" y="146" width="96" height="66" rx="14" fill="#12606D"/>
+  <path d="M104 160V198M128 160V198M152 160V198" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="58,80 198,80 186,150 70,150" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="80,94 118,94 118,136 86,136" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="138,94 176,94 170,136 138,136" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M92 124L106 104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

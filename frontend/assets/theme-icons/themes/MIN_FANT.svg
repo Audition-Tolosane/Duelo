@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fantasy &amp; Épopées">
+  <ellipse cx="128" cy="194" rx="94" ry="22" fill="#12606D"/>
+  <path d="M72 186C92 150 104 110 116 76C122 58 134 44 156 40C168 38 176 44 170 54C160 50 150 56 146 70C142 100 156 150 184 186Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M82 174C112 184 144 184 174 174" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="172" cy="52" r="11" fill="#FF6B5B"/>
+  <polygon points="134,110 139,122 151,122 142,130 145,143 134,136 123,143 126,130 117,122 129,122" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="200,72 205,85 218,90 205,95 200,108 195,95 182,90 195,85" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="64,92 68,102 78,106 68,110 64,120 60,110 50,106 60,102" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M96 152L106 124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

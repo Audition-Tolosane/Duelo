@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Satellites">
+  <path d="M150 124L222 150M144 136L208 186M134 146L182 210M122 152L148 222" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="106" cy="106" r="50" fill="#12606D"/>
+  <path d="M58 116C90 132 124 132 154 114" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M138.9 44.2A70 70 0 0 1 170.9 79.8M153.7 29.7A90 90 0 0 1 186.9 66.5" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M72.2 93.7A36 36 0 0 1 90.8 73.4" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

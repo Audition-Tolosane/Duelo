@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fullmetal Alchemist">
+  <rect x="110" y="62" width="36" height="160" rx="14" fill="#FF6B5B"/>
+  <rect x="52" y="94" width="152" height="32" rx="14" fill="#FF6B5B"/>
+  <polygon points="98,58 102,34 116,48 128,30 140,48 154,34 158,58" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M170 206C108 206 88 184 128 170C168 156 170 138 128 134C92 130 88 112 110 102" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="122" cy="100" rx="18" ry="13" fill="#12606D"/>
+  <circle cx="127" cy="96" r="4" fill="#FFDB3D"/>
+  <path d="M68 104L82 104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

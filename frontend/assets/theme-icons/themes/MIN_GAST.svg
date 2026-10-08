@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Gaston Lagaffe">
+  <path d="M116 184L108 208M140 184L148 208" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M36 92C64 80 98 90 116 118H140C158 90 192 80 220 92C196 104 170 124 156 156H100C86 124 60 104 36 92Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="152" rx="30" ry="36" fill="#12606D"/>
+  <circle cx="128" cy="100" r="34" fill="#12606D"/>
+  <circle cx="114" cy="94" r="12" fill="#E8F1EC"/>
+  <circle cx="142" cy="94" r="12" fill="#E8F1EC"/>
+  <circle cx="119" cy="97" r="6" fill="#12606D"/>
+  <circle cx="137" cy="91" r="6" fill="#12606D"/>
+  <polygon points="112,118 144,118 128,148" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M60 94C72 92 86 96 96 104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

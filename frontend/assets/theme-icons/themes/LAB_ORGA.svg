@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Chimie Organique">
+  <path d="M178 104L206 68" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="208" cy="60" r="16" fill="#FF6B5B"/>
+  <polygon points="116,68 178.4,104 178.4,176 116,212 53.6,176 53.6,104" fill="none" stroke="#12606D" stroke-width="20" stroke-linejoin="round"/>
+  <circle cx="116" cy="140" r="30" fill="none" stroke="#FFDB3D" stroke-width="12"/>
+  <path d="M70 123L87 113" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

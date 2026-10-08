@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Retour vers le futur">
+  <rect x="44" y="40" width="168" height="180" rx="18" fill="#12606D"/>
+  <rect x="64" y="60" width="128" height="140" rx="12" fill="#0B3D4A"/>
+  <path d="M96 96L128 136L160 96M128 136V180" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="96" cy="96" r="16" fill="#FFDB3D"/>
+  <circle cx="160" cy="96" r="16" fill="#FFDB3D"/>
+  <circle cx="128" cy="180" r="16" fill="#FFDB3D"/>
+  <circle cx="128" cy="136" r="12" fill="#E8F1EC"/>
+  <path d="M54 70L54 94" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

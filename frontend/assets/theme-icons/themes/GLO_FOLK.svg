@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Folklore">
+  <path d="M138 30A32 32 0 1 0 156 84A26 26 0 0 1 138 30Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="186,40 191,52 203,57 191,62 186,74 181,62 169,57 181,52" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M32 120C68 114 102 118 128 132C154 118 188 114 224 120V208C188 202 154 206 128 220C102 206 68 202 32 208Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M46 108C76 102 106 110 122 124V198C104 186 76 184 46 190Z" fill="#FFDB3D"/>
+  <path d="M210 108C180 102 150 110 134 124V198C152 186 180 184 210 190Z" fill="#FFDB3D"/>
+  <path d="M62 136C80 134 96 138 108 144M62 160C80 158 96 162 108 168M194 136C176 134 160 138 148 144M194 160C176 158 160 162 148 168" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M56 118C66 114 78 114 90 116" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

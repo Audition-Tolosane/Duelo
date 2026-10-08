@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="David Bowie">
+  <circle cx="128" cy="128" r="88" fill="#12606D"/>
+  <circle cx="178" cy="84" r="12" fill="#FFDB3D"/>
+  <polygon points="152,34 90,140 126,140 102,222 174,106 138,106" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M70 92C76 76 88 64 100 58" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

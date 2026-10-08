@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fargo">
+  <path d="M68 188L64 210M188 188L192 210" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="64" cy="212" r="10" fill="#FFDB3D"/>
+  <circle cx="192" cy="212" r="10" fill="#FFDB3D"/>
+  <rect x="44" y="118" width="48" height="76" rx="22" fill="#FF6B5B"/>
+  <rect x="164" y="118" width="48" height="76" rx="22" fill="#FF6B5B"/>
+  <path d="M60 124C60 78 88 52 128 52C168 52 196 78 196 124Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="52" y="112" width="152" height="40" rx="20" fill="#FF6B5B"/>
+  <path d="M206 40V68M194 47L218 61M194 61L218 47" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M88 96C90 82 98 72 110 66" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

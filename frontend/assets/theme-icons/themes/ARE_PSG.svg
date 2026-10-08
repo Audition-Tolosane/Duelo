@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Paris Saint-Germain">
+  <ellipse cx="82" cy="126" rx="26" ry="54" transform="rotate(-35 82 126)" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12"/>
+  <ellipse cx="174" cy="126" rx="26" ry="54" transform="rotate(35 174 126)" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12"/>
+  <path d="M128 38C164 74 164 124 128 164C92 124 92 74 128 38Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="74" y="158" width="108" height="26" rx="10" fill="#FFDB3D"/>
+  <path d="M112 190C112 204 120 212 128 220C136 212 144 204 144 190Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M116 70C110 88 110 102 114 116" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Génériques TV Cultes">
+  <path d="M128 118L84 52M128 118L172 52" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="82" cy="48" r="12" fill="#FFDB3D"/>
+  <circle cx="174" cy="48" r="12" fill="#FFDB3D"/>
+  <rect x="36" y="112" width="184" height="108" rx="26" fill="#12606D"/>
+  <rect x="68" y="134" width="108" height="64" rx="14" fill="#0B3D4A"/>
+  <polygon points="108,150 108,182 138,166" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="198" cy="150" r="9" fill="#FF6B5B"/>
+  <circle cx="198" cy="184" r="9" fill="#FF6B5B"/>
+</svg>

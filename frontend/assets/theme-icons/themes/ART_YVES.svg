@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Yves Saint Laurent">
+  <path d="M84 46L128 62L172 46Q206 54 208 84L212 206Q212 214 204 214H52Q44 214 44 206L48 84Q50 54 84 46Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="102,56 154,56 128,140" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M90 50L128 148L106 166L80 104Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M166 50L128 148L150 166L176 104Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M106 62L128 72L150 62V82L128 72L106 82Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="180" r="9" fill="#FF6B5B"/>
+  <path d="M62 86L60 112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Death Note">
+  <rect x="48" y="40" width="136" height="172" rx="14" fill="#12606D"/>
+  <rect x="84" y="76" width="76" height="26" rx="8" fill="#FFDB3D"/>
+  <path d="M176 152C192 138 216 148 214 174C212 202 194 216 176 208C158 216 140 202 138 174C136 148 160 138 176 152Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M176 152Q176 140 184 132" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <ellipse cx="196" cy="134" rx="12" ry="7" transform="rotate(-30 196 134)" fill="#FFDB3D"/>
+  <path d="M88 124V140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

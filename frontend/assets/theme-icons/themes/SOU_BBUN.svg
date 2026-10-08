@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Bad Bunny">
+  <ellipse cx="94" cy="68" rx="20" ry="54" fill="#12606D" transform="rotate(-8 94 68)"/>
+  <ellipse cx="162" cy="68" rx="20" ry="54" fill="#12606D" transform="rotate(8 162 68)"/>
+  <ellipse cx="94" cy="72" rx="7" ry="34" fill="#FF6B5B" transform="rotate(-8 94 72)"/>
+  <ellipse cx="162" cy="72" rx="7" ry="34" fill="#FF6B5B" transform="rotate(8 162 72)"/>
+  <ellipse cx="128" cy="154" rx="82" ry="64" fill="#12606D"/>
+  <rect x="58" y="128" width="60" height="38" rx="16" fill="#0B3D4A"/>
+  <rect x="138" y="128" width="60" height="38" rx="16" fill="#0B3D4A"/>
+  <rect x="112" y="136" width="32" height="12" rx="6" fill="#E8F1EC"/>
+  <circle cx="128" cy="188" r="11" fill="#FF6B5B"/>
+  <path d="M72 142H88" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

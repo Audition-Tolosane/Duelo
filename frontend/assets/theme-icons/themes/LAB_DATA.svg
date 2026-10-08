@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Big Data">
+  <path d="M56 64V188A72 26 0 0 0 200 188V64Z" fill="#12606D"/>
+  <ellipse cx="128" cy="64" rx="72" ry="26" fill="#12606D"/>
+  <ellipse cx="128" cy="64" rx="54" ry="16" fill="#FFDB3D"/>
+  <path d="M62 118.4A72 26 0 0 0 194 118.4" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M62 162.4A72 26 0 0 0 194 162.4" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <circle cx="172" cy="110" r="9" fill="#FFDB3D"/>
+  <circle cx="172" cy="154" r="9" fill="#FFDB3D"/>
+  <circle cx="172" cy="196" r="9" fill="#FFDB3D"/>
+  <path d="M72 94L72 110" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

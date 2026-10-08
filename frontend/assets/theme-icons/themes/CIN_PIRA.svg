@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pirates des Caraïbes">
+  <path d="M80 172Q128 196 176 172V188Q128 214 80 188Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M180 182L204 204M178 194L192 218" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M88 130V100C88 80 104 70 128 70C152 70 168 80 168 100V130Z" fill="#12606D"/>
+  <path d="M34 64C58 108 92 118 128 132C164 118 198 108 222 64C220 120 180 160 128 180C76 160 36 120 34 64Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M34 64C58 108 92 118 128 132C164 118 198 108 222 64" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M56 104Q70 132 92 142" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Migrations">
+  <path d="M40 212C80 212 112 196 136 172" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M160 150L170 140" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M119 70C136 44 155 48 170 70C185 48 204 44 221 70C199 62 180 68 170 87C160 68 141 62 119 70Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M64 104C77 84 92 86 104 104C116 86 131 84 144 104C127 97 112 103 104 118C96 103 81 97 64 104Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M140 140C152 122 165 124 176 140C187 124 200 122 212 140C196 134 183 139 176 152C169 139 156 134 140 140Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M140 62C150 52 160 48 168 48" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

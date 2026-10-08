@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Bridgerton">
+  <path d="M150 112C170 72 194 46 220 36C212 64 190 92 158 116Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="34" y="80" width="188" height="130" rx="14" fill="#12606D"/>
+  <path d="M44 90L128 150L212 90" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M44 200L104 156M212 200L152 156" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="152" r="28" fill="#FFDB3D"/>
+  <circle cx="128" cy="152" r="14" stroke="#0B3D4A" stroke-width="6" fill="none"/>
+  <path d="M52 112L52 132" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

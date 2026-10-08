@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Symboles">
+  <polygon points="104,150 74,212 94,204 106,222 130,164" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="152,150 182,212 162,204 150,222 126,164" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <g fill="#FF6B5B"><circle cx="128" cy="108" r="64"/><circle cx="188" cy="108" r="14"/><circle cx="158" cy="56" r="14"/><circle cx="98" cy="56" r="14"/><circle cx="68" cy="108" r="14"/><circle cx="98" cy="160" r="14"/><circle cx="158" cy="160" r="14"/></g>
+  <circle cx="128" cy="108" r="44" fill="none" stroke="#FFDB3D" stroke-width="8"/>
+  <polygon points="128,78 135.6,99.5 158.4,100.1 140.4,114 146.8,135.9 128,123 109.2,135.9 115.6,114 97.6,100.1 120.4,99.5" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M78 82A56 56 0 0 1 98 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

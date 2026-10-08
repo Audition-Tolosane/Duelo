@@ -1,8 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Bates Motel">
-  <circle cx="128" cy="56" r="22" stroke="#FFDB3D" stroke-width="12" fill="none"/>
-  <rect x="76" y="84" width="104" height="134" rx="22" fill="#FF6B5B"/>
-  <circle cx="128" cy="114" r="12" fill="#0B3D4A"/>
-  <rect x="96" y="144" width="64" height="52" rx="8" fill="#E8F1EC"/>
-  <path d="M110 162H146M110 178H138" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
-  <path d="M92 104V124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <g transform="rotate(-20 128 128)">
+  <polygon points="128,34 178,80 128,126 78,80" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="128,58 152,80 128,102 104,80" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="140" r="12" fill="none" stroke="#FFDB3D" stroke-width="8"/>
+  <circle cx="128" cy="170" r="24" fill="#12606D"/>
+  <circle cx="128" cy="170" r="9" fill="#E8F1EC"/>
+  <rect x="120" y="186" width="16" height="40" rx="8" fill="#12606D"/>
+  <path d="M136 204H150" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M136 220H146" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M100 72L114 58" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
 </svg>

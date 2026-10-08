@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Peaky Blinders">
+  <g transform="translate(0 -12)">
+  <path d="M140 148C170 138 204 140 222 154C210 168 172 170 140 164Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M38 160C32 112 72 80 128 80C168 80 196 102 204 136C180 160 70 170 38 160Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 84C112 104 106 130 108 156M76 98C74 118 76 140 82 158" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="90" r="8" fill="#0B3D4A"/>
+  <path d="M58 132C60 118 68 106 80 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g transform="rotate(-8 180 168)"><rect x="142" y="154" width="76" height="34" rx="6" fill="#FFDB3D"/><rect x="160" y="167" width="40" height="8" rx="4" fill="#0B3D4A"/></g>
+</svg>

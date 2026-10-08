@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="New Girl">
+  <rect x="80" y="36" width="96" height="28" rx="10" fill="#12606D"/>
+  <path d="M88 70H168V88C190 96 200 112 200 132V198C200 212 190 220 176 220H80C66 220 56 212 56 198V132C56 112 66 96 88 88Z" fill="#12606D"/>
+  <rect x="74" y="108" width="108" height="96" rx="12" fill="#0B3D4A"/>
+  <path d="M82 196V178C98 168 112 174 128 168C146 162 162 168 174 176V196Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="110" cy="148" r="14" fill="#FFDB3D"/>
+  <circle cx="150" cy="130" r="12" fill="#FFDB3D"/>
+  <circle cx="110" cy="148" r="5" fill="#0B3D4A"/>
+  <rect x="130" y="144" width="36" height="20" rx="4" transform="rotate(-18 148 154)" fill="#E8F1EC"/>
+  <path d="M66 126L66 150" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

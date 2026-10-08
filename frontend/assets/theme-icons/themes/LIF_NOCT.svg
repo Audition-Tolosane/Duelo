@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Vie Nocturne">
+  <path d="M178 150C190 176 216 182 230 168C206 172 190 156 196 132C184 134 176 142 178 150Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M36 52H220" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M112 54V74M144 54V74" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M80 76C78 128 96 166 128 176C160 166 178 128 176 76C164 88 150 88 140 80C134 88 122 88 116 80C106 88 92 88 80 76Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M106 194L102 226L124 204Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M150 194L154 226L132 204Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="188" r="28" fill="#12606D"/>
+  <circle cx="116" cy="192" r="6" fill="#FFDB3D"/>
+  <circle cx="140" cy="192" r="6" fill="#FFDB3D"/>
+  <path d="M92 96C92 114 96 128 102 140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

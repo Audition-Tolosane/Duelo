@@ -1,0 +1,12 @@
+[
+  {"id": "ARE_ROBL", "symbole": "pièce hexagonale Robux"},
+  {"id": "ARE_ROCK", "symbole": "balle de foot propulsée en flammes"},
+  {"id": "ARE_SLEN", "symbole": "sirène d'alerte à deux pavillons"},
+  {"id": "ARE_SIMR", "symbole": "volant de course"},
+  {"id": "ARE_SKRM", "symbole": "hache de guerre à double tranchant"},
+  {"id": "ARE_SSB", "symbole": "boule Smash et étoile d'impact"},
+  {"id": "ARE_SONC", "symbole": "anneau doré et traînées de vitesse"},
+  {"id": "ARE_MINE", "symbole": "sablier"},
+  {"id": "ARE_STAR", "symbole": "pylône cristal protoss"},
+  {"id": "ARE_STDW", "symbole": "navet aux feuilles vertes"}
+]

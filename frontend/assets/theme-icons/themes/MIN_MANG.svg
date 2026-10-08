@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Culture Manga">
+  <path d="M40 96Q92 96 92 44M116 44Q116 96 168 96M168 120Q116 120 116 172M92 172Q92 120 40 120" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M188 112C200 136 216 154 216 176C216 196 204 210 188 210C172 210 160 196 160 176C160 154 176 136 188 112Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M174 176C174 166 178 156 184 148" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

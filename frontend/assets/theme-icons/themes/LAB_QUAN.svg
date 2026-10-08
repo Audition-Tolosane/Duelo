@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Informatique Quantique">
+  <circle cx="128" cy="132" r="76" fill="#12606D"/>
+  <ellipse cx="128" cy="132" rx="70" ry="22" stroke="#0B3D4A" stroke-width="8" fill="none"/>
+  <path d="M128 72V192" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M128 132L170 90" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="174" cy="86" r="13" fill="#FFDB3D"/>
+  <circle cx="128" cy="132" r="10" fill="#FFDB3D"/>
+  <circle cx="128" cy="56" r="12" fill="#FFDB3D"/>
+  <circle cx="128" cy="208" r="12" fill="#FFDB3D"/>
+  <path d="M74 112A58 58 0 0 1 99 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

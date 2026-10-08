@@ -1,0 +1,7 @@
+[
+  {"id": "LIF_RIVI", "symbole": "rivière en méandre et saumon"},
+  {"id": "LIF_SAIS", "symbole": "disque hiver-été et flèches cycliques"},
+  {"id": "LIF_SOLS", "symbole": "coupe de sol et ver de terre"},
+  {"id": "LIF_ECOL", "symbole": "terrarium en bocal"},
+  {"id": "LIF_EVOL", "symbole": "crosse de fougère et fleur"}
+]

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Agatha Christie">
+  <rect x="108" y="52" width="40" height="36" rx="6" fill="#12606D"/>
+  <rect x="100" y="34" width="56" height="22" rx="10" fill="#FFDB3D"/>
+  <path d="M84 92H172C182 92 188 98 188 108V204C188 214 182 220 172 220H84C74 220 68 214 68 204V108C68 98 74 92 84 92Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="96" y="122" width="64" height="64" rx="8" fill="#FFDB3D"/>
+  <path d="M112 138L144 170M144 138L112 170" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M196 60C196 60 186 74 186 80C186 86 190 90 196 90C202 90 206 86 206 80C206 74 196 60 196 60Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M82 108V148" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

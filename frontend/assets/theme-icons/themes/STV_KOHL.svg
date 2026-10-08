@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Koh-Lanta &amp; Jeux TV">
+  <circle cx="190" cy="72" r="24" fill="#FF6B5B"/>
+  <rect x="108" y="62" width="40" height="138" rx="10" fill="#FFDB3D"/>
+  <rect x="108" y="98" width="40" height="12" fill="#FF6B5B"/>
+  <rect x="108" y="146" width="40" height="12" fill="#FF6B5B"/>
+  <rect x="86" y="44" width="84" height="24" rx="12" fill="#12606D"/>
+  <path d="M36 186Q58 170 80 186T124 186T168 186T212 186" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M56 212Q78 196 100 212T144 212T188 212" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M120 76L120 88" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

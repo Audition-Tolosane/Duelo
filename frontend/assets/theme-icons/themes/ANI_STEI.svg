@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Steins;Gate">
+  <rect x="50" y="186" width="28" height="22" rx="8" fill="#12606D"/>
+  <rect x="178" y="186" width="28" height="22" rx="8" fill="#12606D"/>
+  <rect x="32" y="62" width="192" height="134" rx="18" fill="#12606D"/>
+  <rect x="50" y="80" width="114" height="98" rx="12" fill="#0B3D4A"/>
+  <polygon points="118,92 90,136 110,136 98,168 136,120 116,120 130,92" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="194" cy="102" r="14" fill="#FFDB3D"/>
+  <rect x="180" y="130" width="28" height="12" rx="6" fill="#0B3D4A"/>
+  <rect x="180" y="152" width="28" height="12" rx="6" fill="#0B3D4A"/>
+  <path d="M66 120L66 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

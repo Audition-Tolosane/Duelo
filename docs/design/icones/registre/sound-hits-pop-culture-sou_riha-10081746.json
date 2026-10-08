@@ -1,0 +1,12 @@
+[
+  {"id": "SOU_RIHA", "symbole": "rouge à lèvres"},
+  {"id": "SOU_ROCK", "symbole": "ampli de guitare"},
+  {"id": "SOU_ROSA", "symbole": "castagnettes flamenco"},
+  {"id": "SOU_SZA", "symbole": "disque vinyle"},
+  {"id": "SOU_SCAR", "symbole": "gros nœud ruban"},
+  {"id": "SOU_SALS", "symbole": "maracas croisées"},
+  {"id": "SOU_SHAK", "symbole": "foulard de hanches à pièces"},
+  {"id": "SOU_TSWI", "symbole": "bracelet d'amitié en perles"},
+  {"id": "SOU_WKND", "symbole": "veste rouge"},
+  {"id": "SOU_TRAV", "symbole": "grande roue Astroworld"}
+]

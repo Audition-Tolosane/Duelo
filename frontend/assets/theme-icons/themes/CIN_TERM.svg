@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Terminator">
+  <rect x="96" y="140" width="20" height="60" rx="8" fill="#12606D"/>
+  <rect x="124" y="140" width="20" height="60" rx="8" fill="#12606D"/>
+  <path d="M40 196C40 182 80 174 128 174C176 174 216 182 216 196C216 210 176 218 128 218C80 218 40 210 40 196Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M70 196C90 190 166 190 186 196" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="80" y="30" width="32" height="90" rx="16" fill="#12606D"/>
+  <rect x="80" y="88" width="72" height="68" rx="18" fill="#12606D"/>
+  <rect x="124" y="88" width="64" height="20" rx="10" fill="#12606D"/>
+  <rect x="124" y="106" width="60" height="18" rx="9" fill="#12606D"/>
+  <rect x="124" y="122" width="56" height="18" rx="9" fill="#12606D"/>
+  <rect x="124" y="138" width="50" height="18" rx="9" fill="#12606D"/>
+  <path d="M136 107H178M136 123H174M136 139H168" stroke="#0B3D4A" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <circle cx="96" cy="112" r="8" fill="#FFDB3D"/>
+  <circle cx="176" cy="98" r="5" fill="#FFDB3D"/>
+  <path d="M93 46L93 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

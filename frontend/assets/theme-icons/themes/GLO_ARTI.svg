@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Artisanat">
+  <rect x="36" y="194" width="184" height="24" rx="12" fill="#FF6B5B"/>
+  <path d="M104 58C104 80 62 96 62 140C62 174 90 188 128 188C166 188 194 174 194 140C194 96 152 80 152 58Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="84" y="36" width="88" height="24" rx="12" fill="#12606D"/>
+  <rect x="102" y="44" width="52" height="10" rx="5" fill="#FF6B5B"/>
+  <path d="M72 144L92 128L112 144L132 128L152 144L172 128L186 140" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M80 116C86 102 96 92 108 86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Drapeaux du Monde">
+  <g transform="rotate(-33 128 200)">
+    <rect x="106" y="56" width="44" height="156" rx="12" fill="#12606D"/>
+    <polygon points="128.0,90.0 131.5,99.1 141.3,99.7 133.7,105.9 136.2,115.3 128.0,110.0 119.8,115.3 122.3,105.9 114.7,99.7 124.5,99.1" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M118 70V80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g transform="rotate(-11 128 200)">
+    <rect x="106" y="56" width="44" height="156" rx="12" fill="#FF6B5B"/>
+    <path d="M136 76C122 78 116 90 118 100C120 112 132 118 142 114C130 114 124 104 126 94C128 86 132 80 136 76Z" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="6" stroke-linejoin="round"/>
+  </g>
+  <g transform="rotate(11 128 200)">
+    <rect x="106" y="56" width="44" height="156" rx="12" fill="#FFDB3D"/>
+    <path d="M116 82H140M116 104H140" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g transform="rotate(33 128 200)">
+    <rect x="106" y="56" width="44" height="156" rx="12" fill="#12606D"/>
+    <circle cx="128" cy="98" r="14" fill="#FFDB3D"/>
+  </g>
+  <circle cx="128" cy="194" r="10" fill="#E8F1EC"/>
+</svg>

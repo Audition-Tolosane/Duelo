@@ -1,0 +1,12 @@
+[
+  {"id": "LEG_ALEX", "symbole": "soleil de Vergina"},
+  {"id": "LEG_CHIV", "symbole": "lance de joute et écu"},
+  {"id": "LEG_CHAR", "symbole": "globe impérial crucifère"},
+  {"id": "LEG_AZTE", "symbole": "pyramide à degrés et temples"},
+  {"id": "LEG_BYZA", "symbole": "église à coupole dorée"},
+  {"id": "LEG_OTTO", "symbole": "turban de sultan à aigrette"},
+  {"id": "LEG_HUNS", "symbole": "arc composite et flèche"},
+  {"id": "LEG_GLAD", "symbole": "casque de gladiateur à grille"},
+  {"id": "LEG_JOAN", "symbole": "étendard à queue d'aronde"},
+  {"id": "LEG_SPAR", "symbole": "bouclier hoplite lambda et lance"}
+]

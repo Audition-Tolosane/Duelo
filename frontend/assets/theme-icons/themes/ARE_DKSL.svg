@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dark Souls">
+  <path d="M70 196L186 216M186 196L70 216" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <g transform="translate(12.8 4) scale(0.9)">
+    <path d="M128 36C140 76 188 96 188 140C188 178 160 196 128 196C96 196 68 178 68 140C68 112 90 100 98 80C108 96 114 100 118 104C120 80 120 60 128 36Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M128 104C136 124 156 134 156 156C156 174 144 184 128 184C112 184 100 174 100 156C100 134 120 124 128 104Z" fill="#FFDB3D"/>
+    <path d="M128 120V176M112 166H144" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <path d="M84 120L92 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

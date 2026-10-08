@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Récits Bibliques">
+  <path d="M174 70C184 58 202 56 212 64L222 60L216 72C210 82 196 84 184 80L172 86Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M190 68L198 44L208 66Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M174 80L160 90" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="82" y="110" width="92" height="44" rx="6" fill="#FFDB3D"/>
+  <rect x="98" y="122" width="16" height="16" rx="4" fill="#12606D"/>
+  <rect x="142" y="122" width="16" height="16" rx="4" fill="#12606D"/>
+  <polygon points="72,112 128,78 184,112" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M38 152H218L198 196Q194 206 182 206H74Q62 206 58 196Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M74 180H182" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M56 162L64 176" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

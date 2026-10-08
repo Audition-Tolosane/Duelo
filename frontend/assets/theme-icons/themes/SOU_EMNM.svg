@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Eminem">
+  <path d="M76 122C60 130 52 152 50 216H206C204 152 196 130 180 122Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="88" rx="56" ry="52" fill="#12606D"/>
+  <ellipse cx="128" cy="96" rx="32" ry="32" fill="#0B3D4A"/>
+  <rect x="88" y="172" width="80" height="34" rx="14" fill="#0B3D4A"/>
+  <path d="M110 128V158M146 128V158" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M110 166h0M146 166h0" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M82 70Q88 56 102 50" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

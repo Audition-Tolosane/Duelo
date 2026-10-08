@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Nutrition">
+  <path d="M128 32C152 32 162 54 166 80C170 104 196 124 196 160C196 196 166 222 128 222C90 222 60 196 60 160C60 124 86 104 90 80C94 54 104 32 128 32Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 52C142 52 148 68 150 88C154 112 176 128 176 160C176 186 154 204 128 204C102 204 80 186 80 160C80 128 102 112 106 88C108 68 114 52 128 52Z" fill="#FFDB3D"/>
+  <circle cx="128" cy="160" r="30" fill="#FF6B5B"/>
+  <path d="M110 154C112 146 118 140 126 138" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

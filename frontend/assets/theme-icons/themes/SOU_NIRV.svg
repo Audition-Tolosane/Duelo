@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Nirvana">
+  <g transform="translate(16 0)">
+    <path d="M150 58V142C150 202 78 204 82 154" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M82 154L62 134" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="150" cy="42" r="12" fill="none" stroke="#FFDB3D" stroke-width="8"/>
+    <circle cx="84" cy="86" r="42" fill="#FF6B5B"/>
+    <circle cx="84" cy="86" r="22" fill="none" stroke="#0B3D4A" stroke-width="8"/>
+    <path d="M54 66C58 56 66 50 76 46" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

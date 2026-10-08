@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Golf Elite">
+  <path d="M32 214C48 168 92 150 128 150C164 150 208 168 224 214Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="140" cy="172" rx="22" ry="8" fill="#E8F1EC"/>
+  <path d="M140 60V168" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="140,52 196,76 140,100" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="186" cy="196" r="13" fill="#E8F1EC"/>
+  <path d="M52 196C58 178 70 168 84 162" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

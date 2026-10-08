@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sex and the City">
+  <rect x="54" y="44" width="148" height="114" rx="14" fill="#12606D"/>
+  <rect x="70" y="60" width="116" height="82" rx="6" fill="#0B3D4A"/>
+  <path d="M86 82H144M86 102H128M86 122H112" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M158 132C148 125 140 120 140 112C140 106 145 102 150 102C154 102 157 104 158 107C159 104 162 102 166 102C171 102 176 106 176 112C176 120 168 125 158 132Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M46 164H210L222 198C224 206 218 212 210 212H46C38 212 32 206 34 198Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="66" y="174" width="124" height="12" rx="6" fill="#0B3D4A"/>
+  <rect x="106" y="194" width="44" height="10" rx="5" fill="#0B3D4A"/>
+  <path d="M60 62L60 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

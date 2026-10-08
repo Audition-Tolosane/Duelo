@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Gabriel Garcia Marquez">
+  <path d="M100 98C110 66 148 66 162 100Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M110 158C118 182 140 186 152 158Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="72,128 38,96 38,160" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M56 128C84 84 160 78 208 128C160 178 84 172 56 128Z" fill="#FFDB3D"/>
+  <path d="M106 108C116 118 116 138 106 148M132 102C142 114 142 142 132 154" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M162 98C172 114 172 142 162 158" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="184" cy="120" r="9" fill="#12606D"/>
+  <path d="M74 124C80 116 88 110 96 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

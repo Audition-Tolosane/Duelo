@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Seconde Guerre Mondiale">
+  <path d="M68 172L92 212H164L188 172" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M46 162C46 90 84 52 128 52C172 52 210 90 210 162Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="28" y="156" width="200" height="26" rx="13" fill="#12606D"/>
+  <polygon points="128,80 135.5,99.7 156.5,100.8 140.2,114 145.6,134.2 128,122.8 110.4,134.2 115.8,114 99.5,100.8 120.5,99.7" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M68 124A64 64 0 0 1 88 86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

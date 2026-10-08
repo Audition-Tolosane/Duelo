@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Écologie">
+  <rect x="88" y="36" width="80" height="30" rx="10" fill="#FFDB3D"/>
+  <rect x="52" y="62" width="152" height="160" rx="44" fill="#12606D"/>
+  <rect x="68" y="80" width="120" height="126" rx="32" fill="#0B3D4A"/>
+  <path d="M68 172H188V178C188 194 176 206 160 206H96C80 206 68 194 68 178Z" fill="#12606D"/>
+  <path d="M128 174V118" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M128 156C110 156 96 146 94 128C112 128 124 138 128 156Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M128 138C134 120 148 110 166 110C164 128 148 138 128 138Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="128" cy="112" r="8" fill="#FFDB3D"/>
+  <path d="M84 146V108C84 100 88 96 94 96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

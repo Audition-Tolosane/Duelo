@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Musée d'Orsay">
+  <path d="M44 218V122A84 84 0 0 1 212 122V218Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="122" r="52" fill="#E8F1EC" stroke="#FFDB3D" stroke-width="12"/>
+  <path d="M128 82V90M128 154V162M88 122H96M160 122H168" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M128 96V122L148 134" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 194H196M100 194V214M156 194V214" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M58 116A72 72 0 0 1 76 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

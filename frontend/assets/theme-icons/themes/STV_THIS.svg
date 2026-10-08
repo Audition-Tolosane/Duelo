@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="This Is Us">
+  <path d="M110 70C102 60 116 54 108 42" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M148 70C140 60 154 54 146 40" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="28" y="130" width="34" height="20" rx="10" fill="#12606D"/>
+  <rect x="194" y="130" width="34" height="20" rx="10" fill="#12606D"/>
+  <rect x="64" y="192" width="22" height="22" rx="6" fill="#12606D"/>
+  <rect x="170" y="192" width="22" height="22" rx="6" fill="#12606D"/>
+  <rect x="44" y="108" width="168" height="96" rx="40" fill="#12606D"/>
+  <path d="M54 110Q128 66 202 110Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="48" y="106" width="160" height="14" rx="7" fill="#FF6B5B"/>
+  <rect x="116" y="76" width="24" height="16" rx="8" fill="#FF6B5B"/>
+  <circle cx="128" cy="162" r="20" fill="#FFDB3D"/>
+  <path d="M128 162L138 150" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M64 134L64 152" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

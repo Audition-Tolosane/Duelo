@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cinéma Français d'Auteur">
+  <circle cx="86" cy="78" r="32" fill="#FFDB3D"/>
+  <circle cx="152" cy="74" r="28" fill="#FFDB3D"/>
+  <circle cx="86" cy="78" r="10" fill="#12606D"/>
+  <circle cx="152" cy="74" r="9" fill="#12606D"/>
+  <path d="M112 192L90 222M112 192L134 222" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="50" y="110" width="126" height="84" rx="14" fill="#12606D"/>
+  <polygon points="176,134 214,116 214,188 176,170" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M68 128L68 152" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

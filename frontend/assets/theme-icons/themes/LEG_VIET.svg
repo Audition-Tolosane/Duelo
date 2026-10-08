@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Guerre du Viêt Nam">
+  <path d="M36 70H220" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="120" y="70" width="16" height="36" rx="6" fill="#12606D"/>
+  <path d="M168 124L214 110" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M218 88V130" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M60 196H184M96 164V196M152 164V196" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M56 140C56 112 80 100 110 100H156C170 100 178 112 178 124V148C178 160 170 166 156 166H84C66 166 56 156 56 140Z" fill="#12606D"/>
+  <path d="M68 140C68 124 80 114 98 114H110V142Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M84 132L94 122" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

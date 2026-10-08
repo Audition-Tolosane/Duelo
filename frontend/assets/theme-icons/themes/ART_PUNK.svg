@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Vivienne Westwood">
+  <g transform="rotate(-35 128 128)">
+  <path d="M190 104H78C46 104 46 152 78 152H184" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="64" cy="128" r="22" fill="#FF6B5B"/>
+  <circle cx="64" cy="128" r="8" fill="#12606D"/>
+  <rect x="172" y="88" width="50" height="80" rx="22" fill="#FFDB3D"/>
+  <rect x="186" y="112" width="20" height="32" rx="8" fill="#12606D"/>
+  <path d="M98 104H122" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

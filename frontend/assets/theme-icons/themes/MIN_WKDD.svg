@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Walking Dead Comics">
+  <rect x="56" y="36" width="68" height="184" rx="12" fill="#12606D"/>
+  <rect x="132" y="36" width="68" height="184" rx="12" fill="#12606D"/>
+  <path d="M44 92L212 140" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M44 172L212 124" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M116 176V166A12 12 0 0 1 140 166V176" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="108" y="174" width="40" height="32" rx="8" fill="#FF6B5B"/>
+  <circle cx="128" cy="190" r="5" fill="#12606D"/>
+  <path d="M76 52L76 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

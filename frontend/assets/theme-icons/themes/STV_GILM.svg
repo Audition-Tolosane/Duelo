@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Gilmore Girls">
+  <rect x="64" y="108" width="16" height="92" rx="6" fill="#12606D"/>
+  <rect x="120" y="108" width="16" height="92" rx="6" fill="#12606D"/>
+  <rect x="176" y="108" width="16" height="92" rx="6" fill="#12606D"/>
+  <rect x="64" y="152" width="128" height="14" rx="7" fill="#12606D"/>
+  <path d="M40 106C82 98 112 76 128 46C144 76 174 98 216 106Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="38" r="9" fill="#FFDB3D"/>
+  <rect x="44" y="104" width="168" height="16" rx="8" fill="#12606D"/>
+  <path d="M80 126Q100 144 120 126M136 126Q156 144 176 126" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="40" y="196" width="176" height="20" rx="10" fill="#12606D"/>
+  <path d="M88 90L104 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

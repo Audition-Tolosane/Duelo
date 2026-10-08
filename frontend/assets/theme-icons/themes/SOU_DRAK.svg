@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Drake">
+  <path d="M128 34V80" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="92" rx="14" ry="14" fill="#12606D"/>
+  <polygon points="118,100 138,100 146,208 110,208" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="80" y="112" width="96" height="32" rx="16" fill="#12606D"/>
+  <rect x="98" y="122" width="60" height="12" rx="6" fill="#FFDB3D"/>
+  <path d="M76 214H180" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M122 160V188" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="206,64 211,76 223,81 211,86 206,98 201,86 189,81 201,76" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M92 124V132" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

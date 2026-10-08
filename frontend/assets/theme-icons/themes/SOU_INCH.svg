@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pépites Indie Games">
+  <path d="M78 134C56 100 32 104 30 118C46 118 52 128 56 134C44 136 44 148 56 152C64 152 72 148 80 142Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M178 134C200 100 224 104 226 118C210 118 204 128 200 134C212 136 212 148 200 152C192 152 184 148 176 142Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 216C92 198 78 164 82 130C84 112 102 104 128 110C154 104 172 112 174 130C178 164 164 198 128 216Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="128,112 106,88 128,96 150,88" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="108" cy="146" r="7" fill="#FFDB3D"/>
+  <circle cx="148" cy="146" r="7" fill="#FFDB3D"/>
+  <circle cx="128" cy="172" r="7" fill="#FFDB3D"/>
+  <path d="M96 132C98 126 102 122 108 120" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

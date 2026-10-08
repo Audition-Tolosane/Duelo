@@ -1,0 +1,106 @@
+[
+ {
+  "id": "MIN_ARTI",
+  "symbole": "porte logique ET et étincelle"
+ },
+ {
+  "id": "MIN_BALZ",
+  "symbole": "cafetière fumante (le café de Balzac)"
+ },
+ {
+  "id": "MIN_BATM",
+  "symbole": "bat-signal braqué sur le ciel"
+ },
+ {
+  "id": "MIN_BIAI",
+  "symbole": "illusion d'Ebbinghaus (cercles égaux)"
+ },
+ {
+  "id": "MIN_CHRI",
+  "symbole": "flacon de poison étiqueté"
+ },
+ {
+  "id": "MIN_COGN",
+  "symbole": "ampoule à engrenage"
+ },
+ {
+  "id": "MIN_DCKS",
+  "symbole": "pudding de Noël au houx (Un chant de Noël)"
+ },
+ {
+  "id": "MIN_DONT",
+  "symbole": "bassin de Mambrin et lance"
+ },
+ {
+  "id": "MIN_DOST",
+  "symbole": "roulette de casino (Le Joueur)"
+ },
+ {
+  "id": "MIN_DRAC",
+  "symbole": "cercueil ouvert, yeux et crocs"
+ },
+ {
+  "id": "MIN_EPIS",
+  "symbole": "cygne noir (Popper)"
+ },
+ {
+  "id": "MIN_ETHI",
+  "symbole": "aiguillage du dilemme du tramway"
+ },
+ {
+  "id": "MIN_GRRM",
+  "symbole": "loup géant hurlant"
+ },
+ {
+  "id": "MIN_HDMW",
+  "symbole": "aléthiomètre à trois molettes et aiguille"
+ },
+ {
+  "id": "MIN_HEMI",
+  "symbole": "marlin sautant hors de l'eau"
+ },
+ {
+  "id": "MIN_HUNG",
+  "symbole": "corne d'abondance dorée"
+ },
+ {
+  "id": "MIN_LOTR",
+  "symbole": "Anneau unique au-dessus des flammes"
+ },
+ {
+  "id": "MIN_LUCK",
+  "symbole": "les quatre Dalton en tenue rayée"
+ },
+ {
+  "id": "MIN_MUSS",
+  "symbole": "cœur ailé"
+ },
+ {
+  "id": "MIN_NEUR",
+  "symbole": "neurone à axone myélinisé"
+ },
+ {
+  "id": "MIN_NIHI",
+  "symbole": "table de pierre fendue et marteau"
+ },
+ {
+  "id": "MIN_SATR",
+  "symbole": "pipe fumante"
+ },
+ {
+  "id": "MIN_SPID",
+  "symbole": "motif de toile rouge sur fond bleu"
+ },
+ {
+  "id": "MIN_THOR",
+  "symbole": "arc nordique, flèche et étoile"
+ },
+ {
+  "id": "MIN_VICT",
+  "symbole": "robe à crinoline sur mannequin"
+ },
+ {
+  "id": "MIN_ZWEI",
+  "symbole": "roi d'échecs et lettre d'une inconnue"
+ }
+]

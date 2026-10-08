@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Forêts">
+  <rect x="174" y="150" width="16" height="56" rx="6" fill="#FF6B5B"/>
+  <polygon points="182,70 210,112 198,112 220,158 144,158 166,112 154,112" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="98" y="176" width="20" height="32" rx="6" fill="#FF6B5B"/>
+  <polygon points="108,38 146,92 128,92 160,136 140,136 172,180 44,180 76,136 56,136 88,92 70,92" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="36" y="204" width="188" height="14" rx="7" fill="#12606D"/>
+  <path d="M94 78L104 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

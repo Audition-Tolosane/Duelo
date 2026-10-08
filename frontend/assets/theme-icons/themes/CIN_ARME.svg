@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Arme Fatale">
+  <path d="M128 40C142 52 160 56 182 52C186 76 192 92 204 104C196 150 170 190 128 216C86 190 60 150 52 104C64 92 70 76 74 52C96 56 114 52 128 40Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="90" y="72" width="76" height="18" rx="9" fill="#FF6B5B"/>
+  <circle cx="128" cy="130" r="36" fill="#12606D"/>
+  <polygon points="128,108 132.7,121.5 147,121.8 135.6,130.5 139.8,144.2 128,136 116.2,144.2 120.4,130.5 109,121.8 123.3,121.5" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="98" y="176" width="60" height="16" rx="8" fill="#FF6B5B"/>
+  <path d="M82 70L78 94" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

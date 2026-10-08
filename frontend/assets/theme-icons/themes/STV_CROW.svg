@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Crown">
+  <polygon points="66,128 72,50 120,100" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="190,128 184,50 136,100" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="80,104 82,74 102,96" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="176,104 174,74 154,96" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="156" rx="68" ry="60" fill="#FF6B5B"/>
+  <rect x="116" y="100" width="24" height="80" rx="12" fill="#E8F1EC"/>
+  <ellipse cx="128" cy="188" rx="38" ry="26" fill="#E8F1EC"/>
+  <circle cx="98" cy="146" r="9" fill="#0B3D4A"/>
+  <circle cx="158" cy="146" r="9" fill="#0B3D4A"/>
+  <ellipse cx="128" cy="176" rx="13" ry="9" fill="#0B3D4A"/>
+  <polygon points="108,84 108,56 118,68 128,50 138,68 148,56 148,84" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M74 166Q74 146 84 132" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

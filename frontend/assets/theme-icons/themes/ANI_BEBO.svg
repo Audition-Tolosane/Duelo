@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cowboy Bebop">
+  <polygon points="68,40 73.3,54.7 88.9,55.2 76.6,64.8 80.9,79.8 68,71 55.1,79.8 59.4,64.8 47.1,55.2 62.7,54.7" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <g transform="translate(4 16) rotate(-20 128 128)">
+  <path d="M70 140V162Q70 174 82 174H138Q150 174 150 162V140" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M150 114L202 82Q210 78 210 88V168Q210 178 202 174L150 142Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="44" y="116" width="114" height="24" rx="10" fill="#12606D"/>
+  <rect x="32" y="120" width="20" height="16" rx="6" fill="#FF6B5B"/>
+  <ellipse cx="210" cy="128" rx="12" ry="52" fill="#FFDB3D"/>
+  <ellipse cx="212" cy="128" rx="5" ry="38" fill="#12606D"/>
+  <rect x="82" y="96" width="14" height="36" rx="6" fill="#FFDB3D"/>
+  <rect x="104" y="96" width="14" height="36" rx="6" fill="#FFDB3D"/>
+  <rect x="126" y="96" width="14" height="36" rx="6" fill="#FFDB3D"/>
+  <path d="M56 128H70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Shrek">
+  <path d="M128 68C118 52 112 44 96 36M128 68C136 52 146 42 166 38" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 66C120 88 64 100 64 150C64 190 94 210 128 210C162 210 192 190 192 150C192 100 136 88 128 66Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M126 82C98 108 90 166 112 204M130 82C158 108 166 166 144 204M128 84V206" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M112 218L108 226M128 218V228M144 218L148 226" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M82 148Q84 124 100 110" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

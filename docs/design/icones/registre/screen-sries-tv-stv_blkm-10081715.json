@@ -1,0 +1,12 @@
+[
+  {"id": "STV_BLKM", "symbole": "smartphone à l'écran fissuré"},
+  {"id": "STV_BOJA", "symbole": "tête de cheval de face et col de pull"},
+  {"id": "STV_BOAR", "symbole": "flasque de poche et œillet rouge"},
+  {"id": "STV_BORG", "symbole": "pupitre d'orateur à micros"},
+  {"id": "STV_BRID", "symbole": "lettre à sceau de cire et plume"},
+  {"id": "STV_BRCH", "symbole": "falaise dorée et ruban de police"},
+  {"id": "STV_B99", "symbole": "insigne de police 99"},
+  {"id": "STV_BUFF", "symbole": "pieu en bois et croix"},
+  {"id": "STV_CASA", "symbole": "masque moustachu sous capuche rouge"},
+  {"id": "STV_CHRM", "symbole": "livre des ombres à triquetra"}
+]

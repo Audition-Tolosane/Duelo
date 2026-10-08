@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sherlock Holmes (Films)">
+  <g transform="translate(128 132) scale(1.12) rotate(30) translate(-128 -128)">
+  <circle cx="128" cy="40" r="14" fill="#12606D"/>
+  <rect x="118" y="40" width="20" height="70" rx="8" fill="#12606D"/>
+  <path d="M128 92C150 92 160 102 160 120C160 134 150 140 150 152C150 160 170 166 170 188C170 208 152 218 128 218C104 218 86 208 86 188C86 166 106 160 106 152C106 140 96 134 96 120C96 102 106 92 128 92Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="120" y="96" width="16" height="70" rx="8" fill="#0B3D4A"/>
+  <path d="M102 166Q96 182 104 198M154 166Q160 182 152 198" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="108" y="174" width="40" height="10" rx="5" fill="#FFDB3D"/>
+  <rect x="118" y="190" width="20" height="22" rx="8" fill="#0B3D4A"/>
+  <path d="M106 118Q106 104 118 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <path d="M40 118L216 196" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="40" cy="118" r="10" fill="#FFDB3D"/>
+</svg>

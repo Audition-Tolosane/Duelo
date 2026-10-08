@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Batman">
+  <polygon points="104,112 56,52 62,98 44,112 72,128 62,154 104,160" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="152,112 200,52 194,98 212,112 184,128 194,154 152,160" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M80 76L92 120M176 76L164 120" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M88 186C84 150 98 124 128 122C158 124 172 150 168 186Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="106,84 102,50 122,74" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="150,84 154,50 134,74" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="100" r="30" fill="#12606D"/>
+  <ellipse cx="116" cy="100" rx="8" ry="5" fill="#FFDB3D" transform="rotate(20 116 100)"/>
+  <ellipse cx="140" cy="100" rx="8" ry="5" fill="#FFDB3D" transform="rotate(-20 140 100)"/>
+  <path d="M106 156L112 182M150 156L144 182" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="40" y="182" width="176" height="34" rx="12" fill="#FFDB3D"/>
+  <rect x="56" y="204" width="144" height="6" rx="3" fill="#0B3D4A"/>
+  <path d="M106 92Q108 80 118 74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

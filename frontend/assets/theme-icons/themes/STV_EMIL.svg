@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Emily in Paris">
+  <ellipse cx="52" cy="176" rx="16" ry="30" transform="rotate(-20 52 176)" fill="#FFDB3D"/>
+  <ellipse cx="204" cy="176" rx="16" ry="30" transform="rotate(20 204 176)" fill="#FFDB3D"/>
+  <ellipse cx="82" cy="140" rx="28" ry="42" transform="rotate(-42 82 140)" fill="#FFDB3D"/>
+  <ellipse cx="174" cy="140" rx="28" ry="42" transform="rotate(42 174 140)" fill="#FFDB3D"/>
+  <ellipse cx="128" cy="122" rx="36" ry="52" fill="#FFDB3D"/>
+  <path d="M96 100C110 118 112 146 102 168M160 100C146 118 144 146 154 168M58 136C70 152 72 170 64 184M198 136C186 152 184 170 192 184" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M178 58C178 46 194 42 196 54C198 42 214 46 212 58C210 70 196 76 196 76C196 76 180 70 178 58Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M108 104C110 92 116 84 124 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

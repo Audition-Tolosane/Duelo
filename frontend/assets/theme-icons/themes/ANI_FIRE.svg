@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fire Force">
+  <path d="M56 150C40 112 56 84 70 64C72 84 80 92 88 92C84 64 100 42 124 30C120 54 134 64 144 70C150 56 160 48 176 40C172 62 184 74 192 84C206 104 212 128 200 150Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M86 140C78 118 90 102 98 90C102 104 110 108 116 106C114 88 122 70 136 60C136 78 148 88 156 98C162 90 168 84 172 78C182 98 184 120 174 140Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="180" rx="96" ry="24" fill="#12606D"/>
+  <path d="M68 174C68 128 94 102 128 102C162 102 188 128 188 174Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M106 118H150V142C150 156 140 164 128 168C116 164 106 156 106 142Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="128" cy="140" r="10" fill="#FF6B5B"/>
+  <path d="M84 156Q86 134 98 122" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

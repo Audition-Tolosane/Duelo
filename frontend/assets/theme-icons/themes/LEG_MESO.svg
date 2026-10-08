@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mésopotamie">
+  <g transform="rotate(-8 118 126)">
+  <rect x="40" y="60" width="156" height="132" rx="24" fill="#12606D"/>
+  <path d="M68 84L82 92L68 100ZM82 92H96M110 84L124 92L110 100ZM124 92H138M152 84L166 92L152 100ZM166 92H178M68 118L82 126L68 134ZM82 126H96M110 118L124 126L110 134ZM124 126H138M152 118L166 126L152 134ZM166 126H178M68 152L82 160L68 168ZM82 160H96M110 152L124 160L110 168ZM124 160H138" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M58 98L58 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+  <rect x="172" y="150" width="44" height="68" rx="14" fill="#FF6B5B"/>
+  <path d="M182 172H206M182 196H206" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+</svg>

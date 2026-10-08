@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Office (US)">
+  <ellipse cx="128" cy="208" rx="100" ry="16" fill="#12606D"/>
+  <path d="M58 92Q128 76 198 92L206 190Q206 204 192 204H64Q50 204 50 190Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M60 112Q128 98 196 112" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="74" y="164" width="112" height="18" rx="9" fill="#0B3D4A"/>
+  <rect x="76" y="134" width="108" height="24" rx="12" transform="rotate(-8 130 146)" fill="#12606D"/>
+  <circle cx="84" cy="160" r="12" fill="#12606D"/>
+  <path d="M70 120L70 140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

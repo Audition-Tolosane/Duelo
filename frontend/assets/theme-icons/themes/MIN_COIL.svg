@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Arthur Conan Doyle">
+  <g transform="translate(0 18)">
+  <path d="M182 150L220 166C216 178 194 180 174 170Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M74 150L36 166C40 178 62 180 82 170Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M64 160C64 100 92 72 128 72C164 72 192 100 192 160Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="60" y="150" width="136" height="20" rx="10" fill="#FFDB3D"/>
+  <path d="M108 106C104 124 106 138 118 148C130 138 134 124 130 106" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 66C116 50 98 54 102 66C106 78 120 74 128 66Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M128 66C140 50 158 54 154 66C150 78 136 74 128 66Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="68" r="8" fill="#FF6B5B"/>
+  <path d="M82 128C84 112 92 98 102 90" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

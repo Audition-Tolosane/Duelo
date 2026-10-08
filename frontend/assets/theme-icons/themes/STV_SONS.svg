@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sons of Anarchy">
+  <path d="M64 56L104 46L122 124V214H60V134Q86 96 64 56Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M192 56L152 46L134 124V214H196V134Q170 96 192 56Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="92" cy="158" r="18" fill="#FF6B5B"/>
+  <circle cx="92" cy="158" r="7" fill="#FFDB3D"/>
+  <rect x="146" y="146" width="40" height="16" rx="8" fill="#FFDB3D"/>
+  <path d="M100 72L100 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

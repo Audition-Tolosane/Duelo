@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dead by Daylight">
+  <circle cx="128" cy="132" r="88" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12"/>
+  <circle cx="104" cy="62" r="14" fill="none" stroke="#FF6B5B" stroke-width="12"/>
+  <path d="M104 78V140A44 44 0 0 0 192 140" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="182,146 202,146 192,116" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M68 108L80 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

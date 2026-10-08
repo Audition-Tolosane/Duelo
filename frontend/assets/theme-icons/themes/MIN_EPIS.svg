@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Épistémologie">
+  <path d="M136 150C118 120 110 92 122 70C132 52 158 52 164 70" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M44 150C56 196 196 206 214 140C196 154 172 156 150 150C120 140 84 148 44 150Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M82 162C112 152 150 154 180 162C152 182 106 182 82 162Z" fill="#0B3D4A"/>
+  <polygon points="166,64 196,78 168,84" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M50 212Q90 200 128 212Q166 224 206 212" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 160Q72 152 90 152" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

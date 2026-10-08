@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Arachnides">
+  <path d="M128 32V96" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M114 122L78 90L50 106M110 136L64 128L40 150M110 150L68 166L50 194M116 162L90 194L82 220M142 122L178 90L206 106M146 136L192 128L216 150M146 150L188 166L206 194M140 162L166 194L174 220" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="118" r="24" fill="#12606D"/>
+  <ellipse cx="128" cy="168" rx="38" ry="42" fill="#12606D"/>
+  <polygon points="118,152 138,152 128,166" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="128,166 138,180 118,180" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="119" cy="112" r="6" fill="#FFDB3D"/>
+  <circle cx="137" cy="112" r="6" fill="#FFDB3D"/>
+  <path d="M104 160C104 148 108 140 116 134" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

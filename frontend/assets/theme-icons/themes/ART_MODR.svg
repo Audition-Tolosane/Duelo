@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mouvement Moderne">
+  <path d="M150 72V58Q174 44 196 60V72Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="44" y="76" width="168" height="70" rx="0" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="58" y="100" width="140" height="24" rx="6" fill="#FFDB3D"/>
+  <path d="M92 100V124M128 100V124M164 100V124" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M96 150H176V196H112Q96 196 96 180Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="132" y="160" width="32" height="30" rx="4" fill="#0B3D4A"/>
+  <path d="M56 152V200M200 152V200" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="36" y="204" width="184" height="14" rx="7" fill="#FFDB3D"/>
+  <path d="M58 88H76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

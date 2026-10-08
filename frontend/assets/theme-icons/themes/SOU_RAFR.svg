@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Rap FR Actuel">
+  <path d="M52 150V128C52 64 204 64 204 128V150" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="32" y="136" width="56" height="84" rx="24" fill="#FFDB3D"/>
+  <rect x="168" y="136" width="56" height="84" rx="24" fill="#FFDB3D"/>
+  <rect x="48" y="158" width="24" height="40" rx="12" fill="#0B3D4A"/>
+  <rect x="184" y="158" width="24" height="40" rx="12" fill="#0B3D4A"/>
+  <path d="M108 176V152M128 176V124M148 176V142" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M72 108C78 94 88 86 102 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

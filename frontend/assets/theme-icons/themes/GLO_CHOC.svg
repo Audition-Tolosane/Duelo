@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Tout Chocolat">
+  <g transform="rotate(-12 128 128)">
+  <path d="M72 40H148Q150 60 168 60Q170 78 188 80V200Q188 208 180 208H72Q64 208 64 200V48Q64 40 72 40Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="88" y="56" width="34" height="32" rx="6" fill="#0B3D4A"/>
+  <rect x="88" y="100" width="34" height="32" rx="6" fill="#0B3D4A"/>
+  <rect x="136" y="100" width="34" height="32" rx="6" fill="#0B3D4A"/>
+  <rect x="58" y="146" width="136" height="70" rx="8" fill="#FFDB3D"/>
+  <polygon points="62,150 62,140 76,132 90,140 104,132 118,140 132,132 146,140 160,132 174,140 190,132 190,150" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="58" y="176" width="136" height="14" fill="#0B3D4A"/>
+  <path d="M76 58V82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

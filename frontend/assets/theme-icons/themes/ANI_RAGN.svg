@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Record of Ragnarok">
+  <path d="M112 38.8A70 22 0 0 0 58 60A70 22 0 0 0 128 82A70 22 0 0 0 198 60A70 22 0 0 0 144 38.8" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <rect x="98" y="166" width="60" height="56" rx="10" fill="#12606D"/>
+  <path d="M80 122Q80 98 94 98Q106 98 106 110Q106 94 118 94Q130 94 130 106Q130 94 142 94Q154 94 154 106Q154 98 164 98Q176 98 176 122V152Q176 172 156 172H100Q80 172 80 152Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M106 112V126M130 108V124M154 108V124M88 144H140" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="94" y="172" width="68" height="18" rx="8" fill="#FFDB3D"/>
+  <path d="M94 120Q94 110 100 106" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

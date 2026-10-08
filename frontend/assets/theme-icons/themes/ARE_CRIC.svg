@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cricket">
+  <rect x="54" y="72" width="20" height="136" rx="8" fill="#FFDB3D"/>
+  <rect x="90" y="72" width="20" height="136" rx="8" fill="#FFDB3D"/>
+  <rect x="126" y="72" width="20" height="136" rx="8" fill="#FFDB3D"/>
+  <path d="M58 54H88M96 54H142" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M64 94V126" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="190" cy="172" r="32" fill="#12606D"/>
+  <path d="M168 158C182 164 190 176 188 192" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

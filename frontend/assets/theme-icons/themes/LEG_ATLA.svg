@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cités Perdues">
+  <path d="M128 74V50" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M102 124C102 96 112 80 128 80C144 80 154 96 154 124Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="64" y="96" width="30" height="64" rx="4" fill="#FFDB3D"/>
+  <polygon points="64,98 79,70 94,98" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="162" y="96" width="30" height="64" rx="4" fill="#FFDB3D"/>
+  <polygon points="162,98 177,70 192,98" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="94" y="118" width="68" height="42" rx="4" fill="#FFDB3D"/>
+  <path d="M38 142C56 130 76 130 96 142C116 154 140 154 160 142C180 130 200 130 218 142V212C218 218 214 222 208 222H48C42 222 38 218 38 212Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M60 182C76 172 92 172 108 182C124 192 140 192 156 182C172 172 188 172 198 178" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="150" cy="204" r="7" fill="#E8F1EC"/>
+  <circle cx="168" cy="194" r="5" fill="#E8F1EC"/>
+  <circle cx="92" cy="204" r="5" fill="#E8F1EC"/>
+  <path d="M70 110C72 100 76 92 80 86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

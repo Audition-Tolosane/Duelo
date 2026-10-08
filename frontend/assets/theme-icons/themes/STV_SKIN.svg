@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Skins">
+  <path d="M196 96L212 48" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M84 96V76Q84 62 98 62H158Q172 62 172 76V96" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="36" y="92" width="184" height="116" rx="22" fill="#12606D"/>
+  <circle cx="84" cy="160" r="32" fill="#0B3D4A"/>
+  <circle cx="172" cy="160" r="32" fill="#0B3D4A"/>
+  <circle cx="84" cy="160" r="15" fill="#FFDB3D"/>
+  <circle cx="172" cy="160" r="15" fill="#FFDB3D"/>
+  <rect x="112" y="106" width="32" height="18" rx="6" fill="#FFDB3D"/>
+  <path d="M54 108L54 118" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

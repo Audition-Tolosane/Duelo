@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Kaamelott">
+  <path d="M128 34L128 48M86 54L96 66M170 54L160 66" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="116" y="180" width="24" height="30" fill="#12606D"/>
+  <rect x="84" y="202" width="88" height="16" rx="8" fill="#12606D"/>
+  <ellipse cx="128" cy="164" rx="96" ry="40" fill="#12606D"/>
+  <ellipse cx="128" cy="150" rx="96" ry="40" fill="#12606D"/>
+  <path d="M32 152A96 40 0 0 0 224 152" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <ellipse cx="128" cy="150" rx="76" ry="26" fill="#0B3D4A"/>
+  <path d="M104 78H152C152 106 142 120 128 120C114 120 104 106 104 78Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="122" y="118" width="12" height="24" fill="#FFDB3D"/>
+  <ellipse cx="128" cy="146" rx="24" ry="8" fill="#FFDB3D"/>
+  <path d="M44 146C46 138 52 132 60 128" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

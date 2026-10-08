@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mick Gordon (Doom)">
+  <path d="M58 122C40 92 58 62 72 42C80 66 92 72 100 60C104 44 116 36 128 30C138 48 150 58 160 44C170 60 178 70 188 52C204 78 214 102 198 124Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M92 116C86 98 98 84 108 72C114 86 124 88 130 74C140 88 148 94 156 82C168 98 166 112 160 120Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M60 112C60 96 196 96 196 112C196 152 150 196 128 214C106 196 60 152 60 112Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="132" r="10" fill="#FFDB3D"/>
+  <path d="M78 126C80 142 88 156 98 168" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fleabag">
+  <rect x="68" y="178" width="24" height="26" rx="10" fill="#FF6B5B"/>
+  <rect x="164" y="178" width="24" height="26" rx="10" fill="#FF6B5B"/>
+  <path d="M40 168C36 124 70 88 124 88C178 88 220 116 220 156C220 180 204 192 180 192H72C52 192 42 184 40 168Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M160 96C156 74 172 62 188 70C200 76 196 94 184 100Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="186" cy="128" r="10" fill="#0B3D4A"/>
+  <circle cx="222" cy="152" r="10" fill="#FF6B5B"/>
+  <path d="M200 166Q208 172 216 168" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M62 132C64 120 70 110 80 104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

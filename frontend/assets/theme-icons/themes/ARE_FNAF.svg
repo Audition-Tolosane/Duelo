@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Five Nights at Freddy's">
+  <circle cx="76" cy="96" r="28" fill="#12606D"/>
+  <circle cx="180" cy="96" r="28" fill="#12606D"/>
+  <circle cx="76" cy="96" r="12" fill="#FF6B5B"/>
+  <circle cx="180" cy="96" r="12" fill="#FF6B5B"/>
+  <circle cx="128" cy="148" r="68" fill="#12606D"/>
+  <rect x="96" y="34" width="64" height="44" rx="6" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="84" y="76" width="88" height="10" rx="5" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="104" cy="136" r="13" fill="#FFDB3D"/>
+  <circle cx="152" cy="136" r="13" fill="#FFDB3D"/>
+  <ellipse cx="128" cy="182" rx="34" ry="24" fill="#E8F1EC"/>
+  <ellipse cx="128" cy="172" rx="12" ry="8" fill="#FF6B5B"/>
+  <path d="M76 132L82 116" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

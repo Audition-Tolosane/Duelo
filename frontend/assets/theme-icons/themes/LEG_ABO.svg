@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Temps du Rêve">
+  <circle cx="46" cy="50" r="9" fill="#FF6B5B"/>
+  <circle cx="210" cy="206" r="9" fill="#FF6B5B"/>
+  <path d="M204 78L216 66M216 66L228 66M216 66L216 54" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M38 136A48 62 0 0 1 134 136A16 21 0 0 0 166 136L166 104L198 104L198 136A48 62 0 0 1 102 136A16 21 0 0 0 70 136L54 190Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M49 136A37 48 0 0 1 123 136A27 36 0 0 0 177 136L177 108" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M59 136A27 36 0 0 1 113 136A37 48 0 0 0 187 136L187 108" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="184" cy="90" rx="27" ry="22" transform="rotate(-20 184 90)" fill="#12606D"/>
+  <circle cx="192" cy="84" r="7" fill="#E8F1EC"/>
+  <path d="M44 111A46 59 0 0 1 67 83" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

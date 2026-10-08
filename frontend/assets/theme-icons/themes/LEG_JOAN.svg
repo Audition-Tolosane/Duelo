@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Guerre de Cent Ans">
+  <path d="M72 66V216" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <polygon points="72,36 62,62 82,62" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M80 72C120 62 156 82 210 70L184 116L210 160C156 172 120 152 80 162Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M80 92C116 84 146 100 186 92M80 142C116 134 146 150 186 142" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="117" r="16" fill="#FFDB3D"/>
+  <path d="M60 216H84" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M96 108L96 124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

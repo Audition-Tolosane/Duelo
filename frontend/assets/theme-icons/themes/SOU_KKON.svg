@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Koji Kondo (Nintendo)">
+  <g transform="rotate(-20 128 140)">
+    <ellipse cx="128" cy="140" rx="80" ry="58" fill="#12606D"/>
+    <rect x="196" y="124" width="30" height="32" rx="12" fill="#FFDB3D"/>
+    <circle cx="100" cy="148" r="11" fill="#0B3D4A"/>
+    <circle cx="128" cy="148" r="11" fill="#0B3D4A"/>
+    <circle cx="156" cy="148" r="11" fill="#0B3D4A"/>
+    <circle cx="114" cy="120" r="11" fill="#0B3D4A"/>
+    <circle cx="142" cy="120" r="11" fill="#0B3D4A"/>
+    <path d="M78 116C84 104 96 96 110 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <circle cx="46" cy="186" r="16" stroke="#FFDB3D" stroke-width="10" fill="none"/>
+</svg>

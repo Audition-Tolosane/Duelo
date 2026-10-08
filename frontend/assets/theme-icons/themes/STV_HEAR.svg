@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Heartstopper">
+  <path d="M116 212C66 180 44 152 44 124C44 100 62 84 84 84C100 84 110 92 116 104C122 92 132 84 148 84C170 84 188 100 188 124C188 152 166 180 116 212Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M186 92C166 80 158 70 158 60C158 50 166 44 174 44C180 44 184 48 186 52C188 48 192 44 198 44C206 44 214 50 214 60C214 70 206 80 186 92Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M58 72C48 66 42 60 42 54C42 48 46 44 51 44C54 44 57 46 58 50C59 46 62 44 65 44C70 44 74 48 74 54C74 60 68 66 58 72Z" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M206 120L220 112M200 144L216 148" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M66 126C66 112 72 104 82 102" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

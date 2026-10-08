@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="La Belle Époque">
+  <rect x="52" y="204" width="152" height="16" rx="8" fill="#12606D"/>
+  <path d="M92 208L104 108H152L164 208Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="98,110 128,74 158,110" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M116 208V186A12 12 0 0 1 140 186V208Z" fill="#FFDB3D"/>
+  <circle cx="128" cy="140" r="10" fill="#FFDB3D"/>
+  <g transform="rotate(45 128 100)">
+  <rect x="116" y="16" width="24" height="168" rx="8" fill="#FF6B5B"/>
+  <rect x="44" y="88" width="168" height="24" rx="8" fill="#FF6B5B"/>
+  </g>
+  <circle cx="128" cy="100" r="14" fill="#FFDB3D"/>
+  <path d="M112 158L108 180" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

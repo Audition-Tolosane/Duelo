@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Vikings">
+  <path d="M52 144C52 82 86 40 128 40C170 40 204 82 204 144Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="118" y="38" width="20" height="104" rx="10" fill="#FFDB3D"/>
+  <path d="M60 150H196V164C196 190 178 206 158 206C146 206 136 198 128 188C120 198 110 206 98 206C78 206 60 190 60 164Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="116" y="150" width="24" height="70" rx="10" fill="#FFDB3D"/>
+  <ellipse cx="96" cy="172" rx="20" ry="14" fill="#0B3D4A"/>
+  <ellipse cx="160" cy="172" rx="20" ry="14" fill="#0B3D4A"/>
+  <path d="M80 108L92 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

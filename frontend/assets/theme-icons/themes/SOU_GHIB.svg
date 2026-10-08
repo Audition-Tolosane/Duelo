@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Joe Hisaishi (Ghibli)">
+  <g transform="rotate(-18 128 128)">
+  <path d="M30 128H156" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M154 116L224 90V166L154 140Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M172 118L206 106M172 128H210M172 138L206 150" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="146" y="110" width="16" height="36" rx="6" fill="#FF6B5B"/>
+  <ellipse cx="78" cy="112" rx="20" ry="10" transform="rotate(-25 78 112)" fill="#FF6B5B"/>
+  <ellipse cx="78" cy="144" rx="20" ry="10" transform="rotate(25 78 144)" fill="#FF6B5B"/>
+  <circle cx="94" cy="128" r="9" fill="#FF6B5B"/>
+  <path d="M166 104L182 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <polygon points="58.0,53.0 61.5,62.5 71.0,66.0 61.5,69.5 58.0,79.0 54.5,69.5 45.0,66.0 54.5,62.5" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="208.0,196.0 210.7,203.3 218.0,206.0 210.7,208.7 208.0,216.0 205.3,208.7 198.0,206.0 205.3,203.3" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+</svg>

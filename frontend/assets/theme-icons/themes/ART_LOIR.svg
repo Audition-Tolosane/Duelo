@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Châteaux de la Loire">
+  <rect x="94" y="116" width="68" height="76" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="128,32 168,106 88,106" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="174" y="144" width="32" height="48" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="190,106 212,138 168,138" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="80" y="112" width="96" height="12" rx="6" fill="#FFDB3D"/>
+  <path d="M116 176V148Q116 138 128 138Q140 138 140 148V176Z" fill="#E8F1EC"/>
+  <path d="M30 220Q54 204 78 220T126 220T174 220T226 220" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M110 84L120 66" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

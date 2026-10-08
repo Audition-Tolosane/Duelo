@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Empire Ottoman">
+  <path d="M128 96C108 76 110 52 134 34C150 56 148 80 128 96Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M52 180C34 126 68 82 128 80C188 82 222 126 204 180C172 200 84 200 52 180Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M62 150C104 120 150 106 198 112M70 178C112 150 160 138 204 144" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="104" r="18" fill="#FFDB3D"/>
+  <circle cx="128" cy="104" r="7" fill="#FF6B5B"/>
+  <path d="M74 136C76 122 82 112 92 104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

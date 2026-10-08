@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Comètes &amp; Astéroïdes">
+  <path d="M138 58C104 104 74 160 40 216C100 196 160 160 200 118Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M146 120L104 162" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M124 104L104 132" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="170" cy="86" r="44" fill="#FF6B5B"/>
+  <circle cx="170" cy="86" r="30" fill="#FFDB3D"/>
+  <polygon points="166,172 188,164 206,178 204,198 184,208 164,196" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="186" cy="186" r="8" fill="#FF6B5B"/>
+</svg>

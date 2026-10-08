@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Hell's Paradise">
+  <ellipse cx="128" cy="190" rx="94" ry="26" fill="#12606D"/>
+  <path d="M128 184C86 184 50 160 40 120C76 116 110 144 128 184Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 184C170 184 206 160 216 120C180 116 146 144 128 184Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 182C90 170 68 128 76 82C106 98 126 136 128 182Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 182C166 170 188 128 180 82C150 98 130 136 128 182Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 46C154 80 156 136 128 180C100 136 102 80 128 46Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M116 112Q118 88 126 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

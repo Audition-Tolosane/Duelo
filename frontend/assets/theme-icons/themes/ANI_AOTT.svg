@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="L'Attaque des Titans">
+  <path d="M128 38L198 60V118C198 166 170 200 128 218C86 200 58 166 58 118V60Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M122 180C98 178 80 162 74 136L92 140C80 128 74 112 76 94L96 106C92 92 94 78 102 66C116 84 122 104 122 124Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M134 180C158 178 176 162 182 136L164 140C176 128 182 112 180 94L160 106C164 92 162 78 154 66C140 84 134 104 134 124Z" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M72 74V98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

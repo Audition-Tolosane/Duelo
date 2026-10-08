@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Karol G">
+  <g transform="translate(128 128) scale(1.1) translate(-136 -128)">
+  <path d="M76 216C68 160 98 112 156 86C146 122 146 170 156 216Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M160 88C146 66 134 52 118 40C150 40 172 54 180 72C190 52 206 44 220 46C214 70 196 88 172 96Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M90 196Q102 186 114 196Q126 186 138 196M98 166Q110 156 122 166Q134 156 144 166M112 136Q124 126 136 136" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="56" cy="96" r="10" fill="#FFDB3D"/>
+  <circle cx="72" cy="66" r="7" fill="#FFDB3D"/>
+  <circle cx="48" cy="136" r="6" fill="#FFDB3D"/>
+  <path d="M88 186C88 162 94 144 106 130" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

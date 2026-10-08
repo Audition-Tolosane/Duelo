@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Le Nom de la Rose">
+  <path d="M128 104V140" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <ellipse cx="152" cy="118" rx="18" ry="9" transform="rotate(-30 152 118)" fill="#12606D"/>
+  <circle cx="128" cy="74" r="38" fill="#FF6B5B"/>
+  <path d="M112 74A16 16 0 1 1 128 90" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="54" y="176" width="148" height="34" rx="6" fill="#FFDB3D"/>
+  <path d="M70 192H186" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="40" y="136" width="176" height="48" rx="14" fill="#12606D"/>
+  <rect x="40" y="204" width="176" height="18" rx="9" fill="#12606D"/>
+  <rect x="168" y="170" width="22" height="40" rx="6" fill="#FF6B5B"/>
+  <path d="M104 62C106 54 112 48 120 44" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

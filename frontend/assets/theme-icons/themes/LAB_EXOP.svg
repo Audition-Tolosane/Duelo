@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Exoplanètes">
+  <circle cx="64" cy="62" r="24" fill="#FF6B5B"/>
+  <polygon points="200,40 204.2,51.8 216,56 204.2,60.2 200,72 195.8,60.2 184,56 195.8,51.8" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="140" cy="144" r="66" fill="#12606D"/>
+  <path d="M122 124C134 116 148 122 146 136C144 150 130 152 124 164C118 174 106 168 106 156C106 142 112 130 122 124Z" fill="#FFDB3D"/>
+  <path d="M158 100C174 98 190 110 188 126C186 138 172 136 168 148C164 160 152 158 152 146C152 132 146 112 158 100Z" fill="#FFDB3D"/>
+  <path d="M94.7 122.9A50 50 0 0 1 115 100.7" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

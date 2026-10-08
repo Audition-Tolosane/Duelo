@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Brutalisme">
+  <rect x="38" y="70" width="180" height="44" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="62" y="122" width="132" height="44" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="86" y="174" width="84" height="44" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="56" y="90" width="24" height="20" rx="4" fill="#0B3D4A"/>
+  <rect x="96" y="90" width="24" height="20" rx="4" fill="#0B3D4A"/>
+  <rect x="136" y="90" width="24" height="20" rx="4" fill="#0B3D4A"/>
+  <rect x="176" y="90" width="24" height="20" rx="4" fill="#0B3D4A"/>
+  <rect x="76" y="142" width="24" height="20" rx="4" fill="#0B3D4A"/>
+  <rect x="116" y="142" width="24" height="20" rx="4" fill="#FFDB3D"/>
+  <rect x="156" y="142" width="24" height="20" rx="4" fill="#0B3D4A"/>
+  <rect x="114" y="188" width="28" height="30" rx="4" fill="#FFDB3D"/>
+  <path d="M48 77H66" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Suits">
+  <path d="M40 214V122Q40 86 76 74L106 60L128 120L150 60L180 74Q216 86 216 122V214Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="106,60 150,60 128,180" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M120 66H136L132 84L142 150L128 168L114 150L124 84Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="104,60 84,94 102,102 92,114 128,184" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="152,60 172,94 154,102 164,114 128,184" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="200" r="6" fill="#0B3D4A"/>
+  <path d="M60 110Q62 96 72 88" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

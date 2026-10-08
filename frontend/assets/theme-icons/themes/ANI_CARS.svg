@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cars">
+  <rect x="52" y="172" width="40" height="44" rx="12" fill="#12606D"/>
+  <rect x="164" y="172" width="40" height="44" rx="12" fill="#12606D"/>
+  <path d="M40 184V146C40 128 52 116 70 112L88 70Q92 58 106 58H150Q164 58 168 70L186 112C204 116 216 128 216 146V184Q216 196 204 196H52Q40 196 40 184Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="100,74 156,74 170,108 86,108" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="112" cy="94" r="12" fill="#12606D"/>
+  <circle cx="144" cy="94" r="12" fill="#12606D"/>
+  <circle cx="80" cy="142" r="13" fill="#FFDB3D"/>
+  <circle cx="176" cy="142" r="13" fill="#FFDB3D"/>
+  <path d="M100 160Q128 178 156 160" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M54 174V158" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

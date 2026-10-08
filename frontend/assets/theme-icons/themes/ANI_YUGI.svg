@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Yu-Gi-Oh!">
+  <path d="M84 34Q128 58 172 34" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="58" r="12" stroke="#12606D" stroke-width="10" fill="none"/>
+  <polygon points="40,78 216,78 128,216" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M100 170H156" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M84 114Q128 82 172 114Q128 146 84 114Z" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="114" r="14" fill="#FF6B5B"/>
+  <path d="M118 136L112 154" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M60 92L70 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

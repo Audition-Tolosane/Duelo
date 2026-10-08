@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Yellowstone">
+  <polygon points="36,204 90,96 122,140 168,64 220,204" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="168,64 186,100 150,100" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="78" y="112" width="20" height="104" rx="8" fill="#FF6B5B"/>
+  <rect x="158" y="112" width="20" height="104" rx="8" fill="#FF6B5B"/>
+  <path d="M88 158L116 124M168 158L140 124" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="68" y="104" width="120" height="20" rx="10" fill="#FF6B5B"/>
+  <path d="M112 124V136M144 124V136" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="100" y="134" width="56" height="26" rx="8" fill="#FFDB3D"/>
+  <path d="M62 176L72 156" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

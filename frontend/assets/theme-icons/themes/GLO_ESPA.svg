@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Espagne">
+  <path d="M104 42Q128 54 152 42L156 106L162 138Q196 166 214 204Q196 218 176 208Q160 220 142 210Q128 222 114 210Q96 220 80 208Q60 218 42 204Q60 166 94 138L100 106Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="94" y="100" width="68" height="16" rx="8" fill="#12606D"/>
+  <path d="M84 156Q98 164 110 156Q122 166 128 158Q136 166 146 156Q158 164 172 156" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 186Q78 196 94 186Q110 198 128 188Q146 198 162 186Q178 196 196 186" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="134" cy="76" r="7" fill="#E8F1EC"/>
+  <circle cx="114" cy="134" r="7" fill="#E8F1EC"/>
+  <circle cx="144" cy="132" r="7" fill="#E8F1EC"/>
+  <circle cx="100" cy="174" r="7" fill="#E8F1EC"/>
+  <circle cx="156" cy="174" r="7" fill="#E8F1EC"/>
+  <path d="M114 60L112 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

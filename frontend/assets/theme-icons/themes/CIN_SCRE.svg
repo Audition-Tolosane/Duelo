@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Scream">
+  <path d="M128 32C76 32 52 76 52 128C52 172 64 204 76 222H180C192 204 204 172 204 128C204 76 180 32 128 32Z" fill="#12606D"/>
+  <path d="M128 58C96 58 82 86 82 124C82 164 102 198 128 204C154 198 174 164 174 124C174 86 160 58 128 58Z" fill="#E8F1EC"/>
+  <ellipse cx="106" cy="116" rx="12" ry="24" transform="rotate(18 106 116)" fill="#0B3D4A"/>
+  <ellipse cx="150" cy="116" rx="12" ry="24" transform="rotate(-18 150 116)" fill="#0B3D4A"/>
+  <ellipse cx="128" cy="172" rx="11" ry="20" fill="#0B3D4A"/>
+  <path d="M68 118Q70 86 88 64" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

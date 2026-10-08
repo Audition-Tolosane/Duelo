@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Morning Show">
+  <rect x="118" y="178" width="20" height="24" fill="#12606D"/>
+  <rect x="80" y="196" width="96" height="16" rx="8" fill="#12606D"/>
+  <rect x="34" y="52" width="188" height="130" rx="16" fill="#12606D"/>
+  <rect x="50" y="68" width="156" height="98" rx="6" fill="#0B3D4A"/>
+  <path d="M88 166A40 40 0 0 1 168 166Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M128 112V100M90 128L82 120M166 128L174 120M74 150L64 146M182 150L192 146" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M66 84L66 104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

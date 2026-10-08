@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Philip K. Dick">
+  <path d="M62 144C40 150 36 176 50 190" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="36" y="186" width="30" height="24" rx="6" fill="#FF6B5B"/>
+  <path d="M44 210V222M58 210V222" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="98" y="160" width="16" height="44" rx="8" fill="#12606D"/>
+  <rect x="148" y="160" width="16" height="44" rx="8" fill="#12606D"/>
+  <path d="M68 126a30 30 0 1 0 60 0a30 30 0 1 0 -60 0ZM102 102a32 32 0 1 0 64 0a32 32 0 1 0 -64 0ZM136 124a30 30 0 1 0 60 0a30 30 0 1 0 -60 0ZM118 150a28 28 0 1 0 56 0a28 28 0 1 0 -56 0ZM84 150a28 28 0 1 0 56 0a28 28 0 1 0 -56 0Z" fill="#12606D"/>
+  <ellipse cx="204" cy="104" rx="22" ry="28" transform="rotate(-20 204 104)" fill="#FF6B5B"/>
+  <circle cx="210" cy="98" r="6" fill="#12606D"/>
+  <polygon points="138,92 118,132 134,132 122,166 158,118 140,118 152,92" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M84 114A22 22 0 0 1 100 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

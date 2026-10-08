@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Final Fantasy">
+  <path d="M80 212C80 170 96 146 128 146C160 146 176 170 176 212Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="148" rx="40" ry="30" fill="#0B3D4A"/>
+  <circle cx="112" cy="150" r="9" fill="#FFDB3D"/>
+  <circle cx="144" cy="150" r="9" fill="#FFDB3D"/>
+  <path d="M88 118L120 52C126 40 140 34 158 40L178 50L150 60L170 118Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="120" rx="88" ry="16" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M100 104L170 104" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M112 84L120 68" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

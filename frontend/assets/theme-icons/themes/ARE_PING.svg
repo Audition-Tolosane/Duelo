@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Tennis de Table">
+  <g transform="rotate(25 112 120)">
+    <rect x="94" y="152" width="36" height="56" rx="10" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+    <circle cx="112" cy="104" r="62" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12"/>
+    <path d="M100 152H124" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M70 92C74 76 86 64 100 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <circle cx="200" cy="184" r="20" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12"/>
+  <path d="M164 222L182 206" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

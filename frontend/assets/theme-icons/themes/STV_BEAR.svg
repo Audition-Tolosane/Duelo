@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Bear">
+  <path d="M98 70Q128 22 158 70" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M76 126L44 146M180 126L212 146" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M96 66H160V106L180 122V206Q180 218 168 218H88Q76 218 76 206V122L96 106Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="70" y="118" width="116" height="14" rx="7" fill="#0B3D4A"/>
+  <rect x="94" y="152" width="50" height="34" rx="8" fill="#0B3D4A"/>
+  <rect x="150" y="122" width="38" height="78" rx="8" fill="#FFDB3D"/>
+  <path d="M152 150H186M152 170H186" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M108 78L108 96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

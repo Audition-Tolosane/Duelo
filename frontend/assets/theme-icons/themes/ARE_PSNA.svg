@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Persona">
+  <path d="M128 84L92 48M128 84L164 48" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="36" y="84" width="184" height="124" rx="26" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="58" y="104" width="140" height="84" rx="16" fill="#0B3D4A"/>
+  <ellipse cx="128" cy="146" rx="40" ry="24" fill="#FFDB3D"/>
+  <circle cx="128" cy="146" r="14" fill="#0B3D4A"/>
+  <path d="M72 124L88 118" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

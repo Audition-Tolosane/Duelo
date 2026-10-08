@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Seinfeld">
+  <path d="M158 49A88 88 0 1 0 211 102A16 16 0 0 1 192 84A16 16 0 0 1 176 66A16 16 0 0 1 158 49Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M128 54A78 78 0 0 0 128 210Z" fill="#0B3D4A"/>
+  <path d="M128 54A78 78 0 0 1 148 57Q170 92 203 112A78 78 0 0 1 128 210Z" fill="#E8F1EC"/>
+  <circle cx="214" cy="62" r="7" fill="#FFDB3D"/>
+  <circle cx="198" cy="44" r="6" fill="#FFDB3D"/>
+  <path d="M80 120A52 52 0 0 1 96 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

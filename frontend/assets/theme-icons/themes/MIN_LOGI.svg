@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Logique Pure">
+  <circle cx="100" cy="128" r="64" fill="#12606D"/>
+  <circle cx="156" cy="128" r="64" fill="#FF6B5B"/>
+  <path d="M128 70.5A64 64 0 0 1 128 185.5A64 64 0 0 1 128 70.5Z" fill="#FFDB3D"/>
+  <path d="M57 103A50 50 0 0 1 75 85" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Coldplay">
+  <circle cx="128" cy="132" r="90" fill="#12606D"/>
+  <polygon points="128.0,82.0 143.3,119.0 183.2,122.1 152.7,148.0 162.1,186.9 128.0,166.0 93.9,186.9 103.3,148.0 72.8,122.1 112.7,119.0" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="186.0,54.0 190.1,64.3 201.2,65.1 192.7,72.2 195.4,82.9 186.0,77.0 176.6,82.9 179.3,72.2 170.8,65.1 181.9,64.3" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="72.0,180.0 74.9,188.0 83.4,188.3 76.8,193.5 79.1,201.7 72.0,197.0 64.9,201.7 67.2,193.5 60.6,188.3 69.1,188.0" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="184" cy="186" r="7" fill="#E8F1EC"/>
+  <circle cx="86" cy="84" r="6" fill="#FFDB3D"/>
+  <path d="M54 112C58 92 70 74 86 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

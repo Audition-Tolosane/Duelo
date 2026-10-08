@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Boule et Bill">
+  <path d="M94 142L166 74" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <circle cx="100" cy="152" r="14" fill="#FFDB3D"/>
+  <circle cx="84" cy="136" r="14" fill="#FFDB3D"/>
+  <circle cx="176" cy="80" r="14" fill="#FFDB3D"/>
+  <circle cx="160" cy="64" r="14" fill="#FFDB3D"/>
+  <path d="M52 152H204L188 204Q186 214 176 214H80Q70 214 68 204Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="36" y="130" width="184" height="26" rx="13" fill="#FF6B5B"/>
+  <path d="M70 168L74 186" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

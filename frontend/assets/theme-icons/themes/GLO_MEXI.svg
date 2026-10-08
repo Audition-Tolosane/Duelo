@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Viva México !">
+  <g transform="rotate(32 128 128)">
+    <rect x="120" y="170" width="16" height="56" rx="8" fill="#FF6B5B"/>
+    <rect x="92" y="34" width="72" height="150" rx="36" fill="#FFDB3D"/>
+    <path d="M116 50V174M140 50V174M96 78H160M94 106H162M94 134H162M98 160H158" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="106" cy="92" r="6" fill="#FF6B5B"/>
+    <circle cx="152" cy="120" r="6" fill="#FF6B5B"/>
+    <circle cx="116" cy="148" r="6" fill="#FF6B5B"/>
+    <path d="M126 170C96 170 74 186 62 210C90 206 110 196 126 186Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M130 170C160 170 182 186 194 210C166 206 146 196 130 186Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M106 52L104 66" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

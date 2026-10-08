@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pop Culture">
+  <polygon points="62,38 70,62 94,70 70,78 62,102 54,78 30,70 54,62" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="200,170 205,184 218,190 205,196 200,210 195,196 182,190 195,184" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <g transform="rotate(30 128 128)">
+  <path d="M106 136H150L140 212C139 222 117 222 116 212Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="164" r="8" fill="#FF6B5B"/>
+  <circle cx="128" cy="76" r="44" fill="#12606D"/>
+  <path d="M96 64H160M90 88H166M128 36V116" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="98" y="114" width="60" height="22" rx="10" fill="#FFDB3D"/>
+  <path d="M96 52A40 40 0 0 1 112 40" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Haikyuu!!">
+  <circle cx="196" cy="58" r="24" fill="#FFDB3D"/>
+  <path d="M174 50Q196 62 216 48M184 78Q192 58 208 38" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <polygon points="94,174 42,206 50,184 38,168 80,158" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M112 150C88 120 64 88 40 62C68 64 82 72 92 80C92 66 96 56 104 46C114 64 120 76 126 84C130 74 138 66 148 60C150 92 146 118 142 138Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="154" rx="56" ry="28" transform="rotate(-35 128 154)" fill="#12606D"/>
+  <circle cx="174" cy="118" r="24" fill="#12606D"/>
+  <polygon points="192,108 218,104 196,128" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="178" cy="112" r="7" fill="#E8F1EC"/>
+  <path d="M100 136Q114 120 116 104" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M66 76Q80 82 90 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

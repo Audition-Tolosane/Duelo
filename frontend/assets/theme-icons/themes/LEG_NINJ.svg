@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ombres Shinobi">
+  <path d="M192 100C206 92 214 80 218 64M194 108C208 110 218 104 224 96" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="120" cy="136" r="76" fill="#12606D"/>
+  <rect x="58" y="112" width="124" height="40" rx="20" fill="#E8F1EC"/>
+  <ellipse cx="96" cy="132" rx="14" ry="8" transform="rotate(15 96 132)" fill="#0B3D4A"/>
+  <ellipse cx="144" cy="132" rx="14" ry="8" transform="rotate(-15 144 132)" fill="#0B3D4A"/>
+  <path d="M72 100C78 86 88 78 98 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

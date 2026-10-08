@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Good Place">
+  <path d="M168 104L204 60" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="64" y="118" width="128" height="30" rx="15" fill="#FFDB3D"/>
+  <rect x="80" y="94" width="96" height="30" rx="15" fill="#FFDB3D"/>
+  <rect x="96" y="70" width="64" height="30" rx="15" fill="#FFDB3D"/>
+  <path d="M128 72Q132 52 148 44" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M90 122H166M106 98H150" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M70 148H186L170 214H86Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="86" y="170" width="84" height="14" rx="7" fill="#FF6B5B"/>
+  <path d="M84 132L96 128" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

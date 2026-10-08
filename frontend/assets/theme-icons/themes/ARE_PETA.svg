@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pétanque">
+  <circle cx="92" cy="148" r="56" fill="#12606D"/>
+  <circle cx="92" cy="148" r="32" stroke="#E8F1EC" stroke-width="6" fill="none"/>
+  <circle cx="176" cy="170" r="42" fill="#FF6B5B"/>
+  <circle cx="176" cy="170" r="22" stroke="#E8F1EC" stroke-width="6" fill="none"/>
+  <circle cx="186" cy="76" r="20" fill="#FFDB3D"/>
+  <path d="M56 118A44 44 0 0 1 76 100" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

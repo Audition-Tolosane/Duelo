@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ordre du Temple">
+  <polygon points="92,40 164,40 140,116 216,92 216,164 140,140 164,216 92,216 116,140 40,164 40,92 116,116" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="128" r="14" fill="#FFDB3D"/>
+  <path d="M100 56L106 74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

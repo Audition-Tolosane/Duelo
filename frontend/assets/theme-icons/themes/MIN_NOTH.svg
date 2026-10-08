@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Amélie Nothomb">
+  <g transform="translate(-8 18)">
+  <path d="M84 160L90 64C90 58 94 54 100 54H156C162 54 166 58 166 64L172 160Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="164" rx="94" ry="20" fill="#12606D"/>
+  <path d="M86 134H170L171 154H85Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M102 120C102 100 104 84 110 74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g transform="translate(196 78) rotate(30)">
+  <path d="M0 -42C14 -32 18 -12 0 30C-18 -12 -14 -32 0 -42Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M0 0V24" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="0" cy="-8" r="6" fill="#12606D"/>
+  </g>
+</svg>

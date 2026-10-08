@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Victor Hugo">
+  <rect x="40" y="40" width="64" height="176" rx="8" fill="#12606D"/>
+  <rect x="152" y="40" width="64" height="176" rx="8" fill="#12606D"/>
+  <rect x="96" y="100" width="64" height="116" fill="#12606D"/>
+  <rect x="96" y="114" width="64" height="14" rx="7" fill="#0B3D4A"/>
+  <path d="M56 132V94A16 16 0 0 1 88 94V132Z" fill="#0B3D4A"/>
+  <path d="M168 132V94A16 16 0 0 1 200 94V132Z" fill="#0B3D4A"/>
+  <path d="M172 124H196C192 118 192 112 192 106C192 98 188 94 184 94C180 94 176 98 176 106C176 112 176 118 172 124Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M108 216V184Q108 160 128 150Q148 160 148 184V216Z" fill="#FFDB3D"/>
+  <path d="M56 160V196" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M200 160V196" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M54 56L54 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fast &amp; Furious">
+  <path d="M120 72C96 60 64 70 36 96C62 106 86 130 120 124Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M120 138C96 126 64 136 36 162C62 172 86 196 120 190Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M120 86C104 80 88 86 72 98C88 104 102 114 120 112Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M120 152C104 146 88 152 72 164C88 170 102 180 120 178Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="176" y="80" width="28" height="128" rx="12" fill="#12606D"/>
+  <rect x="112" y="74" width="108" height="52" rx="22" fill="#12606D"/>
+  <rect x="112" y="140" width="108" height="52" rx="22" fill="#12606D"/>
+  <ellipse cx="122" cy="100" rx="12" ry="22" fill="#FFDB3D"/>
+  <ellipse cx="122" cy="166" rx="12" ry="22" fill="#FFDB3D"/>
+  <path d="M150 88H186" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

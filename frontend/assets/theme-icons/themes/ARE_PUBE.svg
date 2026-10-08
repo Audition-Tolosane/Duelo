@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="PUBG">
+  <rect x="150" y="112" width="70" height="32" rx="16" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="204" cy="128" r="6" fill="#0B3D4A"/>
+  <circle cx="98" cy="128" r="72" fill="#12606D" stroke="#12606D" stroke-width="12"/>
+  <circle cx="98" cy="128" r="50" fill="#0B3D4A"/>
+  <path d="M60 124C60 100 84 88 104 94C130 90 142 112 136 134C130 160 90 168 70 152C62 146 60 136 60 124Z" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="98" cy="124" r="16" fill="#FFDB3D"/>
+  <path d="M50 92A62 62 0 0 1 74 68" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Judo Voie Noble">
+  <path d="M72 70L28 128L52 152L82 118ZM184 70L228 128L204 152L174 118Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="68" y="44" width="120" height="172" rx="16" fill="#12606D"/>
+  <path d="M100 50L144 126M156 50L112 126" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="68" y="138" width="120" height="24" fill="#0B3D4A"/>
+  <rect x="114" y="150" width="28" height="52" rx="8" fill="#0B3D4A"/>
+  <path d="M84 70V104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

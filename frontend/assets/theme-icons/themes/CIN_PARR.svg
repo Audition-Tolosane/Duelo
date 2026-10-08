@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Le Parrain">
+  <path d="M68 62L104 146M188 62L152 146M128 62L128 132" stroke="#FFDB3D" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <rect x="48" y="44" width="160" height="22" rx="11" fill="#12606D"/>
+  <circle cx="68" cy="66" r="9" fill="#12606D"/>
+  <circle cx="128" cy="66" r="9" fill="#12606D"/>
+  <circle cx="188" cy="66" r="9" fill="#12606D"/>
+  <path d="M64 50L84 50" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <ellipse cx="88" cy="190" rx="26" ry="12" transform="rotate(-35 88 190)" fill="#12606D"/>
+  <ellipse cx="168" cy="190" rx="26" ry="12" transform="rotate(35 168 190)" fill="#12606D"/>
+  <circle cx="128" cy="172" r="40" fill="#FF6B5B"/>
+  <path d="M126 172Q130 160 140 168Q146 182 128 188Q108 188 108 168Q110 150 132 148" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Spider-Man">
+  <circle cx="128" cy="128" r="88" fill="#12606D"/>
+  <path d="M128 44V212M44 128H212M69 69L187 187M187 69L69 187" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128.0 94.0Q137.2 105.8 152.0 104.0Q150.2 118.8 162.0 128.0Q150.2 137.2 152.0 152.0Q137.2 150.2 128.0 162.0Q118.8 150.2 104.0 152.0Q105.8 137.2 94.0 128.0Q105.8 118.8 104.0 104.0Q118.8 105.8 128.0 94.0" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128.0 64.0Q147.1 81.8 173.3 82.7Q174.2 108.9 192.0 128.0Q174.2 147.1 173.3 173.3Q147.1 174.2 128.0 192.0Q108.9 174.2 82.7 173.3Q81.8 147.1 64.0 128.0Q81.8 108.9 82.7 82.7Q108.9 81.8 128.0 64.0" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M62 96Q70 74 92 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

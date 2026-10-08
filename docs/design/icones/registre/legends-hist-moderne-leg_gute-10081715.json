@@ -1,0 +1,10 @@
+[
+  {"id": "LEG_GUTE", "symbole": "presse d'imprimerie à vis"},
+  {"id": "LEG_REVO", "symbole": "cocarde tricolore à rubans"},
+  {"id": "LEG_SGM", "symbole": "casque de soldat étoilé"},
+  {"id": "LEG_ENLI", "symbole": "livre ouvert et soleil"},
+  {"id": "LEG_CRIM", "symbole": "menottes"},
+  {"id": "LEG_HOLL", "symbole": "caméra à deux bobines"},
+  {"id": "LEG_VICT", "symbole": "réverbère à gaz"},
+  {"id": "LEG_NAPO", "symbole": "bicorne à cocarde"}
+]

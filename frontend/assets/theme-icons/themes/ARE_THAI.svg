@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Muay Thaï">
+  <path d="M62 92H194L214 196C215 204 210 210 202 210H150L128 150L106 210H54C46 210 41 204 42 196Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="54" y="44" width="148" height="48" rx="12" fill="#FF6B5B"/>
+  <path d="M80 68H176" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M56 192H110M146 192H200" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M196 150L212 150L214 196L200 196Z" fill="#0B3D4A"/>
+  <path d="M76 112V140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

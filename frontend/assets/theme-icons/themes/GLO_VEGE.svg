@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Green &amp; Veggie">
+  <path d="M128 40C156 40 168 66 176 94C186 126 204 146 204 174C204 206 170 222 128 222C86 222 52 206 52 174C52 146 70 126 80 94C88 66 100 40 128 40Z" fill="#12606D"/>
+  <path d="M128 58C146 58 154 78 160 100C168 130 186 148 186 174C186 194 162 206 128 206C94 206 70 194 70 174C70 148 88 130 96 100C102 78 110 58 128 58Z" fill="#FFDB3D"/>
+  <circle cx="128" cy="166" r="30" fill="#FF6B5B"/>
+  <path d="M112 160C112 152 118 146 126 144" stroke="#E8F1EC" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M84 108C88 92 94 76 104 64" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

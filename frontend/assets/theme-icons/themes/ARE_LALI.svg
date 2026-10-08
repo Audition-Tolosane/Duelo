@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="La Liga">
+  <path d="M128 176L33.0 116.6A112 112 0 0 1 223.0 116.6Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 176L70.6 94.1M128 176L107.2 78.2M128 176L148.8 78.2M128 176L185.4 94.1" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M58.1 113.1A94 94 0 0 1 197.9 113.1" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="180" r="38" fill="#12606D"/>
+  <polygon points="128,166 142,176 137,193 119,193 114,176" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M61.3 106.9A96 96 0 0 1 89.0 88.3" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

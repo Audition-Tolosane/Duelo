@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Modern Family">
+  <g transform="rotate(-12 64 140)">
+    <rect x="30" y="94" width="72" height="88" rx="10" fill="#FF6B5B"/>
+    <rect x="42" y="106" width="48" height="64" rx="4" fill="#0B3D4A"/>
+  </g>
+  <g transform="rotate(12 192 140)">
+    <rect x="154" y="94" width="72" height="88" rx="10" fill="#FF6B5B"/>
+    <rect x="166" y="106" width="48" height="64" rx="4" fill="#0B3D4A"/>
+  </g>
+  <path d="M110 196L96 222M146 196L160 222" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="72" y="58" width="112" height="140" rx="14" fill="#12606D"/>
+  <rect x="88" y="74" width="80" height="108" rx="6" fill="#0B3D4A"/>
+  <path d="M128 160C108 146 100 136 100 124C100 114 108 108 116 108C122 108 126 112 128 116C130 112 134 108 140 108C148 108 156 114 156 124C156 136 148 146 128 160Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M80 80L80 100" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

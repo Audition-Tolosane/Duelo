@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Analyse &amp; Calcul">
+  <rect x="80" y="162" width="26" height="36" rx="4" fill="#FF6B5B"/>
+  <rect x="110" y="150" width="26" height="48" rx="4" fill="#FF6B5B"/>
+  <rect x="140" y="131" width="26" height="67" rx="4" fill="#FF6B5B"/>
+  <rect x="170" y="102" width="26" height="96" rx="4" fill="#FF6B5B"/>
+  <path d="M40 54L52 40L64 54M52 40V204H220M206 192L220 204L206 216" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M64 164Q150 150 212 40" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M180 116V130" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

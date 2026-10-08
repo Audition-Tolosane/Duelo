@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Stranger Things">
+  <circle cx="128" cy="128" r="86" fill="#FFDB3D"/>
+  <path d="M99 65h24v24h-24zM133 65h24v24h-24zM65 99h24v24h-24zM99 99h24v24h-24zM133 99h24v24h-24zM167 99h24v24h-24zM65 133h24v24h-24zM99 133h24v24h-24zM133 133h24v24h-24zM167 133h24v24h-24zM99 167h24v24h-24zM133 167h24v24h-24z" fill="#12606D" stroke="#12606D" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="176" y="168" width="20" height="16" rx="4" transform="rotate(-35 186 176)" fill="#12606D"/>
+  <ellipse cx="200" cy="196" rx="14" ry="20" transform="rotate(-35 200 196)" fill="#FF6B5B"/>
+  <path d="M54 108L54 128" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

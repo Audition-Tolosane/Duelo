@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Batman">
+  <circle cx="128" cy="136" r="84" fill="#FF6B5B"/>
+  <path d="M64 196L70 112C72 92 80 78 90 70L94 32L114 62C122 60 134 60 142 62L162 32L166 70C176 78 184 92 186 112L192 196C178 196 166 184 160 164L140 150L128 166L116 150L96 164C90 184 78 196 64 196Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="90,114 120,124 116,134 94,130" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="166,114 136,124 140,134 162,130" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M128 76L128 104" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M84 104Q86 88 96 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

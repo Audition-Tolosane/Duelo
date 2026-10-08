@@ -1,0 +1,12 @@
+[
+  {"id": "MIN_LOTR", "symbole": "œil de feu sur tour"},
+  {"id": "MIN_GOT", "symbole": "œuf de dragon écaillé"},
+  {"id": "MIN_MISC", "symbole": "paire de chandeliers d'argent"},
+  {"id": "MIN_SMRF", "symbole": "tête bleue à bonnet blanc"},
+  {"id": "MIN_LUCK", "symbole": "quatre Dalton rayés en rang"},
+  {"id": "MIN_LEVY", "symbole": "avion en papier et cœur"},
+  {"id": "MIN_PROU", "symbole": "madeleine et tasse de thé"},
+  {"id": "MIN_MOLI", "symbole": "rideau de scène rouge"},
+  {"id": "MIN_NARN", "symbole": "réverbère dans la neige"},
+  {"id": "MIN_WILD", "symbole": "portrait en cadre doré"}
+]

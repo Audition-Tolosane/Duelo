@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Grands Fleuves">
+  <rect x="80" y="44" width="16" height="56" rx="6" fill="#FF6B5B"/>
+  <rect x="110" y="44" width="16" height="56" rx="6" fill="#FF6B5B"/>
+  <circle cx="184" cy="160" r="34" fill="#FFDB3D"/>
+  <path d="M184 132V188M156 160H212M164 140L204 180M204 140L164 180" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="68" y="94" width="72" height="34" rx="6" fill="#12606D"/>
+  <rect x="50" y="124" width="108" height="40" rx="6" fill="#12606D"/>
+  <path d="M38 162H166L158 190Q154 198 144 198H62Q52 198 46 190Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="76" y="136" width="70" height="12" rx="6" fill="#FFDB3D"/>
+  <path d="M36 216Q58 204 80 216T124 216T168 216T212 216" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M62 136V152" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

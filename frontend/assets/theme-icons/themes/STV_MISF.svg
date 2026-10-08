@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Misfits">
+  <path d="M48 34C48 34 38 48 38 54A10 10 0 0 0 58 54C58 48 48 34 48 34Z" fill="#12606D" stroke="#12606D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M208 30C208 30 198 44 198 50A10 10 0 0 0 218 50C218 44 208 30 208 30Z" fill="#12606D" stroke="#12606D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M212 168C212 168 202 182 202 188A10 10 0 0 0 222 188C222 182 212 168 212 168Z" fill="#12606D" stroke="#12606D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M98 64H158L190 82L210 132L186 142L170 112V212H136L128 154L120 212H86V112L70 142L46 132L66 82Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M106 64L128 92L150 64Z" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M128 98V146" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <rect x="86" y="134" width="84" height="12" rx="6" fill="#FFDB3D"/>
+  <circle cx="128" cy="102" r="7" fill="#FFDB3D"/>
+  <path d="M74 98L66 116" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

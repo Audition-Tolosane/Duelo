@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Univers DC">
+  <g transform="translate(0 8)">
+  <path d="M40 160Q80 134 102 128L128 50L154 128Q176 134 216 160L208 190Q170 166 128 164Q86 166 48 190Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M60 178Q94 158 128 156Q162 158 196 178" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="128,98 134.3,116.7 152.9,117.2 138.2,128.6 143.3,146.5 128,136 112.7,146.5 117.8,128.6 103.1,117.2 121.7,116.7" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M62 152Q78 142 96 136" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

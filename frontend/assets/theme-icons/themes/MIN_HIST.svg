@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Histoire des mathématiques">
+  <rect x="40" y="48" width="176" height="160" rx="16" fill="#12606D"/>
+  <rect x="58" y="66" width="140" height="124" rx="6" fill="#0B3D4A"/>
+  <path d="M60 86H196M60 114H196M60 142H196M60 170H196" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M61 86a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM84 86a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM107 86a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM173 86a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM61 142a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM84 142a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM150 142a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM173 142a11 11 0 1 0 22 0a11 11 0 1 0 -22 0Z" fill="#FFDB3D"/>
+  <path d="M61 114a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM127 114a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM150 114a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM173 114a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM61 170a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM84 170a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM107 170a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM130 170a11 11 0 1 0 22 0a11 11 0 1 0 -22 0ZM173 170a11 11 0 1 0 22 0a11 11 0 1 0 -22 0Z" fill="#FFDB3D"/>
+  <path d="M49 92V66" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

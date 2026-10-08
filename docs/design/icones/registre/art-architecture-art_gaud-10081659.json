@@ -1,0 +1,12 @@
+[
+  {"id": "ART_GAUD", "symbole": "tours à pinacles Sagrada Família"},
+  {"id": "ART_BRUT", "symbole": "béton en ziggurat inversé"},
+  {"id": "ART_GOTH", "symbole": "arc brisé et rosace"},
+  {"id": "ART_VERS", "symbole": "grille dorée et soleil"},
+  {"id": "ART_LOIR", "symbole": "tour à toit conique et Loire"},
+  {"id": "ART_SKYS", "symbole": "gratte-ciel à retraits"},
+  {"id": "ART_ROMA", "symbole": "Panthéon dôme et colonnes"},
+  {"id": "ART_MODR", "symbole": "villa sur pilotis"},
+  {"id": "ART_OPER", "symbole": "voiles de l'opéra de Sydney"},
+  {"id": "ART_STAD", "symbole": "stade vu de dessus"}
+]

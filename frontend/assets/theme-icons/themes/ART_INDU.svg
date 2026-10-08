@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Design Industriel">
+  <path d="M192 68L216 38" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="218" cy="36" r="8" fill="#FFDB3D"/>
+  <rect x="36" y="64" width="184" height="148" rx="22" fill="#12606D"/>
+  <circle cx="92" cy="138" r="46" fill="#0B3D4A"/>
+  <circle cx="92" cy="138" r="24" stroke="#FFDB3D" stroke-width="8" fill="none"/>
+  <circle cx="92" cy="138" r="6" fill="#FFDB3D"/>
+  <circle cx="176" cy="112" r="18" fill="#E8F1EC"/>
+  <circle cx="176" cy="172" r="14" fill="#FFDB3D"/>
+  <path d="M56 84H86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

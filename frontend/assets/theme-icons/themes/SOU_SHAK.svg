@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Shakira">
+  <polygon points="40,84 216,84 128,156" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="32" y="64" width="192" height="26" rx="13" fill="#12606D"/>
+  <path d="M68 108V130M100 132V154M128 156V176M156 132V154M188 108V130" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="68" cy="142" r="13" fill="#FFDB3D"/>
+  <circle cx="100" cy="166" r="13" fill="#FFDB3D"/>
+  <circle cx="128" cy="188" r="13" fill="#FFDB3D"/>
+  <circle cx="156" cy="166" r="13" fill="#FFDB3D"/>
+  <circle cx="188" cy="142" r="13" fill="#FFDB3D"/>
+  <path d="M60 77H84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

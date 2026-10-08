@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Monuments">
+  <rect x="92" y="34" width="72" height="32" rx="12" fill="#FF6B5B"/>
+  <path d="M84 70H172L178 112L170 120L176 196H80L86 120L78 112Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="94" y="106" width="68" height="16" rx="8" fill="#0B3D4A"/>
+  <path d="M130 124L120 164H140" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M110 180H146" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="56" y="198" width="144" height="22" rx="11" fill="#12606D"/>
+  <path d="M94 92L104 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

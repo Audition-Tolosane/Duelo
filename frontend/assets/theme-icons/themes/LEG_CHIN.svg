@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mythologie Chinoise">
+  <polygon points="94,46 162,46 210,94 210,162 162,210 94,210 46,162 46,94" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <g stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none">
+  <path d="M115 54H141M115 66H141M115 78H141"/>
+  <path transform="rotate(45 128 128)" d="M115 54H120M136 54H141M115 66H141M115 78H141"/>
+  <path transform="rotate(90 128 128)" d="M115 54H120M136 54H141M115 66H141M115 78H120M136 78H141"/>
+  <path transform="rotate(135 128 128)" d="M115 54H120M136 54H141M115 66H120M136 66H141M115 78H141"/>
+  <path transform="rotate(180 128 128)" d="M115 54H120M136 54H141M115 66H120M136 66H141M115 78H120M136 78H141"/>
+  <path transform="rotate(225 128 128)" d="M115 54H141M115 66H120M136 66H141M115 78H120M136 78H141"/>
+  <path transform="rotate(270 128 128)" d="M115 54H141M115 66H120M136 66H141M115 78H141"/>
+  <path transform="rotate(315 128 128)" d="M115 54H141M115 66H141M115 78H120M136 78H141"/>
+  </g>
+  <circle cx="128" cy="128" r="30" fill="#FF6B5B"/>
+  <circle cx="128" cy="128" r="10" fill="#12606D"/>
+  <path d="M110 120A20 20 0 0 1 122 109" stroke="#E8F1EC" stroke-width="10" stroke-linecap="round" fill="none"/>
+</svg>

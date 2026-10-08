@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Zaha Hadid">
+  <path d="M36 196C44 130 104 80 220 64C196 108 164 126 146 148C130 168 124 186 134 196Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M70 182C82 140 122 112 178 94" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M40 222H216" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="204" cy="46" r="10" fill="#FF6B5B"/>
+  <path d="M62 148C70 130 84 116 100 106" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

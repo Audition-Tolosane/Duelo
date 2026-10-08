@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Foundation">
+  <polygon points="116,184 140,184 160,136 96,136" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="104" r="72" fill="#12606D"/>
+  <path d="M100 64H156M80 86H128M144 86H176M72 108H112M128 108H184M80 130H148M88 152H128M144 152H168" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="164" cy="152" r="7" fill="#FF6B5B"/>
+  <circle cx="186" cy="64" r="7" fill="#FF6B5B"/>
+  <polygon points="104,186 152,186 164,206 152,220 104,220 92,206" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M108 203H148" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M68 76C72 64 80 54 90 48" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Prix Nobel">
+  <polygon points="176,36 146,36 116,118 146,118" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="80,36 110,36 140,118 110,118" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="158" r="64" fill="#FFDB3D"/>
+  <circle cx="128" cy="158" r="48" fill="#12606D"/>
+  <path d="M98 150C110 144 120 146 128 152C136 146 146 144 158 150V180C146 174 136 176 128 182C120 176 110 174 98 180Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M128 154V178" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M80 150A52 52 0 0 1 96 120" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

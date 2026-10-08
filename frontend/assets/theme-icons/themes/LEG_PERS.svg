@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mythologie Persane">
+  <path d="M84 160C70 172 70 190 86 196M172 160C186 172 186 190 170 196" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M110 146H146L162 192Q164 200 156 200H100Q92 200 94 192Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M112 106L38 88C36 100 42 106 52 108C46 114 46 122 58 124C54 132 58 140 72 140L112 144Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M144 106L218 88C220 100 214 106 204 108C210 114 210 122 198 124C202 132 198 140 184 140L144 144Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="126" r="26" fill="#FFDB3D"/>
+  <circle cx="128" cy="126" r="12" fill="#12606D"/>
+  <path d="M128 92C116 82 116 68 128 52C140 68 140 82 128 92Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M54 98L76 102" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Digimon">
+  <rect x="108" y="34" width="40" height="30" rx="12" stroke="#FFDB3D" stroke-width="12" fill="none"/>
+  <rect x="44" y="58" width="168" height="160" rx="56" fill="#12606D"/>
+  <circle cx="128" cy="132" r="54" fill="#FFDB3D"/>
+  <rect x="94" y="98" width="68" height="68" rx="12" fill="#0B3D4A"/>
+  <path d="M118 116h20v8h8v24h-36v-24h8Z" fill="#E8F1EC"/>
+  <circle cx="122" cy="132" r="4" fill="#0B3D4A"/>
+  <circle cx="134" cy="132" r="4" fill="#0B3D4A"/>
+  <circle cx="196" cy="132" r="9" fill="#FFDB3D"/>
+  <circle cx="128" cy="200" r="9" fill="#FFDB3D"/>
+  <path d="M64 120Q66 96 82 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Rocky">
+  <circle cx="76" cy="92" r="32" fill="#FFDB3D"/>
+  <path d="M38 214V188H78V160H118V132H150V120H218V214Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="164" y="88" width="48" height="22" rx="8" fill="#E8F1EC"/>
+  <path d="M166 92V62C166 42 180 32 198 32C216 32 226 44 226 62V78C226 88 220 94 210 94H172Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <ellipse cx="160" cy="70" rx="13" ry="18" fill="#FF6B5B"/>
+  <path d="M172 60Q182 64 182 80" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M50 182V198" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

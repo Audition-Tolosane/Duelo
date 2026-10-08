@@ -1,0 +1,12 @@
+[
+  {"id": "ART_MCQU", "symbole": "corset à laçage"},
+  {"id": "ART_DECO", "symbole": "éventail soleil Art Déco"},
+  {"id": "ART_BALN", "symbole": "manteau cocon à col"},
+  {"id": "ART_BAUH", "symbole": "carré, cercle et triangle"},
+  {"id": "ART_DIOR", "symbole": "robe New Look fleurie"},
+  {"id": "ART_INDU", "symbole": "radio transistor"},
+  {"id": "ART_SCAN", "symbole": "chaise en bois clair"},
+  {"id": "ART_COUT", "symbole": "bobine de fil et aiguille"},
+  {"id": "ART_BIJO", "symbole": "diamant taille brillant"},
+  {"id": "ART_PERF", "symbole": "flacon de parfum"}
+]

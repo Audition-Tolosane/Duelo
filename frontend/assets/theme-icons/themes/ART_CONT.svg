@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Art Contemporain">
+  <rect x="44" y="200" width="168" height="20" rx="10" fill="#12606D"/>
+  <ellipse cx="190" cy="100" rx="12" ry="26" transform="rotate(30 190 100)" fill="#FF6B5B"/>
+  <ellipse cx="170" cy="170" rx="15" ry="28" fill="#FFDB3D"/>
+  <ellipse cx="98" cy="170" rx="15" ry="28" fill="#FFDB3D"/>
+  <ellipse cx="136" cy="138" rx="54" ry="22" fill="#FFDB3D"/>
+  <ellipse cx="114" cy="66" rx="12" ry="26" transform="rotate(25 114 66)" fill="#FF6B5B"/>
+  <ellipse cx="92" cy="108" rx="16" ry="30" transform="rotate(-15 92 108)" fill="#FFDB3D"/>
+  <ellipse cx="66" cy="76" rx="32" ry="16" transform="rotate(-8 66 76)" fill="#FFDB3D"/>
+  <path d="M110 128L128 124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

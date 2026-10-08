@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mario Kart">
+  <polygon points="84,86 100,38 122,80" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="134,80 156,38 172,86" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M60 120C36 120 30 150 38 176C60 170 76 150 76 128Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M196 120C220 120 226 150 218 176C196 170 180 150 180 128Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="148" r="66" fill="#12606D" stroke="#12606D" stroke-width="12"/>
+  <path d="M74 174C100 158 156 158 182 174" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="140" r="16" fill="#FF6B5B"/>
+  <path d="M88 112L102 100" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

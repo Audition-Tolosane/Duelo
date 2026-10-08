@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Amphibiens">
+  <rect x="32" y="200" width="192" height="20" rx="10" fill="#FF6B5B"/>
+  <circle cx="84" cy="90" r="32" fill="#12606D"/>
+  <circle cx="172" cy="90" r="32" fill="#12606D"/>
+  <ellipse cx="128" cy="150" rx="90" ry="58" fill="#12606D"/>
+  <circle cx="84" cy="88" r="18" fill="#FFDB3D"/>
+  <circle cx="172" cy="88" r="18" fill="#FFDB3D"/>
+  <ellipse cx="84" cy="88" rx="10" ry="5" fill="#12606D"/>
+  <ellipse cx="172" cy="88" rx="10" ry="5" fill="#12606D"/>
+  <path d="M74 140Q128 178 182 140" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="188" rx="40" ry="14" fill="#FFDB3D"/>
+  <path d="M56 148C56 132 62 120 72 112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

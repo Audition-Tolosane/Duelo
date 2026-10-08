@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Picsou et ses Aventures">
+  <path d="M36 216C48 178 84 164 128 164C172 164 208 178 220 216Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="84" cy="196" r="12" fill="#FFDB3D" stroke="#12606D" stroke-width="6"/>
+  <circle cx="128" cy="186" r="12" fill="#FFDB3D" stroke="#12606D" stroke-width="6"/>
+  <circle cx="172" cy="196" r="12" fill="#FFDB3D" stroke="#12606D" stroke-width="6"/>
+  <path d="M88 150L94 52C94 44 100 40 108 40H148C156 40 162 44 162 52L168 150Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="88" y="116" width="80" height="22" rx="6" fill="#FF6B5B"/>
+  <rect x="52" y="144" width="152" height="22" rx="11" fill="#12606D"/>
+  <path d="M108 62L106 96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

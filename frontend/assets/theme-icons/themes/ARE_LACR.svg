@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Lacrosse">
+  <g transform="rotate(18 128 136)">
+  <rect x="118" y="128" width="20" height="96" rx="10" fill="#12606D"/>
+  <rect x="116" y="188" width="24" height="36" rx="10" fill="#FFDB3D"/>
+  <polygon points="70,44 186,44 162,118 128,138 94,118" fill="#0B3D4A" stroke="#FFDB3D" stroke-width="20" stroke-linejoin="round"/>
+  <path d="M98 62L118 116M158 62L138 116M88 82H168" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="108" r="20" fill="#E8F1EC"/>
+  <path d="M90 60L96 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

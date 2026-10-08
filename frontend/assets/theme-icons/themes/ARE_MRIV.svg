@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Marvel Rivals">
+  <path d="M128 70C170 54 210 72 222 100C214 150 184 180 150 170C138 166 134 158 128 158C122 158 118 166 106 170C72 180 42 150 34 100C46 72 86 54 128 70Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M60 108C74 98 100 104 108 124C96 140 70 138 60 108Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M196 108C182 98 156 104 148 124C160 140 186 138 196 108Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="136,34 116,76 134,76 120,110 152,64 134,64" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M60 80L84 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

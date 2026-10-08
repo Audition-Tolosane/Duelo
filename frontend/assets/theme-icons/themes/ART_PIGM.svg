@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Couleurs &amp; Pigments">
+  <path d="M128 44C184 44 220 80 220 124C220 160 196 176 172 168C152 162 142 176 150 192C158 208 146 216 124 216C72 216 36 176 36 128C36 80 76 44 128 44Z" fill="#12606D"/>
+  <circle cx="86" cy="96" r="18" fill="#FFDB3D"/>
+  <circle cx="134" cy="76" r="18" fill="#FF6B5B"/>
+  <circle cx="182" cy="102" r="16" fill="#FFDB3D"/>
+  <circle cx="98" cy="164" r="16" fill="#E8F1EC"/>
+  <path d="M54 136C54 124 56 116 60 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

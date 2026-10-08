@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Hunter x Hunter">
+  <path d="M206 42Q214 110 190 160" stroke="#12606D" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M82 178L206 42" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M44 220L86 174" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <circle cx="92" cy="190" r="20" fill="#FFDB3D"/>
+  <circle cx="92" cy="190" r="8" fill="#FF6B5B"/>
+  <path d="M190 148V160" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="190" cy="184" r="26" fill="#FF6B5B"/>
+  <path d="M164 186H216C216 202 204 210 190 210C176 210 164 202 164 186Z" fill="#12606D"/>
+  <path d="M178 176Q180 168 186 164" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+</svg>

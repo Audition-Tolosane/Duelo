@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Détective Conan">
+  <path d="M112 118Q128 104 144 118" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="38" y="86" width="80" height="84" rx="30" fill="#0B3D4A" stroke="#12606D" stroke-width="12"/>
+  <rect x="138" y="86" width="80" height="84" rx="30" fill="#0B3D4A" stroke="#12606D" stroke-width="12"/>
+  <circle cx="178" cy="128" r="24" stroke="#FFDB3D" stroke-width="6" fill="none"/>
+  <path d="M178 128L196 112" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="190" cy="138" r="9" fill="#FFDB3D"/>
+  <path d="M58 116Q62 106 72 102" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Océans">
+  <path d="M88 104C60 88 40 92 34 104C52 112 70 122 86 128ZM168 104C196 88 216 92 222 104C204 112 186 122 170 128ZM96 178C80 188 72 200 74 210C88 206 100 196 108 188ZM160 178C176 188 184 200 182 210C168 206 156 196 148 188Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="60" rx="18" ry="22" fill="#12606D"/>
+  <ellipse cx="128" cy="138" rx="50" ry="60" fill="#12606D"/>
+  <ellipse cx="128" cy="138" rx="36" ry="46" fill="#0B3D4A"/>
+  <path d="M128 120V92M144 129L160 119M144 147L160 157M128 156V184M112 147L96 157M112 129L96 119" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <polygon points="128,120 144,129 144,147 128,156 112,147 112,129" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="120" cy="54" r="4" fill="#0B3D4A"/>
+  <circle cx="136" cy="54" r="4" fill="#0B3D4A"/>
+  <path d="M88 120Q92 98 110 90" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

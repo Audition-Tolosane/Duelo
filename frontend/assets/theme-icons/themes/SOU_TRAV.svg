@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Travis Scott">
+  <path d="M32 212H224" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 212V160M84 212V96M108 212V68M132 212V100M156 212V150M200 212V130" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M32 196C62 196 70 66 108 66C142 66 148 158 174 158C196 158 208 128 224 118" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="-22" y="-14" width="44" height="28" rx="8" transform="translate(140 104) rotate(62)" fill="#FF6B5B"/>
+  <polygon points="196.0,50.0 200.3,61.7 212.0,66.0 200.3,70.3 196.0,82.0 191.7,70.3 180.0,66.0 191.7,61.7" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="52.0,74.0 55.2,82.8 64.0,86.0 55.2,89.2 52.0,98.0 48.8,89.2 40.0,86.0 48.8,82.8" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M62 132C68 112 76 96 86 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

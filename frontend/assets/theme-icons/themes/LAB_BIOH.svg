@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Bio-Hacking">
+  <g transform="rotate(-24 108 116)">
+  <rect x="90" y="36" width="36" height="160" rx="18" fill="#12606D"/>
+  <rect x="90" y="68" width="36" height="12" fill="#FFDB3D"/>
+  <rect x="90" y="156" width="36" height="12" fill="#FFDB3D"/>
+  </g>
+  <g transform="rotate(24 108 116)">
+  <rect x="90" y="36" width="36" height="160" rx="18" fill="#12606D"/>
+  <rect x="90" y="68" width="36" height="12" fill="#FFDB3D"/>
+  <rect x="90" y="156" width="36" height="12" fill="#FFDB3D"/>
+  </g>
+  <circle cx="108" cy="116" r="14" fill="#FF6B5B"/>
+  <path d="M170 150L206 196M206 150L170 196" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="212" cy="210" r="10" stroke="#FF6B5B" stroke-width="8" fill="none"/>
+  <circle cx="164" cy="210" r="10" stroke="#FF6B5B" stroke-width="8" fill="none"/>
+  <path d="M74 66L80 54" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

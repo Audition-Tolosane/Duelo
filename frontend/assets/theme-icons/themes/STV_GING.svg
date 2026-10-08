@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ginny &amp; Georgia">
+  <path d="M128 66L84 36M128 66L172 36" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="68" r="10" fill="none" stroke="#12606D" stroke-width="8"/>
+  <path d="M128 214C80 178 46 150 46 112C46 84 68 66 94 66C110 66 122 74 128 86C134 74 146 66 162 66C188 66 210 84 210 112C210 150 176 178 128 214Z" fill="#FFDB3D"/>
+  <path d="M128 192C92 164 68 144 68 116C68 98 82 86 98 86C110 86 122 94 128 106C134 94 146 86 158 86C174 86 188 98 188 116C188 144 164 164 128 192Z" fill="#12606D"/>
+  <circle cx="128" cy="128" r="13" fill="#FFDB3D"/>
+  <polygon points="122,132 134,132 138,162 118,162" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="168" cy="110" r="7" fill="#FF6B5B"/>
+  <path d="M60 110C62 96 70 86 82 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sciences Cognitives">
+  <path d="M128 36C88 36 64 66 64 100C64 126 78 142 92 156C100 164 102 170 102 176H154C154 170 156 164 164 156C178 142 192 126 192 100C192 66 168 36 128 36Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 60V70M128 134V144M86 102H96M160 102H170M98 72L105 79M151 125L158 132M158 72L151 79M105 125L98 132" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="102" r="30" fill="#0B3D4A"/>
+  <circle cx="128" cy="102" r="11" fill="#FFDB3D"/>
+  <rect x="98" y="180" width="60" height="16" rx="8" fill="#12606D"/>
+  <rect x="104" y="198" width="48" height="14" rx="7" fill="#12606D"/>
+  <rect x="116" y="214" width="24" height="10" rx="5" fill="#12606D"/>
+  <path d="M80 92Q84 68 104 54" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Buffy the Vampire Slayer">
+  <rect x="68" y="40" width="34" height="176" rx="12" fill="#12606D"/>
+  <rect x="36" y="82" width="98" height="32" rx="12" fill="#12606D"/>
+  <g transform="rotate(30 160 128)">
+  <path d="M144 36H176C180 36 182 40 182 44V148L160 218L138 148V44C138 40 140 36 144 36Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="134" y="70" width="52" height="22" rx="8" fill="#FF6B5B"/>
+  <path d="M152 108V142M168 112V134" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  </g>
+  <path d="M84 54L84 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

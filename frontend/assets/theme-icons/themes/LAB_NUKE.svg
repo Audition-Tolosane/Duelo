@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Nucléaire">
+  <circle cx="128" cy="128" r="92" fill="#FFDB3D"/>
+  <path d="M142 152.25L163 188.6A70 70 0 0 1 93 188.6L114 152.25A28 28 0 0 0 142 152.25Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M142 103.75L163 67.4A70 70 0 0 1 198 128L156 128A28 28 0 0 0 142 103.75Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M100 128L58 128A70 70 0 0 1 93 67.4L114 103.75A28 28 0 0 0 100 128Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="128" r="14" fill="#FF6B5B"/>
+  <path d="M49 99A84 84 0 0 1 69 69" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

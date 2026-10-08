@@ -1,0 +1,12 @@
+[
+  {"id": "ARE_STRF", "symbole": "quart de cercle fléché et bouton"},
+  {"id": "ARE_SBSR", "symbole": "rame de métro de face"},
+  {"id": "ARE_TEKK", "symbole": "botte de coup de pied et impact"},
+  {"id": "ARE_TPRL", "symbole": "idole dorée à couronne"},
+  {"id": "ARE_TERR", "symbole": "pioche et minerai"},
+  {"id": "ARE_TLOU", "symbole": "masque à gaz et spores"},
+  {"id": "ARE_SIMS", "symbole": "plumbob en losange allongé"},
+  {"id": "ARE_WITC", "symbole": "médaillon à tête de loup"},
+  {"id": "ARE_UNCH", "symbole": "boussole de chasseur de trésor"},
+  {"id": "ARE_VALO", "symbole": "viseur à cercle et croix"}
+]

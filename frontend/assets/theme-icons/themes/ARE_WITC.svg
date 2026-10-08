@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Witcher 3">
+  <circle cx="128" cy="38" r="12" stroke="#12606D" stroke-width="12" fill="none"/>
+  <circle cx="128" cy="136" r="82" fill="#0B3D4A" stroke="#12606D" stroke-width="12"/>
+  <polygon points="90,76 114,98 142,98 166,76 170,120 148,166 128,180 108,166 86,120" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M106 122L120 130M150 122L136 130" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="166" r="8" fill="#0B3D4A"/>
+  <path d="M50 114A82 82 0 0 1 80 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

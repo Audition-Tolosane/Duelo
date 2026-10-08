@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Comportementalisme">
+  <path d="M50 126C40 108 42 88 56 72M206 126C216 108 214 88 200 72" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="114" y="32" width="28" height="44" rx="12" fill="#FF6B5B"/>
+  <circle cx="128" cy="206" r="16" fill="#FF6B5B"/>
+  <path d="M128 68C94 68 80 94 80 128V162L64 184H192L176 162V128C176 94 162 68 128 68Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="80" y="140" width="96" height="16" rx="8" fill="#12606D"/>
+  <rect x="50" y="178" width="156" height="22" rx="11" fill="#12606D"/>
+  <path d="M98 124C98 106 104 94 114 86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

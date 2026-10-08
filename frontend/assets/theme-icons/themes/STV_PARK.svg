@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Parks and Recreation">
+  <ellipse cx="128" cy="190" rx="94" ry="26" fill="#12606D"/>
+  <rect x="58" y="62" width="140" height="128" rx="22" fill="#FFDB3D"/>
+  <path d="M76 82h28v28h-28ZM114 82h28v28h-28ZM152 82h28v28h-28ZM76 120h28v28h-28ZM114 120h28v28h-28ZM152 120h28v28h-28ZM76 158h28v16h-28ZM114 158h28v16h-28ZM152 158h28v16h-28Z" fill="#12606D" stroke="#12606D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M112 108C104 94 116 82 128 88C132 72 156 72 158 88C172 84 180 100 168 110C164 118 116 118 112 108Z" fill="#E8F1EC"/>
+  <circle cx="142" cy="78" r="12" fill="#FF6B5B"/>
+  <path d="M72 128L72 148" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

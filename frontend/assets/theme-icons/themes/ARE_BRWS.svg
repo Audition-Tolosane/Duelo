@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Brawl Stars">
+  <polygon points="128,32 162,90 224,100 182,150 190,214 128,188 66,214 74,150 32,100 94,90" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="108" cy="128" r="13" fill="#0B3D4A"/>
+  <circle cx="148" cy="128" r="13" fill="#0B3D4A"/>
+  <polygon points="128,142 120,158 136,158" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M110 168H146" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M84 96L106 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

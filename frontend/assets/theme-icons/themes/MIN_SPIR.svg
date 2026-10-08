@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Spirou et Fantasio">
+  <path d="M216 214C160 222 74 216 52 196C36 180 48 160 66 164C80 168 80 186 66 188" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="110" cy="210" r="5" fill="#12606D"/>
+  <circle cx="160" cy="212" r="5" fill="#12606D"/>
+  <circle cx="52" cy="178" r="5" fill="#12606D"/>
+  <g transform="rotate(-12 128 120)">
+  <path d="M66 146C78 196 178 196 190 146" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M68 146L78 70C80 58 90 52 102 52H154C166 52 176 58 178 70L188 146Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="60" y="124" width="136" height="26" rx="10" fill="#FFDB3D"/>
+  <circle cx="128" cy="137" r="7" fill="#12606D"/>
+  <path d="M94 74L90 104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

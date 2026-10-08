@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Romantisme Noir">
+  <circle cx="152" cy="96" r="58" fill="#FFDB3D"/>
+  <rect x="40" y="200" width="176" height="18" rx="9" fill="#12606D"/>
+  <path d="M122 176L118 204M142 180L142 204" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="46,104 86,90 88,112" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M84 90C86 70 112 64 124 80C132 92 134 104 144 114C166 134 194 158 212 186C190 184 170 184 150 182C130 180 112 174 102 160C92 146 86 128 86 112Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M116 122C142 126 168 150 186 174C158 172 132 164 118 148Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="104" cy="88" r="8" fill="#FFDB3D"/>
+  <path d="M98 120L102 144" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

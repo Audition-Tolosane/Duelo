@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Casa de Papel">
+  <path d="M128 32C76 32 48 76 48 128C48 176 64 208 76 222H180C192 208 208 176 208 128C208 76 180 32 128 32Z" fill="#FF6B5B"/>
+  <ellipse cx="128" cy="132" rx="56" ry="76" fill="#0B3D4A"/>
+  <path d="M128 62C98 62 84 86 84 122C84 162 104 196 128 196C152 196 172 162 172 122C172 86 158 62 128 62Z" fill="#E8F1EC"/>
+  <ellipse cx="108" cy="114" rx="10" ry="7" fill="#0B3D4A"/>
+  <ellipse cx="148" cy="114" rx="10" ry="7" fill="#0B3D4A"/>
+  <path d="M96 96C102 90 112 90 118 94M138 94C144 90 154 90 160 96" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M128 150C118 144 106 150 100 140C98 134 94 130 88 134M128 150C138 144 150 150 156 140C158 134 162 130 168 134" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M112 170C120 176 136 176 144 170" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M128 208L128 222" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M74 76L64 94" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

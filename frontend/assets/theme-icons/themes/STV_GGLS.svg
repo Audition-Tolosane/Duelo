@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Golden Girls">
+  <ellipse cx="128" cy="192" rx="100" ry="24" fill="#12606D"/>
+  <path d="M52 140L172 96L204 124V168L52 184Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M52 140L204 124" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M52 170L204 154" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M144 98C144 86 154 80 162 86C170 80 180 86 178 98C176 110 166 116 161 118C156 116 146 110 144 98Z" fill="#FF6B5B"/>
+  <path d="M154 84L162 76L170 84" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M78 134L102 126" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,12 @@
+[
+  {"id": "STV_KNIG", "symbole": "voiture noire à scanner rouge"},
+  {"id": "STV_KOHL", "symbole": "poteau d'épreuve dans les vagues"},
+  {"id": "STV_3BOD", "symbole": "trois soleils en orbite chaotique"},
+  {"id": "STV_CSI", "symbole": "microscope de laboratoire"},
+  {"id": "STV_LOST", "symbole": "trappe ronde lumineuse"},
+  {"id": "STV_LUCI", "symbole": "ailes d'ange, auréole et queue fourchue"},
+  {"id": "STV_LUPIN", "symbole": "monocle à chaînette"},
+  {"id": "STV_MCGV", "symbole": "couteau suisse et trombone"},
+  {"id": "STV_MADM", "symbole": "verre old fashioned et cerise"},
+  {"id": "STV_MAND", "symbole": "casque à visière en T"}
+]

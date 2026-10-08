@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="True Detective">
+  <polygon points="128,62 198,136 128,210 58,136" fill="none" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M76 92L180 180M180 92L76 180M48 136H208" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M128 36L128 220" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="62" r="10" fill="#FFDB3D"/>
+  <circle cx="128" cy="210" r="10" fill="#FFDB3D"/>
+  <circle cx="128" cy="136" r="28" fill="#FFDB3D"/>
+  <path d="M128 136A4 4 0 0 1 136 136A8 8 0 0 1 120 136A12 12 0 0 1 144 136A16 16 0 0 1 112 136" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M128 70L128 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

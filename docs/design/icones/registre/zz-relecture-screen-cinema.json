@@ -1,0 +1,12 @@
+[
+  {"id": "CIN_BATN", "symbole": "pièce de Double-Face, moitié nette, moitié balafrée"},
+  {"id": "CIN_CFRA", "symbole": "képi de gendarme à visière en croissant"},
+  {"id": "CIN_DEAD", "symbole": "masque rouge sur deux katanas croisés"},
+  {"id": "CIN_DUNE", "symbole": "ver des sables de face, gueule ronde dentée"},
+  {"id": "CIN_INCE", "symbole": "ville en miroir qui se replie"},
+  {"id": "CIN_JUMA", "symbole": "plateau de bois à hublot et feuilles de jungle"},
+  {"id": "CIN_MIB_", "symbole": "neuralyseur qui flashe"},
+  {"id": "CIN_SCOR", "symbole": "enseigne lumineuse de taxi à damier"},
+  {"id": "CIN_TOPG", "symbole": "casque de pilote de chasse à visière dorée"},
+  {"id": "CIN_XMEN", "symbole": "poing fermé aux trois griffes"}
+]

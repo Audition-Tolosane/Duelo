@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dynastie Carolingienne">
+  <path d="M128 92V42M108 60H148" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="150" r="66" fill="#12606D"/>
+  <path d="M64 146H192" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M128 86V146" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <circle cx="96" cy="146" r="8" fill="#FF6B5B"/>
+  <circle cx="160" cy="146" r="8" fill="#FF6B5B"/>
+  <circle cx="128" cy="118" r="8" fill="#FF6B5B"/>
+  <path d="M84 126A50 50 0 0 1 100 104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

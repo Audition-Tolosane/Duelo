@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Prédateurs Apex">
+  <path d="M36 176C52 166 68 186 84 176C100 166 116 186 132 176C148 166 164 186 180 176C196 166 212 186 220 180" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M72 202C88 192 104 212 120 202C136 192 152 212 168 202" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="52" cy="132" r="12" fill="#12606D"/>
+  <path d="M196 132L204 116L212 136Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M212 142L222 128L226 150Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M40 154C40 142 48 136 62 136H132C140 116 154 106 170 106C186 106 194 118 196 130C210 132 222 142 224 156Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M160 122C166 114 176 114 182 122C176 128 166 128 160 122Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M74 156L82 146L90 156Z" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M106 156L114 146L122 156Z" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M66 140C84 140 102 140 118 140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

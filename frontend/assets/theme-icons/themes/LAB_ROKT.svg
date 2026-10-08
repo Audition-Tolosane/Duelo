@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fusées &amp; Propulsion">
+  <polygon points="80,160 176,160 162,194 148,184 128,218 108,184 94,194" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="106,162 150,162 128,196" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M116 86H140C142 120 164 144 186 154H70C92 144 114 120 116 86Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="106" y="84" width="44" height="14" rx="6" fill="#FF6B5B"/>
+  <circle cx="128" cy="62" r="28" fill="#12606D"/>
+  <path d="M111.1 57.8A18 18 0 0 1 121.8 47.1" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

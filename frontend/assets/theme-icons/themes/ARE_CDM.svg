@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Coupe du Monde de Football">
+  <path d="M82 96C90 126 112 134 118 150C118 162 112 170 108 180H148C144 170 138 162 138 150C144 134 166 126 174 96C160 112 146 114 128 110C110 114 96 112 82 96Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="64" r="38" fill="#FFDB3D"/>
+  <path d="M92 64H164M128 26C112 46 112 82 128 102" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="92" y="180" width="72" height="30" rx="10" fill="#FF6B5B"/>
+  <path d="M100 48C104 40 110 36 118 34" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="GTA V">
+  <circle cx="128" cy="128" r="92" fill="#12606D"/>
+  <polygon points="128,58 142.7,93.8 181.3,96.7 151.8,121.7 160.9,159.3 128,139 95.1,159.3 104.2,121.7 74.7,96.7 113.3,93.8" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="78,158 83.9,171.9 98.9,173.2 87.5,183.1 90.9,197.8 78,190 65.1,197.8 68.5,183.1 57.1,173.2 72.1,171.9" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="178,158 183.9,171.9 198.9,173.2 187.5,183.1 190.9,197.8 178,190 165.1,197.8 168.5,183.1 157.1,173.2 172.1,171.9" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M66 92L84 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

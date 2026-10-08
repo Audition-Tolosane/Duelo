@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Jeunesse &amp; Contes">
+  <path d="M128 70C126 54 134 42 150 38" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="128" rx="84" ry="62" fill="#FF6B5B"/>
+  <path d="M100 72C84 102 84 154 100 184M156 72C172 102 172 154 156 184" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M108 150V120C108 106 116 98 128 98C140 98 148 106 148 120V150Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M128 102V150M108 126H148" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="72" cy="190" r="28" fill="#12606D"/>
+  <circle cx="184" cy="190" r="28" fill="#12606D"/>
+  <circle cx="72" cy="190" r="10" fill="#FFDB3D"/>
+  <circle cx="184" cy="190" r="10" fill="#FFDB3D"/>
+  <path d="M64 120C66 104 74 92 86 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

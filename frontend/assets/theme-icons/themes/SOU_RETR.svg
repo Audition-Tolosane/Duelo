@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="8-bit &amp; Retro Gaming">
+  <path d="M72 64h16v16H72ZM168 64h16v16h-16ZM88 80h16v16H88ZM152 80h16v16h-16ZM72 96h112v16H72ZM56 112h32v16H56ZM104 112h48v16h-48ZM168 112h32v16h-32ZM40 128h176v16H40ZM40 144h16v16H40ZM72 144h112v16H72ZM200 144h16v16h-16ZM40 160h16v16H40ZM72 160h16v16H72ZM168 160h16v16h-16ZM200 160h16v16h-16ZM88 176h32v16H88ZM136 176h32v16h-32Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="122" y="204" width="12" height="20" rx="5" fill="#FFDB3D"/>
+  <rect x="76" y="100" width="10" height="10" rx="3" fill="#E8F1EC"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Night Agent">
+  <path d="M76 36A30 30 0 1 0 108 82A24 24 0 1 1 76 36Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M140 62V82M104 78L114 94M176 78L166 94" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M66 172C80 118 176 118 190 172" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <rect x="36" y="160" width="68" height="44" rx="18" fill="#12606D"/>
+  <rect x="152" y="160" width="68" height="44" rx="18" fill="#12606D"/>
+  <path d="M76 154Q84 138 98 130" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

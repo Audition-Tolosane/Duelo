@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Crossfit">
+  <path d="M88 118C88 44 168 44 168 118" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="156" r="68" fill="#12606D"/>
+  <rect x="84" y="200" width="88" height="20" rx="10" fill="#FF6B5B"/>
+  <circle cx="128" cy="150" r="24" fill="#0B3D4A"/>
+  <path d="M82 134C86 118 96 106 110 100" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

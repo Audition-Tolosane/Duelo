@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Alice au Pays des Merveilles">
+  <ellipse cx="98" cy="76" rx="16" ry="40" transform="rotate(-14 98 76)" fill="#12606D"/>
+  <ellipse cx="98" cy="74" rx="7" ry="26" transform="rotate(-14 98 74)" fill="#FF6B5B"/>
+  <ellipse cx="158" cy="76" rx="16" ry="40" transform="rotate(14 158 76)" fill="#12606D"/>
+  <ellipse cx="158" cy="74" rx="7" ry="26" transform="rotate(14 158 74)" fill="#FF6B5B"/>
+  <rect x="116" y="72" width="24" height="18" rx="6" fill="#FFDB3D"/>
+  <circle cx="128" cy="152" r="66" fill="#12606D"/>
+  <circle cx="128" cy="152" r="48" fill="#FFDB3D"/>
+  <path d="M128 152V118" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M128 152L154 164" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="152" r="8" fill="#FF6B5B"/>
+  <path d="M74 132A57 57 0 0 1 95 105" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

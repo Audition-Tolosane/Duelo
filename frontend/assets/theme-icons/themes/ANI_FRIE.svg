@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Frieren">
+  <circle cx="186" cy="182" r="11" fill="#12606D"/>
+  <circle cx="208" cy="192" r="11" fill="#12606D"/>
+  <circle cx="202" cy="216" r="11" fill="#12606D"/>
+  <circle cx="176" cy="210" r="11" fill="#12606D"/>
+  <circle cx="191" cy="200" r="8" fill="#FFDB3D"/>
+  <g transform="rotate(30 128 140)">
+  <path d="M128 112V222" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M94 52A38 38 0 1 0 162 52" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="114" y="108" width="28" height="18" rx="7" fill="#FFDB3D"/>
+  <circle cx="128" cy="72" r="22" fill="#FF6B5B"/>
+  <path d="M117 76Q117 66 124 60" stroke="#E8F1EC" stroke-width="10" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

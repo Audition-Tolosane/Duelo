@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="South Park">
+  <circle cx="128" cy="58" r="24" fill="#FF6B5B"/>
+  <path d="M52 162C52 104 86 76 128 76C170 76 204 104 204 162Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="40" y="154" width="176" height="44" rx="18" fill="#FF6B5B"/>
+  <path d="M72 166V186M100 166V186M128 166V186M156 166V186M184 166V186" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M80 136Q84 112 102 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

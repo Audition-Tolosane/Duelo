@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Respiration">
+  <circle cx="186" cy="50" r="12" fill="#FF6B5B"/>
+  <circle cx="212" cy="36" r="8" fill="#FF6B5B"/>
+  <g transform="translate(128 132) scale(1.12) translate(-128 -132)">
+    <path d="M112 84C84 72 52 98 48 150C44 190 64 212 92 206C108 202 114 188 114 170Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M144 84C172 72 204 98 208 150C212 190 192 212 164 206C148 202 142 188 142 170Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M128 46V108M128 108L100 130L88 158M128 108L156 130L168 158" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M64 136C66 118 74 104 86 96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

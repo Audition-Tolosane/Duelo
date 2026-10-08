@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Grey's Anatomy">
+  <path d="M80 48C56 100 76 132 128 132M176 48C200 100 180 132 128 132" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 132C128 196 150 218 178 208" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="80" cy="42" r="12" fill="#FF6B5B"/>
+  <circle cx="176" cy="42" r="12" fill="#FF6B5B"/>
+  <circle cx="128" cy="132" r="12" fill="#12606D"/>
+  <circle cx="180" cy="174" r="34" fill="#FFDB3D"/>
+  <circle cx="180" cy="174" r="18" fill="#12606D"/>
+  <circle cx="180" cy="174" r="7" fill="#FF6B5B"/>
+  <path d="M158 168A24 24 0 0 1 170 152" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

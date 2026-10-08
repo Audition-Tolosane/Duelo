@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sports Nationaux">
+  <path d="M104 112V82C104 72 112 64 122 64H186" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M38 154C38 120 78 104 128 104C178 104 218 120 218 154C218 188 178 204 128 204C78 204 38 188 38 154Z" fill="#12606D"/>
+  <path d="M74 120C90 114 108 112 128 112C148 112 166 114 182 120C166 128 148 130 128 130C108 130 90 128 74 120Z" fill="#FFDB3D"/>
+  <path d="M44 156Q128 178 212 156" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="32" y="212" width="192" height="12" rx="6" fill="#12606D"/>
+  <path d="M58 144C62 136 70 130 80 128" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Slow Horses">
+  <path d="M44 76Q44 64 56 64H98L112 80H200Q212 80 212 92V196Q212 208 200 208H56Q44 208 44 196Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="64" y="86" width="128" height="40" rx="6" fill="#E8F1EC"/>
+  <rect x="38" y="104" width="180" height="110" rx="14" fill="#12606D"/>
+  <path d="M100 136V160Q100 190 128 190Q156 190 156 160V136" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M100 146L100 146M104 174L104 174M152 174L152 174M156 146L156 146" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M58 124L58 142" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

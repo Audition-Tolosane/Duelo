@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cobra Kai">
+  <ellipse cx="128" cy="198" rx="84" ry="22" fill="#12606D"/>
+  <ellipse cx="128" cy="196" rx="52" ry="9" fill="#0B3D4A"/>
+  <rect x="112" y="150" width="32" height="50" rx="12" fill="#12606D"/>
+  <path d="M128 68C162 68 190 96 188 128C186 150 160 162 142 168H114C96 162 70 150 68 128C66 96 94 68 128 68Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="56" rx="26" ry="20" fill="#12606D"/>
+  <rect x="114" y="92" width="28" height="80" rx="14" fill="#0B3D4A"/>
+  <path d="M120 112H136M120 132H136M120 152H136" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="117" cy="52" r="6" fill="#FFDB3D"/>
+  <circle cx="139" cy="52" r="6" fill="#FFDB3D"/>
+  <path d="M128 76V88M128 88L121 95M128 88L135 95" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M84 128Q84 108 98 94" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

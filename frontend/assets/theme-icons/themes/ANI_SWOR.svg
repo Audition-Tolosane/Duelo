@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Sword Art Online">
+  <g transform="rotate(38 128 110)">
+  <path d="M116 136V40L128 18L140 40V136Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="92" y="134" width="72" height="18" rx="9" fill="#FF6B5B"/>
+  <rect x="119" y="150" width="18" height="38" rx="7" fill="#12606D"/>
+  <circle cx="128" cy="194" r="12" fill="#FF6B5B"/>
+  </g>
+  <g transform="rotate(-38 128 110)">
+  <path d="M116 136V40L128 18L140 40V136Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="92" y="134" width="72" height="18" rx="9" fill="#FFDB3D"/>
+  <rect x="119" y="150" width="18" height="38" rx="7" fill="#12606D"/>
+  <circle cx="128" cy="194" r="12" fill="#FFDB3D"/>
+  <path d="M122 52L122 100" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+  <rect x="40" y="194" width="176" height="28" rx="14" fill="#12606D"/>
+  <rect x="50" y="202" width="112" height="12" rx="6" fill="#FFDB3D"/>
+</svg>

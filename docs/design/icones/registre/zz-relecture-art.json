@@ -1,0 +1,42 @@
+[
+  {
+    "id": "ART_RENA",
+    "symbole": "dôme de Brunelleschi à nervures et lanterne"
+  },
+  {
+    "id": "ART_STAD",
+    "symbole": "tribune et pylônes d'éclairage face à la pelouse"
+  },
+  {
+    "id": "ART_GAUD",
+    "symbole": "quatre flèches fuselées de la Sagrada Família"
+  },
+  {
+    "id": "ART_ECOA",
+    "symbole": "maison à toit solaire et pousse"
+  },
+  {
+    "id": "ART_GOTH",
+    "symbole": "arc brisé, grande rosace et lancettes"
+  },
+  {
+    "id": "ART_BALN",
+    "symbole": "manteau cocon sur cintre"
+  },
+  {
+    "id": "ART_MICH",
+    "symbole": "ciseau de sculpteur dans un bloc de marbre"
+  },
+  {
+    "id": "ART_BARO",
+    "symbole": "colonne torse baroque à chapiteau"
+  },
+  {
+    "id": "ART_HERM",
+    "symbole": "selle d'équitation de profil et étrier"
+  },
+  {
+    "id": "ART_MODR",
+    "symbole": "villa sur pilotis à fenêtre en bandeau"
+  }
+]

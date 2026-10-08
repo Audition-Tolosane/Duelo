@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Succession">
+  <path d="M68 212L128 194L188 212M128 194V214" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="120" y="164" width="16" height="32" fill="#12606D"/>
+  <rect x="74" y="36" width="108" height="114" rx="28" fill="#12606D"/>
+  <rect x="98" y="54" width="60" height="80" rx="16" fill="#FF6B5B"/>
+  <circle cx="128" cy="78" r="7" fill="#FFDB3D"/>
+  <circle cx="128" cy="110" r="7" fill="#FFDB3D"/>
+  <rect x="60" y="138" width="136" height="34" rx="16" fill="#12606D"/>
+  <rect x="42" y="112" width="26" height="50" rx="13" fill="#FF6B5B"/>
+  <rect x="188" y="112" width="26" height="50" rx="13" fill="#FF6B5B"/>
+  <circle cx="68" cy="214" r="9" fill="#FFDB3D"/>
+  <circle cx="188" cy="214" r="9" fill="#FFDB3D"/>
+  <path d="M86 58L86 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

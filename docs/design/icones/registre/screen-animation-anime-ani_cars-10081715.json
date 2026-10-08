@@ -1,0 +1,12 @@
+[
+  {"id": "ANI_CARS", "symbole": "voiture rouge de face aux yeux"},
+  {"id": "ANI_CHAI", "symbole": "Pochita à lame tronçonneuse"},
+  {"id": "ANI_DISN", "symbole": "flocon de neige"},
+  {"id": "ANI_COCO", "symbole": "guitare à tête de calavera"},
+  {"id": "ANI_CODE", "symbole": "casque de Zéro à sceau Geass"},
+  {"id": "ANI_BEBO", "symbole": "trompette jazz et étoile"},
+  {"id": "ANI_DAND", "symbole": "chat porte-bonheur patte levée"},
+  {"id": "ANI_DNOT", "symbole": "carnet noir et pomme"},
+  {"id": "ANI_DEMO", "symbole": "boucle d'oreille hanafuda soleil"},
+  {"id": "ANI_DIGI", "symbole": "Digivice à écran pixel"}
+]

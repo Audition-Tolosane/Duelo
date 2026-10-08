@@ -1,0 +1,6 @@
+[
+  {"id": "LAB_STTN", "symbole": "station spatiale à panneaux solaires"},
+  {"id": "LAB_SOLR", "symbole": "soleil et planètes en orbites concentriques"},
+  {"id": "LAB_TIME", "symbole": "montre molle qui coule"},
+  {"id": "LAB_NEUT", "symbole": "pulsar à faisceaux et lignes de champ"}
+]

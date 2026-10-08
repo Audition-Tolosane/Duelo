@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Beyoncé">
+  <rect x="48" y="160" width="160" height="50" rx="25" fill="#FFDB3D"/>
+  <rect x="62" y="124" width="132" height="44" rx="22" fill="#FFDB3D"/>
+  <rect x="78" y="90" width="100" height="42" rx="21" fill="#FFDB3D"/>
+  <rect x="96" y="58" width="64" height="40" rx="20" fill="#FFDB3D"/>
+  <path d="M66 162H190M80 126H176M96 92H160" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M108 210V192A20 20 0 0 1 148 192V210Z" fill="#0B3D4A"/>
+  <polygon points="128,22 134,36 148,42 134,48 128,62 122,48 108,42 122,36" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M76 178V186" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

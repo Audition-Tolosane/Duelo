@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Narcos">
+  <path d="M184 92C194 102 194 120 184 130M202 76C220 92 220 130 202 146" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="126" y="34" width="14" height="50" rx="7" fill="#12606D"/>
+  <circle cx="133" cy="36" r="10" fill="#FFDB3D"/>
+  <rect x="72" y="72" width="88" height="150" rx="18" fill="#12606D"/>
+  <rect x="88" y="98" width="56" height="34" rx="6" fill="#FFDB3D"/>
+  <rect x="88" y="144" width="56" height="64" rx="6" fill="#0B3D4A"/>
+  <path d="M102 160h0M116 160h0M130 160h0M102 176h0M116 176h0M130 176h0M102 192h0M116 192h0M130 192h0" stroke="#E8F1EC" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M88 84L104 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

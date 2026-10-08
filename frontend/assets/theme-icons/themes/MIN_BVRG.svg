@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Jorge Luis Borges">
+  <path d="M157 47A86 86 0 1 1 99 47" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M109 181A56 56 0 1 1 147 181" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M184 128H214" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M128 72V98" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M128 30V57A71 71 0 0 0 128 199V152" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="128" r="18" fill="#FFDB3D"/>
+  <path d="M47 99A86 86 0 0 1 79 58" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

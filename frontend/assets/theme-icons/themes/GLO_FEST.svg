@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Fêtes &amp; Rites">
+  <rect x="102" y="186" width="52" height="26" rx="8" fill="#12606D"/>
+  <path d="M38 136H170L214 118C208 170 172 196 126 196C80 196 46 172 38 136Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M70 164L86 154L102 164L118 154L134 164L150 154L166 164" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M204 40C226 70 228 92 212 106C200 114 186 106 188 90C190 74 198 62 204 40Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M206 74C214 86 214 96 207 100C201 102 196 96 198 90C199 84 202 80 206 74Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M54 150C58 162 64 170 74 178" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

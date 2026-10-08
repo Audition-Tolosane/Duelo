@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Bob l'Éponge">
+  <path d="M128 96C110 72 96 60 70 50C96 50 112 60 120 72C116 54 120 40 128 28C136 40 140 54 136 72C144 60 160 50 186 50C160 60 146 72 128 96Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="152" rx="66" ry="72" fill="#FFDB3D"/>
+  <path d="M76 150L118 192M86 116L150 180M110 96L176 162M150 92L186 128M70 128L106 92M146 96L80 162M170 116L106 180M184 146L138 192" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="164" cy="138" r="16" fill="#12606D"/>
+  <circle cx="164" cy="138" r="7" fill="#E8F1EC"/>
+  <path d="M106 222V192A22 22 0 0 1 150 192V222Z" fill="#12606D"/>
+  <path d="M78 146Q80 122 96 106" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

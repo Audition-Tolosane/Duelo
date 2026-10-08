@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Hearthstone">
+  <rect x="56" y="30" width="144" height="196" rx="20" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="76" y="50" width="104" height="156" rx="10" fill="#0B3D4A"/>
+  <polygon points="128,80 164,102 164,142 128,164 92,142 92,102" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="94" cy="188" r="12" fill="#FF6B5B"/>
+  <circle cx="162" cy="188" r="12" fill="#FF6B5B"/>
+  <path d="M108 108L124 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

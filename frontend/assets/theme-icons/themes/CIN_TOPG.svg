@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Top Gun">
+  <path d="M58 140C58 82 90 46 128 46C166 46 198 82 198 140V194C198 202 192 208 184 208H72C64 208 58 202 58 194Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 50V92" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M72 112C92 98 164 98 184 112L178 146C158 156 98 156 78 146Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M98 124L112 114" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M110 160H146L140 198H116Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M146 186Q176 194 194 176" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M80 92Q88 72 106 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

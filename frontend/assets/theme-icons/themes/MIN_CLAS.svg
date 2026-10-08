@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Classiques Mondiaux">
+  <g transform="translate(0 -10)">
+  <polygon points="122,196 134,196 134,222 128,216 122,222" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M36 104C70 92 104 96 128 112C152 96 186 92 220 104V200C186 190 152 192 128 208C104 192 70 190 36 200Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M40 92C72 80 102 84 120 100V190C102 176 72 174 40 184Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M136 100C154 84 184 80 216 92V184C184 174 154 176 136 190Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M60 128C76 122 92 122 104 128M60 152C76 146 92 146 104 152M152 128C164 122 180 122 196 128M152 152C164 146 180 146 196 152" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M56 104C64 100 74 98 84 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

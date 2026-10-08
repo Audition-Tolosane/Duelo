@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="ABBA">
+  <path d="M88 56H168L172 136L206 214H146L128 112L110 214H50L84 136Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="76" y="34" width="104" height="24" rx="10" fill="#FFDB3D"/>
+  <rect x="116" y="38" width="24" height="16" rx="5" fill="#12606D"/>
+  <polygon points="104.0,80.0 107.2,88.8 116.0,92.0 107.2,95.2 104.0,104.0 100.8,95.2 92.0,92.0 100.8,88.8" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="154.0,116.0 157.2,124.8 166.0,128.0 157.2,131.2 154.0,140.0 150.8,131.2 142.0,128.0 150.8,124.8" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="78.0,173.0 81.0,181.0 89.0,184.0 81.0,187.0 78.0,195.0 75.0,187.0 67.0,184.0 75.0,181.0" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="178.0,181.0 181.0,189.0 189.0,192.0 181.0,195.0 178.0,203.0 175.0,195.0 167.0,192.0 175.0,189.0" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="212.0,52.0 215.2,60.8 224.0,64.0 215.2,67.2 212.0,76.0 208.8,67.2 200.0,64.0 208.8,60.8" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M96 72L92 104" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

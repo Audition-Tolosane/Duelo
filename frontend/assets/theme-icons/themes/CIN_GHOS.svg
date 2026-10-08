@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="S.O.S. Fantômes">
+  <polygon points="88,166 168,166 206,44 50,44" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M70 166L46 138" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M186 166L210 138" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M100 132V96C100 74 112 62 128 62C144 62 156 74 156 96V132L146 122L137 132L128 122L119 132L110 122Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="117" cy="94" r="7" fill="#12606D"/>
+  <circle cx="139" cy="94" r="7" fill="#12606D"/>
+  <rect x="60" y="164" width="136" height="46" rx="10" fill="#12606D"/>
+  <rect x="110" y="178" width="36" height="16" rx="6" fill="#FFDB3D"/>
+  <path d="M196 194Q220 194 222 216" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M74 182V196" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

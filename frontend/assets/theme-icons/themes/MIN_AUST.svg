@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Jane Austen">
+  <path d="M44 180C44 96 82 44 128 44C174 44 212 96 212 180Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M78 180C78 118 100 84 128 84C156 84 178 118 178 180Z" fill="#0B3D4A"/>
+  <path d="M60 182L128 204L196 182" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="128,204 98,190 98,218" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="128,204 158,190 158,218" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="182" cy="74" r="18" fill="#FF6B5B"/>
+  <circle cx="182" cy="74" r="7" fill="#0B3D4A"/>
+  <path d="M62 140C64 118 72 98 86 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Balzac">
+  <path d="M80 80H164L176 204C176 214 170 220 160 220H88C78 220 72 214 72 204Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="80,104 46,76 56,68 86,90" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M168 104C204 104 206 172 172 182" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="74" y="140" width="100" height="16" rx="8" fill="#FF6B5B"/>
+  <path d="M88 80C88 62 104 52 124 52C144 52 160 62 160 80Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="124" cy="44" r="10" fill="#FFDB3D"/>
+  <path d="M190 64Q182 50 192 38M210 70Q202 56 212 44" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M92 102V128" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

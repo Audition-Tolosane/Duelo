@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="True Crime &amp; Affaires criminelles">
+  <ellipse cx="102" cy="80" rx="16" ry="10" transform="rotate(-30 102 80)" stroke="#FFDB3D" stroke-width="10" fill="none"/>
+  <ellipse cx="128" cy="68" rx="16" ry="10" stroke="#FFDB3D" stroke-width="10" fill="none"/>
+  <ellipse cx="154" cy="80" rx="16" ry="10" transform="rotate(30 154 80)" stroke="#FFDB3D" stroke-width="10" fill="none"/>
+  <circle cx="78" cy="158" r="36" stroke="#12606D" stroke-width="20" fill="none"/>
+  <circle cx="178" cy="158" r="36" stroke="#12606D" stroke-width="20" fill="none"/>
+  <rect x="58" y="96" width="40" height="30" rx="10" fill="#FF6B5B"/>
+  <rect x="158" y="96" width="40" height="30" rx="10" fill="#FF6B5B"/>
+  <circle cx="78" cy="111" r="6" fill="#12606D"/>
+  <circle cx="178" cy="111" r="6" fill="#12606D"/>
+  <path d="M43 149A36 36 0 0 1 52 133" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

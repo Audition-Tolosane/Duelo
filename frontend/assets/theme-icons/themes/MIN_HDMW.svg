@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="His Dark Materials">
+  <g transform="rotate(-65 128 136)"><rect x="116" y="44" width="24" height="22" rx="6" fill="#FF6B5B"/></g>
+  <g transform="rotate(65 128 136)"><rect x="116" y="44" width="24" height="22" rx="6" fill="#FF6B5B"/></g>
+  <g transform="rotate(180 128 136)"><rect x="116" y="44" width="24" height="22" rx="6" fill="#FF6B5B"/></g>
+  <circle cx="128" cy="136" r="80" fill="#FFDB3D"/>
+  <circle cx="128" cy="136" r="64" fill="#0B3D4A"/>
+  <path d="M128.0 86.0h0.1M147.1 89.8h0.1M163.4 100.6h0.1M174.2 116.9h0.1M178.0 136.0h0.1M174.2 155.1h0.1M163.4 171.4h0.1M147.1 182.2h0.1M128.0 186.0h0.1M108.9 182.2h0.1M92.6 171.4h0.1M81.8 155.1h0.1M78.0 136.0h0.1M81.8 116.9h0.1M92.6 100.6h0.1M108.9 89.8h0.1" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M118 150L160 98" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="136" r="11" fill="#FF6B5B"/>
+  <path d="M68 116Q76 92 96 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

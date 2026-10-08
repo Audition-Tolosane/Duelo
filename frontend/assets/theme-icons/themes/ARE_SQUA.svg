@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Squash">
+  <rect x="58" y="40" width="140" height="148" rx="10" fill="#12606D"/>
+  <rect x="58" y="164" width="140" height="24" rx="6" fill="#FF6B5B"/>
+  <path d="M68 82H188M68 132H188" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M44 220L146 104L214 214" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="146" cy="104" r="18" fill="#FFDB3D"/>
+  <circle cx="146" cy="104" r="8" fill="#12606D"/>
+  <path d="M74 54V66" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

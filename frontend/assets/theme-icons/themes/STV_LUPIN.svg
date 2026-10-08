@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Lupin">
+  <path d="M158 150C186 166 196 180 196 190" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="196,186 208,202 196,216 184,202" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="112" cy="104" r="60" fill="#0B3D4A" stroke="#12606D" stroke-width="20"/>
+  <circle cx="160" cy="148" r="12" fill="#FFDB3D"/>
+  <circle cx="112" cy="104" r="12" fill="#12606D"/>
+  <path d="M76 100A38 38 0 0 1 96 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M134 136A38 38 0 0 0 146 124" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" fill="none"/>
+</svg>

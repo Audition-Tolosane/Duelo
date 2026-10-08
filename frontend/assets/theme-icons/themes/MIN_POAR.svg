@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Hercule Poirot">
+  <path d="M52 210L196 192" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="204" cy="190" r="14" fill="#FF6B5B"/>
+  <path d="M80 140C80 92 94 58 128 58C162 58 176 92 176 140Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 66V104" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <rect x="76" y="118" width="104" height="22" rx="8" fill="#FF6B5B"/>
+  <path d="M40 146C40 130 56 134 72 142H184C200 134 216 130 216 146C216 164 198 168 184 162H72C58 168 40 164 40 146Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M60 150C80 156 176 156 196 150" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M96 106C96 88 102 76 112 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

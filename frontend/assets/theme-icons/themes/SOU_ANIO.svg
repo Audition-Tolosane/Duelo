@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Anime OSTs">
+  <path d="M131 52C160 60 180 84 176 120" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="124" y="48" width="14" height="130" rx="7" fill="#12606D"/>
+  <ellipse cx="96" cy="178" rx="38" ry="28" transform="rotate(-20 96 178)" fill="#FFDB3D"/>
+  <path d="M70 168L82 160" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="194" cy="170" rx="14" ry="24" transform="rotate(30 194 170)" fill="#FF6B5B"/>
+  <ellipse cx="204" cy="120" rx="12" ry="20" transform="rotate(-25 204 120)" fill="#FF6B5B"/>
+  <ellipse cx="166" cy="198" rx="10" ry="18" transform="rotate(50 166 198)" fill="#FF6B5B"/>
+</svg>

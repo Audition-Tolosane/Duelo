@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Design Scandinave">
+  <path d="M100 148L78 214M176 148L196 214" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <polygon points="84,124 68,44 104,44 112,124" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="78" y="122" width="116" height="28" rx="12" fill="#FFDB3D"/>
+  <rect x="112" y="100" width="74" height="22" rx="11" fill="#FF6B5B"/>
+  <path d="M86 64L92 98" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M82 134H120" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+</svg>

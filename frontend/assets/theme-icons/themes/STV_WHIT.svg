@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The White Lotus">
+  <path d="M128 100L128 214" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M40 108Q128 24 216 108Q194 98 172 108Q150 98 128 108Q106 98 84 108Q62 98 40 108Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M128 66Q110 84 106 104Q117 100 128 106Q139 100 150 104Q146 84 128 66Z" fill="#FFDB3D"/>
+  <circle cx="128" cy="62" r="9" fill="#FFDB3D"/>
+  <path d="M56 136L94 188H208" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M104 190L104 214M198 190L198 214" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M100 186H200" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M74 96Q86 86 100 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

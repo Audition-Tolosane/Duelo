@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Miami Vice">
+  <path d="M150 150V212" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M152 170L178 160L156 190" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="108" y="208" width="88" height="14" rx="7" fill="#12606D"/>
+  <path d="M190 112L214 104L204 130Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="156" cy="122" rx="50" ry="32" transform="rotate(-10 156 122)" fill="#FF6B5B"/>
+  <path d="M120 112C88 96 86 62 108 52" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="114" cy="54" r="18" fill="#FF6B5B"/>
+  <path d="M100 50L76 66C70 70 74 78 80 76L104 66Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M78 68L84 76" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="118" cy="50" r="5" fill="#12606D"/>
+  <path d="M150 112C162 104 178 106 190 118C176 130 160 128 150 112Z" fill="#FFDB3D"/>
+  <path d="M128 108C132 100 140 96 148 94" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Réactions Chimiques">
+  <g transform="rotate(25 96 150)">
+  <path d="M74 76V176A22 22 0 0 0 118 176V76Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="62" y="62" width="68" height="20" rx="10" fill="#12606D"/>
+  <path d="M86 132V176A10 10 0 0 0 106 176V132Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M84 96L84 112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+  <g transform="translate(4 -6)">
+  <polygon points="180,30 186.5,50.3 205.5,40.5 195.7,59.5 216,66 195.7,72.5 205.5,91.5 186.5,81.7 180,102 173.5,81.7 154.5,91.5 164.3,72.5 144,66 164.3,59.5 154.5,40.5 173.5,50.3" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="180" cy="66" r="12" fill="#FF6B5B"/>
+  </g>
+  <circle cx="150" cy="116" r="8" fill="#FF6B5B"/>
+  <circle cx="124" cy="52" r="8" fill="#FFDB3D"/>
+</svg>

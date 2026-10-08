@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Nébuleuses">
+  <circle cx="84" cy="150" r="46" fill="#12606D"/>
+  <circle cx="132" cy="108" r="56" fill="#12606D"/>
+  <circle cx="176" cy="146" r="44" fill="#12606D"/>
+  <circle cx="128" cy="164" r="46" fill="#12606D"/>
+  <circle cx="104" cy="144" r="24" fill="#FF6B5B"/>
+  <circle cx="142" cy="124" r="28" fill="#FF6B5B"/>
+  <circle cx="156" cy="162" r="22" fill="#FF6B5B"/>
+  <circle cx="120" cy="170" r="20" fill="#FF6B5B"/>
+  <polygon points="136,112 141.7,132.3 162,138 141.7,143.7 136,164 130.3,143.7 110,138 130.3,132.3" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="176" cy="100" r="7" fill="#FFDB3D"/>
+  <circle cx="72" cy="176" r="7" fill="#FFDB3D"/>
+  <path d="M92.5 93.6A42 42 0 0 1 114.2 69.9" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

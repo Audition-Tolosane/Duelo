@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Logique de l'IA">
+  <path d="M40 100H84M40 156H84" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M192 128H204" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="210" cy="128" r="12" fill="#FFDB3D"/>
+  <path d="M80 72H128C164 72 192 96 192 128C192 160 164 184 128 184H80Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M96 88H128C154 88 176 106 176 128C176 150 154 168 128 168H96Z" fill="#0B3D4A"/>
+  <polygon points="136,100 144,120 164,128 144,136 136,156 128,136 108,128 128,120" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M90 80H112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

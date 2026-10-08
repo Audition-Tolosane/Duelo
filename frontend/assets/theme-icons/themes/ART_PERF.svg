@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="L'Art du Parfum">
+  <rect x="100" y="38" width="56" height="40" rx="12" fill="#FFDB3D"/>
+  <rect x="108" y="74" width="40" height="34" rx="8" fill="#12606D"/>
+  <rect x="48" y="100" width="160" height="122" rx="30" fill="#12606D"/>
+  <rect x="68" y="126" width="120" height="80" rx="16" fill="#0B3D4A"/>
+  <polygon points="128,142 148,166 128,190 108,166" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M76 114H100" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

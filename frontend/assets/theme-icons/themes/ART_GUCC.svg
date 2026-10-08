@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Maison Gucci">
+  <g transform="translate(0 -14)">
+  <path d="M46 88Q46 76 58 80L100 96Q118 102 134 94Q180 80 208 124Q224 148 218 172H46Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M120 124Q160 112 204 140" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <rect x="34" y="168" width="192" height="24" rx="12" fill="#FF6B5B"/>
+  <rect x="44" y="180" width="46" height="26" rx="8" fill="#FF6B5B"/>
+  <path d="M148 120L170 122" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="134" cy="120" r="14" stroke="#FFDB3D" stroke-width="10" fill="none"/>
+  <circle cx="184" cy="124" r="14" stroke="#FFDB3D" stroke-width="10" fill="none"/>
+  <path d="M60 104L64 132" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Le Comte de Monte-Cristo">
+  <circle cx="66" cy="66" r="24" fill="#FFDB3D"/>
+  <rect x="64" y="96" width="20" height="24" rx="4" fill="#12606D"/>
+  <rect x="106" y="96" width="20" height="24" rx="4" fill="#12606D"/>
+  <rect x="64" y="112" width="104" height="66" rx="6" fill="#12606D"/>
+  <rect x="152" y="70" width="52" height="108" rx="12" fill="#12606D"/>
+  <rect x="88" y="138" width="16" height="26" rx="8" fill="#FFDB3D"/>
+  <rect x="124" y="138" width="16" height="26" rx="8" fill="#FFDB3D"/>
+  <rect x="170" y="96" width="16" height="26" rx="8" fill="#FFDB3D"/>
+  <polygon points="40,204 68,176 190,176 216,204" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M44 222C60 214 76 214 92 222C108 230 124 230 140 222C156 214 172 214 188 222" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M164 90L164 112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

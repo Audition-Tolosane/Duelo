@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Délices Thaï">
+  <path d="M62 194C62 208 74 214 88 214H168C182 214 194 208 194 194C198 164 196 138 186 118L152 66H104L70 118C60 138 58 164 62 194Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M104 72L90 118M152 72L166 118M128 128V200" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="128" cy="66" rx="24" ry="9" fill="#12606D"/>
+  <path d="M136 64L152 38L180 34" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M80 132C76 150 76 168 78 184" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

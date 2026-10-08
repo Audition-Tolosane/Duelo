@@ -1,0 +1,12 @@
+[
+  {"id": "SOU_RETR", "symbole": "envahisseur pixel et tir"},
+  {"id": "SOU_ANIO", "symbole": "croche et pétales de cerisier"},
+  {"id": "SOU_BROA", "symbole": "enseigne à ampoules et étoile"},
+  {"id": "SOU_DISM", "symbole": "baguette de fée étoilée"},
+  {"id": "SOU_DELF", "symbole": "citrouille au sourire cousu"},
+  {"id": "SOU_GELE", "symbole": "poste TV et antenne en V"},
+  {"id": "SOU_GHIB", "symbole": "balai de sorcière à ruban"},
+  {"id": "SOU_KKON", "symbole": "ocarina à cinq trous"},
+  {"id": "SOU_MGOR", "symbole": "ampli de métal en flammes"},
+  {"id": "SOU_NUEM", "symbole": "tête de chocobo à huppe"}
+]

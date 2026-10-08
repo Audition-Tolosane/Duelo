@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="MMA / Octogone">
+  <polygon points="92,32 164,32 224,92 224,164 164,224 92,224 32,164 32,92" fill="#0B3D4A" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M92 108C92 90 106 80 124 80H146C164 80 176 92 176 110V138C176 156 164 166 146 166H108C98 166 92 160 92 150Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="96" y="164" width="76" height="28" rx="8" fill="#E8F1EC"/>
+  <path d="M112 112V138M136 112V138" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M56 84L84 56" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cryptographie">
+  <circle cx="128" cy="128" r="86" fill="#12606D"/>
+  <path d="M188 128H202M180 98L192 91M158 76L165 64M128 68V54M68 128H54M76 158L64 165M98 180L91 192M128 188V202M158 180L165 192M180 158L192 165" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="128" r="46" fill="#FF6B5B"/>
+  <path d="M157 120L167 118M136 99L138 89M107 107L100 100M99 136L89 138M120 157L118 167" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M142 142L204 204M184 184L170 198M200 200L188 212" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="128" r="18" fill="none" stroke="#FFDB3D" stroke-width="12"/>
+  <polygon points="116,36 140,36 128,52" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M66 92A72 72 0 0 1 92 66" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

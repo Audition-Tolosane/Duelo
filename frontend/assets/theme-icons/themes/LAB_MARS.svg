@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Mars Project">
+  <circle cx="128" cy="128" r="88" fill="#FF6B5B"/>
+  <ellipse cx="128" cy="60" rx="30" ry="10" fill="#E8F1EC"/>
+  <path d="M70 124C92 116 108 132 130 124C150 118 164 128 186 120" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="158" cy="166" r="15" fill="#0B3D4A"/>
+  <circle cx="210" cy="44" r="11" fill="#FFDB3D"/>
+  <path d="M60.3 103.4A72 72 0 0 1 80 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

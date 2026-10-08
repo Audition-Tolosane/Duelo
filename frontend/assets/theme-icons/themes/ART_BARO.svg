@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Art Baroque">
+  <path d="M100 64Q92 82 100 100Q108 118 100 136Q92 154 100 172Q106 184 100 196H156Q162 184 156 172Q148 154 156 136Q164 118 156 100Q148 82 156 64Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M106 94L150 76M110 130L154 112M106 166L150 148" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M70 38H186L170 62H86Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="72" cy="56" r="10" fill="#FFDB3D"/>
+  <circle cx="184" cy="56" r="10" fill="#FFDB3D"/>
+  <rect x="72" y="198" width="112" height="22" rx="10" fill="#FFDB3D"/>
+  <path d="M96 108L94 122" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

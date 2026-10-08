@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ted Lasso">
+  <g transform="rotate(-7 128 128)">
+  <rect x="40" y="70" width="176" height="116" rx="10" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="62" y="112" width="132" height="28" rx="14" fill="#12606D"/>
+  <rect x="62" y="152" width="84" height="16" rx="8" fill="#FF6B5B"/>
+  <g transform="rotate(-30 52 66)"><rect x="30" y="56" width="44" height="20" rx="4" fill="#12606D"/></g>
+  <g transform="rotate(30 204 66)"><rect x="182" y="56" width="44" height="20" rx="4" fill="#12606D"/></g>
+  <g transform="rotate(30 52 190)"><rect x="30" y="180" width="44" height="20" rx="4" fill="#12606D"/></g>
+  <path d="M58 92H86" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

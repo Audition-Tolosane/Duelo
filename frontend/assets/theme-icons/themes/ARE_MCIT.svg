@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Manchester City">
+  <ellipse cx="68" cy="100" rx="30" ry="50" transform="rotate(-30 68 100)" fill="#12606D"/>
+  <ellipse cx="188" cy="100" rx="30" ry="50" transform="rotate(30 188 100)" fill="#12606D"/>
+  <path d="M116 52L102 36M140 52L154 36" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="116,196 128,224 140,196" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="142" rx="44" ry="58" fill="#FFDB3D"/>
+  <circle cx="128" cy="76" r="28" fill="#12606D"/>
+  <circle cx="118" cy="76" r="6" fill="#E8F1EC"/>
+  <circle cx="138" cy="76" r="6" fill="#E8F1EC"/>
+  <path d="M96 150H160M100 176H156" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M102 114V132" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

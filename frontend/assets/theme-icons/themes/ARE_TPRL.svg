@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Temple Run">
+  <path d="M92 66L100 36L128 56L156 36L164 66" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="68" y="192" width="120" height="28" rx="8" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="98,150 158,150 170,190 86,190" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="100" r="52" fill="#FFDB3D"/>
+  <rect x="104" y="86" width="14" height="22" rx="4" fill="#0B3D4A"/>
+  <rect x="138" y="86" width="14" height="22" rx="4" fill="#0B3D4A"/>
+  <rect x="112" y="122" width="32" height="12" rx="4" fill="#0B3D4A"/>
+  <path d="M92 84C96 72 104 64 114 60" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

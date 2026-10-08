@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Imagine Dragons">
+  <polygon points="128.0,36.0 142.5,64.9 173.3,54.7 163.1,85.5 192.0,100.0 163.1,114.5 173.3,145.3 142.5,135.1 128.0,164.0 113.5,135.1 82.7,145.3 92.9,114.5 64.0,100.0 92.9,85.5 82.7,54.7 113.5,64.9" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M58 212L182 72M198 212L74 72" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M58 212L86 180M198 212L170 180" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="186" cy="66" r="14" fill="#FFDB3D"/>
+  <circle cx="70" cy="66" r="14" fill="#FFDB3D"/>
+  <path d="M96 66C102 56 110 50 120 46" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

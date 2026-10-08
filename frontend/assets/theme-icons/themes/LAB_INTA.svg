@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Intelligence Artificielle">
+  <path d="M124 60C108 46 80 50 72 70C52 74 44 96 52 112C38 126 42 152 58 162C58 184 80 198 100 192C108 206 124 206 124 196Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M74 100C86 94 96 104 108 98M62 138C76 130 90 142 106 134M84 172C94 164 106 170 112 160" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M132 60C148 46 176 50 184 70C204 74 212 96 204 112C218 126 214 152 198 162C198 184 176 198 156 192C148 206 132 206 132 196Z" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M132 96H154L168 82M132 130H180M132 164H150L164 178" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="172" cy="78" r="11" fill="#FFDB3D"/>
+  <circle cx="186" cy="130" r="11" fill="#FFDB3D"/>
+  <circle cx="168" cy="182" r="11" fill="#FFDB3D"/>
+  <path d="M84 68C90 62 100 60 108 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

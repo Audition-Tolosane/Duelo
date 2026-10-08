@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Judge Dredd">
+  <path d="M56 150C56 84 88 44 128 44C168 44 200 84 200 150V196C200 206 192 212 182 212H168V176H88V212H74C64 212 56 206 56 196Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 54V96" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <rect x="70" y="118" width="116" height="42" rx="18" fill="#0B3D4A"/>
+  <path d="M72 108C74 90 82 74 96 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

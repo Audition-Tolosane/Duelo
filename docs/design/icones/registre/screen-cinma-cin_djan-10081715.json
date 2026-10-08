@@ -1,0 +1,12 @@
+[
+  {"id": "CIN_DJAN", "symbole": "chaîne brisée"},
+  {"id": "CIN_DUNE", "symbole": "ver des sables sortant d'une dune"},
+  {"id": "CIN_FAST", "symbole": "pots d'échappement crachant des flammes"},
+  {"id": "CIN_FIGH", "symbole": "savon rose et bulles"},
+  {"id": "CIN_FORR", "symbole": "boîte de chocolats ouverte"},
+  {"id": "CIN_GLAD", "symbole": "glaive et épi de blé"},
+  {"id": "CIN_GODZ", "symbole": "kaiju à plaques dorsales"},
+  {"id": "CIN_INCE", "symbole": "ville repliée sur elle-même"},
+  {"id": "CIN_INDI", "symbole": "fouet enroulé"},
+  {"id": "CIN_INTE", "symbole": "station spatiale annulaire Endurance"}
+]

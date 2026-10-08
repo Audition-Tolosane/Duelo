@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pokémon GO">
+  <ellipse cx="128" cy="204" rx="68" ry="12" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12"/>
+  <path d="M128 36C88 36 62 66 62 100C62 140 128 198 128 198C128 198 194 140 194 100C194 66 168 36 128 36Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="100" r="30" fill="#0B3D4A"/>
+  <circle cx="128" cy="100" r="12" fill="#FFDB3D"/>
+  <path d="M88 96L96 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

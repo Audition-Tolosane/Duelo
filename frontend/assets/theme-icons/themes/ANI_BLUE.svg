@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Blue Lock">
+  <path d="M190 100L222 72M196 120L224 112" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M34 132C70 80 176 80 212 128C176 176 70 180 34 132Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="124" cy="130" r="38" fill="#FFDB3D"/>
+  <polygon points="124,114 139,125 133,143 115,143 109,125" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="142" cy="112" r="8" fill="#E8F1EC"/>
+  <path d="M28 104Q42 92 60 88" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M66 112Q80 100 96 96" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

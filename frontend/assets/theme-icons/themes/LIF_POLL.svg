@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pollinisation">
+  <path d="M122 96C114 76 104 62 92 52M134 96C142 76 152 62 164 52" stroke="#12606D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="90" cy="50" r="9" fill="#12606D"/>
+  <circle cx="166" cy="50" r="9" fill="#12606D"/>
+  <path d="M122 114C100 76 66 60 50 72C38 86 46 118 72 132C92 142 112 134 122 124Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M134 114C156 76 190 60 206 72C218 86 210 118 184 132C164 142 144 134 134 124Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M122 134C100 138 74 150 74 172C76 190 98 194 110 180C118 170 122 154 122 140Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M134 134C156 138 182 150 182 172C180 190 158 194 146 180C138 170 134 154 134 140Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="82" cy="100" r="11" fill="#12606D"/>
+  <circle cx="174" cy="100" r="11" fill="#12606D"/>
+  <rect x="118" y="92" width="20" height="108" rx="10" fill="#12606D"/>
+  <circle cx="196" cy="206" r="7" fill="#FFDB3D"/>
+  <circle cx="216" cy="184" r="6" fill="#FFDB3D"/>
+  <path d="M58 98C60 88 66 80 76 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

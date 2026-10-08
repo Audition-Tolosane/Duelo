@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Rome">
+  <path d="M84 62C56 100 58 168 116 210" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M172 62C200 100 198 168 140 210" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <ellipse cx="62" cy="96" rx="17" ry="9" transform="rotate(-70 62 96)" fill="#FFDB3D"/>
+  <ellipse cx="56" cy="140" rx="17" ry="9" transform="rotate(-95 56 140)" fill="#FFDB3D"/>
+  <ellipse cx="72" cy="180" rx="17" ry="9" transform="rotate(-130 72 180)" fill="#FFDB3D"/>
+  <ellipse cx="194" cy="96" rx="17" ry="9" transform="rotate(70 194 96)" fill="#FFDB3D"/>
+  <ellipse cx="200" cy="140" rx="17" ry="9" transform="rotate(95 200 140)" fill="#FFDB3D"/>
+  <ellipse cx="184" cy="180" rx="17" ry="9" transform="rotate(130 184 180)" fill="#FFDB3D"/>
+  <path d="M106 118H150C148 136 140 144 142 162C144 180 136 200 128 220C120 200 112 180 114 162C116 144 108 136 106 118Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="116" y="56" width="24" height="50" rx="8" fill="#12606D"/>
+  <rect x="90" y="98" width="76" height="20" rx="10" fill="#FF6B5B"/>
+  <ellipse cx="128" cy="46" rx="24" ry="14" fill="#FF6B5B"/>
+  <path d="M114 132L116 148" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

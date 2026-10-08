@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Théorie des Jeux">
+  <rect x="36" y="36" width="184" height="184" rx="26" fill="#12606D"/>
+  <rect x="52" y="52" width="72" height="72" rx="12" fill="#FFDB3D"/>
+  <rect x="132" y="52" width="72" height="72" rx="12" fill="#0B3D4A"/>
+  <rect x="52" y="132" width="72" height="72" rx="12" fill="#0B3D4A"/>
+  <rect x="132" y="132" width="72" height="72" rx="12" fill="#0B3D4A"/>
+  <path d="M188 88H150M162 76L150 88L162 100" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M88 188V150M76 162L88 150L100 162" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M182 182L154 154M154 170V154H170" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="94,74 100,88 115,89 104,99 107,114 94,106 81,114 84,99 73,89 88,88" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M64 96V68" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

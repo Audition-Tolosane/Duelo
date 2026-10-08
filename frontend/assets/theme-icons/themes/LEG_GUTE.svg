@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Rév. de l'Imprimerie">
+  <rect x="52" y="44" width="28" height="172" rx="12" fill="#12606D"/>
+  <rect x="176" y="44" width="28" height="172" rx="12" fill="#12606D"/>
+  <rect x="40" y="36" width="176" height="32" rx="14" fill="#12606D"/>
+  <rect x="116" y="64" width="24" height="48" rx="8" fill="#FFDB3D"/>
+  <path d="M76 100L180 84" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="180" cy="84" r="12" fill="#FF6B5B"/>
+  <rect x="88" y="108" width="80" height="24" rx="10" fill="#FFDB3D"/>
+  <rect x="88" y="148" width="80" height="20" rx="6" fill="#FF6B5B"/>
+  <rect x="36" y="164" width="184" height="28" rx="12" fill="#12606D"/>
+  <rect x="96" y="172" width="64" height="12" rx="6" fill="#E8F1EC"/>
+  <path d="M66 86L66 108" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

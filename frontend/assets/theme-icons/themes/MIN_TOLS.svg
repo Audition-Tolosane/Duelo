@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Tolstoi">
+  <path d="M56 64C96 92 140 128 200 200" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <ellipse cx="80" cy="64" rx="22" ry="11" transform="rotate(-20 80 64)" fill="#FFDB3D"/>
+  <ellipse cx="68" cy="100" rx="22" ry="11" transform="rotate(60 68 100)" fill="#FFDB3D"/>
+  <ellipse cx="196" cy="164" rx="22" ry="11" transform="rotate(-40 196 164)" fill="#FFDB3D"/>
+  <ellipse cx="160" cy="200" rx="22" ry="11" transform="rotate(20 160 200)" fill="#FFDB3D"/>
+  <circle cx="104" cy="70" r="9" fill="#FF6B5B"/>
+  <circle cx="186" cy="196" r="9" fill="#FF6B5B"/>
+  <path d="M96 160L196 60" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M74 142L114 182" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M90 166L64 192" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="56" cy="200" r="12" fill="#FFDB3D"/>
+  <path d="M164 80L180 64" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

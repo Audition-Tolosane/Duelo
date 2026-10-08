@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Jean-Paul Sartre">
+  <path d="M120 156C96 164 70 166 46 158" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M54 160L40 156" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M118 116H186V172C186 194 170 208 152 208C134 208 118 194 118 172Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="152" cy="120" rx="26" ry="7" fill="#0B3D4A"/>
+  <ellipse cx="152" cy="121" rx="16" ry="4" fill="#FF6B5B"/>
+  <path d="M144 96Q130 80 146 66Q162 50 150 36M172 98Q164 86 176 74" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M130 132V160" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

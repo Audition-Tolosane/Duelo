@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The Walking Dead">
+  <polyline points="46,116 128,152 210,116" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M40 118Q128 58 216 118" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <rect x="116" y="84" width="24" height="112" rx="10" fill="#12606D"/>
+  <rect x="106" y="172" width="44" height="48" rx="14" fill="#12606D"/>
+  <path d="M128 150L128 54" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <polygon points="128,36 116,58 140,58" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M150 170Q164 176 158 192" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <path d="M118 184L118 204" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

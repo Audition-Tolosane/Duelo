@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Saisons">
+  <path d="M47 81A94 94 0 0 1 160 40" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <polyline points="146,28 160,40 142,46" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g transform="rotate(180 128 128)">
+    <path d="M47 81A94 94 0 0 1 160 40" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+    <polyline points="146,28 160,40 142,46" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <path d="M128 56A72 72 0 0 0 128 200Z" fill="#12606D"/>
+  <path d="M128 56A72 72 0 0 1 128 200Z" fill="#FFDB3D"/>
+  <path d="M98 106V150M79 117L117 139M79 139L117 117" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M142 156C142 128 158 112 182 110C182 136 166 152 142 156Z" fill="#12606D" stroke="#12606D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M146 152L168 126" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" fill="none"/>
+</svg>

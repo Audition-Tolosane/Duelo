@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Bauhaus">
+  <rect x="46" y="118" width="84" height="84" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="88" cy="160" r="20" fill="#E8F1EC"/>
+  <circle cx="162" cy="86" r="52" fill="#FFDB3D"/>
+  <polygon points="140,208 216,208 178,148" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M124 70A40 40 0 0 1 148 48" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

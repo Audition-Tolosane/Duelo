@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="BoJack Horseman">
+  <path d="M92 76L74 34L114 54ZM164 76L182 34L142 54Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M84 76C84 54 104 44 128 44C152 44 172 54 172 76L164 148C178 164 178 196 156 204H100C78 196 78 164 92 148Z" fill="#12606D"/>
+  <path d="M110 52C118 66 138 66 146 52" stroke="#0B3D4A" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M94 108H116M140 108H162" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <ellipse cx="110" cy="180" rx="8" ry="10" fill="#0B3D4A"/>
+  <ellipse cx="146" cy="180" rx="8" ry="10" fill="#0B3D4A"/>
+  <rect x="72" y="196" width="112" height="28" rx="12" fill="#FF6B5B"/>
+  <path d="M104 206L104 214M128 206L128 214M152 206L152 214" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M96 76L94 94" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

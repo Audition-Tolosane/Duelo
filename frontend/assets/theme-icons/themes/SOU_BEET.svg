@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Beethoven">
+  <g transform="rotate(-45 128 128)">
+    <path d="M52 118L184 66Q198 128 184 190L52 138Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+    <ellipse cx="186" cy="128" rx="14" ry="62" fill="#0B3D4A" stroke="#12606D" stroke-width="12"/>
+    <rect x="104" y="96" width="14" height="64" rx="5" fill="#0B3D4A"/>
+    <circle cx="44" cy="128" r="16" fill="#12606D"/>
+    <path d="M84 104L140 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

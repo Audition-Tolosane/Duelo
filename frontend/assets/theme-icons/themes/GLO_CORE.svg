@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Corée du Sud">
+  <path d="M100 110H156C176 144 198 180 210 212C160 224 96 224 46 212C58 180 80 144 100 110Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M98 50H158L210 100C216 108 210 118 200 114L172 100L168 120H88L84 100L56 114C46 118 40 108 46 100Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M192 98L206 112M64 98L50 112" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M108 52L128 86L148 52" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M144 112L134 176M144 112L156 168" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <ellipse cx="160" cy="108" rx="16" ry="10" fill="#FFDB3D"/>
+  <path d="M78 82L92 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

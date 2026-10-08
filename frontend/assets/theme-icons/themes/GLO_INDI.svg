@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Saveurs d'Inde">
+  <circle cx="124" cy="124" r="88" fill="#12606D"/>
+  <circle cx="92" cy="94" r="28" fill="#FFDB3D"/>
+  <circle cx="92" cy="94" r="18" fill="#FF6B5B"/>
+  <circle cx="158" cy="90" r="28" fill="#FFDB3D"/>
+  <circle cx="158" cy="90" r="18" fill="#FF6B5B"/>
+  <circle cx="84" cy="162" r="28" fill="#FFDB3D"/>
+  <circle cx="84" cy="162" r="18" fill="#FF6B5B"/>
+  <path d="M146 150C164 132 206 156 216 190C222 212 206 222 186 214C160 204 132 172 146 150Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="172" cy="172" r="7" fill="#12606D"/>
+  <circle cx="196" cy="196" r="7" fill="#12606D"/>
+  <path d="M53.6 83.4A81 81 0 0 1 77.5 57.6" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

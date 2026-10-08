@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="The A-Team">
+  <path d="M38 180V96Q38 82 52 82H150L184 120H206Q218 120 218 134V180Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M154 96L178 122H154Z" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="56" y="96" width="56" height="26" rx="6" fill="#E8F1EC"/>
+  <path d="M38 150H122L144 124H218" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="204" y="130" width="14" height="12" rx="4" fill="#FFDB3D"/>
+  <circle cx="78" cy="186" r="26" fill="#FFDB3D"/>
+  <circle cx="178" cy="186" r="26" fill="#FFDB3D"/>
+  <circle cx="78" cy="186" r="10" fill="#12606D"/>
+  <circle cx="178" cy="186" r="10" fill="#12606D"/>
+  <path d="M50 102L50 120" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

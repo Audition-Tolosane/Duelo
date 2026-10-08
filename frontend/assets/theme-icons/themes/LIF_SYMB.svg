@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Symbiose">
+  <path d="M72 196C60 170 64 150 52 134M98 192C92 166 98 146 90 124M128 190C128 166 136 146 128 122M158 192C164 166 158 146 166 124M184 196C196 170 192 150 204 134" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M56 216C56 196 80 188 128 188C176 188 200 196 200 216Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="52" cy="132" r="10" fill="#FFDB3D"/>
+  <circle cx="90" cy="122" r="10" fill="#FFDB3D"/>
+  <circle cx="128" cy="120" r="10" fill="#FFDB3D"/>
+  <circle cx="166" cy="122" r="10" fill="#FFDB3D"/>
+  <circle cx="204" cy="132" r="10" fill="#FFDB3D"/>
+  <polygon points="168,78 200,56 200,100" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M104 52C112 36 136 36 148 54Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="120" cy="78" rx="52" ry="30" fill="#FF6B5B"/>
+  <path d="M104 60Q96 78 104 96M142 64Q134 78 142 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="88" cy="88" r="6" fill="#12606D"/>
+  <path d="M78 74C80 68 84 64 90 61" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

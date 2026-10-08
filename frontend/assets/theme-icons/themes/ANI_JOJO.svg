@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="JoJo's Bizarre Adventure">
+  <path d="M74 94L40 74M66 130L32 130M74 166L44 186M182 94L216 74M190 130L224 130M182 166L212 186" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M128 38C176 38 196 74 192 120C188 168 162 212 128 218C94 212 68 168 64 120C60 74 80 38 128 38Z" fill="#12606D"/>
+  <polygon points="128,54 140,74 128,94 116,74" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M84 116Q102 100 120 116Q102 126 84 116Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M172 116Q154 100 136 116Q154 126 172 116Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M100 176Q128 190 156 176" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <polygon points="108,180 120,184 113,196" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="4" stroke-linejoin="round"/>
+  <polygon points="148,180 136,184 143,196" fill="#E8F1EC" stroke="#E8F1EC" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M84 84Q92 62 108 54" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Baseball">
+  <g transform="rotate(45 128 128)">
+  <path d="M112 36H144V120C144 140 136 150 132 164V196H124V164C120 150 112 140 112 120Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M123 54V98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <circle cx="188" cy="188" r="34" fill="#FF6B5B"/>
+  <path d="M170 166C178 178 178 198 170 210M206 166C198 178 198 198 206 210" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

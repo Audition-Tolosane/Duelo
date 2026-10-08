@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Chopin">
+  <path d="M208 30A26 26 0 1 0 216 76A21 21 0 1 1 208 30Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="34" y="74" width="188" height="134" rx="22" fill="#12606D"/>
+  <rect x="50" y="90" width="27" height="104" rx="8" fill="#E8F1EC"/>
+  <rect x="81" y="90" width="27" height="104" rx="8" fill="#E8F1EC"/>
+  <rect x="112" y="90" width="27" height="104" rx="8" fill="#E8F1EC"/>
+  <rect x="143" y="90" width="27" height="104" rx="8" fill="#E8F1EC"/>
+  <rect x="174" y="90" width="27" height="104" rx="8" fill="#E8F1EC"/>
+  <rect x="70" y="90" width="18" height="58" rx="6" fill="#0B3D4A"/>
+  <rect x="101" y="90" width="18" height="58" rx="6" fill="#0B3D4A"/>
+  <rect x="163" y="90" width="18" height="58" rx="6" fill="#0B3D4A"/>
+  <path d="M48 82H66" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

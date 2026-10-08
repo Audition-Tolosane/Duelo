@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Bleach">
+  <path d="M80 100C58 84 50 62 58 42C68 62 82 74 104 80Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M176 100C198 84 206 62 198 42C188 62 174 74 152 80Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 72C170 72 188 100 188 136C188 178 162 212 128 212C94 212 68 178 68 136C68 100 86 72 128 72Z" fill="#E8F1EC" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M84 132Q100 116 120 128Q100 142 84 132Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M172 132Q156 116 136 128Q156 142 172 132Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M100 84L96 112M98 148L92 190" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M106 176H158" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M116 168V184M132 168V186M148 168V184" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M66 54Q70 66 80 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

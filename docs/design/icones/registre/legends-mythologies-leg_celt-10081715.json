@@ -1,0 +1,12 @@
+[
+  {"id": "LEG_CELT", "symbole": "triskèle d'or sur disque"},
+  {"id": "LEG_CHIN", "symbole": "octogone bagua et disque bi"},
+  {"id": "LEG_HIND", "symbole": "cercle de flammes et damaru"},
+  {"id": "LEG_PERS", "symbole": "disque ailé Faravahar et flamme"},
+  {"id": "LEG_ROME", "symbole": "casque de Mars à crête"},
+  {"id": "LEG_SLAV", "symbole": "isba sur pattes de poulet"},
+  {"id": "LEG_AFRI", "symbole": "araignée Anansi sur son fil"},
+  {"id": "LEG_MESO", "symbole": "tablette cunéiforme et sceau-cylindre"},
+  {"id": "LEG_BIBL", "symbole": "arche de Noé et colombe"},
+  {"id": "LEG_SAIN", "symbole": "clés de saint Pierre croisées"}
+]

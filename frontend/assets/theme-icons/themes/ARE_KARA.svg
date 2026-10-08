@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Karaté Do">
+  <g transform="rotate(16 34 150)">
+  <polygon points="34,128 114,128 102,144 118,158 106,174 34,174" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M50 146H88M50 160H80" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g transform="rotate(-16 222 150)">
+  <polygon points="222,128 142,128 154,144 138,158 150,174 222,174" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M168 146H206M176 160H206" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <polygon points="128.0,34.0 135.7,61.5 160.5,47.5 146.5,72.3 174.0,80.0 146.5,87.7 160.5,112.5 135.7,98.5 128.0,126.0 120.3,98.5 95.5,112.5 109.5,87.7 82.0,80.0 109.5,72.3 95.5,47.5 120.3,61.5" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M46 118L70 116" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

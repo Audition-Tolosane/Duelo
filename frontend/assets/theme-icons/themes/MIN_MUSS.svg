@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Guillaume Musso">
+  <path d="M104 112C66 140 26 120 30 56C46 76 62 76 74 62C72 82 86 96 100 92Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <g transform="translate(256 0) scale(-1 1)"><path d="M104 112C66 140 26 120 30 56C46 76 62 76 74 62C72 82 86 96 100 92Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/></g>
+  <path d="M42 90Q60 104 84 104" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g transform="translate(256 0) scale(-1 1)"><path d="M42 90Q60 104 84 104" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g>
+  <path d="M128 208C80 172 64 146 64 116C64 92 82 76 102 76C114 76 124 82 128 92C132 82 142 76 154 76C174 76 192 92 192 116C192 146 176 172 128 208Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M84 108Q88 92 104 88" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

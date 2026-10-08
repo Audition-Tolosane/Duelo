@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Physique Quantique">
+  <rect x="44" y="42" width="168" height="22" rx="10" transform="rotate(-10 128 53)" fill="#FFDB3D"/>
+  <polygon points="72,116 74,82 98,100" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="118,100 142,82 144,116" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M66 140C66 112 84 96 108 96C132 96 150 112 150 140Z" fill="#FF6B5B"/>
+  <ellipse cx="96" cy="120" rx="7" ry="10" fill="#12606D"/>
+  <ellipse cx="120" cy="120" rx="7" ry="10" fill="#12606D"/>
+  <rect x="44" y="132" width="168" height="84" rx="12" fill="#12606D"/>
+  <path d="M64 150V174" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

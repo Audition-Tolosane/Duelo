@@ -1,0 +1,54 @@
+[
+ {
+  "id": "STV_AUAD",
+  "symbole": "main de zombie surgissant derrière un pupitre d'école"
+ },
+ {
+  "id": "STV_AVAT",
+  "symbole": "crâne chauve à flèche bleue et col de moine"
+ },
+ {
+  "id": "STV_BATE",
+  "symbole": "clé de motel à porte-clé losange"
+ },
+ {
+  "id": "STV_AMHS",
+  "symbole": "manoir victorien à tourelle pointue"
+ },
+ {
+  "id": "STV_ARRE",
+  "symbole": "banane glacée au chocolat sur bâtonnet"
+ },
+ {
+  "id": "STV_HANN",
+  "symbole": "assiette dressée et couverts d'argent"
+ },
+ {
+  "id": "STV_WITC",
+  "symbole": "luth de barde et pièce lancée"
+ },
+ {
+  "id": "STV_EMPI",
+  "symbole": "manteau léopard à col de fourrure"
+ },
+ {
+  "id": "STV_TEDL",
+  "symbole": "affiche jaune scotchée de travers"
+ },
+ {
+  "id": "STV_OMIT",
+  "symbole": "micro de podcast à filtre anti-pop"
+ },
+ {
+  "id": "STV_ROOK",
+  "symbole": "gyrophare de patrouille"
+ },
+ {
+  "id": "STV_NCIS",
+  "symbole": "barque en chantier sur ses cales"
+ },
+ {
+  "id": "STV_SILO",
+  "symbole": "silo enterré et escaliers en lacets"
+ }
+]

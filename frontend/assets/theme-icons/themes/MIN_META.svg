@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Métaphysique">
+  <path d="M128 140C150 106 176 92 196 102C220 114 220 162 196 174C176 184 150 170 128 140C106 110 80 96 60 106C36 118 36 166 60 178C80 188 106 174 128 140Z" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="128,36 138,58 160,68 138,78 128,100 118,78 96,68 118,58" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="10" stroke-linejoin="round"/>
+  <circle cx="190" cy="54" r="10" fill="#FF6B5B"/>
+  <circle cx="68" cy="58" r="8" fill="#FF6B5B"/>
+  <path d="M50 134C52 124 56 118 64 114" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

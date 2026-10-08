@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Monde Polaire">
+  <rect x="40" y="208" width="176" height="16" rx="8" fill="#12606D"/>
+  <path d="M92 118C72 136 64 158 66 180M164 118C184 136 192 158 190 180" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 36C100 36 88 58 88 84C88 96 90 104 84 118C72 146 70 186 92 204H164C186 186 184 146 172 118C166 104 168 96 168 84C168 58 156 36 128 36Z" fill="#12606D"/>
+  <ellipse cx="128" cy="154" rx="32" ry="42" fill="#E8F1EC"/>
+  <circle cx="116" cy="80" r="7" fill="#E8F1EC"/>
+  <circle cx="140" cy="80" r="7" fill="#E8F1EC"/>
+  <circle cx="117" cy="81" r="4" fill="#0B3D4A"/>
+  <circle cx="139" cy="81" r="4" fill="#0B3D4A"/>
+  <polygon points="120,94 136,94 128,110" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <ellipse cx="108" cy="206" rx="18" ry="8" fill="#FFDB3D"/>
+  <ellipse cx="148" cy="206" rx="18" ry="8" fill="#FFDB3D"/>
+  <path d="M98 70C100 58 106 50 114 46" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Empire">
+  <path d="M80 84Q58 92 54 122L46 204Q46 214 58 214H198Q210 214 210 204L202 122Q198 92 176 84Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 104V210" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="84" cy="148" r="10" fill="#0B3D4A"/>
+  <circle cx="110" cy="178" r="10" fill="#0B3D4A"/>
+  <circle cx="170" cy="146" r="10" fill="#0B3D4A"/>
+  <circle cx="184" cy="190" r="10" fill="#0B3D4A"/>
+  <circle cx="80" cy="196" r="10" fill="#0B3D4A"/>
+  <circle cx="150" cy="196" r="10" fill="#0B3D4A"/>
+  <circle cx="90" cy="82" r="22" fill="#FFDB3D"/>
+  <circle cx="110" cy="98" r="18" fill="#FFDB3D"/>
+  <circle cx="146" cy="98" r="18" fill="#FFDB3D"/>
+  <circle cx="166" cy="82" r="22" fill="#FFDB3D"/>
+  <ellipse cx="128" cy="76" rx="22" ry="10" fill="#0B3D4A"/>
+  <path d="M64 128L60 156" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

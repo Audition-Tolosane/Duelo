@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Street Food">
+  <path d="M50 74H180C190 74 196 80 196 90V110H204C214 110 218 116 220 126L222 162C222 172 216 178 206 178H50C40 178 34 172 34 162V90C34 80 40 74 50 74Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M200 120H210L214 144H200Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <rect x="60" y="104" width="104" height="44" rx="6" fill="#FFDB3D"/>
+  <path d="M48 88H176V102Q164 120 152 102Q140 120 128 102Q116 120 104 102Q92 120 80 102Q68 120 56 102Q52 108 48 102Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="80" cy="184" r="22" fill="#12606D"/>
+  <circle cx="80" cy="184" r="9" fill="#E8F1EC"/>
+  <circle cx="180" cy="184" r="22" fill="#12606D"/>
+  <circle cx="180" cy="184" r="9" fill="#E8F1EC"/>
+  <path d="M46 118V146" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

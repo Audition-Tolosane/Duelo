@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Speedrun &amp; Skill">
+  <polygon points="80,60 176,60 136,128 176,196 80,196 120,128" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="102,76 154,76 128,110" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <polygon points="98,184 158,184 128,156" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M128 120V150" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <rect x="64" y="40" width="128" height="20" rx="8" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="64" y="196" width="128" height="20" rx="8" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M90 70L98 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

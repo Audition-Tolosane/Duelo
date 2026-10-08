@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Glee">
+  <path d="M138 96L178 40" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M72 108C72 74 98 58 128 58C158 58 184 74 184 108Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="44" cy="80" r="10" fill="#FF6B5B"/>
+  <circle cx="62" cy="52" r="7" fill="#FF6B5B"/>
+  <circle cx="210" cy="84" r="9" fill="#FF6B5B"/>
+  <path d="M80 112H176L164 212C163 218 159 220 154 220H102C97 220 93 218 92 212Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="62" y="102" width="132" height="20" rx="10" fill="#12606D"/>
+  <path d="M90 152Q109 140 128 152Q147 164 166 152" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M96 172L100 196" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

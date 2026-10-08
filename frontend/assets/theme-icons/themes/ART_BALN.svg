@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Balenciaga">
+  <path d="M128 66V50Q128 38 140 38Q152 38 152 50" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M76 80L128 62L180 80" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M98 72Q60 76 52 120L44 184Q50 192 62 188L72 150Q74 190 96 216H160Q182 190 184 150L194 188Q206 192 212 184L204 120Q196 76 158 72Q128 64 98 72Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M100 76Q128 66 156 76Q150 108 128 128Q106 108 100 76Z" fill="#0B3D4A"/>
+  <path d="M128 128V210" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="146" cy="150" r="9" fill="#FFDB3D"/>
+  <circle cx="146" cy="184" r="9" fill="#FFDB3D"/>
+  <path d="M64 128Q66 104 80 90" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

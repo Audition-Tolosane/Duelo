@@ -1,0 +1,7 @@
+[
+  {"id": "MIN_RHET", "symbole": "pupitre d'orateur et bulle"},
+  {"id": "MIN_COGN", "symbole": "tête de profil à engrenages"},
+  {"id": "MIN_STOI", "symbole": "lampe à huile dans le vent"},
+  {"id": "MIN_EPIS", "symbole": "livre ouvert et clé"},
+  {"id": "MIN_ETHI", "symbole": "poteau indicateur à deux flèches"}
+]

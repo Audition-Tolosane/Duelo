@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Kendrick Lamar">
+  <ellipse cx="128" cy="146" rx="92" ry="42" fill="none" stroke="#12606D" stroke-width="20"/>
+  <path d="M36.2 143.1L-0.7 113.6L39.6 134.4ZM47.5 125.6L21.0 89.8L58.6 118.4ZM73.9 112.0L62.7 72.4L90.6 107.6ZM118.4 104.2L128.0 64.4L137.6 104.2ZM165.4 107.6L193.3 72.4L182.1 112.0ZM197.4 118.4L235.0 89.8L208.5 125.6ZM216.4 134.4L256.7 113.6L219.8 143.1ZM217.3 156.2L242.1 173.0L210.7 164.4ZM188.4 177.7L197.7 199.4L172.6 182.7ZM137.6 187.8L128.0 209.4L118.4 187.8ZM83.4 182.7L58.3 199.4L67.6 177.7ZM45.3 164.4L13.9 173.0L38.7 156.2Z" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="181" cy="180" r="11" fill="#FFDB3D"/>
+  <circle cx="128" cy="188" r="11" fill="#FFDB3D"/>
+  <circle cx="75" cy="180" r="11" fill="#FFDB3D"/>
+  <circle cx="128" cy="104" r="9" fill="#FF6B5B"/>
+  <path d="M48 132C56 118 72 110 90 106" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dandadan">
+  <rect x="176" y="50" width="34" height="96" rx="17" fill="#12606D"/>
+  <path d="M68 214Q56 214 58 200L66 154Q72 132 118 132Q164 132 170 154L178 200Q180 214 168 214Z" fill="#12606D"/>
+  <polygon points="78,80 76,42 106,62" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="158,80 160,42 130,62" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="118" cy="106" r="50" fill="#12606D"/>
+  <path d="M94 108Q102 98 110 108M126 108Q134 98 142 108" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="76" y="148" width="84" height="14" rx="7" fill="#FF6B5B"/>
+  <circle cx="118" cy="166" r="11" fill="#FFDB3D"/>
+  <ellipse cx="146" cy="194" rx="16" ry="20" fill="#FFDB3D"/>
+  <circle cx="193" cy="66" r="9" fill="#FF6B5B"/>
+  <path d="M80 100Q84 82 96 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

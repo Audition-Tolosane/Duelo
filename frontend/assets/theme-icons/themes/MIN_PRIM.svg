@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Nombres Premiers">
+  <path d="M47 47h24v24h-24ZM185 47h24v24h-24ZM93 93h24v24h-24ZM185 93h24v24h-24ZM47 139h24v24h-24ZM93 139h24v24h-24ZM185 139h24v24h-24ZM93 185h24v24h-24ZM139 185h24v24h-24ZM185 185h24v24h-24Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M93 47h24v24h-24ZM139 47h24v24h-24ZM47 93h24v24h-24ZM139 93h24v24h-24ZM139 139h24v24h-24ZM47 185h24v24h-24Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M52 64V52" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+</svg>

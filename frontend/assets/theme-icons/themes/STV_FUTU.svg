@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Futurama">
+  <path d="M52 132C40 128 30 136 34 146C30 156 40 164 52 160Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M84 124L70 76C68 68 76 66 82 72L124 116Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M84 168L70 204C68 212 76 214 82 208L124 172Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M54 126L96 120C116 102 148 96 178 102C206 108 222 126 222 146C222 164 206 174 178 176H96L54 166Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M158 106C182 104 204 112 212 130H158Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M84 150H196" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <polygon points="196,40 202,52 214,56 202,60 196,72 190,60 178,56 190,52" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M106 130C114 122 124 116 136 112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

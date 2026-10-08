@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="États de la Matière">
+  <circle cx="108" cy="64" r="20" fill="#FFDB3D"/>
+  <circle cx="142" cy="56" r="26" fill="#FFDB3D"/>
+  <rect x="80" y="64" width="96" height="24" rx="12" fill="#FFDB3D"/>
+  <g transform="rotate(-10 76 168)">
+  <rect x="40" y="132" width="72" height="72" rx="12" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M46 140L60 140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+  <path d="M180 106C180 106 214 148 214 172A34 34 0 0 1 146 172C146 148 180 106 180 106Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M158 174A20 20 0 0 1 164 158" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" fill="none"/>
+</svg>

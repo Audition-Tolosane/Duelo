@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Cyberpunk 2077">
+  <path d="M40 128C70 82 186 82 216 128C186 174 70 174 40 128Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="128" r="34" fill="#FFDB3D"/>
+  <rect x="118" y="108" width="20" height="40" rx="6" fill="#FF6B5B"/>
+  <path d="M128 38V60M128 196V218" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M70 126L86 112" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
