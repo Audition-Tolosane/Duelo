@@ -6,7 +6,9 @@
     python scripts/icons-pilot.py                      # produit toutes les icônes manquantes
     python scripts/icons-pilot.py --univers SCREEN     # un seul univers
     python scripts/icons-pilot.py --cluster "Séries TV" --max-lots 3
-    python scripts/icons-pilot.py --parallele 2        # 2 sessions en même temps (plus rapide, plus de quota)
+    python scripts/icons-pilot.py --model sonnet --parallele 10 --max-sessions 100
+                                                       # 100 sessions de 10 icônes, 10 en même temps :
+                                                       # dès qu'une session finit, la suivante démarre
 
 Arrêt propre : créer le fichier  frontend/scripts/icons-pilot.STOP  (le lot en cours se termine).
 Reprise : relancer la même commande — les thèmes qui ont déjà leur SVG sont sautés.
@@ -31,6 +33,7 @@ import shutil
 import subprocess
 import sys
 import time
+import threading
 from concurrent.futures import ThreadPoolExecutor
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))          # frontend/
@@ -277,8 +280,10 @@ def main():
     ap.add_argument("--taille", type=int, default=10, help="thèmes par session (défaut 10)")
     ap.add_argument("--univers", help="ARENA, ART, GLOBE, LAB, LEGENDS, LIFE, MIND, SCREEN, SOUND")
     ap.add_argument("--cluster", help="nom exact du cluster")
-    ap.add_argument("--max-lots", type=int, default=0, help="arrêter après N lots (0 = tous)")
-    ap.add_argument("--parallele", type=int, default=1, help="sessions simultanées (défaut 1)")
+    ap.add_argument("--max-lots", "--max-sessions", dest="max_lots", type=int, default=0,
+                    help="nombre maximum de sessions à lancer (0 = toutes)")
+    ap.add_argument("--parallele", type=int, default=1,
+                    help="sessions simultanées ; dès qu'une finit, la suivante démarre (défaut 1)")
     ap.add_argument("--model", help="modèle Claude (défaut : celui de Claude Code)")
     ap.add_argument("--timeout", type=int, default=40, help="minutes max par session (défaut 40)")
     ap.add_argument("--pause", type=int, default=20, help="minutes d'attente sur limite d'utilisation (défaut 20)")
@@ -310,23 +315,48 @@ def main():
     if os.path.exists(STOP_FILE):
         os.remove(STOP_FILE)
 
-    if args.parallele <= 1:
-        for n, lot in zip(names, lots):
-            if run_lot(lot, n, by_id, args) in ("stop", "limite"):
-                log("Arrêt demandé ou limite persistante : le pilote s'arrête (relancer pour reprendre).")
-                break
-    else:
-        # En parallèle, les lots d'un même cluster restent en série (doublons d'idée)
-        groups = {}
-        for n, lot in zip(names, lots):
-            groups.setdefault((lot[0]["universe"], lot[0]["cluster"]), []).append((n, lot))
+    # File de sessions : N en même temps ; dès qu'une session finit, la suivante démarre.
+    # On préfère un lot d'un cluster où aucune session ne tourne (le registre anti-doublons d'un
+    # cluster est alors à jour) ; s'il n'y en a plus, on prend le suivant quand même.
+    queue = list(zip(names, lots))
+    running = {}                      # cluster -> nombre de sessions en cours
+    lock = threading.Lock()
+    halt = threading.Event()
+    stats = {"lancees": 0}
 
-        def run_group(items):
-            for n, lot in items:
-                if run_lot(lot, n, by_id, args) in ("stop", "limite"):
-                    return
-        with ThreadPoolExecutor(max_workers=args.parallele) as ex:
-            list(ex.map(run_group, groups.values()))
+    def next_lot():
+        with lock:
+            if halt.is_set() or not queue:
+                return None
+            idx = next((k for k, (_, l) in enumerate(queue) if not running.get(l[0]["cluster"])), 0)
+            n, lot = queue.pop(idx)
+            running[lot[0]["cluster"]] = running.get(lot[0]["cluster"], 0) + 1
+            stats["lancees"] += 1
+            log(f"   session {stats['lancees']}/{len(names)} — {len(queue)} en attente")
+            return n, lot
+
+    def worker():
+        while True:
+            item = next_lot()
+            if item is None:
+                return
+            n, lot = item
+            try:
+                res = run_lot(lot, n, by_id, args)
+            except Exception as e:                                   # une session plantée n'arrête pas les autres
+                log(f"✗ {n} : erreur du pilote ({e})")
+                res = "ok"
+            finally:
+                with lock:
+                    running[lot[0]["cluster"]] -= 1
+            if res in ("stop", "limite"):
+                halt.set()
+                log("Arrêt demandé ou limite persistante : plus de nouvelles sessions (relancer pour reprendre).")
+                return
+
+    with ThreadPoolExecutor(max_workers=max(1, args.parallele)) as ex:
+        for _ in range(max(1, args.parallele)):
+            ex.submit(worker)
     finish()
 
 

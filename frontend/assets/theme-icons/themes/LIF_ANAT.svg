@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Anatomie">
+  <circle cx="128" cy="128" r="94" fill="#12606D" stroke="#12606D" stroke-width="12"/>
+  <g transform="rotate(45 128 128)">
+    <rect x="70" y="106" width="116" height="44" rx="6" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+    <circle cx="62" cy="104" r="22" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12"/>
+    <circle cx="62" cy="152" r="22" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12"/>
+    <circle cx="194" cy="104" r="22" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12"/>
+    <circle cx="194" cy="152" r="22" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12"/>
+    <path d="M96 128H160" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M50 96C52 90 56 86 62 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

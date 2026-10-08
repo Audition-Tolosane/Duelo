@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Audition">
+  <path d="M60 94C50 110 50 134 60 150" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M42 76C30 106 30 138 42 168" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <g transform="translate(22 0)">
+    <path d="M136 36C90 36 66 70 70 108C72 128 86 138 92 154C96 168 92 184 104 198C116 212 140 214 152 204C170 190 164 172 176 156C196 132 206 108 198 84C190 54 166 36 136 36Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M132 72C110 72 102 96 110 112C118 128 134 126 136 144C138 160 124 168 116 162" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M86 96C88 76 102 60 120 54" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>
