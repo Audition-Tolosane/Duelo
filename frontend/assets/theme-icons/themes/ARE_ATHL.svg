@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Athlétisme">
+  <path d="M44 72C80 30 176 30 212 72" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M196 56L212 72L190 78" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="58" y="128" width="20" height="76" rx="8" fill="#12606D"/>
+  <rect x="178" y="128" width="20" height="76" rx="8" fill="#12606D"/>
+  <rect x="36" y="196" width="62" height="20" rx="10" fill="#FF6B5B"/>
+  <rect x="158" y="196" width="62" height="20" rx="10" fill="#FF6B5B"/>
+  <rect x="36" y="92" width="184" height="44" rx="12" fill="#12606D"/>
+  <rect x="72" y="92" width="32" height="44" fill="#FFDB3D"/>
+  <rect x="152" y="92" width="32" height="44" fill="#FFDB3D"/>
+  <path d="M52 106V122" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

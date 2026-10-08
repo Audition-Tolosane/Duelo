@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Biathlon">
+  <path d="M84 218L160 62C166 50 176 42 190 44" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M172 218L96 62C90 50 80 42 66 44" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="32" y="96" width="192" height="68" rx="18" fill="#12606D"/>
+  <circle cx="64" cy="132" r="13" fill="#E8F1EC"/>
+  <circle cx="96" cy="132" r="13" fill="#E8F1EC"/>
+  <circle cx="128" cy="132" r="13" fill="#E8F1EC"/>
+  <circle cx="160" cy="132" r="13" fill="#FF6B5B"/>
+  <circle cx="192" cy="132" r="13" fill="#FF6B5B"/>
+  <path d="M52 108H84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

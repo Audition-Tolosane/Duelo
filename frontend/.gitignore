@@ -37,3 +37,8 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+# Pilote des icônes (sorties de session, arrêt)
+scripts/icons-sessions/
+scripts/icons-pilot.STOP
+assets/theme-icons/rejets/
