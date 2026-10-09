@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
-  View, StyleSheet, ScrollView, Pressable, RefreshControl, Modal, Alert, Share, useWindowDimensions,
+  View, StyleSheet, ScrollView, Pressable, RefreshControl, Modal, Share, useWindowDimensions,
 } from 'react-native';
 import Svg, { Defs, Pattern, Path, Rect } from 'react-native-svg';
 import { useRouter } from 'expo-router';
@@ -18,11 +18,11 @@ import SpinWheelModal from '../../components/SpinWheelModal';
 import SwordMark from '../../components/SwordMark';
 import { useTabBar } from '../../contexts/TabBarContext';
 import { authFetch } from '../../utils/api';
-import { t, getLanguage } from '../../utils/i18n';
+import { t, getLanguage, pluralKey } from '../../utils/i18n';
 import { flushPendingScores } from '../../utils/pendingScores';
 import {
   Txt, Icon, Button, IconButton, Badge, Card, Chip, Section, ProgressBar, ListRow, Loader,
-  BottomSheet, ThemeIcon, ThemeCard, AnswerButton, EmptyState, StatCard,
+  BottomSheet, Dialog, ThemeIcon, ThemeCard, AnswerButton, EmptyState, StatCard,
 } from '../../components/ui';
 import type { IconName, AnswerState } from '../../components/ui';
 import { COLOR, SPACE, RADII, SIZE, BORDER, ELEVATION, GRADIENTS, ICON_SIZE, PALETTE, alpha } from '../../theme/tokens';
@@ -271,7 +271,9 @@ const TournamentBlock = React.memo(function TournamentBlock({ info, onOpen, onPl
       if (diff <= 0) return '00:00';
       const h = Math.floor(diff / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
-      return h > 0 ? `${h}h ${m.toString().padStart(2, '0')}m` : `${m}m`;
+      return h > 0
+        ? t('pilot.tournament.hours', { h: String(h), m: m.toString().padStart(2, '0') })
+        : t('pilot.tournament.minutes', { m: String(Math.max(1, m)) });
     };
     setCountdown(fmt(info.end_at));
     const iv = setInterval(() => setCountdown(fmt(info!.end_at!)), 30000);
@@ -335,9 +337,9 @@ const MissionsCard = React.memo(function MissionsCard({
   const midnight = new Date(now);
   midnight.setHours(24, 0, 0, 0);
   const secsLeft = Math.floor((midnight.getTime() - now.getTime()) / 1000);
-  const hh = String(Math.floor(secsLeft / 3600)).padStart(2, '0');
+  const hh = Math.floor(secsLeft / 3600);
   const mm = String(Math.floor((secsLeft % 3600) / 60)).padStart(2, '0');
-  const countdown = `${hh}h${mm}`;
+  const countdown = hh > 0 ? t('pilot.tournament.hours', { h: String(hh), m: mm }) : t('pilot.tournament.minutes', { m: String(Math.max(1, Number(mm))) });
 
   const totalXP = data.missions.reduce((s, m) => s + (m.completed ? m.xp : 0), 0) * data.multiplier;
   const canClaim = data.any_completed && !data.reward_claimed;
@@ -554,6 +556,7 @@ const OfferRow = React.memo(function OfferRow({ item, onActivate, onLaunch }: {
   const [expiresAt, setExpiresAt] = useState<string | null>(item.expires_at || null);
   const [isActive, setIsActive] = useState(item.is_active || false);
   const [loading, setLoading] = useState(false);
+  const [ask, setAsk] = useState(false);
 
   useEffect(() => {
     if (!expiresAt) { setCountdown(''); return; }
@@ -590,17 +593,11 @@ const OfferRow = React.memo(function OfferRow({ item, onActivate, onLaunch }: {
       onLaunch(themeId, item.category_name);
       return;
     }
-    Alert.alert(
-      t('pilot.home.offer_alert_title'),
-      t('pilot.home.offer_alert_body', { theme: item.category_name }),
-      [
-        { text: t('pilot.home.offer_alert_later'), style: 'cancel' },
-        { text: t('pilot.home.offer_alert_watch'), onPress: watchAdAndActivate },
-      ],
-    );
+    setAsk(true);
   };
 
   return (
+    <>
     <Pressable onPress={handleCardPress} accessibilityRole="button" style={({ pressed }) => [styles.offerRow, pressed && styles.pressed]}>
       <View style={[styles.iconDisc, { backgroundColor: COLOR.tint.gold }]}>
         <Icon name="bolt" size={ICON_SIZE.md} color={COLOR.reward.gold} />
@@ -616,12 +613,31 @@ const OfferRow = React.memo(function OfferRow({ item, onActivate, onLaunch }: {
           <Txt variant="caption">{isActive ? t('pilot.home.offer_active') : t('pilot.home.offer_watch')}</Txt>
         )}
       </View>
-      {isActive ? (
-        <Badge label={t('pilot.home.offer_badge_active')} tone="success" />
-      ) : (
-        <Badge label={loading ? '…' : t('pilot.home.offer_ad')} tone="neutral" />
-      )}
+      {/* Enveloppe : le Badge s'aligne en haut (alignSelf flex-start) ; ici on le veut centré dans la ligne */}
+      <View>
+        {isActive ? (
+          <Badge label={t('pilot.home.offer_badge_active')} tone="success" />
+        ) : (
+          <Badge label={loading ? '…' : t('pilot.home.offer_ad')} tone="neutral" />
+        )}
+      </View>
     </Pressable>
+    {/* Dialog rendu dans la feuille Bonus (modal imbriqué) : Alert.alert à boutons ne s'affiche pas sur le web */}
+    <Dialog
+      visible={ask}
+      onClose={() => setAsk(false)}
+      icon="tv"
+      tone="reward"
+      title={t('pilot.home.offer_alert_title')}
+      message={t('pilot.home.offer_alert_body', { theme: item.category_name })}
+      actions={
+        <>
+          <Button label={t('pilot.home.offer_alert_watch')} icon="tv" fullWidth haptic={false} onPress={() => { setAsk(false); watchAdAndActivate(); }} />
+          <Button label={t('pilot.home.offer_alert_later')} variant="ghost" fullWidth haptic={false} onPress={() => setAsk(false)} />
+        </>
+      }
+    />
+    </>
   );
 });
 
@@ -1034,9 +1050,12 @@ export default function AccueilScreen() {
     if (!offerSlotExpiresAt) return;
     const tick = () => {
       const secs = Math.max(0, Math.floor((new Date(offerSlotExpiresAt).getTime() - Date.now()) / 1000));
-      const mm = String(Math.floor(secs / 60)).padStart(2, '0');
-      const ss = String(secs % 60).padStart(2, '0');
-      setOfferCountdown(`${mm}:${ss}`);
+      // Même format que les missions et le tournoi : « 2 h 05 », « 25 min »
+      const h = Math.floor(secs / 3600);
+      const m = Math.floor((secs % 3600) / 60);
+      setOfferCountdown(h > 0
+        ? t('pilot.tournament.hours', { h: String(h), m: String(m).padStart(2, '0') })
+        : t('pilot.tournament.minutes', { m: String(Math.max(1, m + (secs % 60 > 0 ? 1 : 0))) }));
     };
     tick();
     const id = setInterval(tick, 1000);
@@ -1430,7 +1449,7 @@ export default function AccueilScreen() {
                     key={th.id}
                     name={th.name}
                     themeId={th.id}
-                    meta={th.match_count > 0 ? `${th.match_count} ${t('home.duels_label')}` : undefined}
+                    meta={th.match_count > 0 ? t(pluralKey('pilot.home.duels', th.match_count), { n: String(th.match_count) }) : undefined}
                     onPress={() => router.push(`/category-detail?id=${th.id}`)}
                   />
                 ))}
