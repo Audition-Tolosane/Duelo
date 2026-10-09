@@ -724,7 +724,7 @@ export default function AdminScreen() {
                   <MaterialCommunityIcons name="lock-outline" size={36} color="#B366FF" />
                 </LinearGradient>
                 <Text style={styles.authTitle}>Administration</Text>
-                <Text style={styles.authSubtitle}>Panel d'administration Duelo</Text>
+                <Text style={styles.authSubtitle}>Panel d'administration SKILKI</Text>
                 <TextInput
                   style={styles.passwordInput}
                   placeholder="Mot de passe admin"

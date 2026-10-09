@@ -1,12 +1,12 @@
 import SwipeBackPage from '../components/SwipeBackPage';
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Switch, Share } from 'react-native';
+import { View, StyleSheet, ScrollView, Switch, Share } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authFetch, clearToken } from '../utils/api';
 import { setSoundEnabled, isSoundEnabled } from '../utils/sounds';
 import { t } from '../utils/i18n';
-import { Txt, Icon, Button, Badge, Card, ScreenContainer, ScreenHeader, ListRow } from '../components/ui';
+import { Txt, Icon, Button, Badge, Card, Dialog, ScreenContainer, ScreenHeader, ListRow } from '../components/ui';
 import { COLOR, SPACE, RADII, BORDER, ICON_SIZE } from '../theme/tokens';
 
 // Réglages SKILKI (ouvert depuis l'engrenage du Profil) : parrainage, préférences, aide, compte.
@@ -53,6 +53,9 @@ export default function SettingsScreen() {
   const isGuest = guest !== '0';
   const [referralData, setReferralData] = useState<ReferralData | null>(null);
   const [soundOn, setSoundOn] = useState(isSoundEnabled());
+  const [deleteAsk, setDeleteAsk] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
 
   useEffect(() => { loadReferral(); }, []);
 
@@ -80,32 +83,26 @@ export default function SettingsScreen() {
     router.replace('/');
   };
 
-  const handleDeleteAccount = () => {
-    Alert.alert(
-      t('profile.delete_account_title'),
-      t('profile.delete_account_confirm'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('profile.delete_account_confirm_btn'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              const res = await authFetch(`${API_URL}/api/auth/delete-account`, { method: 'DELETE' });
-              if (res.ok) {
-                await clearToken();
-                await AsyncStorage.multiRemove(['duelo_user_id', 'duelo_pseudo', 'duelo_avatar_seed', 'duelo_avatar_url']);
-                router.replace('/');
-              } else {
-                Alert.alert(t('common.error'), t('profile.error_network'));
-              }
-            } catch {
-              Alert.alert(t('common.error'), t('profile.error_network'));
-            }
-          },
-        },
-      ]
-    );
+  // Dialog plutôt qu'Alert.alert : une alerte à boutons ne s'affiche pas sur le web
+  // (la suppression y était impossible). L'erreur reste dans le dialogue.
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    setDeleteError(false);
+    try {
+      const res = await authFetch(`${API_URL}/api/auth/delete-account`, { method: 'DELETE' });
+      if (res.ok) {
+        await clearToken();
+        await AsyncStorage.multiRemove(['duelo_user_id', 'duelo_pseudo', 'duelo_avatar_seed', 'duelo_avatar_url']);
+        setDeleteAsk(false);
+        router.replace('/');
+        return;
+      }
+      setDeleteError(true);
+    } catch {
+      setDeleteError(true);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const pending = referralData ? referralData.total_referrals - referralData.confirmed_referrals : 0;
@@ -215,11 +212,39 @@ export default function SettingsScreen() {
             label={t('profile.delete_account')}
             variant="danger"
             icon="trash"
-            onPress={handleDeleteAccount}
+            onPress={() => { setDeleteError(false); setDeleteAsk(true); }}
             fullWidth
             testID="settings-delete-account"
           />
         )}
+
+        <Dialog
+          visible={deleteAsk}
+          onClose={() => { if (!deleting) setDeleteAsk(false); }}
+          icon="trash"
+          title={t('profile.delete_account_title')}
+          message={t('profile.delete_account_confirm')}
+          actions={
+            <>
+              <Button
+                label={t('profile.delete_account_confirm_btn')}
+                variant="danger"
+                fullWidth
+                loading={deleting}
+                onPress={handleDeleteAccount}
+                testID="settings-delete-confirm"
+              />
+              <Button label={t('common.cancel')} variant="ghost" fullWidth disabled={deleting} onPress={() => setDeleteAsk(false)} />
+            </>
+          }
+        >
+          {deleteError ? (
+            <View style={s.inline}>
+              <Icon name="error" size={16} color={COLOR.status.errorText} />
+              <Txt variant="bodySmall" color={COLOR.status.errorText} style={s.flex}>{t('pilot.settings.delete_error')}</Txt>
+            </View>
+          ) : null}
+        </Dialog>
       </ScrollView>
     </ScreenContainer>
     </SwipeBackPage>

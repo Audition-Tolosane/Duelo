@@ -109,7 +109,7 @@ function Brand() {
           style={{ position: 'absolute', transform: [{ rotate: '0deg' }] }} />
       </View>
       <View>
-        <Text style={s.brandName}>Duelo</Text>
+        <Text style={s.brandName}>SKILKI</Text>
         <Text style={s.brandTag}>CONSOLE ADMIN</Text>
       </View>
     </View>

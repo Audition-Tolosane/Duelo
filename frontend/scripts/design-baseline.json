@@ -1,12 +1,9 @@
 {
  "totals": {
-  "gradient": 17,
-  "hex": 38,
+  "gradient": 12,
+  "hex": 7,
   "emoji": 2,
-  "rgba": 35,
-  "fontSize": 19,
-  "heavy": 4,
-  "iconLib": 2
+  "rgba": 1
  },
  "files": {
   "app/(tabs)/accueil.tsx": {
@@ -29,21 +26,6 @@
   },
   "app/shop.tsx": {
    "gradient": 1
-  },
-  "app/support.tsx": {
-   "hex": 26,
-   "rgba": 28,
-   "fontSize": 13,
-   "heavy": 2,
-   "gradient": 5,
-   "iconLib": 1
-  },
-  "app/terms.tsx": {
-   "hex": 5,
-   "rgba": 6,
-   "fontSize": 6,
-   "heavy": 2,
-   "iconLib": 1
   },
   "app/_layout.tsx": {
    "hex": 1
