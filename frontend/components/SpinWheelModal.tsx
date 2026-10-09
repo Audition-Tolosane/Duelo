@@ -65,9 +65,9 @@ function labelCenter(i: number): { x: number; y: number; rotation: number } {
   const midDeg = (i + 0.5) * SEG_DEG - 90;
   const midRad = toRad(midDeg);
   const dist = R * 0.62;
-  // Rotate text so it reads from center outward; flip upside-down segments
-  let textRot = midDeg + 90;
-  if (textRot > 90 && textRot <= 270) textRot += 180;
+  // Texte droit quand le segment passe en haut : le gain se lit toujours à l'endroit sous le pointeur
+  // (pas de retournement : il mettait le segment gagnant tête en bas une fois la roue arrêtée)
+  const textRot = midDeg + 90;
   return {
     x: CX + dist * Math.cos(midRad),
     y: CY + dist * Math.sin(midRad),

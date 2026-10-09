@@ -50,12 +50,15 @@
   - le gain s'appelle partout « XP ×2 », avec « Pendant 15 min » en détail ; il portait trois noms différents ;
   - le thème gagné s'affiche « Thème offert 24 h » ;
   - « Roue Quotidienne » devient « Roue quotidienne ».
+- Les nouveaux textes sont traduits dans les 9 autres langues (« Soon », « Pronto », etc.).
 - Espaces insécables dans « 24 h », « 15 min » et « 14 h 05 », pour qu'ils ne se coupent plus en fin de ligne.
 
 ## Mise en page
 
 - **Boutique en 320** : la colonne de texte ne faisait que 88 px, d'où des titres sur 2 lignes. Le prix et le bouton passent maintenant sous le texte, alignés avec lui.
 - **Tournoi** : les 4 chiffres passent en 2 × 2 sur toutes les largeurs. En une seule ligne, « 128 765 » et « Duels restants » débordaient, même en 390.
+
+- **Roue** : le segment gagnant s'affichait tête en bas sous le pointeur, à cause d'un retournement prévu pour la roue au repos. Retournement retiré : le gain se lit toujours à l'endroit.
 
 ## Tests
 
@@ -77,8 +80,6 @@
 ## Restant
 
 - **Backend** : les libellés de gain de `backend/spin.py` sont en français en dur (« Boost ×2 », « Thème 24h »). L'app affiche désormais ses propres libellés traduits pour le boost et le thème, mais le backend n'a pas été modifié.
-- **Traductions** : les nouvelles corrections de texte ne valent qu'en français. Les autres langues gardent leurs libellés (par exemple « Buy » au lieu de « Bientôt »).
-- **Roue** : les libellés des segments du bas sont tête en bêche. C'est la rotation d'origine, conservée.
 - « Duelo » reste visible dans l'administration (`admin.tsx`, `AdminUI.tsx`), qui est un outil interne : à traiter au Lot G si tu veux.
 
 ## Captures
