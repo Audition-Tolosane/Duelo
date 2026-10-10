@@ -114,6 +114,26 @@ interface DailyMission {
   rerolled?: boolean;
 }
 
+// Libellé de mission construit côté app (traduit, vocabulaire « duel ») ; celui du backend,
+// en français en dur, ne sert que pour un type inconnu.
+const MISSION_CATS = ['STV', 'CIN', 'SPO', 'GEO', 'HIS', 'SCI'];
+function missionLabel(m: DailyMission): string {
+  const n = { n: String(m.target) };
+  switch (m.type) {
+    case 'play_N': return t(pluralKey('pilot.mission.play', m.target), n);
+    case 'win_N': return t(pluralKey('pilot.mission.win', m.target), n);
+    case 'perfect_score': return t('pilot.mission.perfect');
+    case 'send_challenge': return t('pilot.mission.send_challenge');
+    case 'complete_challenge': return t('pilot.mission.complete_challenge');
+    case 'play_category':
+      if (m.cat && MISSION_CATS.includes(m.cat)) {
+        return t(pluralKey('pilot.mission.category', m.target), { ...n, cat: t(`pilot.mission.cat_${m.cat}`) });
+      }
+      return m.label;
+    default: return m.label;
+  }
+}
+
 interface DailyMissionsState {
   missions: DailyMission[];
   multiplier: number;
@@ -359,7 +379,7 @@ const MissionsCard = React.memo(function MissionsCard({
               />
               <View style={styles.flexGap}>
                 <Txt variant="bodySmall" color={m.completed ? COLOR.text.secondary : COLOR.text.primary} numberOfLines={2}>
-                  {m.label}
+                  {missionLabel(m)}
                 </Txt>
                 <View style={styles.rowCenter}>
                   <ProgressBar value={pct} tone={m.completed ? 'success' : 'action'} height={4} style={styles.flex} />

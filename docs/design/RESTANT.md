@@ -10,8 +10,6 @@ C. **Fichiers backend non suivis** (`backend/i18n.py`, `backend/simulate_games.p
 
 ## À trancher par toi
 
-1. **Vocabulaire duel / défi / match / partie.** Il reste « Résultats de match » et « parties ». Proposition : « duel » pour une partie jouée, « défi » pour l'invitation. *(Lot B)*
-2. **« Suis des joueurs pour les voir ici »** sous l'onglet « Amis » : faut-il parler de suivre ou d'amis ? *(Lot C)*
 3. **Ballon de Toy Story** (icône de thème) : il garde un léger risque de droits. *(Icônes)*
 
 ## Backend (à faire au prochain redéploiement sur Railway)
@@ -40,6 +38,9 @@ C. **Fichiers backend non suivis** (`backend/i18n.py`, `backend/simulate_games.p
 13. **Libellés des segments du bas de la roue** à l'envers pendant la rotation, comme sur une vraie roue. Le gain, lui, se lit toujours à l'endroit. *(Lot E)*
 
 ## Réglé depuis
+
+- **Vocabulaire** (tranché le 10/10/2026) : « duel » pour une partie jouée, partout (24 textes en français et en anglais), « défi » pour l'invitation. Les libellés de mission sont construits par l'app, traduits (« Gagner 2 duels », « 3 duels en Cinéma ») ; ceux du backend (`services/missions.py`, « 2 parties en Cinéma ») ne servent plus qu'en secours et pourront être alignés au prochain déploiement.
+- **Filtre « Amis » du Classement** (option B) : on garde « Amis » ; l'état vide dit « Les joueurs que tu suis apparaîtront ici. »
 
 - Les 1 032 icônes de thèmes sont produites et relues, les 56 icônes moyennes refaites et les 9 icônes à risque de droits remplacées (le Lot B les signalait comme restant à faire).
 - Les traductions des textes revus aux Lots E et F sont faites dans les 10 langues.
