@@ -2,6 +2,12 @@
 
 Liste tenue à jour à chaque lot. Elle regroupe les points ouverts des rapports `10-lot-a.md` à `16-lot-g.md` (Lots A à G terminés).
 
+## Mise en production de la refonte
+
+A. **Tester sur un vrai téléphone (Expo Go).** Toutes les vérifications ont été faites sur le web en 390 et 320 px : il faut repasser sur iOS et Android, en particulier les dialogues imbriqués dans la feuille Bonus, le clavier du support et la roue.
+B. **Fusionner la branche `refonte-skilki` dans `master`**, qui a 22 commits d'avance. Elle n'a jamais été poussée : la pousser seulement après ta validation.
+C. **Fichiers backend non suivis** (`backend/i18n.py`, `backend/simulate_games.py`) : décider s'ils vont avec le prochain déploiement.
+
 ## À trancher par toi
 
 1. **Vocabulaire duel / défi / match / partie.** Il reste « Résultats de match » et « parties ». Proposition : « duel » pour une partie jouée, « défi » pour l'invitation. *(Lot B)*
