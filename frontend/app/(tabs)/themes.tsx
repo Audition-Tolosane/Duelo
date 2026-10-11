@@ -10,7 +10,7 @@ import {
 import { useTabBar } from '../../contexts/TabBarContext';
 import { COLOR, SPACE, RADII, BORDER, SIZE, ICON_SIZE } from '../../theme/tokens';
 import { authFetch } from '../../utils/api';
-import { t } from '../../utils/i18n';
+import { t, getLanguage } from '../../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -72,9 +72,11 @@ export default function ThemesScreen() {
     setLoadError(false);
     try {
       const uid = await AsyncStorage.getItem('duelo_user_id');
-      const url = uid
-        ? `${API_URL}/api/explore/super-categories?user_id=${uid}`
-        : `${API_URL}/api/explore/super-categories`;
+      // lang : noms de clusters traduits côté serveur (i18n.CLUSTERS_TRADUITS)
+      const lang = getLanguage();
+      const qs = [uid ? `user_id=${uid}` : '', lang && lang !== 'fr' ? `lang=${lang}` : '']
+        .filter(Boolean).join('&');
+      const url = `${API_URL}/api/explore/super-categories${qs ? `?${qs}` : ''}`;
       const res = await fetch(url);
       const data = await res.json();
       setCats(Array.isArray(data) ? data : []);

@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from database import get_db
 from models import User, Question, Theme, UserThemeXP, Match, ThemeFollow
-from i18n import libelles_theme, nom_theme, theme_localise
+from i18n import libelles_theme, nom_theme, theme_localise, nom_cluster
 from constants import SUPER_CATEGORY_META, CLUSTER_ICONS
 from services.xp import (
     get_level, get_xp_progress, get_theme_title, get_theme_unlocked_titles,
@@ -103,7 +103,7 @@ async def themes_explore(user_id: Optional[str] = None, lang: str = 'fr',
 
             cluster_themes.append({
                 "id": f"cluster_{sc_name}_{cluster_name}".replace(" ", "_"),
-                "name": cluster_name, "icon": cluster_icon, "playable": True,
+                "name": nom_cluster(cluster_name, lang), "icon": cluster_icon, "playable": True,
                 "level": cluster_level, "xp": cluster_xp,
                 "title": "", "title_lvl50": "",
                 "xp_progress": get_xp_progress(cluster_xp, cluster_level),
@@ -112,7 +112,7 @@ async def themes_explore(user_id: Optional[str] = None, lang: str = 'fr',
 
         pillars.append({
             "id": sc_name.lower(), "name": meta["label"].upper(),
-            "label": ", ".join(clusters.keys()),
+            "label": ", ".join(nom_cluster(c, lang) for c in clusters.keys()),
             "color": meta["color"], "icon": meta["icon"], "themes": cluster_themes,
         })
 
@@ -120,7 +120,7 @@ async def themes_explore(user_id: Optional[str] = None, lang: str = 'fr',
 
 
 @router.get("/explore/super-categories")
-async def get_super_categories(db: AsyncSession = Depends(get_db)):
+async def get_super_categories(lang: str = 'fr', db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(Theme.super_category, Theme.cluster, func.count(Theme.id).label("theme_count"))
         .group_by(Theme.super_category, Theme.cluster)
@@ -137,7 +137,7 @@ async def get_super_categories(db: AsyncSession = Depends(get_db)):
                 "color": meta["color"], "clusters": [], "total_themes": 0,
             }
         cluster_icon = CLUSTER_ICONS.get(cluster, "📁")
-        super_cats[sc]["clusters"].append({"name": cluster, "icon": cluster_icon, "theme_count": count})
+        super_cats[sc]["clusters"].append({"name": nom_cluster(cluster, lang), "icon": cluster_icon, "theme_count": count})
         super_cats[sc]["total_themes"] += count
 
     return list(super_cats.values())
@@ -165,7 +165,7 @@ async def get_clusters(super_category: str, user_id: Optional[str] = None,
     for t in themes:
         if t.cluster not in clusters:
             clusters[t.cluster] = {
-                "name": t.cluster, "icon": CLUSTER_ICONS.get(t.cluster, "📁"), "themes": [],
+                "name": nom_cluster(t.cluster, lang), "icon": CLUSTER_ICONS.get(t.cluster, "📁"), "themes": [],
             }
 
         theme_xp = user_xp_map.get(t.id, 0)
@@ -253,7 +253,7 @@ async def get_theme_detail(theme_id: str, user_id: Optional[str] = None,
 
     return {
         "id": theme.id, "name": vue.name, "description": vue.description,
-        "super_category": theme.super_category, "cluster": theme.cluster,
+        "super_category": theme.super_category, "cluster": nom_cluster(theme.cluster, lang),
         "color_hex": theme.color_hex or "#8A2BE2", "icon_url": theme.icon_url or "",
         "question_count": theme.question_count or 0,
         "followers_count": followers_count,

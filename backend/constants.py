@@ -56,13 +56,15 @@ CLUSTER_ICONS = {
     "Musiques de Films & Jeux": "🎼",
     "Rock & Classiques": "🎸",
     # ARENA
-    "Combat & Athlé": "🥊",
+    "Combat & Sports individuels": "🥊",
     "E-sport & Gaming": "🎮",
     "Sports de Balle": "🏀",
+    "Sports mécaniques": "🏎️",
     # LEGENDS
-    "Antiq. & M-Â": "🏛️",
-    "Hist. Moderne": "📜",
-    "Mythologies": "⚡",
+    "Antiquité & Moyen Âge": "🏛️",
+    "Histoire moderne": "📜",
+    "Histoires nationales": "🗺️",
+    "Mythes & Religions": "⚡",
     # LAB
     "Espace & Univers": "🚀",
     "Physique & Chimie": "⚗️",
