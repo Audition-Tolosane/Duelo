@@ -15,7 +15,7 @@ import { PALETTE, alpha } from '../../theme/tokens';
 
 const ROWS = 11;              // rangées visibles ; la première et la dernière sont coupées à moitié
 const POOL = 36;              // icônes distinctes utilisées
-const OPACITY = 0.2;          // opacité globale du motif
+const OPACITY = 0.3;          // opacité globale du motif
 const CURVE = 0.07;           // bombé vertical aux bords (fraction de la distance au centre)
 const SPREAD = 0.06;          // étirement horizontal aux bords
 const WIDEN = 0.1;            // grossissement aux bords
@@ -120,22 +120,15 @@ export default function ThemeIconBackdrop({ width, height }: Props) {
           />
         ))}
       </Svg>
-      {/* Voiles : le titre de page (haut) et la barre d'onglets (bas) restent sur un fond calme */}
-      <LinearGradient
-        colors={[alpha(PALETTE.night, 0.75), alpha(PALETTE.night, 0.6), alpha(PALETTE.night, 0)]}
-        locations={[0, 0.55, 1]}
-        style={[styles.veil, styles.veilTop]}
-      />
+      {/* Voile : la barre d'onglets reste sur un fond calme */}
       <LinearGradient
         colors={[alpha(PALETTE.night, 0), alpha(PALETTE.night, 0.8)]}
-        style={[styles.veil, styles.veilBottom]}
+        style={styles.veilBottom}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  veil: { position: 'absolute', left: 0, right: 0 },
-  veilTop: { top: 0, height: 200 },  // couvre l'en-tête de page, même sur deux lignes à 320 px
-  veilBottom: { bottom: 0, height: 140 },
+  veilBottom: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 140 },
 });

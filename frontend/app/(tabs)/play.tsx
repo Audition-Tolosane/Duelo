@@ -70,8 +70,9 @@ export default function PlayScreen() {
     <ThemeIconBackdrop width={area.w} height={area.h} />
     <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
       <View style={s.pageHeader}>
-        <Txt variant="overline">{t('play.modes_eyebrow')}</Txt>
-        <Txt variant="h1">{t('play.modes_title')}</Txt>
+        <View style={s.headerScrim} pointerEvents="none" />
+        <Txt variant="overline" style={s.overMotif}>{t('play.modes_eyebrow')}</Txt>
+        <Txt variant="h1" style={s.overMotif}>{t('play.modes_title')}</Txt>
       </View>
 
       {/* Duel rapide : un seul CTA jaune (même carte que l'Accueil) */}
@@ -131,9 +132,19 @@ export default function PlayScreen() {
 const s = StyleSheet.create({
   root: { flex: 1 },
   // Bas : place réservée à la barre d'onglets flottante
-  scroll: { paddingHorizontal: SPACE.screenX, paddingTop: SPACE.lg, paddingBottom: 120, gap: SPACE.lg },
+  // Contenu centré verticalement : le fond d'icônes reste visible au-dessus et au-dessous
+  scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: SPACE.screenX, paddingTop: SPACE.lg, paddingBottom: 120, gap: SPACE.lg },
   flex: { flex: 1, gap: SPACE.xxs },
   pageHeader: { gap: SPACE.xs },
+  // Voile nuit à bords fondus derrière le titre : le motif s'efface sous le texte, sans cadre visible
+  headerScrim: {
+    position: 'absolute', top: 0, bottom: 0, left: 0, right: SPACE.xl,
+    borderRadius: RADII.xl,
+    backgroundColor: alpha(PALETTE.night, 0.7),
+    boxShadow: `0 0 24px 18px ${alpha(PALETTE.night, 0.7)}`,
+  },
+  // Ombre nuit douce : le titre posé directement sur le motif garde son contraste
+  overMotif: { textShadowColor: PALETTE.night, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 12 },
 
   // Coque : porte l'ombre (la carte rogne son filigrane, ce qui couperait l'ombre sur iOS)
   heroShell: { borderRadius: RADII.xl, backgroundColor: COLOR.surface.card, ...ELEVATION.e2 },
