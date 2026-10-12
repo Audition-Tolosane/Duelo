@@ -8,7 +8,7 @@ import { startQuickMatch } from '../../utils/quickMatch';
 import { useTabBar } from '../../contexts/TabBarContext';
 import SwordMark from '../../components/SwordMark';
 import { t } from '../../utils/i18n';
-import { Txt, Icon, IconName, Button, Badge, Card, ListRow } from '../../components/ui';
+import { Txt, Icon, IconName, Button, Badge, Card, ListRow, ThemeIconBackdrop } from '../../components/ui';
 import { COLOR, SPACE, RADII, BORDER, ELEVATION, GRADIENTS, PALETTE, alpha } from '../../theme/tokens';
 
 // Onglet central « Jouer » : modes de jeu. Même carte « Duel rapide » que l'Accueil (même action),
@@ -22,6 +22,8 @@ export default function PlayScreen() {
   const { width } = useWindowDimensions();
   const compact = width < 360;
   const [quickLoading, setQuickLoading] = useState(false);
+  // Taille réelle de la page (varie quand l'en-tête se replie) : le fond d'icônes la couvre exactement
+  const [area, setArea] = useState({ w: 0, h: 0 });
 
   // Les tournois ont lieu du vendredi au dimanche (cf. crons backend)
   const day = new Date().getDay();
@@ -61,6 +63,11 @@ export default function PlayScreen() {
   ];
 
   return (
+    <View style={s.root} onLayout={(e) => {
+      const { width: w, height: h } = e.nativeEvent.layout;
+      if (Math.round(w) !== area.w || Math.round(h) !== area.h) setArea({ w: Math.round(w), h: Math.round(h) });
+    }}>
+    <ThemeIconBackdrop width={area.w} height={area.h} />
     <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
       <View style={s.pageHeader}>
         <Txt variant="overline">{t('play.modes_eyebrow')}</Txt>
@@ -117,10 +124,12 @@ export default function PlayScreen() {
         </Card>
       </Animated.View>
     </ScrollView>
+    </View>
   );
 }
 
 const s = StyleSheet.create({
+  root: { flex: 1 },
   // Bas : place réservée à la barre d'onglets flottante
   scroll: { paddingHorizontal: SPACE.screenX, paddingTop: SPACE.lg, paddingBottom: 120, gap: SPACE.lg },
   flex: { flex: 1, gap: SPACE.xxs },

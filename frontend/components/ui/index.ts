@@ -19,6 +19,7 @@ export { default as Loader } from './Loader';
 export { default as Dialog } from './Dialog';
 export { default as BottomSheet } from './BottomSheet';
 export { default as ThemeIcon, ThemeIllustration } from './ThemeIcon';
+export { default as ThemeIconBackdrop } from './ThemeIconBackdrop';
 export { default as ThemeCard } from './ThemeCard';
 export { default as PlayerCard } from './PlayerCard';
 export { default as AnswerButton } from './AnswerButton';

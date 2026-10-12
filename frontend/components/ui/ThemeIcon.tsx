@@ -10,7 +10,7 @@ const ELEMENTS: Record<string, React.ComponentType<any>> = {
   path: Path, circle: Circle, rect: Rect, ellipse: Ellipse, polygon: Polygon, line: Line, polyline: Polyline, g: G,
 };
 
-function renderNode(n: SvgNode, key: string): React.ReactNode {
+export function renderNode(n: SvgNode, key: string): React.ReactNode {
   const Cmp = ELEMENTS[n.t];
   if (!Cmp) return null;
   return <Cmp key={key} {...n.p}>{n.c?.map((c, i) => renderNode(c, `${key}.${i}`))}</Cmp>;
