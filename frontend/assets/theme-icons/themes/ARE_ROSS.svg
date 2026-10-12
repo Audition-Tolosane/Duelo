@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Valentino Rossi">
+  <path d="M109 189L98 208M83 163L64 174M74 128L52 128M83 93L64 82M109 67L98 48" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M144 72A56 56 0 0 0 144 184Z" fill="#FFDB3D"/>
+  <path d="M156 72A56 56 0 0 1 156 184A64 64 0 0 0 156 72Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="212.0,50.0 215.5,59.1 225.3,59.7 217.7,65.9 220.2,75.3 212.0,70.0 203.8,75.3 206.3,65.9 198.7,59.7 208.5,59.1" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M104 100A46 46 0 0 1 120 84" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

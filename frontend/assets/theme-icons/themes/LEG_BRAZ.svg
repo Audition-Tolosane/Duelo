@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Histoire du Brésil">
+  <circle cx="128" cy="104" r="62" fill="#FFDB3D"/>
+  <path d="M42 96H214V112H42Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M108 112L60 116L108 136Z" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M148 112L196 116L148 136Z" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M112 96H144L150 196H106Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="76" r="14" fill="#12606D"/>
+  <rect x="88" y="198" width="80" height="20" rx="8" fill="#FF6B5B"/>
+  <path d="M84 64A62 62 0 0 1 104 48" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

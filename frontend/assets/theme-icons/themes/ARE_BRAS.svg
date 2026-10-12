@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Brasileirão">
+  <path d="M76 142L174 62" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M120 106V114" stroke="#12606D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <rect x="106" y="112" width="30" height="24" rx="6" fill="#FFDB3D"/>
+  <path d="M38 212C42 166 58 142 78 142C98 142 108 168 110 212Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M120 212C120 120 142 58 176 58C206 58 218 130 218 212Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="62" cy="72" r="24" fill="#FFDB3D"/>
+  <circle cx="62" cy="72" r="8" fill="#0B3D4A"/>
+  <path d="M150 108C152 90 158 78 166 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

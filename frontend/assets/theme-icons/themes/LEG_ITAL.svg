@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Histoire de l'Italie">
+  <path d="M76 52L108 176" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M34 140C46 152 70 158 128 160C172 162 192 150 200 124C212 146 204 176 176 186C140 198 82 194 54 174C44 166 38 154 34 140Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M196 128L200 88L220 84L220 96L208 98L218 104L208 108L216 116L206 120Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <rect x="110" y="148" width="56" height="16" rx="8" fill="#FFDB3D"/>
+  <path d="M44 216C60 206 76 206 92 216C108 226 124 226 140 216C156 206 172 206 188 216" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 168L82 174" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

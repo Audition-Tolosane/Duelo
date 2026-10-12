@@ -73,14 +73,13 @@ const BY_UNIVERSE: Record<string, ThemeIconName> = {
   LEGENDS: 'histoire',
   LAB: 'sciences',
   GLOBE: 'geographie',
+  ART: 'arts',
+  LIFE: 'vie',
+  MIND: 'esprit',
 };
 
-// Univers sans illustration pour l'instant : pictogramme Lucide sur la même plaque crème
-export const UNIVERSE_FALLBACK_GLYPH: Record<string, IconName> = {
-  ART: 'palette',
-  LIFE: 'leaf',
-  MIND: 'brain',
-};
+// Univers inconnu : pictogramme Lucide sur la même plaque crème
+export const UNIVERSE_FALLBACK_GLYPH: Record<string, IconName> = {};
 
 export type ThemeIconSource = {
   /** Id du thème (ARE_CLRY…) : clé de son icône personnalisée. */

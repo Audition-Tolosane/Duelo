@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Palmeiras">
+  <path d="M69 173Q50 154 42 128M91 135Q74 112 70 86M119 105Q106 80 106 56M154 80Q146 62 150 42M69 173Q96 182 114 198M91 135Q120 140 138 158M119 105Q150 108 168 124M154 80Q178 82 194 94" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M56 204C80 130 130 80 206 60" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="182" cy="186" r="32" fill="#FFDB3D"/>
+  <circle cx="182" cy="186" r="11" fill="#0B3D4A"/>
+  <path d="M162 176C164 168 168 162 174 159" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

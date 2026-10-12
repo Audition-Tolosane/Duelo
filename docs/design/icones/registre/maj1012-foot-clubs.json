@@ -1,0 +1,12 @@
+[
+  {"id": "ARE_ROMA", "symbole": "louve debout et ballon"},
+  {"id": "ARE_BVB", "symbole": "mur jaune en gradins et drapeau"},
+  {"id": "ARE_CORI", "symbole": "deux rames croisées et ballon"},
+  {"id": "ARE_FLAM", "symbole": "urubu perché sur un ballon"},
+  {"id": "ARE_PALM", "symbole": "palme et ballon"},
+  {"id": "ARE_NAPO", "symbole": "Vésuve crachant un ballon"},
+  {"id": "ARE_BRAS", "symbole": "Pain de Sucre et téléphérique"},
+  {"id": "ARE_BUND", "symbole": "plateau Meisterschale à gemmes"},
+  {"id": "ARE_SERA", "symbole": "botte italienne (carte) qui frappe un ballon à la place de la Sicile"},
+  {"id": "ARE_EKST", "symbole": "Palais de la Culture de Varsovie"}
+]

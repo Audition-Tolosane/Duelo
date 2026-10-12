@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ayrton Senna">
+  <path d="M54 45.4C61.8 58.4 67 66.2 67 74A13 13 0 0 1 41 74C41 66.2 46.2 58.4 54 45.4Z" fill="#12606D"/>
+  <path d="M40 113.8C46.6 124.8 51 131.4 51 138A11 11 0 0 1 29 138C29 131.4 33.4 124.8 40 113.8Z" fill="#12606D"/>
+  <path d="M88 18.0C94.0 28.0 98 34.0 98 40A10 10 0 0 1 78 40C78 34.0 82.0 28.0 88 18.0Z" fill="#12606D"/>
+  <path d="M90 206C70 182 66 142 78 114C94 82 124 70 156 70C194 70 218 100 218 140V158C218 170 210 178 198 180L190 206Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M136 116C136 108 142 104 150 104H202C208 112 210 120 210 128V140H148C140 140 136 134 136 128Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M84 166H206" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M96 122C102 106 112 96 126 90" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

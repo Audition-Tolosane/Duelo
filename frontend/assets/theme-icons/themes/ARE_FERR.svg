@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Ferrari">
+  <path d="M38 146C38 134 42 128 54 126L92 120C104 106 118 98 136 98C152 98 162 104 172 118L208 128C216 130 220 136 220 144V150C220 156 216 160 210 160H48C42 160 38 156 38 150Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M106 120C114 112 124 108 136 108C146 108 154 112 160 120Z" fill="#12606D" stroke="#12606D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M44 120L64 118" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="78" cy="160" r="25" fill="#12606D"/>
+  <circle cx="78" cy="160" r="10" fill="#FFDB3D"/>
+  <circle cx="184" cy="160" r="25" fill="#12606D"/>
+  <circle cx="184" cy="160" r="10" fill="#FFDB3D"/>
+  <path d="M202 136L212 140" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M56 138Q62 132 76 130" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

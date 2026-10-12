@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Physique du Quotidien">
+  <path d="M48 74C40 64 56 56 48 44M76 62C68 52 84 44 76 32" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M96 118L60 94L64 112L92 146Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M178 112C212 110 222 136 210 166C206 176 198 182 188 184" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M84 200L96 108C98 96 106 90 118 90H154C166 90 174 96 176 108L188 200Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="110" y="72" width="52" height="18" rx="9" fill="#12606D"/>
+  <rect x="66" y="196" width="140" height="22" rx="11" fill="#FFDB3D"/>
+  <polygon points="142,112 118,150 136,150 126,182 156,138 138,138 148,112" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M106 116L102 140" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

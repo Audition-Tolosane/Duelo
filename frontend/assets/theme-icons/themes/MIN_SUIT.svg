@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Suites &amp; Logique">
+  <rect x="38" y="38" width="180" height="180" rx="24" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="54" y="54" width="68" height="68" rx="12" fill="#E8F1EC"/>
+  <rect x="134" y="54" width="68" height="68" rx="12" fill="#E8F1EC"/>
+  <rect x="54" y="134" width="68" height="68" rx="12" fill="#E8F1EC"/>
+  <rect x="134" y="134" width="68" height="68" rx="12" fill="#FF6B5B"/>
+  <polygon points="88,70 106,104 70,104" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="152" y="72" width="32" height="32" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="88,148 108,163 101,186 75,186 68,163" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="150" y="150" width="36" height="36" rx="8" stroke="#E8F1EC" stroke-width="6" stroke-dasharray="10 10" fill="none"/>
+  <path d="M48 70V54" stroke="#E8F1EC" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

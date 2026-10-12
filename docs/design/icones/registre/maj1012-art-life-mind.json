@@ -1,0 +1,11 @@
+[
+  {"id": "ART_ARMO", "symbole": "maison en porte-à-faux sur cascade"},
+  {"id": "ART_DESN", "symbole": "chaise bistrot Thonet n° 14 vue de face (dossier en arceau, assise ronde, cercle entre les pieds)"},
+  {"id": "ART_GREK", "symbole": "amphore à frise rouge"},
+  {"id": "LIF_VEGE", "symbole": "pissenlit en graines"},
+  {"id": "LIF_STRA", "symbole": "hérisson roulé en boule"},
+  {"id": "MIN_CALC", "symbole": "quatre signes opératoires"},
+  {"id": "MIN_CALX", "symbole": "racine carrée sur un carré"},
+  {"id": "MIN_SUIT", "symbole": "matrice de formes à case vide"},
+  {"id": "MIN_PHGQ", "symbole": "nuage de pensée et point d'interrogation"}
+]

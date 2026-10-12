@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Équipe de Pologne de football">
+  <path d="M100 212C86 182 82 158 90 134C98 108 120 96 146 98C168 100 182 112 186 128L192 160C182 162 174 166 166 172C160 184 156 196 154 212L138 198L126 216L112 198Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M178 118C202 114 222 130 220 160C220 168 216 172 212 168C206 160 198 156 186 156Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="158" cy="128" r="12" fill="#E8F1EC"/>
+  <circle cx="161" cy="129" r="6" fill="#0B3D4A"/>
+  <path d="M142 112L176 118" stroke="#0B3D4A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="100,92 104,58 120,76 132,50 144,76 160,58 164,92" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="132" cy="80" r="7" fill="#0B3D4A"/>
+  <path d="M106 140C106 126 112 116 122 110" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

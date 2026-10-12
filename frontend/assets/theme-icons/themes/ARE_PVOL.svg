@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Volley-ball polonais">
+  <g transform="translate(88 140) rotate(-14)">
+  <rect x="-30" y="-10" width="60" height="64" rx="22" fill="#FF6B5B"/>
+  <path d="M-22 0V-44M0 -4V-52M22 0V-44" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M-28 30L-46 8" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g transform="translate(168 140) rotate(14)">
+  <rect x="-30" y="-10" width="60" height="64" rx="22" fill="#FF6B5B"/>
+  <path d="M-22 0V-44M0 -4V-52M22 0V-44" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M28 30L46 8" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <rect x="36" y="192" width="184" height="24" rx="12" fill="#12606D"/>
+  <circle cx="128" cy="58" r="26" fill="#FFDB3D"/>
+  <path d="M110 50C124 44 140 48 148 60M112 72C124 64 140 66 148 74" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M70 132V150" stroke="#E8F1EC" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

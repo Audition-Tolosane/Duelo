@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Histoire de la Pologne">
+  <path d="M88 168L69 143L59 118L56 94L62 71L76 48L98 26L78 31L60 15L56 55L28 39L44 82L10 75L43 110L11 115L54 136L30 148Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M88 168Q20 92 98 26" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M168 168L187 143L197 118L200 94L194 71L180 48L158 26L178 31L196 15L200 55L228 39L212 82L246 75L213 110L245 115L202 136L226 148Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M168 168Q236 92 158 26" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M86 140C100 130 114 128 128 128C142 128 156 130 170 140L156 162L160 204Q128 218 96 204L100 162Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M100 168Q128 180 156 168M102 190Q128 202 154 190" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M108 114A20 20 0 0 1 148 114Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="128" cy="86" r="6" fill="#12606D"/>
+  <path d="M100 156L104 146" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

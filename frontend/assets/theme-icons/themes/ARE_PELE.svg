@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pelé">
+  <path d="M90 196H166L174 218H82Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="100" y="174" width="56" height="26" rx="8" fill="#12606D"/>
+  <path d="M118 178C114 150 116 132 128 112C140 132 142 150 138 178Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M124 128C98 120 72 96 60 58C78 62 92 74 100 84C104 74 106 66 106 60C118 74 126 92 128 108Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M132 128C158 120 184 96 196 58C178 62 164 74 156 84C152 74 150 66 150 60C138 74 130 92 128 108Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M88 34H168C168 58 152 74 128 74C104 74 88 58 88 34Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="48.0,128.0 50.9,136.0 59.4,136.3 52.8,141.5 55.1,149.7 48.0,145.0 40.9,149.7 43.2,141.5 36.6,136.3 45.1,136.0" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="208.0,128.0 210.9,136.0 219.4,136.3 212.8,141.5 215.1,149.7 208.0,145.0 200.9,149.7 203.2,141.5 196.6,136.3 205.1,136.0" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M72 74L82 86" stroke="#E8F1EC" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

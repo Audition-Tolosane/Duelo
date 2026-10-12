@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Football polonais">
+  <polygon points="128,38 138,62 118,62" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M40 214V168H72V120H94V84H110V62H146V84H162V120H184V168H216V214Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M100 136V156M116 136V156M140 136V156M156 136V156M56 184V200M88 184V200M128 184V200" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="102" r="10" fill="#FFDB3D"/>
+  <circle cx="194" cy="194" r="26" fill="#FFDB3D"/>
+  <circle cx="194" cy="194" r="9" fill="#0B3D4A"/>
+  <path d="M80 132V150" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

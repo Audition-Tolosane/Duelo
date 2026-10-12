@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Stratégies du Vivant">
+  <path d="M50 214Q96 186 150 206Q118 224 50 214Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="202,132 181,143 197,161 173,164 182,186 159,181 160,205 140,192 133,215 118,196 103,215 96,192 76,205 77,181 54,186 63,164 39,161 55,143 34,132 55,121 39,103 63,100 54,78 77,83 76,59 96,72 103,49 118,68 133,49 140,72 160,59 159,83 182,78 173,100 197,103 181,121" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M132 120Q188 118 210 160Q184 184 128 170Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="208" cy="160" r="10" fill="#FF6B5B"/>
+  <path d="M160 140Q168 148 178 142" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M72 104Q80 86 98 78" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

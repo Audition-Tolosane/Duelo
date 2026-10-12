@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="AS Roma">
+  <path d="M198 102C222 112 226 140 214 162" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M104 126V204M126 126V200M164 126V200M186 126V204" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M90 100C90 90 98 86 112 86L172 88C190 88 200 98 200 110C200 124 190 130 174 130L112 130C98 130 90 122 90 112Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="114,112 110,80 106,46 94,64 86,44 78,66 38,80 40,92 74,100 94,118" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="82" cy="76" r="6" fill="#0B3D4A"/>
+  <circle cx="58" cy="190" r="26" fill="#FFDB3D"/>
+  <circle cx="58" cy="190" r="9" fill="#0B3D4A"/>
+  <path d="M120 98C130 94 142 93 152 94" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Corinthians">
+  <g transform="rotate(45 128 128)">
+  <path d="M128 90V196" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <ellipse cx="128" cy="72" rx="24" ry="44" fill="#12606D"/>
+  <ellipse cx="128" cy="74" rx="9" ry="28" fill="#0B3D4A"/>
+  <rect x="118" y="190" width="20" height="32" rx="10" fill="#FFDB3D"/>
+  </g>
+  <g transform="rotate(-45 128 128)">
+  <path d="M128 90V196" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <ellipse cx="128" cy="72" rx="24" ry="44" fill="#12606D"/>
+  <ellipse cx="128" cy="74" rx="9" ry="28" fill="#0B3D4A"/>
+  <rect x="118" y="190" width="20" height="32" rx="10" fill="#FFDB3D"/>
+  <path d="M112 54V78" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+  <circle cx="128" cy="128" r="30" fill="#FFDB3D"/>
+  <circle cx="128" cy="128" r="10" fill="#0B3D4A"/>
+</svg>

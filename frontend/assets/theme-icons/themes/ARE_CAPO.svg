@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Capoeira">
+  <g transform="rotate(18 128 128)">
+  <path d="M134 32C78 88 78 168 134 224" stroke="#12606D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M134 32V224" stroke="#FFDB3D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="166" cy="172" r="38" fill="#FFDB3D"/>
+  <circle cx="176" cy="180" r="16" fill="#12606D"/>
+  <path d="M150 118L196 76" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M188 72C196 58 216 56 222 70C228 84 216 100 202 98C190 96 182 84 188 72Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M196 74L214 90" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M100 96C96 108 94 120 94 132" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

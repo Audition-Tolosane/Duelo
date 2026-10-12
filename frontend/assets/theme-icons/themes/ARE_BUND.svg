@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Bundesliga">
+  <ellipse cx="128" cy="144" rx="96" ry="62" fill="#12606D"/>
+  <ellipse cx="128" cy="126" rx="96" ry="62" fill="#FFDB3D"/>
+  <ellipse cx="128" cy="126" rx="70" ry="44" fill="#12606D"/>
+  <ellipse cx="128" cy="126" rx="40" ry="24" fill="#FFDB3D"/>
+  <ellipse cx="128" cy="126" rx="16" ry="9" fill="#12606D"/>
+  <path d="M211 126L211 126M45 126L45 126M128 73L128 73M128 179L128 179M187 89L187 89M69 163L69 163M187 163L187 163" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M46 112C52 98 62 88 76 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

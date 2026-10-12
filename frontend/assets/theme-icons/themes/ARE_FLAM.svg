@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Flamengo">
+  <circle cx="132" cy="196" r="28" fill="#FFDB3D"/>
+  <circle cx="132" cy="200" r="9" fill="#12606D"/>
+  <polygon points="172,156 212,192 184,196" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M96 120C96 92 120 80 146 84C178 88 196 118 192 150C188 172 172 180 148 180L118 176C104 166 96 146 96 120Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M110 108L92 82" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <circle cx="86" cy="70" r="20" fill="#FF6B5B"/>
+  <polygon points="68,66 50,80 68,84" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="86" cy="66" r="5" fill="#12606D"/>
+  <path d="M108 124C110 108 120 100 132 97" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Histoire du Mexique">
+  <circle cx="128" cy="128" r="94" fill="#12606D"/>
+  <path d="M207.5 160.9L190.8 140.3L181.1 163.8ZM160.9 207.5L163.8 181.1L140.3 190.8ZM95.1 207.5L115.7 190.8L92.2 181.1ZM48.5 160.9L74.9 163.8L65.2 140.3ZM48.5 95.1L65.2 115.7L74.9 92.2ZM95.1 48.5L92.2 74.9L115.7 65.2ZM160.9 48.5L140.3 65.2L163.8 74.9ZM207.5 95.1L181.1 92.2L190.8 115.7Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="128" r="58" fill="#0B3D4A"/>
+  <path d="M148.3 156.3L156.3 148.3L164.3 156.3L156.3 164.3ZM91.7 156.3L99.7 148.3L107.7 156.3L99.7 164.3ZM91.7 99.7L99.7 91.7L107.7 99.7L99.7 107.7ZM148.3 99.7L156.3 91.7L164.3 99.7L156.3 107.7Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="128" cy="128" r="22" fill="#FFDB3D"/>
+  <circle cx="128" cy="128" r="9" fill="#0B3D4A"/>
+  <path d="M56 96A78 78 0 0 1 72 72" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

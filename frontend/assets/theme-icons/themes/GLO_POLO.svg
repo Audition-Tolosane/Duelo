@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Pologne">
+  <g transform="translate(0 -14)">
+  <ellipse cx="128" cy="178" rx="94" ry="26" fill="#12606D"/>
+  <ellipse cx="128" cy="174" rx="70" ry="14" fill="#0B3D4A"/>
+  <path d="M110 168A10 10 0 0 1 113.5 150.4A10 10 0 0 1 123.5 135.5A10 10 0 0 1 138.4 125.5A10 10 0 0 1 156.0 122.0A10 10 0 0 1 173.6 125.5A10 10 0 0 1 188.5 135.5A10 10 0 0 1 198.5 150.4A10 10 0 0 1 202.0 168.0Z" fill="#FFDB3D"/>
+  <path d="M124 164A32 32 0 0 1 188 164" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M50 176A10 10 0 0 1 53.1 158.2A10 10 0 0 1 62.2 142.6A10 10 0 0 1 76.0 131.0A10 10 0 0 1 93.0 124.8A10 10 0 0 1 111.0 124.8A10 10 0 0 1 128.0 131.0A10 10 0 0 1 141.8 142.6A10 10 0 0 1 150.9 158.2A10 10 0 0 1 154.0 176.0Z" fill="#FFDB3D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M64 172A38 38 0 0 1 140 172" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M74 150C76 138 84 130 94 126" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

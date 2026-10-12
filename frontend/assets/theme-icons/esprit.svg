@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Esprit">
+  <path d="M128 140C108 126 74 122 40 130V204C74 198 108 202 128 214C148 202 182 198 216 204V130C182 122 148 126 128 140Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M58 156C78 150 96 152 110 160M58 180C78 174 96 176 110 184M198 156C178 150 160 152 146 160M198 180C178 174 160 176 146 184" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <polygon points="120,196 136,196 136,224 128,216 120,224" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="68" r="36" fill="#FFDB3D"/>
+  <rect x="110" y="96" width="36" height="24" rx="8" fill="#FF6B5B"/>
+  <path d="M62 68H76M180 68H194M78 32L88 42M178 32L168 42" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M104 64A26 26 0 0 1 114 48" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

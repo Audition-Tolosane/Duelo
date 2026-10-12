@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Grandes Questions Philosophiques">
+  <path d="M66 150Q38 146 42 118Q46 92 72 94Q74 58 110 54Q130 36 154 52Q188 46 194 80Q222 90 214 122Q212 152 182 152Q162 172 130 162Q102 176 82 158Q72 154 66 150Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="70" cy="190" r="14" fill="#12606D"/>
+  <circle cx="48" cy="214" r="9" fill="#12606D"/>
+  <path d="M106 92Q106 70 130 70Q154 70 154 92Q154 108 132 116V126" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="132" cy="146" r="11" fill="#FF6B5B"/>
+  <path d="M66 110Q70 96 84 92" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

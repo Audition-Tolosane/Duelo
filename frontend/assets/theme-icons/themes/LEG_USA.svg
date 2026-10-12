@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Histoire des États-Unis">
+  <rect x="52" y="48" width="152" height="24" rx="12" fill="#FFDB3D"/>
+  <rect x="112" y="68" width="32" height="24" rx="6" fill="#12606D"/>
+  <path d="M84 184C88 146 88 100 128 88C168 100 168 146 172 184L190 198C194 204 190 210 184 210H72C66 210 62 204 66 198Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="88" y="120" width="80" height="10" rx="5" fill="#0B3D4A"/>
+  <rect x="74" y="190" width="108" height="8" rx="4" fill="#FFDB3D"/>
+  <path d="M134 136L122 154L136 168L126 186" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M98 140C98 120 104 108 112 102" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

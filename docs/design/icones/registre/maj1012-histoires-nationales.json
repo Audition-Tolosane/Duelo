@@ -1,0 +1,12 @@
+[
+  {"id": "LEG_FRAN", "symbole": "Arc de Triomphe élancé à arche ouverte"},
+  {"id": "LEG_GERM", "symbole": "porte de Brandebourg à quadrige"},
+  {"id": "LEG_LATM", "symbole": "Machu Picchu et terrasses incas"},
+  {"id": "LEG_ESPA", "symbole": "arc outrepassé de la Mezquita"},
+  {"id": "LEG_ITAL", "symbole": "gondole vénitienne à ferro"},
+  {"id": "LEG_POLA", "symbole": "hussard ailé : cuirasse, casque et deux ailes de plumes en arc"},
+  {"id": "LEG_USA", "symbole": "cloche de la Liberté fêlée"},
+  {"id": "LEG_BRAZ", "symbole": "Christ Rédempteur stylisé (sans visage) devant le soleil"},
+  {"id": "LEG_MEXI", "symbole": "Pierre du Soleil aztèque"},
+  {"id": "LEG_UKHI", "symbole": "rose des Tudor"}
+]

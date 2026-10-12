@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Rome, la Ville éternelle">
+  <circle cx="76" cy="182" r="24" fill="#12606D"/>
+  <circle cx="76" cy="182" r="9" fill="#FFDB3D"/>
+  <circle cx="186" cy="182" r="24" fill="#12606D"/>
+  <circle cx="186" cy="182" r="9" fill="#FFDB3D"/>
+  <path d="M44 168C44 136 66 122 98 122H134C142 122 146 128 146 136V170C146 176 142 180 136 180H54C48 180 44 176 44 170Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="70" y="104" width="68" height="18" rx="9" fill="#12606D"/>
+  <path d="M140 168H180V180H140Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M172 178C164 150 164 118 178 86L192 90C184 118 186 150 198 172Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M186 88L190 60M168 58H210" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="196" cy="80" r="12" fill="#FFDB3D"/>
+  <path d="M58 150Q62 138 76 134" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

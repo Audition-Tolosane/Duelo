@@ -1,5 +1,5 @@
 {
- "_source": "GET /api/explore/{univers}/clusters (production, 08/10/2026)",
+ "_source": "GET /api/explore/{univers}/clusters (production, 08/10/2026) + 45 thèmes ajoutés (production, 12/10/2026)",
  "themes": [
   {
    "id": "ARE_ATHL",
@@ -7224,6 +7224,321 @@
    "cluster": "Rock & Classiques",
    "universe": "SOUND",
    "description": "Traversez les Quatre Saisons en un seul quiz."
+  },
+  {
+   "id": "ARE_CAPO",
+   "name": "Capoeira",
+   "cluster": "Combat & Sports individuels",
+   "universe": "ARENA",
+   "description": "Entre art martial, danse et musique : la capoeira brésilienne et ses mestres."
+  },
+  {
+   "id": "ARE_ROMA",
+   "name": "AS Roma",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Totti, les giallorossi et le derby della Capitale : la Louve du football romain."
+  },
+  {
+   "id": "ARE_BVB",
+   "name": "Borussia Dortmund",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Le Mur jaune, les titres de Klopp et la Ligue des champions 1997 : la légende du BVB."
+  },
+  {
+   "id": "ARE_BRAS",
+   "name": "Brasileirão",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Le championnat du Brésil, ses clubs géants et ses stars : le football à la brésilienne."
+  },
+  {
+   "id": "ARE_BUND",
+   "name": "Bundesliga",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Le Bayern, le Mur jaune, les buteurs de légende : tout sur le championnat d'Allemagne depuis 1963."
+  },
+  {
+   "id": "ARE_CORI",
+   "name": "Corinthians",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Le Timão, la démocratie corinthienne et deux titres mondiaux : la fierté de São Paulo."
+  },
+  {
+   "id": "ARE_MANN",
+   "name": "Équipe d'Allemagne de football",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Quatre étoiles, des légendes et des finales épiques : la Mannschaft dans l'histoire."
+  },
+  {
+   "id": "ARE_AZZU",
+   "name": "Équipe d'Italie de football",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Quatre Coupes du monde, des gardiens légendaires et la Squadra Azzurra."
+  },
+  {
+   "id": "ARE_PFOO",
+   "name": "Équipe de Pologne de football",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Les Aigles blancs, la génération Lato et Boniek, et Lewandowski : la sélection polonaise."
+  },
+  {
+   "id": "ARE_SELE",
+   "name": "Équipe du Brésil de football",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Cinq étoiles, le jogo bonito et des légendes : la Seleção dans l'histoire."
+  },
+  {
+   "id": "ARE_FLAM",
+   "name": "Flamengo",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Le club le plus populaire du Brésil : Zico, le Maracanã et les Libertadores."
+  },
+  {
+   "id": "ARE_EKST",
+   "name": "Football polonais",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Ekstraklasa, Legia Varsovie, Lech Poznań et grands clubs : le football en Pologne."
+  },
+  {
+   "id": "ARE_PALM",
+   "name": "Palmeiras",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Le Verdão, ses racines italiennes et ses Libertadores : un géant de São Paulo."
+  },
+  {
+   "id": "ARE_PELE",
+   "name": "Pelé",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Trois Coupes du monde, Santos, le Cosmos et plus de mille buts : le Roi du football."
+  },
+  {
+   "id": "ARE_LEWA",
+   "name": "Robert Lewandowski",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Du Znicz Pruszków au Barça, en passant par Dortmund et le Bayern : la machine à buts polonaise."
+  },
+  {
+   "id": "ARE_SERA",
+   "name": "Serie A",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Calcio, catenaccio et clubs de légende : l'histoire du championnat d'Italie."
+  },
+  {
+   "id": "ARE_NAPO",
+   "name": "SSC Napoli",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Maradona, le stade Diego-Armando-Maradona et les scudetti : la passion napolitaine."
+  },
+  {
+   "id": "ARE_PVOL",
+   "name": "Volley-ball polonais",
+   "cluster": "Sports de Balle",
+   "universe": "ARENA",
+   "description": "Champions du monde, PlusLiga et ferveur des salles : la Pologne, nation du volley."
+  },
+  {
+   "id": "ARE_SENN",
+   "name": "Ayrton Senna",
+   "cluster": "Sports mécaniques",
+   "universe": "ARENA",
+   "description": "Trois titres mondiaux, la pluie de Monaco et la rivalité avec Prost : la légende brésilienne."
+  },
+  {
+   "id": "ARE_FERR",
+   "name": "Ferrari",
+   "cluster": "Sports mécaniques",
+   "universe": "ARENA",
+   "description": "Le cheval cabré, Maranello et la Scuderia : la légende rouge sur route et sur circuit."
+  },
+  {
+   "id": "ARE_SCHU",
+   "name": "Michael Schumacher",
+   "cluster": "Sports mécaniques",
+   "universe": "ARENA",
+   "description": "Sept titres mondiaux, Benetton, Ferrari et des records en pagaille : la carrière du Baron rouge."
+  },
+  {
+   "id": "ARE_ROSS",
+   "name": "Valentino Rossi",
+   "cluster": "Sports mécaniques",
+   "universe": "ARENA",
+   "description": "Le Docteur, ses neuf titres mondiaux et ses duels mythiques : la légende du numéro 46."
+  },
+  {
+   "id": "LEG_FRAN",
+   "name": "Histoire de France",
+   "cluster": "Histoires nationales",
+   "universe": "LEGENDS",
+   "description": "De la Gaule à la Ve République : les grandes heures de l'histoire de France."
+  },
+  {
+   "id": "LEG_GERM",
+   "name": "Histoire de l'Allemagne",
+   "cluster": "Histoires nationales",
+   "universe": "LEGENDS",
+   "description": "Du Saint-Empire à la réunification : deux mille ans d'histoire allemande."
+  },
+  {
+   "id": "LEG_LATM",
+   "name": "Histoire de l'Amérique latine",
+   "cluster": "Histoires nationales",
+   "universe": "LEGENDS",
+   "description": "Conquistadors, libertadores et révolutions : l'histoire du continent latino-américain."
+  },
+  {
+   "id": "LEG_ESPA",
+   "name": "Histoire de l'Espagne",
+   "cluster": "Histoires nationales",
+   "universe": "LEGENDS",
+   "description": "De la Reconquista à la démocratie : l'histoire de l'Espagne."
+  },
+  {
+   "id": "LEG_ITAL",
+   "name": "Histoire de l'Italie",
+   "cluster": "Histoires nationales",
+   "universe": "LEGENDS",
+   "description": "Des cités-États au Risorgimento : l'histoire de la péninsule après Rome."
+  },
+  {
+   "id": "LEG_POLA",
+   "name": "Histoire de la Pologne",
+   "cluster": "Histoires nationales",
+   "universe": "LEGENDS",
+   "description": "Des Piast à Solidarność : mille ans d'histoire polonaise."
+  },
+  {
+   "id": "LEG_USA",
+   "name": "Histoire des États-Unis",
+   "cluster": "Histoires nationales",
+   "universe": "LEGENDS",
+   "description": "Des treize colonies à la superpuissance : l'histoire des États-Unis."
+  },
+  {
+   "id": "LEG_BRAZ",
+   "name": "Histoire du Brésil",
+   "cluster": "Histoires nationales",
+   "universe": "LEGENDS",
+   "description": "Des peuples autochtones à Brasília : cinq siècles d'histoire brésilienne."
+  },
+  {
+   "id": "LEG_MEXI",
+   "name": "Histoire du Mexique",
+   "cluster": "Histoires nationales",
+   "universe": "LEGENDS",
+   "description": "Des Olmèques à la révolution de 1910 : l'histoire du Mexique."
+  },
+  {
+   "id": "LEG_UKHI",
+   "name": "Histoire du Royaume-Uni",
+   "cluster": "Histoires nationales",
+   "universe": "LEGENDS",
+   "description": "Des Anglo-Saxons au Brexit : l'histoire des îles Britanniques."
+  },
+  {
+   "id": "LAB_PHYQ",
+   "name": "Physique du Quotidien",
+   "cluster": "Physique & Chimie",
+   "universe": "LAB",
+   "description": "Vitesse, énergie, électricité, chaleur : la physique qui se calcule dans la vraie vie."
+  },
+  {
+   "id": "LAB_UNIT",
+   "name": "Unités & Ordres de Grandeur",
+   "cluster": "Physique & Chimie",
+   "universe": "LAB",
+   "description": "Mètres, litres, octets et années-lumière : convertir et estimer sans se tromper d'un zéro."
+  },
+  {
+   "id": "GLO_POLO",
+   "name": "Pologne",
+   "cluster": "Voyage & Géo",
+   "universe": "GLOBE",
+   "description": "Cracovie, la Vistule, les pierogi et Chopin : la Pologne d'hier et d'aujourd'hui."
+  },
+  {
+   "id": "GLO_ROME",
+   "name": "Rome, la Ville éternelle",
+   "cluster": "Voyage & Géo",
+   "universe": "GLOBE",
+   "description": "Colisée, Vatican, fontaines et trattorias : la capitale italienne d'hier à aujourd'hui."
+  },
+  {
+   "id": "ART_ARMO",
+   "name": "Architecture Moderne",
+   "cluster": "Architecture",
+   "universe": "ART",
+   "description": "Bauhaus, Le Corbusier, béton brut et courbes de Zaha Hadid : un siècle qui a réinventé la ville."
+  },
+  {
+   "id": "ART_DESN",
+   "name": "Design",
+   "cluster": "Mode & Design",
+   "universe": "ART",
+   "description": "De la chaise Thonet aux objets Braun et au mobilier scandinave : l'histoire des objets qui ont du style."
+  },
+  {
+   "id": "ART_GREK",
+   "name": "Art Grec Antique",
+   "cluster": "Peinture & Sculpture",
+   "universe": "ART",
+   "description": "Parthénon, kouros, Vénus de Milo et vases à figures rouges : la beauté selon les Grecs."
+  },
+  {
+   "id": "LIF_VEGE",
+   "name": "Le Monde Végétal",
+   "cluster": "Nature & Écologie",
+   "universe": "LIFE",
+   "description": "Photosynthèse, racines, graines et premières plantes : comment les végétaux ont conquis la planète."
+  },
+  {
+   "id": "LIF_STRA",
+   "name": "Stratégies du Vivant",
+   "cluster": "Nature & Écologie",
+   "universe": "LIFE",
+   "description": "Symbioses, mimétisme, hibernation : les astuces étonnantes que la vie a trouvées pour survivre."
+  },
+  {
+   "id": "MIN_CALC",
+   "name": "Calcul Mental",
+   "cluster": "Maths & Logique",
+   "universe": "MIND",
+   "description": "Additions, tables et pourcentages : dix secondes pour calculer plus vite que ton adversaire."
+  },
+  {
+   "id": "MIN_CALX",
+   "name": "Calcul Mental Expert",
+   "cluster": "Maths & Logique",
+   "universe": "MIND",
+   "description": "Multiplications à deux chiffres, carrés, racines et astuces de calcul : le niveau au-dessus."
+  },
+  {
+   "id": "MIN_SUIT",
+   "name": "Suites & Logique",
+   "cluster": "Maths & Logique",
+   "universe": "MIND",
+   "description": "Trouve le nombre manquant, devine la règle, résous l'énigme : la logique en dix secondes."
+  },
+  {
+   "id": "MIN_PHGQ",
+   "name": "Grandes Questions Philosophiques",
+   "cluster": "Philo & Psycho",
+   "universe": "MIND",
+   "description": "Qu'est-ce que savoir, être, exister, percevoir ? Les questions sans fin et les penseurs qui ont osé y répondre."
   }
  ]
 }

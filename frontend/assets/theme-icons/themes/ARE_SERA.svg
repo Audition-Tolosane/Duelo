@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Serie A">
+  <path d="M53 49L99 35L141 41L142 54L123 60L127 82L140 91L149 111L173 119L185 133L198 142L204 152L187 144L179 152L186 168L178 177L171 188L166 182L171 165L161 149L148 139L138 131L121 121L100 102L96 89L87 80L74 76L61 85L53 76Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="150" cy="205" r="26" fill="#FFDB3D"/>
+  <polygon points="150,196 159,203 155,213 145,213 141,203" fill="#12606D" stroke="#12606D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M102 199H116M106 219H116" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M70 58L96 46" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

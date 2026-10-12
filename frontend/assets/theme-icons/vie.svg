@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Vie">
+  <g transform="rotate(40 128 128)">
+  <path d="M128 222L128 200" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M128 28C198 62 212 142 128 206C44 142 58 62 128 28Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M128 62V190M128 150L164 124M128 150L92 124M128 110L104 90" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M94 70L80 94" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+  <g transform="rotate(40 172 122)">
+  <circle cx="172" cy="122" r="22" fill="#FF6B5B"/>
+  <path d="M172 102V142" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="163" cy="118" r="5" fill="#12606D"/>
+  <circle cx="182" cy="128" r="5" fill="#12606D"/>
+  </g>
+</svg>

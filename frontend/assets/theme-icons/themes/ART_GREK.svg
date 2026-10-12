@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Art Grec Antique">
+  <path d="M110 66Q74 58 82 102" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M146 66Q182 58 174 102" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M108 48H148V72Q196 92 192 138Q188 182 150 198H106Q68 182 64 138Q60 92 108 72Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M72 116H184Q188 138 182 156H74Q68 138 72 116Z" fill="#0B3D4A"/>
+  <path d="M78 142H90V124H108V142H120V124H138V142H150V124H168V142H180" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="94" y="34" width="68" height="18" rx="9" fill="#12606D"/>
+  <rect x="100" y="196" width="56" height="22" rx="8" fill="#12606D"/>
+  <path d="M112 196H144" stroke="#FF6B5B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M78 104Q82 90 96 82" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

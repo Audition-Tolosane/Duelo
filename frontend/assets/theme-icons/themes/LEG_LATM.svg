@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Histoire de l'Amérique latine">
+  <circle cx="70" cy="74" r="20" fill="#FF6B5B"/>
+  <path d="M96 204C102 146 120 70 150 58C178 50 196 130 212 204Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="64" y="148" width="80" height="18" rx="8" fill="#FFDB3D"/>
+  <rect x="52" y="170" width="124" height="18" rx="8" fill="#FFDB3D"/>
+  <rect x="38" y="192" width="180" height="22" rx="10" fill="#FFDB3D"/>
+  <rect x="84" y="152" width="20" height="10" rx="4" fill="#12606D"/>
+  <rect x="118" y="174" width="20" height="10" rx="4" fill="#12606D"/>
+  <path d="M144 76L134 98" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

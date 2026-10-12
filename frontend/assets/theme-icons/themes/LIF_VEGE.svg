@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Le Monde Végétal">
+  <path d="M124 150Q118 184 128 218" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M126 206Q86 206 66 176Q96 170 104 186Q110 172 126 190" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="124" cy="96" r="54" fill="#12606D"/>
+  <path d="M143 101L168 108 M138 110L157 128 M129 115L136 140 M119 115L112 140 M110 110L92 129 M105 101L80 108 M105 91L80 84 M110 82L91 64 M119 77L112 52 M129 77L136 52 M138 82L156 63 M143 91L168 84" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M186 96h0.1 M181 120h0.1 M168 140h0.1 M148 153h0.1 M124 158h0.1 M100 153h0.1 M80 140h0.1 M67 120h0.1 M62 96h0.1 M67 72h0.1 M80 52h0.1 M100 39h0.1 M124 34h0.1 M148 39h0.1 M168 52h0.1 M181 72h0.1" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="124" cy="96" r="16" fill="#FFDB3D"/>
+  <path d="M206 44L184 74" stroke="#12606D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M192 44Q206 30 220 46" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M92 76Q98 62 110 56" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Histoire de France">
+  <path d="M60 76H196V214H152V140A24 24 0 0 0 104 140V214H60Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="48" y="40" width="160" height="34" rx="8" fill="#12606D"/>
+  <rect x="44" y="70" width="168" height="14" rx="7" fill="#FFDB3D"/>
+  <rect x="70" y="148" width="22" height="40" rx="6" fill="#FF6B5B"/>
+  <rect x="164" y="148" width="22" height="40" rx="6" fill="#FF6B5B"/>
+  <path d="M100 57H156" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M62 56H78" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
