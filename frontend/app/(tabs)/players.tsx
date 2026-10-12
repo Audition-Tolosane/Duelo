@@ -7,7 +7,7 @@ import * as Haptics from 'expo-haptics';
 import Animated, { useAnimatedStyle, FadeInDown, SlideInRight, interpolate } from 'react-native-reanimated';
 import { useTabBar } from '../../contexts/TabBarContext';
 import UserAvatar from '../../components/UserAvatar';
-import { t } from '../../utils/i18n';
+import { t, getLanguage } from '../../utils/i18n';
 import {
   Txt, Icon, IconName, Button, Card, Chip, ThemeIcon, Loader, EmptyState,
 } from '../../components/ui';
@@ -47,8 +47,17 @@ type CoachSuggestion = {
   type: string; rival_id?: string; rival_pseudo?: string;
   rival_avatar_seed?: string; category?: string; category_name?: string;
   category_color?: string; rival_level?: number; my_level?: number;
-  message?: string; icon?: string;
+  message?: string; icon?: string; my_xp?: number;
 };
+
+// Texte du coach composé ici, dans la langue du joueur ; `message` (français, serveur) ne sert qu'en secours.
+function coachMessage(s: CoachSuggestion): string {
+  if (s.type === 'rivalry' && s.rival_pseudo && s.category_name)
+    return t('players.coach_rivalry', { pseudo: s.rival_pseudo, theme: s.category_name });
+  if (s.type === 'improve' && s.category_name && s.my_xp != null)
+    return t('players.coach_improve', { xp: String(s.my_xp), theme: s.category_name });
+  return s.message ?? '';
+}
 
 type SectionTab = 'pulse' | 'tribus' | 'forge';
 
@@ -189,7 +198,7 @@ const CoachWidget = ({ suggestions, onAction }: {
         <View style={st.iconDisc}><Icon name="sparkles" size={ICON_SIZE.md} color={COLOR.text.primary} /></View>
         <View style={st.coachText}>
           <Txt variant="overline">{t('players.coach_label')}</Txt>
-          <Txt variant="bodySmall" color={COLOR.text.primary} numberOfLines={3}>{sug.message}</Txt>
+          <Txt variant="bodySmall" color={COLOR.text.primary} numberOfLines={3}>{coachMessage(sug)}</Txt>
         </View>
         <Button label={t('tab.play')} size="sm" haptic={false} onPress={() => onAction(sug)} />
       </Card>
@@ -280,7 +289,7 @@ export default function PlayersScreen() {
   const loadCoach = async (uid: string) => {
     setCoachError(false);
     try {
-      const res = await fetch(`${API_URL}/api/social/coach/${uid}`);
+      const res = await fetch(`${API_URL}/api/social/coach/${uid}?lang=${getLanguage()}`);
       const data = await res.json();
       setCoachSuggestions(data.suggestions || []);
     } catch {

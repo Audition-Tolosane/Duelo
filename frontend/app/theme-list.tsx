@@ -50,7 +50,7 @@ export default function ThemeListScreen() {
       const uid = await AsyncStorage.getItem('duelo_user_id');
       if (isMine) {
         if (!uid) { setGroups([]); return; }
-        const res = await authFetch(`${API_URL}/api/player/${uid}/profile?viewer_id=${uid}&posts_limit=0`);
+        const res = await authFetch(`${API_URL}/api/player/${uid}/profile?viewer_id=${uid}&posts_limit=0&lang=${getLanguage()}`);
         const data = await res.json();
         const map: Record<string, PlayedTheme> = data?.themes ?? {};
         const rows = Object.entries(map)

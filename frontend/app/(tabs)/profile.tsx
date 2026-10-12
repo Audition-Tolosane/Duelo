@@ -8,7 +8,7 @@ import UserAvatar from '../../components/UserAvatar';
 import { authFetch } from '../../utils/api';
 import { useTabBar } from '../../contexts/TabBarContext';
 import Svg, { Path, Circle } from 'react-native-svg';
-import { t, getLocale } from '../../utils/i18n';
+import { t, getLocale, getLanguage } from '../../utils/i18n';
 import {
   Txt, Icon, IconName, Button, IconButton, Card, Section, ProgressBar, ListRow, Loader, Dialog,
   BottomSheet, ThemeIcon, EmptyState,
@@ -391,7 +391,7 @@ export default function ProfileScreen() {
     const avatarSeed = await AsyncStorage.getItem('duelo_avatar_seed');
     if (!userId) { setLoading(false); return; }
     try {
-      const res = await fetch(`${API_URL}/api/profile-v2/${userId}?pseudo=${encodeURIComponent(pseudo || '')}`);
+      const res = await fetch(`${API_URL}/api/profile-v2/${userId}?pseudo=${encodeURIComponent(pseudo || '')}&lang=${getLanguage()}`);
       if (res.ok) {
         const data = await res.json();
         setProfile(data);

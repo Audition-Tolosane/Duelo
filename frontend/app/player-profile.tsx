@@ -4,7 +4,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { authFetch } from '../utils/api';
-import { t, getLocale } from '../utils/i18n';
+import { t, getLocale, getLanguage } from '../utils/i18n';
 import SwipeBackPage from '../components/SwipeBackPage';
 import UserAvatar from '../components/UserAvatar';
 import {
@@ -124,7 +124,7 @@ export default function PlayerProfileScreen() {
 
   const fetchProfile = async (viewerId: string) => {
     try {
-      const res = await fetch(`${API_URL}/api/player/${id}/profile?viewer_id=${viewerId}`);
+      const res = await fetch(`${API_URL}/api/player/${id}/profile?viewer_id=${viewerId}&lang=${getLanguage()}`);
       const data = await res.json();
       setProfile(data);
       return data as PlayerProfile;

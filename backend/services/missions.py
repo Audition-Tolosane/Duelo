@@ -6,22 +6,22 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 MISSION_POOL = [
-    {"type": "play_N",            "target": 3,  "xp": 50,  "label": "Jouer 3 parties"},
-    {"type": "play_N",            "target": 5,  "xp": 75,  "label": "Jouer 5 parties"},
-    {"type": "win_N",             "target": 2,  "xp": 75,  "label": "Gagner 2 parties"},
-    {"type": "win_N",             "target": 3,  "xp": 100, "label": "Gagner 3 parties"},
+    {"type": "play_N",            "target": 3,  "xp": 50,  "label": "Jouer 3 duels"},
+    {"type": "play_N",            "target": 5,  "xp": 75,  "label": "Jouer 5 duels"},
+    {"type": "win_N",             "target": 2,  "xp": 75,  "label": "Gagner 2 duels"},
+    {"type": "win_N",             "target": 3,  "xp": 100, "label": "Gagner 3 duels"},
     {"type": "perfect_score",     "target": 1,  "xp": 100, "label": "Faire un 7/7"},
     {"type": "send_challenge",    "target": 1,  "xp": 50,  "label": "Envoyer un défi"},
     {"type": "complete_challenge","target": 1,  "xp": 75,  "label": "Terminer un défi"},
-    {"type": "play_category", "target": 2, "xp": 75,  "cat": "STV", "label": "2 parties en Séries TV"},
-    {"type": "play_category", "target": 2, "xp": 75,  "cat": "CIN", "label": "2 parties en Cinéma"},
-    {"type": "play_category", "target": 2, "xp": 75,  "cat": "SPO", "label": "2 parties en Sport"},
-    {"type": "play_category", "target": 2, "xp": 75,  "cat": "GEO", "label": "2 parties en Géographie"},
-    {"type": "play_category", "target": 2, "xp": 75,  "cat": "HIS", "label": "2 parties en Histoire"},
-    {"type": "play_category", "target": 2, "xp": 75,  "cat": "SCI", "label": "2 parties en Sciences"},
-    {"type": "play_category", "target": 3, "xp": 100, "cat": "STV", "label": "3 parties en Séries TV"},
-    {"type": "play_category", "target": 3, "xp": 100, "cat": "CIN", "label": "3 parties en Cinéma"},
-    {"type": "play_category", "target": 3, "xp": 100, "cat": "SPO", "label": "3 parties en Sport"},
+    {"type": "play_category", "target": 2, "xp": 75,  "cat": "STV", "label": "2 duels en Séries TV"},
+    {"type": "play_category", "target": 2, "xp": 75,  "cat": "CIN", "label": "2 duels en Cinéma"},
+    {"type": "play_category", "target": 2, "xp": 75,  "cat": "SPO", "label": "2 duels en Sport"},
+    {"type": "play_category", "target": 2, "xp": 75,  "cat": "GEO", "label": "2 duels en Géographie"},
+    {"type": "play_category", "target": 2, "xp": 75,  "cat": "HIS", "label": "2 duels en Histoire"},
+    {"type": "play_category", "target": 2, "xp": 75,  "cat": "SCI", "label": "2 duels en Sciences"},
+    {"type": "play_category", "target": 3, "xp": 100, "cat": "STV", "label": "3 duels en Séries TV"},
+    {"type": "play_category", "target": 3, "xp": 100, "cat": "CIN", "label": "3 duels en Cinéma"},
+    {"type": "play_category", "target": 3, "xp": 100, "cat": "SPO", "label": "3 duels en Sport"},
 ]
 
 

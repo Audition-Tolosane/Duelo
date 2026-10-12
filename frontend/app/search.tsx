@@ -9,7 +9,7 @@ import {
   Txt, Icon, IconName, Card, Chip, ListRow, SearchField, ScreenContainer, ScreenHeader, ThemeCard, Loader, EmptyState,
 } from '../components/ui';
 import { COLOR, SPACE, RADII, BORDER, ICON_SIZE } from '../theme/tokens';
-import { t } from '../utils/i18n';
+import { t, getLanguage } from '../utils/i18n';
 
 // Recherche (thèmes, joueurs, contenu des murs). Ouverte depuis la loupe de l'en-tête ou d'Explorer.
 //   /search?tab=joueurs | contenu  → onglet de départ
@@ -136,7 +136,7 @@ export default function SearchScreen() {
     setIsSearching(true);
     setSearchError(false);
     try {
-      let url = `${API_URL}/api/search/themes?`;
+      let url = `${API_URL}/api/search/themes?lang=${getLanguage()}&`;
       if (q.trim()) url += `q=${encodeURIComponent(q.trim())}&`;
       if (diff !== 'all') url += `difficulty=${diff}&`;
       if (userId) url += `user_id=${userId}`;

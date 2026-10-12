@@ -10,6 +10,7 @@ from models import User, Match, WallPost, PostLike, PostComment, PlayerFollow, T
 from schemas import WallPostCreate, CommentCreate, FollowToggle, PlayerFollowToggle
 from constants import COUNTRY_FLAGS, SUPER_CATEGORY_META, TOTAL_QUESTIONS
 from services.xp import get_level, get_theme_title, get_streak_badge
+from i18n import theme_localise, nom_cluster, nom_theme
 from services.notifications import create_notification
 from auth_middleware import get_current_user_id
 from rate_limit import rate_limit
@@ -216,12 +217,12 @@ async def get_comments(post_id: str, db: AsyncSession = Depends(get_db)):
 
 # ── Helper: get theme name/color from theme_id ──
 
-async def _get_theme_info(db: AsyncSession, theme_id: str):
-    """Look up theme name and color from DB."""
+async def _get_theme_info(db: AsyncSession, theme_id: str, lang: str = 'fr'):
+    """Look up theme name (dans `lang`, français en repli) and color from DB."""
     res = await db.execute(select(Theme).where(Theme.id == theme_id))
     theme = res.scalar_one_or_none()
     if theme:
-        return theme.name, theme.color_hex or "#8A2BE2"
+        return nom_theme(theme, lang), theme.color_hex or "#8A2BE2"
     return theme_id, "#8A2BE2"
 
 
@@ -244,7 +245,8 @@ async def _get_user_best_theme(db: AsyncSession, user_id: str):
 # ── Player Profile & Follow ──
 
 @router.get("/player/{user_id}/profile")
-async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, posts_limit: int = 20, posts_offset: int = 0, db: AsyncSession = Depends(get_db)):
+async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, posts_limit: int = 20, posts_offset: int = 0,
+                             lang: str = 'fr', db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
     if not user:
@@ -292,16 +294,17 @@ async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, post
             if not t:
                 continue
             lvl = get_level(xp)
+            vue = theme_localise(t, lang)
             themes_data[tid] = {
-                "xp": xp, "level": lvl, "title": get_theme_title(t, lvl),
-                "name": t.name, "color_hex": t.color_hex or "#8A2BE2",
-                "cluster": t.cluster or "", "super_category": t.super_category or "",
+                "xp": xp, "level": lvl, "title": get_theme_title(vue, lvl),
+                "name": vue.name, "color_hex": t.color_hex or "#8A2BE2",
+                "cluster": nom_cluster(t.cluster, lang), "super_category": t.super_category or "",
             }
 
             # Check if this user is #1 in this theme (their xp equals the max)
             if top_xp_map.get(tid) is not None and xp >= top_xp_map[tid]:
                 champion_titles.append({
-                    "theme_id": tid, "theme_name": t.name,
+                    "theme_id": tid, "theme_name": vue.name,
                     "scope": "Monde",
                     "date": datetime.now(timezone.utc).strftime("%B %Y").capitalize(),
                 })
@@ -366,7 +369,7 @@ async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, post
 
         for p in user_posts:
             p_theme = p_themes_map.get(p.category_id)
-            theme_name = p_theme.name if p_theme else p.category_id
+            theme_name = nom_theme(p_theme, lang) if p_theme else p.category_id
             posts_data.append({
                 "id": p.id, "category_id": p.category_id,
                 "category_name": theme_name,
@@ -707,7 +710,9 @@ async def social_tribes(user_id: Optional[str] = None, db: AsyncSession = Depend
 
 
 @router.get("/social/coach/{user_id}")
-async def social_coach(user_id: str, db: AsyncSession = Depends(get_db)):
+async def social_coach(user_id: str, lang: str = 'fr', db: AsyncSession = Depends(get_db)):
+    # `message` reste en français pour les anciennes versions de l'app ; l'app actuelle compose
+    # son texte dans la langue du joueur à partir de `type`, `rival_pseudo`, `category_name`, `my_xp`.
     u_res = await db.execute(select(User).where(User.id == user_id))
     user = u_res.scalar_one_or_none()
     if not user:
@@ -733,7 +738,7 @@ async def social_coach(user_id: str, db: AsyncSession = Depends(get_db)):
         for rival_uxp in rival_xps_res.scalars().all():
             my_xp = user_xps.get(rival_uxp.theme_id, 0)
             if rival_uxp.xp > my_xp and rival_uxp.xp > 0:
-                theme_name, theme_color = await _get_theme_info(db, rival_uxp.theme_id)
+                theme_name, theme_color = await _get_theme_info(db, rival_uxp.theme_id, lang)
                 suggestions.append({
                     "type": "rivalry", "rival_id": rival.id,
                     "rival_pseudo": rival.pseudo, "rival_avatar_seed": rival.avatar_seed,
@@ -750,11 +755,11 @@ async def social_coach(user_id: str, db: AsyncSession = Depends(get_db)):
     if user_xps:
         weakest_tid = min(user_xps, key=user_xps.get)
         weakest_xp = user_xps[weakest_tid]
-        theme_name, theme_color = await _get_theme_info(db, weakest_tid)
+        theme_name, theme_color = await _get_theme_info(db, weakest_tid, lang)
         suggestions.append({
             "type": "improve", "category": weakest_tid, "category_name": theme_name,
-            "category_color": theme_color,
-            "message": f"Tu n'as que {int(weakest_xp)} XP en {theme_name}. Lance un match pour progresser !",
+            "category_color": theme_color, "my_xp": int(weakest_xp),
+            "message": f"Tu n'as que {int(weakest_xp)} XP en {theme_name}. Lance un duel pour progresser !",
             "icon": "📈",
         })
 

@@ -15,6 +15,7 @@ from models import User, Match, PlayerFollow, Theme, UserThemeXP, Avatar
 from config import ROOT_DIR
 from schemas import SelectTitleRequest
 from constants import COUNTRY_FLAGS
+from i18n import theme_localise, nom_cluster, LANGUES_CONNUES
 from services.xp import (
     get_level, get_xp_progress, get_streak_badge,
     get_theme_title, get_theme_unlocked_titles, get_all_unlocked_titles_v2,
@@ -43,7 +44,8 @@ async def geocode_city(city: str, country: str) -> tuple:
 
 
 @router.get("/profile/{user_id}")
-async def get_profile(user_id: str, pseudo: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+async def get_profile(user_id: str, pseudo: Optional[str] = None, lang: str = 'fr',
+                      db: AsyncSession = Depends(get_db)):
     """Profile with theme-based XP system."""
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
@@ -66,15 +68,16 @@ async def get_profile(user_id: str, pseudo: Optional[str] = None, db: AsyncSessi
             if not t:
                 continue
             lvl = get_level(xp)
-            title = get_theme_title(t, lvl)
+            vue = theme_localise(t, lang)          # nom et titres de niveau dans la langue
+            title = get_theme_title(vue, lvl)
             themes_data.append({
-                "id": t.id, "name": t.name, "super_category": t.super_category,
-                "cluster": t.cluster, "color_hex": t.color_hex or "#8A2BE2",
+                "id": t.id, "name": vue.name, "super_category": t.super_category,
+                "cluster": nom_cluster(t.cluster, lang), "color_hex": t.color_hex or "#8A2BE2",
                 "icon_url": t.icon_url or "", "xp": xp, "level": lvl,
                 "title": title, "xp_progress": get_xp_progress(xp, lvl),
             })
-            for ut in get_theme_unlocked_titles(t, lvl):
-                all_unlocked_titles.append({**ut, "theme_id": t.id, "theme_name": t.name})
+            for ut in get_theme_unlocked_titles(vue, lvl):
+                all_unlocked_titles.append({**ut, "theme_id": t.id, "theme_name": vue.name})
 
     matches_res = await db.execute(
         select(Match).where(Match.player1_id == user_id).order_by(Match.created_at.desc()).limit(10)
@@ -151,8 +154,9 @@ async def get_profile(user_id: str, pseudo: Optional[str] = None, db: AsyncSessi
 
 # Keep /profile-v2 as alias for frontend compatibility
 @router.get("/profile-v2/{user_id}")
-async def get_profile_v2(user_id: str, pseudo: Optional[str] = None, db: AsyncSession = Depends(get_db)):
-    return await get_profile(user_id, pseudo, db)
+async def get_profile_v2(user_id: str, pseudo: Optional[str] = None, lang: str = 'fr',
+                         db: AsyncSession = Depends(get_db)):
+    return await get_profile(user_id, pseudo, lang, db)
 
 
 @router.post("/user/select-title")
@@ -175,8 +179,12 @@ async def select_title(data: SelectTitleRequest, current_user: str = Depends(get
     else:
         themes_map = {}
 
-    all_titles = get_all_unlocked_titles_v2(user_xps, themes_map)
-    unlocked_names = [t["title"] for t in all_titles]
+    # Le profil affiche les titres dans la langue du joueur (12/10/2026) : le titre choisi
+    # peut donc être la version EN ou ES. On accepte le titre débloqué dans toute langue connue.
+    unlocked_names = set()
+    for lg in LANGUES_CONNUES:
+        vues = {tid: theme_localise(th, lg) for tid, th in themes_map.items()}
+        unlocked_names.update(t["title"] for t in get_all_unlocked_titles_v2(user_xps, vues))
     if data.title not in unlocked_names:
         raise HTTPException(status_code=400, detail="Ce titre n'est pas encore débloqué")
 
