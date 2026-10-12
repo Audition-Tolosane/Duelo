@@ -15,7 +15,7 @@ import { PALETTE, alpha } from '../../theme/tokens';
 
 const ROWS = 11;              // rangées visibles ; la première et la dernière sont coupées à moitié
 const POOL = 36;              // icônes distinctes utilisées
-const OPACITY = 0.3;          // opacité globale du motif
+const OPACITY = 0.5;          // opacité globale du motif
 const CURVE = 0.07;           // bombé vertical aux bords (fraction de la distance au centre)
 const SPREAD = 0.06;          // étirement horizontal aux bords
 const WIDEN = 0.1;            // grossissement aux bords
