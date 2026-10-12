@@ -1093,7 +1093,21 @@ export function getLocale(): string {
 
 /** Choisit `${base}_one` ou `${base}_many` selon les règles de la langue (fr : 0 et 1 au singulier). */
 export function pluralKey(base: string, n: number): string {
-  return new Intl.PluralRules(getLocale()).select(n) === 'one' ? `${base}_one` : `${base}_many`;
+  return isPluralOne(n) ? `${base}_one` : `${base}_many`;
+}
+
+// Règles CLDR de la catégorie « one » pour nos 10 langues. Écrites ici car Hermes (moteur JS de
+// l'app sur téléphone) n'a pas Intl.PluralRules : l'appeler fait planter l'écran.
+function isPluralOne(n: number): boolean {
+  const i = Math.floor(Math.abs(n));
+  switch (currentLanguage) {
+    case 'fr':
+    case 'pt': return i === 0 || i === 1;            // 0 et 1 au singulier
+    case 'ja':
+    case 'ko':
+    case 'zh': return false;                         // pas de pluriel grammatical
+    default:   return n === 1;                       // en, es, de, it, ar
+  }
 }
 
 export function t(key: string, params?: Record<string, string>): string {
