@@ -6,6 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { startQuickMatch } from '../../utils/quickMatch';
 import { useTabBar } from '../../contexts/TabBarContext';
+import { useActiveTab } from '../../contexts/ActiveTabContext';
 import SwordMark from '../../components/SwordMark';
 import { t } from '../../utils/i18n';
 import { Txt, Icon, IconName, Button, Badge, Card, ListRow, ThemeIconBackdrop } from '../../components/ui';
@@ -19,6 +20,8 @@ type Mode = { key: string; icon: IconName; iconColor: string; title: string; sub
 export default function PlayScreen() {
   const router = useRouter();
   const { onScroll: onTabScroll } = useTabBar();
+  // Le pager garde cet onglet monté à côté d'Accueil/Thèmes : le fond ne défile que s'il est affiché
+  const visible = useActiveTab() === 'play';
   const { width } = useWindowDimensions();
   const compact = width < 360;
   const [quickLoading, setQuickLoading] = useState(false);
@@ -67,7 +70,7 @@ export default function PlayScreen() {
       const { width: w, height: h } = e.nativeEvent.layout;
       if (Math.round(w) !== area.w || Math.round(h) !== area.h) setArea({ w: Math.round(w), h: Math.round(h) });
     }}>
-    <ThemeIconBackdrop width={area.w} height={area.h} />
+    <ThemeIconBackdrop width={area.w} height={area.h} active={visible} />
     <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
       <View style={s.pageHeader}>
         <View style={s.headerScrim} pointerEvents="none" />
@@ -140,8 +143,8 @@ const s = StyleSheet.create({
   headerScrim: {
     position: 'absolute', top: 0, bottom: 0, left: 0, right: SPACE.xl,
     borderRadius: RADII.xl,
-    backgroundColor: alpha(PALETTE.night, 0.7),
-    boxShadow: `0 0 24px 18px ${alpha(PALETTE.night, 0.7)}`,
+    backgroundColor: alpha(PALETTE.night, 0.85),
+    boxShadow: `0 0 28px 22px ${alpha(PALETTE.night, 0.85)}`,
   },
   // Ombre nuit douce : le titre posé directement sur le motif garde son contraste
   overMotif: { textShadowColor: PALETTE.night, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 12 },

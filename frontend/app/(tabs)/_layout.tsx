@@ -12,6 +12,7 @@ import DueloHeader from '../../components/DueloHeader';
 import { useSwipeBackProgress } from '../../components/SwipeBackContext';
 import { t } from '../../utils/i18n';
 import { TabBarProvider, useTabBar } from '../../contexts/TabBarContext';
+import { ActiveTabContext } from '../../contexts/ActiveTabContext';
 import { ScreenContainer, Txt, Icon } from '../../components/ui';
 import type { IconName } from '../../components/ui';
 import { COLOR, SPACE, SIZE, RADII, BORDER, ELEVATION, ICON_SIZE, TYPO } from '../../theme/tokens';
@@ -286,6 +287,7 @@ export default function TabLayout() {
       <CollapsingHeader />
 
       {/* Custom swipeable pager */}
+      <ActiveTabContext.Provider value={TAB_NAMES[activeIndex]}>
       <View style={styles.pagerContainer}>
         <GestureDetector gesture={panGesture}>
           <Animated.View style={[styles.pagerStrip, containerStyle]}>
@@ -297,6 +299,7 @@ export default function TabLayout() {
           </Animated.View>
         </GestureDetector>
       </View>
+      </ActiveTabContext.Provider>
 
       <CustomTabBar currentIndex={activeIndex} onTabPress={onTabPress} />
     </ScreenContainer>
