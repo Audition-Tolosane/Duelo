@@ -5,8 +5,8 @@ Liste tenue à jour à chaque lot. Elle regroupe les points ouverts des rapports
 ## Mise en production de la refonte
 
 A. **Tester sur un vrai téléphone (Expo Go).** Toutes les vérifications ont été faites sur le web en 390 et 320 px : il faut repasser sur iOS et Android, en particulier les dialogues imbriqués dans la feuille Bonus, le clavier du support et la roue.
-B. **Fusionner la branche `refonte-skilki` dans `master`**, qui a 22 commits d'avance. Elle n'a jamais été poussée : la pousser seulement après ta validation.
-C. **Fichiers backend non suivis** (`backend/i18n.py`, `backend/simulate_games.py`) : décider s'ils vont avec le prochain déploiement.
+B. ~~Fusionner `refonte-skilki` dans `master`~~ **FAIT le 12/10** (avance rapide jusqu'à 05d60d7, à la demande de l'utilisatrice).
+C. `backend/i18n.py` **commité le 11/10** (importé par 5 routeurs). Reste non suivi : `backend/simulate_games.py`.
 
 ## À trancher par toi
 
