@@ -16,7 +16,7 @@ C. `backend/i18n.py` **commité le 11/10** (importé par 5 routeurs). Reste non 
 
 4. **Messages du coach** écrits en dur par le backend (« Reprends ton trône ! », « Tu n'as que 120 XP… ») : à reformuler et traduire. *(Lot B)*
 5. **Libellés de gain de la roue** dans `backend/spin.py`, en français en dur (« Boost ×2 », « Thème 24h »). L'app a ses propres libellés pour le boost et le thème, mais pas pour les autres gains. *(Lot E)*
-6. **Clusters « Litterature » et « Littérature »** en double : à fusionner en base. *(Lot C)*
+6. ~~Clusters « Litterature » et « Littérature » en double~~ **FAIT le 11/10** : fusionnés en base (avec renommages, Sports mécaniques, Histoires nationales et noms traduits EN/ES). *(Lot C)*
 7. **Tester un duel entre deux humains**, puis redéployer le backend. *(Hors design)*
 
 ## Contenu

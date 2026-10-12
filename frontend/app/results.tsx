@@ -6,17 +6,21 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import Reanimated, {
+  useSharedValue, useAnimatedStyle, withTiming, withDelay, withSequence, Easing, useReducedMotion,
+} from 'react-native-reanimated';
 import { authFetch } from '../utils/api';
 import { playSound } from '../utils/sounds';
 import SwipeBackPage from '../components/SwipeBackPage';
 import UserAvatar from '../components/UserAvatar';
+import VictoryBurst from '../components/VictoryBurst';
 import { useWS } from '../contexts/WebSocketContext';
 import { t, pluralKey } from '../utils/i18n';
 import {
   Txt, Icon, IconName, Button, Badge, Card, Loader, Dialog, BottomSheet,
   ScreenContainer, ScreenHeader, ThemeIcon, ResultState,
 } from '../components/ui';
-import { COLOR, SPACE, RADII, SIZE, BORDER, ICON_SIZE, TYPO, PALETTE } from '../theme/tokens';
+import { COLOR, SPACE, RADII, SIZE, BORDER, ICON_SIZE, TYPO, PALETTE, MOTION, alpha } from '../theme/tokens';
 
 // Fin de duel SKILKI : en-tête ResultState (victoire = halo jaune, défaite = pétrole sobre,
 // sans-faute = violet rare), score moi (jaune) / rival (corail), XP en or, révision des erreurs,
@@ -101,7 +105,6 @@ export default function ResultsScreen() {
   const [rewards, setRewards] = useState<Reward[]>([]);
   const [showRewardsModal, setShowRewardsModal] = useState(false);
 
-  const confettiRef = useRef<any>(null);
   const [playerPseudo, setPlayerPseudo] = useState(t('game.player'));
 
   // Report question states
@@ -117,10 +120,28 @@ export default function ResultsScreen() {
   const [reportSuccess, setReportSuccess] = useState(false);
   const [reportError, setReportError] = useState<string | null>(null);
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.5)).current;
-  const cardSlide = useRef(new Animated.Value(60)).current;
-  const xpSlide = useRef(new Animated.Value(40)).current;
+  // Entrée de l'écran. Victoire : le titre tombe comme un tampon (115 % → 100 %, léger tassement),
+  // l'éclat part du titre à l'impact avec la vibration, puis le score et l'XP prennent le relais.
+  // Défaite / égalité : simple fondu. « Réduire les animations » : tout est en place d'emblée.
+  const reduceMotion = useReducedMotion();
+  const celebrate = won && !reduceMotion;
+  const shellIn = useSharedValue(reduceMotion ? 1 : 0);
+  const titleOpacity = useSharedValue(reduceMotion ? 1 : 0);
+  const titleScale = useSharedValue(reduceMotion ? 1 : celebrate ? 1.15 : 0.97);
+  const flash = useSharedValue(0);
+  const scoreIn = useSharedValue(reduceMotion ? 1 : 0);
+  const xpIn = useSharedValue(reduceMotion ? 1 : 0);
+  const restIn = useSharedValue(reduceMotion ? 1 : 0);
+  const overlayRef = useRef<View>(null);
+  const titleRef = useRef<View>(null);
+  const [burstOrigin, setBurstOrigin] = useState<{ x: number; y: number } | null>(null);
+
+  const shellStyle = useAnimatedStyle(() => ({ opacity: shellIn.value }));
+  const titleStyle = useAnimatedStyle(() => ({ opacity: titleOpacity.value, transform: [{ scale: titleScale.value }] }));
+  const flashStyle = useAnimatedStyle(() => ({ opacity: flash.value }));
+  const scoreStyle = useAnimatedStyle(() => ({ opacity: scoreIn.value, transform: [{ translateY: (1 - scoreIn.value) * 16 }] }));
+  const xpStyle = useAnimatedStyle(() => ({ opacity: xpIn.value, transform: [{ translateY: (1 - xpIn.value) * 16 }] }));
+  const restStyle = useAnimatedStyle(() => ({ opacity: restIn.value }));
 
   // Compteur XP qui s'incrémente 0 → total (écran résultats)
   const xpCountAnim = useRef(new Animated.Value(0)).current;
@@ -136,30 +157,59 @@ export default function ResultsScreen() {
     xpCountAnim.setValue(0);
     const id = xpCountAnim.addListener(({ value }) => setDisplayXp(Math.round(value)));
     Animated.timing(xpCountAnim, {
-      toValue: total, duration: 900, delay: 300, useNativeDriver: false,
+      toValue: total, duration: 900, delay: reduceMotion ? 0 : 600, useNativeDriver: false,
     }).start();
     return () => xpCountAnim.removeListener(id);
   }, [xpBreakdown]);
+
+  // Joue l'entrée de l'écran ; renvoie les minuteries à annuler au démontage.
+  const playEntrance = (): ReturnType<typeof setTimeout>[] => {
+    const haptic = () => Haptics.notificationAsync(
+      won ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Error
+    );
+    if (reduceMotion) { haptic(); return []; }
+    const out = Easing.bezier(0.215, 0.61, 0.355, 1); // ease-out-cubic
+    shellIn.value = withTiming(1, { duration: MOTION.fast });
+    if (celebrate) {
+      const IMPACT = 140;
+      titleOpacity.value = withTiming(1, { duration: 100 });
+      // Chute accélérée jusqu'à l'impact (ease-in assumé : c'est un choc), tassement, retour
+      titleScale.value = withSequence(
+        withTiming(1, { duration: IMPACT, easing: Easing.in(Easing.quad) }),
+        withTiming(0.97, { duration: 70, easing: out }),
+        withTiming(1, { duration: 180, easing: out }),
+      );
+      flash.value = withDelay(IMPACT, withSequence(
+        withTiming(1, { duration: 60 }),
+        withTiming(0, { duration: 500, easing: out }),
+      ));
+      scoreIn.value = withDelay(450, withTiming(1, { duration: MOTION.base, easing: out }));
+      xpIn.value = withDelay(550, withTiming(1, { duration: MOTION.base, easing: out }));
+      restIn.value = withDelay(650, withTiming(1, { duration: MOTION.base }));
+      return [setTimeout(() => {
+        haptic();
+        // Centre du titre dans le repère de l'overlay plein écran
+        titleRef.current?.measureInWindow((tx, ty, tw, th) => {
+          overlayRef.current?.measureInWindow((ox, oy) => {
+            setBurstOrigin({ x: tx - ox + tw / 2, y: ty - oy + th / 2 });
+          });
+        });
+      }, IMPACT)];
+    }
+    haptic();
+    titleOpacity.value = withTiming(1, { duration: MOTION.base, easing: out });
+    titleScale.value = withTiming(1, { duration: MOTION.base, easing: out });
+    scoreIn.value = withDelay(150, withTiming(1, { duration: MOTION.base, easing: out }));
+    xpIn.value = withDelay(250, withTiming(1, { duration: MOTION.base, easing: out }));
+    restIn.value = withDelay(350, withTiming(1, { duration: MOTION.base }));
+    return [];
+  };
 
   useEffect(() => {
     submitMatch();
     loadQuizQuestions();
     loadPlayerPseudo();
-    Haptics.notificationAsync(
-      won ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Error
-    );
-    Animated.sequence([
-      Animated.parallel([
-        Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
-        Animated.spring(scaleAnim, { toValue: 1, tension: 60, friction: 8, useNativeDriver: true }),
-      ]),
-      Animated.parallel([
-        Animated.timing(cardSlide, { toValue: 0, duration: 300, useNativeDriver: true }),
-        Animated.timing(xpSlide, { toValue: 0, duration: 400, useNativeDriver: true }),
-      ]),
-    ]).start(() => {
-      if (won) setTimeout(() => confettiRef.current?.start(), 100);
-    });
+    const timers = playEntrance();
 
     // Rematch WS listeners
     const unsubs = [
@@ -190,7 +240,10 @@ export default function ResultsScreen() {
         }
       }),
     ];
-    return () => unsubs.forEach((u) => u());
+    return () => {
+      timers.forEach(clearTimeout);
+      unsubs.forEach((u) => u());
+    };
   }, []);
 
   // Safety timeout: if waiting for rematch response for > 20s, fallback
@@ -507,10 +560,19 @@ export default function ResultsScreen() {
         )}
 
         {/* En-tête du résultat (moment émotionnel : halo du kit) */}
-        <Animated.View style={[s.resultShell, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+        <Reanimated.View style={[s.resultShell, shellStyle]}>
+          {/* Éclair du halo à l'impact (victoire jaune, sans-faute violet) */}
+          {celebrate ? (
+            <Reanimated.View
+              pointerEvents="none"
+              style={[StyleSheet.absoluteFill, { backgroundColor: alpha(outcome === 'flawless' ? PALETTE.violet : PALETTE.yellow, 0.16) }, flashStyle]}
+            />
+          ) : null}
           <ResultState
             outcome={outcome}
             subtitle={t('pilot.results.correct_count', { n: String(correctCount) })}
+            titleStyle={titleStyle}
+            titleRef={titleRef}
           />
           {(draw && correctCount >= 7) || newLevel || isNearMiss ? (
             <View style={s.resultBadges}>
@@ -524,10 +586,10 @@ export default function ResultsScreen() {
               ) : null}
             </View>
           ) : null}
-        </Animated.View>
+        </Reanimated.View>
 
         {/* Score : moi (jaune) / rival (corail) */}
-        <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: cardSlide }] }}>
+        <Reanimated.View style={scoreStyle}>
           <Card style={s.scoreCard}>
             <View style={s.scoreSide}>
               <UserAvatar pseudo={playerPseudo} size={56} borderColor={COLOR.player.self} borderWidth={BORDER.strong} />
@@ -558,10 +620,10 @@ export default function ResultsScreen() {
               {!won && !draw ? <Badge label={t('pilot.results.winner')} tone="warm" /> : <View style={s.badgeSpacer} />}
             </View>
           </Card>
-        </Animated.View>
+        </Reanimated.View>
 
         {/* XP gagnés (récompense : or) */}
-        <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: xpSlide }] }}>
+        <Reanimated.View style={xpStyle}>
           <Card accent={won ? 'reward' : 'none'} style={s.xpCard}>
             {submitting ? (
               <Loader />
@@ -604,11 +666,11 @@ export default function ResultsScreen() {
               </View>
             ) : null}
           </Card>
-        </Animated.View>
+        </Reanimated.View>
 
         {/* Révision des erreurs (dépliable) */}
         {missedQuestions.length > 0 && (
-          <Animated.View style={{ opacity: fadeAnim }}>
+          <Reanimated.View style={restStyle}>
             <Card padded={false}>
               <Pressable
                 onPress={() => {
@@ -659,11 +721,11 @@ export default function ResultsScreen() {
                 </View>
               )}
             </Card>
-          </Animated.View>
+          </Reanimated.View>
         )}
 
         {/* Actions : un seul CTA jaune (revanche) */}
-        <Animated.View style={[s.actions, { opacity: fadeAnim }]}>
+        <Reanimated.View style={[s.actions, restStyle]}>
           {rematchState === 'waiting' ? (
             <>
               <Button testID="play-again-btn" label={t('pilot.results.rematch')} loading fullWidth size="lg" onPress={playAgain} />
@@ -690,7 +752,7 @@ export default function ResultsScreen() {
               <Txt variant="label">{t('results.report_error')}</Txt>
             </Pressable>
           )}
-        </Animated.View>
+        </Reanimated.View>
       </ScrollView>
 
       {/* Récompenses (montée de niveau, titre, succès, bouclier de série) */}
@@ -814,21 +876,12 @@ export default function ResultsScreen() {
         )}
       </BottomSheet>
 
-      {/* Confettis — victoire (animation existante, couleurs de la palette) */}
-      {won && (
-        <View style={StyleSheet.absoluteFill} pointerEvents="none">
-          <ConfettiCannon
-            ref={confettiRef}
-            count={140}
-            origin={{ x: SCREEN_WIDTH / 2, y: -10 }}
-            autoStart={false}
-            fadeOut={true}
-            explosionSpeed={350}
-            fallSpeed={2800}
-            colors={CONFETTI}
-          />
-        </View>
-      )}
+      {/* Éclat de victoire : part du titre au moment de l'impact */}
+      <View ref={overlayRef} collapsable={false} style={StyleSheet.absoluteFill} pointerEvents="none">
+        {celebrate ? (
+          <VictoryBurst origin={burstOrigin} play={!!burstOrigin} variant={outcome === 'flawless' ? 'flawless' : 'victory'} />
+        ) : null}
+      </View>
     </ScreenContainer>
     </SwipeBackPage>
   );
