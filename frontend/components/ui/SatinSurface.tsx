@@ -22,6 +22,8 @@ type Props = {
   /** Coins dont le liseré chauffe vers le jaune */
   warm?: Warm;
   halo?: boolean;
+  /** Rayon imposé (tuiles denses) ; sinon celui de la variante */
+  radius?: number;
   /** 'event' = liseré corail à gauche (défi reçu), comme Card */
   accent?: 'none' | 'event';
   onPress?: () => void;
@@ -62,9 +64,9 @@ function Radial({ id, size, stops }: { id: string; size: number; stops: [number,
 }
 
 export default function SatinSurface({
-  children, variant = 'hero', warm = 'tr', halo = false, accent = 'none', onPress, testID, accessibilityLabel, style, contentStyle,
+  children, variant = 'hero', warm = 'tr', halo = false, accent = 'none', radius, onPress, testID, accessibilityLabel, style, contentStyle,
 }: Props) {
-  const s = SIZES[variant];
+  const s = { ...SIZES[variant], radius: radius ?? SIZES[variant].radius };
   const reduceMotion = useReducedMotion();
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
   const breath = useSharedValue(0.85);

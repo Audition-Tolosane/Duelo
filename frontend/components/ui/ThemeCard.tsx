@@ -24,7 +24,7 @@ type Props = {
    */
   layout?: 'tile' | 'compact' | 'row';
   onPress?: () => void;
-  /** 'satin' : même matière que les cartes de l'Accueil (tuile uniquement) */
+  /** 'satin' : même matière que les cartes de l'Accueil (tuiles 'tile' et 'compact') */
   finish?: 'flat' | 'satin';
   /** Coins chauds du liseré satiné */
   warm?: 'none' | 'tr' | 'tr-bl';
@@ -38,7 +38,7 @@ export default function ThemeCard({ name, themeId, cluster, superCategory, meta,
   const tile = layout === 'tile' || compact;
   const containerStyle = compact ? styles.compact : tile ? styles.tile : styles.row;
   const iconSize = compact ? COMPACT_ICON : tile ? 64 : 44;
-  const satin = finish === 'satin' && layout === 'tile';
+  const satin = finish === 'satin' && tile;
   const body = (
     <>
       <ThemeIcon themeId={themeId} themeName={name} cluster={cluster} superCategory={superCategory} size={iconSize} />
@@ -65,7 +65,7 @@ export default function ThemeCard({ name, themeId, cluster, superCategory, meta,
   const press = () => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onPress?.(); };
   if (satin) {
     return (
-      <SatinSurface variant="card" warm={warm} testID={testID} onPress={press} accessibilityLabel={name} style={style} contentStyle={styles.tileSatin}>
+      <SatinSurface variant="card" warm={warm} radius={compact ? RADII.md : undefined} testID={testID} onPress={press} accessibilityLabel={name} style={style} contentStyle={compact ? styles.compactSatin : styles.tileSatin}>
         {body}
       </SatinSurface>
     );
@@ -113,6 +113,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: SPACE.sm,
   },
+  compactSatin: { width: 108 - 2 * BORDER.hair, padding: SPACE.sm, paddingTop: SPACE.md, alignItems: 'center', gap: SPACE.sm },
   compactTexts: { alignSelf: 'stretch', alignItems: 'center', gap: SPACE.xxs },
   compactName: { minHeight: COMPACT_NAME_H },
   row: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md, minHeight: 60 },

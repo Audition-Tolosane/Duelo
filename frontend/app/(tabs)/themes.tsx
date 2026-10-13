@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Pressable, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
 import { useRouter, Href } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import {
-  Txt, Icon, Card, Section, SearchField, ThemeIcon, ThemeCard, ListRow, Loader, EmptyState,
+  Txt, Icon, Section, SearchField, ThemeIcon, ThemeCard, ListRow, Loader, EmptyState,
+  SatinSurface, AmbientBackdrop,
 } from '../../components/ui';
 import { useTabBar } from '../../contexts/TabBarContext';
 import { COLOR, SPACE, RADII, BORDER, SIZE, ICON_SIZE } from '../../theme/tokens';
@@ -138,6 +139,7 @@ export default function ThemesScreen() {
 
   return (
     <View style={s.container}>
+      <AmbientBackdrop />
       <ScrollView
         contentContainerStyle={s.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -166,10 +168,12 @@ export default function ThemesScreen() {
             onSeeAll={myThemes.length > MY_THEMES_SHOWN ? () => router.push('/theme-list?mine=1' as Href) : undefined}
           >
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.carousel}>
-              {myThemes.slice(0, MY_THEMES_SHOWN).map((th) => (
+              {myThemes.slice(0, MY_THEMES_SHOWN).map((th, i) => (
                 <ThemeCard
                   key={th.id}
                   layout="compact"
+                  finish="satin"
+                  warm={i % 2 === 0 ? 'tr-bl' : 'tr'}
                   name={th.name}
                   themeId={th.id}
                   cluster={th.cluster}
@@ -186,7 +190,7 @@ export default function ThemesScreen() {
         {featured && (
           <Animated.View entering={FadeInDown.duration(450)} style={s.inset}>
             <Section title={t('pilot.explorer.featured')} style={s.section}>
-              <Card testID="explorer-featured" onPress={() => openUniverse(featured)} style={s.featuredCard}>
+              <SatinSurface variant="card" halo testID="explorer-featured" onPress={() => openUniverse(featured)} accessibilityLabel={featured.label} contentStyle={s.featuredCard}>
                 <View style={s.featuredRow}>
                   <ThemeIcon superCategory={featured.id} size={ICON_SIZE.theme.md} />
                   <View style={s.featuredTexts}>
@@ -204,7 +208,7 @@ export default function ThemesScreen() {
                     <Icon name="chevronRight" size={ICON_SIZE.lg} color={COLOR.text.onAction} />
                   </View>
                 </View>
-              </Card>
+              </SatinSurface>
             </Section>
           </Animated.View>
         )}
@@ -216,11 +220,13 @@ export default function ThemesScreen() {
               <View style={s.grid}>
                 {rest.map((cat, index) => (
                   <Animated.View key={cat.id} entering={FadeInDown.delay(Math.min(index, 8) * 50).duration(400)}>
-                    <Pressable
-                      accessibilityRole="button"
+                    <SatinSurface
+                      variant="card"
+                      radius={RADII.md}
+                      warm={index % 3 === 0 ? 'tr-bl' : 'tr'}
                       accessibilityLabel={cat.label}
                       onPress={() => openUniverse(cat)}
-                      style={({ pressed }) => [s.tile, { width: tileW }, pressed && s.tilePressed]}
+                      contentStyle={[s.tile, { width: tileW - 2 * BORDER.hair }]}
                     >
                       <ThemeIcon superCategory={cat.id} size={ICON_SIZE.theme.sm} />
                       <View style={s.tileTexts}>
@@ -229,7 +235,7 @@ export default function ThemesScreen() {
                         <Txt variant="caption" color={COLOR.text.secondary} numberOfLines={1}>{universeHint(cat.clusters)}</Txt>
                         <Txt variant="caption" numberOfLines={1}>{`${cat.total_themes} ${themesLabel}`}</Txt>
                       </View>
-                    </Pressable>
+                    </SatinSurface>
                   </Animated.View>
                 ))}
               </View>
@@ -300,20 +306,15 @@ const s = StyleSheet.create({
   },
 
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.sm },
-  // Tuile basse (64 px) : plaque 40 à gauche, nom + compteur à droite
+  // Tuile basse (64 px) : plaque 40 à gauche, nom + compteur à droite ; surface satinée (liseré 1 px autour)
   tile: {
-    minHeight: SIZE.listRow + SPACE.xs,
+    minHeight: SIZE.listRow + SPACE.xs - 2 * BORDER.hair,
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: SPACE.md,
     paddingHorizontal: SPACE.sm,
     gap: SPACE.sm,
-    borderRadius: RADII.md,
-    backgroundColor: COLOR.surface.card,
-    borderWidth: BORDER.hair,
-    borderColor: COLOR.border.subtle,
   },
-  tilePressed: { backgroundColor: COLOR.surface.elevated },
   tileTexts: { flex: 1, gap: SPACE.xxs },
 
   forgeRow: { borderTopWidth: BORDER.hair, borderBottomWidth: BORDER.hair, borderColor: COLOR.border.subtle },
