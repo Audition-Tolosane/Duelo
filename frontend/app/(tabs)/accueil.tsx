@@ -22,7 +22,7 @@ import { flushPendingScores } from '../../utils/pendingScores';
 import {
   Txt, Icon, Button, IconButton, Badge, Card, Section, ProgressBar, ListRow, Loader,
   BottomSheet, Dialog, ThemeIcon, ThemeCard, AnswerButton, EmptyState, StatCard,
-  SatinSurface, ProgressRing, HaloIcon,
+  SatinSurface, ProgressRing, HaloIcon, AmbientBackdrop,
 } from '../../components/ui';
 import type { IconName, AnswerState } from '../../components/ui';
 import { COLOR, SPACE, RADII, SIZE, BORDER, ELEVATION, GRADIENTS, ICON_SIZE, PALETTE, alpha } from '../../theme/tokens';
@@ -1271,6 +1271,7 @@ export default function AccueilScreen() {
 
   return (
     <View style={styles.container}>
+      <AmbientBackdrop />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -1391,11 +1392,13 @@ export default function AccueilScreen() {
                 style={styles.carousel}
                 contentContainerStyle={styles.carouselContent}
               >
-                {replayThemes.map(th => (
-                  <Card
+                {replayThemes.map((th, i) => (
+                  <SatinSurface
                     key={th.id}
+                    variant="card"
+                    warm={i % 2 === 0 ? 'tr-bl' : 'tr'}
                     onPress={() => handleReplayTheme(th)}
-                    style={styles.replayCard}
+                    contentStyle={styles.replayCard}
                     accessibilityLabel={`${t('pilot.home.replay_action')} : ${th.name}`}
                   >
                     <ThemeIcon themeId={th.id} themeName={th.name} size={44} />
@@ -1404,7 +1407,7 @@ export default function AccueilScreen() {
                       <Icon name="replay" size={14} color={COLOR.action.primary} />
                       <Txt variant="caption" color={COLOR.action.primary}>{t('pilot.home.replay_action')}</Txt>
                     </View>
-                  </Card>
+                  </SatinSurface>
                 ))}
               </ScrollView>
             </Section>
@@ -1414,7 +1417,7 @@ export default function AccueilScreen() {
         {/* ── 4. Progression + série : une seule carte ── */}
         {userData && xp ? (
           <Animated.View entering={FadeInDown.delay(160).duration(400)}>
-            <Card style={styles.progressCard}>
+            <SatinSurface variant="card" contentStyle={styles.progressCard}>
               {/* Niveau (médaille or) → XP → série : du plus durable au plus quotidien */}
               <View style={styles.levelRow}>
                 <View style={styles.levelMedal} accessibilityLabel={`${levelShort()} ${lvl}`}>
@@ -1460,7 +1463,7 @@ export default function AccueilScreen() {
                   </View>
                 ) : null}
               </Pressable>
-            </Card>
+            </SatinSurface>
           </Animated.View>
         ) : null}
 
@@ -1775,7 +1778,7 @@ const styles = StyleSheet.create({
   heroHead: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
 
   // ── 3 bis. Rejoue tes thèmes ──
-  replayCard: { width: 128, gap: SPACE.sm, padding: SPACE.md },
+  replayCard: { width: 128 - 2 * BORDER.hair, gap: SPACE.sm, padding: SPACE.md },
   replayName: { minHeight: 32 },
 
   // ── 3. À toi de jouer ──
@@ -1784,7 +1787,7 @@ const styles = StyleSheet.create({
 
   // ── 4. Progression ──
   // Un seul écart (8) dans le groupe niveau ; la série forme un 2e groupe (8 + 8 + filet) — V1.2
-  progressCard: { gap: SPACE.sm },
+  progressCard: { gap: SPACE.sm, padding: SPACE.cardPad },
   levelRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
   levelMedal: {
     width: MEDAL, height: MEDAL, borderRadius: MEDAL / 2,
