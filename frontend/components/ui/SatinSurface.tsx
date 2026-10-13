@@ -29,15 +29,15 @@ type Props = {
 };
 
 const SIZES = {
-  hero: { radius: RADII.xl, bloom: 280, glow: 110, sheen: 0.07, elevation: ELEVATION.e2 },
-  card: { radius: RADII.lg, bloom: 150, glow: 0, sheen: 0.06, elevation: ELEVATION.e1 },
+  hero: { radius: RADII.xl, bloom: 280, glow: 110, sheen: 0.11, elevation: ELEVATION.e2 },
+  card: { radius: RADII.lg, bloom: 150, glow: 0, sheen: 0.1, elevation: ELEVATION.e1 },
 };
 const BREATH = 4200; // une respiration complète du halo (ms)
 
 // Liseré : dégradé diagonal du coin haut droit au coin bas gauche
 function rimColors(warm: Warm): [string, string, ...string[]] {
   const hot = PALETTE.yellow;
-  const lit = alpha(PALETTE.cream, 0.2);
+  const lit = alpha(PALETTE.cream, 0.24);
   const dim = alpha(PALETTE.cream, 0.08);
   if (warm === 'none') return [alpha(PALETTE.cream, 0.2), lit, dim, dim];
   if (warm === 'tr') return [hot, lit, dim, alpha(PALETTE.cream, 0.09)];
@@ -115,15 +115,23 @@ export default function SatinSurface({
             </View>
             {/* Satin : deux voiles de lumière diagonaux */}
             <LinearGradient
-              colors={[alpha(PALETTE.cream, 0), alpha(PALETTE.cream, 0.055), alpha(PALETTE.cream, 0), alpha(PALETTE.cream, 0.035), alpha(PALETTE.cream, 0)]}
-              locations={[0.18, 0.36, 0.5, 0.66, 0.82]}
+              colors={[alpha(PALETTE.cream, 0), alpha(PALETTE.cream, 0.085), alpha(PALETTE.cream, 0.02), alpha(PALETTE.cream, 0.055), alpha(PALETTE.cream, 0)]}
+              locations={[0.16, 0.34, 0.5, 0.64, 0.82]}
               start={{ x: 0, y: 0.15 }}
               end={{ x: 1, y: 0.85 }}
               style={StyleSheet.absoluteFill}
             />
+            {/* Brillance satinée : une arête de lumière fine et douce dans le voile principal */}
+            <LinearGradient
+              colors={[alpha(PALETTE.cream, 0), alpha(PALETTE.cream, 0.07), alpha(PALETTE.cream, 0)]}
+              locations={[0.27, 0.32, 0.38]}
+              start={{ x: 0, y: 0.1 }}
+              end={{ x: 1, y: 0.9 }}
+              style={StyleSheet.absoluteFill}
+            />
             {/* Bas enfoncé : relief sans ombre portée visible */}
             <LinearGradient
-              colors={[alpha(PALETTE.night, 0), alpha(PALETTE.night, 0.3)]}
+              colors={[alpha(PALETTE.night, 0), alpha(PALETTE.night, 0.36)]}
               locations={[0.55, 1]}
               style={StyleSheet.absoluteFill}
             />
@@ -140,7 +148,7 @@ export default function SatinSurface({
             })}
             {/* Arête haute : la lumière accroche le bord supérieur */}
             <LinearGradient
-              colors={[alpha(PALETTE.cream, 0.04), alpha(PALETTE.cream, 0.2), alpha(warm === 'none' ? PALETTE.cream : PALETTE.yellow, 0.22)]}
+              colors={[alpha(PALETTE.cream, 0.08), alpha(PALETTE.cream, 0.3), alpha(warm === 'none' ? PALETTE.cream : PALETTE.yellow, 0.22)]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.topEdge}
