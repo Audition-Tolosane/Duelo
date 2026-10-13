@@ -20,7 +20,7 @@ import { authFetch } from '../../utils/api';
 import { t, getLanguage, pluralKey } from '../../utils/i18n';
 import { flushPendingScores } from '../../utils/pendingScores';
 import {
-  Txt, Icon, Button, IconButton, Badge, Card, Section, ProgressBar, ListRow, Loader,
+  Txt, Icon, Button, IconButton, Badge, Section, ProgressBar, ListRow, Loader,
   BottomSheet, Dialog, ThemeIcon, ThemeCard, AnswerButton, EmptyState, StatCard,
   SatinSurface, ProgressRing, HaloIcon, AmbientBackdrop,
 } from '../../components/ui';
@@ -380,7 +380,7 @@ const MissionsCard = React.memo(function MissionsCard({
   const canClaim = data.any_completed && !data.reward_claimed;
 
   return (
-    <Card>
+    <SatinSurface variant="card" contentStyle={styles.satinPad}>
       <View style={styles.missionList}>
         {data.missions.map((m) => {
           const pct = Math.min(m.progress / m.target, 1);
@@ -452,7 +452,7 @@ const MissionsCard = React.memo(function MissionsCard({
           </View>
         )}
       </View>
-    </Card>
+    </SatinSurface>
   );
 });
 
@@ -467,7 +467,7 @@ const ChallengeCard = React.memo(function ChallengeCard({ challenge, onAccept, o
     return `${h}h`;
   }
   return (
-    <Card accent="event">
+    <SatinSurface variant="card" warm="none" accent="event" contentStyle={styles.satinPad}>
       <View style={styles.rowCenter}>
         <UserAvatar avatarUrl={challenge.challenger_avatar_url} avatarSeed={challenge.challenger_avatar_seed} pseudo={challenge.challenger_pseudo} size={40} />
         <View style={styles.flexGap}>
@@ -486,7 +486,7 @@ const ChallengeCard = React.memo(function ChallengeCard({ challenge, onAccept, o
         <Button label={t('challenge.decline')} variant="ghost" size="sm" onPress={onDecline} haptic={false} style={styles.flex} />
         <Button label={t('challenge.accept')} icon="duel" size="sm" onPress={onAccept} haptic={false} style={styles.flex} />
       </View>
-    </Card>
+    </SatinSurface>
   );
 });
 
@@ -1315,13 +1315,13 @@ export default function AccueilScreen() {
         </Animated.View>
 
         {feedError ? (
-          <Card onPress={() => { setFeedError(false); loadFeed(); }}>
+          <SatinSurface variant="card" warm="none" contentStyle={styles.satinPad} onPress={() => { setFeedError(false); loadFeed(); }}>
             <View style={styles.rowCenter}>
               <Icon name="error" size={ICON_SIZE.md} color={COLOR.status.error} />
               <Txt variant="bodySmall" style={styles.flex}>{t('home.load_error')}</Txt>
               <Icon name="replay" size={ICON_SIZE.md} color={COLOR.text.secondary} />
             </View>
-          </Card>
+          </SatinSurface>
         ) : null}
 
         {/* ── 2. HERO Duel rapide : un seul CTA jaune ── */}
@@ -1361,12 +1361,12 @@ export default function AccueilScreen() {
                 />
               ))}
               {shownDuels.length > 0 && (
-                <Card style={styles.revengeCard}>
+                <SatinSurface variant="card" contentStyle={[styles.satinPad, styles.revengeCard]}>
                   <Txt variant="overline">{t('challenge.revenge_title')}</Txt>
                   {shownDuels.map((duel) => (
                     <RevengeRow key={duel.id} duel={duel} onRematch={() => handleRematch(duel)} />
                   ))}
-                </Card>
+                </SatinSurface>
               )}
               {canExpandMoves ? (
                 <Button
@@ -1491,9 +1491,11 @@ export default function AccueilScreen() {
                 style={styles.carousel}
                 contentContainerStyle={styles.carouselContent}
               >
-                {recommended.map(th => (
+                {recommended.map((th, i) => (
                   <ThemeCard
                     key={th.id}
+                    finish="satin"
+                    warm={i % 2 === 0 ? 'tr-bl' : 'tr'}
                     name={th.name}
                     themeId={th.id}
                     meta={th.match_count > 0 ? t(pluralKey('pilot.home.duels', th.match_count), { n: String(th.match_count) }) : undefined}
@@ -1506,7 +1508,7 @@ export default function AccueilScreen() {
         )}
 
         {/* ── Rangée discrète : bonus & événements, activité de la communauté ── */}
-        <Card padded={false} style={styles.moreCard}>
+        <SatinSurface variant="card" warm="none" contentStyle={styles.moreCard}>
           <ListRow
             leadingIcon="gift"
             title={t('pilot.home.bonus_row')}
@@ -1527,7 +1529,7 @@ export default function AccueilScreen() {
             style={styles.moreRow}
             testID="home-activity-row"
           />
-        </Card>
+        </SatinSurface>
       </ScrollView>
 
       {/* ── Feuille « Bonus & événements » ── */}
@@ -1783,6 +1785,8 @@ const styles = StyleSheet.create({
 
   // ── 3. À toi de jouer ──
   challengeActions: { flexDirection: 'row', gap: SPACE.sm, marginTop: SPACE.md },
+  // Cartes satinées : même padding que Card
+  satinPad: { padding: SPACE.cardPad },
   revengeCard: { paddingBottom: SPACE.sm },
 
   // ── 4. Progression ──

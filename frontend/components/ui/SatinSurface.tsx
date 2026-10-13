@@ -22,7 +22,10 @@ type Props = {
   /** Coins dont le liseré chauffe vers le jaune */
   warm?: Warm;
   halo?: boolean;
+  /** 'event' = liseré corail à gauche (défi reçu), comme Card */
+  accent?: 'none' | 'event';
   onPress?: () => void;
+  testID?: string;
   accessibilityLabel?: string;
   style?: StyleProp<ViewStyle>;
   contentStyle?: StyleProp<ViewStyle>;
@@ -59,7 +62,7 @@ function Radial({ id, size, stops }: { id: string; size: number; stops: [number,
 }
 
 export default function SatinSurface({
-  children, variant = 'hero', warm = 'tr', halo = false, onPress, accessibilityLabel, style, contentStyle,
+  children, variant = 'hero', warm = 'tr', halo = false, accent = 'none', onPress, testID, accessibilityLabel, style, contentStyle,
 }: Props) {
   const s = SIZES[variant];
   const reduceMotion = useReducedMotion();
@@ -153,6 +156,7 @@ export default function SatinSurface({
               end={{ x: 1, y: 0 }}
               style={styles.topEdge}
             />
+            {accent === 'event' ? <View style={styles.event} /> : null}
             {pressed ? <View style={[StyleSheet.absoluteFill, styles.pressed]} /> : null}
           </View>
           {children}
@@ -162,9 +166,9 @@ export default function SatinSurface({
   );
 
   const shell = [styles.shell, { borderRadius: s.radius }, s.elevation, style];
-  if (!onPress) return <View style={shell}>{body(false)}</View>;
+  if (!onPress) return <View testID={testID} style={shell}>{body(false)}</View>;
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={accessibilityLabel} style={shell}>
+    <Pressable testID={testID} onPress={onPress} accessibilityRole="button" accessibilityLabel={accessibilityLabel} style={shell}>
       {({ pressed }) => body(pressed)}
     </Pressable>
   );
@@ -178,4 +182,5 @@ const styles = StyleSheet.create({
   sheen: { position: 'absolute' },
   topEdge: { position: 'absolute', top: 0, left: 0, right: 0, height: 1 },
   pressed: { backgroundColor: alpha(PALETTE.cream, 0.05) },
+  event: { position: 'absolute', top: 0, bottom: 0, left: 0, width: 3, backgroundColor: PALETTE.coral },
 });
