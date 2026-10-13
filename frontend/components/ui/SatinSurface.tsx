@@ -13,7 +13,8 @@ import { RADII, BORDER, ELEVATION, PALETTE, alpha } from '../../theme/tokens';
 // le jaune dans les coins « chauds », lueur très douce qui déborde de ces coins.
 // `halo` (hero) : lumière chaude diffuse dans l'angle haut droit ; elle « respire » lentement.
 
-type Warm = 'none' | 'tr' | 'tr-bl';
+// 'gold' : tout le liseré prend un reflet doré (carte de prestige : rang, niveau)
+type Warm = 'none' | 'tr' | 'tr-bl' | 'gold';
 
 type Props = {
   children: React.ReactNode;
@@ -46,6 +47,7 @@ function rimColors(warm: Warm): [string, string, ...string[]] {
   const dim = alpha(PALETTE.cream, 0.08);
   if (warm === 'none') return [alpha(PALETTE.cream, 0.2), lit, dim, dim];
   if (warm === 'tr') return [hot, lit, dim, alpha(PALETTE.cream, 0.09)];
+  if (warm === 'gold') return [hot, alpha(PALETTE.gold, 0.55), alpha(PALETTE.gold, 0.22), alpha(PALETTE.gold, 0.45)];
   return [hot, lit, dim, alpha(PALETTE.yellow, 0.6)];
 }
 const RIM_STOPS: [number, number, ...number[]] = [0, 0.26, 0.7, 1];
@@ -82,7 +84,7 @@ export default function SatinSurface({
     position: 'absolute' as const, width: size, height: size,
     ...(at === 'tr' ? { top: -size / 2, right: -size / 2 } : { bottom: -size / 2, left: -size / 2 }),
   });
-  const warmCorners: ('tr' | 'bl')[] = warm === 'none' ? [] : warm === 'tr' ? ['tr'] : ['tr', 'bl'];
+  const warmCorners: ('tr' | 'bl')[] = warm === 'none' ? [] : warm === 'tr-bl' ? ['tr', 'bl'] : ['tr'];
 
   const body = (pressed: boolean) => (
     <>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import { View, StyleSheet, ScrollView, Image, Alert, TextInput, Pressable } from 'react-native';
 import { useRouter, Href } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -7,11 +7,11 @@ import * as ImagePicker from 'expo-image-picker';
 import UserAvatar from '../../components/UserAvatar';
 import { authFetch } from '../../utils/api';
 import { useTabBar } from '../../contexts/TabBarContext';
-import Svg, { Path, Circle } from 'react-native-svg';
+import Svg, { Path, Circle, Defs, LinearGradient as SvgLinear, RadialGradient, Stop, Rect } from 'react-native-svg';
 import { t, getLocale, getLanguage } from '../../utils/i18n';
 import {
-  Txt, Icon, IconName, Button, IconButton, Card, Section, ProgressBar, ListRow, Loader, Dialog,
-  BottomSheet, ThemeIcon, EmptyState,
+  Txt, Icon, IconName, Button, IconButton, Section, ProgressBar, ListRow, Loader, Dialog,
+  BottomSheet, ThemeIcon, EmptyState, SatinSurface, AmbientBackdrop, HeroGlow,
 } from '../../components/ui';
 import { COLOR, PALETTE, SPACE, RADII, SIZE, BORDER, ICON_SIZE, TYPO, alpha } from '../../theme/tokens';
 
@@ -65,6 +65,7 @@ const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 const THEMES_SHOWN = 5;
 const HISTORY_SHOWN = 5;
 const ACH_SHOWN = 8;
+const MEDAL_W = 52; // écusson de succès
 
 // ── Succès : pictogrammes Lucide du registre (au plus proche de l'ancien glyphe) ──
 const ACH_ICONS: Record<string, IconName> = {
@@ -111,6 +112,8 @@ function Divider() {
 const CREST_W = 48;
 const CREST_H = 52;
 const CREST_PATH = 'M24 2 L44 8.5 V25 C44 37.5 35.5 46.5 24 50 C12.5 46.5 4 37.5 4 25 V8.5 Z';
+// Cœur de l'écusson : même forme réduite autour de son centre (liseré métal de ~4 px)
+const CREST_INSET = 'translate(24 26) scale(0.78) translate(-24 -26)';
 
 function Crest({ width, fill, tint, stroke, children }: {
   width: number; fill: string; tint?: string; stroke?: string; children?: React.ReactNode;
@@ -130,13 +133,77 @@ function Crest({ width, fill, tint, stroke, children }: {
   );
 }
 
-// ── Écusson de ligue : aplat or (violet au palier ultime), pictogramme nuit ──
+// Identifiant SVG unique (plusieurs écussons par écran ; le web partage un seul espace d'ids)
+function useSvgId(prefix: string) {
+  return `${prefix}${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+}
+
+// Lueur douce derrière un élément (écusson obtenu) : diffuse, jamais un néon
+function SoftGlow({ size, color, strength }: { size: number; color: string; strength: number }) {
+  const id = useSvgId('glow');
+  return (
+    <View pointerEvents="none" style={[s.glow, { width: size, height: size, marginLeft: -size / 2, marginTop: -size / 2 }]}>
+      <Svg width={size} height={size}>
+        <Defs>
+          <RadialGradient id={id} cx="50%" cy="50%" r="50%">
+            <Stop offset="0" stopColor={color} stopOpacity={strength} />
+            <Stop offset="0.55" stopColor={color} stopOpacity={strength * 0.3} />
+            <Stop offset="1" stopColor={color} stopOpacity={0} />
+          </RadialGradient>
+        </Defs>
+        <Rect x={0} y={0} width={size} height={size} fill={`url(#${id})`} />
+      </Svg>
+    </View>
+  );
+}
+
+// ── Écusson métal : or satiné (violet au palier ultime / succès rare).
+//    `inset` = cœur pétrole sombre et pictogramme or (succès) ; sinon métal plein, pictogramme nuit (rang).
+function MetalCrest({ width, hue, inset, children }: {
+  width: number; hue: string; inset?: boolean; children?: React.ReactNode;
+}) {
+  const id = useSvgId('crest');
+  const height = (width * CREST_H) / CREST_W;
+  return (
+    <View style={[s.crestBox, { width, height }]}>
+      <SoftGlow size={width * 1.9} color={hue} strength={0.3} />
+      <Svg width={width} height={height} viewBox={`0 0 ${CREST_W} ${CREST_H}`} style={StyleSheet.absoluteFill}>
+        <Defs>
+          {/* Métal : teinte pleine en haut, plus sourde en bas (une seule teinte) */}
+          <SvgLinear id={`${id}m`} x1="0" y1="0" x2="0.35" y2="1">
+            <Stop offset="0" stopColor={hue} stopOpacity={1} />
+            <Stop offset="1" stopColor={hue} stopOpacity={0.62} />
+          </SvgLinear>
+          {/* Reflet satiné en haut à gauche */}
+          <SvgLinear id={`${id}h`} x1="0" y1="0" x2="0.8" y2="0.7">
+            <Stop offset="0" stopColor={PALETTE.cream} stopOpacity={0.45} />
+            <Stop offset="0.45" stopColor={PALETTE.cream} stopOpacity={0.06} />
+            <Stop offset="1" stopColor={PALETTE.cream} stopOpacity={0} />
+          </SvgLinear>
+          <SvgLinear id={`${id}i`} x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={PALETTE.petrol} stopOpacity={1} />
+            <Stop offset="1" stopColor={PALETTE.night} stopOpacity={1} />
+          </SvgLinear>
+        </Defs>
+        <Path d={CREST_PATH} fill={PALETTE.night} />
+        <Path d={CREST_PATH} fill={`url(#${id}m)`} />
+        <Path d={CREST_PATH} fill={`url(#${id}h)`} />
+        {inset ? (
+          <Path d={CREST_PATH} transform={CREST_INSET} fill={`url(#${id}i)`} stroke={hue} strokeOpacity={0.5} strokeWidth={0.8} />
+        ) : null}
+      </Svg>
+      <View style={s.crestIcon}>{children}</View>
+    </View>
+  );
+}
+
+// ── Écusson de ligue : métal or (violet au palier ultime), pictogramme nuit ──
 function LeagueCrest({ tier }: { tier: string }) {
   const ultimate = tier === ULTIMATE_TIER;
   return (
-    <Crest width={SIZE.touch + SPACE.xs} fill={ultimate ? COLOR.accent.rare : COLOR.reward.gold}>
+    <MetalCrest width={SIZE.touch + SPACE.sm} hue={ultimate ? PALETTE.violet : PALETTE.gold}>
       <Icon name={ultimate ? 'crown' : 'shield'} size={ICON_SIZE.lg} color={COLOR.text.onAction} />
-    </Crest>
+    </MetalCrest>
   );
 }
 
@@ -149,14 +216,21 @@ function AchievementMedal({ item, width }: { item: any; width: number }) {
   const pct = done ? 1 : Math.min(1, (item.progress || 0) / (item.target || 1));
   return (
     <View style={s.medalWrap}>
-      <Crest
-        width={width}
-        fill={done ? COLOR.surface.elevated : COLOR.bg.primary}
-        tint={done ? alpha(rare ? PALETTE.violet : PALETTE.gold, 0.18) : undefined}
-        stroke={done ? accent : COLOR.border.default}
-      >
-        <Icon name={ACH_ICONS[item.id] ?? 'star'} size={ICON_SIZE.md} color={done ? accent : COLOR.text.disabled} />
-      </Crest>
+      {done ? (
+        <MetalCrest width={width} hue={rare ? PALETTE.violet : PALETTE.gold} inset>
+          <Icon name={ACH_ICONS[item.id] ?? 'star'} size={ICON_SIZE.md} color={accent} />
+        </MetalCrest>
+      ) : (
+        <View>
+          <Crest width={width} fill={COLOR.bg.primary} stroke={COLOR.border.default}>
+            <Icon name={ACH_ICONS[item.id] ?? 'star'} size={ICON_SIZE.md} color={COLOR.text.disabled} />
+          </Crest>
+          {/* Verrouillé : petit cadenas, la forme reste lisible mais éteinte */}
+          <View style={s.medalLock}>
+            <Icon name="lock" size={12} color={COLOR.text.tertiary} />
+          </View>
+        </View>
+      )}
       {!done && pct > 0 ? (
         <View style={[s.medalTrack, { width: width - SPACE.md }]}>
           <View style={[s.medalFill, { width: `${pct * 100}%` }]} />
@@ -167,8 +241,8 @@ function AchievementMedal({ item, width }: { item: any; width: number }) {
 }
 
 // ── Anneau du taux de victoire (lecture rapide) : piste crème 12 %, arc jaune = moi ──
-const RING = 64;
-const RING_STROKE = 6;
+const RING = 84;
+const RING_STROKE = 9;
 function WinRing({ value }: { value: number }) {
   const r = (RING - RING_STROKE) / 2;
   const c = 2 * Math.PI * r;
@@ -188,17 +262,15 @@ function WinRing({ value }: { value: number }) {
   );
 }
 
-// ── Cellule de stat détaillée : chiffre tabulaire qui rétrécit plutôt que de déborder ──
-function StatCell({ value, label, icon }: { value: string; label: string; icon?: IconName }) {
+// ── Cellule de stat (Série, Record) : pictogramme, libellé, chiffre tabulaire qui rétrécit ──
+function StatCell({ value, label, icon, color }: { value: string; label: string; icon: IconName; color: string }) {
   return (
     <View style={s.statCell} accessible accessibilityLabel={`${label} ${value}`}>
-      <View style={s.statValueRow}>
-        {icon ? <Icon name={icon} size={ICON_SIZE.sm} color={COLOR.accent.warm} /> : null}
-        <Txt variant="statMedium" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6} style={s.shrink}>
-          {value}
-        </Txt>
+      <Icon name={icon} size={ICON_SIZE.lg} color={color} />
+      <View style={s.shrink}>
+        <Txt variant="overline" numberOfLines={1}>{label}</Txt>
+        <Txt variant="statMedium" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>{value}</Txt>
       </View>
-      <Txt variant="overline" numberOfLines={1}>{label}</Txt>
     </View>
   );
 }
@@ -240,7 +312,7 @@ function AchievementsSection({ userId, footer }: { userId: string; footer?: Reac
         accessibilityRole="button"
         accessibilityLabel={done ? item.name : `${item.name}, ${item.progress || 0} / ${item.target}`}
       >
-        <AchievementMedal item={item} width={SIZE.touch} />
+        <AchievementMedal item={item} width={MEDAL_W} />
         <Txt variant="caption" color={done ? COLOR.text.primary : COLOR.text.tertiary} align="center" numberOfLines={2}>
           {item.name}
         </Txt>
@@ -264,13 +336,13 @@ function AchievementsSection({ userId, footer }: { userId: string; footer?: Reac
       overline={t('pilot.profile.ach_count', { n: String(unlocked.length), total: String(all.length) })}
       onSeeAll={all.length > ACH_SHOWN ? () => setShowAll(true) : undefined}
     >
-      <Card>
+      <SatinSurface variant="card" contentStyle={s.achCard}>
         {shown.length > 0 ? (
           <View style={s.achGrid}>{shown.map(item => renderCell(item, () => setSelectedAch(item)))}</View>
         ) : null}
         {shown.length > 0 && footer ? <Divider /> : null}
         {footer}
-      </Card>
+      </SatinSurface>
 
       {/* Tous les succès */}
       <BottomSheet visible={showAll} onClose={() => setShowAll(false)} title={t('pilot.profile.achievements_title')}>
@@ -594,20 +666,22 @@ export default function ProfileScreen() {
 
   return (
     <View style={s.container}>
+      <AmbientBackdrop />
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
 
         {profileError && (
-          <Card onPress={() => { setProfileError(false); setLoading(true); loadProfile(); }} style={s.errorCard}>
+          <SatinSurface variant="card" warm="none" onPress={() => { setProfileError(false); setLoading(true); loadProfile(); }} style={s.errorCard} contentStyle={s.cardPad}>
             <View style={s.inline}>
               <Icon name="error" size={ICON_SIZE.md} color={COLOR.status.error} />
               <Txt variant="bodySmall" color={COLOR.status.error} style={s.flex}>{t('profile.offline_error')}</Txt>
               <Icon name="replay" size={ICON_SIZE.sm} color={COLOR.status.error} />
             </View>
-          </Card>
+          </SatinSurface>
         )}
 
         {/* ── Hero : avatar, pseudo, titre (or), lieu, engrenage ── */}
         <View style={s.hero}>
+          <HeroGlow height={HERO_GLOW} />
           <IconButton
             icon="settings"
             accessibilityLabel={t('pilot.settings.title')}
@@ -642,6 +716,7 @@ export default function ProfileScreen() {
             onPress={() => setShowTitleModal(true)}
             accessibilityRole="button"
             accessibilityLabel={t('profile.change_title')}
+            hitSlop={HERO_SLOP}
             style={({ pressed }) => [s.heroLink, pressed && s.pressed]}
           >
             <Icon name="crown" size={ICON_SIZE.sm} color={displayTitle ? COLOR.reward.gold : COLOR.text.tertiary} />
@@ -655,6 +730,7 @@ export default function ProfileScreen() {
             onPress={openLocationModal}
             accessibilityRole="button"
             accessibilityLabel={t('profile.edit_location')}
+            hitSlop={HERO_SLOP}
             style={({ pressed }) => [s.heroLink, pressed && s.pressed]}
           >
             {user?.country_flag
@@ -667,11 +743,40 @@ export default function ProfileScreen() {
             </Txt>
             <Icon name="chevronDown" size={ICON_SIZE.sm} color={COLOR.text.tertiary} />
           </Pressable>
+
+          {/* ── Abonnés · abonnements : une ligne sous l'identité ── */}
+          <View style={s.socialRow}>
+            <Pressable
+              onPress={() => router.push(`/followers?userId=${profile?.user.id}&type=followers`)}
+              accessibilityRole="button"
+              hitSlop={HERO_SLOP}
+              style={({ pressed }) => [s.socialItem, pressed && s.pressed]}
+            >
+              <Txt variant="bodySmall" color={COLOR.text.secondary} style={s.tabular}>
+                <Txt variant="bodySmall" color={COLOR.text.primary}>{fmt(user?.followers_count)}</Txt>
+                {` ${t('profile.followers_label').toLocaleLowerCase(getLocale())}`}
+              </Txt>
+            </Pressable>
+            <View style={s.socialDot} />
+            <Pressable
+              onPress={() => router.push(`/followers?userId=${profile?.user.id}&type=following`)}
+              accessibilityRole="button"
+              hitSlop={HERO_SLOP}
+              style={({ pressed }) => [s.socialItem, pressed && s.pressed]}
+            >
+              <Txt variant="bodySmall" color={COLOR.text.secondary} style={s.tabular}>
+                <Txt variant="bodySmall" color={COLOR.text.primary}>{fmt(user?.following_count)}</Txt>
+                {` ${t('profile.following_label').toLocaleLowerCase(getLocale())}`}
+              </Txt>
+            </Pressable>
+          </View>
         </View>
 
         <View style={s.body}>
           {/* ── Rang (prestige, en tête) puis niveau et progression — une seule carte ── */}
-          <Card style={s.progressCard}>
+          {/* Rang + niveau et victoires : deux cartes sœurs, plus serrées que les sections */}
+          <View style={s.cardsBlock}>
+          <SatinSurface variant="card" warm="gold" contentStyle={[s.cardPad, s.progressCard]}>
             {leagueData && (
               <>
                 <View style={s.leagueRow}>
@@ -704,55 +809,32 @@ export default function ProfileScreen() {
                 <Txt variant="caption" numberOfLines={1}>{t('profile.total_xp')}</Txt>
               </View>
             </View>
-            <ProgressBar value={progress} tone="action" />
+            <ProgressBar value={progress} tone="action" sheen />
             <View style={s.spread}>
               <Txt variant="caption" style={s.tabular}>{`${fmt(current)} / ${fmt(needed)} XP`}</Txt>
               <Txt variant="caption" color={COLOR.text.secondary}>{`${t('profile.level_short')} ${Math.min(lvl + 1, 50)}`}</Txt>
             </View>
-          </Card>
+          </SatinSurface>
 
-          {/* ── Victoires : % en lecture rapide + nombre brut, puis 4 stats détaillées ── */}
-          <View style={s.statsBlock}>
-            <Card style={s.statsCard}>
-              <View style={s.winRow}>
-                <View style={s.flex}>
-                  <Txt variant="overline" numberOfLines={1}>{t('pilot.profile.win_rate_title')}</Txt>
-                  <Txt variant="statLarge" numberOfLines={1}>{`${winRate}%`}</Txt>
-                  <Txt variant="caption" numberOfLines={2} style={s.tabular}>
-                    {t('pilot.profile.win_summary', { wins: fmt(user?.matches_won), played: fmt(user?.matches_played) })}
-                  </Txt>
-                </View>
-                <WinRing value={winRate / 100} />
+          {/* ── Victoires : % en lecture rapide + nombre brut, anneau à droite ; Série | Record dessous ── */}
+          <SatinSurface variant="card" contentStyle={[s.cardPad, s.statsCard]}>
+            <View style={s.winRow}>
+              <View style={s.flex}>
+                <Txt variant="overline" numberOfLines={1}>{t('pilot.profile.win_rate_title')}</Txt>
+                <Txt variant="statLarge" numberOfLines={1}>{`${winRate}%`}</Txt>
+                <Txt variant="caption" numberOfLines={2} style={s.tabular}>
+                  {t('pilot.profile.win_summary', { wins: fmt(user?.matches_won), played: fmt(user?.matches_played) })}
+                </Txt>
               </View>
-              <Divider />
-              <View style={s.statGrid}>
-                <StatCell value={fmt(user?.matches_played)} label={t('pilot.profile.stat_duels')} />
-                <StatCell value={fmt(user?.matches_won)} label={t('profile.matches_won')} />
-                <StatCell value={fmt(user?.current_streak)} label={t('pilot.profile.stat_streak')} icon="flame" />
-                <StatCell value={fmt(user?.best_streak)} label={t('pilot.profile.stat_best')} />
-              </View>
-            </Card>
-
-            {/* ── Abonnés / abonnements (ligne compacte) ── */}
-            <View style={s.socialRow}>
-              <Pressable
-                onPress={() => router.push(`/followers?userId=${profile?.user.id}&type=followers`)}
-                accessibilityRole="button"
-                style={({ pressed }) => [s.socialItem, pressed && s.pressed]}
-              >
-                <Txt variant="cardTitle" style={s.tabular}>{fmt(user?.followers_count)}</Txt>
-                <Txt variant="overline">{t('profile.followers_label')}</Txt>
-              </Pressable>
-              <View style={s.socialDot} />
-              <Pressable
-                onPress={() => router.push(`/followers?userId=${profile?.user.id}&type=following`)}
-                accessibilityRole="button"
-                style={({ pressed }) => [s.socialItem, pressed && s.pressed]}
-              >
-                <Txt variant="cardTitle" style={s.tabular}>{fmt(user?.following_count)}</Txt>
-                <Txt variant="overline">{t('profile.following_label')}</Txt>
-              </Pressable>
+              <WinRing value={winRate / 100} />
             </View>
+            <Divider />
+            <View style={s.statRow}>
+              <StatCell value={fmt(user?.current_streak)} label={t('pilot.profile.stat_streak')} icon="flame" color={COLOR.accent.warm} />
+              <View style={s.statSep} />
+              <StatCell value={fmt(user?.best_streak)} label={t('pilot.profile.stat_best')} icon="trophy" color={COLOR.reward.gold} />
+            </View>
+          </SatinSurface>
           </View>
 
           {/* ── Succès & titres ── */}
@@ -760,12 +842,11 @@ export default function ProfileScreen() {
             userId={user?.id || ''}
             footer={
               <ListRow
-                leadingIcon="crown"
+                leading={<Icon name="crown" size={ICON_SIZE.lg} color={COLOR.reward.gold} />}
                 title={t('pilot.profile.titles_row')}
-                subtitle={t('pilot.profile.titles_count', { n: String(all_unlocked_titles?.length || 0) })}
-                trailing={displayTitle ? (
-                  <Txt variant="label" color={COLOR.reward.gold} numberOfLines={1} style={s.trailingTitle}>{displayTitle}</Txt>
-                ) : undefined}
+                subtitle={displayTitle
+                  ? `${displayTitle} · ${t('pilot.profile.titles_count', { n: String(all_unlocked_titles?.length || 0) })}`
+                  : t('profile.no_title')}
                 chevron
                 onPress={() => setShowTitleModal(true)}
               />
@@ -778,12 +859,12 @@ export default function ProfileScreen() {
             onSeeAll={favThemes.length > THEMES_SHOWN ? () => router.push('/theme-list?mine=1' as Href) : undefined}
           >
             {favThemes.length > 0 ? (
-              <Card padded={false} style={s.listCard}>
+              <SatinSurface variant="card" contentStyle={s.listCard}>
                 {favThemes.slice(0, THEMES_SHOWN).map((thm, i) => (
                   <React.Fragment key={thm.id}>
                     {i > 0 ? <Divider /> : null}
                     <ListRow
-                      leading={<ThemeIcon themeName={thm.name} cluster={thm.cluster} superCategory={thm.super_category} size={ICON_SIZE.theme.sm} />}
+                      leading={<ThemeIcon themeId={thm.id} themeName={thm.name} cluster={thm.cluster} superCategory={thm.super_category} size={ICON_SIZE.theme.sm} />}
                       title={thm.name}
                       subtitle={thm.title || thm.cluster}
                       trailing={<Txt variant="label" color={COLOR.action.primary}>{`${t('profile.level_short')} ${thm.level}`}</Txt>}
@@ -792,7 +873,7 @@ export default function ProfileScreen() {
                     />
                   </React.Fragment>
                 ))}
-              </Card>
+              </SatinSurface>
             ) : (
               <Txt variant="bodySmall">{t('profile.play_to_progress')}</Txt>
             )}
@@ -806,7 +887,7 @@ export default function ProfileScreen() {
             {history.length === 0 ? (
               <Txt variant="bodySmall">{t('profile.no_matches')}</Txt>
             ) : (
-              <Card padded={false} style={s.listCard}>
+              <SatinSurface variant="card" warm="none" contentStyle={s.listCard}>
                 {historyShown.map((m, i) => {
                   const resultColor = m.won ? COLOR.status.success : COLOR.status.error;
                   const row = (
@@ -842,7 +923,7 @@ export default function ProfileScreen() {
                     </React.Fragment>
                   );
                 })}
-              </Card>
+              </SatinSurface>
             )}
           </Section>
         </View>
@@ -995,6 +1076,9 @@ export default function ProfileScreen() {
 
 const AVATAR_ITEM = 64;
 
+const HERO_GLOW = 340;
+const HERO_SLOP = { top: 6, bottom: 6, left: 4, right: 4 };
+
 const s = StyleSheet.create({
   levelRowSeparated: { borderTopWidth: BORDER.hair, borderTopColor: COLOR.border.subtle, paddingTop: SPACE.md },
   pointsLabel: { maxWidth: 104 },
@@ -1012,12 +1096,14 @@ const s = StyleSheet.create({
   divider: { height: BORDER.hair, backgroundColor: COLOR.border.subtle },
 
   errorCard: { marginHorizontal: SPACE.screenX, marginTop: SPACE.md },
+  cardPad: { padding: SPACE.cardPad },
 
   /* Hero */
-  hero: { alignItems: 'center', paddingTop: SPACE.xl, paddingBottom: SPACE.md, paddingHorizontal: SPACE.screenX },  // + marge interne des liens de 44 px ≈ sectionGap
+  hero: { alignItems: 'center', paddingTop: SPACE.lg, paddingBottom: SPACE.lg, paddingHorizontal: SPACE.screenX },
   gear: { position: 'absolute', top: SPACE.sm, right: SPACE.screenX },
-  avatarWrap: { marginBottom: SPACE.md },
-  heroName: { alignSelf: 'stretch', marginBottom: SPACE.xxs },
+  // Avatar : anneau jaune (moi) et halo chaud très doux
+  avatarWrap: { marginBottom: SPACE.sm, borderRadius: RADII.pill, boxShadow: `0 0 28px 2px ${alpha(PALETTE.yellow, 0.28)}` },
+  heroName: { alignSelf: 'stretch' },
   avatarEdit: {
     position: 'absolute', bottom: 0, right: 0,
     width: ICON_SIZE.xl, height: ICON_SIZE.xl, borderRadius: RADII.pill,
@@ -1025,7 +1111,8 @@ const s = StyleSheet.create({
     borderWidth: BORDER.strong, borderColor: COLOR.bg.primary,
     alignItems: 'center', justifyContent: 'center',
   },
-  heroLink: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs, minHeight: SIZE.touch, maxWidth: '100%', paddingHorizontal: SPACE.sm },
+  // Lignes du hero serrées (32 px) ; hitSlop rend la cible tactile à 44 px
+  heroLink: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs, minHeight: SIZE.touch - SPACE.md, maxWidth: '100%', paddingHorizontal: SPACE.sm },
 
   /* Niveau + ligue */
   progressCard: { gap: SPACE.md },
@@ -1037,26 +1124,33 @@ const s = StyleSheet.create({
   crestIcon: { marginTop: -SPACE.xs },   // centre optique : la pointe du bas alourdit la forme
 
   /* Victoires + stats */
-  statsBlock: { gap: SPACE.sm },
-  statsCard: { gap: SPACE.lg },
+  cardsBlock: { gap: SPACE.lg },
+  statsCard: { gap: SPACE.md },
   winRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
-  statGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: SPACE.lg },
-  statCell: { width: '50%', gap: SPACE.xxs, paddingRight: SPACE.sm },
-  statValueRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs },
+  statRow: { flexDirection: 'row', alignItems: 'center' },
+  statCell: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: SPACE.md, paddingHorizontal: SPACE.xs },
+  statSep: { width: BORDER.hair, alignSelf: 'stretch', backgroundColor: COLOR.border.subtle, marginHorizontal: SPACE.sm },
 
   /* Social */
-  socialRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.lg },
-  socialItem: { flexDirection: 'row', alignItems: 'baseline', gap: SPACE.xs, minHeight: SIZE.touch, paddingHorizontal: SPACE.sm, justifyContent: 'center' },
+  socialRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.xs, marginTop: SPACE.xxs },
+  socialItem: { minHeight: SIZE.touch - SPACE.md, paddingHorizontal: SPACE.sm, justifyContent: 'center' },
   socialDot: { width: SPACE.xs, height: SPACE.xs, borderRadius: RADII.pill, backgroundColor: COLOR.border.strong },
 
   /* Succès */
+  achCard: { padding: SPACE.cardPad, paddingTop: SPACE.lg, gap: SPACE.sm },
   achGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: SPACE.lg },
   achCell: { width: '25%', alignItems: 'center', gap: SPACE.xs, paddingHorizontal: SPACE.xxs },
   medalWrap: { alignItems: 'center', gap: SPACE.xs },
+  medalLock: {
+    position: 'absolute', top: -SPACE.xxs, right: -SPACE.sm,
+    width: 20, height: 20, borderRadius: RADII.pill,
+    backgroundColor: COLOR.bg.primary, borderWidth: BORDER.hair, borderColor: COLOR.border.default,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  glow: { position: 'absolute', left: '50%', top: '50%' },
   medalTrack: { height: BORDER.selected, borderRadius: RADII.pill, backgroundColor: COLOR.track, overflow: 'hidden' },
   medalFill: { height: '100%', borderRadius: RADII.pill, backgroundColor: COLOR.text.secondary },
   achDetail: { gap: SPACE.sm },
-  trailingTitle: { maxWidth: 120 },
 
   /* Listes (thèmes, historique) */
   listCard: { paddingHorizontal: SPACE.cardPad },

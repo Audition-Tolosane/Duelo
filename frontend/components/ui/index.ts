@@ -17,6 +17,7 @@ export { default as ProgressBar } from './ProgressBar';
 export { default as ProgressRing } from './ProgressRing';
 export { default as SatinSurface } from './SatinSurface';
 export { default as AmbientBackdrop } from './AmbientBackdrop';
+export { default as HeroGlow } from './HeroGlow';
 export { default as HaloIcon } from './HaloIcon';
 export { default as ListRow } from './ListRow';
 export { default as Loader } from './Loader';
