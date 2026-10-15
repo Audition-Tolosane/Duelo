@@ -19,7 +19,7 @@ que les 100 thèmes soient prêts.
 """
 
 LANGUE_REFERENCE = "fr"
-LANGUES_TRADUITES = ("en", "es", "pt")
+LANGUES_TRADUITES = ("en", "es", "pt", "it")
 LANGUES_CONNUES = (LANGUE_REFERENCE,) + LANGUES_TRADUITES
 
 # Champs de `themes` qui portent du texte affiché au joueur, donc traduisibles.
@@ -74,45 +74,45 @@ def libelles_theme(theme, lang):
 # partagée par une vingtaine de thèmes chacun) : une table de correspondance suffit.
 # Un cluster absent de la table s'affiche en français (même repli que les thèmes).
 CLUSTERS_TRADUITS = {
-    "Communauté": {"en": "Community", "es": "Comunidad", "pt": "Comunidade"},
+    "Communauté": {"en": "Community", "es": "Comunidad", "pt": "Comunidade", "it": "Comunità"},
     # SCREEN
-    "Séries TV": {"en": "TV Series", "es": "Series de TV", "pt": "Séries de TV"},
-    "Cinéma": {"en": "Movies", "es": "Cine", "pt": "Cinema"},
-    "Animation & Anime": {"en": "Animation & Anime", "es": "Animación y anime", "pt": "Animação e anime"},
+    "Séries TV": {"en": "TV Series", "es": "Series de TV", "pt": "Séries de TV", "it": "Serie TV"},
+    "Cinéma": {"en": "Movies", "es": "Cine", "pt": "Cinema", "it": "Cinema"},
+    "Animation & Anime": {"en": "Animation & Anime", "es": "Animación y anime", "pt": "Animação e anime", "it": "Animazione e anime"},
     # SOUND
-    "Hits & Pop Culture": {"en": "Hits & Pop Culture", "es": "Éxitos y cultura pop", "pt": "Hits e cultura pop"},
-    "Musiques de Films & Jeux": {"en": "Film & Game Music", "es": "Música de cine y videojuegos", "pt": "Trilhas de filmes e games"},
-    "Rock & Classiques": {"en": "Rock & Classical", "es": "Rock y clásica", "pt": "Rock e clássica"},
+    "Hits & Pop Culture": {"en": "Hits & Pop Culture", "es": "Éxitos y cultura pop", "pt": "Hits e cultura pop", "it": "Hit e cultura pop"},
+    "Musiques de Films & Jeux": {"en": "Film & Game Music", "es": "Música de cine y videojuegos", "pt": "Trilhas de filmes e games", "it": "Colonne sonore di film e videogiochi"},
+    "Rock & Classiques": {"en": "Rock & Classical", "es": "Rock y clásica", "pt": "Rock e clássica", "it": "Rock e classica"},
     # ARENA
-    "Combat & Sports individuels": {"en": "Combat & Individual Sports", "es": "Combate y deportes individuales", "pt": "Lutas e esportes individuais"},
-    "E-sport & Gaming": {"en": "Esports & Gaming", "es": "Esports y videojuegos", "pt": "eSports e games"},
-    "Sports de Balle": {"en": "Ball Sports", "es": "Deportes de pelota", "pt": "Esportes com bola"},
-    "Sports mécaniques": {"en": "Motorsport", "es": "Deportes de motor", "pt": "Automobilismo"},
+    "Combat & Sports individuels": {"en": "Combat & Individual Sports", "es": "Combate y deportes individuales", "pt": "Lutas e esportes individuais", "it": "Sport da combattimento e individuali"},
+    "E-sport & Gaming": {"en": "Esports & Gaming", "es": "Esports y videojuegos", "pt": "eSports e games", "it": "Esport e gaming"},
+    "Sports de Balle": {"en": "Ball Sports", "es": "Deportes de pelota", "pt": "Esportes com bola", "it": "Sport con la palla"},
+    "Sports mécaniques": {"en": "Motorsport", "es": "Deportes de motor", "pt": "Automobilismo", "it": "Motorsport"},
     # LEGENDS
-    "Antiquité & Moyen Âge": {"en": "Antiquity & Middle Ages", "es": "Antigüedad y Edad Media", "pt": "Antiguidade e Idade Média"},
-    "Histoire moderne": {"en": "Modern History", "es": "Historia moderna", "pt": "História moderna"},
-    "Histoires nationales": {"en": "National Histories", "es": "Historias nacionales", "pt": "Histórias nacionais"},
-    "Mythes & Religions": {"en": "Myths & Religions", "es": "Mitos y religiones", "pt": "Mitos e religiões"},
+    "Antiquité & Moyen Âge": {"en": "Antiquity & Middle Ages", "es": "Antigüedad y Edad Media", "pt": "Antiguidade e Idade Média", "it": "Antichità e Medioevo"},
+    "Histoire moderne": {"en": "Modern History", "es": "Historia moderna", "pt": "História moderna", "it": "Storia moderna"},
+    "Histoires nationales": {"en": "National Histories", "es": "Historias nacionales", "pt": "Histórias nacionais", "it": "Storie nazionali"},
+    "Mythes & Religions": {"en": "Myths & Religions", "es": "Mitos y religiones", "pt": "Mitos e religiões", "it": "Miti e religioni"},
     # LAB
-    "Espace & Univers": {"en": "Space & Universe", "es": "Espacio y universo", "pt": "Espaço e universo"},
-    "Physique & Chimie": {"en": "Physics & Chemistry", "es": "Física y química", "pt": "Física e química"},
-    "Tech & IA": {"en": "Tech & AI", "es": "Tecnología e IA", "pt": "Tecnologia e IA"},
+    "Espace & Univers": {"en": "Space & Universe", "es": "Espacio y universo", "pt": "Espaço e universo", "it": "Spazio e universo"},
+    "Physique & Chimie": {"en": "Physics & Chemistry", "es": "Física y química", "pt": "Física e química", "it": "Fisica e chimica"},
+    "Tech & IA": {"en": "Tech & AI", "es": "Tecnología e IA", "pt": "Tecnologia e IA", "it": "Tecnologia e IA"},
     # GLOBE
-    "Gastronomie": {"en": "Gastronomy", "es": "Gastronomía", "pt": "Gastronomia"},
-    "Langues & Cultures": {"en": "Languages & Cultures", "es": "Lenguas y culturas", "pt": "Línguas e culturas"},
-    "Voyage & Géo": {"en": "Travel & Geography", "es": "Viajes y geografía", "pt": "Viagem e geografia"},
+    "Gastronomie": {"en": "Gastronomy", "es": "Gastronomía", "pt": "Gastronomia", "it": "Gastronomia"},
+    "Langues & Cultures": {"en": "Languages & Cultures", "es": "Lenguas y culturas", "pt": "Línguas e culturas", "it": "Lingue e culture"},
+    "Voyage & Géo": {"en": "Travel & Geography", "es": "Viajes y geografía", "pt": "Viagem e geografia", "it": "Viaggi e geografia"},
     # ART
-    "Architecture": {"en": "Architecture", "es": "Arquitectura", "pt": "Arquitetura"},
-    "Mode & Design": {"en": "Fashion & Design", "es": "Moda y diseño", "pt": "Moda e design"},
-    "Peinture & Sculpture": {"en": "Painting & Sculpture", "es": "Pintura y escultura", "pt": "Pintura e escultura"},
+    "Architecture": {"en": "Architecture", "es": "Arquitectura", "pt": "Arquitetura", "it": "Architettura"},
+    "Mode & Design": {"en": "Fashion & Design", "es": "Moda y diseño", "pt": "Moda e design", "it": "Moda e design"},
+    "Peinture & Sculpture": {"en": "Painting & Sculpture", "es": "Pintura y escultura", "pt": "Pintura e escultura", "it": "Pittura e scultura"},
     # LIFE
-    "Corps Humain": {"en": "Human Body", "es": "Cuerpo humano", "pt": "Corpo humano"},
-    "Monde Animal": {"en": "Animal Kingdom", "es": "Mundo animal", "pt": "Mundo animal"},
-    "Nature & Écologie": {"en": "Nature & Ecology", "es": "Naturaleza y ecología", "pt": "Natureza e ecologia"},
+    "Corps Humain": {"en": "Human Body", "es": "Cuerpo humano", "pt": "Corpo humano", "it": "Corpo umano"},
+    "Monde Animal": {"en": "Animal Kingdom", "es": "Mundo animal", "pt": "Mundo animal", "it": "Mondo animale"},
+    "Nature & Écologie": {"en": "Nature & Ecology", "es": "Naturaleza y ecología", "pt": "Natureza e ecologia", "it": "Natura ed ecologia"},
     # MIND
-    "Littérature": {"en": "Literature", "es": "Literatura", "pt": "Literatura"},
-    "Maths & Logique": {"en": "Math & Logic", "es": "Matemáticas y lógica", "pt": "Matemática e lógica"},
-    "Philo & Psycho": {"en": "Philosophy & Psychology", "es": "Filosofía y psicología", "pt": "Filosofia e psicologia"},
+    "Littérature": {"en": "Literature", "es": "Literatura", "pt": "Literatura", "it": "Letteratura"},
+    "Maths & Logique": {"en": "Math & Logic", "es": "Matemáticas y lógica", "pt": "Matemática e lógica", "it": "Matematica e logica"},
+    "Philo & Psycho": {"en": "Philosophy & Psychology", "es": "Filosofía y psicología", "pt": "Filosofia e psicologia", "it": "Filosofia e psicologia"},
 }
 
 
