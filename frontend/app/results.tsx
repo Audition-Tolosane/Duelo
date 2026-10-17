@@ -506,9 +506,10 @@ export default function ResultsScreen() {
   const isNearMiss = !won && scoreGap >= 0 && scoreGap <= 1 && playerAnswers.length > 0;
 
   // Missed questions (player's selected answer differs from correct_option)
+  // Sans bonne réponse connue (duel interrompu avant la révélation), la question est ignorée.
   const missedQuestions = quizQuestions
     .map((q, i) => ({ q, i, playerAnswer: playerAnswers[i] ?? -1 }))
-    .filter(({ q, playerAnswer }) => playerAnswer !== q.correct_option);
+    .filter(({ q, playerAnswer }) => typeof q.correct_option === 'number' && playerAnswer !== q.correct_option);
 
   const goBack = () => {
     if (router.canGoBack()) { router.back(); } else { router.replace(category ? `/category-detail?id=${category}` : '/(tabs)/play'); }
