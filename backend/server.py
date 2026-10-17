@@ -43,7 +43,9 @@ async def global_rate_limit(request: Request, call_next):
     if request.url.path.startswith("/ws"):
         return await call_next(request)
     try:
-        _limiter.check(f"global:{client_ip}", 120, 60)  # 120 req/min global
+        # 300 req/min par IP : plusieurs joueurs partagent souvent la même IP publique
+        # (même wifi, NAT opérateur), et un écran comme l'Accueil lance une rafale d'appels.
+        _limiter.check(f"global:{client_ip}", 300, 60)
     except Exception:
         from fastapi.responses import JSONResponse
         return JSONResponse(status_code=429, content={"detail": "Trop de requêtes"})

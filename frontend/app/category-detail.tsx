@@ -16,7 +16,7 @@ import SwipeBackPage from '../components/SwipeBackPage';
 import UserAvatar from '../components/UserAvatar';
 import {
   Txt, Icon, Button, IconButton, Badge, Card, Chip, Section, ScreenContainer, ScreenHeader,
-  ProgressBar, ListRow, Loader, EmptyState, ThemeIcon, ThemeIllustration,
+  ProgressBar, ListRow, Loader, EmptyState, ThemeIcon, ThemeIllustration, BottomSheet, SearchField,
 } from '../components/ui';
 import { COLOR, SPACE, RADII, SIZE, BORDER, GRADIENTS, TYPO, ICON_SIZE, PALETTE, alpha } from '../theme/tokens';
 import { resolveThemeIcon } from '../theme/themeIconMap';
@@ -84,6 +84,13 @@ export default function CategoryDetailScreen() {
   }
 
   const [userId, setUserId] = useState('');
+  // « Défier un ami » : amis (abonnements + abonnés) puis recherche de joueurs.
+  type FriendItem = { id: string; pseudo: string; avatar_seed?: string; avatar_url?: string | null; selected_title?: string };
+  const [friendSheetVisible, setFriendSheetVisible] = useState(false);
+  const [friends, setFriends] = useState<FriendItem[]>([]);
+  const [friendsLoading, setFriendsLoading] = useState(false);
+  const [friendQuery, setFriendQuery] = useState('');
+  const [friendResults, setFriendResults] = useState<FriendItem[]>([]);
   const [detail, setDetail] = useState<CategoryDetail | null>(null);
   const [posts, setPosts] = useState<WallPostData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -239,6 +246,47 @@ export default function CategoryDetailScreen() {
   const handlePlay = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     router.push(`/matchmaking?category=${id}&themeName=${encodeURIComponent(detail?.name || '')}`);
+  };
+
+  const openFriendSheet = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setFriendSheetVisible(true);
+    if (!userId || friends.length > 0) return;
+    setFriendsLoading(true);
+    try {
+      const lists = await Promise.all(['following', 'followers'].map(async (type) => {
+        const res = await authFetch(`${API_URL}/api/player/${userId}/followers?type=${type}`);
+        const data = res.ok ? await res.json() : [];
+        return Array.isArray(data) ? (data as FriendItem[]) : [];
+      }));
+      const seen = new Set<string>();
+      setFriends(lists.flat().filter((f) => f.id !== userId && !seen.has(f.id) && !!seen.add(f.id)));
+    } catch (e) { console.error(e); }
+    setFriendsLoading(false);
+  };
+
+  useEffect(() => {
+    const q = friendQuery.trim();
+    if (q.length < 2) { setFriendResults([]); return; }
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/search/players?limit=20&q=${encodeURIComponent(q)}`);
+        const data = res.ok ? await res.json() : [];
+        setFriendResults((Array.isArray(data) ? data : data.players || []).filter((p: FriendItem) => p.id !== userId));
+      } catch (e) { console.error(e); }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [friendQuery]);
+
+  const closeFriendSheet = () => {
+    setFriendSheetVisible(false);
+    setFriendQuery('');
+  };
+
+  // Le défi se confirme sur le profil de l'ami, avec ce thème présélectionné.
+  const handleChallengeFriend = (friendId: string) => {
+    closeFriendSheet();
+    router.push(`/player-profile?id=${friendId}&challenge=1&themeId=${id}&themeName=${encodeURIComponent(detail?.name || '')}` as any);
   };
 
   const handleLeaderboard = () => {
@@ -777,18 +825,66 @@ export default function CategoryDetailScreen() {
         {!keyboardOpen && (
           <View style={[styles.footer, { paddingBottom: insets.bottom + SPACE.md }]}>
             <LinearGradient colors={GRADIENTS.fadeBottom.colors} style={styles.footerFade} pointerEvents="none" />
-            <Button
-              testID="play-button"
-              label={t('pilot.theme.play')}
-              icon="duel"
-              size="lg"
-              fullWidth
-              haptic={false}
-              onPress={handlePlay}
-            />
+            <View style={styles.footerRow}>
+              <Button
+                testID="challenge-friend-button"
+                label={t('play.challenge_friend')}
+                icon="users"
+                variant="secondary"
+                size="lg"
+                haptic={false}
+                onPress={openFriendSheet}
+                style={styles.footerBtn}
+              />
+              <Button
+                testID="play-button"
+                label={t('pilot.theme.play')}
+                icon="duel"
+                size="lg"
+                haptic={false}
+                onPress={handlePlay}
+                style={styles.footerBtn}
+              />
+            </View>
           </View>
         )}
       </KeyboardAvoidingView>
+
+      {/* Défier un ami sur ce thème */}
+      <BottomSheet
+        visible={friendSheetVisible}
+        onClose={closeFriendSheet}
+        title={t('play.challenge_friend')}
+        subtitle={detail?.name}
+      >
+        <SearchField
+          placeholder={t('search.placeholder_players')}
+          value={friendQuery}
+          onChangeText={setFriendQuery}
+        />
+        <ScrollView style={styles.friendList} keyboardShouldPersistTaps="handled">
+          {friendsLoading && friendQuery.trim().length < 2 ? (
+            <Loader />
+          ) : (() => {
+            const list = friendQuery.trim().length >= 2 ? friendResults : friends;
+            if (list.length === 0) {
+              return friendQuery.trim().length >= 2
+                ? <Txt variant="bodySmall" align="center" style={styles.friendEmpty}>{t('search.no_results')}</Txt>
+                : null;
+            }
+            return list.map((f) => (
+              <ListRow
+                key={f.id}
+                title={f.pseudo}
+                subtitle={f.selected_title || undefined}
+                leading={<UserAvatar avatarUrl={f.avatar_url || undefined} avatarSeed={f.avatar_seed || f.pseudo} pseudo={f.pseudo} size={40} />}
+                trailing={<Icon name="duel" size={20} color={COLOR.action.primary} />}
+                onPress={() => handleChallengeFriend(f.id)}
+              />
+            ));
+          })()}
+        </ScrollView>
+      </BottomSheet>
 
       {/* Create Post Modal */}
       <Modal visible={showCreatePost} transparent animationType="slide" onRequestClose={() => setShowCreatePost(false)}>
@@ -958,6 +1054,10 @@ const styles = StyleSheet.create({
 
   // CTA collant
   footer: { paddingHorizontal: SPACE.screenX, paddingTop: SPACE.sm, backgroundColor: COLOR.bg.primary },
+  footerRow: { flexDirection: 'row', gap: SPACE.sm },
+  footerBtn: { flex: 1 },
+  friendList: { maxHeight: 360, marginTop: SPACE.sm },
+  friendEmpty: { paddingVertical: SPACE.lg },
   footerFade: { position: 'absolute', left: 0, right: 0, top: -SPACE.xxl, height: SPACE.xxl },
 
   // Modale de création

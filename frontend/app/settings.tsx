@@ -4,6 +4,7 @@ import { View, StyleSheet, ScrollView, Switch, Share } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authFetch, clearToken } from '../utils/api';
+import { dueloWS } from '../services/websocket';
 import { setSoundEnabled, isSoundEnabled } from '../utils/sounds';
 import { t } from '../utils/i18n';
 import { Txt, Icon, Button, Badge, Card, Dialog, ScreenContainer, ScreenHeader, ListRow } from '../components/ui';
@@ -78,6 +79,7 @@ export default function SettingsScreen() {
   };
 
   const handleLogout = async () => {
+    dueloWS.disconnect();
     await clearToken();
     await AsyncStorage.multiRemove(['duelo_user_id', 'duelo_pseudo', 'duelo_avatar_seed', 'duelo_avatar_url']);
     router.replace('/');
@@ -91,6 +93,7 @@ export default function SettingsScreen() {
     try {
       const res = await authFetch(`${API_URL}/api/auth/delete-account`, { method: 'DELETE' });
       if (res.ok) {
+        dueloWS.disconnect();
         await clearToken();
         await AsyncStorage.multiRemove(['duelo_user_id', 'duelo_pseudo', 'duelo_avatar_seed', 'duelo_avatar_url']);
         setDeleteAsk(false);

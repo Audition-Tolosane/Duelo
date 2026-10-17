@@ -239,7 +239,11 @@ class ConnectionManager:
             timer.cancel()
 
     def _find_match(self, entry: dict) -> Optional[dict]:
-        """Find a compatible opponent in the queue (same theme, close MMR)."""
+        """Find an opponent in the queue on the same theme, closest MMR first.
+
+        Un humain est TOUJOURS préféré à un bot : pas de plafond d'écart MMR, sinon deux
+        joueurs de niveaux éloignés qui cherchent en même temps finissent chacun contre un bot.
+        """
         best_match = None
         best_diff = float("inf")
 
@@ -250,8 +254,7 @@ class ConnectionManager:
                 continue
 
             mmr_diff = abs(candidate["mmr"] - entry["mmr"])
-            # Accept within 300 MMR range
-            if mmr_diff < 300 and mmr_diff < best_diff:
+            if mmr_diff < best_diff:
                 best_diff = mmr_diff
                 best_match = candidate
 
