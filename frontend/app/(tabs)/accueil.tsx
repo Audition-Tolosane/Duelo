@@ -1174,9 +1174,19 @@ export default function AccueilScreen() {
         body: JSON.stringify({ user_id: userId }),
       });
       if (res.ok) {
+        const data = await res.json().catch(() => ({}));
         setIncomingChallenges(prev => prev.filter(c => c.challenge_id !== challenge.challenge_id));
-        // Play in reveal mode: see Player A's answers revealed after each question
-        if (challenge.theme_id) {
+        // Le serveur ouvre une salle privée et prévient l'expéditeur (challenge_ready) : on la
+        // rejoint pour jouer EN DIRECT, comme depuis la pop-up. Partir en mode différé laissait
+        // l'expéditeur bloqué sur la carte du matchmaking pendant qu'on avait les questions.
+        if (data.room_id && challenge.theme_id) {
+          router.push(
+            `/matchmaking?room_id=${data.room_id}&category=${challenge.theme_id}&challenge=true` +
+            `&opponentPseudo=${encodeURIComponent(challenge.challenger_pseudo)}` +
+            `&themeName=${encodeURIComponent(challenge.theme_name || '')}` as any
+          );
+        } else if (challenge.theme_id) {
+          // Play in reveal mode: see Player A's answers revealed after each question
           router.push(
             `/game?category=${challenge.theme_id}&asyncMode=reveal` +
             `&opponentPseudo=${encodeURIComponent(challenge.challenger_pseudo)}` +
