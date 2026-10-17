@@ -1,5 +1,5 @@
-import React from 'react';
-import { Modal as RNModal, View, Pressable, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Modal as RNModal, View, Pressable, StyleSheet, ScrollView, Keyboard, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Txt from './Txt';
 import IconButton from './IconButton';
@@ -20,11 +20,27 @@ type Props = {
 // dès que le contenu dépasse une hauteur d'écran.
 export default function BottomSheet({ visible, onClose, title, subtitle, children, footer }: Props) {
   const insets = useSafeAreaInsets();
+  // La feuille remonte au-dessus du clavier : sinon un champ de recherche dans la feuille
+  // reste caché derrière (KeyboardAvoidingView est peu fiable dans une Modal Android).
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  useEffect(() => {
+    const show = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow', (e) => setKeyboardHeight(e.endCoordinates.height));
+    const hide = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', () => setKeyboardHeight(0));
+    return () => { show.remove(); hide.remove(); };
+  }, []);
   return (
     <RNModal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <View style={styles.root}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel={t('common.close')} />
-        <View style={[styles.sheet, { paddingBottom: insets.bottom + SPACE.lg }]} accessibilityViewIsModal>
+        <View
+          style={[
+            styles.sheet,
+            keyboardHeight > 0
+              ? { marginBottom: keyboardHeight, paddingBottom: SPACE.md }
+              : { paddingBottom: insets.bottom + SPACE.lg },
+          ]}
+          accessibilityViewIsModal
+        >
           <View style={styles.grabber} />
           {(title || subtitle) ? (
             <View style={styles.head}>
@@ -35,7 +51,7 @@ export default function BottomSheet({ visible, onClose, title, subtitle, childre
               <IconButton icon="close" accessibilityLabel={t('common.close')} onPress={onClose} />
             </View>
           ) : null}
-          <ScrollView style={styles.scroll} contentContainerStyle={styles.content} bounces={false}>
+          <ScrollView style={styles.scroll} contentContainerStyle={styles.content} bounces={false} keyboardShouldPersistTaps="handled">
             {children}
           </ScrollView>
           {footer ? <View style={styles.footer}>{footer}</View> : null}

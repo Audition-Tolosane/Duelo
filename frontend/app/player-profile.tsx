@@ -572,17 +572,30 @@ export default function PlayerProfileScreen() {
           value={themeQuery}
           onChangeText={setThemeQuery}
         />
-        <View style={s.chips}>
+        <View style={s.themeGrid}>
           {challengeThemes.map(([catKey, catData]) => {
             const displayName = catData.name || catKey;
+            const selected = selectedTheme?.id === catKey;
             return (
-              <Chip
+              <Pressable
                 key={catKey}
-                label={displayName}
-                selected={selectedTheme?.id === catKey}
+                accessibilityRole="button"
+                accessibilityState={{ selected }}
+                accessibilityLabel={displayName}
                 onPress={() => setSelectedTheme({ id: catKey, name: displayName, color: catData.color_hex || COLOR.action.primary })}
-                style={s.chip}
-              />
+                style={({ pressed }) => [s.themeTile, selected && s.themeTileSelected, pressed && s.pressed]}
+              >
+                <ThemeIcon
+                  themeId={catKey}
+                  themeName={displayName}
+                  cluster={catData.cluster}
+                  superCategory={catData.super_category}
+                  size={52}
+                />
+                <Txt variant="caption" align="center" numberOfLines={2} color={selected ? COLOR.action.primary : COLOR.text.primary}>
+                  {displayName}
+                </Txt>
+              </Pressable>
             );
           })}
         </View>
@@ -643,6 +656,12 @@ const s = StyleSheet.create({
   postActions: { flexDirection: 'row', gap: SPACE.xl },
 
   /* Défi */
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.sm, paddingTop: SPACE.xs },
-  chip: { maxWidth: '100%' },
+  themeGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: SPACE.sm, paddingTop: SPACE.xs },
+  themeTile: {
+    width: '31.5%', alignItems: 'center', gap: SPACE.xs,
+    paddingVertical: SPACE.sm, paddingHorizontal: SPACE.xs,
+    borderRadius: RADII.md, borderWidth: BORDER.hair, borderColor: COLOR.border.subtle,
+    backgroundColor: COLOR.surface.subtle,
+  },
+  themeTileSelected: { borderColor: COLOR.action.primary, borderWidth: BORDER.selected, backgroundColor: COLOR.action.selectedFill },
 });
