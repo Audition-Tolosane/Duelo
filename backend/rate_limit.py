@@ -45,9 +45,16 @@ def _get_client_ip(request: Request) -> str:
 
 
 def rate_limit(limit: int = 60, window: int = 60):
-    """Returns a dependency that rate-limits by IP. Default: 60 req/min."""
+    """Returns a dependency that rate-limits by IP, per route. Default: 60 req/min.
+
+    Chaque route a son propre compteur : partager la clé « global:{ip} » du middleware
+    faisait compter TOUTES les requêtes de l'app dans la limite de la route (ex. 5/min
+    pour l'envoi de défi) → 429 quasi systématique dès qu'on naviguait un peu.
+    """
     async def dependency(request: Request):
-        _limiter.check(f"global:{_get_client_ip(request)}", limit, window)
+        route = request.scope.get("route")
+        scope = getattr(route, "path", None) or request.url.path
+        _limiter.check(f"route:{scope}:{_get_client_ip(request)}", limit, window)
     return dependency
 
 
