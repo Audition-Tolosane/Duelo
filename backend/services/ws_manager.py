@@ -288,7 +288,7 @@ class ConnectionManager:
 
     # ── Rematch ──
 
-    REMATCH_TIMEOUT = 15  # seconds to wait for opponent response
+    REMATCH_TIMEOUT = 30  # seconds to wait for opponent response (laisse le temps de fermer la fenêtre de récompenses)
 
     async def propose_rematch(self, proposer_id: str, opponent_id: str, theme_id: str, proposer_data: dict):
         """Send a rematch proposal to the opponent."""

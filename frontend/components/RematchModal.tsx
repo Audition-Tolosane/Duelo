@@ -8,7 +8,7 @@ import { t } from '../utils/i18n';
 import { Txt, Button, Dialog } from './ui';
 import { COLOR, SPACE, RADII } from '../theme/tokens';
 
-const TIMEOUT_SECONDS = 15;
+const TIMEOUT_SECONDS = 30;
 
 export default function RematchModal() {
   const { on, send } = useWS();

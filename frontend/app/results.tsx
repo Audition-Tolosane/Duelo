@@ -270,7 +270,7 @@ export default function ResultsScreen() {
     if (rematchState !== 'waiting' && rematchState !== 'accepting') return;
     const timeout = setTimeout(() => {
       setRematchState('declined');
-    }, 20000);
+    }, 35000);
     return () => clearTimeout(timeout);
   }, [rematchState]);
 
