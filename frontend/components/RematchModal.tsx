@@ -3,6 +3,7 @@ import { View, StyleSheet, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useWS } from '../contexts/WebSocketContext';
+import { getResultsOpponent } from '../utils/rematchState';
 import { t } from '../utils/i18n';
 import { Txt, Button, Dialog } from './ui';
 import { COLOR, SPACE, RADII } from '../theme/tokens';
@@ -39,6 +40,8 @@ export default function RematchModal() {
     const unsubs = [
       on('rematch_proposal', (msg: any) => {
         const data = msg.data || {};
+        // L'écran de résultats contre ce joueur affiche déjà la demande (bouton Accepter).
+        if (data.proposer_id && data.proposer_id === getResultsOpponent()) return;
         setProposerPseudo(data.proposer_pseudo || t('pilot.challenge.someone'));
         setThemeId(data.theme_id || '');
         setCountdown(TIMEOUT_SECONDS);

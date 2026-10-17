@@ -11,6 +11,7 @@ import Reanimated, {
 } from 'react-native-reanimated';
 import { authFetch } from '../utils/api';
 import { playSound } from '../utils/sounds';
+import { setResultsOpponent } from '../utils/rematchState';
 import SwipeBackPage from '../components/SwipeBackPage';
 import UserAvatar from '../components/UserAvatar';
 import VictoryBurst from '../components/VictoryBurst';
@@ -87,7 +88,8 @@ export default function ResultsScreen() {
   const isBot = params.isBot === 'true';
 
   // Rematch states: idle | waiting | declined | accepted
-  const [rematchState, setRematchState] = useState<'idle' | 'waiting' | 'declined' | 'accepted'>('idle');
+  // incoming = l'adversaire propose une revanche ; accepting = on a accepté, on attend la salle
+  const [rematchState, setRematchState] = useState<'idle' | 'waiting' | 'declined' | 'accepted' | 'incoming' | 'accepting'>('idle');
   const rematchStateRef = useRef(rematchState);
   // #22 — Guard against double navigation from concurrent WS events + safety timeout
   const hasNavigatedRef = useRef(false);
@@ -212,10 +214,25 @@ export default function ResultsScreen() {
     const timers = playEntrance();
 
     // Rematch WS listeners
+    if (!isBot && params.opponentId) setResultsOpponent(params.opponentId);
     const unsubs = [
+      on('rematch_proposal', (msg) => {
+        const data = msg?.data || {};
+        if (!params.opponentId || data.proposer_id !== params.opponentId) return;
+        // Les deux ont appuyé sur « Revanche » en même temps : un seul accepte (départage
+        // stable par id), sinon le serveur ouvrirait deux salles et chacun attendrait seul.
+        if (rematchStateRef.current === 'waiting') {
+          if ((params.userId || '') < params.opponentId) {
+            setRematchState('accepting');
+            send({ action: 'rematch_accept' });
+          }
+          return;
+        }
+        setRematchState('incoming');
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      }),
       on('rematch_accepted', (msg) => {
-        // Seul celui qui a proposé navigue d'ici ; celui qui accepte est guidé par RematchModal.
-        if (rematchStateRef.current !== 'waiting') return;
+        if (rematchStateRef.current !== 'waiting' && rematchStateRef.current !== 'accepting') return;
         setRematchState('accepted');
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         const roomId = msg?.data?.room_id;
@@ -234,13 +251,15 @@ export default function ResultsScreen() {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       }),
       on('rematch_expired', () => {
-        if (rematchStateRef.current === 'waiting') {
+        if (rematchStateRef.current === 'incoming') { setRematchState('idle'); return; }
+        if (rematchStateRef.current === 'waiting' || rematchStateRef.current === 'accepting') {
           setRematchState('declined');
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         }
       }),
     ];
     return () => {
+      setResultsOpponent(null);
       timers.forEach(clearTimeout);
       unsubs.forEach((u) => u());
     };
@@ -248,7 +267,7 @@ export default function ResultsScreen() {
 
   // Safety timeout: if waiting for rematch response for > 20s, fallback
   useEffect(() => {
-    if (rematchState !== 'waiting') return;
+    if (rematchState !== 'waiting' && rematchState !== 'accepting') return;
     const timeout = setTimeout(() => {
       setRematchState('declined');
     }, 20000);
@@ -469,8 +488,14 @@ export default function ResultsScreen() {
 
   const playAgain = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    if (rematchState === 'waiting') return;
+    if (rematchState === 'waiting' || rematchState === 'accepting') return;
     if (rematchState === 'declined') { newDuel(); return; }
+    // L'adversaire a déjà proposé : appuyer sur Revanche = accepter sa proposition.
+    if (rematchState === 'incoming') {
+      setRematchState('accepting');
+      send({ action: 'rematch_accept' });
+      return;
+    }
 
     setRematchState('waiting');
 
@@ -727,7 +752,17 @@ export default function ResultsScreen() {
 
         {/* Actions : un seul CTA jaune (revanche) */}
         <Reanimated.View style={[s.actions, restStyle]}>
-          {rematchState === 'waiting' ? (
+          {rematchState === 'incoming' ? (
+            <>
+              <Txt variant="body" align="center">
+                <Txt variant="body" color={COLOR.player.opponentText}>{opponentName}</Txt>
+                {' '}{t('rematch.wants_rematch')}
+              </Txt>
+              <Button testID="play-again-btn" label={t('rematch.accept')} icon="duel" fullWidth size="lg" onPress={playAgain} />
+            </>
+          ) : rematchState === 'accepting' ? (
+            <Button testID="play-again-btn" label={t('pilot.results.accepted')} loading fullWidth size="lg" onPress={playAgain} />
+          ) : rematchState === 'waiting' ? (
             <>
               <Button testID="play-again-btn" label={t('pilot.results.rematch')} loading fullWidth size="lg" onPress={playAgain} />
               <Txt variant="caption" align="center">{t('pilot.results.waiting_rematch')}</Txt>
