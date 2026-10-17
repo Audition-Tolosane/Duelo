@@ -6,7 +6,7 @@ import Animated, {
   useSharedValue, useAnimatedStyle, withSpring, withTiming,
   runOnJS, interpolate, Extrapolation,
 } from 'react-native-reanimated';
-import { usePathname, Slot } from 'expo-router';
+import { usePathname, Slot, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import DueloHeader from '../../components/DueloHeader';
 import { useSwipeBackProgress } from '../../components/SwipeBackContext';
@@ -161,6 +161,19 @@ export default function TabLayout() {
   const currentIndex = useSharedValue(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const swipeBackProgress = useSwipeBackProgress();
+
+  // Quand les onglets reprennent le focus, aucune page ne les recouvre : on remet la
+  // parallaxe à zéro. Sinon une valeur restée bloquée (page remplacée, retour
+  // interrompu…) laissait l'écran décalé vers la gauche et rétréci, fond visible à droite.
+  useFocusEffect(useCallback(() => {
+    if (swipeBackProgress) swipeBackProgress.value = withTiming(0, { duration: 200 });
+  }, [swipeBackProgress]));
+
+  // La largeur d'écran peut changer (rotation, redimensionnement) : on recale le pager
+  // sur l'onglet courant, sinon il reste à cheval entre deux onglets.
+  useEffect(() => {
+    translateX.value = -currentIndex.value * SCREEN_WIDTH;
+  }, [SCREEN_WIDTH]);
 
   // Only keep active page + adjacent pages mounted, unmount the rest
   const renderedPages = useMemo(() => {
