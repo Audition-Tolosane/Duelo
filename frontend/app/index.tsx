@@ -15,6 +15,7 @@ import * as Google from 'expo-auth-session/providers/google';
 import { makeRedirectUri } from 'expo-auth-session';
 import { COLOR, SPACE, RADII, SIZE, BORDER, TYPO } from '../theme/tokens';
 import { saveToken } from '../utils/api';
+import { dueloWS } from '../services/websocket';
 import { t } from '../utils/i18n';
 
 WebBrowser.maybeCompleteAuthSession();
@@ -132,6 +133,9 @@ export default function WelcomeScreen() {
     await AsyncStorage.setItem('duelo_pseudo', data.pseudo);
     await AsyncStorage.setItem('duelo_avatar_seed', data.avatar_seed);
     if (data.avatar_url) await AsyncStorage.setItem('duelo_avatar_url', data.avatar_url);
+    // Le WebSocketProvider ne se connecte qu'au lancement si un compte existe déjà :
+    // sans ça, un joueur qui vient de se connecter n'a pas de temps réel (défis, matchmaking).
+    dueloWS.connect(data.id);
   };
 
   const handleGuestLogin = async () => {

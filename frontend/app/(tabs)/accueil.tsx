@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import {
   View, StyleSheet, ScrollView, Pressable, RefreshControl, Modal, Share, useWindowDimensions,
 } from 'react-native';
-import Svg, { Defs, Pattern, Path, Rect } from 'react-native-svg';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
@@ -21,8 +20,9 @@ import { authFetch } from '../../utils/api';
 import { t, getLanguage, pluralKey } from '../../utils/i18n';
 import { flushPendingScores } from '../../utils/pendingScores';
 import {
-  Txt, Icon, Button, IconButton, Badge, Card, Chip, Section, ProgressBar, ListRow, Loader,
+  Txt, Icon, Button, IconButton, Badge, Section, ProgressBar, ListRow, Loader,
   BottomSheet, Dialog, ThemeIcon, ThemeCard, AnswerButton, EmptyState, StatCard,
+  SatinSurface, ProgressRing, HaloIcon, AmbientBackdrop,
 } from '../../components/ui';
 import type { IconName, AnswerState } from '../../components/ui';
 import { COLOR, SPACE, RADII, SIZE, BORDER, ELEVATION, GRADIENTS, ICON_SIZE, PALETTE, alpha } from '../../theme/tokens';
@@ -89,6 +89,8 @@ interface FeedItem {
 interface UserData {
   pseudo: string;
   avatar_seed: string;
+  avatar_url?: string | null;
+  avatar_frame?: string | null;
   total_xp: number;
   current_streak: number;
   streak_badge: string;
@@ -342,6 +344,19 @@ const WeeklyBlock = React.memo(function WeeklyBlock({ summary }: { summary: Week
 });
 
 // ── Missions du jour ──
+// Icône de mission : ce qu'il faut faire, lisible d'un coup d'œil
+function missionIcon(m: DailyMission): IconName {
+  switch (m.type) {
+    case 'play_N': return 'duel';
+    case 'win_N': return 'trophy';
+    case 'perfect_score': return 'star';
+    case 'send_challenge': return 'send';
+    case 'complete_challenge': return 'users';
+    case 'play_category': return 'compass';
+    default: return 'target';
+  }
+}
+
 const MissionsCard = React.memo(function MissionsCard({
   data,
   onDouble,
@@ -365,28 +380,35 @@ const MissionsCard = React.memo(function MissionsCard({
   const canClaim = data.any_completed && !data.reward_claimed;
 
   return (
-    <Card>
+    <SatinSurface variant="card" contentStyle={styles.satinPad}>
       <View style={styles.missionList}>
         {data.missions.map((m) => {
           const pct = Math.min(m.progress / m.target, 1);
           const canReroll = !m.completed && !m.rerolled && !data.reward_claimed;
           return (
             <View key={m.id} style={styles.missionRow}>
-              <Icon
-                name={m.completed ? 'success' : 'target'}
-                size={ICON_SIZE.md}
-                color={m.completed ? COLOR.status.success : COLOR.text.tertiary}
-              />
-              <View style={styles.flexGap}>
-                <Txt variant="bodySmall" color={m.completed ? COLOR.text.secondary : COLOR.text.primary} numberOfLines={2}>
+              {/* Anneau = progression ; coche verte une fois faite */}
+              <ProgressRing value={pct} tone={m.completed ? 'success' : 'action'}>
+                <Icon
+                  name={m.completed ? 'check' : missionIcon(m)}
+                  size={ICON_SIZE.sm}
+                  color={m.completed ? COLOR.status.success : COLOR.text.primary}
+                />
+              </ProgressRing>
+              <View style={styles.missionText}>
+                <Txt variant="cardTitle" color={m.completed ? COLOR.text.secondary : COLOR.text.primary} numberOfLines={2}>
                   {missionLabel(m)}
                 </Txt>
+                {/* Progression et récompense sur une ligne : le titre garde toute la largeur */}
                 <View style={styles.rowCenter}>
-                  <ProgressBar value={pct} tone={m.completed ? 'success' : 'action'} height={4} style={styles.flex} />
-                  <Txt variant="caption">{`${m.progress}/${m.target}`}</Txt>
+                  <Txt variant="caption" color={m.completed ? COLOR.status.success : COLOR.text.tertiary}>
+                    {`${m.progress} / ${m.target}`}
+                  </Txt>
+                  <View style={[styles.xpPill, m.completed && styles.xpPillDone]}>
+                    <Txt variant="caption" color={COLOR.reward.gold}>{`+${m.xp * data.multiplier} XP`}</Txt>
+                  </View>
                 </View>
               </View>
-              <Txt variant="label" color={COLOR.reward.gold}>{`+${m.xp * data.multiplier} XP`}</Txt>
               {canReroll ? (
                 <IconButton icon="replay" appearance="bare" accessibilityLabel={t('pilot.home.reroll')} onPress={() => onReroll(m.id)} />
               ) : null}
@@ -402,23 +424,23 @@ const MissionsCard = React.memo(function MissionsCard({
         </View>
 
         {!data.reward_claimed && (
-          <View style={styles.rowCenter}>
+          <View style={styles.missionActions}>
+            {canClaim && (
+              <Button
+                label={t('missions.claim_xp').replace('{xp}', String(totalXP))}
+                size="sm"
+                fullWidth
+                haptic={false}
+                onPress={onClaim}
+              />
+            )}
             {data.multiplier < 2 ? (
-              <Button label={t('pilot.home.double_ad')} icon="bolt" variant="ghost" size="sm" haptic={false} onPress={onDouble} />
+              <Button label={t('pilot.home.double_ad')} icon="bolt" variant="ghost" size="sm" fullWidth haptic={false} onPress={onDouble} />
             ) : (
               <View style={styles.rowTight}>
                 <Icon name="bolt" size={14} color={COLOR.reward.gold} />
                 <Txt variant="label" color={COLOR.reward.gold}>{t('pilot.home.double_active')}</Txt>
               </View>
-            )}
-            {canClaim && (
-              <Button
-                label={t('missions.claim_xp').replace('{xp}', String(totalXP))}
-                size="sm"
-                haptic={false}
-                onPress={onClaim}
-                style={styles.flex}
-              />
             )}
           </View>
         )}
@@ -430,7 +452,7 @@ const MissionsCard = React.memo(function MissionsCard({
           </View>
         )}
       </View>
-    </Card>
+    </SatinSurface>
   );
 });
 
@@ -445,7 +467,7 @@ const ChallengeCard = React.memo(function ChallengeCard({ challenge, onAccept, o
     return `${h}h`;
   }
   return (
-    <Card accent="event">
+    <SatinSurface variant="card" warm="none" accent="event" contentStyle={styles.satinPad}>
       <View style={styles.rowCenter}>
         <UserAvatar avatarUrl={challenge.challenger_avatar_url} avatarSeed={challenge.challenger_avatar_seed} pseudo={challenge.challenger_pseudo} size={40} />
         <View style={styles.flexGap}>
@@ -464,7 +486,7 @@ const ChallengeCard = React.memo(function ChallengeCard({ challenge, onAccept, o
         <Button label={t('challenge.decline')} variant="ghost" size="sm" onPress={onDecline} haptic={false} style={styles.flex} />
         <Button label={t('challenge.accept')} icon="duel" size="sm" onPress={onAccept} haptic={false} style={styles.flex} />
       </View>
-    </Card>
+    </SatinSurface>
   );
 });
 
@@ -664,27 +686,6 @@ const OfferRow = React.memo(function OfferRow({ item, onActivate, onLaunch }: {
 // ── Décor du bloc Duel rapide : treillis de losanges + épées en filigrane, ton sur ton ──
 // Purement décoratif (pointerEvents none, masqué à l'accessibilité). Aucune animation :
 // l'Accueil reste plus calme que le jeu, le CTA jaune reste l'unique point focal.
-const HERO_LATTICE = 20;
-const HERO_MARK = 176;
-const HeroDecor = React.memo(function HeroDecor() {
-  const h = HERO_LATTICE / 2;
-  return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Svg width="100%" height="100%">
-        <Defs>
-          <Pattern id="skilkiHeroLattice" width={HERO_LATTICE} height={HERO_LATTICE} patternUnits="userSpaceOnUse">
-            <Path d={`M${h} ${h - 2.5} L${h + 2.5} ${h} L${h} ${h + 2.5} L${h - 2.5} ${h} Z`} fill={alpha(PALETTE.cream, 0.05)} />
-          </Pattern>
-        </Defs>
-        <Rect x="0" y="0" width="100%" height="100%" fill="url(#skilkiHeroLattice)" />
-      </Svg>
-      <View style={styles.heroMark}>
-        <SwordMark size={HERO_MARK} color={PALETTE.cream} />
-      </View>
-    </View>
-  );
-});
-
 // ── Machine à sous (tirage du thème du Duel rapide) ──
 const SLOT_CARD_W = 84;
 const SLOT_GAP = 10;
@@ -1173,9 +1174,19 @@ export default function AccueilScreen() {
         body: JSON.stringify({ user_id: userId }),
       });
       if (res.ok) {
+        const data = await res.json().catch(() => ({}));
         setIncomingChallenges(prev => prev.filter(c => c.challenge_id !== challenge.challenge_id));
-        // Play in reveal mode: see Player A's answers revealed after each question
-        if (challenge.theme_id) {
+        // Le serveur ouvre une salle privée et prévient l'expéditeur (challenge_ready) : on la
+        // rejoint pour jouer EN DIRECT, comme depuis la pop-up. Partir en mode différé laissait
+        // l'expéditeur bloqué sur la carte du matchmaking pendant qu'on avait les questions.
+        if (data.room_id && challenge.theme_id) {
+          router.push(
+            `/matchmaking?room_id=${data.room_id}&category=${challenge.theme_id}&challenge=true` +
+            `&opponentPseudo=${encodeURIComponent(challenge.challenger_pseudo)}` +
+            `&themeName=${encodeURIComponent(challenge.theme_name || '')}` as any
+          );
+        } else if (challenge.theme_id) {
+          // Play in reveal mode: see Player A's answers revealed after each question
           router.push(
             `/game?category=${challenge.theme_id}&asyncMode=reveal` +
             `&opponentPseudo=${encodeURIComponent(challenge.challenger_pseudo)}` +
@@ -1270,6 +1281,7 @@ export default function AccueilScreen() {
 
   return (
     <View style={styles.container}>
+      <AmbientBackdrop />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -1302,32 +1314,29 @@ export default function AccueilScreen() {
             </View>
           </View>
           {userData ? (
-            <View style={styles.levelBox} accessibilityLabel={`${levelShort()} ${lvl}`}>
-              <Txt variant="overline">{levelShort()}</Txt>
-              <Txt variant="statMedium">{lvl}</Txt>
-            </View>
+            <UserAvatar
+              avatarUrl={userData.avatar_url}
+              avatarSeed={userData.avatar_seed}
+              pseudo={userData.pseudo}
+              frame={userData.avatar_frame}
+              size={52}
+            />
           ) : null}
         </Animated.View>
 
         {feedError ? (
-          <Card onPress={() => { setFeedError(false); loadFeed(); }}>
+          <SatinSurface variant="card" warm="none" contentStyle={styles.satinPad} onPress={() => { setFeedError(false); loadFeed(); }}>
             <View style={styles.rowCenter}>
               <Icon name="error" size={ICON_SIZE.md} color={COLOR.status.error} />
               <Txt variant="bodySmall" style={styles.flex}>{t('home.load_error')}</Txt>
               <Icon name="replay" size={ICON_SIZE.md} color={COLOR.text.secondary} />
             </View>
-          </Card>
+          </SatinSurface>
         ) : null}
 
         {/* ── 2. HERO Duel rapide : un seul CTA jaune ── */}
-        <Animated.View entering={FadeInDown.delay(60).duration(400)} style={styles.heroShell}>
-          <LinearGradient
-            colors={GRADIENTS.hero.colors}
-            start={GRADIENTS.hero.start}
-            end={GRADIENTS.hero.end}
-            style={[styles.hero, compact && styles.heroCompact]}
-          >
-            <HeroDecor />
+        <Animated.View entering={FadeInDown.delay(60).duration(400)}>
+          <SatinSurface halo contentStyle={[styles.hero, compact && styles.heroCompact]}>
             <View style={styles.heroHead}>
               <SwordMark size={compact ? 36 : 48} color={COLOR.text.primary} />
               <View style={styles.flexGap}>
@@ -1346,15 +1355,7 @@ export default function AccueilScreen() {
               onPress={handleQuickDuel}
               testID="home-quick-duel"
             />
-            {replayThemes.length > 0 ? (
-              <View style={styles.replayRow}>
-                <Txt variant="caption">{t('pilot.home.replay')}</Txt>
-                {replayThemes.map(th => (
-                  <Chip key={th.id} label={th.name} icon="replay" onPress={() => handleReplayTheme(th)} style={styles.replayChip} />
-                ))}
-              </View>
-            ) : null}
-          </LinearGradient>
+          </SatinSurface>
         </Animated.View>
 
         {/* ── 3. À toi de jouer : défis reçus + revanches (conditionnel) ── */}
@@ -1370,12 +1371,12 @@ export default function AccueilScreen() {
                 />
               ))}
               {shownDuels.length > 0 && (
-                <Card style={styles.revengeCard}>
+                <SatinSurface variant="card" contentStyle={[styles.satinPad, styles.revengeCard]}>
                   <Txt variant="overline">{t('challenge.revenge_title')}</Txt>
                   {shownDuels.map((duel) => (
                     <RevengeRow key={duel.id} duel={duel} onRematch={() => handleRematch(duel)} />
                   ))}
-                </Card>
+                </SatinSurface>
               )}
               {canExpandMoves ? (
                 <Button
@@ -1391,20 +1392,58 @@ export default function AccueilScreen() {
           </Animated.View>
         )}
 
+        {/* ── 3 bis. Rejoue tes thèmes : pictogrammes SKILKI uniquement ── */}
+        {replayThemes.length > 0 && (
+          <Animated.View entering={FadeInDown.delay(140).duration(400)}>
+            <Section title={t('pilot.home.replay_title')}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.carousel}
+                contentContainerStyle={styles.carouselContent}
+              >
+                {replayThemes.map((th, i) => (
+                  <SatinSurface
+                    key={th.id}
+                    variant="card"
+                    warm={i % 2 === 0 ? 'tr-bl' : 'tr'}
+                    onPress={() => handleReplayTheme(th)}
+                    contentStyle={styles.replayCard}
+                    accessibilityLabel={`${t('pilot.home.replay_action')} : ${th.name}`}
+                  >
+                    <ThemeIcon themeId={th.id} themeName={th.name} size={44} />
+                    <Txt variant="label" color={COLOR.text.primary} numberOfLines={2} style={styles.replayName}>{th.name}</Txt>
+                    <View style={styles.rowTight}>
+                      <Icon name="replay" size={14} color={COLOR.action.primary} />
+                      <Txt variant="caption" color={COLOR.action.primary}>{t('pilot.home.replay_action')}</Txt>
+                    </View>
+                  </SatinSurface>
+                ))}
+              </ScrollView>
+            </Section>
+          </Animated.View>
+        )}
+
         {/* ── 4. Progression + série : une seule carte ── */}
         {userData && xp ? (
           <Animated.View entering={FadeInDown.delay(160).duration(400)}>
-            <Card style={styles.progressCard}>
-              <View style={styles.rowBetween}>
-                <Txt variant="cardTitle" numberOfLines={1}>{`${levelShort()} ${lvl}`}</Txt>
-                <Txt variant="label" color={COLOR.reward.gold} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85} style={styles.shrink}>
-                  {`${xp.current.toLocaleString()} / ${xp.needed.toLocaleString()} XP`}
-                </Txt>
+            <SatinSurface variant="card" contentStyle={styles.progressCard}>
+              {/* Niveau (médaille or) → XP → série : du plus durable au plus quotidien */}
+              <View style={styles.levelRow}>
+                <View style={styles.levelMedal} accessibilityLabel={`${levelShort()} ${lvl}`}>
+                  <Txt variant="overline" color={COLOR.reward.gold}>{levelShort()}</Txt>
+                  <Txt variant="statMedium">{lvl}</Txt>
+                </View>
+                <View style={styles.levelBody}>
+                  <Txt variant="cardTitle" color={COLOR.reward.gold} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>
+                    {`${xp.current.toLocaleString()} / ${xp.needed.toLocaleString()} XP`}
+                  </Txt>
+                  <ProgressBar value={xp.progress} tone="action" height={10} sheen />
+                  <Txt variant="caption">
+                    {`${Math.max(0, xp.needed - xp.current).toLocaleString()} ${t('home.xp_to_level')} ${Math.min(lvl + 1, 50)}`}
+                  </Txt>
+                </View>
               </View>
-              <ProgressBar value={xp.progress} tone="action" style={styles.xpBar} />
-              <Txt variant="caption">
-                {`${Math.max(0, xp.needed - xp.current).toLocaleString()} ${t('home.xp_to_level')} ${Math.min(lvl + 1, 50)}`}
-              </Txt>
 
               <Pressable
                 style={({ pressed }) => [styles.streakRow, pressed && styles.pressed]}
@@ -1414,9 +1453,7 @@ export default function AccueilScreen() {
                   if (!hasPlayedToday) router.push('/(tabs)/play');
                 }}
               >
-                <View style={[styles.iconDisc, { backgroundColor: COLOR.tint.opponent }]}>
-                  <Icon name="flame" size={ICON_SIZE.md} color={COLOR.accent.warm} />
-                </View>
+                <HaloIcon name="flame" color={streak > 0 ? COLOR.accent.warm : COLOR.text.tertiary} size={SIZE.buttonSm} />
                 <View style={styles.flexGap}>
                   <Txt variant="cardTitle">
                     {streak > 0 ? t(streak === 1 ? 'pilot.home.streak_one' : 'pilot.home.streak_many', { n: String(streak) }) : t('home.no_streak')}
@@ -1436,7 +1473,7 @@ export default function AccueilScreen() {
                   </View>
                 ) : null}
               </Pressable>
-            </Card>
+            </SatinSurface>
           </Animated.View>
         ) : null}
 
@@ -1464,9 +1501,11 @@ export default function AccueilScreen() {
                 style={styles.carousel}
                 contentContainerStyle={styles.carouselContent}
               >
-                {recommended.map(th => (
+                {recommended.map((th, i) => (
                   <ThemeCard
                     key={th.id}
+                    finish="satin"
+                    warm={i % 2 === 0 ? 'tr-bl' : 'tr'}
                     name={th.name}
                     themeId={th.id}
                     meta={th.match_count > 0 ? t(pluralKey('pilot.home.duels', th.match_count), { n: String(th.match_count) }) : undefined}
@@ -1479,7 +1518,7 @@ export default function AccueilScreen() {
         )}
 
         {/* ── Rangée discrète : bonus & événements, activité de la communauté ── */}
-        <Card padded={false} style={styles.moreCard}>
+        <SatinSurface variant="card" warm="none" contentStyle={styles.moreCard}>
           <ListRow
             leadingIcon="gift"
             title={t('pilot.home.bonus_row')}
@@ -1500,7 +1539,7 @@ export default function AccueilScreen() {
             style={styles.moreRow}
             testID="home-activity-row"
           />
-        </Card>
+        </SatinSurface>
       </ScrollView>
 
       {/* ── Feuille « Bonus & événements » ── */}
@@ -1716,6 +1755,8 @@ export default function AccueilScreen() {
   );
 }
 
+const MEDAL = SIZE.buttonLg + SPACE.sm; // médaille de niveau : 64
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
   scrollView: { flex: 1 },
@@ -1741,50 +1782,34 @@ const styles = StyleSheet.create({
 
   // ── 1. En-tête ──
   greeting: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
-  levelBox: {
-    minWidth: SIZE.buttonLg, alignItems: 'center',
-    paddingVertical: SPACE.xs, paddingHorizontal: SPACE.md,
-    borderRadius: RADII.md, borderWidth: BORDER.hair, borderColor: COLOR.border.default,
-  },
 
-  // ── 2. Hero ──
-  // Coque : porte l'ombre (le hero lui-même rogne son décor, ce qui couperait l'ombre sur iOS)
-  heroShell: {
-    borderRadius: RADII.xl,
-    backgroundColor: COLOR.surface.card,
-    ...ELEVATION.e2,
-  },
-  hero: {
-    borderRadius: RADII.xl,
-    borderWidth: BORDER.hair,
-    borderColor: COLOR.border.subtle,
-    borderTopColor: alpha(PALETTE.cream, 0.10),   // liseré haut : relief discret
-    padding: SPACE.xl,
-    gap: SPACE.lg,
-    overflow: 'hidden',
-  },
+  // ── 2. Hero (surface satinée : components/ui/SatinSurface) ──
+  hero: { padding: SPACE.xl, gap: SPACE.lg },
   heroCompact: { padding: SPACE.lg },
   heroCtaCompact: { paddingHorizontal: SPACE.md },
-  // Épées en filigrane, rognées dans l'angle haut droit
-  heroMark: {
-    position: 'absolute',
-    top: -SPACE.huge,
-    right: -SPACE.giant,
-    opacity: 0.06,
-    transform: [{ rotate: '-14deg' }],
-  },
   heroHead: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
-  replayRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: SPACE.sm },
-  replayChip: { maxWidth: '100%' },
+
+  // ── 3 bis. Rejoue tes thèmes ──
+  replayCard: { width: 128 - 2 * BORDER.hair, gap: SPACE.sm, padding: SPACE.md },
+  replayName: { minHeight: 32 },
 
   // ── 3. À toi de jouer ──
   challengeActions: { flexDirection: 'row', gap: SPACE.sm, marginTop: SPACE.md },
+  // Cartes satinées : même padding que Card
+  satinPad: { padding: SPACE.cardPad },
   revengeCard: { paddingBottom: SPACE.sm },
 
   // ── 4. Progression ──
   // Un seul écart (8) dans le groupe niveau ; la série forme un 2e groupe (8 + 8 + filet) — V1.2
-  progressCard: { gap: SPACE.sm },
-  xpBar: {},
+  progressCard: { gap: SPACE.sm, padding: SPACE.cardPad },
+  levelRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
+  levelMedal: {
+    width: MEDAL, height: MEDAL, borderRadius: MEDAL / 2,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: COLOR.tint.gold,
+    borderWidth: BORDER.hair, borderColor: alpha(PALETTE.gold, 0.45),
+  },
+  levelBody: { flex: 1, gap: SPACE.sm },
   streakRow: {
     flexDirection: 'row', alignItems: 'center', gap: SPACE.md,
     marginTop: SPACE.sm, paddingTop: SPACE.lg,
@@ -1794,6 +1819,13 @@ const styles = StyleSheet.create({
   // ── 5. Missions ──
   missionList: { gap: SPACE.md },
   missionRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md, minHeight: SIZE.touch },
+  missionText: { flex: 1, gap: SPACE.xxs },
+  missionActions: { gap: SPACE.sm },
+  xpPill: {
+    paddingHorizontal: SPACE.sm, paddingVertical: SPACE.xxs,
+    borderRadius: RADII.pill, backgroundColor: COLOR.tint.gold,
+  },
+  xpPillDone: { borderWidth: BORDER.hair, borderColor: alpha(PALETTE.gold, 0.45) },
   missionFooter: {
     gap: SPACE.md, marginTop: SPACE.lg, paddingTop: SPACE.md,
     borderTopWidth: BORDER.hair, borderTopColor: COLOR.border.subtle,

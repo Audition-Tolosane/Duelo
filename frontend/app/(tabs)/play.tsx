@@ -6,9 +6,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { startQuickMatch } from '../../utils/quickMatch';
 import { useTabBar } from '../../contexts/TabBarContext';
+import { useActiveTab } from '../../contexts/ActiveTabContext';
 import SwordMark from '../../components/SwordMark';
 import { t } from '../../utils/i18n';
-import { Txt, Icon, IconName, Button, Badge, Card, ListRow } from '../../components/ui';
+import { Txt, Icon, IconName, Button, Badge, Card, ListRow, ThemeIconBackdrop } from '../../components/ui';
 import { COLOR, SPACE, RADII, BORDER, ELEVATION, GRADIENTS, PALETTE, alpha } from '../../theme/tokens';
 
 // Onglet central « Jouer » : modes de jeu. Même carte « Duel rapide » que l'Accueil (même action),
@@ -19,9 +20,13 @@ type Mode = { key: string; icon: IconName; iconColor: string; title: string; sub
 export default function PlayScreen() {
   const router = useRouter();
   const { onScroll: onTabScroll } = useTabBar();
+  // Le pager garde cet onglet monté à côté d'Accueil/Thèmes : le fond ne défile que s'il est affiché
+  const visible = useActiveTab() === 'play';
   const { width } = useWindowDimensions();
   const compact = width < 360;
   const [quickLoading, setQuickLoading] = useState(false);
+  // Taille réelle de la page (varie quand l'en-tête se replie) : le fond d'icônes la couvre exactement
+  const [area, setArea] = useState({ w: 0, h: 0 });
 
   // Les tournois ont lieu du vendredi au dimanche (cf. crons backend)
   const day = new Date().getDay();
@@ -61,10 +66,16 @@ export default function PlayScreen() {
   ];
 
   return (
+    <View style={s.root} onLayout={(e) => {
+      const { width: w, height: h } = e.nativeEvent.layout;
+      if (Math.round(w) !== area.w || Math.round(h) !== area.h) setArea({ w: Math.round(w), h: Math.round(h) });
+    }}>
+    <ThemeIconBackdrop width={area.w} height={area.h} active={visible} />
     <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
       <View style={s.pageHeader}>
-        <Txt variant="overline">{t('play.modes_eyebrow')}</Txt>
-        <Txt variant="h1">{t('play.modes_title')}</Txt>
+        <View style={s.headerScrim} pointerEvents="none" />
+        <Txt variant="overline" style={s.overMotif}>{t('play.modes_eyebrow')}</Txt>
+        <Txt variant="h1" style={s.overMotif}>{t('play.modes_title')}</Txt>
       </View>
 
       {/* Duel rapide : un seul CTA jaune (même carte que l'Accueil) */}
@@ -117,14 +128,26 @@ export default function PlayScreen() {
         </Card>
       </Animated.View>
     </ScrollView>
+    </View>
   );
 }
 
 const s = StyleSheet.create({
+  root: { flex: 1 },
   // Bas : place réservée à la barre d'onglets flottante
-  scroll: { paddingHorizontal: SPACE.screenX, paddingTop: SPACE.lg, paddingBottom: 120, gap: SPACE.lg },
+  // Contenu centré verticalement : le fond d'icônes reste visible au-dessus et au-dessous
+  scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: SPACE.screenX, paddingTop: SPACE.lg, paddingBottom: 120, gap: SPACE.lg },
   flex: { flex: 1, gap: SPACE.xxs },
   pageHeader: { gap: SPACE.xs },
+  // Voile nuit à bords fondus derrière le titre : le motif s'efface sous le texte, sans cadre visible
+  headerScrim: {
+    position: 'absolute', top: 0, bottom: 0, left: 0, right: SPACE.xl,
+    borderRadius: RADII.xl,
+    backgroundColor: alpha(PALETTE.night, 0.85),
+    boxShadow: `0 0 28px 22px ${alpha(PALETTE.night, 0.85)}`,
+  },
+  // Ombre nuit douce : le titre posé directement sur le motif garde son contraste
+  overMotif: { textShadowColor: PALETTE.night, textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 12 },
 
   // Coque : porte l'ombre (la carte rogne son filigrane, ce qui couperait l'ombre sur iOS)
   heroShell: { borderRadius: RADII.xl, backgroundColor: COLOR.surface.card, ...ELEVATION.e2 },

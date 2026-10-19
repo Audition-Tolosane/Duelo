@@ -9,7 +9,7 @@ import SwipeBackPage from '../components/SwipeBackPage';
 import UserAvatar from '../components/UserAvatar';
 import {
   Txt, Icon, IconName, Button, IconButton, Card, Chip, Section, ListRow, Loader, BottomSheet,
-  ScreenContainer, ScreenHeader, ThemeIcon,
+  ScreenContainer, ScreenHeader, ThemeIcon, SearchField,
 } from '../components/ui';
 import { COLOR, SPACE, RADII, SIZE, BORDER, ICON_SIZE } from '../theme/tokens';
 
@@ -83,6 +83,11 @@ export default function PlayerProfileScreen() {
   const [selectedTheme, setSelectedTheme] = useState<{id: string, name: string, color: string} | null>(null);
   const [challengeSending, setChallengeSending] = useState(false);
   const [challengeSent, setChallengeSent] = useState(false);
+  // Thèmes proposés en plus de ceux de l'adversaire : tendances, puis recherche libre.
+  // Sans ça, deux joueurs qui n'ont jamais joué ne pouvaient choisir aucun thème.
+  const [suggestedThemes, setSuggestedThemes] = useState<{ id: string; name: string; color_hex?: string }[]>([]);
+  const [themeQuery, setThemeQuery] = useState('');
+  const [themeResults, setThemeResults] = useState<{ id: string; name: string; color_hex?: string }[]>([]);
   const [vsStats, setVsStats] = useState<{ total: number; user_wins: number; opponent_wins: number } | null>(null);
   const [challengeHistory, setChallengeHistory] = useState<{
     challenge_id: string; opponent_pseudo: string; theme_name: string;
@@ -97,6 +102,7 @@ export default function PlayerProfileScreen() {
     const loaded = await fetchProfile(uid || '');
     if (uid && uid !== id) {
       fetchVsStats(uid);
+      fetchSuggestedThemes(uid);
       if (challenge === '1') openChallenge(loaded);
     }
     if (uid === id) {
@@ -111,6 +117,28 @@ export default function PlayerProfileScreen() {
       if (res.ok) setVsStats(await res.json());
     } catch (e) { console.error(e); }
   };
+
+  const fetchSuggestedThemes = async (viewerId: string) => {
+    try {
+      const res = await fetch(`${API_URL}/api/themes/trending?user_id=${viewerId}&lang=${getLanguage()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSuggestedThemes(data.trending || []);
+      }
+    } catch (e) { console.error(e); }
+  };
+
+  useEffect(() => {
+    const q = themeQuery.trim();
+    if (q.length < 2) { setThemeResults([]); return; }
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/search/themes?q=${encodeURIComponent(q)}&limit=12&lang=${getLanguage()}`);
+        if (res.ok) setThemeResults(await res.json());
+      } catch (e) { console.error(e); }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [themeQuery]);
 
   const fetchChallengeHistory = async (userId: string) => {
     try {
@@ -141,6 +169,9 @@ export default function PlayerProfileScreen() {
     } else if (p?.themes && Object.keys(p.themes).length > 0) {
       const [bestId, best] = Object.entries(p.themes).reduce((a, b) => (b[1].xp > a[1].xp ? b : a));
       setSelectedTheme({ id: bestId, name: best.name || bestId, color: best.color_hex || COLOR.action.primary });
+    } else if (suggestedThemes.length > 0) {
+      const first = suggestedThemes[0];
+      setSelectedTheme({ id: first.id, name: first.name, color: first.color_hex || COLOR.action.primary });
     }
     setChallengeModalVisible(true);
   };
@@ -148,6 +179,7 @@ export default function PlayerProfileScreen() {
   const closeChallenge = () => {
     setChallengeModalVisible(false);
     setSelectedTheme(null);
+    setThemeQuery('');
   };
 
   const onRefresh = async () => {
@@ -257,14 +289,23 @@ export default function PlayerProfileScreen() {
     .sort((a, b) => b[1].level - a[1].level || b[1].xp - a[1].xp);
   const themesShown = themesExpanded ? sortedCategories : sortedCategories.slice(0, THEMES_SHOWN);
 
-  // Thèmes proposés pour le défi : celui du contexte s'il y en a un, puis ceux de l'adversaire.
+  // Thèmes proposés pour le défi : celui du contexte s'il y en a un, ceux de l'adversaire,
+  // puis les tendances — ou les résultats de recherche dès qu'on tape. N'importe quel thème
+  // est jouable, même si aucun des deux joueurs n'y a encore joué.
   // Pas d'option « thème libre » : une salle sans thème ne trouve aucune question.
-  const challengeThemes = [
-    ...(themeId && !profile.themes?.[themeId]
-      ? [[themeId, { xp: 0, level: 0, title: '', name: themeName || themeId }]]
-      : []),
-    ...Object.entries(profile.themes || {}).slice(0, 6),
-  ] as [string, PlayerProfile['themes'][string]][];
+  const toEntry = (th: { id: string; name: string; color_hex?: string }) =>
+    [th.id, { xp: 0, level: 0, title: '', name: th.name, color_hex: th.color_hex }] as [string, PlayerProfile['themes'][string]];
+  const challengeThemes: [string, PlayerProfile['themes'][string]][] = [];
+  const pushTheme = (entry: [string, PlayerProfile['themes'][string]]) => {
+    if (!challengeThemes.some(([k]) => k === entry[0])) challengeThemes.push(entry);
+  };
+  if (themeQuery.trim().length >= 2) {
+    themeResults.forEach((th) => pushTheme(toEntry(th)));
+  } else {
+    if (themeId) pushTheme([themeId, profile.themes?.[themeId] || { xp: 0, level: 0, title: '', name: themeName || themeId }]);
+    Object.entries(profile.themes || {}).slice(0, 6).forEach(pushTheme);
+    suggestedThemes.forEach((th) => pushTheme(toEntry(th)));
+  }
 
   return (
     <SwipeBackPage>
@@ -526,17 +567,35 @@ export default function PlayerProfileScreen() {
           />
         )}
       >
-        <View style={s.chips}>
+        <SearchField
+          placeholder={t('search.placeholder_themes')}
+          value={themeQuery}
+          onChangeText={setThemeQuery}
+        />
+        <View style={s.themeGrid}>
           {challengeThemes.map(([catKey, catData]) => {
             const displayName = catData.name || catKey;
+            const selected = selectedTheme?.id === catKey;
             return (
-              <Chip
+              <Pressable
                 key={catKey}
-                label={displayName}
-                selected={selectedTheme?.id === catKey}
+                accessibilityRole="button"
+                accessibilityState={{ selected }}
+                accessibilityLabel={displayName}
                 onPress={() => setSelectedTheme({ id: catKey, name: displayName, color: catData.color_hex || COLOR.action.primary })}
-                style={s.chip}
-              />
+                style={({ pressed }) => [s.themeTile, selected && s.themeTileSelected, pressed && s.pressed]}
+              >
+                <ThemeIcon
+                  themeId={catKey}
+                  themeName={displayName}
+                  cluster={catData.cluster}
+                  superCategory={catData.super_category}
+                  size={52}
+                />
+                <Txt variant="caption" align="center" numberOfLines={2} color={selected ? COLOR.action.primary : COLOR.text.primary}>
+                  {displayName}
+                </Txt>
+              </Pressable>
             );
           })}
         </View>
@@ -597,6 +656,12 @@ const s = StyleSheet.create({
   postActions: { flexDirection: 'row', gap: SPACE.xl },
 
   /* Défi */
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACE.sm, paddingTop: SPACE.xs },
-  chip: { maxWidth: '100%' },
+  themeGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: SPACE.sm, paddingTop: SPACE.xs },
+  themeTile: {
+    width: '31.5%', alignItems: 'center', gap: SPACE.xs,
+    paddingVertical: SPACE.sm, paddingHorizontal: SPACE.xs,
+    borderRadius: RADII.md, borderWidth: BORDER.hair, borderColor: COLOR.border.subtle,
+    backgroundColor: COLOR.surface.subtle,
+  },
+  themeTileSelected: { borderColor: COLOR.action.primary, borderWidth: BORDER.selected, backgroundColor: COLOR.action.selectedFill },
 });

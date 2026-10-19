@@ -205,6 +205,26 @@ export default function GameScreen() {
   // Anti-triche : garde de fin de match (évite double navigation + pilote le forfait)
   const matchEndedRef = useRef(false);
 
+  // « Revoir mes erreurs » (results.tsx) lit les questions du dernier match dans AsyncStorage.
+  // On purge au démarrage et on enregistre à CHAQUE fin de match (solo, duel en ligne,
+  // forfait, adversaire parti) : sinon l'écran montrait les questions d'une partie précédente.
+  useEffect(() => {
+    AsyncStorage.multiRemove(['duelo_last_quiz_questions', 'duelo_last_player_answers']).catch(() => {});
+  }, []);
+  const saveReviewData = async () => {
+    try {
+      const qs = questionsRef.current;
+      if (qs.length === 0) return;
+      const selections = qs.map((_, i) =>
+        playerSelectionsRef.current[i] !== undefined ? playerSelectionsRef.current[i] : -1
+      );
+      await AsyncStorage.multiSet([
+        ['duelo_last_quiz_questions', JSON.stringify(qs)],
+        ['duelo_last_player_answers', JSON.stringify(selections)],
+      ]);
+    } catch (e) { console.error(e); }
+  };
+
   // ⚔️ Quitter l'app en plein match = FORFAIT immédiat — bot compris.
   // Sinon on peut mettre l'app en fond, chercher la réponse et revenir.
   // Déclenché sur 'background' uniquement (pas 'inactive' : centre de
@@ -216,7 +236,7 @@ export default function GameScreen() {
     const ps = playerScoreRef.current;
     // Défaite garantie, peu importe le score au moment de l'abandon
     const forfeitOpp = Math.max(botScoreRef.current, ps + 10);
-    AsyncStorage.getItem('duelo_user_id').then((userId) => {
+    saveReviewData().then(() => AsyncStorage.getItem('duelo_user_id')).then((userId) => {
       router.replace(
         `/results?playerScore=${ps}&opponentScore=${forfeitOpp}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId || ''}&isBot=${params.isBot}&correctCount=${correctCountRef.current}&opponentLevel=${parseInt(params.opponentLevel || '1') || 1}&opponentId=${params.opponentId || ''}`
       );
@@ -326,6 +346,11 @@ export default function GameScreen() {
         const { is_correct, points, your_score, opponent_score, question_index, correct_option } = msg.data || {};
         lastAnswerCorrectRef.current = is_correct;
         lastCorrectOptionRef.current = typeof correct_option === 'number' ? correct_option : null;
+        // En duel, le serveur ne révèle la bonne réponse qu'ici : on la garde pour « Revoir mes erreurs ».
+        const answeredQ = questionsRef.current[question_index];
+        if (answeredQ && typeof correct_option === 'number') {
+          questionsRef.current[question_index] = { ...answeredQ, correct_option };
+        }
         playerScoreRef.current = your_score;
         botScoreRef.current = opponent_score;
         setPlayerScore(your_score);
@@ -370,23 +395,25 @@ export default function GameScreen() {
         }
       }),
       // Game over
-      wsOn('game_over', (msg) => {
+      wsOn('game_over', async (msg) => {
         matchEndedRef.current = true;
         if (timerRef.current) clearInterval(timerRef.current);
         const { your_score, opponent_score, your_correct } = msg.data || {};
         const userId = userIdRef.current;
         playSound(your_score >= opponent_score ? 'victory' : 'defeat');
+        await saveReviewData();
         router.replace(
           `/results?playerScore=${your_score}&opponentScore=${opponent_score}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=false&correctCount=${your_correct || correctCountRef.current}&opponentLevel=${params.opponentLevel || 1}&opponentId=${params.opponentId || ''}`
         );
       }),
       // Opponent disconnected
-      wsOn('opponent_disconnected', (msg) => {
+      wsOn('opponent_disconnected', async (msg) => {
         matchEndedRef.current = true;
         if (timerRef.current) clearInterval(timerRef.current);
         const { your_score, opponent_score, your_correct, compensation_points } = msg.data || {};
         // Navigate to results with auto-victory
         const userId = userIdRef.current;
+        await saveReviewData();
         router.replace(
           `/results?playerScore=${your_score}&opponentScore=${opponent_score}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=false&correctCount=${your_correct || correctCountRef.current}&opponentLevel=${params.opponentLevel || 1}&opponentId=${params.opponentId || ''}&opponentDisconnected=true`
         );
@@ -721,14 +748,7 @@ export default function GameScreen() {
     playSound(ps >= bs ? 'victory' : 'defeat');
     const cc = correctCountRef.current;
     const ol = parseInt(params.opponentLevel || '1') || 1;
-    // Save questions for the report feature on results screen
-    try {
-      await AsyncStorage.setItem('duelo_last_quiz_questions', JSON.stringify(questions));
-      const selections = questions.map((_, i) =>
-        playerSelectionsRef.current[i] !== undefined ? playerSelectionsRef.current[i] : -1
-      );
-      await AsyncStorage.setItem('duelo_last_player_answers', JSON.stringify(selections));
-    } catch (e) { console.error(e); }
+    await saveReviewData();
     // Async challenge mode: save score + per-question answers (with retry + offline queue)
     if (params.challenge_id && isAsync) {
       const { ok, data: saveData } = await saveScoreWithRetry(

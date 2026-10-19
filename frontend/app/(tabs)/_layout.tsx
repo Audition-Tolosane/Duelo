@@ -6,12 +6,13 @@ import Animated, {
   useSharedValue, useAnimatedStyle, withSpring, withTiming,
   runOnJS, interpolate, Extrapolation,
 } from 'react-native-reanimated';
-import { usePathname, Slot } from 'expo-router';
+import { usePathname, Slot, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import DueloHeader from '../../components/DueloHeader';
 import { useSwipeBackProgress } from '../../components/SwipeBackContext';
 import { t } from '../../utils/i18n';
 import { TabBarProvider, useTabBar } from '../../contexts/TabBarContext';
+import { ActiveTabContext } from '../../contexts/ActiveTabContext';
 import { ScreenContainer, Txt, Icon } from '../../components/ui';
 import type { IconName } from '../../components/ui';
 import { COLOR, SPACE, SIZE, RADII, BORDER, ELEVATION, ICON_SIZE, TYPO } from '../../theme/tokens';
@@ -161,6 +162,19 @@ export default function TabLayout() {
   const [activeIndex, setActiveIndex] = useState(0);
   const swipeBackProgress = useSwipeBackProgress();
 
+  // Quand les onglets reprennent le focus, aucune page ne les recouvre : on remet la
+  // parallaxe à zéro. Sinon une valeur restée bloquée (page remplacée, retour
+  // interrompu…) laissait l'écran décalé vers la gauche et rétréci, fond visible à droite.
+  useFocusEffect(useCallback(() => {
+    if (swipeBackProgress) swipeBackProgress.value = withTiming(0, { duration: 200 });
+  }, [swipeBackProgress]));
+
+  // La largeur d'écran peut changer (rotation, redimensionnement) : on recale le pager
+  // sur l'onglet courant, sinon il reste à cheval entre deux onglets.
+  useEffect(() => {
+    translateX.value = -currentIndex.value * SCREEN_WIDTH;
+  }, [SCREEN_WIDTH]);
+
   // Only keep active page + adjacent pages mounted, unmount the rest
   const renderedPages = useMemo(() => {
     const pages = new Set<number>();
@@ -286,6 +300,7 @@ export default function TabLayout() {
       <CollapsingHeader />
 
       {/* Custom swipeable pager */}
+      <ActiveTabContext.Provider value={TAB_NAMES[activeIndex]}>
       <View style={styles.pagerContainer}>
         <GestureDetector gesture={panGesture}>
           <Animated.View style={[styles.pagerStrip, containerStyle]}>
@@ -297,6 +312,7 @@ export default function TabLayout() {
           </Animated.View>
         </GestureDetector>
       </View>
+      </ActiveTabContext.Provider>
 
       <CustomTabBar currentIndex={activeIndex} onTabPress={onTabPress} />
     </ScreenContainer>

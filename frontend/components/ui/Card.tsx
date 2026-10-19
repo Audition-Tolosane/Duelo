@@ -9,11 +9,13 @@ type Props = {
   accent?: 'none' | 'event' | 'selected' | 'reward';
   padded?: boolean;
   testID?: string;
+  /** Libellé lu par les lecteurs d'écran (carte cliquable) */
+  accessibilityLabel?: string;
   style?: StyleProp<ViewStyle>;
 };
 
 // Surface pétrole unique. Règle : JAMAIS de Card dans une Card (pas de vignettes dans des vignettes).
-export default function Card({ children, onPress, accent = 'none', padded = true, testID, style }: Props) {
+export default function Card({ children, onPress, accent = 'none', padded = true, testID, accessibilityLabel, style }: Props) {
   const content = [
     styles.base,
     padded && styles.padded,
@@ -24,7 +26,7 @@ export default function Card({ children, onPress, accent = 'none', padded = true
   ];
   if (!onPress) return <View testID={testID} style={content}>{children}</View>;
   return (
-    <Pressable testID={testID} onPress={onPress} accessibilityRole="button" style={({ pressed }) => [...content, pressed && styles.pressed]}>
+    <Pressable testID={testID} onPress={onPress} accessibilityRole="button" accessibilityLabel={accessibilityLabel} style={({ pressed }) => [...content, pressed && styles.pressed]}>
       {children}
     </Pressable>
   );
