@@ -54,6 +54,7 @@ const translations: Translations = {
   'pilot.theme.send': { fr: "Envoyer", en: "Send", es: "Enviar", de: "Senden", pt: "Enviar", it: "Invia", ar: "إرسال", ja: "送信", ko: "보내기", zh: "发送" },
   'pilot.theme.remove_photo': { fr: "Retirer la photo", en: "Remove photo", es: "Quitar la foto", de: "Foto entfernen", pt: "Remover foto", it: "Rimuovi foto", ar: "إزالة الصورة", ja: "写真を削除", ko: "사진 삭제", zh: "移除照片" },
   'pilot.explorer.your_themes': { fr: "Tes thèmes", en: "Your themes", es: "Tus temas", de: "Deine Themen", pt: "Seus temas", it: "I tuoi temi", ar: "مواضيعك", ja: "あなたのテーマ", ko: "내 테마", zh: "你的主题" },
+  'pilot.explorer.everyone': { fr: "Pour tout le monde", en: "For everyone", es: "Para todos", de: "Für alle", pt: "Para todos", it: "Per tutti", ar: "للجميع", ja: "みんなで遊べる", ko: "모두를 위한 테마", zh: "适合所有人" },
   'pilot.explorer.featured': { fr: "À la une", en: "Featured", es: "Destacado", de: "Im Fokus", pt: "Em destaque", it: "In evidenza", ar: "مميز", ja: "注目", ko: "추천", zh: "精选" },
   'pilot.explorer.all_universes': { fr: "Tous les univers", en: "All universes", es: "Todos los universos", de: "Alle Universen", pt: "Todos os universos", it: "Tutti gli universi", ar: "كل العوالم", ja: "すべてのユニバース", ko: "모든 유니버스", zh: "所有宇宙" },
   'pilot.explorer.explore_cta': { fr: "Explorer", en: "Explore", es: "Explorar", de: "Entdecken", pt: "Explorar", it: "Esplora", ar: "استكشف", ja: "探索する", ko: "탐험하기", zh: "探索" },

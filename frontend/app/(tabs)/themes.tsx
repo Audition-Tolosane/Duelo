@@ -32,6 +32,9 @@ type PlayedTheme = {
   cluster?: string; super_category?: string;
 };
 
+// Thème « Pour tout le monde », tel que renvoyé par GET /api/themes/everyone
+type EveryoneTheme = { id: string; name: string; cluster: string; super_category: string };
+
 // Univers teasés verrouillés : une ligne de pied de page (noms de marque, pas de traduction)
 const UPCOMING_CATS = [
   { id: 'SOUND', label: 'Sound' },
@@ -64,10 +67,11 @@ export default function ThemesScreen() {
   const { onScroll: onTabScroll } = useTabBar();
   const [cats, setCats] = useState<SuperCategory[]>([]);
   const [myThemes, setMyThemes] = useState<PlayedTheme[]>([]);
+  const [everyone, setEveryone] = useState<EveryoneTheme[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
 
-  useEffect(() => { loadCategories(); loadMyThemes(); }, []);
+  useEffect(() => { loadCategories(); loadMyThemes(); loadEveryone(); }, []);
 
   const loadCategories = async () => {
     setLoadError(false);
@@ -103,11 +107,23 @@ export default function ThemesScreen() {
     } catch { /* bloc masqué */ }
   };
 
+  // Thèmes sans œuvre ni artiste à connaître : de quoi jouer à deux sans sujet commun.
+  // En cas d'échec, la rangée reste masquée.
+  const loadEveryone = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/themes/everyone?lang=${getLanguage()}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setEveryone(Array.isArray(data?.themes) ? data.themes : []);
+    } catch { /* rangée masquée */ }
+  };
+
   const openUniverse = (cat: SuperCategory) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.push(`/super-category?id=${cat.id}`);
   };
 
+  const playedLevel = new Map(myThemes.map(th => [th.id, th.level]));
   const loadedIds = new Set(cats.map(c => c.id));
   const upcomingFiltered = UPCOMING_CATS.filter(c => !loadedIds.has(c.id));
 
@@ -158,6 +174,28 @@ export default function ThemesScreen() {
             onPressTrigger={() => router.push('/search')}
           />
         </View>
+
+        {/* ── Pour tout le monde : thèmes larges, niveau affiché si le joueur y a déjà joué ── */}
+        {everyone.length > 0 && (
+          <Section title={t('pilot.explorer.everyone')} insetTitle style={s.section}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.carousel}>
+              {everyone.map((th, i) => (
+                <ThemeCard
+                  key={th.id}
+                  layout="compact"
+                  finish="satin"
+                  warm={i % 2 === 0 ? 'tr-bl' : 'tr'}
+                  name={th.name}
+                  themeId={th.id}
+                  cluster={th.cluster}
+                  superCategory={th.super_category}
+                  level={playedLevel.get(th.id)}
+                  onPress={() => router.push(`/category-detail?id=${th.id}`)}
+                />
+              ))}
+            </ScrollView>
+          </Section>
+        )}
 
         {/* ── Tes thèmes (masqué tant que le joueur n'a rien joué) ── */}
         {myThemes.length > 0 && (

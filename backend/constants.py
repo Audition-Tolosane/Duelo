@@ -32,6 +32,20 @@ NOTIFICATION_TYPE_MAP = {
 
 TOTAL_QUESTIONS = 7
 
+# « Pour tout le monde » (onglet Thèmes + Quick Match) : thèmes jouables à deux sans œuvre
+# ni artiste en commun. D'abord les thèmes écrits exprès pour ça (mode GRAND PUBLIC du
+# pipeline de contenu), puis les thèmes larges déjà au catalogue. Un id absent de la base
+# ou sans question dans la langue du joueur est simplement ignoré : on peut lister ici un
+# thème encore en cours de génération.
+GRAND_PUBLIC_THEMES = [
+    "GLO_CULTGEN", "GLO_SAVIEZ", "GLO_MARQ", "CIN_CULTES", "STV_CULTES", "ANI_ENFANCE",
+    "SOU_TUBES", "ARE_SPORTGEN", "LEG_GDMOM", "LAB_INVENT", "LIF_ANIMAUX", "ART_CHEFS",
+    "ART_MODE",
+    "GLO_CAPI", "GLO_DRAP", "GLO_MONU", "LAB_VOIT", "SOU_P80S", "SOU_P90S", "ARE_CDM",
+    "ARE_OLYM", "LIF_CHIE", "LIF_CHAT", "LIF_DINO", "ANI_DISN", "ANI_PIXA", "GLO_BOLL",
+    "LAB_SOLR", "GLO_OCEA", "GLO_MYTH",
+]
+
 
 SUPER_CATEGORY_META = {
     "SCREEN": {"icon": "🎬", "color": "#8A2BE2", "label": "Screen"},
