@@ -52,11 +52,13 @@ export default function ThemeCard({ name, themeId, cluster, superCategory, meta,
         >
           {name}
         </Txt>
-        {level !== undefined || meta ? (
+        {/* En compact, la ligne existe toujours (vide si rien à dire) : un thème jamais joué
+            garde la même hauteur que ses voisins dans le carrousel. */}
+        {level !== undefined || meta || compact ? (
           <Txt variant="caption" numberOfLines={1} align={tile ? 'center' : 'left'}>
             {level !== undefined ? <Txt variant="caption" color={COLOR.action.primary}>{t('common.level_short', { n: String(level) })}</Txt> : null}
             {level !== undefined && meta ? ' · ' : ''}
-            {meta ?? ''}
+            {meta ?? (level === undefined ? ' ' : '')}
           </Txt>
         ) : null}
       </View>
