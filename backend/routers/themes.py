@@ -4,8 +4,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from database import get_db
 from models import User, Question, Theme, UserThemeXP, Match, ThemeFollow
-from i18n import libelles_theme, nom_theme, theme_localise, nom_cluster
-from constants import SUPER_CATEGORY_META, CLUSTER_ICONS
+from i18n import (
+    libelles_theme, nom_theme, theme_localise, nom_cluster,
+    normaliser_langue, filtre_langue_questions,
+)
+from constants import SUPER_CATEGORY_META, CLUSTER_ICONS, GRAND_PUBLIC_THEMES, TOTAL_QUESTIONS
 from services.xp import (
     get_level, get_xp_progress, get_theme_title, get_theme_unlocked_titles,
 )
@@ -52,6 +55,35 @@ async def get_trending_themes(user_id: Optional[str] = None, lang: str = 'fr',
             })
 
     return {"trending": trending}
+
+
+@router.get("/themes/everyone")
+async def get_everyone_themes(lang: str = 'fr', db: AsyncSession = Depends(get_db)):
+    """Thèmes « Pour tout le monde », dans l'ordre de GRAND_PUBLIC_THEMES.
+
+    Seuls ceux qui ont des questions dans la langue du joueur : le jeu retomberait sur le
+    français pour un thème pas encore traduit, ce qu'on ne veut pas mettre en avant."""
+    lang = normaliser_langue(lang)
+    counts = dict((await db.execute(
+        select(Question.category, func.count())
+        .where(Question.category.in_(GRAND_PUBLIC_THEMES),
+               filtre_langue_questions(Question.language, lang))
+        .group_by(Question.category)
+    )).all())
+    res = await db.execute(select(Theme).where(Theme.id.in_(GRAND_PUBLIC_THEMES)))
+    by_id = {t.id: t for t in res.scalars().all()}
+    themes = []
+    for tid in GRAND_PUBLIC_THEMES:
+        t = by_id.get(tid)
+        if not t or counts.get(tid, 0) < TOTAL_QUESTIONS:
+            continue
+        lib = libelles_theme(t, lang)
+        themes.append({
+            "id": t.id, "name": lib["name"], "description": lib["description"],
+            "cluster": t.cluster, "super_category": t.super_category,
+            "color_hex": t.color_hex or "#8A2BE2", "icon_url": t.icon_url or "",
+        })
+    return {"themes": themes}
 
 
 @router.get("/themes/explore")
