@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Chefs-d'œuvre Célèbres">
+  <rect x="64" y="34" width="128" height="90" rx="10" fill="#FFDB3D"/>
+  <rect x="80" y="50" width="96" height="58" rx="4" fill="#12606D"/>
+  <path d="M94 96L114 78L130 90L148 74L164 96Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="160" cy="64" r="8" fill="#FF6B5B"/>
+  <rect x="48" y="156" width="20" height="54" rx="8" fill="#FFDB3D"/>
+  <rect x="188" y="156" width="20" height="54" rx="8" fill="#FFDB3D"/>
+  <circle cx="58" cy="152" r="14" fill="#FFDB3D"/>
+  <circle cx="198" cy="152" r="14" fill="#FFDB3D"/>
+  <rect x="36" y="204" width="44" height="16" rx="8" fill="#12606D"/>
+  <rect x="176" y="204" width="44" height="16" rx="8" fill="#12606D"/>
+  <path d="M70 168Q128 196 186 168" stroke="#FF6B5B" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M94 62L94 74" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

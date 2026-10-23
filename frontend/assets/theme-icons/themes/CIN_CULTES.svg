@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Films Cultes">
+  <circle cx="80" cy="96" r="20" fill="#FFDB3D"/>
+  <circle cx="102" cy="70" r="24" fill="#FFDB3D"/>
+  <circle cx="138" cy="58" r="26" fill="#FFDB3D"/>
+  <circle cx="170" cy="76" r="22" fill="#FFDB3D"/>
+  <circle cx="182" cy="100" r="16" fill="#FFDB3D"/>
+  <circle cx="126" cy="92" r="22" fill="#FFDB3D"/>
+  <circle cx="212" cy="62" r="13" fill="#FFDB3D"/>  <polygon points="70,124 186,124 172,212 84,212" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="96,124 114,124 114,212 103,212" fill="#FF6B5B"/>
+  <polygon points="142,124 160,124 153,212 142,212" fill="#FF6B5B"/>
+  <rect x="56" y="104" width="144" height="22" rx="11" fill="#12606D"/>
+  <path d="M82 142L86 170" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

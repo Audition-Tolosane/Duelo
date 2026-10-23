@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Dessins Animés d'Enfance">
+  <g transform="rotate(-8 128 136)">
+    <rect x="26" y="66" width="204" height="136" rx="16" fill="#12606D"/>
+    <rect x="48" y="80" width="160" height="42" rx="10" fill="#FFDB3D"/>
+    <polygon points="128.0,88.0 131.5,96.9 141.3,97.5 133.7,103.6 136.2,113.1 128.0,107.8 119.8,113.1 122.3,103.6 114.7,97.5 124.5,96.9" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+    <rect x="48" y="134" width="160" height="54" rx="16" fill="#0B3D4A"/>
+    <circle cx="90" cy="161" r="20" fill="#E8F1EC"/>
+    <circle cx="166" cy="161" r="20" fill="#E8F1EC"/>
+    <circle cx="90" cy="161" r="7" fill="#0B3D4A"/>
+    <circle cx="166" cy="161" r="7" fill="#0B3D4A"/>
+    <path d="M38 140V96Q38 84 48 80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <path d="M214 24Q218 40 232 44Q218 48 214 64Q210 48 196 44Q210 40 214 24Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+</svg>

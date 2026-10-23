@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Inventions &amp; Découvertes">
+  <path d="M44 190H32V172" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="44" y="164" width="128" height="56" rx="10" fill="#12606D"/>
+  <circle cx="122" cy="194" r="9" fill="#FFDB3D"/>
+  <ellipse cx="108" cy="162" rx="56" ry="13" fill="#FF6B5B"/>
+  <circle cx="108" cy="160" r="6" fill="#FFDB3D"/>
+  <path d="M146 134Q152 148 136 156" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M139 130Q152 100 145 55L215 101Q180 110 153 138Z" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="180" cy="78" rx="44" ry="20" transform="rotate(33 180 78)" fill="#FFDB3D"/>
+  <ellipse cx="180" cy="78" rx="32" ry="11" transform="rotate(33 180 78)" fill="#FF6B5B"/>
+  <path d="M60 182L60 200" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

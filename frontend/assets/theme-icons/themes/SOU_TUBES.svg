@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Tubes de Toujours">
+  <path d="M48 214V112C48 66 84 36 128 36C172 36 208 66 208 112V214Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M80 204V116C80 86 102 64 128 64C154 64 176 86 176 116V204" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M94 146V116C94 96 108 82 128 82C148 82 162 96 162 116V146Z" fill="#0B3D4A" stroke="#0B3D4A" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="128" cy="118" r="26" fill="#FFDB3D"/>
+  <path d="M110 112C112 104 118 98 126 96" stroke="#0B3D4A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="128" cy="118" r="7" fill="#0B3D4A"/>
+  <rect x="96" y="154" width="64" height="20" rx="8" fill="#0B3D4A"/>
+  <path d="M112 164h0M128 164h0M144 164h0" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M100 186H156M100 198H156" stroke="#0B3D4A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="40" y="206" width="176" height="18" rx="9" fill="#FFDB3D"/>
+  <path d="M62 124C62 100 68 84 80 70" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

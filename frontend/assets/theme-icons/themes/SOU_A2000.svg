@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Les Années 2000">
+  <path d="M136 40C136 16 190 16 190 56V122" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M190 122C190 146 176 158 176 176M190 122C190 146 206 158 206 176" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="176" cy="190" r="15" fill="#FF6B5B"/>
+  <circle cx="206" cy="190" r="15" fill="#FF6B5B"/>
+  <rect x="62" y="38" width="104" height="170" rx="22" fill="#12606D"/>
+  <rect x="82" y="56" width="64" height="52" rx="8" fill="#0B3D4A"/>
+  <path d="M94 92H122" stroke="#FF6B5B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M94 74H110" stroke="#E8F1EC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="114" cy="156" r="34" fill="#E8F1EC"/>
+  <circle cx="114" cy="156" r="13" fill="#12606D"/>
+  <path d="M71 62V80" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

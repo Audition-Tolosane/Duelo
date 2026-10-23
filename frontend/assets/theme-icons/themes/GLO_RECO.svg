@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Records du Monde">
+  <rect x="48" y="200" width="148" height="22" rx="11" fill="#12606D"/>
+  <rect x="88" y="40" width="64" height="168" rx="14" fill="#12606D"/>
+  <path d="M120 120H140M128 144H140M120 168H140M128 192H140" stroke="#FFDB3D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <rect x="40" y="70" width="124" height="28" rx="14" fill="#FF6B5B"/>
+  <path d="M198 196V114M182 130L198 114L214 130" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="194,34 201.1,52.3 220.6,53.3 205.4,65.7 210.5,84.7 194,74 177.5,84.7 182.6,65.7 167.4,53.3 186.9,52.3" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M104 116V146" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Le Corps Humain">
+  <circle cx="128" cy="52" r="24" fill="#12606D"/>
+  <path d="M96 88H160Q186 88 192 112L204 164Q206 176 194 176Q186 176 184 168L172 126V208Q172 218 160 218H146Q136 218 136 208V170H120V208Q120 218 110 218H96Q84 218 84 208V126L72 168Q70 176 62 176Q50 176 52 164L64 112Q70 88 96 88Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="120" y="92" width="16" height="72" rx="4" fill="#FFDB3D"/>
+  <rect x="120" y="92" width="16" height="72" rx="4" fill="#FFDB3D" transform="rotate(60 128 128)"/>
+  <rect x="120" y="92" width="16" height="72" rx="4" fill="#FFDB3D" transform="rotate(120 128 128)"/>
+  <circle cx="128" cy="128" r="26" fill="#FFDB3D"/>
+  <circle cx="128" cy="128" r="11" fill="#0B3D4A"/>
+  <path d="M112 50C112 42 118 36 126 34" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

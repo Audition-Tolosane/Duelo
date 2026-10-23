@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Le Monde au Quotidien">
+  <polygon points="34,182 68,148 96,176 62,210" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="222,182 188,148 160,176 194,210" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="86" y="136" width="90" height="40" rx="20" fill="#12606D"/>
+  <rect x="76" y="90" width="110" height="50" rx="22" fill="#FFDB3D"/>
+  <path d="M88 120V164M112 120V168M136 120V164" stroke="#FFDB3D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <path d="M100 132V164M124 132V164" stroke="#12606D" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M86 114L132 98" stroke="#12606D" stroke-width="20" stroke-linecap="round" fill="none"/>
+  <polygon points="70,146 98,174 108,164 80,136" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="186,146 158,174 148,164 176,136" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M96 50L104 66M128 42V60M160 50L152 66" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M50 182L66 166" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

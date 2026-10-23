@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Culture Générale">
+  <path d="M128 50V72M78 70L90 86M178 70L166 86" stroke="#FFDB3D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M60 156H196L220 210H36Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="62" y="180" width="132" height="14" rx="7" fill="#FFDB3D"/>
+  <path d="M58 150C58 120 88 102 128 102C168 102 198 120 198 150Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M84 134C90 124 100 118 112 115" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

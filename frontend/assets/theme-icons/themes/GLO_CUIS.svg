@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Nourriture &amp; Cuisine">
+  <g transform="translate(128 124) scale(1.1) translate(-128 -128)">
+  <g transform="rotate(-32 128 128)">
+  <rect x="119" y="96" width="18" height="122" rx="9" fill="#FF6B5B"/>
+  <ellipse cx="128" cy="68" rx="32" ry="42" fill="#FF6B5B"/>
+  <path d="M110 84C106 70 108 54 118 44" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g transform="rotate(32 128 128)">
+  <path d="M116 150C82 120 82 44 128 36C174 44 174 120 140 150Z" stroke="#12606D" stroke-width="12" stroke-linejoin="round" fill="none"/>
+  <path d="M122 148C108 118 108 60 128 52C148 60 148 118 134 148" stroke="#12606D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M128 148V44" stroke="#12606D" stroke-width="10" stroke-linecap="round" fill="none"/>
+  <rect x="114" y="144" width="28" height="18" rx="8" fill="#FFDB3D"/>
+  <rect x="118" y="158" width="20" height="62" rx="10" fill="#FFDB3D"/>
+  </g>
+  </g>
+</svg>

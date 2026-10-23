@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Science du Quotidien">
+  <path d="M66 124V60C60 50 66 36 80 34C86 24 98 24 104 34C118 36 124 50 118 60V124Z" fill="#FFDB3D" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M132 124V76C126 66 132 52 146 50C152 40 164 40 170 50C184 52 190 66 184 76V124Z" fill="#FFDB3D" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="190" y="132" width="34" height="16" rx="8" fill="#FF6B5B"/>
+  <rect x="56" y="200" width="28" height="24" rx="10" fill="#12606D"/>
+  <rect x="156" y="200" width="28" height="24" rx="10" fill="#12606D"/>
+  <rect x="36" y="108" width="168" height="104" rx="28" fill="#12606D"/>
+  <rect x="58" y="172" width="124" height="20" rx="10" fill="#FF6B5B"/>
+  <path d="M54 152V140A18 18 0 0 1 70 124" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

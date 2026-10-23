@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Grands Moments de l'Histoire">
+  <path d="M76 108V84M124 156V172M178 108V92" stroke="#12606D" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <polygon points="40,108 182,108 182,86 220,132 182,178 182,156 40,156" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <circle cx="76" cy="64" r="28" fill="#FFDB3D"/>
+  <circle cx="76" cy="64" r="11" fill="#12606D"/>
+  <circle cx="124" cy="194" r="28" fill="#FF6B5B"/>
+  <circle cx="124" cy="194" r="11" fill="#E8F1EC"/>
+  <polygon points="178,36 188,56 210,59 194,74 198,96 178,85 158,96 162,74 146,59 168,56" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M50 122H64" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg>

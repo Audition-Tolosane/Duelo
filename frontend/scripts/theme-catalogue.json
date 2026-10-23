@@ -1,5 +1,5 @@
 {
- "_source": "GET /api/explore/{univers}/clusters (production, 08/10/2026) + 45 thèmes ajoutés (production, 12/10/2026)",
+ "_source": "GET /api/explore/{univers}/clusters (production, 08/10/2026) + 45 thèmes ajoutés (production, 12/10/2026) + 21 thèmes grand public (production, 23/10/2026)",
  "themes": [
   {
    "id": "ARE_ATHL",
@@ -7539,6 +7539,153 @@
    "cluster": "Philo & Psycho",
    "universe": "MIND",
    "description": "Qu'est-ce que savoir, être, exister, percevoir ? Les questions sans fin et les penseurs qui ont osé y répondre."
+  },
+  {
+   "id": "GLO_CULTGEN",
+   "name": "Culture Générale",
+   "cluster": "Langues & Cultures",
+   "universe": "GLOBE",
+   "description": "Capitales, histoire, sciences, arts, sport, cuisine : le grand quiz de ceux qui s'intéressent à tout."
+  },
+  {
+   "id": "GLO_SAVIEZ",
+   "name": "Le Saviez-vous ?",
+   "cluster": "Langues & Cultures",
+   "universe": "GLOBE",
+   "description": "Des faits étonnants, bien réels, sur le monde, le corps et le vivant. Vous allez en apprendre."
+  },
+  {
+   "id": "GLO_MARQ",
+   "name": "Marques & Logos",
+   "cluster": "Langues & Cultures",
+   "universe": "GLOBE",
+   "description": "Logos, mascottes et histoires : les marques que le monde entier a sous les yeux, chaque jour."
+  },
+  {
+   "id": "CIN_CULTES",
+   "name": "Films Cultes",
+   "cluster": "Cinéma",
+   "universe": "SCREEN",
+   "description": "Répliques, héros, musiques et affiches : les films que tout le monde a vus, ou croit avoir vus."
+  },
+  {
+   "id": "ANI_ENFANCE",
+   "name": "Dessins Animés d'Enfance",
+   "cluster": "Animation & Anime",
+   "universe": "SCREEN",
+   "description": "Du goûter devant la télé aux films d'animation en salle : retrouvez les héros qui ont bercé trois générations."
+  },
+  {
+   "id": "ARE_SPORTGEN",
+   "name": "Le Sport en Général",
+   "cluster": "Combat & Sports individuels",
+   "universe": "ARENA",
+   "description": "Règles, grandes compétitions, légendes et vocabulaire : tous les sports dans un seul quiz."
+  },
+  {
+   "id": "LAB_INVENT",
+   "name": "Inventions & Découvertes",
+   "cluster": "Tech & IA",
+   "universe": "LAB",
+   "description": "Des objets du quotidien aux grandes découvertes : qui a trouvé quoi, et comment ça marche."
+  },
+  {
+   "id": "ART_CHEFS",
+   "name": "Chefs-d'œuvre Célèbres",
+   "cluster": "Peinture & Sculpture",
+   "universe": "ART",
+   "description": "Tableaux, sculptures et monuments que tout le monde reconnaît : qui les a créés, où les voir et ce qu'ils racontent."
+  },
+  {
+   "id": "ART_MODE",
+   "name": "La Mode",
+   "cluster": "Mode & Design",
+   "universe": "ART",
+   "description": "Jean, trench, mini-jupe ou survêtement : les vêtements et les styles que le monde entier porte, d'une époque à l'autre."
+  },
+  {
+   "id": "LEG_GDMOM",
+   "name": "Grands Moments de l'Histoire",
+   "cluster": "Histoire moderne",
+   "universe": "LEGENDS",
+   "description": "De l'Antiquité à nos jours : les dates, les personnages et les événements que l'école nous a fait retenir."
+  },
+  {
+   "id": "LIF_ANIMAUX",
+   "name": "Animaux du Monde",
+   "cluster": "Monde Animal",
+   "universe": "LIFE",
+   "description": "Des plus grands aux plus petits : savane, océan, forêt, ferme. Que savez-vous des bêtes qui nous entourent ?"
+  },
+  {
+   "id": "SOU_TUBES",
+   "name": "Tubes de Toujours",
+   "cluster": "Hits & Pop Culture",
+   "universe": "SOUND",
+   "description": "Interprètes, titres et époques : les chansons que tout le monde a fredonnées, des années 60 à aujourd'hui."
+  },
+  {
+   "id": "STV_CULTES",
+   "name": "Séries Cultes",
+   "cluster": "Séries TV",
+   "universe": "SCREEN",
+   "description": "Personnages, concepts et génériques des séries que toute la famille connaît."
+  },
+  {
+   "id": "GLO_QUOT",
+   "name": "Le Monde au Quotidien",
+   "cluster": "Langues & Cultures",
+   "universe": "GLOBE",
+   "description": "Brosse à dents, poignée de main, billet de banque : les objets et les habitudes que chacun croise chaque jour, ici et ailleurs."
+  },
+  {
+   "id": "GLO_CUIS",
+   "name": "Nourriture & Cuisine",
+   "cluster": "Gastronomie",
+   "universe": "GLOBE",
+   "description": "Pizza, sushi, tacos ou crêpes : les plats, les ingrédients et les gestes de cuisine que le monde entier connaît, sans être chef."
+  },
+  {
+   "id": "LAB_SCIQ",
+   "name": "Science du Quotidien",
+   "cluster": "Physique & Chimie",
+   "universe": "LAB",
+   "description": "Pourquoi le ciel est bleu, le pain lève ou les oignons font pleurer : la science cachée derrière ce que chacun voit chaque jour."
+  },
+  {
+   "id": "SOU_A2000",
+   "name": "Les Années 2000",
+   "cluster": "Hits & Pop Culture",
+   "universe": "SOUND",
+   "description": "Téléphones à clapet, iPod, Harry Potter et télé-réalité : la décennie où le monde entier a découvert internet."
+  },
+  {
+   "id": "SOU_A2010",
+   "name": "Les Années 2010",
+   "cluster": "Hits & Pop Culture",
+   "universe": "SOUND",
+   "description": "Selfies, stories, Gangnam Style et Game of Thrones : la décennie où le smartphone est entré dans toutes les poches."
+  },
+  {
+   "id": "LIF_CORPS",
+   "name": "Le Corps Humain",
+   "cluster": "Corps Humain",
+   "universe": "LIFE",
+   "description": "Os, cœur, cerveau, sommeil : ce que chacun devrait savoir sur la machine qu'il habite, sans jargon de médecin."
+  },
+  {
+   "id": "GLO_RECO",
+   "name": "Records du Monde",
+   "cluster": "Langues & Cultures",
+   "universe": "GLOBE",
+   "description": "Le plus haut, le plus rapide, le plus vieux : les records de la nature, des humains et des constructions qui font dire « vraiment ? »."
+  },
+  {
+   "id": "LEG_PERSO",
+   "name": "Les Grandes Personnalités",
+   "cluster": "Histoire moderne",
+   "universe": "LEGENDS",
+   "description": "Savants, artistes, explorateurs, champions ou leaders : les femmes et les hommes que le monde entier connaît, et pourquoi."
   }
  ]
 }

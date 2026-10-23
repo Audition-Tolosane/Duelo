@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Animaux du Monde">
+  <rect x="54" y="150" width="24" height="60" rx="10" fill="#12606D"/>
+  <rect x="86" y="150" width="24" height="60" rx="10" fill="#12606D"/>
+  <rect x="130" y="150" width="24" height="60" rx="10" fill="#12606D"/>
+  <rect x="160" y="150" width="24" height="60" rx="10" fill="#12606D"/>
+  <ellipse cx="108" cy="130" rx="74" ry="50" fill="#12606D"/>
+  <polygon points="150,96 194,100 220,148 212,168 170,170 146,150" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="152,96 158,68 176,96" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="206,124 218,144 220,86" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <polygon points="194,104 202,118 196,88" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="180" cy="124" r="7" fill="#0B3D4A"/>
+  <path d="M150 104Q138 134 150 164" stroke="#0B3D4A" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M58 122C62 106 74 94 92 88" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Marques &amp; Logos">
+  <g transform="translate(4 -6) rotate(30 128 128)">
+  <path d="M100 72H200Q212 72 212 84V172Q212 184 200 184H100L52 128Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="156,94 164.8,115.9 188.3,117.5 170.3,132.6 176,155.5 156,143 136,155.5 141.7,132.6 123.7,117.5 147.2,115.9" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="90" cy="128" r="15" fill="#E8F1EC"/>
+  <circle cx="90" cy="128" r="7" fill="#12606D"/>
+  <path d="M90 128C66 128 44 116 40 96C38 82 50 74 60 82" stroke="#FF6B5B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M116 90H144" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

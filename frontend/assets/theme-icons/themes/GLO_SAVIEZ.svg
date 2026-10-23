@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Le Saviez-vous ?">
+  <path d="M36 146Q52 136 68 146Q84 136 100 146Q116 136 132 146Q148 136 164 146Q180 136 196 146Q212 136 220 146C214 190 176 214 128 214C80 214 42 190 36 146Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M60 160H196C188 184 162 198 128 198C94 198 68 184 60 160Z" fill="#0B3D4A"/>
+  <g transform="rotate(20 220 132)">
+  <path d="M36 132C42 102 80 84 128 84C176 84 214 102 220 132Q204 124 188 132Q172 124 156 132Q140 124 124 132Q108 124 92 132Q76 124 60 132Q48 124 36 132Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M66 112C76 102 90 96 106 94" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <circle cx="110" cy="146" r="28" fill="#E8F1EC"/>
+  <circle cx="120" cy="136" r="7" fill="#FFDB3D"/>
+  <polygon points="204,30 211,45 226,52 211,59 204,74 197,59 182,52 197,45" fill="#FFDB3D" stroke="#FFDB3D" stroke-width="4" stroke-linejoin="round"/>
+</svg>
