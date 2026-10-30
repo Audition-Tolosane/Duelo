@@ -476,6 +476,14 @@ let themesData = [];
 let allReports = [];
 let csvParsedRows = [];
 
+// Player-controlled data (reports, Forge themes, generated questions) must never reach innerHTML raw.
+function esc(v) {
+  return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+// For values passed as JS string arguments inside an onclick="..." attribute.
+function jsArg(v) { return esc(JSON.stringify(String(v ?? ''))); }
+function safeColor(v) { return /^#[0-9A-Fa-f]{3,8}$/.test(v || '') ? v : '#8A2BE2'; }
+
 function apiFetch(url, options = {}) {
   const headers = { 'Content-Type': 'application/json', 'X-Admin-Key': adminPassword, ...(options.headers || {}) };
   return fetch(url, { ...options, headers });
@@ -574,8 +582,8 @@ async function recountQuestions() {
 function renderDashTable(scs) {
   const html = scs.map(sc => `
     <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span style="font-size:22px">${sc.icon}</span>
-      <span style="flex:1;font-size:14px;font-weight:700">${sc.label}</span>
+      <span style="font-size:22px">${esc(sc.icon)}</span>
+      <span style="flex:1;font-size:14px;font-weight:700">${esc(sc.label)}</span>
       <span style="font-size:13px;color:#525252">${sc.total_themes} thèmes</span>
       <span style="font-size:14px;font-weight:800;color:#8A2BE2;min-width:60px;text-align:right">${(sc.total_questions||0).toLocaleString()} q.</span>
     </div>`).join('');
@@ -587,21 +595,21 @@ function renderThemesTree(scs) {
     const clusters = (sc.clusters || []).map(cl => {
       const themes = (cl.themes || []).map(th => `
         <div class="theme-row">
-          <div class="theme-dot" style="background:${th.color_hex||'#8A2BE2'}"></div>
-          <span class="theme-name">${th.name}</span>
-          <span class="theme-id">${th.id}</span>
+          <div class="theme-dot" style="background:${safeColor(th.color_hex)}"></div>
+          <span class="theme-name">${esc(th.name)}</span>
+          <span class="theme-id">${esc(th.id)}</span>
           <span class="theme-qcount">${th.question_count} q.</span>
         </div>`).join('');
       return `<div class="cluster-row">
-        <div class="cluster-name">${cl.icon||''} ${cl.name}</div>
+        <div class="cluster-name">${esc(cl.icon)} ${esc(cl.name)}</div>
         ${themes}
       </div>`;
     }).join('');
     return `
       <div class="sc-block" onclick="toggleSC(this)">
         <div class="sc-header">
-          <span class="sc-icon">${sc.icon}</span>
-          <span class="sc-name">${sc.label}</span>
+          <span class="sc-icon">${esc(sc.icon)}</span>
+          <span class="sc-name">${esc(sc.label)}</span>
           <span class="sc-count">${sc.total_themes} thèmes · ${(sc.total_questions||0).toLocaleString()} questions</span>
           <span class="sc-chevron">▼</span>
         </div>
@@ -950,16 +958,16 @@ function filterReports(f) {
   if (!list.length) { container.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div>Aucun signalement</div>'; return; }
   container.innerHTML = list.map(rep => `
     <div class="report-row">
-      <span class="report-badge badge-${rep.status}">${{pending:'En attente',reviewed:'Examiné',resolved:'Résolu'}[rep.status]||rep.status}</span>
+      <span class="report-badge badge-${esc(rep.status)}">${{pending:'En attente',reviewed:'Examiné',resolved:'Résolu'}[rep.status]||esc(rep.status)}</span>
       <div class="report-content">
-        <div class="report-question">${rep.question_text||rep.question_id}</div>
-        <div class="report-meta">${rep.user_pseudo} · ${rep.category||'—'}</div>
-        <div class="report-reason">${{wrong_answer:'Mauvaise réponse',unclear_question:'Question floue',typo:'Faute/typo',outdated:'Info obsolète',other:'Autre'}[rep.reason_type]||rep.reason_type}${rep.description?' — '+rep.description:''}</div>
+        <div class="report-question">${esc(rep.question_text||rep.question_id)}</div>
+        <div class="report-meta">${esc(rep.user_pseudo)} · ${esc(rep.category||'—')}</div>
+        <div class="report-reason">${{wrong_answer:'Mauvaise réponse',unclear_question:'Question floue',typo:'Faute/typo',outdated:'Info obsolète',other:'Autre'}[rep.reason_type]||esc(rep.reason_type)}${rep.description?' — '+esc(rep.description):''}</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:4px">
-        ${rep.status!=='resolved'?`<button class="btn btn-sm" style="background:rgba(0,255,157,0.1);color:#00FF9D;border:none" onclick="setReportStatus('${rep.id}','resolved')">✓ Résolu</button>`:''}
-        ${rep.status==='pending'?`<button class="btn btn-sm" style="background:rgba(138,43,226,0.1);color:#8A2BE2;border:none" onclick="setReportStatus('${rep.id}','reviewed')">👁 Examiné</button>`:''}
-        <button class="btn btn-sm" style="background:rgba(255,59,48,0.1);color:#FF3B30;border:none" onclick="deleteQuestion('${rep.question_id}', this)">🗑 Supprimer</button>
+        ${rep.status!=='resolved'?`<button class="btn btn-sm" style="background:rgba(0,255,157,0.1);color:#00FF9D;border:none" onclick="setReportStatus(${jsArg(rep.id)},'resolved')">✓ Résolu</button>`:''}
+        ${rep.status==='pending'?`<button class="btn btn-sm" style="background:rgba(138,43,226,0.1);color:#8A2BE2;border:none" onclick="setReportStatus(${jsArg(rep.id)},'reviewed')">👁 Examiné</button>`:''}
+        <button class="btn btn-sm" style="background:rgba(255,59,48,0.1);color:#FF3B30;border:none" onclick="deleteQuestion(${jsArg(rep.question_id)}, this)">🗑 Supprimer</button>
       </div>
     </div>`).join('');
 }
@@ -986,17 +994,17 @@ function renderQBrowse() {
     <div class="tree-sc" id="sc_${sc.id}">
       <div class="tree-sc-header" onclick="toggleSC('${sc.id}')">
         <input type="checkbox" class="tree-cb" id="cb_sc_${sc.id}" onclick="event.stopPropagation();toggleCheckSC('${sc.id}',this.checked)">
-        <span style="font-size:18px">${sc.icon||'📁'}</span>
-        <span class="tree-label">${sc.label}</span>
+        <span style="font-size:18px">${esc(sc.icon||'📁')}</span>
+        <span class="tree-label">${esc(sc.label)}</span>
         <span class="tree-badge">${sc.total_themes||0} thèmes · ${sc.total_questions||0} Q</span>
         <span class="tree-toggle" id="tog_sc_${sc.id}">▶</span>
       </div>
       <div id="body_sc_${sc.id}" style="display:none">
         ${(sc.clusters||[]).map(cl => `
           <div class="tree-cluster" id="cl_${sc.id}_${cl.name.replace(/\W/g,'_')}">
-            <div class="tree-cluster-header" onclick="toggleCL('${sc.id}','${cl.name}')">
-              <input type="checkbox" class="tree-cb" id="cb_cl_${sc.id}_${cl.name.replace(/\W/g,'_')}" onclick="event.stopPropagation();toggleCheckCL('${sc.id}','${cl.name}',this.checked)">
-              <span class="tree-label" style="font-size:12px">${cl.name}</span>
+            <div class="tree-cluster-header" onclick="toggleCL(${jsArg(sc.id)},${jsArg(cl.name)})">
+              <input type="checkbox" class="tree-cb" id="cb_cl_${sc.id}_${cl.name.replace(/\W/g,'_')}" onclick="event.stopPropagation();toggleCheckCL(${jsArg(sc.id)},${jsArg(cl.name)},this.checked)">
+              <span class="tree-label" style="font-size:12px">${esc(cl.name)}</span>
               <span class="tree-badge">${(cl.themes||[]).length} thèmes · ${cl.total_questions||0} Q</span>
               <span class="tree-toggle" id="tog_cl_${sc.id}_${cl.name.replace(/\W/g,'_')}">▶</span>
             </div>
@@ -1005,7 +1013,7 @@ function renderQBrowse() {
                 <div class="tree-questions" id="th_${th.id}">
                   <div class="tree-cluster-header" style="padding-left:24px" onclick="toggleTheme('${th.id}')">
                     <input type="checkbox" class="tree-cb" id="cb_th_${th.id}" onclick="event.stopPropagation();toggleCheckTheme('${th.id}',this.checked)">
-                    <span class="tree-label" style="font-size:11px;color:#A3A3A3">${th.name}</span>
+                    <span class="tree-label" style="font-size:11px;color:#A3A3A3">${esc(th.name)}</span>
                     <span class="tree-badge">${th.question_count||0} Q</span>
                     <span class="tree-toggle" id="tog_th_${th.id}">▶</span>
                   </div>
@@ -1059,8 +1067,8 @@ function renderThemeQuestions(themeId) {
   body.innerHTML = qs.map(q => `
     <div class="tree-q-row" id="qrow_${q.id}">
       <input type="checkbox" class="tree-cb" id="cb_q_${q.id}" ${qSelected.has(q.id)?'checked':''} onchange="toggleQ('${q.id}','${themeId}',this.checked)">
-      <span class="tree-q-text">${q.text}</span>
-      <span class="tree-q-diff">${q.difficulty||''}</span>
+      <span class="tree-q-text">${esc(q.text)}</span>
+      <span class="tree-q-diff">${esc(q.difficulty)}</span>
     </div>`).join('');
   updateThemeCb(themeId);
 }

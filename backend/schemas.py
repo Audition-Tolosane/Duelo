@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 
 
@@ -92,12 +92,12 @@ class CSVUploadRequest(BaseModel):
     questions: List[dict]
 
 class QuestionReportRequest(BaseModel):
-    user_id: str
-    question_id: str
-    question_text: Optional[str] = None
-    category: Optional[str] = None
-    reason_type: str
-    description: Optional[str] = None
+    user_id: str = Field(max_length=64)
+    question_id: str = Field(max_length=64)
+    question_text: Optional[str] = Field(default=None, max_length=500)
+    category: Optional[str] = Field(default=None, max_length=100)
+    reason_type: str = Field(max_length=32)
+    description: Optional[str] = Field(default=None, max_length=1000)
 
 class DeleteThemesRequest(BaseModel):
     password: str

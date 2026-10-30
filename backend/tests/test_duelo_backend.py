@@ -272,7 +272,7 @@ class TestAdmin:
     def test_admin_verify_correct_password(self, api_client):
         response = api_client.post(
             f"{BASE_URL}/api/admin/verify",
-            json={"password": "Temporaire1!"}
+            json={"password": os.environ.get("ADMIN_PASSWORD", "")}
         )
         assert response.status_code == 200
         data = response.json()

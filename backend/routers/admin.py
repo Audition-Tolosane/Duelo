@@ -4,10 +4,11 @@ import base64
 import os
 import re
 import secrets
+import time
 import uuid
 from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException, Request, Header
-from rate_limit import rate_limit
+from rate_limit import rate_limit, _limiter, _get_client_ip
 from fastapi.responses import HTMLResponse
 from sqlalchemy import select, func, text, delete, update, or_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,9 +25,22 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 CORRECT_OPTION_MAP = {"A": 0, "B": 1, "C": 2, "D": 3}
 
 
-async def verify_admin_key(x_admin_key: str = Header(default="", alias="X-Admin-Key")):
-    """Dependency: validates admin password from X-Admin-Key header."""
+ADMIN_MAX_FAILURES = 10        # wrong keys per IP...
+ADMIN_FAILURE_WINDOW = 3600    # ...per hour, then the IP is locked out
+
+
+async def verify_admin_key(request: Request, x_admin_key: str = Header(default="", alias="X-Admin-Key")):
+    """Dependency: validates admin password from X-Admin-Key header.
+
+    Failed attempts are counted per IP on every admin route (not only /verify),
+    so the key can't be brute-forced through the other endpoints.
+    """
+    fail_key = f"admin_fail:{_get_client_ip(request)}"
+    _limiter._cleanup(fail_key, ADMIN_FAILURE_WINDOW)
+    if len(_limiter.requests[fail_key]) >= ADMIN_MAX_FAILURES:
+        raise HTTPException(status_code=429, detail="Trop de tentatives, réessayez plus tard")
     if not secrets.compare_digest(x_admin_key, ADMIN_PASSWORD):
+        _limiter.requests[fail_key].append(time.time())
         raise HTTPException(status_code=403, detail="Accès refusé")
 
 

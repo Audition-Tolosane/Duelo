@@ -7,11 +7,12 @@ Testing the 5 new admin endpoints for themes and reports management.
 import asyncio
 import aiohttp
 import json
+import os
 import time
 
 # Backend URL from environment
 BACKEND_URL = "https://theme-stats-hub-1.preview.emergentagent.com/api"
-ADMIN_PASSWORD = "Temporaire1!"
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
 
 async def test_admin_endpoints():
     """Test all 5 new admin panel endpoints."""

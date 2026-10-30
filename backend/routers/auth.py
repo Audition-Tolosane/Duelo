@@ -213,16 +213,6 @@ async def logout(
     return {"success": True}
 
 
-@router.get("/user/{user_id}", response_model=UserResponse)
-async def get_user(user_id: str, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).where(User.id == user_id))
-    user = result.scalar_one_or_none()
-    if not user:
-        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
-
-    return _user_response(user)
-
-
 @router.post("/check-pseudo")
 async def check_pseudo(data: GuestRegister, db: AsyncSession = Depends(get_db), _rl=Depends(rate_limit(limit=30, window=60))):
     # Rate-limited to curb pseudo enumeration / availability scraping.
@@ -351,7 +341,9 @@ async def social_login(
     elif data.provider == "apple":
         claims = await _verify_apple_token(data.token)
         provider_id = claims["sub"]
-        email = data.email or claims.get("email")  # Apple only sends email on 1st login
+        # Only trust the email signed by Apple — never the client-supplied one,
+        # otherwise anyone could link their Apple ID to a victim's account.
+        email = claims.get("email") if claims.get("email_verified") in (True, "true") else None
         name = data.full_name
         id_field = "apple_id"
     else:

@@ -7,9 +7,10 @@ Testing error scenarios, validation, and edge cases.
 import asyncio
 import aiohttp
 import json
+import os
 
 BACKEND_URL = "https://theme-stats-hub-1.preview.emergentagent.com/api"
-ADMIN_PASSWORD = "Temporaire1!"
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
 
 async def test_edge_cases():
     """Test error scenarios and edge cases."""
