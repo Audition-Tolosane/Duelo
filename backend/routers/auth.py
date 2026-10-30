@@ -13,6 +13,8 @@ from config import GOOGLE_CLIENT_IDS, APPLE_BUNDLE_ID
 import re
 import json
 import logging
+from datetime import datetime, timezone
+from pydantic import BaseModel
 import httpx
 import jwt as pyjwt
 
@@ -162,7 +164,11 @@ async def delete_account(
     from models import (
         Match, WallPost, PostLike, PostComment, PlayerFollow,
         ChatMessage, Notification, NotificationSettings, UserThemeXP,
+        Challenge, TournamentEntry, DailyMissions, DailyQuestionAnswer, UserAchievement,
+        StreakShield, UserLives, XPMultiplierActivation, BoostActivation, BoostOfferRefresh,
+        ThemeFollow, QuestionReport, SpinThemeUnlock, UserBlock, ContentReport,
     )
+    from config import ROOT_DIR
 
     result = await db.execute(select(User).where(User.id == current_user_id))
     user = result.scalar_one_or_none()
@@ -178,8 +184,16 @@ async def delete_account(
     await db.execute(
         sql_update(Match)
         .where(Match.player2_id == current_user_id)
-        .values(player2_id="deleted")
+        .values(player2_id="deleted", player2_pseudo="Joueur supprimé")
     )
+
+    # Other players' likes/comments on this player's posts go with the posts
+    own_posts = select(WallPost.id).where(WallPost.user_id == current_user_id)
+    await db.execute(sql_delete(PostComment).where(PostComment.post_id.in_(own_posts)))
+    await db.execute(sql_delete(PostLike).where(PostLike.post_id.in_(own_posts)))
+    # Referral link and notifications naming this player (pseudo/avatar copied in)
+    await db.execute(sql_update(User).where(User.referred_by == current_user_id).values(referred_by=None))
+    await db.execute(sql_delete(Notification).where(Notification.actor_id == current_user_id))
 
     # Delete personal data
     for model, col in [
@@ -189,12 +203,66 @@ async def delete_account(
         (ChatMessage, ChatMessage.receiver_id), (Notification, Notification.user_id),
         (NotificationSettings, NotificationSettings.user_id),
         (UserThemeXP, UserThemeXP.user_id),
+        (Challenge, Challenge.challenger_id), (Challenge, Challenge.challenged_id),
+        (TournamentEntry, TournamentEntry.user_id), (DailyMissions, DailyMissions.user_id),
+        (DailyQuestionAnswer, DailyQuestionAnswer.user_id), (UserAchievement, UserAchievement.user_id),
+        (StreakShield, StreakShield.user_id), (UserLives, UserLives.user_id),
+        (XPMultiplierActivation, XPMultiplierActivation.user_id), (BoostActivation, BoostActivation.user_id),
+        (BoostOfferRefresh, BoostOfferRefresh.user_id), (ThemeFollow, ThemeFollow.user_id),
+        (QuestionReport, QuestionReport.user_id), (SpinThemeUnlock, SpinThemeUnlock.user_id),
+        (UserBlock, UserBlock.blocker_id), (UserBlock, UserBlock.blocked_id),
+        (ContentReport, ContentReport.reporter_id),
     ]:
         await db.execute(sql_delete(model).where(col == current_user_id))
+
+    # Uploaded profile picture is served publicly from disk
+    try:
+        (ROOT_DIR / "static" / "avatars" / "users" / f"{current_user_id}.webp").unlink(missing_ok=True)
+    except OSError as e:
+        logger.warning(f"[delete-account] avatar file not removed: {e}")
 
     await db.delete(user)
     await db.commit()
     return {"success": True, "message": "Compte supprimé définitivement"}
+
+
+MIN_AGE = 13          # Terms of use
+DIGITAL_MAJORITY = 15  # France (loi Informatique et Libertés art. 45): below, no personalised ads
+
+
+def _is_minor(birth_year) -> bool:
+    return bool(birth_year) and datetime.now(timezone.utc).year - birth_year < DIGITAL_MAJORITY
+
+
+class ConsentRequest(BaseModel):
+    birth_year: int
+    accept_terms: bool
+
+
+@router.post("/consent")
+async def give_consent(
+    data: ConsentRequest,
+    current_user_id: str = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+):
+    """Terms + privacy policy acceptance and age gate, required once per account."""
+    year_now = datetime.now(timezone.utc).year
+    if not data.accept_terms:
+        raise HTTPException(status_code=400, detail="Acceptation des conditions requise")
+    if not (year_now - 110 <= data.birth_year <= year_now):
+        raise HTTPException(status_code=400, detail="Année de naissance invalide")
+    # Year only (no full date of birth collected): someone turning 13 this year is let in.
+    if year_now - data.birth_year < MIN_AGE:
+        await delete_account(current_user_id=current_user_id, db=db)
+        raise HTTPException(status_code=403, detail="too_young")
+
+    user = (await db.execute(select(User).where(User.id == current_user_id))).scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    user.birth_year = data.birth_year
+    user.privacy_accepted_at = datetime.now(timezone.utc)
+    await db.commit()
+    return {"privacy_accepted": True, "minor": _is_minor(user.birth_year)}
 
 
 @router.post("/logout")
@@ -404,5 +472,7 @@ def _user_response(user: User) -> UserResponse:
         matches_played=user.matches_played, matches_won=user.matches_won,
         best_streak=user.best_streak, current_streak=user.current_streak,
         onboarding_done=getattr(user, 'onboarding_done', False),
+        privacy_accepted=user.privacy_accepted_at is not None,
+        minor=_is_minor(user.birth_year),
         token=create_access_token(user.id, getattr(user, 'token_version', 0) or 0),
     )

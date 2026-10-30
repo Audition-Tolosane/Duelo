@@ -9,6 +9,7 @@ from schemas import ChatSend
 from services.notifications import create_notification
 from auth_middleware import get_current_user_id
 from rate_limit import rate_limit
+from routers.moderation import blocked_user_ids, is_blocked_between
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -26,6 +27,8 @@ async def send_message(data: ChatSend, current_user: str = Depends(get_current_u
         raise HTTPException(status_code=400, detail="Vous ne pouvez pas vous envoyer un message")
     if data.message_type not in ("text", "image", "game_card"):
         raise HTTPException(status_code=400, detail="Type de message invalide")
+    if await is_blocked_between(db, data.sender_id, data.receiver_id):
+        raise HTTPException(status_code=403, detail="Impossible d'envoyer un message à ce joueur")
 
     msg = ChatMessage(
         sender_id=data.sender_id, receiver_id=data.receiver_id,
@@ -90,6 +93,7 @@ async def get_conversations(user_id: str, current_user: str = Depends(get_curren
     for row in received_result:
         partner_ids.add(row[0])
 
+    partner_ids -= await blocked_user_ids(db, user_id)
     if not partner_ids:
         return []
 
@@ -157,6 +161,8 @@ async def get_conversations(user_id: str, current_user: str = Depends(get_curren
 async def get_chat_messages(user_id: str, with_user: str, limit: int = 50, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     if current_user != user_id:
         raise HTTPException(status_code=403, detail="Non autorisé")
+    if await is_blocked_between(db, user_id, with_user):
+        return []
     result = await db.execute(
         select(ChatMessage).where(
             or_(

@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 from database import get_db
 
-from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge, challenges, boosts, missions, daily_question, achievements, streak_shield, xp_multiplier, tournaments, spin, referral, league
+from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge, challenges, boosts, missions, daily_question, achievements, streak_shield, xp_multiplier, tournaments, spin, referral, league, moderation
 from schemas import QuestionReportRequest
 from models import QuestionReport
 from sqlalchemy import select
@@ -133,12 +133,23 @@ api_router.include_router(tournaments.router)
 api_router.include_router(spin.router)
 api_router.include_router(referral.router)
 api_router.include_router(league.router)
+api_router.include_router(moderation.router)
 
 # Serve avatar static files
 avatars_dir = ROOT_DIR / "static" / "avatars"
 os.makedirs(avatars_dir, exist_ok=True)
 os.makedirs(avatars_dir / "users", exist_ok=True)
 app.mount("/static/avatars", StaticFiles(directory=str(avatars_dir)), name="avatars")
+
+# Public legal pages (store listings link here).
+@app.get("/privacy", include_in_schema=False)
+async def privacy_policy():
+    return FileResponse(ROOT_DIR / "static" / "privacy.html", media_type="text/html")
+
+
+@app.get("/delete-account", include_in_schema=False)
+async def delete_account_page():
+    return FileResponse(ROOT_DIR / "static" / "delete-account.html", media_type="text/html")
 
 app.include_router(api_router)
 
@@ -254,10 +265,27 @@ async def _ensure_columns():
                 activated_at TIMESTAMPTZ DEFAULT NOW(), expires_at TIMESTAMPTZ
             )""",
             "CREATE INDEX IF NOT EXISTS ix_xp_mult_user ON xp_multiplier_activations(user_id)",
+            # Moderation (report / block)
+            """CREATE TABLE IF NOT EXISTS user_blocks (
+                id VARCHAR(36) PRIMARY KEY, blocker_id VARCHAR(36) NOT NULL,
+                blocked_id VARCHAR(36) NOT NULL, created_at TIMESTAMPTZ DEFAULT NOW(),
+                CONSTRAINT uq_user_block UNIQUE (blocker_id, blocked_id)
+            )""",
+            "CREATE INDEX IF NOT EXISTS ix_user_blocks_blocker ON user_blocks(blocker_id)",
+            "CREATE INDEX IF NOT EXISTS ix_user_blocks_blocked ON user_blocks(blocked_id)",
+            """CREATE TABLE IF NOT EXISTS content_reports (
+                id VARCHAR(36) PRIMARY KEY, reporter_id VARCHAR(36) NOT NULL,
+                target_type VARCHAR(20) NOT NULL, target_id VARCHAR(36) NOT NULL,
+                target_user_id VARCHAR(36), reason VARCHAR(30) NOT NULL, details TEXT,
+                snapshot TEXT, status VARCHAR(20) DEFAULT 'pending', created_at TIMESTAMPTZ DEFAULT NOW(),
+                CONSTRAINT uq_content_report UNIQUE (reporter_id, target_type, target_id)
+            )""",
+            "CREATE INDEX IF NOT EXISTS ix_content_reports_status ON content_reports(status)",
             # player1_streak_before on matches
             "ALTER TABLE matches ADD COLUMN IF NOT EXISTS player1_streak_before INTEGER",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_done BOOLEAN DEFAULT FALSE",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS privacy_accepted_at TIMESTAMPTZ",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS birth_year INTEGER",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS lat FLOAT",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS lng FLOAT",
             """CREATE TABLE IF NOT EXISTS theme_follows (

@@ -2,7 +2,7 @@ import secrets
 import random
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func, and_, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 from database import get_db
@@ -12,7 +12,8 @@ from constants import COUNTRY_FLAGS, SUPER_CATEGORY_META, TOTAL_QUESTIONS
 from services.xp import get_level, get_theme_title, get_streak_badge
 from i18n import theme_localise, nom_cluster, nom_theme
 from services.notifications import create_notification
-from auth_middleware import get_current_user_id
+from auth_middleware import get_current_user_id, get_optional_user_id
+from routers.moderation import blocked_user_ids, is_blocked_between
 from rate_limit import rate_limit
 
 router = APIRouter(tags=["social"])
@@ -24,9 +25,12 @@ router = APIRouter(tags=["social"])
 async def get_wall_posts(category_id: str, user_id: Optional[str] = None, limit: int = 20, offset: int = 0, db: AsyncSession = Depends(get_db)):
     limit = min(limit, 100)
     offset = min(offset, 10000)
+    q = select(WallPost).where(WallPost.category_id == category_id)
+    hidden = await blocked_user_ids(db, user_id)
+    if hidden:
+        q = q.where(WallPost.user_id.notin_(hidden))
     result = await db.execute(
-        select(WallPost).where(WallPost.category_id == category_id)
-        .order_by(WallPost.created_at.desc()).limit(limit).offset(offset)
+        q.order_by(WallPost.created_at.desc()).limit(limit).offset(offset)
     )
     posts = result.scalars().all()
 
@@ -155,10 +159,13 @@ async def add_comment(post_id: str, data: CommentCreate, current_user: str = Dep
         raise HTTPException(status_code=400, detail="Le commentaire ne peut pas être vide")
 
     comment = PostComment(user_id=data.user_id, post_id=post_id, content=data.content.strip())
-    db.add(comment)
-
     post_res = await db.execute(select(WallPost).where(WallPost.id == post_id))
     post = post_res.scalar_one_or_none()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post introuvable")
+    if post.user_id != data.user_id and await is_blocked_between(db, post.user_id, data.user_id):
+        raise HTTPException(status_code=403, detail="Action impossible")
+    db.add(comment)
     if post and post.user_id != data.user_id:
         commenter_res = await db.execute(select(User).where(User.id == data.user_id))
         commenter = commenter_res.scalar_one_or_none()
@@ -186,11 +193,39 @@ async def add_comment(post_id: str, data: CommentCreate, current_user: str = Dep
     }
 
 
+@router.delete("/wall/{post_id}")
+async def delete_wall_post(post_id: str, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    post = (await db.execute(select(WallPost).where(WallPost.id == post_id))).scalar_one_or_none()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post introuvable")
+    if post.user_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+    await db.execute(delete(PostComment).where(PostComment.post_id == post_id))
+    await db.execute(delete(PostLike).where(PostLike.post_id == post_id))
+    await db.delete(post)
+    await db.commit()
+    return {"deleted": True}
+
+
+@router.delete("/wall/comment/{comment_id}")
+async def delete_comment(comment_id: str, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    c = (await db.execute(select(PostComment).where(PostComment.id == comment_id))).scalar_one_or_none()
+    if not c:
+        raise HTTPException(status_code=404, detail="Commentaire introuvable")
+    if c.user_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+    await db.delete(c)
+    await db.commit()
+    return {"deleted": True}
+
+
 @router.get("/wall/{post_id}/comments")
-async def get_comments(post_id: str, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
-        select(PostComment).where(PostComment.post_id == post_id).order_by(PostComment.created_at.asc())
-    )
+async def get_comments(post_id: str, viewer_id: Optional[str] = Depends(get_optional_user_id), db: AsyncSession = Depends(get_db)):
+    q = select(PostComment).where(PostComment.post_id == post_id)
+    hidden = await blocked_user_ids(db, viewer_id)
+    if hidden:
+        q = q.where(PostComment.user_id.notin_(hidden))
+    result = await db.execute(q.order_by(PostComment.created_at.asc()))
     comments = result.scalars().all()
     if not comments:
         return []
@@ -859,8 +894,12 @@ async def get_home_feed(user_id: str, limit: int = 20, offset: int = 0, db: Asyn
             "xp_earned": m.xp_earned or 0, "created_at": m.created_at.isoformat(),
         })
 
+    feed_q = select(WallPost)
+    hidden = await blocked_user_ids(db, user_id)
+    if hidden:
+        feed_q = feed_q.where(WallPost.user_id.notin_(hidden))
     recent_posts = await db.execute(
-        select(WallPost).order_by(WallPost.created_at.desc()).limit(8)
+        feed_q.order_by(WallPost.created_at.desc()).limit(8)
     )
     posts = recent_posts.scalars().all()
 

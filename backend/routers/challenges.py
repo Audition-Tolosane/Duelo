@@ -32,6 +32,9 @@ async def send_challenge(request: Request, data: dict, current_user: str = Depen
         raise HTTPException(status_code=400, detail="Paramètres manquants")
     if challenger_id == challenged_id:
         raise HTTPException(status_code=400, detail="Impossible de se défier soi-même")
+    from routers.moderation import is_blocked_between
+    if await is_blocked_between(db, challenger_id, challenged_id):
+        raise HTTPException(status_code=403, detail="Impossible de défier ce joueur")
 
     # #18 — Validate theme exists when provided
     if theme_id:

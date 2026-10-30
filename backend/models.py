@@ -64,6 +64,7 @@ class User(Base):
     last_played_at = Column(DateTime(timezone=True), nullable=True)
     onboarding_done = Column(Boolean, default=False)
     privacy_accepted_at = Column(DateTime(timezone=True), nullable=True)
+    birth_year = Column(Integer, nullable=True)  # age gate: <13 refused, <15 non-personalised ads
 
     # Bot fields
     is_bot = Column(Boolean, default=False, index=True)
@@ -469,3 +470,37 @@ class XPMultiplierActivation(Base):
     source = Column(String(20), default='purchase')     # 'purchase' or 'pro'
     activated_at = Column(DateTime(timezone=True), default=utc_now)
     expires_at = Column(DateTime(timezone=True), nullable=True)  # None = permanent (pro)
+
+
+class UserBlock(Base):
+    """A player hiding another one: no chat, challenges, posts or comments between them."""
+    __tablename__ = 'user_blocks'
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    blocker_id = Column(String(36), nullable=False, index=True)
+    blocked_id = Column(String(36), nullable=False, index=True)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+
+    __table_args__ = (
+        UniqueConstraint('blocker_id', 'blocked_id', name='uq_user_block'),
+    )
+
+
+class ContentReport(Base):
+    """Player report on user-generated content (store requirement: reviewed within 24h)."""
+    __tablename__ = 'content_reports'
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    reporter_id = Column(String(36), nullable=False, index=True)
+    target_type = Column(String(20), nullable=False)   # user, post, comment, message, theme
+    target_id = Column(String(36), nullable=False, index=True)
+    target_user_id = Column(String(36), nullable=True, index=True)  # author of the content
+    reason = Column(String(30), nullable=False)        # spam, harassment, hate, sexual, violence, other
+    details = Column(Text, nullable=True)
+    snapshot = Column(Text, nullable=True)             # content as it was when reported
+    status = Column(String(20), default='pending')     # pending, resolved, dismissed
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+
+    __table_args__ = (
+        UniqueConstraint('reporter_id', 'target_type', 'target_id', name='uq_content_report'),
+    )

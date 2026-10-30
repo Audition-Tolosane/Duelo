@@ -185,6 +185,10 @@ async def handle_chat_send(sender_id: str, data: dict):
         return
 
     async with AsyncSessionLocal() as db:
+        from routers.moderation import is_blocked_between
+        if await is_blocked_between(db, sender_id, receiver_id):
+            await manager.send_to_user(sender_id, {"type": "error", "data": {"message": "Impossible d'envoyer un message à ce joueur"}})
+            return
         msg = ChatMessage(
             sender_id=sender_id, receiver_id=receiver_id,
             content=content, message_type=message_type, extra_data=extra_data,

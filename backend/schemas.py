@@ -39,6 +39,8 @@ class UserResponse(BaseModel):
     current_streak: int = 0
     mmr: float = 1000.0
     onboarding_done: bool = False
+    privacy_accepted: bool = False
+    minor: bool = False  # under 15 → non-personalised ads only
     token: Optional[str] = None
 
 class SelectTitleRequest(BaseModel):

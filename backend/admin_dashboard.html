@@ -232,6 +232,10 @@
       <span class="nav-icon">🚨</span> Signalements
       <span class="nav-badge" id="badgeReports" style="background:rgba(255,59,48,0.15);color:#FF3B30">—</span>
     </button>
+    <button class="nav-btn" onclick="showPage('moderation');loadModeration()">
+      <span class="nav-icon">🛡️</span> Modération
+      <span class="nav-badge" id="badgeModeration" style="background:rgba(255,181,71,0.15);color:#FFB547">—</span>
+    </button>
 
     <div class="sidebar-bottom">
       <button class="logout-btn" onclick="logout()">🚪 Déconnexion</button>
@@ -466,6 +470,22 @@
       </div>
     </div>
 
+    <div class="page" id="page-moderation">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="page-title">Modération</div>
+          <div class="page-subtitle">Joueurs, posts, commentaires, messages et thèmes signalés — à traiter sous 24 h</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline btn-sm" onclick="loadModeration('pending')">En attente</button>
+          <button class="btn btn-outline btn-sm" onclick="loadModeration('all')">Tous</button>
+        </div>
+      </div>
+      <div id="moderationList">
+        <div style="text-align:center;padding:32px"><div class="loading-spinner"></div></div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -518,6 +538,7 @@ async function initDashboard() {
   await loadThemesOverview();
   loadAvatars();
   loadReports('all');
+  loadModeration('pending');
   populateThemeSelect();
 }
 
@@ -970,6 +991,44 @@ function filterReports(f) {
         <button class="btn btn-sm" style="background:rgba(255,59,48,0.1);color:#FF3B30;border:none" onclick="deleteQuestion(${jsArg(rep.question_id)}, this)">🗑 Supprimer</button>
       </div>
     </div>`).join('');
+}
+
+// ── Modération (contenus joueurs signalés) ──
+const MOD_TYPES = {user:'Joueur', post:'Post', comment:'Commentaire', message:'Message privé', theme:'Thème Forge'};
+const MOD_REASONS = {spam:'Spam / arnaque', harassment:'Harcèlement', hate:'Haine', sexual:'Sexuel', violence:'Violence / menaces', other:'Autre'};
+const MOD_REMOVE = {user:'Réinitialiser le pseudo', post:'Supprimer le post', comment:'Supprimer le commentaire', message:'Supprimer le message', theme:'Supprimer le thème'};
+
+async function loadModeration(status = 'pending') {
+  const el = document.getElementById('moderationList');
+  el.innerHTML = '<div style="text-align:center;padding:32px"><div class="loading-spinner"></div></div>';
+  try {
+    const r = await apiFetch(`${API}/admin/content-reports?status=${encodeURIComponent(status)}`);
+    const list = await r.json();
+    if (status === 'pending') document.getElementById('badgeModeration').textContent = list.length;
+    if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div>Rien à traiter</div>'; return; }
+    el.innerHTML = list.map(m => `
+      <div class="report-row">
+        <span class="report-badge badge-${m.status === 'pending' ? 'pending' : 'resolved'}">${esc(MOD_TYPES[m.target_type] || m.target_type)}</span>
+        <div class="report-content">
+          <div class="report-question">${esc(m.snapshot || m.target_id)}</div>
+          <div class="report-meta">Auteur : ${esc(m.target_pseudo || '—')} · signalé par ${esc(m.reporter_pseudo || '—')} · ${esc((m.created_at || '').slice(0, 16).replace('T', ' '))}</div>
+          <div class="report-reason">${esc(MOD_REASONS[m.reason] || m.reason)}${m.details ? ' — ' + esc(m.details) : ''}</div>
+        </div>
+        ${m.status === 'pending' ? `<div style="display:flex;flex-direction:column;gap:4px">
+          <button class="btn btn-sm" style="background:rgba(255,59,48,0.1);color:#FF3B30;border:none" onclick="handleModeration(${jsArg(m.id)},'remove_content')">🗑 ${esc(MOD_REMOVE[m.target_type] || 'Retirer')}</button>
+          <button class="btn btn-sm" style="background:rgba(255,255,255,0.06);color:#A3A3A3;border:none" onclick="handleModeration(${jsArg(m.id)},'dismiss')">Ignorer</button>
+        </div>` : `<span class="report-meta">${esc(m.status === 'dismissed' ? 'Ignoré' : 'Traité')}</span>`}
+      </div>`).join('');
+  } catch { el.innerHTML = '<div class="empty-state">Erreur de chargement</div>'; }
+}
+
+async function handleModeration(id, action) {
+  try {
+    const r = await apiFetch(`${API}/admin/content-reports/${encodeURIComponent(id)}`, { method: 'POST', body: JSON.stringify({ action }) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    toast(action === 'dismiss' ? 'Signalement ignoré' : 'Contenu retiré');
+    loadModeration('pending');
+  } catch (e) { toast(e.message, true); }
 }
 
 // ── Browse & bulk delete questions ──
