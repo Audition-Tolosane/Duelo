@@ -322,3 +322,13 @@ async def save_push_token(data: dict, current_user: str = Depends(get_current_us
     user.push_token = token
     await db.commit()
     return {"status": "ok"}
+
+
+@router.get("/avatars")
+async def list_preset_avatars(db: AsyncSession = Depends(get_db)):
+    """Public preset avatar library for the profile picker (the admin route needs the admin key)."""
+    result = await db.execute(select(Avatar).order_by(Avatar.category, Avatar.created_at))
+    return {"avatars": [
+        {"id": a.id, "name": a.name, "image_url": a.image_url, "category": a.category}
+        for a in result.scalars().all()
+    ]}

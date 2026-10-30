@@ -447,6 +447,51 @@ async def handle_game_answer(user_id: str, data: dict):
         await save_game_results(room)
 
 
+async def _post_match_progress(db, player_id: str, user, theme_id: str, won: bool, correct: int, score: int):
+    """Missions, achievements and tournament — what solo matches already do in game.py.
+
+    Each part is best-effort, as in game.py (these services commit the session themselves).
+    """
+    try:
+        from services.missions import update_progress
+        await update_progress(player_id, {"type": "game_played", "theme_id": theme_id, "won": won, "correct": correct}, db)
+    except Exception as e:
+        logger.warning(f"[ws post-match] missions failed: {e}")
+
+    try:
+        from services.achievements import check_achievements
+        from constants import TOTAL_QUESTIONS
+        themes_count = (await db.execute(
+            select(func.count(func.distinct(Match.category))).where(Match.player1_id == player_id)
+        )).scalar() or 0
+        perfect = (await db.execute(
+            select(func.count(Match.id)).where(Match.player1_id == player_id, Match.player1_correct == TOTAL_QUESTIONS)
+        )).scalar() or 0
+        await check_achievements(player_id, {
+            "games_played": user.matches_played, "wins": user.matches_won,
+            "win_streak": user.current_streak, "perfect_scores": perfect,
+            "login_streak": user.login_streak or 0, "themes_played": themes_count,
+        }, db)
+    except Exception as e:
+        logger.warning(f"[ws post-match] achievements failed: {e}")
+
+    try:
+        from routers.tournaments import _get_or_create_current
+        from models import TournamentEntry
+        active_t = await _get_or_create_current(db)
+        if active_t and active_t.theme_id == theme_id:
+            entry = (await db.execute(select(TournamentEntry).where(
+                TournamentEntry.tournament_id == active_t.id, TournamentEntry.user_id == player_id,
+            ))).scalar_one_or_none()
+            if not entry:
+                db.add(TournamentEntry(tournament_id=active_t.id, user_id=player_id, score=score, games_played=1))
+            elif entry.games_played < 3:
+                entry.score += score
+                entry.games_played += 1
+    except Exception as e:
+        logger.warning(f"[ws post-match] tournament failed: {e}")
+
+
 async def save_game_results(room):
     """Save match results to database for both players."""
     results = room.get_final_results()
@@ -525,12 +570,16 @@ async def save_game_results(room):
             game_xp = base_xp + victory_bonus + perfection_bonus + giant_slayer_bonus + streak_bonus
             theme_id_for_boost = room.theme_id if room else None
             x2_bonus = game_xp if (theme_id_for_boost and await get_active_boost(player_id, theme_id_for_boost, db)) else 0
-            total_xp = game_xp + x2_bonus + daily_bonus
+            # Same purchasable multiplier as solo matches (game.py)
+            from routers.xp_multiplier import get_active_multiplier
+            xp_mult = await get_active_multiplier(player_id, db)
+            mult_bonus = round(game_xp * (xp_mult - 1.0)) if xp_mult > 1.0 else 0
+            total_xp = game_xp + x2_bonus + mult_bonus + daily_bonus
 
             xp_breakdown = {
                 "base": base_xp, "victory": victory_bonus, "perfection": perfection_bonus,
                 "giant_slayer": giant_slayer_bonus, "streak": streak_bonus,
-                "daily": daily_bonus, "x2": x2_bonus, "total": total_xp,
+                "daily": daily_bonus, "x2": x2_bonus, "mult": mult_bonus, "total": total_xp,
             }
 
             match = Match(
@@ -580,6 +629,8 @@ async def save_game_results(room):
 
             level_after = get_level(uxp.xp)
             new_title_info = check_new_title_theme(theme, level_before, level_after) if theme else None
+
+            await _post_match_progress(db, player_id, user, room.theme_id, won, correct_count, player_score)
 
             await manager.send_to_user(player_id, {
                 "type": "match_xp",
