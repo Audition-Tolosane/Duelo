@@ -33,6 +33,18 @@ import RematchModal from '../components/RematchModal';
 import ChallengeReadyModal from '../components/ChallengeReadyModal';
 import OfflineOverlay from '../components/OfflineOverlay';
 import { COLOR } from '../theme/tokens';
+import { initAds } from '../utils/ads';
+import * as Notifications from 'expo-notifications';
+import { openNotificationTarget } from '../utils/notificationRoute';
+
+// Push reçu app ouverte : bannière + son (sans handler, iOS n'affiche rien au premier plan).
+if (Platform.OS !== 'web') {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true, shouldShowList: true, shouldPlaySound: true, shouldSetBadge: false,
+    }),
+  });
+}
 
 // All stack pages that support swipe-back with transparent overlay
 const SWIPEABLE_SCREENS = [
@@ -66,9 +78,23 @@ export default function RootLayout() {
     JetBrainsMono_700Bold,
   });
 
+  // Toucher une notification push ouvre l'écran visé (app en arrière-plan ou fermée).
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    Notifications.getLastNotificationResponseAsync().then((resp) => {
+      if (resp) openNotificationTarget(resp.notification.request.content.data as any);
+    }).catch(() => {});
+    const sub = Notifications.addNotificationResponseReceivedListener((resp) => {
+      openNotificationTarget(resp.notification.request.content.data as any);
+    });
+    return () => sub.remove();
+  }, []);
+
   useEffect(() => {
     if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
+      // GDPR consent form (EEA/UK) + ads SDK start, once the UI is visible.
+      initAds();
     }
   }, [fontsLoaded, fontError]);
 
@@ -95,6 +121,7 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="admin" options={{ headerShown: false, animation: 'slide_from_bottom', contentStyle: { backgroundColor: '#000000' } }} />
           <Stack.Screen name="onboarding" options={{ headerShown: false, animation: 'fade', gestureEnabled: false }} />
+          <Stack.Screen name="consent" options={{ headerShown: false, animation: 'fade', gestureEnabled: false }} />
           {SWIPEABLE_SCREENS.map((name) => (
             <Stack.Screen key={name} name={name} options={swipeableScreenOptions} />
           ))}

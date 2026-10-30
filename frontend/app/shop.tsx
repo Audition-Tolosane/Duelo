@@ -1,3 +1,5 @@
+import { Redirect } from 'expo-router';
+import { SHOP_ENABLED } from '../utils/features';
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
 import * as Haptics from 'expo-haptics';
@@ -72,6 +74,8 @@ function Group({ titleKey, hintKey, children }: { titleKey: string; hintKey?: st
 // ── Écran ─────────────────────────────────────────────────────────────────────
 
 export default function ShopScreen() {
+  // Store release: no IAP yet → screen unreachable outside dev (see utils/features).
+  if (!SHOP_ENABLED) return <Redirect href="/" />;
   const [pending, setPending] = useState<ShopItem | null>(null);
 
   const handlePurchase = (item: ShopItem) => {

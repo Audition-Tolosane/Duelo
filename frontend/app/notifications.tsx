@@ -5,9 +5,11 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import SwipeBackPage from '../components/SwipeBackPage';
+import { openNotificationTarget } from '../utils/notificationRoute';
 import { t, getLocale } from '../utils/i18n';
 import UserAvatar from '../components/UserAvatar';
 import { authFetch } from '../utils/api';
+import { useWS } from '../contexts/WebSocketContext';
 import { Txt, Icon, IconName, IconButton, ScreenContainer, ScreenHeader, EmptyState, Loader } from '../components/ui';
 import { COLOR, SPACE, SIZE, BORDER, ICON_SIZE } from '../theme/tokens';
 
@@ -86,6 +88,7 @@ function getDateGroup(dateStr: string): string {
 
 export default function NotificationsScreen() {
   const router = useRouter();
+  const { resetNotifCount, decrementNotifs } = useWS();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -101,7 +104,7 @@ export default function NotificationsScreen() {
       if (!uid) return;
       setUserId(uid);
 
-      const res = await fetch(`${API_URL}/api/notifications/${uid}?limit=50`);
+      const res = await authFetch(`${API_URL}/api/notifications/${uid}?limit=50`);
       if (res.ok) {
         const data = await res.json();
         setNotifications(data);
@@ -130,6 +133,7 @@ export default function NotificationsScreen() {
       setNotifications(prev =>
         prev.map(n => n.id === notifId ? { ...n, read: true } : n)
       );
+      decrementNotifs();
     } catch (e) { console.error(e); }
   };
 
@@ -143,6 +147,7 @@ export default function NotificationsScreen() {
         body: JSON.stringify({ user_id: userId }),
       });
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      resetNotifCount();
     } catch (e) { console.error(e); }
   };
 
@@ -152,18 +157,7 @@ export default function NotificationsScreen() {
       markAsRead(notif.id);
     }
 
-    if (notif.data?.screen) {
-      const screen = notif.data.screen;
-      const params = notif.data.params || {};
-
-      if (screen === 'player-profile' && params.id) {
-        router.push(`/player-profile?id=${params.id}`);
-      } else if (screen === 'chat' && params.userId) {
-        router.push(`/chat?userId=${params.userId}&pseudo=${params.pseudo || ''}`);
-      } else if (screen === 'category-detail' && params.id) {
-        router.push(`/category-detail?id=${params.id}`);
-      }
-    }
+    openNotificationTarget(notif.data);
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;

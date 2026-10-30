@@ -5,6 +5,7 @@ import { useWS } from '../contexts/WebSocketContext';
 import { Wordmark, IconButton } from './ui';
 import { SIZE, SPACE } from '../theme/tokens';
 import { t } from '../utils/i18n';
+import { SHOP_ENABLED } from '../utils/features';
 
 // ── En-tête global des onglets ────────────────────────────────────────────────
 // Logotype SKILKI à gauche, 4 actions de 44 px à droite, fond transparent (le fond
@@ -25,7 +26,9 @@ export default function DueloHeader() {
 
       <View style={styles.actions}>
         <IconButton icon="search" accessibilityLabel={t('common.search')} onPress={() => go('/search')} testID="header-search" />
-        <IconButton icon="shop" accessibilityLabel={t('pilot.header.shop')} onPress={() => go('/shop')} testID="header-shop" />
+        {SHOP_ENABLED && (
+          <IconButton icon="shop" accessibilityLabel={t('pilot.header.shop')} onPress={() => go('/shop')} testID="header-shop" />
+        )}
         <IconButton
           icon="message"
           accessibilityLabel={t('conversations.title')}

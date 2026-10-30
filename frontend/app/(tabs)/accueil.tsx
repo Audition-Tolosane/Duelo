@@ -17,6 +17,8 @@ import SpinWheelModal from '../../components/SpinWheelModal';
 import SwordMark from '../../components/SwordMark';
 import { useTabBar } from '../../contexts/TabBarContext';
 import { authFetch } from '../../utils/api';
+import { showRewardedAd } from '../../utils/ads';
+import ModerationSheet from '../../components/ModerationSheet';
 import { t, getLanguage, pluralKey } from '../../utils/i18n';
 import { flushPendingScores } from '../../utils/pendingScores';
 import {
@@ -533,8 +535,8 @@ const RecordRow = React.memo(function RecordRow({ item }: { item: FeedItem }) {
 });
 
 // ── Fil : publication de la communauté ──
-const CommunityRow = React.memo(function CommunityRow({ item, onLike, onComment }: {
-  item: FeedItem; onLike: (postId: string) => void; onComment: (item: FeedItem) => void;
+const CommunityRow = React.memo(function CommunityRow({ item, onLike, onComment, onMore }: {
+  item: FeedItem; onLike: (postId: string) => void; onComment: (item: FeedItem) => void; onMore: (item: FeedItem) => void;
 }) {
   const liked = !!item.is_liked;
   return (
@@ -545,6 +547,7 @@ const CommunityRow = React.memo(function CommunityRow({ item, onLike, onComment 
           <Txt variant="cardTitle" numberOfLines={1}>{item.user_pseudo}</Txt>
           <Txt variant="caption" numberOfLines={1}>{`${item.category_name} · ${timeAgo(item.created_at)}`}</Txt>
         </View>
+        <IconButton icon="more" appearance="bare" accessibilityLabel={t('mod.more')} onPress={() => onMore(item)} />
       </View>
       <Txt variant="body">{item.content}</Txt>
       <View style={styles.feedActions}>
@@ -619,8 +622,7 @@ const OfferRow = React.memo(function OfferRow({ item, onActivate, onLaunch }: {
   const watchAdAndActivate = async () => {
     if (loading) return;
     setLoading(true);
-    // TODO: afficher vraie pub ici (AdMob rewarded)
-    await new Promise(r => setTimeout(r, 1000));
+    if (!(await showRewardedAd())) { setLoading(false); return; }
     const newExpiry = await onActivate(themeId);
     if (newExpiry) {
       setExpiresAt(newExpiry);
@@ -816,6 +818,8 @@ export default function AccueilScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  // Signaler / bloquer une publication du fil
+  const [modItem, setModItem] = useState<FeedItem | null>(null);
   const [feedError, setFeedError] = useState(false);
   const [dailyMissions, setDailyMissions] = useState<DailyMissionsState | null>(null);
   const [showThemePicker, setShowThemePicker] = useState(false);
@@ -944,7 +948,7 @@ export default function AccueilScreen() {
   }, []);
 
   const handleDoubleReward = useCallback(async () => {
-    // TODO: show rewarded ad before calling API
+    if (!(await showRewardedAd())) return;
     const res = await authFetch(`${API_URL}/api/missions/double`, { method: 'POST' });
     if (res.ok) {
       const d = await res.json();
@@ -953,7 +957,7 @@ export default function AccueilScreen() {
   }, []);
 
   const handleRerollMission = useCallback(async (missionId: string) => {
-    // TODO: show rewarded ad before calling API
+    if (!(await showRewardedAd())) return;
     const res = await authFetch(`${API_URL}/api/missions/reroll/${missionId}`, { method: 'POST' });
     if (res.ok) {
       const d = await res.json();
@@ -1084,7 +1088,7 @@ export default function AccueilScreen() {
   }, [offerSlotExpiresAt]);
 
   const handleRefreshOffers = useCallback(async () => {
-    // TODO: show rewarded ad before calling API
+    if (!(await showRewardedAd())) return;
     try {
       const res = await authFetch(`${API_URL}/api/boosts/refresh-offers`, { method: 'POST' });
       if (res.ok) await loadFeed();
@@ -1704,7 +1708,7 @@ export default function AccueilScreen() {
               {item.type === 'record' ? (
                 <RecordRow item={item} />
               ) : (
-                <CommunityRow item={item} onLike={handleLike} onComment={handleComment} />
+                <CommunityRow item={item} onLike={handleLike} onComment={handleComment} onMore={(it) => { if (it.user_id !== userId) setModItem(it); }} />
               )}
             </View>
           ))
@@ -1751,6 +1755,15 @@ export default function AccueilScreen() {
           />
         ))}
       </BottomSheet>
+
+      <ModerationSheet
+        visible={!!modItem}
+        onClose={() => setModItem(null)}
+        target={modItem?.post_id ? { type: 'post', id: modItem.post_id } : null}
+        authorId={modItem?.user_id}
+        isOwn={!!modItem?.user_id && modItem.user_id === userId}
+        onBlockedChange={(b) => { const a = modItem?.user_id; if (b && a) setSocialFeed((prev) => prev.filter((f) => f.user_id !== a)); }}
+      />
     </View>
   );
 }

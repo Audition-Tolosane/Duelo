@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { dueloWS } from '../services/websocket';
 import { useWS } from '../contexts/WebSocketContext';
 import { Txt, Icon } from './ui';
 import { COLOR, SPACE, RADII, BORDER } from '../theme/tokens';
@@ -13,21 +13,11 @@ const SHOW_DELAY_MS = 1800;
 
 export default function OfflineOverlay() {
   const { isConnected } = useWS();
-  const [loggedIn, setLoggedIn] = useState(false);
   const [visible, setVisible] = useState(false);
   const wasConnectedRef = useRef(false);
   const showTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const pulseAnim = useRef(new Animated.Value(0.4)).current;
-
-  // Savoir si on a un utilisateur logué (sinon on est sur onboarding/index).
-  useEffect(() => {
-    let mounted = true;
-    AsyncStorage.getItem('duelo_user_id').then((id) => {
-      if (mounted) setLoggedIn(!!id);
-    });
-    return () => { mounted = false; };
-  }, []);
 
   useEffect(() => {
     if (isConnected) wasConnectedRef.current = true;
@@ -37,6 +27,11 @@ export default function OfflineOverlay() {
       showTimerRef.current = null;
     }
 
+    // Logué = la socket a un joueur. Lu à chaque changement (et non une fois au
+    // montage) : après une déconnexion volontaire, disconnect() remet l'id à null
+    // et l'overlay ne doit plus recouvrir l'écran de connexion.
+    const loggedIn = !!dueloWS.currentUserId;
+    if (!loggedIn) wasConnectedRef.current = false;
     const shouldShow = loggedIn && wasConnectedRef.current && !isConnected;
     if (shouldShow) {
       showTimerRef.current = setTimeout(() => setVisible(true), SHOW_DELAY_MS);
@@ -47,7 +42,7 @@ export default function OfflineOverlay() {
     return () => {
       if (showTimerRef.current) clearTimeout(showTimerRef.current);
     };
-  }, [isConnected, loggedIn]);
+  }, [isConnected]);
 
   // Pulse du point « Reconnexion… »
   useEffect(() => {

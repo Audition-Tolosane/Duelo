@@ -4,9 +4,9 @@
     "slug": "duelo-v7sn6v",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon-v2.png",
+    "icon": "./assets/images/icon-skilki.png",
     "scheme": "duelo",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -24,16 +24,22 @@
           "zh-Hans"
         ],
         "CFBundleDevelopmentRegion": "fr"
-      }
+      },
+      "bundleIdentifier": "com.skilki.app",
+      "buildNumber": "1",
+      "usesAppleSignIn": true
     },
     "android": {
+      "package": "com.skilki.app",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon-v2.png",
-        "backgroundColor": "#000000"
+        "foregroundImage": "./assets/images/adaptive-icon-skilki.png",
+        "backgroundColor": "#071F26"
       },
-      "permissions": [
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
+      "permissions": [],
+      "blockedPermissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
       ]
     },
     "web": {
@@ -46,10 +52,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-duelo.png",
+          "image": "./assets/images/splash-skilki.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#000000"
+          "backgroundColor": "#071F26"
         }
       ],
       "expo-font",
@@ -58,7 +64,25 @@
       "expo-status-bar",
       "expo-web-browser",
       "expo-audio",
-      "expo-asset"
+      "expo-asset",
+      "expo-apple-authentication",
+      "expo-notifications",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Partage des photos dans le mur communautaire",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511",
+          "delayAppMeasurementInit": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

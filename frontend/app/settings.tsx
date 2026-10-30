@@ -7,6 +7,8 @@ import { authFetch, clearToken } from '../utils/api';
 import { dueloWS } from '../services/websocket';
 import { setSoundEnabled, isSoundEnabled } from '../utils/sounds';
 import { t } from '../utils/i18n';
+import { privacyOptionsRequired, showPrivacyOptions } from '../utils/ads';
+import * as WebBrowser from 'expo-web-browser';
 import { Txt, Icon, Button, Badge, Card, Dialog, ScreenContainer, ScreenHeader, ListRow } from '../components/ui';
 import { COLOR, SPACE, RADII, BORDER, ICON_SIZE } from '../theme/tokens';
 
@@ -58,7 +60,10 @@ export default function SettingsScreen() {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
 
+  const [privacyChoices, setPrivacyChoices] = useState(false);
+
   useEffect(() => { loadReferral(); }, []);
+  useEffect(() => { privacyOptionsRequired().then(setPrivacyChoices); }, []);
 
   const loadReferral = async () => {
     try {
@@ -79,9 +84,11 @@ export default function SettingsScreen() {
   };
 
   const handleLogout = async () => {
+    // Révoque le token côté serveur (tous les appareils) avant de l'oublier ici.
+    await authFetch(`${API_URL}/api/auth/logout`, { method: 'POST' }).catch(() => {});
     dueloWS.disconnect();
     await clearToken();
-    await AsyncStorage.multiRemove(['duelo_user_id', 'duelo_pseudo', 'duelo_avatar_seed', 'duelo_avatar_url']);
+    await AsyncStorage.multiRemove(['duelo_user_id', 'duelo_pseudo', 'duelo_avatar_seed', 'duelo_avatar_url', 'duelo_consent', 'duelo_ads_npa']);
     router.replace('/');
   };
 
@@ -203,6 +210,14 @@ export default function SettingsScreen() {
           <ListRow leadingIcon="message" title={t('settings.support')} onPress={() => router.push('/support')} />
           <Divider />
           <ListRow leadingIcon="book" title={t('settings.terms')} onPress={() => router.push('/terms')} />
+          <Divider />
+          <ListRow leadingIcon="shield" title={t('settings.privacy_policy')} onPress={() => WebBrowser.openBrowserAsync(`${API_URL}/privacy`)} />
+          {privacyChoices && (
+            <>
+              <Divider />
+              <ListRow leadingIcon="shield" title={t('settings.privacy_choices')} onPress={showPrivacyOptions} />
+            </>
+          )}
         </Group>
 
         {/* ── Compte ── */}

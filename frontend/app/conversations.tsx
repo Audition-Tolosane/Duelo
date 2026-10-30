@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { t, getLocale } from '../utils/i18n';
+import { authFetch } from '../utils/api';
 import SwipeBackPage from '../components/SwipeBackPage';
 import UserAvatar from '../components/UserAvatar';
 import { useWS } from '../contexts/WebSocketContext';
@@ -80,7 +81,7 @@ export default function ConversationsScreen() {
       const pseudo = await AsyncStorage.getItem('duelo_pseudo');
       if (pseudo) setMyPseudo(pseudo);
       if (!uid) { setLoading(false); return; }
-      const res = await fetch(`${API_URL}/api/chat/conversations/${uid}`);
+      const res = await authFetch(`${API_URL}/api/chat/conversations/${uid}`);
       if (res.ok) {
         const data = await res.json();
         setConversations(data);

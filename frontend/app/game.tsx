@@ -50,7 +50,18 @@ type Question = {
   question_text: string;
   options: string[];
   correct_option: number;
+  difficulty?: string; // 'Facile' | 'Moyen' | 'Difficile'
 };
+
+// Hash FNV-1a → [0, 1) : traits stables d'un bot (affinité par thème, forme du jour)
+function botHash01(s: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0) / 4294967296;
+}
 
 // ── Présentation ──
 const LETTERS = ['A', 'B', 'C', 'D'];
@@ -533,40 +544,58 @@ export default function GameScreen() {
 
   const resolveBotAnswer = (question: Question) => {
     // Use real bot stats from DB if available, otherwise fall back to defaults
-    const skillLevel = parseFloat(params.botSkill || '') || 0.55;
-    const avgSpeed   = parseFloat(params.botSpeed || '') || 5.0;
+    const baseSkill = parseFloat(params.botSkill || '') || 0.55;
+    const avgSpeed  = parseFloat(params.botSpeed || '') || 5.0;
+    const pseudo    = params.opponentPseudo || '';
 
-    const botCorrect = Math.random() < skillLevel;
+    // Un humain n'a pas le même niveau partout : affinité stable par (bot, thème)
+    // ±0,12, plus une « forme du jour » ±0,04. Déterministe → le même bot reste
+    // fort (ou faible) sur un thème donné d'un match à l'autre.
+    const themeAffinity = (botHash01(`${pseudo}|${params.category}`) - 0.5) * 0.24;
+    const dayForm = (botHash01(`${pseudo}|${new Date().toISOString().slice(0, 10)}`) - 0.5) * 0.08;
+    // Seul le palier Facile est fiable (audit SCREEN 28/07) : Moyen ≈ Difficile.
+    const diffMod = question.difficulty === 'Facile' ? 0.10 : question.difficulty === 'Difficile' ? -0.05 : 0;
+    const pCorrect = Math.max(0.05, Math.min(0.97, baseSkill + themeAffinity + dayForm + diffMod));
 
-    // Realistic time distribution: base ± wide variance, occasional outliers
-    const r = Math.random();
-    let botTimeSec: number;
-    if (r < 0.08) {
-      // ~8%: very fast (snap answer)
-      botTimeSec = avgSpeed * (0.25 + Math.random() * 0.20);
-    } else if (r < 0.15) {
-      // ~7%: slow / hesitant
-      botTimeSec = avgSpeed * (1.4 + Math.random() * 0.8);
-    } else {
-      // Normal range with ±50% variance (wider than before)
-      botTimeSec = avgSpeed * (0.55 + Math.random() * 0.90);
-    }
-    // Étirement proportionnel sur les questions longues — le bot « lit » lui
-    // aussi, sinon sa rapidité trahirait sa nature sur les pavés.
     const qDuration = getQuestionDuration(question);
-    botTimeSec = botTimeSec * (qDuration / TIMER_DURATION);
-    botTimeSec = Math.max(0.6, Math.min(qDuration - 1, botTimeSec));
+    const readScale = qDuration / TIMER_DURATION; // le bot « lit » lui aussi les pavés
+
+    // Rare non-réponse (laisse filer le chrono), plus fréquente chez les faibles
+    if (Math.random() < 0.06 * (1 - pCorrect)) {
+      return { botPick: -1, botPts: 0, botTimeMs: qDuration * 1000 };
+    }
+
+    const botCorrect = Math.random() < pCorrect;
+
+    // Temps log-normal (asymétrique : beaucoup de réponses autour de la moyenne,
+    // une traîne d'hésitations). Une erreur prend en moyenne plus de temps,
+    // une question facile moins.
+    const gauss = Math.sqrt(-2 * Math.log(1 - Math.random())) * Math.cos(2 * Math.PI * Math.random());
+    let botTimeSec = avgSpeed * Math.exp(0.38 * gauss - 0.07);
+    if (!botCorrect) botTimeSec *= 1.25;
+    if (question.difficulty === 'Facile') botTimeSec *= 0.85;
+    botTimeSec *= readScale;
+    botTimeSec = Math.max(1.1 * readScale, Math.min(qDuration - 0.4, botTimeSec));
     const botTimeMs = Math.round(botTimeSec * 1000);
 
     if (botCorrect) {
       const speedBonus = Math.max(0, Math.round(10 * (1 - botTimeMs / 10000)));
       return { botPick: question.correct_option, botPts: Math.max(10 + speedBonus, 10), botTimeMs };
     }
-    // Wrong answer: slight positional bias (humans don't pick uniformly)
-    const wrongOpts = [0, 1, 2, 3].filter(i => i !== question.correct_option);
-    // Weight first wrong option slightly higher (~45%), others equal
-    const rw = Math.random();
-    const botPick = rw < 0.45 ? wrongOpts[0] : wrongOpts[1 + Math.floor(Math.random() * (wrongOpts.length - 1))];
+    // Erreur humaine = leurre plausible : on pondère les mauvaises options par
+    // leur proximité de longueur avec la bonne réponse (proxy de vraisemblance).
+    const correctLen = (question.options[question.correct_option] || '').length || 1;
+    const wrongOpts = [0, 1, 2, 3].filter(i => i !== question.correct_option && i < question.options.length);
+    const weights = wrongOpts.map(i => {
+      const len = (question.options[i] || '').length || 1;
+      return 1 / (1 + Math.abs(Math.log(len / correctLen)) * 2);
+    });
+    let rw = Math.random() * weights.reduce((a, b) => a + b, 0);
+    let botPick = wrongOpts[wrongOpts.length - 1];
+    for (let k = 0; k < wrongOpts.length; k++) {
+      rw -= weights[k];
+      if (rw <= 0) { botPick = wrongOpts[k]; break; }
+    }
     return { botPick, botPts: 0, botTimeMs };
   };
 

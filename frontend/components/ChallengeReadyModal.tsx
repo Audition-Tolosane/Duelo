@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, usePathname } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useWS } from '../contexts/WebSocketContext';
@@ -10,12 +10,18 @@ import { Txt, Button, Dialog, ThemeIcon } from './ui';
 import { COLOR, SPACE, RADII, BORDER, ICON_SIZE } from '../theme/tokens';
 
 const TIMEOUT_SECONDS = 30;
+// Écrans où le joueur est en pleine partie : on ne l'interrompt pas (le défi reste dans les notifs et sur l'Accueil).
+const IN_GAME_SCREENS = ['/game', '/matchmaking'];
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 // This modal is for Player B (the challenged player) receiving a real-time challenge
 export default function ChallengeReadyModal() {
   const { on } = useWS();
   const router = useRouter();
+  const pathname = usePathname();
+  // Lu dans le handler WS (abonné une seule fois) : un ref évite une valeur figée.
+  const pathnameRef = useRef(pathname);
+  pathnameRef.current = pathname;
 
   const [visible, setVisible] = useState(false);
   const [challengerPseudo, setChallengerPseudo] = useState('');
@@ -47,6 +53,7 @@ export default function ChallengeReadyModal() {
       // challenge_incoming = Player B receives a real-time challenge from Player A
       on('challenge_incoming', (msg: any) => {
         const data = msg.data || {};
+        if (IN_GAME_SCREENS.includes(pathnameRef.current)) return;
         setChallengerPseudo(data.challenger_pseudo || t('pilot.challenge.someone'));
         setThemeName(data.theme_name || '');
         setChallengeId(data.challenge_id || '');
@@ -133,6 +140,7 @@ export default function ChallengeReadyModal() {
   return (
     <Dialog
       visible
+      fullWindow
       onClose={handleDecline}
       dismissable={false}
       icon="duel"

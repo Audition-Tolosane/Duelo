@@ -114,6 +114,7 @@ export default function RematchModal() {
   return (
     <Dialog
       visible
+      fullWindow
       onClose={handleDecline}
       dismissable={false}
       icon="replay"

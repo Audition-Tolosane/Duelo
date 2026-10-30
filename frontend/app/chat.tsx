@@ -8,8 +8,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import { t, getLocale } from '../utils/i18n';
+import { authFetch } from '../utils/api';
 import SwipeBackPage from '../components/SwipeBackPage';
 import UserAvatar from '../components/UserAvatar';
+import ModerationSheet from '../components/ModerationSheet';
+import { fetchBlockedIds } from '../utils/moderation';
+import type { ReportTarget } from '../utils/moderation';
 import { useWS } from '../contexts/WebSocketContext';
 import {
   Txt, Icon, Button, IconButton, BackButton, Badge, Card, Chip, ScreenContainer, EmptyState, Loader, ThemeIcon,
@@ -60,6 +64,9 @@ export default function ChatScreen() {
   const [sending, setSending] = useState(false);
   const [showImageOptions, setShowImageOptions] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [modTarget, setModTarget] = useState<{ type: ReportTarget; id: string } | null>(null);
+  const [blocked, setBlocked] = useState(false);
+  useEffect(() => { fetchBlockedIds().then((ids) => setBlocked(ids.has(String(partnerId)))); }, [partnerId]);
   const flatListRef = useRef<FlatList>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -119,9 +126,10 @@ export default function ChatScreen() {
 
   const fetchMessages = async (uid: string) => {
     try {
-      const res = await fetch(`${API_URL}/api/chat/${uid}/messages?with_user=${partnerId}`);
+      const res = await authFetch(`${API_URL}/api/chat/${uid}/messages?with_user=${partnerId}`);
+      if (!res.ok) return;
       const data = await res.json();
-      setMessages(data);
+      if (Array.isArray(data)) setMessages(data);
     } catch (e) { console.error(e); }
   };
 
@@ -257,6 +265,8 @@ export default function ChatScreen() {
   // ── Message ──
   const renderMessage = ({ item, index }: { item: Message; index: number }) => {
     const isMe = item.sender_id === myId;
+    // Appui long sur un message reçu → le signaler
+    const onLongPress = isMe ? undefined : () => setModTarget({ type: 'message', id: item.id });
     const msgType = item.message_type || 'text';
     const fg = isMe ? COLOR.text.onAction : COLOR.text.primary;
     const timeColor = isMe ? COLOR.text.onAction : COLOR.text.tertiary;
@@ -282,7 +292,7 @@ export default function ChatScreen() {
             <UserAvatar avatarUrl={partnerAvatarUrl || undefined} avatarSeed={partnerAvatarSeed || partnerPseudo || ''} pseudo={partnerPseudo || '?'} size={30} />
           )}
 
-          <View style={st.msgContent}>
+          <Pressable style={st.msgContent} onLongPress={onLongPress} delayLongPress={350} disabled={!onLongPress}>
             {msgType === 'game_card' && item.extra_data ? (
               <GameCard data={item.extra_data} isMe={isMe} />
             ) : (
@@ -296,7 +306,7 @@ export default function ChatScreen() {
                 </View>
               </View>
             )}
-          </View>
+          </Pressable>
         </View>
       </View>
     );
@@ -351,6 +361,7 @@ export default function ChatScreen() {
           style={st.challengeBtn}
           onPress={() => router.push(`/player-profile?id=${partnerId}`)}
         />
+        <IconButton icon="more" accessibilityLabel={t('mod.more')} onPress={() => setModTarget({ type: 'user', id: String(partnerId) })} testID="chat-more" />
       </View>
 
       <KeyboardAvoidingView style={st.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -418,6 +429,14 @@ export default function ChatScreen() {
           />
         </View>
       </KeyboardAvoidingView>
+      <ModerationSheet
+        visible={!!modTarget}
+        onClose={() => setModTarget(null)}
+        target={modTarget}
+        authorId={String(partnerId)}
+        isBlocked={blocked}
+        onBlockedChange={(b) => { setBlocked(b); if (b) router.back(); }}
+      />
     </ScreenContainer>
     </SwipeBackPage>
   );

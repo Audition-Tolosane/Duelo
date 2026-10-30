@@ -60,7 +60,7 @@ export default function NotificationSettingsScreen() {
       if (!uid) return;
       setUserId(uid);
 
-      const res = await fetch(`${API_URL}/api/notifications/${uid}/settings`);
+      const res = await authFetch(`${API_URL}/api/notifications/${uid}/settings`);
       if (res.ok) {
         const data = await res.json();
         setSettings(data);

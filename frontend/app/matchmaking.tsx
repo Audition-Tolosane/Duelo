@@ -474,7 +474,11 @@ export default function MatchmakingScreen() {
       const res = await authFetch(`${API_URL}/api/game/matchmaking-v2`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ theme_id: category, player_id: userId }),
+        body: JSON.stringify({
+          theme_id: category, player_id: userId,
+          // Revanche contre un bot : le serveur ressert le même bot (avatar, pays, niveau, skill)
+          ...(isRematch && rematchBotPseudo ? { bot_pseudo: String(rematchBotPseudo) } : {}),
+        }),
       });
       if (!res.ok) {
         if (res.status === 401) {
@@ -490,12 +494,11 @@ export default function MatchmakingScreen() {
         return;
       }
       const data = await res.json();
-      console.log('[fetchBotOpponent] opponent:', data.opponent?.pseudo, '| category:', category);
       let opp: OpponentData = data.opponent ?? FALLBACK_BOT;
-      // Revanche contre un bot : on garde l'identité de l'adversaire du match précédent,
-      // sinon « Revanche » ferait affronter quelqu'un d'autre.
-      if (isRematch && rematchBotPseudo) {
-        opp = { ...opp, pseudo: decodeURIComponent(rematchBotPseudo), avatar_seed: rematchBotSeed || opp.avatar_seed };
+      // Revanche contre un bot de secours (absent de la DB) : le serveur n'a pas pu le
+      // retrouver, on garde au moins le pseudo du match précédent.
+      if (isRematch && rematchBotPseudo && opp.pseudo !== String(rematchBotPseudo)) {
+        opp = { ...opp, pseudo: String(rematchBotPseudo), avatar_seed: rematchBotSeed || opp.avatar_seed };
       }
       setOpponent(opp);
       setPlayerInfo(data.player ?? { level: 1, title: '' });

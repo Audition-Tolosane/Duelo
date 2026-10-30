@@ -6,6 +6,8 @@ import * as Haptics from 'expo-haptics';
 import { authFetch } from '../utils/api';
 import { t, getLocale, getLanguage } from '../utils/i18n';
 import SwipeBackPage from '../components/SwipeBackPage';
+import ModerationSheet from '../components/ModerationSheet';
+import { fetchBlockedIds } from '../utils/moderation';
 import UserAvatar from '../components/UserAvatar';
 import {
   Txt, Icon, IconName, Button, IconButton, Card, Chip, Section, ListRow, Loader, BottomSheet,
@@ -94,11 +96,15 @@ export default function PlayerProfileScreen() {
     my_score: number; opponent_score: number; won: boolean; played_at: string;
   }[]>([]);
 
+  const [modOpen, setModOpen] = useState(false);
+  const [blocked, setBlockedState] = useState(false);
+
   useEffect(() => { init(); }, []);
 
   const init = async () => {
     const uid = await AsyncStorage.getItem('duelo_user_id');
     if (uid) setMyId(uid);
+    if (uid && uid !== id) fetchBlockedIds().then((ids) => setBlockedState(ids.has(String(id))));
     const loaded = await fetchProfile(uid || '');
     if (uid && uid !== id) {
       fetchVsStats(uid);
@@ -113,7 +119,7 @@ export default function PlayerProfileScreen() {
 
   const fetchVsStats = async (viewerId: string) => {
     try {
-      const res = await fetch(`${API_URL}/api/challenges/vs-stats?user_id=${viewerId}&opponent_id=${id}`);
+      const res = await authFetch(`${API_URL}/api/challenges/vs-stats?user_id=${viewerId}&opponent_id=${id}`);
       if (res.ok) setVsStats(await res.json());
     } catch (e) { console.error(e); }
   };
@@ -310,7 +316,12 @@ export default function PlayerProfileScreen() {
   return (
     <SwipeBackPage>
     <ScreenContainer>
-      <ScreenHeader title={t('pilot.player.title')} />
+      <ScreenHeader
+        title={t('pilot.player.title')}
+        right={!isOwnProfile ? (
+          <IconButton icon="more" accessibilityLabel={t('mod.more')} onPress={() => setModOpen(true)} testID="player-more" />
+        ) : undefined}
+      />
       <ScrollView
         contentContainerStyle={s.scroll}
         showsVerticalScrollIndicator={false}
@@ -600,6 +611,14 @@ export default function PlayerProfileScreen() {
           })}
         </View>
       </BottomSheet>
+      <ModerationSheet
+        visible={modOpen}
+        onClose={() => setModOpen(false)}
+        target={{ type: 'user', id: profile.id }}
+        authorId={profile.id}
+        isBlocked={blocked}
+        onBlockedChange={setBlockedState}
+      />
     </ScreenContainer>
     </SwipeBackPage>
   );

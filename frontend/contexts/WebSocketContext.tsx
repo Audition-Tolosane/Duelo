@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback, use
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState } from 'react-native';
 import { dueloWS } from '../services/websocket';
+import { authFetch } from '../utils/api';
 
 type WebSocketContextType = {
   isConnected: boolean;
@@ -15,6 +16,8 @@ type WebSocketContextType = {
   decrementUnread: (count?: number) => void;
   /** Reset unread notifications count */
   resetNotifCount: () => void;
+  /** Decrement unread notifications count (when user reads one notification) */
+  decrementNotifs: (count?: number) => void;
 };
 
 const WebSocketContext = createContext<WebSocketContextType>({
@@ -25,6 +28,7 @@ const WebSocketContext = createContext<WebSocketContextType>({
   on: () => () => {},
   decrementUnread: () => {},
   resetNotifCount: () => {},
+  decrementNotifs: () => {},
 });
 
 export function useWS() {
@@ -101,8 +105,8 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const _doFetchUnreadCounts = async (userId: string) => {
     try {
       const [msgRes, notifRes] = await Promise.all([
-        fetch(`${API_URL}/api/chat/unread-count/${userId}`),
-        fetch(`${API_URL}/api/notifications/${userId}/unread-count`),
+        authFetch(`${API_URL}/api/chat/unread-count/${userId}`),
+        authFetch(`${API_URL}/api/notifications/${userId}/unread-count`),
       ]);
       const msgData = await msgRes.json();
       const notifData = await notifRes.json();
@@ -127,10 +131,14 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     setUnreadNotifs(0);
   }, []);
 
+  const decrementNotifs = useCallback((count = 1) => {
+    setUnreadNotifs((prev) => Math.max(0, prev - count));
+  }, []);
+
   return (
     <WebSocketContext.Provider value={{
       isConnected, unreadMessages, unreadNotifs,
-      send, on, decrementUnread, resetNotifCount,
+      send, on, decrementUnread, resetNotifCount, decrementNotifs,
     }}>
       {children}
     </WebSocketContext.Provider>

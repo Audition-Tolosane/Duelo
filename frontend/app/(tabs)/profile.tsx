@@ -566,7 +566,7 @@ export default function ProfileScreen() {
     setShowAvatarModal(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
-      const res = await fetch(`${API_URL}/api/admin/avatars`);
+      const res = await fetch(`${API_URL}/api/avatars`);
       const data = await res.json();
       setPresetAvatars(data.avatars || []);
     } catch (e) { console.error(e); }

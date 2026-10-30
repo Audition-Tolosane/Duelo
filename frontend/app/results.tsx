@@ -10,6 +10,7 @@ import Reanimated, {
   useSharedValue, useAnimatedStyle, withTiming, withDelay, withSequence, Easing, useReducedMotion,
 } from 'react-native-reanimated';
 import { authFetch } from '../utils/api';
+import { showRewardedAd } from '../utils/ads';
 import { playSound } from '../utils/sounds';
 import { setResultsOpponent } from '../utils/rematchState';
 import SwipeBackPage from '../components/SwipeBackPage';
@@ -100,7 +101,6 @@ export default function ResultsScreen() {
   const [matchId, setMatchId] = useState<string | null>(null);
   const [streakBefore, setStreakBefore] = useState(0);
   const [adWatching, setAdWatching] = useState(false);
-  const [adCountdown, setAdCountdown] = useState(3);
   const [streakRestored, setStreakRestored] = useState(false);
 
   // Unified rewards modal
@@ -361,13 +361,9 @@ export default function ResultsScreen() {
   const watchAdAndRestoreStreak = async () => {
     if (!matchId) return;
     setAdWatching(true);
-    setAdCountdown(3);
-    // Fake ad countdown
-    for (let i = 3; i > 0; i--) {
-      setAdCountdown(i);
-      await new Promise(r => setTimeout(r, 1000));
-    }
+    const watched = await showRewardedAd();
     setAdWatching(false);
+    if (!watched) return;
     try {
       const res = await authFetch(`${API_URL}/api/game/restore-streak`, {
         method: 'POST',
@@ -807,7 +803,6 @@ export default function ResultsScreen() {
               reward={r}
               streakRestored={streakRestored}
               adWatching={adWatching}
-              adCountdown={adCountdown}
               onWatchAd={watchAdAndRestoreStreak}
             />
           ))}
@@ -927,11 +922,10 @@ type RewardRowProps = {
   reward: Reward;
   streakRestored: boolean;
   adWatching: boolean;
-  adCountdown: number;
   onWatchAd: () => void;
 };
 
-function RewardRow({ reward, streakRestored, adWatching, adCountdown, onWatchAd }: RewardRowProps) {
+function RewardRow({ reward, streakRestored, adWatching, onWatchAd }: RewardRowProps) {
   const disc = (name: IconName, color: string) => (
     <View style={s.rewardDisc}><Icon name={name} size={ICON_SIZE.lg} color={color} /></View>
   );
@@ -981,7 +975,6 @@ function RewardRow({ reward, streakRestored, adWatching, adCountdown, onWatchAd 
             ) : adWatching ? (
               <>
                 <Txt variant="overline">{t('results.ad_watching')}</Txt>
-                <Txt variant="statMedium">{adCountdown}</Txt>
               </>
             ) : (
               <>

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal as RNModal, View, Pressable, StyleSheet } from 'react-native';
+import { Modal as RNModal, View, Pressable, StyleSheet, Platform } from 'react-native';
+import { FullWindowOverlay } from 'react-native-screens';
 import Txt from './Txt';
 import Icon, { IconName } from './Icon';
 import { COLOR, RADII, SPACE, ELEVATION } from '../../theme/tokens';
@@ -16,6 +17,11 @@ type Props = {
   actions?: React.ReactNode;
   children?: React.ReactNode;
   dismissable?: boolean;
+  /**
+   * Alerte globale (défi, revanche) montée à la racine : sur iOS, un Modal RN ne peut pas se
+   * présenter par-dessus les écrans en modal natif (notifs, profil, chat…). FullWindowOverlay passe au-dessus de tout.
+   */
+  fullWindow?: boolean;
 };
 
 const ICON_TONE = {
@@ -26,9 +32,8 @@ const ICON_TONE = {
 };
 
 // Modale centrée unique : voile nuit 85 %, surface pétrole, rayon 24.
-export default function Dialog({ visible, onClose, title, message, icon, tone = 'neutral', actions, children, dismissable = true }: Props) {
-  return (
-    <RNModal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
+export default function Dialog({ visible, onClose, title, message, icon, tone = 'neutral', actions, children, dismissable = true, fullWindow = false }: Props) {
+  const content = (
       <Pressable style={styles.scrim} onPress={dismissable ? onClose : undefined} accessibilityLabel="close">
         <Pressable style={styles.card} onPress={() => {}} accessibilityViewIsModal>
           {icon ? (
@@ -42,6 +47,20 @@ export default function Dialog({ visible, onClose, title, message, icon, tone = 
           {actions ? <View style={styles.actions}>{actions}</View> : null}
         </Pressable>
       </Pressable>
+  );
+
+  if (fullWindow && Platform.OS === 'ios') {
+    if (!visible) return null;
+    return (
+      <FullWindowOverlay>
+        <View style={StyleSheet.absoluteFill}>{content}</View>
+      </FullWindowOverlay>
+    );
+  }
+
+  return (
+    <RNModal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
+      {content}
     </RNModal>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View, TextInput, Pressable, ScrollView, StyleSheet, Animated, Easing,
-  KeyboardAvoidingView, Platform, Keyboard, ActivityIndicator,
+  KeyboardAvoidingView, Platform, Keyboard, ActivityIndicator, Image,
 } from 'react-native';
 import { Wordmark, Txt, Icon, Button, Chip, ScreenContainer, Loader } from '../components/ui';
 import Svg, { Path } from 'react-native-svg';
@@ -92,7 +92,7 @@ export default function WelcomeScreen() {
     try {
       const [userId, onboardingDone] = await AsyncStorage.multiGet(['duelo_user_id', 'duelo_onboarding_done']);
       if (userId[1]) {
-        router.replace(onboardingDone[1] ? '/(tabs)/play' : '/onboarding');
+        await goAfterAuth(onboardingDone[1] ? '/(tabs)/play' : '/onboarding');
         return;
       }
     } catch (e) { console.error(e); }
@@ -127,8 +127,19 @@ export default function WelcomeScreen() {
     setChecking(false);
   };
 
+  // CGU + âge pas encore acceptés sur ce compte → écran de consentement d'abord.
+  const goAfterAuth = async (target: string) => {
+    const consent = await AsyncStorage.getItem('duelo_consent');
+    router.replace((consent ? target : `/consent?next=${encodeURIComponent(target)}`) as any);
+  };
+
   const saveUserData = async (data: any) => {
     if (data.token) await saveToken(data.token);
+    if (data.privacy_accepted) {
+      await AsyncStorage.multiSet([['duelo_consent', '1'], ['duelo_ads_npa', data.minor ? '1' : '0']]);
+    } else {
+      await AsyncStorage.removeItem('duelo_consent');
+    }
     await AsyncStorage.setItem('duelo_user_id', data.id);
     await AsyncStorage.setItem('duelo_pseudo', data.pseudo);
     await AsyncStorage.setItem('duelo_avatar_seed', data.avatar_seed);
@@ -150,7 +161,7 @@ export default function WelcomeScreen() {
       const data = await res.json();
       if (!res.ok) { setError(data.detail || t('welcome.server_error')); setLoading(false); return; }
       await saveUserData(data);
-      router.replace('/onboarding');
+      await goAfterAuth('/onboarding');
     } catch {
       setError(t('welcome.network_error'));
     }
@@ -184,7 +195,7 @@ export default function WelcomeScreen() {
       const data = await res.json();
       if (!res.ok) { setError(data.detail || t('welcome.server_error')); setLoading(false); return; }
       await saveUserData(data);
-      router.replace(data.onboarding_done ? '/(tabs)/play' : '/onboarding');
+      await goAfterAuth(data.onboarding_done ? '/(tabs)/play' : '/onboarding');
     } catch {
       setError(t('welcome.network_error'));
     }
@@ -201,7 +212,7 @@ export default function WelcomeScreen() {
       const data = await res.json();
       if (!res.ok) { setError(data.detail || t('welcome.server_error')); setLoading(false); return; }
       await saveUserData(data);
-      router.replace(data.onboarding_done ? '/(tabs)/play' : '/onboarding');
+      await goAfterAuth(data.onboarding_done ? '/(tabs)/play' : '/onboarding');
     } catch {
       setError(t('welcome.network_error'));
     }
@@ -252,8 +263,9 @@ export default function WelcomeScreen() {
           >
             <Pressable onPress={Keyboard.dismiss} accessible={false} style={styles.inner}>
 
-              {/* Logotype SKILKI (renommage visuel ; logo définitif à venir) */}
+              {/* Logo SKILKI + logotype */}
               <Animated.View style={[styles.logoContainer, { transform: [{ scale: logoScale }] }]}>
+                <Image source={require('../assets/images/logo-skilki.png')} style={styles.logoMark} resizeMode="contain" accessibilityIgnoresInvertColors />
                 <Wordmark size="lg" />
               </Animated.View>
 
@@ -428,7 +440,8 @@ const styles = StyleSheet.create({
   scrollContent: { flexGrow: 1, justifyContent: 'center', paddingVertical: SPACE.xxxl },
   inner: { paddingHorizontal: SPACE.xxl, width: '100%', maxWidth: 440, alignSelf: 'center' },
 
-  logoContainer: { alignItems: 'center', justifyContent: 'center', marginBottom: SPACE.lg },
+  logoContainer: { alignItems: 'center', justifyContent: 'center', gap: SPACE.md, marginBottom: SPACE.lg },
+  logoMark: { width: 96, height: 115 },
   tagline: { marginBottom: SPACE.xxxl },
 
   // Formulaire posé sur le fond nuit (pas de carte : les erreurs restent lisibles, 5,4:1)

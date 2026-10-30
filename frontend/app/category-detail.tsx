@@ -14,6 +14,8 @@ import { authFetch } from '../utils/api';
 import { t, getLanguage } from '../utils/i18n';
 import SwipeBackPage from '../components/SwipeBackPage';
 import UserAvatar from '../components/UserAvatar';
+import ModerationSheet from '../components/ModerationSheet';
+import type { ReportTarget } from '../utils/moderation';
 import {
   Txt, Icon, Button, IconButton, Badge, Card, Chip, Section, ScreenContainer, ScreenHeader,
   ProgressBar, ListRow, Loader, EmptyState, ThemeIcon, ThemeIllustration, BottomSheet, SearchField,
@@ -109,6 +111,8 @@ export default function CategoryDetailScreen() {
   // Comments
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const [comments, setComments] = useState<Record<string, CommentData[]>>({});
+  // Signaler / supprimer un post, un commentaire ou un thème de la Forge
+  const [modTarget, setModTarget] = useState<{ type: ReportTarget; id: string; authorId?: string; postId?: string } | null>(null);
   const [commentText, setCommentText] = useState('');
   const [commentingPost, setCommentingPost] = useState<string | null>(null);
 
@@ -385,10 +389,33 @@ export default function CategoryDetailScreen() {
     }
     setExpandedPost(postId);
     try {
-      const res = await fetch(`${API_URL}/api/wall/${postId}/comments`);
+      // Authentifié : le serveur masque les commentaires des joueurs bloqués
+      const res = await authFetch(`${API_URL}/api/wall/${postId}/comments`);
       const data = await res.json();
-      setComments(prev => ({ ...prev, [postId]: data }));
+      if (Array.isArray(data)) setComments(prev => ({ ...prev, [postId]: data }));
     } catch (e) { console.error(e); }
+  };
+
+  const deleteOwnContent = async () => {
+    if (!modTarget) return;
+    const { type, id: targetId, postId } = modTarget;
+    try {
+      const url = type === 'post' ? `${API_URL}/api/wall/${targetId}` : `${API_URL}/api/wall/comment/${targetId}`;
+      const res = await authFetch(url, { method: 'DELETE' });
+      if (!res.ok) return;
+      if (type === 'post') {
+        setPosts(prev => prev.filter(p => p.id !== targetId));
+      } else if (postId) {
+        setComments(prev => ({ ...prev, [postId]: (prev[postId] || []).filter(c => c.id !== targetId) }));
+        setPosts(prev => prev.map(p => p.id === postId ? { ...p, comments_count: Math.max(0, p.comments_count - 1) } : p));
+      }
+    } catch (e) { console.error(e); }
+  };
+
+  // Bloquer un auteur : ses posts et commentaires disparaissent tout de suite
+  const hideAuthor = (authorId: string) => {
+    setPosts(prev => prev.filter(p => p.user.id !== authorId));
+    setComments(prev => Object.fromEntries(Object.entries(prev).map(([k, list]) => [k, list.filter(c => c.user.id !== authorId)])));
   };
 
   const handleComment = async (postId: string) => {
@@ -473,6 +500,10 @@ export default function CategoryDetailScreen() {
         overline={headerOverline}
         title={headerTitleShown ? detail.name : undefined}
         right={
+          <View style={styles.headerRight}>
+          {detail.cluster === 'Communauté' ? (
+            <IconButton icon="more" accessibilityLabel={t('mod.more')} onPress={() => setModTarget({ type: 'theme', id: String(id) })} testID="theme-more" />
+          ) : null}
           <Pressable
             testID="follow-button"
             accessibilityRole="button"
@@ -489,6 +520,7 @@ export default function CategoryDetailScreen() {
               strokeWidth={detail.is_following ? 2.5 : 2}
             />
           </Pressable>
+          </View>
         }
       />
 
@@ -742,6 +774,13 @@ export default function CategoryDetailScreen() {
                         <Txt variant="cardTitle" numberOfLines={1}>{post.user.pseudo}</Txt>
                         <Txt variant="caption">{timeAgo(post.created_at)}</Txt>
                       </View>
+                      <IconButton
+                        icon="more"
+                        appearance="bare"
+                        accessibilityLabel={t('mod.more')}
+                        onPress={() => setModTarget({ type: 'post', id: post.id, authorId: post.user.id })}
+                        testID={`post-more-${post.id}`}
+                      />
                     </Pressable>
 
                     {/* Post Content */}
@@ -782,14 +821,19 @@ export default function CategoryDetailScreen() {
                     {expandedPost === post.id && (
                       <View style={styles.commentsSection}>
                         {(comments[post.id] || []).map(c => (
-                          <View key={c.id} style={styles.commentRow}>
+                          <Pressable
+                            key={c.id}
+                            style={styles.commentRow}
+                            onLongPress={() => setModTarget({ type: 'comment', id: c.id, authorId: c.user.id, postId: post.id })}
+                            delayLongPress={350}
+                          >
                             <UserAvatar avatarUrl={c.user.avatar_url} avatarSeed={c.user.avatar_seed} pseudo={c.user.pseudo} size={28} />
                             <View style={styles.commentContent}>
                               <Txt variant="label" color={COLOR.text.primary}>{c.user.pseudo}</Txt>
                               <Txt variant="bodySmall">{c.content}</Txt>
                               <Txt variant="caption">{timeAgo(c.created_at)}</Txt>
                             </View>
-                          </View>
+                          </Pressable>
                         ))}
                         {/* Add comment input */}
                         <View style={styles.commentInputRow}>
@@ -951,6 +995,15 @@ export default function CategoryDetailScreen() {
         </KeyboardAvoidingView>
       </Modal>
 
+      <ModerationSheet
+        visible={!!modTarget}
+        onClose={() => setModTarget(null)}
+        target={modTarget}
+        authorId={modTarget?.authorId}
+        isOwn={!!modTarget?.authorId && modTarget.authorId === userId}
+        onBlockedChange={(b) => { if (b && modTarget?.authorId) hideAuthor(modTarget.authorId); }}
+        onDelete={deleteOwnContent}
+      />
     </ScreenContainer>
     </SwipeBackPage>
   );
@@ -963,6 +1016,7 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.7 },
 
   // Favori : corail (accent chaud), jamais le rouge d'erreur ni le jaune de sélection
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xs },
   favBtn: {
     width: SIZE.touch, height: SIZE.touch, borderRadius: SIZE.touch / 2,
     alignItems: 'center', justifyContent: 'center',
