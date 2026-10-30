@@ -27,7 +27,6 @@ async def send_challenge(request: Request, data: dict, current_user: str = Depen
     challenger_id = current_user  # always use authenticated user, ignore body field
     challenged_id = data.get("challenged_id")
     theme_id = data.get("theme_id", "")
-    theme_name = data.get("theme_name", "")
 
     if not challenged_id:
         raise HTTPException(status_code=400, detail="Paramètres manquants")
@@ -59,8 +58,8 @@ async def send_challenge(request: Request, data: dict, current_user: str = Depen
     if not challenger:
         raise HTTPException(status_code=404, detail="Joueur introuvable")
 
-    if not theme_name and theme_id:
-        theme_name = await _get_theme_name(db, theme_id)
+    # Never from the client: it goes verbatim into the opponent's push notification.
+    theme_name = await _get_theme_name(db, theme_id) if theme_id else ""
 
     challenge = Challenge(
         id=str(uuid.uuid4()),
@@ -337,6 +336,11 @@ async def save_async_score(challenge_id: str, data: dict, current_user: str = De
 
     if not is_p1 and not is_p2:
         raise HTTPException(status_code=403, detail="Non autorisé")
+    # One submission per player: no overwriting a score once the opponent's is known.
+    if (challenge.p1_score if is_p1 else challenge.p2_score) is not None:
+        raise HTTPException(status_code=400, detail="Score déjà enregistré")
+    if challenge.expires_at and challenge.expires_at < now:
+        raise HTTPException(status_code=400, detail="Défi expiré")
 
     answers_json = json.dumps(answers) if answers else None
     if is_p1:

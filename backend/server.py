@@ -20,7 +20,13 @@ from rate_limit import _limiter, _get_client_ip
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
+# API docs map every route (admin included) — only exposed when explicitly enabled.
+_DOCS = os.environ.get("ENABLE_API_DOCS") == "1"
+app = FastAPI(
+    docs_url="/docs" if _DOCS else None,
+    redoc_url="/redoc" if _DOCS else None,
+    openapi_url="/openapi.json" if _DOCS else None,
+)
 
 
 @app.middleware("http")
@@ -69,7 +75,8 @@ async def health(db: AsyncSession = Depends(get_db)):
         await db.execute(text("SELECT 1"))
         return {"status": "healthy", "database": "connected"}
     except Exception as e:
-        return {"status": "unhealthy", "database": str(e)}
+        logger.error(f"[health] database check failed: {e}")
+        return {"status": "unhealthy", "database": "error"}
 
 # ── Question Report ──
 @api_router.post("/questions/report")

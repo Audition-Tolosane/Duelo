@@ -735,10 +735,11 @@ async def generate_vo_questions(
 
     # Generate via Claude
     import anthropic
-    client = anthropic.Anthropic(api_key=api_key)
+    # Async client — the sync one blocked the event loop during generation.
+    client = anthropic.AsyncAnthropic(api_key=api_key)
     prompt = VO_GENERATION_PROMPT.format(theme_name=theme.name)
     try:
-        message = client.messages.create(
+        message = await client.messages.create(
             model="claude-haiku-4-5-20251001",
             max_tokens=4096,
             messages=[{"role": "user", "content": prompt}],

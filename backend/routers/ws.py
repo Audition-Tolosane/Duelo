@@ -160,11 +160,21 @@ async def websocket_endpoint(
 async def handle_chat_send(sender_id: str, data: dict):
     """Save message to DB and deliver in real-time."""
     receiver_id = data.get("receiver_id", "")
-    content = data.get("content", "").strip()
+    content = data.get("content", "")
+    content = content.strip() if isinstance(content, str) else ""
     message_type = data.get("message_type", "text")
     extra_data = data.get("extra_data")
 
-    if not receiver_id:
+    if not receiver_id or not isinstance(receiver_id, str):
+        return
+    # Same rules as REST /chat/send.
+    if message_type not in ("text", "image", "game_card"):
+        return
+    if len(content) > 500:
+        await manager.send_to_user(sender_id, {"type": "error", "data": {"message": "Message trop long (max 500 caractères)"}})
+        return
+    if extra_data is not None and len(json.dumps(extra_data)) > 200_000:
+        await manager.send_to_user(sender_id, {"type": "error", "data": {"message": "Pièce jointe trop lourde"}})
         return
     if message_type == "text" and not content:
         return

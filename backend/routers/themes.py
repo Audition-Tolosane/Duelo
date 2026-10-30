@@ -308,8 +308,8 @@ async def toggle_theme_follow(
     current_user_id: str = Depends(get_optional_user_id),
     db: AsyncSession = Depends(get_db),
 ):
-    body = await request.json()
-    user_id = body.get("user_id") or current_user_id
+    # Only ever the authenticated player — a body user_id let anyone (un)follow for others.
+    user_id = current_user_id
     if not user_id:
         raise HTTPException(status_code=401, detail="Non authentifié")
 

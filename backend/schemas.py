@@ -59,7 +59,7 @@ class WallPostCreate(BaseModel):
 
 class CommentCreate(BaseModel):
     user_id: str
-    content: str
+    content: str = Field(max_length=500)
 
 class FollowToggle(BaseModel):
     user_id: str

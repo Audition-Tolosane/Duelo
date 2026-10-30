@@ -232,13 +232,13 @@ async def update_location(
     from sqlalchemy import update as _update
     updates: dict = {}
     if "city" in body:
-        updates["city"] = body["city"].strip() or None
+        updates["city"] = str(body["city"] or "").strip()[:100] or None
     if "country" in body:
-        updates["country"] = body["country"].strip() or None
+        updates["country"] = str(body["country"] or "").strip()[:100] or None
     if "continent" in body:
-        updates["continent"] = body["continent"].strip() or None
+        updates["continent"] = str(body["continent"] or "").strip()[:100] or None
     if "region" in body:
-        updates["region"] = body["region"].strip() or None
+        updates["region"] = str(body["region"] or "").strip()[:100] or None
 
     if updates:
         await db.execute(_update(User).where(User.id == current_user_id).values(**updates))

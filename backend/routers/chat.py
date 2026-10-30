@@ -8,12 +8,13 @@ from models import User, ChatMessage
 from schemas import ChatSend
 from services.notifications import create_notification
 from auth_middleware import get_current_user_id
+from rate_limit import rate_limit
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 @router.post("/send")
-async def send_message(data: ChatSend, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+async def send_message(data: ChatSend, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db), _rl=Depends(rate_limit(limit=30, window=60))):
     if data.sender_id != current_user:
         raise HTTPException(status_code=403, detail="Non autorisé")
     if data.message_type == "text":

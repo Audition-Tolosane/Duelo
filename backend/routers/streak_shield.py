@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import StreakShield, UserLives, User, Match
 from auth_middleware import get_current_user_id
+from services.ad_rewards import verify_ad_reward
 
 router = APIRouter(tags=["streak"])
 
@@ -54,6 +55,10 @@ async def activate_shield(
     db: AsyncSession = Depends(get_db),
 ):
     """Called after rewarded ad or IAP. shield_type: 'login' or 'win'."""
+    # SECURITY: no purchase verification exists yet (no RevenueCat / store receipt
+    # check), so granting here would hand out paid items for free. Re-enable only
+    # behind a signed IAP webhook.
+    raise HTTPException(status_code=501, detail="Achats intégrés pas encore disponibles")
     shield_type = data.get("shield_type", "login")
     if shield_type not in ("login", "win"):
         raise HTTPException(status_code=400, detail="shield_type doit être 'login' ou 'win'")
@@ -78,6 +83,8 @@ async def activate_shield(
 
 # ── Lives ─────────────────────────────────────────────────────────────────────
 
+MAX_LIVES = 3  # stock cap — rewarded-ad lives can't be farmed without limit
+
 async def get_lives(user_id: str, db: AsyncSession) -> int:
     res = await db.execute(select(UserLives).where(UserLives.user_id == user_id))
     row = res.scalar_one_or_none()
@@ -99,6 +106,9 @@ async def add_lives(user_id: str, count: int, db: AsyncSession) -> int:
 @router.post("/lives/earn")
 async def earn_life(current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     """Called after rewarded ad — grants 1 life."""
+    if await get_lives(current_user, db) >= MAX_LIVES:
+        raise HTTPException(status_code=400, detail="Nombre maximum de vies atteint")
+    verify_ad_reward(current_user, "lives_earn")
     new_total = await add_lives(current_user, 1, db)
     return {"lives": new_total}
 

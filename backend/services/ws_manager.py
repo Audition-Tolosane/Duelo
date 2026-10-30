@@ -3,6 +3,7 @@ import json
 import random
 import secrets
 import logging
+import time
 from datetime import datetime, timezone
 from typing import Optional
 from fastapi import WebSocket
@@ -542,6 +543,10 @@ class ConnectionManager:
         room = self.game_rooms.get(room_id)
         if not room:
             return
+        # Only the question currently on screen can be answered (no negative /
+        # past / future indexes — the correct option is revealed after each answer).
+        if not room.is_current_question(question_index):
+            return
 
         opponent_id = room.get_opponent_id(user_id)
         is_correct, points = room.record_answer(user_id, question_index, answer, time_ms)
@@ -576,6 +581,7 @@ class ConnectionManager:
         if room.both_answered(question_index):
             if question_index < room.total_questions - 1:
                 # Move to next question
+                room.advance_to(question_index + 1)
                 await self._broadcast_room(room, {
                     "type": "next_question",
                     "data": {
@@ -626,6 +632,7 @@ class ConnectionManager:
             return
 
         room.set_questions(questions)
+        room.advance_to(0)
 
         await self._broadcast_room(room, {
             "type": "game_start",
@@ -663,6 +670,37 @@ class GameRoom:
         self.finished: bool = False
         self.disconnect_compensation: dict[str, int] = {}
         self.created_at = datetime.now(timezone.utc)
+        # Server-side clock of the question in play, so the speed bonus doesn't
+        # rely on the time the client claims.
+        self.current_index = 0
+        self.question_sent_at = time.monotonic()
+
+    # Network latency + the client starting its timer slightly after receipt.
+    ANSWER_TIME_GRACE_MS = 1500
+
+    def advance_to(self, index: int):
+        self.current_index = index
+        self.question_sent_at = time.monotonic()
+
+    def is_current_question(self, question_index) -> bool:
+        return (
+            isinstance(question_index, int) and not isinstance(question_index, bool)
+            and question_index == self.current_index
+            and 0 <= question_index < len(self.questions)
+        )
+
+    def _effective_time_ms(self, question_index: int, client_ms) -> int:
+        try:
+            ms = int(client_ms)
+        except (TypeError, ValueError):
+            ms = 10000
+        ms = max(0, min(ms, 30000))
+        # Q1 may be buffered during the VS animation (client timer starts late),
+        # so the server floor only applies from Q2 on.
+        if question_index > 0:
+            elapsed = (time.monotonic() - self.question_sent_at) * 1000
+            ms = max(ms, int(elapsed) - self.ANSWER_TIME_GRACE_MS)
+        return ms
 
     def set_questions(self, questions: list[dict]):
         self.questions = questions
@@ -689,11 +727,12 @@ class GameRoom:
             existing = self.answers[user_id][question_index]
             return existing["is_correct"], existing["points"]
 
-        q = self.questions[question_index] if question_index < len(self.questions) else None
+        q = self.questions[question_index] if 0 <= question_index < len(self.questions) else None
         if not q:
             return False, 0
 
-        is_correct = answer == q["correct_option"]
+        time_ms = self._effective_time_ms(question_index, time_ms)
+        is_correct = isinstance(answer, int) and 0 <= answer <= 3 and answer == q["correct_option"]
 
         # Points: base 10 for correct, bonus up to 10 for speed (10s = 10000ms timer)
         if is_correct:

@@ -71,6 +71,10 @@ async def activate_multiplier(
     Called by the IAP webhook / RevenueCat after purchase confirmation.
     data: { multiplier: 1.2|1.5, source: 'purchase'|'pro' }
     """
+    # SECURITY: no purchase verification exists yet (no RevenueCat / store receipt
+    # check), so granting here would hand out paid items for free. Re-enable only
+    # behind a signed IAP webhook.
+    raise HTTPException(status_code=501, detail="Achats intégrés pas encore disponibles")
     multiplier = float(data.get("multiplier", 1.2))
     source = data.get("source", "purchase")
 
@@ -117,6 +121,10 @@ async def activate_multiplier(
 @router.delete("/pro")
 async def cancel_pro(current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     """Called by RevenueCat webhook on subscription cancellation."""
+    # SECURITY: no purchase verification exists yet (no RevenueCat / store receipt
+    # check), so granting here would hand out paid items for free. Re-enable only
+    # behind a signed IAP webhook.
+    raise HTTPException(status_code=501, detail="Achats intégrés pas encore disponibles")
     res = await db.execute(
         select(XPMultiplierActivation).where(
             XPMultiplierActivation.user_id == current_user,

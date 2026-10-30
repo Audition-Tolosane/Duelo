@@ -14,7 +14,11 @@ from dotenv import load_dotenv
 frontend_env = Path(__file__).parent.parent.parent / 'frontend' / '.env'
 load_dotenv(frontend_env)
 
-BASE_URL = os.environ.get('EXPO_PUBLIC_BACKEND_URL')
+# Never the app's EXPO_PUBLIC_BACKEND_URL: these tests create users/challenges and
+# used to run against the production database.
+BASE_URL = os.environ.get('TEST_BACKEND_URL', 'http://localhost:8080')
+if 'railway.app' in BASE_URL or 'duelo-production' in BASE_URL:
+    raise RuntimeError('Refusing to run the test suite against production')
 if not BASE_URL:
     raise ValueError("EXPO_PUBLIC_BACKEND_URL not found")
 

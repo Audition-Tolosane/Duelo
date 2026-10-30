@@ -11,12 +11,17 @@ from database import get_db
 from models import Theme, Question
 from auth_middleware import get_current_user_id
 from constants import SUPER_CATEGORY_META
+from rate_limit import rate_limit, _limiter
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/forge", tags=["forge"])
 
 COMMUNITY_CLUSTER = "Communauté"
 DIFFICULTIES = ("Facile", "Moyen", "Difficile")
+# Each creation is a paid LLM call — cap per player and per IP.
+FORGE_DAILY_PER_USER = 3
+DESCRIPTION_MAX = 500
+COLOR_RE = re.compile(r"^#[0-9A-Fa-f]{6}$")
 
 
 def _gen_theme_id(name: str) -> str:
@@ -54,6 +59,7 @@ async def create_theme(
     request: Request,
     current_user: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
+    _rl=Depends(rate_limit(limit=5, window=3600)),
 ):
     """Generate a theme with AI-created questions and save it to the DB."""
     body = await request.json()
@@ -62,6 +68,8 @@ async def create_theme(
     description = (body.get("description") or "").strip()
     super_category = (body.get("super_category") or "SCREEN").upper()
     color_hex = body.get("color_hex") or "#8A2BE2"
+    if not isinstance(color_hex, str) or not COLOR_RE.match(color_hex):
+        color_hex = "#8A2BE2"
 
     if user_id != current_user:
         raise HTTPException(status_code=403, detail="Non autorisé")
@@ -71,12 +79,17 @@ async def create_theme(
         raise HTTPException(status_code=422, detail="Nom trop long (maximum 100 caractères)")
     if len(description) < 10:
         raise HTTPException(status_code=422, detail="Description trop courte (minimum 10 caractères)")
+    if len(description) > DESCRIPTION_MAX:
+        raise HTTPException(status_code=422, detail=f"Description trop longue (maximum {DESCRIPTION_MAX} caractères)")
     if super_category not in SUPER_CATEGORY_META:
         super_category = "SCREEN"
 
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
         raise HTTPException(status_code=503, detail="Service de génération non disponible. Configurez ANTHROPIC_API_KEY.")
+
+    # Counted once inputs are valid, so a typo doesn't burn the daily quota.
+    _limiter.check(f"forge:{current_user}", FORGE_DAILY_PER_USER, 86400)
 
     # Generate a unique theme ID
     theme_id = _gen_theme_id(name)
@@ -91,8 +104,10 @@ async def create_theme(
     questions_raw: list = []
     try:
         import anthropic
-        client = anthropic.Anthropic(api_key=api_key)
-        message = client.messages.create(
+        # Async client: the sync one blocked the whole event loop (WS games, API) for the
+        # duration of the generation.
+        client = anthropic.AsyncAnthropic(api_key=api_key)
+        message = await client.messages.create(
             model="claude-haiku-4-5-20251001",
             max_tokens=8192,
             messages=[{"role": "user", "content": prompt}],

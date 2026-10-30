@@ -129,62 +129,6 @@ async def get_current_tournament(
     }
 
 
-@router.post("/{tournament_id}/submit")
-async def submit_tournament_score(
-    tournament_id: str,
-    data: dict,
-    current_user: str = Depends(get_current_user_id),
-    db: AsyncSession = Depends(get_db),
-):
-    """Called by game.py after a match on the tournament theme."""
-    score = max(0, int(data.get("score", 0)))
-
-    t_res = await db.execute(select(Tournament).where(Tournament.id == tournament_id))
-    t = t_res.scalar_one_or_none()
-    if not t:
-        raise HTTPException(status_code=404, detail="Tournoi introuvable")
-
-    now = datetime.now(timezone.utc)
-    if not (t.start_at <= now <= t.end_at):
-        raise HTTPException(status_code=400, detail="Tournoi non actif")
-
-    entry_res = await db.execute(
-        select(TournamentEntry).where(
-            TournamentEntry.tournament_id == tournament_id,
-            TournamentEntry.user_id == current_user,
-        )
-    )
-    entry = entry_res.scalar_one_or_none()
-
-    if entry and entry.games_played >= MAX_GAMES:
-        raise HTTPException(status_code=400, detail=f"Maximum {MAX_GAMES} parties par tournoi atteint")
-
-    if entry:
-        entry.score += score
-        entry.games_played += 1
-    else:
-        entry = TournamentEntry(
-            id=str(uuid.uuid4()),
-            tournament_id=tournament_id,
-            user_id=current_user,
-            score=score,
-            games_played=1,
-        )
-        db.add(entry)
-
-    await db.commit()
-
-    # Rank
-    above_res = await db.execute(
-        select(func.count(TournamentEntry.id)).where(
-            TournamentEntry.tournament_id == tournament_id,
-            TournamentEntry.score > entry.score,
-        )
-    )
-    rank = (above_res.scalar() or 0) + 1
-    return {"score": entry.score, "games_played": entry.games_played, "rank": rank}
-
-
 @router.get("/{tournament_id}/leaderboard")
 async def tournament_leaderboard(
     tournament_id: str,
