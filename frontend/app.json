@@ -27,7 +27,10 @@
       },
       "bundleIdentifier": "com.skilki.app",
       "buildNumber": "1",
-      "usesAppleSignIn": true
+      "usesAppleSignIn": true,
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.skilki.app",

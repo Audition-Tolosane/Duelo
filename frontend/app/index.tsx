@@ -391,15 +391,18 @@ export default function WelcomeScreen() {
                   </>
                 )}
 
-                {/* Social */}
+                {/* Social — Google masqué tant que EXPO_PUBLIC_GOOGLE_CLIENT_ID n'est pas configuré */}
+                {(GOOGLE_CLIENT_ID || Platform.OS === 'ios') && (
                 <View style={styles.divider}>
                   <View style={styles.dividerLine} />
                   <Txt variant="overline">{t('welcome.or_social')}</Txt>
                   <View style={styles.dividerLine} />
                 </View>
+                )}
 
                 {/* Google — gabarit du bouton « ghost » du kit (Button n'accepte que les icônes Lucide,
                     or Google impose son logo de marque : seules couleurs hors palette, logo tiers) */}
+                {!!GOOGLE_CLIENT_ID && (
                 <Pressable
                   onPress={handleGoogleSignIn}
                   accessibilityRole="button"
@@ -413,6 +416,7 @@ export default function WelcomeScreen() {
                   </Svg>
                   <Txt variant="button" color={COLOR.text.primary} numberOfLines={1} style={styles.googleText}>{t('welcome.continue_google')}</Txt>
                 </Pressable>
+                )}
 
                 {/* Apple — bouton officiel (langue = langue du système iOS) ; version blanche sur fond nuit */}
                 {Platform.OS === 'ios' && AppleAuthentication.isAvailableAsync && (
