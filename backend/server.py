@@ -186,6 +186,9 @@ async def _ensure_columns():
             # Une colonne JSON plutôt qu'une table jointe : 7 champs courts sur
             # 917 thèmes, la jointure aurait alourdi une dizaine d'endpoints.
             "ALTER TABLE themes ADD COLUMN IF NOT EXISTS translations JSON",
+            # Thèmes propres à une langue (« English Traps »…) : visibles par tous, mais
+            # jamais proposés d'office à un joueur d'une autre langue (voir i18n).
+            "ALTER TABLE themes ADD COLUMN IF NOT EXISTS langue_unique VARCHAR(5)",
             # Widen id column to support long quiz_generator IDs
             "ALTER TABLE questions ALTER COLUMN id TYPE VARCHAR(100)",
             "ALTER TABLE question_reports ALTER COLUMN question_id TYPE VARCHAR(100)",

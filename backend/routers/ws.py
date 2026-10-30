@@ -331,7 +331,12 @@ async def load_and_start_game(room_id: str, theme_id: str):
         # afficherait un mélange des trois — ce que personne ne verrait avant la mise en
         # production. Servir une langue par salon suppose de décider quoi faire quand les
         # deux joueurs diffèrent : c'est un choix produit, pas une correction technique.
-        filtre_langue = filtre_langue_questions(Question.language, LANGUE_REFERENCE)
+        # Exception : un thème NATIF n'existe que dans sa langue (en français, il serait vide).
+        langue_unique = (await db.execute(
+            select(Theme.langue_unique).where(Theme.id.in_([theme_id, category]))
+        )).scalars().first()
+        filtre_langue = filtre_langue_questions(Question.language,
+                                                langue_unique or LANGUE_REFERENCE)
 
         for difficulty, count in mix:
             result = await db.execute(

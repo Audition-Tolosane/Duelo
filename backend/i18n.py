@@ -50,6 +50,20 @@ def filtre_langue_questions(colonne_langue, lang):
     return colonne_langue == lang
 
 
+def filtre_themes_proposables(colonne_langue_unique, lang=None):
+    """Clause SQLAlchemy des thèmes qu'on peut PROPOSER d'office à un joueur (tendances,
+    recommandations, roue…).
+
+    Un thème propre à une langue reste visible et jouable par tous dans le catalogue :
+    un francophone peut choisir « English Traps ». Mais on ne le lui pousse pas sans
+    qu'il l'ait demandé. Sans `lang` connu, ces thèmes sont tous écartés."""
+    from sqlalchemy import or_
+    if not lang:
+        return colonne_langue_unique.is_(None)
+    return or_(colonne_langue_unique.is_(None),
+               colonne_langue_unique == normaliser_langue(lang))
+
+
 def libelles_theme(theme, lang):
     """-> dict des sept champs affichables du thème, dans `lang`, français en repli.
 
@@ -144,6 +158,7 @@ def theme_localise(theme, lang):
     lib = libelles_theme(theme, lang)
     vue = SimpleNamespace(**lib)
     # Les champs non traduisibles (id, couleur, icône…) restent accessibles tels quels.
-    for attr in ("id", "super_category", "cluster", "color_hex", "icon_url", "question_count"):
+    for attr in ("id", "super_category", "cluster", "color_hex", "icon_url", "question_count",
+                 "langue_unique"):
         setattr(vue, attr, getattr(theme, attr, None))
     return vue

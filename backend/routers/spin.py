@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from auth_middleware import get_current_user_id
 from database import get_db
 from models import User, BoostActivation, Theme, SpinThemeUnlock
+from i18n import filtre_themes_proposables
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["spin"])
@@ -106,7 +107,9 @@ async def spin_claim(
     elif reward["type"] == "theme":
         # Give 2x XP on a random theme for 24h
         themes_res = await db.execute(
-            select(Theme).where(Theme.playable == True).order_by(func.random()).limit(1)
+            select(Theme).where(Theme.question_count > 0,
+                                filtre_themes_proposables(Theme.langue_unique))
+            .order_by(func.random()).limit(1)
         )
         theme = themes_res.scalar_one_or_none()
         if theme:

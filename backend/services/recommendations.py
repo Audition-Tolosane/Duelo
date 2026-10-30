@@ -50,12 +50,15 @@ async def get_trending_themes_scored(
     limit: int = 10,
     days: int = 7,
     exclude_ids: set | None = None,
+    lang: str | None = None,
 ) -> list[dict]:
     """
     Retourne une liste de thèmes triés par score.
     Chaque dict : {theme, score, match_count, affinity_label}
+    Les thèmes propres à une autre langue que `lang` ne sont pas proposés.
     """
     from models import Theme, Match
+    from i18n import filtre_themes_proposables
 
     exclude_ids = exclude_ids or set()
 
@@ -77,7 +80,8 @@ async def get_trending_themes_scored(
         fav_clusters, fav_super_cats = await get_user_preferences(user_id, db)
 
     # 3. Candidats (tous les thèmes sauf exclus)
-    q = select(Theme).where(Theme.question_count > 0)
+    q = select(Theme).where(Theme.question_count > 0,
+                            filtre_themes_proposables(Theme.langue_unique, lang))
     if exclude_ids:
         q = q.where(~Theme.id.in_(exclude_ids))
     cand_res = await db.execute(q.limit(300))

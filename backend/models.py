@@ -292,6 +292,9 @@ class Theme(Base):
                                                  # affiché au joueur, il ne doit pas
                                                  # gonfler avec les traductions.
     translations = Column(JSON, nullable=True)   # {"en": {"name": ..., "title_lv1": ...}, "es": {...}}
+    langue_unique = Column(String(5), nullable=True)  # NULL = thème traduit partout ; 'en', 'fr'…
+                                                      # = thème propre à une langue (pièges,
+                                                      # expressions), joué dans cette langue
     created_at = Column(DateTime(timezone=True), default=utc_now)
     updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
 

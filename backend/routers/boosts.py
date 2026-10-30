@@ -39,7 +39,7 @@ async def refresh_offers(
     """Appelé après visionnage de pub. Change les offres x2 XP immédiatement."""
     verify_ad_reward(current_user, "boost_refresh")
     await increment_offer_refresh(current_user, db)
-    new_offers = await get_daily_offers(current_user, db)
+    new_offers = await get_daily_offers(current_user, db, lang)
     from services.boosts import get_any_active_boost as _gab
     active_boost = await _gab(current_user, db)
     result = []

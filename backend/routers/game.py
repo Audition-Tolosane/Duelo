@@ -63,7 +63,15 @@ async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db:
     # traductions au fil de l'eau sans jamais servir un thème vide.
     effective_lang = 'fr'
     lang = normaliser_langue(lang)
-    if lang in LANGUES_TRADUITES:
+    # THÈME NATIF (« English Traps »…) : écrit dans une seule langue et jamais traduit. Il
+    # se joue dans SA langue quelle que soit celle du joueur — un francophone qui le choisit
+    # veut justement de l'anglais. Le repli français le servirait vide.
+    langue_unique = (await db.execute(
+        select(Theme.langue_unique).where(Theme.id.in_([theme, category]))
+    )).scalars().first()
+    if langue_unique:
+        effective_lang = langue_unique
+    elif lang in LANGUES_TRADUITES:
         n = await db.execute(
             select(func.count()).select_from(Question).where(
                 Question.category == category, Question.language == lang

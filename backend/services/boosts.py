@@ -135,6 +135,7 @@ async def _get_smart_popular(
     exclude_ids: set,
     rng: Random,
     db: AsyncSession,
+    lang: str | None = None,
 ):
     """
     Tirage pondéré d'un thème populaire adapté au joueur.
@@ -142,7 +143,8 @@ async def _get_smart_popular(
     """
     from services.recommendations import get_trending_themes_scored
 
-    scored = await get_trending_themes_scored(db, user_id=user_id, limit=20, days=7, exclude_ids=exclude_ids)
+    scored = await get_trending_themes_scored(db, user_id=user_id, limit=20, days=7, exclude_ids=exclude_ids,
+                                          lang=lang)
     if not scored:
         return None
 
@@ -153,7 +155,7 @@ async def _get_smart_popular(
 
 # ── Daily offers ──────────────────────────────────────────────────────────────
 
-async def get_daily_offers(user_id: str, db: AsyncSession) -> list:
+async def get_daily_offers(user_id: str, db: AsyncSession, lang: str | None = None) -> list:
     """
     Retourne 2 thèmes à proposer pour le créneau courant (30 min) :
     - Si le joueur a des thèmes dispo : 1 thème du joueur + 1 thème tendance/affinité
@@ -190,7 +192,7 @@ async def get_daily_offers(user_id: str, db: AsyncSession) -> list:
 
     # ── Offre(s) restante(s) : thème tendance × affinité joueur ──
     for _ in range(2 - len(offers)):
-        smart = await _get_smart_popular(user_id, offered_ids, rng, db)
+        smart = await _get_smart_popular(user_id, offered_ids, rng, db, lang)
         if smart:
             offers.append(smart)
             offered_ids.add(smart.id)

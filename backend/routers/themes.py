@@ -6,7 +6,7 @@ from database import get_db
 from models import User, Question, Theme, UserThemeXP, Match, ThemeFollow
 from i18n import (
     libelles_theme, nom_theme, theme_localise, nom_cluster,
-    normaliser_langue, filtre_langue_questions,
+    normaliser_langue, filtre_langue_questions, filtre_themes_proposables,
 )
 from constants import SUPER_CATEGORY_META, CLUSTER_ICONS, GRAND_PUBLIC_THEMES, TOTAL_QUESTIONS
 from services.xp import (
@@ -24,7 +24,7 @@ async def get_trending_themes(user_id: Optional[str] = None, lang: str = 'fr',
     """Top 6 thèmes scorés par tendance × affinité joueur."""
     from services.recommendations import get_trending_themes_scored
 
-    scored = await get_trending_themes_scored(db, user_id=user_id, limit=6, days=7)
+    scored = await get_trending_themes_scored(db, user_id=user_id, limit=6, days=7, lang=lang)
     trending = [
         {
             "id": e["theme"].id,
@@ -42,7 +42,9 @@ async def get_trending_themes(user_id: Optional[str] = None, lang: str = 'fr',
     if len(trending) < 6:
         existing_ids = {t["id"] for t in trending}
         filler_res = await db.execute(
-            select(Theme).where(Theme.id.notin_(existing_ids)).order_by(func.random()).limit(6 - len(trending))
+            select(Theme).where(Theme.id.notin_(existing_ids),
+                                filtre_themes_proposables(Theme.langue_unique, lang))
+            .order_by(func.random()).limit(6 - len(trending))
         )
         for theme in filler_res.scalars().all():
             trending.append({
