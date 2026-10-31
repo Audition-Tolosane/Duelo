@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Les Transports">
+  <polygon points="128,98 214,146 214,160 128,140 42,160 42,146" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <polygon points="128,190 166,208 166,216 128,208 90,216 90,208" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="114" y="32" width="28" height="192" rx="14" fill="#12606D"/>
+  <rect x="62" y="124" width="20" height="36" rx="10" fill="#FFDB3D"/>
+  <rect x="174" y="124" width="20" height="36" rx="10" fill="#FFDB3D"/>
+  <path d="M124 50L124 62" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

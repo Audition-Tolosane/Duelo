@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Les Années 70">
+  <path d="M100 64H156L184 176H72Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="120" cy="104" rx="14" ry="18" fill="#FFDB3D"/>
+  <circle cx="146" cy="138" r="15" fill="#FFDB3D"/>
+  <ellipse cx="124" cy="166" rx="26" ry="10" fill="#FFDB3D"/>
+  <path d="M108 36H148L156 60H100Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M88 176H168L184 214H72Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M104 84L99 106" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

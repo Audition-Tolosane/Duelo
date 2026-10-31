@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Les Pays du Monde">
+  <rect x="60" y="36" width="136" height="184" rx="18" fill="#12606D"/>
+  <circle cx="128" cy="112" r="38" fill="none" stroke="#FFDB3D" stroke-width="12"/>
+  <ellipse cx="128" cy="112" rx="14" ry="38" fill="none" stroke="#FFDB3D" stroke-width="8"/>
+  <path d="M92 112H164" stroke="#FFDB3D" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="96" y="172" width="64" height="12" rx="6" fill="#FFDB3D"/>
+  <circle cx="196" cy="196" r="26" fill="#FF6B5B"/>
+  <circle cx="196" cy="196" r="12" fill="none" stroke="#E8F1EC" stroke-width="6"/>
+  <path d="M80 60L80 76" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

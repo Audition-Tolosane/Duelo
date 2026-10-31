@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Les Jeux de Société">
+  <g transform="rotate(14 160 112)"><rect x="118" y="52" width="88" height="120" rx="14" fill="#FFDB3D"/><polygon points="162,92 178,112 162,132 146,112" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/></g>
+  <rect x="48" y="192" width="96" height="24" rx="12" fill="#12606D"/>
+  <path d="M96 112C78 112 72 132 80 150L66 196H126L112 150C120 132 114 112 96 112Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="96" cy="114" rx="28" ry="9" fill="#12606D"/>
+  <circle cx="96" cy="82" r="26" fill="#12606D"/>
+  <path d="M84 74C86 68 90 66 96 65" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

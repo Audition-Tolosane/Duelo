@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="L&apos;Argent dans le Monde">
+  <path d="M50 140C34 136 34 116 48 114" stroke="#FF6B5B" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="76" y="176" width="28" height="40" rx="10" fill="#FF6B5B"/>
+  <rect x="148" y="176" width="28" height="40" rx="10" fill="#FF6B5B"/>
+  <polygon points="156,96 170,66 186,98" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <ellipse cx="128" cy="148" rx="80" ry="60" fill="#FF6B5B"/>
+  <rect x="196" y="128" width="28" height="36" rx="12" fill="#FF6B5B"/>
+  <circle cx="210" cy="146" r="5" fill="#0B3D4A"/>
+  <circle cx="170" cy="130" r="8" fill="#0B3D4A"/>
+  <rect x="100" y="98" width="48" height="12" rx="6" fill="#0B3D4A"/>
+  <circle cx="124" cy="62" r="24" fill="#FFDB3D"/>
+  <rect x="119" y="50" width="10" height="24" rx="5" fill="#0B3D4A"/>
+  <path d="M70 128C74 116 82 108 92 103" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

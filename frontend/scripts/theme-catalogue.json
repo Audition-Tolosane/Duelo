@@ -1,5 +1,5 @@
 {
- "_source": "GET /api/explore/{univers}/clusters (production, 08/10/2026) + 45 thèmes ajoutés (production, 12/10/2026) + 21 thèmes grand public (production, 23/10/2026)",
+ "_source": "GET /api/explore/{univers}/clusters (production, 08/10/2026) + 45 thèmes ajoutés (production, 12/10/2026) + 21 thèmes grand public (production, 23/10/2026) + 12 thèmes (production, 31/10/2026)",
  "themes": [
   {
    "id": "ARE_ATHL",
@@ -7686,6 +7686,90 @@
    "cluster": "Histoire moderne",
    "universe": "LEGENDS",
    "description": "Savants, artistes, explorateurs, champions ou leaders : les femmes et les hommes que le monde entier connaît, et pourquoi."
+  },
+  {
+   "id": "ARE_EQUI",
+   "name": "Équitation & Sports Équestres",
+   "cluster": "Combat & Sports individuels",
+   "universe": "ARENA",
+   "description": "Du piaffer au barrage, de Longchamp aux Jeux olympiques : disciplines, techniques et champions pour ceux qui savent ce qu'est un vrai départ au galop."
+  },
+  {
+   "id": "GLO_ARGT",
+   "name": "L'Argent dans le Monde",
+   "cluster": "Langues & Cultures",
+   "universe": "GLOBE",
+   "description": "Du coquillage au paiement sans contact : monnaies, billets, banques et petites histoires de l'argent à travers le temps et les pays."
+  },
+  {
+   "id": "GLO_JOUE",
+   "name": "Les Jouets de Notre Enfance",
+   "cluster": "Langues & Cultures",
+   "universe": "GLOBE",
+   "description": "LEGO, Barbie, yo-yo ou Tamagotchi : les jouets qui ont fait rêver plusieurs générations d'enfants dans le monde entier."
+  },
+  {
+   "id": "GLO_METI",
+   "name": "Les Métiers",
+   "cluster": "Langues & Cultures",
+   "universe": "GLOBE",
+   "description": "Boulanger, pilote, vétérinaire ou souffleur de verre : outils, savoir-faire et anecdotes des métiers d'hier et d'aujourd'hui."
+  },
+  {
+   "id": "GLO_TRAD",
+   "name": "Les Traditions du Monde",
+   "cluster": "Langues & Cultures",
+   "universe": "GLOBE",
+   "description": "Holi, Thanksgiving, Nouvel An chinois ou Día de los Muertos : les fêtes, rites et coutumes qui rythment l'année aux quatre coins du globe."
+  },
+  {
+   "id": "GLO_PAYS",
+   "name": "Les Pays du Monde",
+   "cluster": "Voyage & Géo",
+   "universe": "GLOBE",
+   "description": "Langues, monnaies, frontières et spécialités : faites le tour de la planète sans quitter votre canapé, du plus grand pays au plus petit."
+  },
+  {
+   "id": "LAB_TRSP",
+   "name": "Les Transports",
+   "cluster": "Tech & IA",
+   "universe": "LAB",
+   "description": "Avion, métro, paquebot ou vélo : inventions, records et règles de tout ce qui nous emmène d'un point à un autre."
+  },
+  {
+   "id": "LIF_CHEV",
+   "name": "Chevaux & Monde Équestre",
+   "cluster": "Monde Animal",
+   "universe": "LIFE",
+   "description": "Frison, Pur-sang ou poney Shetland : races, robes, instincts et légendes du plus noble compagnon de l'homme, même sans jamais être monté en selle."
+  },
+  {
+   "id": "LIF_FRLE",
+   "name": "Les Fruits & Légumes",
+   "cluster": "Nature & Écologie",
+   "universe": "LIFE",
+   "description": "Racines, feuilles, graines ou fruits : saisons, couleurs, origines et petits secrets de ce qui remplit nos paniers."
+  },
+  {
+   "id": "MIN_JSOC",
+   "name": "Les Jeux de Société",
+   "cluster": "Maths & Logique",
+   "universe": "MIND",
+   "description": "Monopoly, UNO, échecs ou tarot : règles, origines et records des jeux de plateau et de cartes qui animent nos soirées."
+  },
+  {
+   "id": "SOU_A2020",
+   "name": "Les Années 2020",
+   "cluster": "Hits & Pop Culture",
+   "universe": "SOUND",
+   "description": "Confinement, TikTok et intelligence artificielle : les tubes, séries, mèmes et événements des années 2020 à aujourd'hui."
+  },
+  {
+   "id": "SOU_A1970",
+   "name": "Les Années 70",
+   "cluster": "Hits & Pop Culture",
+   "universe": "SOUND",
+   "description": "Pattes d'eph, disco et premiers pas des jeux vidéo : la décennie des tubes, des films et des événements qui ont changé le monde."
   }
  ]
 }

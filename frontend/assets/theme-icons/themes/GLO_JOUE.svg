@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Les Jouets de Notre Enfance">
+  <path d="M32 156L48 156" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M208 156L224 156" stroke="#12606D" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="116" y="40" width="24" height="52" rx="12" fill="#12606D"/>
+  <path d="M56 116C56 94 88 82 128 82C168 82 200 94 200 116C200 144 160 180 128 208C96 180 56 144 56 116Z" fill="#FF6B5B" stroke="#FF6B5B" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M58 124C84 138 172 138 198 124C196 134 192 142 186 150C160 160 96 160 70 150C64 142 60 134 58 124Z" fill="#FFDB3D"/>
+  <circle cx="128" cy="214" r="8" fill="#12606D"/>
+  <path d="M80 102C88 96 98 92 108 90" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

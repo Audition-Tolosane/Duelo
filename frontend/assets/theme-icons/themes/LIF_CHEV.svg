@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Chevaux &amp; Monde Équestre">
+  <path d="M64 200C42 146 50 60 128 54C206 60 214 146 192 200L160 200C176 150 170 96 128 92C86 96 80 150 96 200Z" fill="#12606D" stroke="#12606D" stroke-width="12" stroke-linejoin="round"/>
+  <rect x="52" y="192" width="52" height="24" rx="10" fill="#FF6B5B"/>
+  <rect x="152" y="192" width="52" height="24" rx="10" fill="#FF6B5B"/>
+  <circle cx="74" cy="166" r="7" fill="#FFDB3D"/>
+  <circle cx="70" cy="128" r="7" fill="#FFDB3D"/>
+  <circle cx="84" cy="92" r="7" fill="#FFDB3D"/>
+  <circle cx="182" cy="166" r="7" fill="#FFDB3D"/>
+  <circle cx="186" cy="128" r="7" fill="#FFDB3D"/>
+  <circle cx="172" cy="92" r="7" fill="#FFDB3D"/>
+  <path d="M104 70Q114 66 124 65" stroke="#E8F1EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
