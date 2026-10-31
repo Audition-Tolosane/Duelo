@@ -14,7 +14,7 @@ type Props = {
   /** Style animé (Reanimated) du seul titre : l'écran de fin de duel y joue l'impact. */
   titleStyle?: StyleProp<AnimatedStyle<StyleProp<ViewStyle>>>;
   /** Repère du titre, pour centrer un éclat dessus. */
-  titleRef?: React.Ref<View>;
+  titleRef?: React.Ref<React.ComponentRef<typeof View>>;
 };
 
 // En-tête de fin de duel. Victoire = halo jaune (moment spectaculaire) ; défaite = pétrole sobre

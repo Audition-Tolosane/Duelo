@@ -50,7 +50,7 @@ export default function SuperCategoryScreen() {
   const [loading, setLoading] = useState(true);
   const [activeCluster, setActiveCluster] = useState<string | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
   // Position verticale de chaque sous-catégorie (puces d'ancrage)
   const sectionY = useRef<Record<string, number>>({});
   const chipsH = useRef(0);

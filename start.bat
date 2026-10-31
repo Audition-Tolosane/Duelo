@@ -14,4 +14,4 @@ start chrome "https://duelo-production.up.railway.app/api/admin/dashboard"
 echo Frontend lance !
 echo   Backend  : https://duelo-production.up.railway.app
 echo   Admin    : https://duelo-production.up.railway.app/api/admin/dashboard
-echo   Frontend : scanner le QR code dans la fenetre Expo (Expo Go SDK 57)
+echo   Frontend : scanner le QR code dans la fenetre Expo (Expo Go SDK 58)

@@ -134,8 +134,8 @@ export default function ResultsScreen() {
   const scoreIn = useSharedValue(reduceMotion ? 1 : 0);
   const xpIn = useSharedValue(reduceMotion ? 1 : 0);
   const restIn = useSharedValue(reduceMotion ? 1 : 0);
-  const overlayRef = useRef<View>(null);
-  const titleRef = useRef<View>(null);
+  const overlayRef = useRef<React.ComponentRef<typeof View>>(null);
+  const titleRef = useRef<React.ComponentRef<typeof View>>(null);
   const [burstOrigin, setBurstOrigin] = useState<{ x: number; y: number } | null>(null);
 
   const shellStyle = useAnimatedStyle(() => ({ opacity: shellIn.value }));

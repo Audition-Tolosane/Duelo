@@ -332,7 +332,7 @@ export default function SearchScreen() {
   const renderCount = (n: number) =>
     searchQuery.trim() && n > 0 ? (
       <Txt variant="overline" style={st.count}>{`${n} ${t('search.results_label')}`}</Txt>
-    ) : null;
+    ) : undefined;
 
   // ── Main Render ──
 

@@ -1,6 +1,8 @@
 module.exports = {
   preset: 'jest-expo',
   setupFiles: ['<rootDir>/jest.setup.js'],
+  // Reanimated 4.7+ : charge ses modules web-only sous Jest (sinon son mock plante à l'init).
+  resolver: 'react-native-reanimated/jest/resolver',
   transformIgnorePatterns: [
     'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg|lucide-react-native)',
   ],
