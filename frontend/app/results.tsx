@@ -14,6 +14,7 @@ import { showRewardedAd } from '../utils/ads';
 import { playSound } from '../utils/sounds';
 import { setResultsOpponent } from '../utils/rematchState';
 import SwipeBackPage from '../components/SwipeBackPage';
+import { RematchDialog } from '../components/RematchModal';
 import UserAvatar from '../components/UserAvatar';
 import VictoryBurst from '../components/VictoryBurst';
 import { useWS } from '../contexts/WebSocketContext';
@@ -92,6 +93,8 @@ export default function ResultsScreen() {
   // incoming = l'adversaire propose une revanche ; accepting = on a accepté, on attend la salle
   const [rematchState, setRematchState] = useState<'idle' | 'waiting' | 'declined' | 'accepted' | 'incoming' | 'accepting'>('idle');
   const rematchStateRef = useRef(rematchState);
+  // Instant de la proposition reçue : la fenêtre de revanche décompte depuis ce moment.
+  const [rematchReceivedAt, setRematchReceivedAt] = useState(0);
   // #22 — Guard against double navigation from concurrent WS events + safety timeout
   const hasNavigatedRef = useRef(false);
   const [xpBreakdown, setXpBreakdown] = useState<XpBreakdown | null>(null);
@@ -228,6 +231,7 @@ export default function ResultsScreen() {
           }
           return;
         }
+        setRematchReceivedAt(Date.now());
         setRematchState('incoming');
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       }),
@@ -474,6 +478,13 @@ export default function ResultsScreen() {
       if (botTimerRef.current) clearTimeout(botTimerRef.current);
     };
   }, []);
+
+  // Refus depuis la fenêtre de revanche : l'adversaire est prévenu, on peut toujours en proposer une.
+  const declineRematch = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    send({ action: 'rematch_decline' });
+    setRematchState('idle');
+  };
 
   const newDuel = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -812,6 +823,18 @@ export default function ResultsScreen() {
         <View style={StyleSheet.absoluteFill} pointerEvents="none">
           <ConfettiCannon count={120} origin={{ x: SCREEN_WIDTH / 2, y: -10 }} autoStart fadeOut explosionSpeed={350} fallSpeed={2800} colors={CONFETTI} />
         </View>
+      )}
+
+      {/* Revanche proposée : même fenêtre que pour un nouveau défi. Elle attend que la fenêtre
+          des récompenses ou du signalement soit fermée (iOS n'empile pas deux fenêtres). */}
+      {rematchState === 'incoming' && !showRewardsModal && !reportModalVisible && (
+        <RematchDialog
+          pseudo={opponentName}
+          receivedAt={rematchReceivedAt}
+          onAccept={playAgain}
+          onDecline={declineRematch}
+          onExpire={() => setRematchState('idle')}
+        />
       )}
 
       {/* Signalement d'une question */}

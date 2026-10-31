@@ -43,6 +43,11 @@ function getQuestionDuration(q?: { question_text?: string; options?: string[] })
 }
 const TOTAL_QUESTIONS = 7;
 const MAX_PTS_PER_Q = 20;
+// Durée minimale d'affichage du vert/rouge avant la question suivante (bot comme duel en ligne).
+const REVEAL_MS = 2000;
+// Duel en ligne : la bonne réponse vient du serveur. Le jaune « en attente » ne s'affiche
+// que si sa réponse tarde, sinon on passe directement au vert/rouge comme contre un bot.
+const PENDING_PICK_DELAY_MS = 400;
 const MAX_TOTAL = MAX_PTS_PER_Q * TOTAL_QUESTIONS; // 140
 
 type Question = {
@@ -173,6 +178,7 @@ export default function GameScreen() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [pseudo, setPseudo] = useState(t('game.player'));
   const [showPending, setShowPending] = useState(true);
+  const [pendingPickVisible, setPendingPickVisible] = useState(false);
 
   // Score refs to avoid stale closures
   const playerScoreRef = useRef(0);
@@ -209,6 +215,17 @@ export default function GameScreen() {
   // Guards
   const isSubmittingRef = useRef(false);               // #18 double-tap prevention
   const wsAnswerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // #17 WS hang timeout
+  const pendingPickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Duel en ligne : quand le second joueur répond, le serveur envoie la question suivante
+  // aussitôt après son résultat. On la retient pour laisser le vert/rouge à l'écran.
+  const revealedAtRef = useRef(0);
+  const afterRevealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const afterReveal = (fn: () => void) => {
+    if (afterRevealTimerRef.current) clearTimeout(afterRevealTimerRef.current);
+    const wait = REVEAL_MS - (Date.now() - revealedAtRef.current);
+    if (wait > 0) afterRevealTimerRef.current = setTimeout(fn, wait);
+    else fn();
+  };
 
   // Question slide scale animation
   const questionScaleAnim = useRef(new Animated.Value(0.96)).current;
@@ -352,6 +369,9 @@ export default function GameScreen() {
       wsOn('answer_result', (msg) => {
         // #17 clear hang timeout, #18 reset submission guard
         if (wsAnswerTimeoutRef.current) clearTimeout(wsAnswerTimeoutRef.current);
+        if (pendingPickTimerRef.current) clearTimeout(pendingPickTimerRef.current);
+        setPendingPickVisible(false);
+        revealedAtRef.current = Date.now();
         isSubmittingRef.current = false;
 
         const { is_correct, points, your_score, opponent_score, question_index, correct_option } = msg.data || {};
@@ -389,7 +409,7 @@ export default function GameScreen() {
         setPlayerScore(your_score);
       }),
       // Next question
-      wsOn('next_question', (msg) => {
+      wsOn('next_question', (msg) => afterReveal(() => {
         const q = msg.data?.question;
         if (q) {
           questionsRef.current = [...questionsRef.current, q];
@@ -404,21 +424,24 @@ export default function GameScreen() {
           animateQuestion();
           startTimer();
         }
-      }),
+      })),
       // Game over
-      wsOn('game_over', async (msg) => {
+      wsOn('game_over', (msg) => {
         matchEndedRef.current = true;
         if (timerRef.current) clearInterval(timerRef.current);
-        const { your_score, opponent_score, your_correct } = msg.data || {};
-        const userId = userIdRef.current;
-        playSound(your_score >= opponent_score ? 'victory' : 'defeat');
-        await saveReviewData();
-        router.replace(
-          `/results?playerScore=${your_score}&opponentScore=${opponent_score}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=false&correctCount=${your_correct || correctCountRef.current}&opponentLevel=${params.opponentLevel || 1}&opponentId=${params.opponentId || ''}`
-        );
+        afterReveal(async () => {
+          const { your_score, opponent_score, your_correct } = msg.data || {};
+          const userId = userIdRef.current;
+          playSound(your_score >= opponent_score ? 'victory' : 'defeat');
+          await saveReviewData();
+          router.replace(
+            `/results?playerScore=${your_score}&opponentScore=${opponent_score}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=false&correctCount=${your_correct || correctCountRef.current}&opponentLevel=${params.opponentLevel || 1}&opponentId=${params.opponentId || ''}`
+          );
+        });
       }),
       // Opponent disconnected
       wsOn('opponent_disconnected', async (msg) => {
+        if (afterRevealTimerRef.current) clearTimeout(afterRevealTimerRef.current);
         matchEndedRef.current = true;
         if (timerRef.current) clearInterval(timerRef.current);
         const { your_score, opponent_score, your_correct, compensation_points } = msg.data || {};
@@ -440,7 +463,11 @@ export default function GameScreen() {
     const pendingStart = dueloWS.takeGameStart(params.roomId as string);
     if (pendingStart) applyGameStart(pendingStart);
 
-    return () => unsubs.forEach((u) => u());
+    return () => {
+      unsubs.forEach((u) => u());
+      if (afterRevealTimerRef.current) clearTimeout(afterRevealTimerRef.current);
+      if (pendingPickTimerRef.current) clearTimeout(pendingPickTimerRef.current);
+    };
   // #38 — isLive is derived from URL params (never changes), use [] to prevent listener leak on re-render
   }, []);
 
@@ -620,7 +647,7 @@ export default function GameScreen() {
     const delay = botRevealDelay ?? 0;
     setTimeout(() => setBotAnswer(botPick), delay);
 
-    setTimeout(nextQuestion, 2000);
+    setTimeout(nextQuestion, REVEAL_MS);
   };
 
   const handleTimeout = () => {
@@ -681,6 +708,8 @@ export default function GameScreen() {
 
     if (isLive) {
       // Live multiplayer: send answer to server, wait for answer_result
+      if (pendingPickTimerRef.current) clearTimeout(pendingPickTimerRef.current);
+      pendingPickTimerRef.current = setTimeout(() => setPendingPickVisible(true), PENDING_PICK_DELAY_MS);
       wsSend({
         action: 'game_answer',
         room_id: params.roomId,
@@ -692,11 +721,12 @@ export default function GameScreen() {
       // #7 — If server hangs, show result then auto-advance to avoid infinite freeze
       if (wsAnswerTimeoutRef.current) clearTimeout(wsAnswerTimeoutRef.current);
       wsAnswerTimeoutRef.current = setTimeout(() => {
+        setPendingPickVisible(false);
         setShowResult(true);
         setShowPending(false);
         isSubmittingRef.current = false;
         // Server never replied — advance after 2s so the game isn't stuck forever
-        setTimeout(() => nextQuestion(), 2000);
+        setTimeout(() => nextQuestion(), REVEAL_MS);
       }, 8000);
       // Don't show result locally — wait for server response
     } else {
@@ -880,7 +910,8 @@ export default function GameScreen() {
   const isOptionCorrectReveal = (index: number): boolean => index === correctIndex();
   const isWrongPick = (index: number): boolean =>
     showResult && index === selectedOption && !isOptionCorrectReveal(index);
-  const isPendingPick = (index: number): boolean => !showResult && index === selectedOption;
+  const isPendingPick = (index: number): boolean =>
+    !showResult && index === selectedOption && (!isLive || pendingPickVisible);
 
   const answerState = (index: number): AnswerState =>
     isOptionCorrectReveal(index) ? 'correct'
