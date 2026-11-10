@@ -24,7 +24,8 @@
       "autoIncrement": true,
       "env": {
         "EXPO_PUBLIC_BACKEND_URL": "https://duelo-production.up.railway.app",
-        "EXPO_PUBLIC_ADS_TEST": "1"
+        "EXPO_PUBLIC_ADS_TEST": "0",
+        "EXPO_PUBLIC_ADMOB_REWARDED_IOS": "ca-app-pub-3913909427290988/5984214480"
       }
     }
   },
