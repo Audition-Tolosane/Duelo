@@ -1,12 +1,13 @@
 import random
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, func, delete, or_, and_
+from sqlalchemy import select, func, delete, update, or_, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import User, ChatMessage
 from schemas import ChatSend
-from services.notifications import create_notification
+from services.notifications import push_message
+from services.ws_manager import manager
 from auth_middleware import get_current_user_id
 from rate_limit import rate_limit
 from routers.moderation import blocked_user_ids, is_blocked_between
@@ -43,21 +44,19 @@ async def send_message(data: ChatSend, current_user: str = Depends(get_current_u
     sender = s_res.scalar_one_or_none()
 
     sender_name = sender.pseudo if sender else "Quelqu'un"
-    if data.message_type == "text":
-        notif_body = f"{sender_name}: {data.content[:100]}{'...' if len(data.content) > 100 else ''}"
-    elif data.message_type == "image":
-        notif_body = f"{sender_name} t'a envoyé une image"
-    elif data.message_type == "game_card":
-        notif_body = f"{sender_name} t'a envoyé un résultat de match"
-    else:
-        notif_body = f"{sender_name} t'a envoyé un message"
-
-    await create_notification(
-        db, data.receiver_id, "message", "notif.new_message", f"notif.message_body:{sender_name}",
-        actor_id=data.sender_id,
-        data={"screen": "chat", "params": {"userId": data.sender_id, "pseudo": sender_name}},
-    )
-    await db.commit()
+    payload = {
+        "id": msg.id, "sender_id": msg.sender_id, "receiver_id": msg.receiver_id,
+        "sender_pseudo": sender_name,
+        "sender_avatar_seed": sender.avatar_seed if sender else None,
+        "sender_avatar_url": getattr(sender, "avatar_url", None) if sender else None,
+        "content": msg.content, "message_type": msg.message_type,
+        "extra_data": msg.extra_data, "read": msg.read,
+        "created_at": msg.created_at.isoformat(),
+    }
+    # Même chemin que l'envoi par WebSocket : temps réel si connecté (icône Messages + bandeau),
+    # push sinon. Pas de notification : un message ne va pas dans la cloche.
+    await manager.send_chat_message(data.sender_id, data.receiver_id, payload)
+    await push_message(db, data.receiver_id, data.sender_id, sender_name)
 
     return {
         "id": msg.id, "sender_id": msg.sender_id, "receiver_id": msg.receiver_id,
@@ -163,20 +162,23 @@ async def get_chat_messages(user_id: str, with_user: str, limit: int = 50, curre
         raise HTTPException(status_code=403, detail="Non autorisé")
     if await is_blocked_between(db, user_id, with_user):
         return []
+    # Les `limit` messages les PLUS RÉCENTS, remis dans l'ordre chronologique (avant : les plus
+    # anciens — au-delà de 50 messages, les nouveaux n'apparaissaient plus).
     result = await db.execute(
         select(ChatMessage).where(
             or_(
                 and_(ChatMessage.sender_id == user_id, ChatMessage.receiver_id == with_user),
                 and_(ChatMessage.sender_id == with_user, ChatMessage.receiver_id == user_id),
             )
-        ).order_by(ChatMessage.created_at.asc()).limit(limit)
+        ).order_by(ChatMessage.created_at.desc()).limit(limit)
     )
-    messages = result.scalars().all()
+    messages = list(reversed(result.scalars().all()))
 
+    # Ouvrir la conversation = tout lire, y compris hors de la page chargée.
+    await _mark_conversation_read(db, user_id, with_user)
     for m in messages:
-        if m.receiver_id == user_id and not m.read:
+        if m.receiver_id == user_id:
             m.read = True
-    await db.commit()
 
     return [{
         "id": m.id, "sender_id": m.sender_id, "receiver_id": m.receiver_id,
@@ -184,6 +186,26 @@ async def get_chat_messages(user_id: str, with_user: str, limit: int = 50, curre
         "extra_data": m.extra_data, "read": m.read,
         "created_at": m.created_at.isoformat(),
     } for m in messages]
+
+
+async def _mark_conversation_read(db: AsyncSession, user_id: str, with_user: str):
+    await db.execute(
+        update(ChatMessage)
+        .where(ChatMessage.sender_id == with_user, ChatMessage.receiver_id == user_id,
+               ChatMessage.read == False)
+        .values(read=True)
+    )
+    await db.commit()
+
+
+@router.post("/{user_id}/read")
+async def mark_conversation_read(user_id: str, with_user: str, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    """Message reçu pendant que la conversation est ouverte : il est lu, côté serveur aussi
+    (sinon le point rouge de l'icône Messages revient au prochain recalcul)."""
+    if current_user != user_id:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+    await _mark_conversation_read(db, user_id, with_user)
+    return {"success": True}
 
 
 @router.get("/unread-count/{user_id}")

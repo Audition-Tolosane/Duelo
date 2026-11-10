@@ -56,7 +56,7 @@ export default function ChatScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { partnerId, partnerPseudo, partnerAvatarSeed, partnerAvatarUrl } = useLocalSearchParams<{ partnerId: string; partnerPseudo: string; partnerAvatarSeed: string; partnerAvatarUrl: string }>();
-  const { send: wsSend, on: wsOn, decrementUnread } = useWS();
+  const { send: wsSend, on: wsOn, refreshUnread } = useWS();
   const [myId, setMyId] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState('');
@@ -85,7 +85,10 @@ export default function ChatScreen() {
           // #39 — dedup by message ID (message may already be in list from initial fetch)
           setMessages((prev) => prev.some(m => m.id === msg.data.id) ? prev : [...prev, msg.data]);
           setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
-          decrementUnread(1); // We're reading it right now
+          // Lu à l'instant : on le marque lu côté serveur aussi, puis on recale la pastille.
+          authFetch(`${API_URL}/api/chat/${myId}/read?with_user=${partnerId}`, { method: 'POST' })
+            .catch(() => {})
+            .finally(refreshUnread);
         }
       }),
       // Our own sent message confirmed
@@ -120,6 +123,8 @@ export default function ChatScreen() {
     if (uid) {
       setMyId(uid);
       await fetchMessages(uid);
+      // Le serveur vient de marquer la conversation lue : la pastille Messages doit suivre.
+      refreshUnread();
     }
     setLoading(false);
   };

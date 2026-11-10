@@ -14,6 +14,8 @@ type WebSocketContextType = {
   on: (type: string, handler: (msg: any) => void) => () => void;
   /** Decrement unread messages count (when user reads a conversation) */
   decrementUnread: (count?: number) => void;
+  /** Relit les compteurs non lus depuis le serveur (ex. après avoir ouvert une conversation) */
+  refreshUnread: () => void;
   /** Reset unread notifications count */
   resetNotifCount: () => void;
   /** Decrement unread notifications count (when user reads one notification) */
@@ -27,6 +29,7 @@ const WebSocketContext = createContext<WebSocketContextType>({
   send: () => {},
   on: () => () => {},
   decrementUnread: () => {},
+  refreshUnread: () => {},
   resetNotifCount: () => {},
   decrementNotifs: () => {},
 });
@@ -127,6 +130,11 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     setUnreadMessages((prev) => Math.max(0, prev - count));
   }, []);
 
+  const refreshUnread = useCallback(async () => {
+    const uid = userIdRef.current || await AsyncStorage.getItem('duelo_user_id');
+    if (uid) fetchUnreadCounts(uid);
+  }, []);
+
   const resetNotifCount = useCallback(() => {
     setUnreadNotifs(0);
   }, []);
@@ -138,7 +146,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   return (
     <WebSocketContext.Provider value={{
       isConnected, unreadMessages, unreadNotifs,
-      send, on, decrementUnread, resetNotifCount, decrementNotifs,
+      send, on, decrementUnread, refreshUnread, resetNotifCount, decrementNotifs,
     }}>
       {children}
     </WebSocketContext.Provider>

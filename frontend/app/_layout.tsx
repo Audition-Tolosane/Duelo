@@ -36,6 +36,7 @@ import { COLOR } from '../theme/tokens';
 import { initAds } from '../utils/ads';
 import * as Notifications from 'expo-notifications';
 import { openNotificationTarget } from '../utils/notificationRoute';
+import MessageBanner from '../components/MessageBanner';
 
 // Push reçu app ouverte : bannière + son (sans handler, iOS n'affiche rien au premier plan).
 if (Platform.OS !== 'web') {
@@ -127,6 +128,7 @@ export default function RootLayout() {
           ))}
         </Stack>
       </SwipeBackProvider>
+      <MessageBanner />
       </ErrorBoundary>
       </WebSocketProvider>
     </GestureHandlerRootView>

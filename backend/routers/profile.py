@@ -306,6 +306,10 @@ async def upload_user_avatar(request: Request, current_user: str = Depends(get_c
     return {"success": True, "avatar_url": user.avatar_url}
 
 
+# Langues de l'interface (frontend/utils/i18n.ts), plus larges que celles du catalogue.
+LANGUES_APP = {"fr", "en", "es", "de", "pt", "it", "pl", "ar", "ja", "ko", "zh"}
+
+
 @router.post("/user/push-token")
 async def save_push_token(data: dict, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     """Save or update the user's Expo push token for remote notifications."""
@@ -320,6 +324,10 @@ async def save_push_token(data: dict, current_user: str = Depends(get_current_us
     if not user:
         raise HTTPException(status_code=404, detail="Utilisateur introuvable")
     user.push_token = token
+    # Langue de l'app : les push sont traduits côté serveur avant l'envoi (services/notifications).
+    lang = str(data.get("lang") or "").strip().lower()[:2]
+    if lang in LANGUES_APP:
+        user.language = lang
     await db.commit()
     return {"status": "ok"}
 

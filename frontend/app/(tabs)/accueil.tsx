@@ -1005,7 +1005,7 @@ export default function AccueilScreen() {
           await authFetch(`${API_URL}/api/profile/user/push-token`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: uid, token }),
+            body: JSON.stringify({ user_id: uid, token, lang: getLanguage() }),
           });
         }
       } catch (e) { console.error(e); }

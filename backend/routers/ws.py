@@ -18,7 +18,7 @@ from services.xp import (
     get_theme_title, check_new_title_theme, MAX_LEVEL, TITLE_THRESHOLDS,
     get_daily_streak_bonus, update_login_streak, difficulty_mix,
 )
-from services.notifications import create_notification
+from services.notifications import push_message
 from config import JWT_SECRET, JWT_ALGORITHM
 
 logger = logging.getLogger(__name__)
@@ -207,6 +207,8 @@ async def handle_chat_send(sender_id: str, data: dict):
             "sender_id": sender_id,
             "receiver_id": receiver_id,
             "sender_pseudo": sender_pseudo,
+            "sender_avatar_seed": sender.avatar_seed if sender else None,
+            "sender_avatar_url": getattr(sender, "avatar_url", None) if sender else None,
             "content": msg.content,
             "message_type": msg.message_type,
             "extra_data": msg.extra_data,
@@ -220,21 +222,9 @@ async def handle_chat_send(sender_id: str, data: dict):
         "data": message_data,
     })
 
-    if not manager.is_online(receiver_id):
-        async with AsyncSessionLocal() as db:
-            if message_type == "text":
-                notif_body = f"{sender_pseudo}: {content[:100]}{'...' if len(content) > 100 else ''}"
-            elif message_type == "image":
-                notif_body = f"{sender_pseudo} t'a envoyé une image"
-            else:
-                notif_body = f"{sender_pseudo} t'a envoyé un message"
-
-            await create_notification(
-                db, receiver_id, "message", "notif.new_message", f"notif.message_body:{sender_pseudo}",
-                actor_id=sender_id,
-                data={"screen": "chat", "params": {"userId": sender_id, "pseudo": sender_pseudo}},
-            )
-            await db.commit()
+    # Destinataire hors ligne : push seulement — un message ne va pas dans la cloche.
+    async with AsyncSessionLocal() as db:
+        await push_message(db, receiver_id, sender_id, sender_pseudo)
 
 
 async def handle_chat_typing(sender_id: str, data: dict):
