@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=1400"/>
+<title>Duelo — Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #E8E4DC; font-family: 'Inter', system-ui, sans-serif; color: #1a1a1a; }
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+  @keyframes scorePop { 0% { transform: scale(1); } 40% { transform: scale(1.4); color: #32E7A3; } 100% { transform: scale(1); } }
+  @keyframes heroIn { 0% { transform: scale(0.3); opacity: 0; } 60% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fadeSlide { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes scaleIn { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+  @keyframes ringExpand { 0% { width: 20px; height: 20px; border: 2px solid #FFB547; opacity: 1; } 100% { width: 600px; height: 600px; border: 1px solid #FFB54700; opacity: 0; } }
+  @keyframes confetti { 0% { transform: translateY(0) rotate(0); opacity: 1; } 100% { transform: translateY(900px) rotate(720deg); opacity: 0.3; } }
+  @keyframes pingRing { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(2.5); opacity: 0; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="tokens.js"></script>
+<script type="text/babel" src="primitives.jsx"></script>
+<script type="text/babel" src="screens_part1.jsx"></script>
+<script type="text/babel" src="screens_part2.jsx"></script>
+<script type="text/babel" src="screens_part3.jsx"></script>
+<script type="text/babel" src="proto.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent1": "#00E5FF",
+  "accent2": "#B366FF",
+  "sectionSpacing": 7,
+  "showProto": true
+}/*EDITMODE-END*/;
+
+function App() {
+  const [tweaks, setTweaks] = React.useState(TWEAK_DEFAULTS);
+  const [tweaksOpen, setTweaksOpen] = React.useState(false);
+  const [, forceRender] = React.useReducer(x => x + 1, 0);
+
+  React.useEffect(() => {
+    const handler = (e) => {
+      if (e.data?.type === '__activate_edit_mode') setTweaksOpen(true);
+      if (e.data?.type === '__deactivate_edit_mode') setTweaksOpen(false);
+    };
+    window.addEventListener('message', handler);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', handler);
+  }, []);
+
+  const updateTweak = (key, value) => {
+    const next = { ...tweaks, [key]: value };
+    setTweaks(next);
+    if (key === 'accent1') window.DUELO_TOKENS.cyan = value;
+    if (key === 'accent2') window.DUELO_TOKENS.violet = value;
+    forceRender();
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [key]: value } }, '*');
+  };
+
+  const spacing = tweaks.sectionSpacing * 8;
+  const TK = window.DUELO_TOKENS;
+
+  const SCREENS = [
+    { key: 'Onboarding', A: window.Onboarding_A, B: window.Onboarding_B, desc: 'Premier écran · bienvenue' },
+    { key: 'Accueil', A: window.Accueil_A, B: window.Accueil_B, desc: 'Home · feed duels + quick match' },
+    { key: 'Matchmaking', A: window.Matchmaking_A, B: window.Matchmaking_B, desc: 'Recherche / VS reveal' },
+    { key: 'Quiz', A: window.Game_A, B: window.Game_B, desc: 'Écran de jeu · question en cours' },
+    { key: 'Résultats', A: window.Results_A, B: window.Results_B, desc: 'Victoire · XP breakdown' },
+    { key: 'Thèmes', A: window.Themes_A, B: window.Themes_B, desc: 'Catégories de quiz' },
+    { key: 'Leaderboard', A: window.Leaderboard_A, B: window.Leaderboard_B, desc: 'Classement mondial / local' },
+    { key: 'Profil', A: window.Profil_A, B: window.Profil_B, desc: 'Profil joueur · stats, trophées' },
+    { key: 'Shop', A: window.Shop_A, B: window.Shop_B, desc: 'Pièces, boosts, packs' },
+  ];
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#E8E4DC', padding: '60px 40px 120px' }}>
+      {/* Header */}
+      <div style={{ maxWidth: 1320, margin: '0 auto 48px' }}>
+        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: 'rgba(0,0,0,0.5)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>
+          ◆ Redesign proposal · juin 2026
+        </div>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontStyle: 'italic', fontWeight: 400, fontSize: 72, margin: 0, letterSpacing: -2, lineHeight: 0.95, color: '#1a1a1a', textWrap: 'balance' }}>
+          Duelo, <span style={{ color: '#6B5ACF' }}>cosmique</span> mais <span style={{ color: '#0090B2' }}>raffiné.</span>
+        </h1>
+        <p style={{ fontFamily: 'Inter', fontSize: 16, lineHeight: 1.5, color: 'rgba(0,0,0,0.65)', maxWidth: 620, marginTop: 20 }}>
+          On garde l'ADN — épées croisées, cyan&nbsp;×&nbsp;violet, ambiance stellaire — mais on hiérarchise, on respire,
+          et on injecte des animations cinématiques aux moments qui comptent&nbsp;: victoires, level-up, streaks.
+          Le proto interactif plus bas joue le flow&nbsp;<em>Quiz → Résultats</em> avec confettis, pop de score et transition héros.
+        </p>
+        <div style={{ display: 'flex', gap: 32, marginTop: 28, fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: 'rgba(0,0,0,0.55)', letterSpacing: 1.5, textTransform: 'uppercase', flexWrap: 'wrap' }}>
+          <div><span style={{ color: '#6B5ACF', fontWeight: 700 }}>9 écrans</span> × 2 variations</div>
+          <div><span style={{ color: '#0090B2', fontWeight: 700 }}>Proto</span> quiz → victoire</div>
+          <div><span style={{ color: '#E8A024', fontWeight: 700 }}>Tweaks</span> palette / densité</div>
+        </div>
+      </div>
+
+      {/* Design system strip */}
+      <div style={{ maxWidth: 1320, margin: '0 auto 64px', padding: 28, background: '#F5F1EA', borderRadius: 24, border: '1px solid rgba(0,0,0,0.08)' }}>
+        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'rgba(0,0,0,0.5)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 16 }}>Système · tokens</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 20 }}>
+          {[
+            { n: 'Cyan', v: TK.cyan, t: 'Joueur 1' },
+            { n: 'Violet', v: TK.violet, t: 'Joueur 2' },
+            { n: 'Or', v: TK.gold, t: 'Victoire / XP' },
+            { n: 'Feu', v: TK.fire, t: 'Streak' },
+            { n: 'Menthe', v: TK.mint, t: 'Succès' },
+            { n: 'Rouge', v: TK.red, t: 'Erreur' },
+          ].map(c => (
+            <div key={c.n}>
+              <div style={{ height: 64, borderRadius: 12, background: c.v, boxShadow: `0 8px 20px ${c.v}40` }}/>
+              <div style={{ fontFamily: 'Space Grotesk', fontSize: 13, fontWeight: 700, marginTop: 8 }}>{c.n}</div>
+              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: 'rgba(0,0,0,0.5)', letterSpacing: 0.5 }}>{c.v} · {c.t}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, marginTop: 28, paddingTop: 24, borderTop: '1px solid rgba(0,0,0,0.08)' }}>
+          <div>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'rgba(0,0,0,0.5)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6 }}>Display</div>
+            <div style={{ fontFamily: 'Space Grotesk', fontSize: 30, fontWeight: 900, letterSpacing: -1 }}>Space Grotesk</div>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'rgba(0,0,0,0.5)' }}>UI, boutons, stats</div>
+          </div>
+          <div>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'rgba(0,0,0,0.5)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6 }}>Editorial</div>
+            <div style={{ fontFamily: 'Fraunces', fontStyle: 'italic', fontSize: 30, fontWeight: 400, letterSpacing: -0.5 }}>Fraunces italic</div>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'rgba(0,0,0,0.5)' }}>Titres, moments hero</div>
+          </div>
+          <div>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'rgba(0,0,0,0.5)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6 }}>Technical</div>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 22, fontWeight: 600, letterSpacing: -0.5 }}>JetBrains Mono</div>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'rgba(0,0,0,0.5)' }}>Eyebrows, scores</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Interactive prototype */}
+      {tweaks.showProto && (
+        <div style={{ maxWidth: 1320, margin: '0 auto 80px', padding: '40px 28px', background: '#0A0A1A', borderRadius: 28, position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 80% 60% at 20% 20%, ${TK.violet}30, transparent 60%), radial-gradient(ellipse 80% 60% at 80% 80%, ${TK.cyan}25, transparent 60%)` }}/>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 60, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <div style={{ flex: '1 1 340px', minWidth: 320 }}>
+              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: TK.gold, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>◆ Prototype interactif</div>
+              <div style={{ fontFamily: 'Fraunces', fontStyle: 'italic', fontSize: 52, fontWeight: 400, color: '#fff', letterSpacing: -1.5, lineHeight: 1, marginBottom: 16 }}>
+                Joue le flow<br/><span style={{ background: `linear-gradient(135deg, ${TK.cyan}, ${TK.violet})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Quiz → Victoire</span>
+              </div>
+              <div style={{ fontFamily: 'Inter', fontSize: 15, color: 'rgba(255,255,255,0.7)', lineHeight: 1.55, maxWidth: 420, marginBottom: 20 }}>
+                Réponds à la question, regarde le timer glower en rouge sous 3s, sens le score popper, profite
+                de la transition héros serif, puis des confettis qui tombent sur la victoire pendant que l'XP s'incrémente.
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {[
+                  { n: 'Timer stress', d: 'Pulse rouge + glow sous 3s' },
+                  { n: 'Score pop', d: 'Anim scale + mint sur +points' },
+                  { n: 'Hero transition', d: 'Ring expanding + serif' },
+                  { n: 'XP counter', d: 'Incrément animé 0 → +124' },
+                  { n: 'Confetti', d: '30 particules brand' },
+                ].map(f => (
+                  <div key={f.n} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                    <div style={{ width: 6, height: 6, borderRadius: 3, background: TK.cyan, boxShadow: `0 0 8px ${TK.cyan}` }}/>
+                    <div style={{ fontFamily: 'Space Grotesk', fontSize: 14, fontWeight: 700, color: '#fff' }}>{f.n}</div>
+                    <div style={{ fontFamily: 'Inter', fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>· {f.d}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <window.InteractiveProto/>
+          </div>
+        </div>
+      )}
+
+      {/* Canvas */}
+      <div style={{ maxWidth: 1320, margin: '0 auto' }}>
+        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: 'rgba(0,0,0,0.5)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>◆ Écrans · 9 × 2 variations</div>
+        <h2 style={{ fontFamily: 'Fraunces', fontStyle: 'italic', fontWeight: 400, fontSize: 42, margin: 0, letterSpacing: -1, marginBottom: 40 }}>L'application, écran par écran</h2>
+        {SCREENS.map((s, i) => (
+          <div key={s.key} style={{ marginBottom: spacing + 40 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 28, paddingBottom: 18, borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
+              <div style={{ fontFamily: 'Fraunces', fontStyle: 'italic', fontSize: 14, color: 'rgba(0,0,0,0.4)' }}>{String(i+1).padStart(2,'0')}</div>
+              <div style={{ fontFamily: 'Space Grotesk', fontSize: 26, fontWeight: 800, letterSpacing: -0.5 }}>{s.key}</div>
+              <div style={{ fontFamily: 'Inter', fontSize: 13, color: 'rgba(0,0,0,0.55)' }}>· {s.desc}</div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, justifyItems: 'center' }}>
+              <Phone label="Editorial · clean · serif" variant="VAR A"><s.A/></Phone>
+              <Phone label="Arcade · bold · gamified" variant="VAR B"><s.B/></Phone>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ maxWidth: 880, margin: '80px auto 0', textAlign: 'center' }}>
+        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'rgba(0,0,0,0.5)', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 16 }}>◆ Prochaines étapes</div>
+        <div style={{ fontFamily: 'Fraunces', fontStyle: 'italic', fontSize: 26, color: 'rgba(0,0,0,0.8)', lineHeight: 1.4, letterSpacing: -0.3 }}>
+          Dis-moi quelles variations tu préfères, par écran, et on assemble le kit final. Je peux aussi pousser
+          plus loin les animations (level-up, nouveau trophée, milestone streak).
+        </div>
+      </div>
+
+      {/* Tweaks panel */}
+      {tweaksOpen && (
+        <div style={{ position: 'fixed', bottom: 20, right: 20, width: 280, zIndex: 1000, background: '#0A0A1A', border: `1px solid ${TK.cyan}40`, borderRadius: 18, padding: 16, boxShadow: '0 20px 60px rgba(0,0,0,0.4)', fontFamily: 'Inter' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <div style={{ fontFamily: 'Space Grotesk', fontWeight: 800, fontSize: 13, color: '#fff', letterSpacing: 1, textTransform: 'uppercase' }}>Tweaks</div>
+            <div onClick={() => setTweaksOpen(false)} style={{ cursor: 'pointer', color: 'rgba(255,255,255,0.5)', fontSize: 18 }}>×</div>
+          </div>
+          <TweakRow label="Cyan (J1)"><input type="color" value={tweaks.accent1} onChange={e => updateTweak('accent1', e.target.value)} style={{ width: '100%', height: 28, border: 'none', background: 'none', cursor: 'pointer' }}/></TweakRow>
+          <TweakRow label="Violet (J2)"><input type="color" value={tweaks.accent2} onChange={e => updateTweak('accent2', e.target.value)} style={{ width: '100%', height: 28, border: 'none', background: 'none', cursor: 'pointer' }}/></TweakRow>
+          <TweakRow label={`Espacement (${tweaks.sectionSpacing})`}><input type="range" min="2" max="14" step="1" value={tweaks.sectionSpacing} onChange={e => updateTweak('sectionSpacing', Number(e.target.value))} style={{ width: '100%' }}/></TweakRow>
+          <TweakRow label="Proto interactif">
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#fff', fontSize: 12, cursor: 'pointer' }}>
+              <input type="checkbox" checked={tweaks.showProto} onChange={e => updateTweak('showProto', e.target.checked)}/>
+              {tweaks.showProto ? 'Visible' : 'Caché'}
+            </label>
+          </TweakRow>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TweakRow({ label, children }) {
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: 'rgba(255,255,255,0.5)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>{label}</div>
+      {children}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

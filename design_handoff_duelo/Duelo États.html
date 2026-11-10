@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=1100"/>
+<title>Duelo — États manquants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #E8E4DC; font-family: 'Inter', system-ui, sans-serif; color: #1a1a1a; }
+  @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
+  @keyframes pingRing { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(2.2); opacity: 0; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="tokens.js"></script>
+<script type="text/babel" src="primitives.jsx"></script>
+<script type="text/babel" src="screens_suite1.jsx"></script>
+<script type="text/babel" src="screens_states.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+function App() {
+  const GROUPS = [
+    { title: 'Fin de duel', color: '#B366FF', screens: [
+      { key: 'Défaite', C: window.E_Defeat, note: 'XP de consolation + revanche' },
+      { key: 'Égalité', C: window.E_Draw, note: 'Scores symétriques · « la belle »' },
+      { key: 'Adversaire parti', C: window.E_OpponentLeft, note: 'Victoire par forfait' },
+    ]},
+    { title: 'États vides', color: '#00E5FF', screens: [
+      { key: 'Aucun duel', C: window.E_EmptyDuels, note: 'Accueil sans duel en cours' },
+      { key: 'Aucun message', C: window.E_EmptyMessages, note: 'Boîte de réception vide' },
+      { key: 'Recherche vide', C: window.E_EmptySearch, note: 'Aucun résultat' },
+    ]},
+    { title: 'Erreurs', color: '#FF3D5E', screens: [
+      { key: 'Hors ligne', C: window.E_Offline, note: 'Connexion perdue · reconnexion' },
+    ]},
+  ];
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#E8E4DC', padding: '60px 40px 120px' }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto 56px' }}>
+        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: 'rgba(0,0,0,0.5)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>◆ États manquants · 7 écrans</div>
+        <h1 style={{ fontFamily: "'Fraunces', serif", fontStyle: 'italic', fontWeight: 400, fontSize: 60, margin: 0, letterSpacing: -2, lineHeight: 0.95, color: '#1a1a1a' }}>
+          Tous les <span style={{ color: '#6B5ACF' }}>cas de figure</span>.
+        </h1>
+        <p style={{ fontFamily: 'Inter', fontSize: 16, lineHeight: 1.5, color: 'rgba(0,0,0,0.65)', maxWidth: 600, marginTop: 20 }}>
+          Les écrans qu'on oublie souvent mais qui font une app finie&nbsp;: défaite et égalité (pas juste la victoire),
+          états vides accueillants plutôt que pages blanches, et gestion propre des erreurs réseau. Chaque état
+          garde un ton positif et propose toujours une action.
+        </p>
+      </div>
+
+      {GROUPS.map(g => (
+        <div key={g.title} style={{ maxWidth: 1000, margin: '0 auto 64px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32, paddingBottom: 16, borderBottom: '1px solid rgba(0,0,0,0.12)' }}>
+            <div style={{ width: 10, height: 10, borderRadius: 5, background: g.color, boxShadow: `0 0 12px ${g.color}` }}/>
+            <div style={{ fontFamily: 'Space Grotesk', fontWeight: 800, fontSize: 22, letterSpacing: -0.5 }}>{g.title}</div>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: 'rgba(0,0,0,0.4)', letterSpacing: 1 }}>{g.screens.length} écran{g.screens.length > 1 ? 's' : ''}</div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48, justifyItems: 'center' }}>
+            {g.screens.map(s => (
+              <Phone key={s.key} label={s.note} variant={s.key}><s.C/></Phone>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <div style={{ maxWidth: 760, margin: '70px auto 0', textAlign: 'center' }}>
+        <div style={{ fontFamily: 'Fraunces', fontStyle: 'italic', fontSize: 24, color: 'rgba(0,0,0,0.8)', lineHeight: 1.4, letterSpacing: -0.3 }}>
+          L'app est désormais couverte de bout en bout — écrans, parcours, et états limites.
+          Dis-moi si tu veux que je régénère le paquet de handoff Claude Code avec l'ensemble.
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

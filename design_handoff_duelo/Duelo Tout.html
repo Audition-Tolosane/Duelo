@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=1280"/>
+<title>Duelo — Tous les écrans</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #E8E4DC; font-family: 'Inter', system-ui, sans-serif; color: #1a1a1a; }
+  @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
+  @keyframes scorePop { 0% { transform: scale(1); } 40% { transform: scale(1.4); color: #32E7A3; } 100% { transform: scale(1); } }
+  @keyframes heroIn { 0% { transform: scale(0.3); opacity: 0; } 60% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fadeSlide { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes scaleIn { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+  @keyframes ringExpand { 0% { width: 20px; height: 20px; border: 2px solid #FFB547; opacity: 1; } 100% { width: 600px; height: 600px; border: 1px solid #FFB54700; opacity: 0; } }
+  @keyframes confetti { 0% { transform: translateY(0) rotate(0); opacity: 1; } 100% { transform: translateY(900px) rotate(720deg); opacity: 0.3; } }
+  @keyframes pingRing { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(2.2); opacity: 0; } }
+  html { scroll-behavior: smooth; }
+  .nav-link { cursor: pointer; transition: color 0.15s; }
+  .nav-link:hover { color: #6B5ACF !important; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="tokens.js"></script>
+<script type="text/babel" src="primitives.jsx"></script>
+<script type="text/babel" src="screens_final.jsx"></script>
+<script type="text/babel" src="proto.jsx"></script>
+<script type="text/babel" src="screens_suite1.jsx"></script>
+<script type="text/babel" src="screens_suite2.jsx"></script>
+<script type="text/babel" src="screens_suite3.jsx"></script>
+<script type="text/babel" src="screens_states.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+function App() {
+  const TK = window.DUELO_TOKENS;
+
+  const SECTIONS = [
+    { id: 'principaux', title: 'Écrans principaux', color: '#6B5ACF', screens: [
+      { key: 'Onboarding', C: window.F_Onboarding, note: 'Bienvenue' },
+      { key: 'Accueil', C: window.F_Accueil, note: 'Home · duels + quick match' },
+      { key: 'Matchmaking', C: window.F_Matchmaking, note: 'Reveal VS' },
+      { key: 'Quiz', C: window.F_Quiz, note: 'Jeu · timer rond' },
+      { key: 'Résultats', C: window.F_Results, note: 'Victoire · détail XP' },
+      { key: 'Thèmes', C: window.F_Themes, note: 'Catégories' },
+      { key: 'Leaderboard', C: window.F_Leaderboard, note: 'Classement · podium' },
+      { key: 'Profil', C: window.F_Profil, note: 'Stats + trophées' },
+      { key: 'Shop', C: window.F_Shop, note: 'Pièces, boosts' },
+    ]},
+    { id: 'social', title: 'Social & joueurs', color: '#B366FF', screens: [
+      { key: 'Conversations', C: window.S_Conversations, note: 'Messages' },
+      { key: 'Chat', C: window.S_Chat, note: 'Interactif ✦' },
+      { key: 'Recherche', C: window.S_Search, note: 'Interactif ✦' },
+      { key: 'Notifications', C: window.S_Notifications, note: 'Défis, classement' },
+      { key: 'Joueurs', C: window.S_Players, note: 'Trouver un rival' },
+      { key: 'Profil joueur', C: window.S_PlayerProfile, note: 'Face à face' },
+      { key: 'Communauté', C: window.S_Followers, note: 'Abonnés' },
+    ]},
+    { id: 'jeu', title: 'Jeu & contenu', color: '#00E5FF', screens: [
+      { key: 'Défi en attente', C: window.S_ChallengeWaiting, note: 'Décompte' },
+      { key: 'Modes de jeu', C: window.S_Play, note: 'Quick/ami/tournoi' },
+      { key: 'Tournoi', C: window.S_Tournament, note: 'Classement + prix' },
+      { key: 'Univers', C: window.S_SuperCategory, note: 'Super-catégorie' },
+      { key: 'Détail thème', C: window.S_CategoryDetail, note: 'Stats + leaders' },
+      { key: 'Créer un thème', C: window.S_CreateTheme, note: 'Studio IA · interactif ✦' },
+    ]},
+    { id: 'reglages', title: 'Réglages', color: '#FFB547', screens: [
+      { key: 'Notifications', C: window.S_NotifSettings, note: 'Toggles' },
+      { key: 'Langue', C: window.S_LanguageSettings, note: 'Interactif ✦' },
+      { key: 'Aide & support', C: window.S_Support, note: 'Contact + FAQ' },
+      { key: 'Conditions', C: window.S_Terms, note: 'Légal' },
+    ]},
+    { id: 'etats', title: 'États & cas limites', color: '#FF3D5E', screens: [
+      { key: 'Défaite', C: window.E_Defeat, note: 'XP consolation' },
+      { key: 'Égalité', C: window.E_Draw, note: 'La belle' },
+      { key: 'Adversaire parti', C: window.E_OpponentLeft, note: 'Forfait' },
+      { key: 'Aucun duel', C: window.E_EmptyDuels, note: 'Vide · accueil' },
+      { key: 'Aucun message', C: window.E_EmptyMessages, note: 'Vide · inbox' },
+      { key: 'Recherche vide', C: window.E_EmptySearch, note: 'Aucun résultat' },
+      { key: 'Hors ligne', C: window.E_Offline, note: 'Reconnexion' },
+    ]},
+  ];
+
+  const total = SECTIONS.reduce((n, s) => n + s.screens.length, 0);
+  let counter = 0;
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#E8E4DC', display: 'flex' }}>
+      {/* Sidebar nav */}
+      <div style={{ width: 220, flexShrink: 0, position: 'sticky', top: 0, height: '100vh', padding: '40px 0 40px 32px', display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto' }}>
+        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'rgba(0,0,0,0.4)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>◆ Duelo</div>
+        <div style={{ fontFamily: 'Space Grotesk', fontWeight: 900, fontSize: 20, letterSpacing: -0.5, marginBottom: 18, color: '#1a1a1a' }}>{total} écrans</div>
+        {SECTIONS.map(s => (
+          <a key={s.id} href={`#${s.id}`} className="nav-link" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, padding: '7px 0', fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: 13, color: 'rgba(0,0,0,0.6)' }}>
+            <span style={{ width: 8, height: 8, borderRadius: 4, background: s.color, flexShrink: 0 }}/>
+            {s.title}
+            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'rgba(0,0,0,0.35)', marginLeft: 'auto', paddingRight: 16 }}>{s.screens.length}</span>
+          </a>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div style={{ flex: 1, padding: '60px 40px 120px', minWidth: 0 }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto 56px' }}>
+          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: 'rgba(0,0,0,0.5)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>◆ Kit complet · {total} écrans</div>
+          <h1 style={{ fontFamily: "'Fraunces', serif", fontStyle: 'italic', fontWeight: 400, fontSize: 64, margin: 0, letterSpacing: -2, lineHeight: 0.95, color: '#1a1a1a' }}>
+            Duelo, <span style={{ color: '#6B5ACF' }}>de A à Z</span>.
+          </h1>
+          <p style={{ fontFamily: 'Inter', fontSize: 16, lineHeight: 1.5, color: 'rgba(0,0,0,0.65)', maxWidth: 600, marginTop: 20 }}>
+            Toute l'application dans une seule page&nbsp;: les 9 écrans principaux, les 17 secondaires et les 7 états limites.
+            Les écrans marqués ✦ sont interactifs. Utilise la navigation à gauche pour sauter d'une section à l'autre.
+          </p>
+        </div>
+
+        {/* Proto interactif en intro */}
+        <div style={{ maxWidth: 1000, margin: '0 auto 64px', padding: '36px 28px', background: '#0A0A1A', borderRadius: 28, position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 80% 60% at 20% 20%, ${TK.violet}30, transparent 60%), radial-gradient(ellipse 80% 60% at 80% 80%, ${TK.cyan}25, transparent 60%)` }}/>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 48, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <div style={{ flex: '1 1 300px', minWidth: 280 }}>
+              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: TK.gold, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 12 }}>◆ Prototype jouable</div>
+              <div style={{ fontFamily: 'Fraunces', fontStyle: 'italic', fontSize: 44, fontWeight: 400, color: '#fff', letterSpacing: -1.5, lineHeight: 1, marginBottom: 14 }}>
+                Quiz → <span style={{ background: `linear-gradient(135deg, ${TK.cyan}, ${TK.violet})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Victoire</span>
+              </div>
+              <div style={{ fontFamily: 'Inter', fontSize: 15, color: 'rgba(255,255,255,0.7)', lineHeight: 1.55, maxWidth: 380 }}>
+                Clique une réponse pour jouer le flow complet&nbsp;: timer rond, pop de score, transition héros,
+                confettis et détail des points animé.
+              </div>
+            </div>
+            <window.InteractiveProto/>
+          </div>
+        </div>
+
+        {/* Sections */}
+        {SECTIONS.map(sec => (
+          <div key={sec.id} id={sec.id} style={{ maxWidth: 1000, margin: '0 auto 64px', scrollMarginTop: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32, paddingBottom: 16, borderBottom: '1px solid rgba(0,0,0,0.12)' }}>
+              <div style={{ width: 10, height: 10, borderRadius: 5, background: sec.color, boxShadow: `0 0 12px ${sec.color}` }}/>
+              <div style={{ fontFamily: 'Space Grotesk', fontWeight: 800, fontSize: 24, letterSpacing: -0.5 }}>{sec.title}</div>
+              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: 'rgba(0,0,0,0.4)', letterSpacing: 1 }}>{sec.screens.length} écrans</div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48, justifyItems: 'center' }}>
+              {sec.screens.map(s => {
+                counter += 1;
+                return <Phone key={s.key} label={s.note} variant={`${String(counter).padStart(2,'0')} · ${s.key}`}><s.C/></Phone>;
+              })}
+            </div>
+          </div>
+        ))}
+
+        <div style={{ maxWidth: 760, margin: '70px auto 0', textAlign: 'center' }}>
+          <div style={{ fontFamily: 'Fraunces', fontStyle: 'italic', fontSize: 24, color: 'rgba(0,0,0,0.8)', lineHeight: 1.4, letterSpacing: -0.3 }}>
+            {total} écrans, une direction unique, prête pour l'intégration.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
