@@ -1098,6 +1098,10 @@ const translations: Translations = {
   'frame.diamond_frame': { fr: 'Cadre Diamant', en: 'Diamond Frame', es: 'Marco Diamante', de: 'Diamantrahmen', pt: 'Moldura Diamante', it: 'Cornice Diamante', ar: 'إطار ألماسي', ja: 'ダイヤモンドフレーム', ko: '다이아몬드 프레임', zh: '钻石边框', pl: 'Diamentowa ramka' },
   'frame.champion_frame': { fr: 'Cadre Champion', en: 'Champion Frame', es: 'Marco Campeón', de: 'Meisterrahmen', pt: 'Moldura Campeão', it: 'Cornice Campione', ar: 'إطار البطل', ja: 'チャンピオンフレーム', ko: '챔피언 프레임', zh: '冠军边框', pl: 'Ramka mistrza' },
 
+  // Pubs récompensées : aucune vidéo n'a pu s'afficher
+  'ads.unavailable_title': { fr: 'Aucune vidéo disponible', en: 'No video available', es: 'Ningún vídeo disponible', de: 'Kein Video verfügbar', pt: 'Nenhum vídeo disponível', it: 'Nessun video disponibile', ar: 'لا يوجد فيديو متاح', ja: '利用できる動画がありません', ko: '시청 가능한 동영상이 없습니다', zh: '暂无可观看的视频', pl: 'Brak dostępnego filmu' },
+  'ads.unavailable_body': { fr: 'Réessaie dans quelques minutes.', en: 'Try again in a few minutes.', es: 'Inténtalo de nuevo en unos minutos.', de: 'Versuch es in ein paar Minuten noch einmal.', pt: 'Tente novamente em alguns minutos.', it: 'Riprova tra qualche minuto.', ar: 'حاول مرة أخرى بعد بضع دقائق.', ja: '数分後にもう一度お試しください。', ko: '몇 분 후에 다시 시도해 주세요.', zh: '请几分钟后再试。', pl: 'Spróbuj ponownie za kilka minut.' },
+
   // Univers (super-catégories). L'id technique (ARENA, LIFE…) reste la clé côté serveur ;
   // seul le nom affiché change, dans la langue du joueur. Lire via universeName().
   'universe.SCREEN': { fr: 'Écran', en: 'Screen', es: 'Pantalla', de: 'Film & TV', pt: 'Tela', it: 'Schermo', ar: 'الشاشة', ja: '映像', ko: '영상', zh: '影视', pl: 'Ekran' },

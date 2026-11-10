@@ -1,4 +1,5 @@
-import { Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
+import { t } from './i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Rewarded ads (AdMob). The native module only exists in a development/store
@@ -90,7 +91,7 @@ export async function showRewardedAd(): Promise<boolean> {
 
   try {
     const info = await mod.AdsConsent.getConsentInfo();
-    if (!info.canRequestAds) return false;
+    if (!info.canRequestAds) { notifyUnavailable(); return false; }
   } catch {
     // consent module unavailable — let the request decide
   }
@@ -100,6 +101,7 @@ export async function showRewardedAd(): Promise<boolean> {
   return new Promise<boolean>((resolve) => {
     const ad = mod.RewardedAd.createForAdRequest(rewardedUnitId(mod), { requestNonPersonalizedAdsOnly: npa });
     let earned = false;
+    let shown = false;
     let done = false;
     const unsubs: (() => void)[] = [];
     const finish = (ok: boolean) => {
@@ -107,6 +109,9 @@ export async function showRewardedAd(): Promise<boolean> {
       done = true;
       clearTimeout(timeout);
       unsubs.forEach((u) => u());
+      // Aucune vidéo n'a pu s'afficher : on le dit, sinon le bouton semble ne rien faire.
+      // (Vidéo fermée avant la fin : pas de message, c'est le choix du joueur.)
+      if (!ok && !shown) notifyUnavailable();
       resolve(ok);
     };
     // No fill within 15 s → give up rather than leave the user waiting.
@@ -114,8 +119,9 @@ export async function showRewardedAd(): Promise<boolean> {
 
     unsubs.push(ad.addAdEventListener(mod.RewardedAdEventType.LOADED, () => {
       clearTimeout(timeout);
-      ad.show().catch(() => finish(false));
+      ad.show().then(() => { shown = true; }).catch(() => finish(false));
     }));
+    unsubs.push(ad.addAdEventListener(mod.AdEventType.OPENED, () => { shown = true; }));
     unsubs.push(ad.addAdEventListener(mod.RewardedAdEventType.EARNED_REWARD, () => {
       earned = true;
     }));
@@ -126,4 +132,11 @@ export async function showRewardedAd(): Promise<boolean> {
     }));
     ad.load();
   });
+}
+
+// Alerte native plutôt que Dialog : les boutons de pub vivent parfois dans une feuille modale,
+// au-dessus de laquelle un Dialog global ne s'affiche pas sur iOS. Les pubs n'existent pas sur
+// le web, où Alert à boutons ne marche pas.
+function notifyUnavailable() {
+  Alert.alert(t('ads.unavailable_title'), t('ads.unavailable_body'), [{ text: t('common.ok') }]);
 }
