@@ -10,7 +10,7 @@ import {
   Txt, Card, Chip, Section, ScreenContainer, ScreenHeader, ThemeIcon, ThemeCard, Loader, EmptyState,
 } from '../components/ui';
 import { COLOR, SPACE, BORDER, ICON_SIZE } from '../theme/tokens';
-import { t, getLanguage } from '../utils/i18n';
+import { t, getLanguage, universeName } from '../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -132,7 +132,7 @@ export default function SuperCategoryScreen() {
   return (
     <SwipeBackPage>
       <ScreenContainer>
-        <ScreenHeader overline={t('forge.universe_label')} title={data.label.toUpperCase()} />
+        <ScreenHeader overline={t('forge.universe_label')} title={universeName(data.super_category || id, data.label).toUpperCase()} />
 
         <Animated.View style={[styles.flex, { opacity: fadeAnim }]}>
           <ScrollView
@@ -147,7 +147,7 @@ export default function SuperCategoryScreen() {
             <View style={styles.hero}>
               <ThemeIcon superCategory={data.super_category || id} size={ICON_SIZE.theme.lg} />
               <View style={styles.heroTexts}>
-                <Txt variant="h1" numberOfLines={2}>{data.label.toUpperCase()}</Txt>
+                <Txt variant="h1" numberOfLines={2}>{universeName(data.super_category || id, data.label).toUpperCase()}</Txt>
                 <Txt variant="label">
                   {`${totalThemes} ${themesLabel} · ${t('pilot.supercat.clusters_count', { n: String(data.clusters.length) })}`}
                 </Txt>

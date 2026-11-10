@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { authFetch } from '../utils/api';
-import { t } from '../utils/i18n';
+import { t, universeName } from '../utils/i18n';
 import SwipeBackPage from '../components/SwipeBackPage';
 import {
   Txt, Icon, IconName, Button, Card, Chip, Loader, ThemeIcon, ScreenContainer, ScreenHeader,
@@ -60,7 +60,7 @@ export default function CreateThemeScreen() {
         const res = await fetch(`${API_URL}/api/explore/super-categories`);
         const data = await res.json();
         const list: Universe[] = (Array.isArray(data) ? data : []).map((sc: any) => ({
-          id: sc.id, label: sc.label, color: sc.color,
+          id: sc.id, label: universeName(sc.id, sc.label), color: sc.color,
         }));
         setUniverses(list);
         if (list.length > 0) {

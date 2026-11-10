@@ -59,12 +59,12 @@ beforeAll(async () => {
 });
 
 describe('LANGUAGE_NAMES', () => {
-  it('exposes exactly 10 languages', () => {
-    expect(LANGUAGES).toHaveLength(10);
+  it('exposes exactly 11 languages', () => {
+    expect(LANGUAGES).toHaveLength(11);
   });
 
-  it('includes fr, en, es, de, pt, it, ar, ja, ko, zh', () => {
-    const expected = ['fr', 'en', 'es', 'de', 'pt', 'it', 'ar', 'ja', 'ko', 'zh'];
+  it('includes fr, en, es, de, pt, it, pl, ar, ja, ko, zh', () => {
+    const expected = ['fr', 'en', 'es', 'de', 'pt', 'it', 'pl', 'ar', 'ja', 'ko', 'zh'];
     expected.forEach(lang => expect(LANGUAGES).toContain(lang));
   });
 });

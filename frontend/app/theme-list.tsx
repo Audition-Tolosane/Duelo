@@ -7,7 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { Txt, ScreenContainer, ScreenHeader, ThemeCard, Loader, EmptyState } from '../components/ui';
 import { COLOR, SPACE, BORDER } from '../theme/tokens';
 import { authFetch } from '../utils/api';
-import { t, getLanguage } from '../utils/i18n';
+import { t, getLanguage, universeName } from '../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -66,7 +66,7 @@ export default function ThemeListScreen() {
           .filter(Boolean).join('&');
         const res = await fetch(`${API_URL}/api/explore/${superCategory}/clusters${qs ? `?${qs}` : ''}`);
         const data: ClusterData = await res.json();
-        setUniverse(data?.label ?? '');
+        setUniverse(universeName(data?.super_category || superCategory, data?.label ?? ''));
         const found = data?.clusters?.find((c) => c.name === cluster);
         const rows: Row[] = (found?.themes ?? []).map((th) => ({
           id: th.id,

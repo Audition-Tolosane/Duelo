@@ -11,7 +11,7 @@ import {
 import { useTabBar } from '../../contexts/TabBarContext';
 import { COLOR, SPACE, RADII, BORDER, SIZE, ICON_SIZE } from '../../theme/tokens';
 import { authFetch } from '../../utils/api';
-import { t, getLanguage } from '../../utils/i18n';
+import { t, getLanguage, universeName } from '../../utils/i18n';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -35,17 +35,8 @@ type PlayedTheme = {
 // Thème « Pour tout le monde », tel que renvoyé par GET /api/themes/everyone
 type EveryoneTheme = { id: string; name: string; cluster: string; super_category: string };
 
-// Univers teasés verrouillés : une ligne de pied de page (noms de marque, pas de traduction)
-const UPCOMING_CATS = [
-  { id: 'SOUND', label: 'Sound' },
-  { id: 'ARENA', label: 'Arena' },
-  { id: 'LEGENDS', label: 'Legends' },
-  { id: 'LAB', label: 'Lab' },
-  { id: 'TASTE', label: 'Taste' },
-  { id: 'GLOBE', label: 'Globe' },
-  { id: 'PIXEL', label: 'Pixel' },
-  { id: 'STYLE', label: 'Style' },
-];
+// Univers teasés verrouillés : une ligne de pied de page (noms traduits via universeName)
+const UPCOMING_CATS = ['SOUND', 'ARENA', 'LEGENDS', 'LAB', 'TASTE', 'GLOBE', 'PIXEL', 'STYLE'];
 
 // 2 premières sous-catégories d'un univers, sans doublon d'accent (« Litterature » / « Littérature »)
 function universeHint(clusters: ClusterInfo[]): string {
@@ -125,7 +116,7 @@ export default function ThemesScreen() {
 
   const playedLevel = new Map(myThemes.map(th => [th.id, th.level]));
   const loadedIds = new Set(cats.map(c => c.id));
-  const upcomingFiltered = UPCOMING_CATS.filter(c => !loadedIds.has(c.id));
+  const upcomingFiltered = UPCOMING_CATS.filter(id => !loadedIds.has(id));
 
   if (loading) {
     return <View style={s.container}><Loader fill /></View>;
@@ -228,12 +219,12 @@ export default function ThemesScreen() {
         {featured && (
           <Animated.View entering={FadeInDown.duration(450)} style={s.inset}>
             <Section title={t('pilot.explorer.featured')} style={s.section}>
-              <SatinSurface variant="card" halo testID="explorer-featured" onPress={() => openUniverse(featured)} accessibilityLabel={featured.label} contentStyle={s.featuredCard}>
+              <SatinSurface variant="card" halo testID="explorer-featured" onPress={() => openUniverse(featured)} accessibilityLabel={universeName(featured.id, featured.label)} contentStyle={s.featuredCard}>
                 <View style={s.featuredRow}>
                   <ThemeIcon superCategory={featured.id} size={ICON_SIZE.theme.md} />
                   <View style={s.featuredTexts}>
                     <Txt variant="cardTitle" numberOfLines={1}>
-                      {featured.label.toUpperCase()}
+                      {universeName(featured.id, featured.label).toUpperCase()}
                       <Txt variant="caption">{`  ${featured.total_themes} ${themesLabel}`}</Txt>
                     </Txt>
                     {featured.clusters.length > 0 && (
@@ -262,13 +253,13 @@ export default function ThemesScreen() {
                       variant="card"
                       radius={RADII.md}
                       warm={index % 3 === 0 ? 'tr-bl' : 'tr'}
-                      accessibilityLabel={cat.label}
+                      accessibilityLabel={universeName(cat.id, cat.label)}
                       onPress={() => openUniverse(cat)}
                       contentStyle={[s.tile, { width: tileW - 2 * BORDER.hair }]}
                     >
                       <ThemeIcon superCategory={cat.id} size={ICON_SIZE.theme.sm} />
                       <View style={s.tileTexts}>
-                        <Txt variant="cardTitle" numberOfLines={1}>{cat.label.toUpperCase()}</Txt>
+                        <Txt variant="cardTitle" numberOfLines={1}>{universeName(cat.id, cat.label).toUpperCase()}</Txt>
                         {/* Ce que contient l'univers : les noms (SCREEN, LAB…) ne le disent pas seuls */}
                         <Txt variant="caption" color={COLOR.text.secondary} numberOfLines={1}>{universeHint(cat.clusters)}</Txt>
                         <Txt variant="caption" numberOfLines={1}>{`${cat.total_themes} ${themesLabel}`}</Txt>
@@ -307,7 +298,7 @@ export default function ThemesScreen() {
             <Icon name="lock" size={ICON_SIZE.sm} color={COLOR.text.tertiary} />
             <Txt variant="caption" style={s.soonText}>
               <Txt variant="overline">{t('themes.coming_soon')}</Txt>
-              {`  ${upcomingFiltered.map(c => c.label).join(' · ')}`}
+              {`  ${upcomingFiltered.map(id => universeName(id)).join(' · ')}`}
             </Txt>
           </View>
         )}

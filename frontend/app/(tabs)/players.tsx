@@ -7,7 +7,7 @@ import * as Haptics from 'expo-haptics';
 import Animated, { useAnimatedStyle, FadeInDown, SlideInRight, interpolate } from 'react-native-reanimated';
 import { useTabBar } from '../../contexts/TabBarContext';
 import UserAvatar from '../../components/UserAvatar';
-import { t, getLanguage } from '../../utils/i18n';
+import { t, getLanguage, universeName } from '../../utils/i18n';
 import {
   Txt, Icon, IconName, Button, Card, Chip, ThemeIcon, Loader, EmptyState,
 } from '../../components/ui';
@@ -241,7 +241,7 @@ export default function PlayersScreen() {
 
   // Nom d'univers : celui que renvoie l'API avec les thèmes, sinon le code
   const pillarName = (id: string) =>
-    tribes.find((tr) => tr.pillar_id.toLowerCase() === id)?.pillar_name || id.toUpperCase();
+    universeName(id, tribes.find((tr) => tr.pillar_id.toLowerCase() === id)?.pillar_name);
 
   useEffect(() => {
     init();
@@ -450,7 +450,7 @@ export default function PlayersScreen() {
                 <Animated.View key={pillarId} entering={FadeInDown.springify()} style={st.group}>
                   <View style={st.groupHead}>
                     <Icon name={UNIVERSE_ICON[pillarId.toLowerCase()] ?? 'compass'} size={ICON_SIZE.sm} color={COLOR.text.secondary} />
-                    <Txt variant="overline" numberOfLines={1}>{pillarTribes[0]?.pillar_name || pillarId}</Txt>
+                    <Txt variant="overline" numberOfLines={1}>{universeName(pillarId, pillarTribes[0]?.pillar_name)}</Txt>
                     <View style={st.groupRule} />
                   </View>
                   {/* FlatList virtualisée : monte 3 cartes, le reste au scroll */}

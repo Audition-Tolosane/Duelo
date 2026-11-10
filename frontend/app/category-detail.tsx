@@ -11,7 +11,7 @@ import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { authFetch } from '../utils/api';
-import { t, getLanguage } from '../utils/i18n';
+import { t, getLanguage, universeName } from '../utils/i18n';
 import SwipeBackPage from '../components/SwipeBackPage';
 import UserAvatar from '../components/UserAvatar';
 import ModerationSheet from '../components/ModerationSheet';
@@ -477,7 +477,7 @@ export default function CategoryDetailScreen() {
   const plateSize = compact ? 88 : 104;
   const universe = (detail.super_category || '').toUpperCase();
   const accent = UNIVERSE_ACCENT[universe] ?? PALETTE.cream;
-  const headerOverline = [detail.super_category, detail.cluster].filter(Boolean).join(' · ') || undefined;
+  const headerOverline = [detail.super_category && universeName(detail.super_category), detail.cluster].filter(Boolean).join(' · ') || undefined;
   const descLong = detail.description.length > DESC_CLAMP_CHARS;
   const descClamped = descLong && !descExpanded;
   const heroArt = resolveThemeIcon({ themeName: detail.name, cluster: detail.cluster, superCategory: detail.super_category });
