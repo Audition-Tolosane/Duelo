@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import User, Question, Match, Theme, UserThemeXP
 from constants import TOTAL_QUESTIONS
-from services.bots import find_bot_opponent
+from services.bots import find_bot_opponent, get_bot_by_pseudo
 
 # Per-(player_id, theme_id) lock to prevent race-condition double-submit
 _submit_locks: dict[str, asyncio.Lock] = {}
@@ -22,7 +22,7 @@ SOLO_XP_HOURLY_CAP = 40
 from helpers import shuffle_question_options, resolve_theme_category
 from i18n import LANGUES_TRADUITES, filtre_langue_questions, normaliser_langue
 from services.xp import (
-    get_level, get_streak_bonus, get_streak_badge,
+    get_level, get_cumulative_xp, xp_for_next_level, get_streak_bonus, get_streak_badge,
     get_theme_title, check_new_title_theme, MAX_LEVEL, TITLE_THRESHOLDS,
     get_daily_streak_bonus, update_login_streak, difficulty_mix,
 )
@@ -192,25 +192,47 @@ async def start_matchmaking(request: Request, current_user: str = Depends(get_cu
             player_level = get_level(uxp.xp)
             player_title = get_theme_title(theme, player_level)
 
+    # Revanche contre un bot : on ressert le même bot (identité complète, pas seulement le pseudo)
+    bot_data = None
+    rematch_pseudo = body.get("bot_pseudo")
+    if rematch_pseudo:
+        bot_data = await get_bot_by_pseudo(rematch_pseudo, player_level, db)
     # Try to find a real bot profile matched to the player's skill level
-    bot_data = await find_bot_opponent(player_level, theme.id, db)
+    if not bot_data:
+        bot_data = await find_bot_opponent(player_level, theme.id, db)
 
     if bot_data:
-        bot_name  = bot_data["pseudo"]
-        bot_seed  = bot_data["avatar_seed"]
-        bot_level = bot_data["bot_level"]
+        bot_name   = bot_data["pseudo"]
+        bot_seed   = bot_data["avatar_seed"]
+        bot_streak = bot_data["streak"]
+        # Niveau STABLE : celui de l'XP du bot sur ce thème. Première rencontre sur
+        # le thème → on l'amorce une fois pour toutes, sinon le même pseudo
+        # changerait de niveau à chaque match.
+        bxp_res = await db.execute(
+            select(UserThemeXP).where(UserThemeXP.user_id == bot_data["id"], UserThemeXP.theme_id == theme.id)
+        )
+        bxp = bxp_res.scalar_one_or_none()
+        if not bxp:
+            seed_level = max(1, bot_data["bot_level"])
+            bxp = UserThemeXP(
+                user_id=bot_data["id"], theme_id=theme.id,
+                xp=get_cumulative_xp(seed_level) + random.randint(0, xp_for_next_level(seed_level) - 1),
+            )
+            db.add(bxp)
+            await db.commit()
+        bot_level = get_level(bxp.xp)
     else:
-        # Fallback si aucun bot en DB (ne devrait pas arriver en prod)
-        bot_name  = f"Bot_{secrets.token_hex(3)}"
+        # Fallback si aucun bot en DB (ne devrait pas arriver en prod) — pseudo plausible, jamais « Bot_ »
+        bot_name  = random.choice(["Nova_78", "Lucas.M", "SarahQz", "Tom_Lyon", "Mimi31", "AlexKz", "Leo_Mtp", "JuJu_92"])
         bot_seed  = secrets.token_hex(4)
         _spread = random.choices(
             [random.randint(-3, 3), random.randint(-8, 8)],
             weights=[70, 30],
         )[0]
         bot_level = max(0, min(MAX_LEVEL, player_level + _spread))
+        bot_streak = random.choice([0, 0, 0, 1, 2])
 
     bot_title  = get_theme_title(theme, bot_level)
-    bot_streak = random.choice([0, 0, 0, 1, 2, 3, 4, 5])
 
     return {
         "theme": {

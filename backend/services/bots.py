@@ -132,8 +132,16 @@ def _bot_to_dict(bot: User, player_level: int) -> dict:
         "skill_level":  bot.skill_level or 0.5,
         "avg_speed":    bot.avg_speed or 5.0,
         "bot_level":    bot_level,
+        "streak":       bot.current_streak or 0,
         "is_bot":       True,
     }
+
+
+async def get_bot_by_pseudo(pseudo: str, player_level: int, db: AsyncSession) -> Optional[dict]:
+    """Revanche : renvoie le MÊME bot (pseudo, avatar, pays, skill) que le match précédent."""
+    res = await db.execute(select(User).where(User.pseudo == pseudo, User.is_bot == True))
+    bot = res.scalar_one_or_none()
+    return _bot_to_dict(bot, player_level) if bot else None
 
 
 # ── simulate_bot_answer ───────────────────────────────────────────────────────

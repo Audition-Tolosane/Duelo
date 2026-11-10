@@ -4,9 +4,9 @@ import json
 from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, or_
+from sqlalchemy import select, and_, or_, func
 from database import get_db
-from models import Challenge, User, Theme
+from models import Challenge, User, Theme, PlayerFollow
 from constants import TOTAL_QUESTIONS
 from services.notifications import create_notification
 from services.ws_manager import manager
@@ -88,17 +88,27 @@ async def send_challenge(request: Request, data: dict, current_user: str = Depen
         data={"challenge_id": challenge.id, "theme_id": theme_id, "screen": "home"},
     )
 
-    # If challenged player is online → send real-time WS notification
-    await manager.send_to_user(challenged_id, {
-        "type": "challenge_incoming",
-        "data": {
-            "challenge_id": challenge.id,
-            "challenger_pseudo": challenger.pseudo,
-            "challenger_seed": challenger.avatar_seed or "",
-            "theme_id": theme_id or "",
-            "theme_name": theme_name or "",
-        },
-    })
+    # Alerte plein écran en direct seulement entre joueurs qui se suivent mutuellement ;
+    # sinon le défi n'arrive que par la notification (et la liste de l'Accueil).
+    follows_res = await db.execute(
+        select(func.count(PlayerFollow.id)).where(or_(
+            and_(PlayerFollow.follower_id == challenger_id, PlayerFollow.followed_id == challenged_id),
+            and_(PlayerFollow.follower_id == challenged_id, PlayerFollow.followed_id == challenger_id),
+        ))
+    )
+    mutual_follow = (follows_res.scalar() or 0) == 2
+
+    if mutual_follow:
+        await manager.send_to_user(challenged_id, {
+            "type": "challenge_incoming",
+            "data": {
+                "challenge_id": challenge.id,
+                "challenger_pseudo": challenger.pseudo,
+                "challenger_seed": challenger.avatar_seed or "",
+                "theme_id": theme_id or "",
+                "theme_name": theme_name or "",
+            },
+        })
 
     # Update daily mission: "envoyer un défi"
     from services.missions import update_progress as _update_missions
