@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TextInput, Pressable, ScrollView, Keyboard } from 'react-native';
+import { View, StyleSheet, TextInput, Pressable, ScrollView, Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as WebBrowser from 'expo-web-browser';
@@ -61,7 +61,9 @@ export default function ConsentScreen() {
 
   return (
     <ScreenContainer safeTop safeBottom>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      {/* Le clavier remonte l'écran (iOS) au lieu de recouvrir le champ ; glisser le ferme. */}
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
         <View style={styles.titles}>
           <Txt variant="overline" color={COLOR.action.primary}>{t('consent.eyebrow')}</Txt>
           <Txt variant="h1">{t('consent.title')}</Txt>
@@ -72,12 +74,20 @@ export default function ConsentScreen() {
           <TextInput
             style={[styles.input, error && !yearValid ? styles.inputError : null]}
             value={year}
-            onChangeText={(v) => { setYear(v.replace(/\D/g, '').slice(0, 4)); setError(''); }}
+            onChangeText={(v) => {
+              const digits = v.replace(/\D/g, '').slice(0, 4);
+              setYear(digits);
+              setError('');
+              // Le pavé numérique iOS n'a pas de touche « Entrée » : l'année complète ferme le clavier.
+              if (digits.length === 4) Keyboard.dismiss();
+            }}
             placeholder={String(nowYear - 20)}
             placeholderTextColor={COLOR.text.tertiary}
             selectionColor={COLOR.action.primary}
             keyboardType="number-pad"
             maxLength={4}
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
             maxFontSizeMultiplier={1.3}
             accessibilityLabel={t('consent.birth_year')}
             testID="consent-year"
@@ -114,6 +124,7 @@ export default function ConsentScreen() {
           testID="consent-continue"
         />
       </ScrollView>
+      </KeyboardAvoidingView>
 
       <Dialog
         visible={tooYoung}
