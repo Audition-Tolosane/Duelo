@@ -8,7 +8,7 @@ import UserAvatar from '../../components/UserAvatar';
 import { authFetch } from '../../utils/api';
 import { useTabBar } from '../../contexts/TabBarContext';
 import Svg, { Path, Circle, Defs, LinearGradient as SvgLinear, RadialGradient, Stop, Rect } from 'react-native-svg';
-import { t, getLocale, getLanguage } from '../../utils/i18n';
+import { t, getLocale, getLanguage, universeName } from '../../utils/i18n';
 import {
   Txt, Icon, IconName, Button, IconButton, Section, ProgressBar, ListRow, Loader, Dialog,
   BottomSheet, ThemeIcon, EmptyState, SatinSurface, AmbientBackdrop, HeroGlow,
@@ -958,7 +958,7 @@ export default function ProfileScreen() {
                     disabled={savingAvatar}
                     accessibilityRole="button"
                     accessibilityState={{ selected: isSelected }}
-                    accessibilityLabel={a.name}
+                    accessibilityLabel={universeName(a.category, a.name)}
                   >
                     <View style={[s.avatarRing, isSelected && s.avatarRingSelected]}>
                       <Image
@@ -972,7 +972,7 @@ export default function ProfileScreen() {
                         </View>
                       )}
                     </View>
-                    <Txt variant="caption" align="center" numberOfLines={1}>{a.name}</Txt>
+                    <Txt variant="caption" align="center" numberOfLines={1}>{universeName(a.category, a.name)}</Txt>
                   </Pressable>
                 );
               })}

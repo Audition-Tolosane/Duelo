@@ -403,6 +403,11 @@ async def _ensure_columns():
             except Exception as e:
                 logger.warning(f"[startup] skip index: {e}")
 
+    # Catalogue des avatars proposés (services/avatar_catalog.py)
+    from database import AsyncSessionLocal
+    from services.avatar_catalog import sync_avatars
+    await sync_avatars(AsyncSessionLocal)
+
     # Start background crons
     import asyncio as _asyncio
     _asyncio.create_task(_weekly_summary_cron())
