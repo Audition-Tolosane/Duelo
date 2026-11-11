@@ -12,7 +12,8 @@ import {
 // Réactions entre joueurs : bulle affichée près d'un joueur, bouton + éventail pendant le duel,
 // panneau émojis + phrases sur l'écran de résultats.
 
-export type ShownReaction = { key: string; id: number };
+/** `at` (ms) : une bulle remontée plus tard (changement d'endroit) ne rejoue pas une vieille réaction. */
+export type ShownReaction = { key: string; id: number; at?: number };
 
 /** Bulle qui apparaît (ressort), flotte un peu puis s'efface. Change d'`id` pour rejouer. */
 export function ReactionBubble({ reaction, side, style }: {
@@ -25,6 +26,7 @@ export function ReactionBubble({ reaction, side, style }: {
 
   useEffect(() => {
     if (!reaction) return;
+    if (reaction.at && Date.now() - reaction.at > 1500) return;
     setShown(reaction);
     anim.setValue(0);
     Animated.sequence([

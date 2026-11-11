@@ -26,7 +26,7 @@ import {
   Txt, Icon, IconName, Button, Badge, Card, Loader, Dialog, BottomSheet,
   ScreenContainer, ScreenHeader, ThemeIcon, ResultState,
 } from '../components/ui';
-import { COLOR, SPACE, RADII, SIZE, BORDER, ICON_SIZE, TYPO, PALETTE, MOTION, alpha } from '../theme/tokens';
+import { COLOR, SPACE, RADII, SIZE, BORDER, ICON_SIZE, TYPO, PALETTE, MOTION, ELEVATION, alpha } from '../theme/tokens';
 
 // Fin de duel SKILKI : en-tête ResultState (victoire = halo jaune, défaite = pétrole sobre,
 // sans-faute = violet rare), score moi (jaune) / rival (corail), XP en or, révision des erreurs,
@@ -131,7 +131,7 @@ export default function ResultsScreen() {
   useEffect(() => { getReactionsMuted().then((m) => { reactionsMutedRef.current = m; }); }, []);
   const showOppBubble = (key: string) => {
     if (reactionsMutedRef.current) return;
-    setOppBubble({ key, id: ++bubbleSeq.current });
+    setOppBubble({ key, id: ++bubbleSeq.current, at: Date.now() });
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
   };
   useEffect(() => {
@@ -150,10 +150,20 @@ export default function ResultsScreen() {
     ];
     return () => unsubs.forEach((u) => u());
   }, [params.opponentId]);
+  // Carte des scores sortie de l'écran : bandeau compact collé en haut (avatars + scores),
+  // où s'affichent les bulles de réaction — on les voit même en bas de page.
+  const scoreCardBottom = useRef(0);
+  const [stickyOn, setStickyOn] = useState(false);
+  const stickyOnRef = useRef(false);
+  const onResultsScroll = (e: any) => {
+    const on = e.nativeEvent.contentOffset.y > scoreCardBottom.current - SPACE.sm;
+    if (on !== stickyOnRef.current) { stickyOnRef.current = on; setStickyOn(on); }
+  };
+
   const sendReaction = (key: string) => {
     if (reactSent >= 3) return;
     setReactSent((n) => n + 1);
-    setMyBubble({ key, id: ++bubbleSeq.current });
+    setMyBubble({ key, id: ++bubbleSeq.current, at: Date.now() });
     setReactNote(t('reaction.sent', { name: params.opponentPseudo || t('game.opponent') }));
     if (params.opponentId) {
       send({ action: 'match_reaction', receiver_id: params.opponentId, key });
@@ -647,7 +657,8 @@ export default function ResultsScreen() {
         onBack={goBack}
         right={category ? <ThemeIcon themeId={category} size={ICON_SIZE.theme.sm} /> : undefined}
       />
-      <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+      <View style={s.flex}>
+      <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false} onScroll={onResultsScroll} scrollEventThrottle={32}>
 
         {/* Défi asynchrone : score enregistré, l'autre joueur jouera plus tard */}
         {isAsyncChallenge && (
@@ -702,7 +713,7 @@ export default function ResultsScreen() {
         </Reanimated.View>
 
         {/* Score : moi (jaune) / rival (corail) */}
-        <Reanimated.View style={scoreStyle}>
+        <Reanimated.View style={scoreStyle} onLayout={(e) => { const l = e.nativeEvent.layout; scoreCardBottom.current = l.y + l.height; }}>
           <Card style={s.scoreCard}>
             <View style={s.scoreSide}>
               <UserAvatar pseudo={playerPseudo} size={56} borderColor={COLOR.player.self} borderWidth={BORDER.strong} />
@@ -732,8 +743,12 @@ export default function ResultsScreen() {
               <Txt variant="score" color={COLOR.player.opponentText}>{oScore}</Txt>
               {!won && !draw ? <Badge label={t('pilot.results.winner')} tone="warm" /> : <View style={s.badgeSpacer} />}
             </View>
-            <ReactionBubble reaction={myBubble} side="self" style={s.bubbleSelf} />
-            <ReactionBubble reaction={oppBubble} side="opponent" style={s.bubbleOpponent} />
+            {!stickyOn ? (
+              <>
+                <ReactionBubble reaction={myBubble} side="self" style={s.bubbleSelf} />
+                <ReactionBubble reaction={oppBubble} side="opponent" style={s.bubbleOpponent} />
+              </>
+            ) : null}
           </Card>
         </Reanimated.View>
 
@@ -902,6 +917,26 @@ export default function ResultsScreen() {
           )}
         </Reanimated.View>
       </ScrollView>
+
+      {/* Bandeau des scores collé en haut une fois la carte sortie de l'écran */}
+      {stickyOn ? (
+        <View style={s.sticky}>
+          <View style={s.stickySide}>
+            <UserAvatar pseudo={playerPseudo} size={32} borderColor={COLOR.player.self} borderWidth={BORDER.default} />
+            <Txt variant="label" numberOfLines={1} style={s.flexShrink}>{playerPseudo}</Txt>
+            <Txt variant="cardTitle" color={COLOR.player.self}>{pScore}</Txt>
+          </View>
+          <Txt variant="overline">{draw ? '=' : 'VS'}</Txt>
+          <View style={[s.stickySide, s.stickySideOpp]}>
+            <Txt variant="cardTitle" color={COLOR.player.opponentText}>{oScore}</Txt>
+            <Txt variant="label" color={COLOR.player.opponentText} numberOfLines={1} style={s.flexShrink}>{opponentName}</Txt>
+            <UserAvatar pseudo={opponentName} size={32} borderColor={COLOR.player.opponent} borderWidth={BORDER.default} />
+          </View>
+          <ReactionBubble reaction={myBubble} side="self" style={s.stickyBubbleSelf} />
+          <ReactionBubble reaction={oppBubble} side="opponent" style={s.stickyBubbleOpp} />
+        </View>
+      ) : null}
+      </View>
 
       {/* Récompenses (montée de niveau, titre, succès, bouclier de série) */}
       <Dialog
@@ -1137,6 +1172,18 @@ const s = StyleSheet.create({
   bubbleSelf: { left: SPACE.md, top: -SPACE.lg },
   bubbleOpponent: { right: SPACE.md, top: -SPACE.lg },
   reactCard: { gap: SPACE.md },
+  sticky: {
+    position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20,
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.sm,
+    paddingHorizontal: SPACE.screenX, paddingVertical: SPACE.sm,
+    backgroundColor: COLOR.surface.card,
+    borderBottomWidth: BORDER.hair, borderBottomColor: COLOR.border.default,
+    ...ELEVATION.e2,
+  },
+  stickySide: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, minWidth: 0 },
+  stickySideOpp: { justifyContent: 'flex-end' },
+  stickyBubbleSelf: { left: SPACE.screenX, top: '100%', marginTop: SPACE.sm },
+  stickyBubbleOpp: { right: SPACE.screenX, top: '100%', marginTop: SPACE.sm },
   scoreSide: { flex: 1, minWidth: 0, alignItems: 'center', gap: SPACE.xs },
   vs: { paddingHorizontal: SPACE.xs },
   underline: { textDecorationLine: 'underline' },
