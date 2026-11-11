@@ -55,7 +55,7 @@ function universeHint(clusters: ClusterInfo[]): string {
 export default function ThemesScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
-  const { onScroll: onTabScroll } = useTabBar();
+  const { onScroll: onTabScroll, headerHeight } = useTabBar();
   const [cats, setCats] = useState<SuperCategory[]>([]);
   const [myThemes, setMyThemes] = useState<PlayedTheme[]>([]);
   const [everyone, setEveryone] = useState<EveryoneTheme[]>([]);
@@ -148,7 +148,7 @@ export default function ThemesScreen() {
     <View style={s.container}>
       <AmbientBackdrop />
       <ScrollView
-        contentContainerStyle={s.scrollContent}
+        contentContainerStyle={[s.scrollContent, { paddingTop: SPACE.md + headerHeight }]}
         showsVerticalScrollIndicator={false}
         onScroll={onTabScroll}
         scrollEventThrottle={16}

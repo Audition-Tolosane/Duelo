@@ -211,14 +211,14 @@ export default function PlayersScreen() {
   const { width: winW } = useWindowDimensions();
   const compact = winW < 360;
   const router = useRouter();
-  const { onScroll: onTabScroll, hidden: tabHidden } = useTabBar();
+  const { onScroll: onTabScroll, hidden: tabHidden, headerHeight } = useTabBar();
   const insets = useSafeAreaInsets();
 
-  // Le header de page est FIXE : quand le header global se replie (safe-area
-  // comprise), on compense pour ne pas passer sous la zone caméra.
+  // Le header de page est FIXE, sous l'en-tête global qui flotte par-dessus : il laisse sa
+  // place à l'en-tête global, puis seulement la zone caméra quand celui-ci est replié.
   const headerSafeStyle = useAnimatedStyle(() => {
     const h = tabHidden ? tabHidden.value : 0;
-    return { paddingTop: interpolate(h, [0, 1], [0, insets.top]) };
+    return { paddingTop: interpolate(h, [0, 1], [headerHeight, insets.top]) };
   });
   const [myId, setMyId] = useState('');
   const [activeSection, setActiveSection] = useState<SectionTab>('pulse');

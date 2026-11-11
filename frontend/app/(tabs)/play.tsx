@@ -19,7 +19,7 @@ type Mode = { key: string; icon: IconName; iconColor: string; title: string; sub
 
 export default function PlayScreen() {
   const router = useRouter();
-  const { onScroll: onTabScroll } = useTabBar();
+  const { onScroll: onTabScroll, headerHeight } = useTabBar();
   // Le pager garde cet onglet monté à côté d'Accueil/Thèmes : le fond ne défile que s'il est affiché
   const visible = useActiveTab() === 'play';
   const { width } = useWindowDimensions();
@@ -71,7 +71,7 @@ export default function PlayScreen() {
       if (Math.round(w) !== area.w || Math.round(h) !== area.h) setArea({ w: Math.round(w), h: Math.round(h) });
     }}>
     <ThemeIconBackdrop width={area.w} height={area.h} active={visible} />
-    <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
+    <ScrollView contentContainerStyle={[s.scroll, { paddingTop: SPACE.lg + headerHeight }]} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
       <View style={s.pageHeader}>
         <View style={s.headerScrim} pointerEvents="none" />
         <Txt variant="overline" style={s.overMotif}>{t('play.modes_eyebrow')}</Txt>

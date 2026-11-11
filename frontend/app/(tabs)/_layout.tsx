@@ -50,26 +50,30 @@ const PAGER_SWIPE_ENABLED = false;
 const TAB_LABEL_SIZE = { fontSize: TYPO.overline.fontSize, lineHeight: TYPO.overline.lineHeight };
 const PLAY_DISC = SIZE.buttonLg; // disque central Jouer : 56 px
 
-// Header qui s'efface au scroll vers le bas (même valeur que la cartouche du bas).
-// Le repli inclut la zone safe-area : aucune bande résiduelle, le contenu
-// monte jusqu'au bord physique de l'écran.
+// En-tête global : il FLOTTE par-dessus le contenu et glisse vers le haut au défilement,
+// en suivant le doigt (voir contexts/TabBarContext.tsx). Rien ne change de hauteur : le
+// contenu ne saute plus. Les onglets réservent `headerHeight` en haut de leur défilement.
+// Tout en haut de page il est transparent (fond commun visible) ; dès qu'on défile il prend
+// le fond nuit, pour que le contenu qui passe dessous ne se mélange pas aux icônes.
 const HEADER_ROW_H = SIZE.header; // 46 px — sync avec DueloHeader
 
 function CollapsingHeader() {
   const insets = useSafeAreaInsets();
-  const { hidden } = useTabBar();
+  const { hidden, scrolled } = useTabBar();
   const fullHeight = insets.top + HEADER_ROW_H;
 
-  const collapseStyle = useAnimatedStyle(() => {
+  const slideStyle = useAnimatedStyle(() => {
     const h = hidden ? hidden.value : 0;
     return {
-      height: interpolate(h, [0, 1], [fullHeight, 0]),
-      opacity: interpolate(h, [0, 0.7], [1, 0], Extrapolation.CLAMP),
+      transform: [{ translateY: -h * fullHeight }],
+      opacity: interpolate(h, [0, 0.85], [1, 0], Extrapolation.CLAMP),
     };
   });
+  const bgStyle = useAnimatedStyle(() => ({ opacity: scrolled ? scrolled.value : 0 }));
 
   return (
-    <Animated.View style={[styles.headerCollapse, collapseStyle]}>
+    <Animated.View style={[styles.headerFloat, { height: fullHeight }, slideStyle]}>
+      <Animated.View pointerEvents="none" style={[styles.headerBg, bgStyle]} />
       <View style={{ paddingTop: insets.top }}>
         <DueloHeader />
       </View>
@@ -156,6 +160,7 @@ function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTa
 }
 
 export default function TabLayout() {
+  const insetsTop = useSafeAreaInsets().top;
   const { width: SCREEN_WIDTH } = useWindowDimensions();
   const translateX = useSharedValue(0);
   const currentIndex = useSharedValue(0);
@@ -286,7 +291,7 @@ export default function TabLayout() {
   });
 
   return (
-    <TabBarProvider>
+    <TabBarProvider headerHeight={insetsTop + HEADER_ROW_H}>
     <Animated.View style={[styles.container, parallaxStyle]}>
     {/* Fond nuit pétrole UNIQUE derrière header + contenu + cartouche
         (les onglets sont transparents — aucune couture sous le header) */}
@@ -295,9 +300,6 @@ export default function TabLayout() {
       <View style={styles.hiddenSlot} pointerEvents="none">
         <Slot />
       </View>
-
-      {/* Header — s'efface au scroll vers le bas, revient au scroll vers le haut */}
-      <CollapsingHeader />
 
       {/* Custom swipeable pager */}
       <ActiveTabContext.Provider value={TAB_NAMES[activeIndex]}>
@@ -313,6 +315,9 @@ export default function TabLayout() {
         </GestureDetector>
       </View>
       </ActiveTabContext.Provider>
+
+      {/* En-tête flottant (après le pager : dessiné par-dessus le contenu) */}
+      <CollapsingHeader />
 
       <CustomTabBar currentIndex={activeIndex} onTabPress={onTabPress} />
     </ScreenContainer>
@@ -333,9 +338,14 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     opacity: 0,
   },
-  headerCollapse: {
-    overflow: 'hidden',
-    justifyContent: 'flex-end',
+  headerFloat: {
+    position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
+  },
+  headerBg: {
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: COLOR.bg.primary,
+    borderBottomWidth: BORDER.hair,
+    borderBottomColor: COLOR.border.subtle,
   },
   pagerContainer: {
     flex: 1,

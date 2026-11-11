@@ -425,7 +425,7 @@ type ProfileData = {
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { onScroll: onTabScroll } = useTabBar();
+  const { onScroll: onTabScroll, headerHeight } = useTabBar();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [profileError, setProfileError] = useState(false);
@@ -667,7 +667,7 @@ export default function ProfileScreen() {
   return (
     <View style={s.container}>
       <AmbientBackdrop />
-      <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
+      <ScrollView contentContainerStyle={[s.scroll, { paddingTop: headerHeight }]} showsVerticalScrollIndicator={false} onScroll={onTabScroll} scrollEventThrottle={16}>
 
         {profileError && (
           <SatinSurface variant="card" warm="none" onPress={() => { setProfileError(false); setLoading(true); loadProfile(); }} style={s.errorCard} contentStyle={s.cardPad}>

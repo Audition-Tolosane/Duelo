@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
-  View, StyleSheet, ScrollView, Pressable, RefreshControl, Modal, Share, useWindowDimensions,
+  View, StyleSheet, ScrollView, Pressable, RefreshControl, Platform, Modal, Share, useWindowDimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -807,7 +807,8 @@ const MOVES_PREVIEW = 2;
 // ── Main Screen ──
 export default function AccueilScreen() {
   const router = useRouter();
-  const { onScroll: onTabScroll } = useTabBar();
+  const { onScroll: onTabScroll, headerHeight } = useTabBar();
+  const IOS_INSET = Platform.OS === 'ios';
   // Très petits écrans (320 px) : hero un peu plus serré pour que le CTA tienne sur une ligne
   const { width: screenW } = useWindowDimensions();
   const compact = screenW < 360;
@@ -1294,12 +1295,20 @@ export default function AccueilScreen() {
       <AmbientBackdrop />
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        // L'en-tête global flotte par-dessus : sur iOS on décale par contentInset (la roue du
+        // « tirer pour rafraîchir » apparaît alors SOUS l'en-tête), ailleurs par une marge.
+        contentContainerStyle={[styles.scrollContent, { paddingTop: SPACE.lg + (IOS_INSET ? 0 : headerHeight) }]}
+        {...(IOS_INSET ? {
+          contentInset: { top: headerHeight },
+          contentOffset: { x: 0, y: -headerHeight },
+          scrollIndicatorInsets: { top: headerHeight },
+        } : {})}
         showsVerticalScrollIndicator={false}
         onScroll={onTabScroll}
         scrollEventThrottle={16}
         refreshControl={
           <RefreshControl
+            progressViewOffset={headerHeight}
             refreshing={refreshing}
             onRefresh={onRefresh}
             tintColor={COLOR.text.primary}
