@@ -41,9 +41,10 @@ def _is_trusted_proxy(ip: str) -> bool:
 def _get_client_ip(request: Request) -> str:
     """Return the real client IP.
 
-    Les en-têtes ne sont lus que si la connexion vient de notre proxy. On prend X-Real-IP
-    (posé par le proxy), sinon la DERNIÈRE adresse de X-Forwarded-For : c'est celle que le
-    proxy a ajoutée. La première peut être inventée par le client (contournement des limites).
+    Les en-têtes ne sont lus que si la connexion vient de notre proxy. On prend X-Real-IP :
+    Railway le pose lui-même avec l'adresse réelle et écrase toute valeur envoyée par le client
+    (vérifié en production le 11/11/2026). Railway réécrit aussi X-Forwarded-For
+    (« client, proxy ») : à défaut de X-Real-IP, on prend sa PREMIÈRE adresse.
     """
     client_host = request.client.host if request.client else None
     if client_host and _is_trusted_proxy(client_host):
@@ -52,7 +53,7 @@ def _get_client_ip(request: Request) -> str:
             return real_ip
         forwarded = request.headers.get("X-Forwarded-For")
         if forwarded:
-            return forwarded.split(",")[-1].strip()
+            return forwarded.split(",")[0].strip()
     return client_host or "unknown"
 
 
