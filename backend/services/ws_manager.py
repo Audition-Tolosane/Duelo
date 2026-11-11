@@ -705,7 +705,7 @@ class ConnectionManager:
         self.game_rooms.pop(room_id, None)
 
 
-LAST_QUESTION_MULT = 1.5
+LAST_QUESTION_MULT = 2
 
 
 class GameRoom:
@@ -800,7 +800,7 @@ class GameRoom:
         if is_correct:
             speed_bonus = max(0, round(10 * (1 - time_ms / 10000)))
             points = 10 + speed_bonus  # 10-20 points per correct answer
-            # Dernière question : ×1,5 (annoncé à l'écran) — le joueur mené garde sa chance
+            # Dernière question : points doublés (annoncé à l'écran) — le joueur mené garde sa chance
             if question_index == self.total_questions - 1:
                 points = round(points * LAST_QUESTION_MULT)
         else:

@@ -52,8 +52,8 @@ const OPPONENT_REVEAL_MS = 1600;
 // Duel en ligne : la bonne réponse vient du serveur. Le jaune « en attente » ne s'affiche
 // que si sa réponse tarde, sinon on passe directement au vert/rouge comme contre un bot.
 const PENDING_PICK_DELAY_MS = 400;
-// Dernière question : points ×1,5 (annoncé pendant la pause qui la précède ; même règle côté serveur)
-const LAST_Q_MULT = 1.5;
+// Dernière question : points ×2 (annoncé pendant la pause qui la précède ; même règle côté serveur)
+const LAST_Q_MULT = 2;
 // Premier match guidé : un conseil par question
 const TUTORIAL_TIPS = ['tuto.tip_speed', 'tuto.tip_opponent', 'tuto.tip_last'];
 const ICON_SIZE_TIP = 18;
@@ -346,7 +346,7 @@ export default function GameScreen() {
     if (!answeredRef.current) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
   };
 
-  // Annonce « Dernière question · ×1,5 » pendant la pause qui la précède
+  // Annonce « Dernière question · ×2 » pendant la pause qui la précède
   const [lastAnnounce, setLastAnnounce] = useState(false);
   const lastAnnounceAnim = useRef(new Animated.Value(0)).current;
   const announceLastQuestion = () => {
