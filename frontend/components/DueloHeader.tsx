@@ -6,9 +6,10 @@ import { Wordmark, IconButton } from './ui';
 import { SIZE, SPACE } from '../theme/tokens';
 import { t } from '../utils/i18n';
 import { SHOP_ENABLED } from '../utils/features';
+import { CreditsPill } from './EconomySheets';
 
 // ── En-tête global des onglets ────────────────────────────────────────────────
-// Logotype SKILKI à gauche, 4 actions de 44 px à droite, fond transparent (le fond
+// Logotype SKILKI à gauche, crédits de jeu puis 4 actions de 44 px à droite, fond transparent (le fond
 // nuit pétrole est porté par le conteneur). C'est le SEUL endroit des pastilles de
 // notification : la tab bar n'en affiche plus.
 // Hauteur fixe SIZE.header (46 px) : synchronisée avec HEADER_ROW_H du layout des onglets.
@@ -25,6 +26,7 @@ export default function DueloHeader() {
       <Wordmark size="sm" />
 
       <View style={styles.actions}>
+        <CreditsPill />
         <IconButton icon="search" accessibilityLabel={t('common.search')} onPress={() => go('/search')} testID="header-search" />
         {SHOP_ENABLED && (
           <IconButton icon="shop" accessibilityLabel={t('pilot.header.shop')} onPress={() => go('/shop')} testID="header-shop" />

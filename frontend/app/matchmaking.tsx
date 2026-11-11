@@ -20,6 +20,8 @@ import type { IconName } from '../components/ui';
 import { useWS } from '../contexts/WebSocketContext';
 import { dueloWS } from '../services/websocket';
 import { authFetch } from '../utils/api';
+import { checkPlay, refundPlay } from '../utils/economy';
+import { CreditsSheet, ThemeLimitSheet } from '../components/EconomySheets';
 import { t } from '../utils/i18n';
 import { COLOR, SPACE, RADII, SIZE, BORDER, GRADIENTS, GLOW, ELEVATION, PALETTE, alpha } from '../theme/tokens';
 
@@ -305,24 +307,19 @@ export default function MatchmakingScreen() {
     t('matchmaking.connecting_network'),
   ];
 
-  // Hard fallback: if no match found after 30s regardless of WS state, launch bot
   const matchFoundRef = useRef(false);
-  useEffect(() => {
-    if (isRematch || isChallengeMode) return;
-    const hardTimeout = setTimeout(() => {
-      if (!matchFoundRef.current) {
-        fetchBotOpponent();
-      }
-    }, 30000);
-    return () => clearTimeout(hardTimeout);
-  }, []);
+  const hardTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Crédits et thèmes (utils/economy) : défis et revanches sont gratuits et ne passent pas par là.
+  const exempt = isRematch || isChallengeMode;
+  const [gate, setGate] = useState<'checking' | 'open' | 'no_credits' | 'theme_limit'>(exempt ? 'open' : 'checking');
+  const chargedRef = useRef(false);
+  const searchStartedRef = useRef(false);
 
-  useEffect(() => {
-    if (!category && !isChallengeMode) {
-      router.replace('/(tabs)/play');
-      return;
-    }
-    loadPlayerInfo();
+  // Lance la recherche, une fois le crédit pris (ou d'emblée pour un défi / une revanche).
+  const beginSearch = () => {
+    if (searchStartedRef.current) return;
+    searchStartedRef.current = true;
+    setGate('open');
     // Revanche contre un joueur réel : salle privée (isChallengeMode + room_id).
     // Revanche contre un bot (rematch=true sans salle) : même bot, même pseudo.
     if (isRematch && !isChallengeMode) {
@@ -332,12 +329,39 @@ export default function MatchmakingScreen() {
       wsSend({ action: 'challenge_join', room_id: challengeRoomId });
     } else {
       wsSend({ action: 'matchmaking_join', theme_id: category });
+      // Hard fallback: if no match found after 30s regardless of WS state, launch bot
+      hardTimeoutRef.current = setTimeout(() => {
+        if (!matchFoundRef.current) fetchBotOpponent();
+      }, 30000);
     }
+  };
+
+  const runGate = async () => {
+    const check = await checkPlay(category);
+    if (check.ok) {
+      chargedRef.current = check.charged;
+      beginSearch();
+    } else {
+      setGate(check.reason);
+    }
+  };
+
+  useEffect(() => {
+    if (!category && !isChallengeMode) {
+      router.replace('/(tabs)/play');
+      return;
+    }
+    loadPlayerInfo();
+    if (exempt) beginSearch();
+    else runGate();
     return () => {
-      if (!isRematch && !isChallengeMode) {
+      if (hardTimeoutRef.current) clearTimeout(hardTimeoutRef.current);
+      if (!exempt && searchStartedRef.current) {
         wsSend({ action: 'matchmaking_leave' });
         dueloWS.clearQueue();
       }
+      // Parti avant d'avoir un adversaire : le crédit est rendu.
+      if (chargedRef.current && !matchFoundRef.current) refundPlay();
     };
   }, []);
 
@@ -854,6 +878,19 @@ export default function MatchmakingScreen() {
           </>
         )}
       </ScreenContainer>
+
+      {/* ── Plus de crédit / thème au-delà de la limite : la recherche attend ── */}
+      <CreditsSheet
+        visible={gate === 'no_credits'}
+        blocked
+        onClose={() => router.back()}
+        onCredited={() => { setGate('checking'); runGate(); }}
+      />
+      <ThemeLimitSheet
+        visible={gate === 'theme_limit'}
+        onClose={() => router.back()}
+        onUnlocked={() => { setGate('checking'); runGate(); }}
+      />
 
       {/* ── Défi : l'adversaire n'a pas rejoint ── */}
       <Dialog

@@ -44,6 +44,7 @@ type XpBreakdown = {
   giant_slayer: number;
   streak: number;
   total: number;
+  ad_double?: number;   // XP ajoutée par la pub « ×2 XP »
 };
 
 type QuizQuestion = {
@@ -105,6 +106,9 @@ export default function ResultsScreen() {
   const [streakBefore, setStreakBefore] = useState(0);
   const [adWatching, setAdWatching] = useState(false);
   const [streakRestored, setStreakRestored] = useState(false);
+  // ×2 XP par pub : une fois par match, dans les 10 min (contrôlé par le serveur)
+  const [doubling, setDoubling] = useState(false);
+  const [xpDoubled, setXpDoubled] = useState(false);
 
   // Unified rewards modal
   const [rewards, setRewards] = useState<Reward[]>([]);
@@ -381,6 +385,28 @@ export default function ResultsScreen() {
     } catch {}
   };
 
+  const watchAdAndDoubleXp = async () => {
+    if (!matchId || doubling || xpDoubled) return;
+    setDoubling(true);
+    const watched = await showRewardedAd();
+    if (!watched) { setDoubling(false); return; }
+    try {
+      const res = await authFetch(`${API_URL}/api/game/double-xp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ match_id: matchId }),
+      });
+      if (res.ok) {
+        const d = await res.json();
+        setXpDoubled(true);
+        setXpBreakdown((prev) => prev ? { ...prev, ad_double: d.bonus, total: prev.total + d.bonus } : prev);
+        if (d.new_level) setNewLevel(d.new_level);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+    } catch {}
+    setDoubling(false);
+  };
+
   const shareResult = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const categoryName = CATEGORY_NAMES[category || ''] || category;
@@ -557,6 +583,7 @@ export default function ResultsScreen() {
     { key: 'perfection', label: t('pilot.results.perfection'), value: xpBreakdown.perfection, icon: 'star' },
     { key: 'giant', label: t('pilot.results.giant_slayer'), value: xpBreakdown.giant_slayer, icon: 'duel' },
     { key: 'streak', label: t('pilot.results.streak_bonus'), value: xpBreakdown.streak, icon: 'flame' },
+    { key: 'ad', label: t('results.double_xp_row'), value: xpBreakdown.ad_double || 0, icon: 'tv' },
   ] as XpRow[]).filter((r) => r.key === 'base' || r.value > 0) : [];
 
   return (
@@ -681,6 +708,18 @@ export default function ResultsScreen() {
                   <Txt variant="cardTitle">{t('pilot.results.total')}</Txt>
                   <Txt variant="statMedium" color={COLOR.reward.gold}>+{displayXp.toLocaleString()} XP</Txt>
                 </View>
+                {matchId && !xpDoubled && xpBreakdown.total > 0 ? (
+                  <Button
+                    label={t('results.double_xp')}
+                    icon="tv"
+                    variant="secondary"
+                    size="sm"
+                    fullWidth
+                    loading={doubling}
+                    onPress={watchAdAndDoubleXp}
+                    testID="double-xp-btn"
+                  />
+                ) : null}
               </>
             ) : submitError ? (
               /* Échec d'enregistrement VISIBLE — plus de score perdu en silence */

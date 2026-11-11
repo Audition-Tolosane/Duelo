@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 from database import get_db
 
-from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge, challenges, boosts, missions, daily_question, achievements, streak_shield, xp_multiplier, tournaments, spin, referral, league, moderation
+from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge, challenges, boosts, missions, daily_question, achievements, streak_shield, xp_multiplier, tournaments, spin, referral, league, moderation, economy
 from schemas import QuestionReportRequest
 from models import QuestionReport
 from sqlalchemy import select
@@ -134,6 +134,7 @@ api_router.include_router(spin.router)
 api_router.include_router(referral.router)
 api_router.include_router(league.router)
 api_router.include_router(moderation.router)
+api_router.include_router(economy.router)
 
 # Serve avatar static files
 avatars_dir = ROOT_DIR / "static" / "avatars"
@@ -347,6 +348,21 @@ async def _ensure_columns():
                 UNIQUE(user_id, date)
             )""",
             "CREATE INDEX IF NOT EXISTS ix_daily_missions_user_id ON daily_missions(user_id)",
+            # Économie de jeu : crédits, places de thèmes, coffre, tour de roue en plus
+            """CREATE TABLE IF NOT EXISTS user_economy (
+                user_id VARCHAR(36) PRIMARY KEY,
+                credits INTEGER DEFAULT 5,
+                regen_at TIMESTAMPTZ DEFAULT NOW(),
+                ad_day VARCHAR(10),
+                ads_today INTEGER DEFAULT 0,
+                refundable_until TIMESTAMPTZ,
+                theme_bonus INTEGER DEFAULT 0,
+                chest_day VARCHAR(10),
+                chests_opened INTEGER DEFAULT 0,
+                spin_ad_day VARCHAR(10)
+            )""",
+            # ×2 XP après un duel (pub) : une seule fois par match
+            "ALTER TABLE matches ADD COLUMN IF NOT EXISTS xp_doubled BOOLEAN DEFAULT FALSE",
         ]:
             try:
                 await conn.execute(text(stmt))

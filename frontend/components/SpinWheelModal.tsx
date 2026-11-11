@@ -11,6 +11,7 @@ import Svg, { Path, Circle, G, Line } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import ConfettiCannon from 'react-native-confetti-cannon';
+import { showRewardedAd } from '../utils/ads';
 import { authFetch } from '../utils/api';
 import { t } from '../utils/i18n';
 import { Txt, Icon, IconName, Button, Card, BottomSheet } from './ui';
@@ -86,9 +87,15 @@ type SpinResult = {
 type Props = {
   visible: boolean;
   onClose: (spinDone: boolean) => void;
+  /** Tour gratuit du jour encore dispo */
+  freeAvailable?: boolean;
+  /** Tour en plus avec une pub encore dispo aujourd'hui */
+  adSpinAvailable?: boolean;
+  /** Le tour « pub » vient d'être utilisé */
+  onAdSpinUsed?: () => void;
 };
 
-export default function SpinWheelModal({ visible, onClose }: Props) {
+export default function SpinWheelModal({ visible, onClose, freeAvailable = true, adSpinAvailable = false, onAdSpinUsed }: Props) {
   const rotation = useSharedValue(0);
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState<SpinResult | null>(null);
@@ -107,13 +114,30 @@ export default function SpinWheelModal({ visible, onClose }: Props) {
     setTimeout(() => confettiRef.current?.start(), 100);
   }, []);
 
+  // Tour gratuit pris pendant cette ouverture : le tour « pub » devient la suite proposée.
+  const [freeUsedHere, setFreeUsedHere] = useState(false);
+  const free = freeAvailable && !freeUsedHere;
+
   const startSpin = async () => {
     if (spinning) return;
+    const withAd = !free;
+    if (withAd && !adSpinAvailable) return;
     setSpinning(true);
+    if (withAd) {
+      // Pub d'abord ; vidéo non terminée = pas de tour
+      if (!(await showRewardedAd())) { setSpinning(false); return; }
+      setShowResult(false);
+      setResult(null);
+    }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     try {
-      const res = await authFetch(`${API_URL}/api/spin/claim`, { method: 'POST' });
+      const res = await authFetch(`${API_URL}/api/spin/claim`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ with_ad: withAd }),
+      });
       if (!res.ok) { setSpinning(false); return; }
+      if (withAd) onAdSpinUsed?.(); else setFreeUsedHere(true);
       const data: SpinResult = await res.json();
       const segIdx = data.reward.segment_index;
       // Segment segIdx center is at: segIdx*60+30 degrees from top (clockwise)
@@ -130,6 +154,7 @@ export default function SpinWheelModal({ visible, onClose }: Props) {
   };
 
   const handleClose = (done: boolean) => {
+    setFreeUsedHere(false);   // le parent relit l'état (tour gratuit pris → spinAvailable=false)
     setShowResult(false);
     setResult(null);
     rotation.value = rotation.value % 360; // keep visual position, don't reset
@@ -144,16 +169,22 @@ export default function SpinWheelModal({ visible, onClose }: Props) {
       onClose={() => handleClose(!!showResult)}
       title={t('pilot.spin.title')}
       subtitle={t('pilot.spin.sub')}
-      footer={showResult && result ? (
-        <Button label={t('spin.collect')} fullWidth onPress={() => handleClose(true)} />
+      footer={showResult && result && !spinning ? (
+        <View style={s.footer}>
+          <Button label={t('spin.collect')} fullWidth onPress={() => handleClose(true)} />
+          {!free && adSpinAvailable ? (
+            <Button label={t('spin.extra')} icon="tv" variant="secondary" fullWidth haptic={false} onPress={startSpin} testID="spin-extra" />
+          ) : null}
+        </View>
       ) : (
         <View style={s.footer}>
           <Button
-            label={spinning ? t('spin.spinning') : t('pilot.spin.spin')}
-            icon="replay"
+            label={spinning ? t('spin.spinning') : free ? t('pilot.spin.spin') : t('spin.extra')}
+            icon={free ? 'replay' : 'tv'}
             size="lg"
             fullWidth
             loading={spinning}
+            disabled={!free && !adSpinAvailable}
             haptic={false}
             onPress={startSpin}
           />

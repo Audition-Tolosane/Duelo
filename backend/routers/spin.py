@@ -63,14 +63,20 @@ async def spin_status(
     last_spin = getattr(user, "last_spin_at", None)
 
     if not last_spin or _is_new_day(last_spin, now):
-        return {"available": True, "next_spin_at": None, "rewards": REWARDS}
+        return {"available": True, "ad_spin_available": False, "next_spin_at": None, "rewards": REWARDS}
 
+    # Tour gratuit pris : un 2e tour par jour avec une pub
+    from routers.economy import get_economy
+    econ = await get_economy(db, current_user)
+    ad_spin = econ.spin_ad_day != now.strftime("%Y-%m-%d")
+    await db.commit()
     next_spin_at = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
-    return {"available": False, "next_spin_at": next_spin_at.isoformat(), "rewards": REWARDS}
+    return {"available": False, "ad_spin_available": ad_spin, "next_spin_at": next_spin_at.isoformat(), "rewards": REWARDS}
 
 
 @router.post("/spin/claim")
 async def spin_claim(
+    body: dict | None = None,
     current_user: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ):
@@ -82,14 +88,26 @@ async def spin_claim(
     now = datetime.now(timezone.utc)
     last_spin = getattr(user, "last_spin_at", None)
 
-    if last_spin and not _is_new_day(last_spin, now):
-        raise HTTPException(status_code=400, detail="Déjà spinné aujourd'hui")
+    free_left = not last_spin or _is_new_day(last_spin, now)
+    ad_spin = False
+    if not free_left:
+        # Tour gratuit déjà pris : seul le tour « pub » (une fois par jour) reste possible
+        from routers.economy import get_economy
+        from services.ad_rewards import verify_ad_reward
+        econ = await get_economy(db, current_user)
+        if not (body or {}).get("with_ad") or econ.spin_ad_day == now.strftime("%Y-%m-%d"):
+            raise HTTPException(status_code=400, detail="Déjà spinné aujourd'hui")
+        verify_ad_reward(current_user, "spin_extra")
+        econ.spin_ad_day = now.strftime("%Y-%m-%d")
+        ad_spin = True
 
     reward, seg_index = _weighted_choice()
     applied: dict = {}
 
     if reward["type"] == "xp":
-        user.total_xp = (user.total_xp or 0) + reward["value"]
+        # Sur le thème le plus joué : ajoutée au seul total, l'XP disparaissait au duel suivant
+        from routers.economy import grant_bonus_xp
+        await grant_bonus_xp(db, current_user, reward["value"])
         applied = {"xp": reward["value"]}
 
     elif reward["type"] == "boost":
@@ -135,10 +153,12 @@ async def spin_claim(
             }
         else:
             # Fallback — no playable theme found
-            user.total_xp = (user.total_xp or 0) + 100
+            from routers.economy import grant_bonus_xp
+            await grant_bonus_xp(db, current_user, 100)
             applied = {"xp": 100}
 
-    user.last_spin_at = now
+    if not ad_spin:
+        user.last_spin_at = now
     await db.commit()
     logger.info(f"[spin] user={current_user} won {reward['label']} (segment {seg_index})")
 

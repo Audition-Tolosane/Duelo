@@ -426,6 +426,8 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
             questions_data=questions_data,
         )
         db.add(match)
+        from routers.economy import close_refund
+        await close_refund(db, player_id)
 
         uxp.xp += total_xp
         level_after = get_level(uxp.xp)
@@ -655,6 +657,57 @@ async def restore_streak(request: Request, current_user: str = Depends(get_curre
     await db.commit()
     logger.info(f"[restore-streak] user={current_user} streak restored to {streak_before}")
     return {"success": True, "current_streak": user.current_streak}
+
+
+@router.post("/double-xp")
+async def double_xp(request: Request, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    """×2 XP après un duel (pub regardée) : l'XP du match est ajoutée une 2e fois, une seule fois."""
+    body = await request.json()
+    match_id = body.get("match_id")
+    if not match_id:
+        raise HTTPException(status_code=400, detail="match_id requis")
+
+    from services.ad_rewards import verify_ad_reward
+    verify_ad_reward(current_user, "double_xp")
+
+    match_res = await db.execute(select(Match).where(Match.id == match_id))
+    match = match_res.scalar_one_or_none()
+    if not match or match.player1_id != current_user:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+    created = match.created_at
+    if created.tzinfo is None:
+        created = created.replace(tzinfo=timezone.utc)
+    if (datetime.now(timezone.utc) - created).total_seconds() > 600:
+        raise HTTPException(status_code=400, detail="Délai dépassé (>10 min)")
+    if match.xp_doubled:
+        raise HTTPException(status_code=400, detail="already_doubled")
+    bonus = match.xp_earned or 0
+    if bonus <= 0:
+        raise HTTPException(status_code=400, detail="no_xp")
+
+    uxp_res = await db.execute(
+        select(UserThemeXP).where(UserThemeXP.user_id == current_user, UserThemeXP.theme_id == match.category)
+    )
+    uxp = uxp_res.scalar_one_or_none()
+    if not uxp:
+        uxp = UserThemeXP(user_id=current_user, theme_id=match.category, xp=0)
+        db.add(uxp)
+    level_before = get_level(uxp.xp or 0)
+    uxp.xp = (uxp.xp or 0) + bonus
+    match.xp_doubled = True
+    await db.flush()
+    total_res = await db.execute(select(func.sum(UserThemeXP.xp)).where(UserThemeXP.user_id == current_user))
+    user_res = await db.execute(select(User).where(User.id == current_user))
+    user = user_res.scalar_one_or_none()
+    if user:
+        user.total_xp = total_res.scalar() or 0
+    level_after = get_level(uxp.xp)
+    await db.commit()
+    logger.info(f"[double-xp] user={current_user} match={match_id} +{bonus} XP")
+    return {
+        "bonus": bonus, "xp_total": bonus * 2,
+        "new_level": level_after if level_after > level_before else None,
+    }
 
 
 @router.get("/weekly-summary")

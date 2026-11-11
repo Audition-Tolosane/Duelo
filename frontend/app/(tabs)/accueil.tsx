@@ -14,6 +14,8 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import UserAvatar from '../../components/UserAvatar';
 import SpinWheelModal from '../../components/SpinWheelModal';
+import ChestBlock from '../../components/ChestBlock';
+import { useEconomy } from '../../utils/economy';
 import SwordMark from '../../components/SwordMark';
 import { useTabBar } from '../../contexts/TabBarContext';
 import { authFetch } from '../../utils/api';
@@ -824,6 +826,8 @@ export default function AccueilScreen() {
   const [dailyMissions, setDailyMissions] = useState<DailyMissionsState | null>(null);
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [spinAvailable, setSpinAvailable] = useState(false);
+  const [adSpinAvailable, setAdSpinAvailable] = useState(false);
+  const economy = useEconomy();   // coffre du jour (pastille de la rangée Bonus)
   const [showSpin, setShowSpin] = useState(false);
   const [offerSlotExpiresAt, setOfferSlotExpiresAt] = useState<string | null>(null);
   const [offerCountdown, setOfferCountdown] = useState('');
@@ -899,6 +903,7 @@ export default function AccueilScreen() {
       if (!res.ok) return;
       const data = await res.json();
       setSpinAvailable(data.available);
+      setAdSpinAvailable(!!data.ad_spin_available);
       if (data.available) {
         // Auto-open once per day — guard with AsyncStorage
         const lastAutoShown = await AsyncStorage.getItem('duelo_spin_auto_shown');
@@ -1264,7 +1269,7 @@ export default function AccueilScreen() {
   const feedItems = useMemo(() => socialFeed.filter(i => i.type !== 'event'), [socialFeed]);
   const replayThemes = (dailyMissions?.user_themes ?? []).slice(0, 3);
   const dqPending = !!dailyQuestion && !dailyQuestion.already_answered && !dqResult;
-  const bonusCount = (spinAvailable ? 1 : 0) + (dqPending ? 1 : 0);
+  const bonusCount = (spinAvailable ? 1 : 0) + (dqPending ? 1 : 0) + (economy?.chest_free ? 1 : 0);
   const hasMoves = incomingChallenges.length > 0 || pendingDuels.length > 0;
   const shownChallenges = showAllMoves ? incomingChallenges : incomingChallenges.slice(0, MOVES_PREVIEW);
   const shownDuels = showAllMoves ? pendingDuels : pendingDuels.slice(0, MOVES_PREVIEW);
@@ -1552,7 +1557,7 @@ export default function AccueilScreen() {
           <ListRow
             leadingIcon="sparkles"
             title={t('spin.btn_title')}
-            subtitle={spinAvailable ? t('spin.available') : t('spin.used')}
+            subtitle={spinAvailable ? t('spin.available') : adSpinAvailable ? t('spin.extra_available') : t('spin.used')}
             trailing={spinAvailable ? <Badge count={1} /> : undefined}
             chevron
             onPress={() => {
@@ -1560,6 +1565,10 @@ export default function AccueilScreen() {
               closeSheetThen(() => setShowSpin(true), 400);
             }}
           />
+        </SheetBlock>
+
+        <SheetBlock title={t('chest.title')}>
+          <ChestBlock />
         </SheetBlock>
 
         {dailyQuestion && !dailyQuestion.already_answered && (
@@ -1731,9 +1740,13 @@ export default function AccueilScreen() {
       {/* Roue quotidienne */}
       <SpinWheelModal
         visible={showSpin}
+        freeAvailable={spinAvailable}
+        adSpinAvailable={adSpinAvailable}
+        onAdSpinUsed={() => setAdSpinAvailable(false)}
         onClose={(done) => {
           setShowSpin(false);
           if (done) setSpinAvailable(false);
+          checkSpinStatus();   // tour gratuit pris → le tour « pub » devient disponible
         }}
       />
 

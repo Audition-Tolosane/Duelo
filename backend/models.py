@@ -75,6 +75,10 @@ class User(Base):
     timezone = Column(String(50), nullable=True)       # IANA tz e.g. "Europe/Paris"
     preferred_hours = Column(JSON, nullable=True)      # ["20:00-23:00", "12:00-13:00"]
 
+    # Roue quotidienne. Colonne ajoutée au démarrage (server.py) mais absente du modèle jusqu'ici :
+    # le tour n'était jamais enregistré, donc illimité.
+    last_spin_at = Column(DateTime(timezone=True), nullable=True)
+
     created_at = Column(DateTime(timezone=True), default=utc_now)
     updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
 
@@ -131,6 +135,7 @@ class Match(Base):
     winner_id = Column(String(36), nullable=True)
     xp_earned = Column(Integer, default=0)
     xp_breakdown = Column(JSON, nullable=True)  # {base, victory, perfection, giant_slayer, streak}
+    xp_doubled = Column(Boolean, default=False)  # ×2 XP déjà pris (pub sur l'écran de résultats)
     questions_data = Column(JSON, nullable=True)
     created_at = Column(DateTime(timezone=True), default=utc_now, index=True)
     updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
@@ -426,6 +431,23 @@ class UserLives(Base):
     id = Column(String(36), primary_key=True, default=generate_uuid)
     user_id = Column(String(36), nullable=False, unique=True, index=True)
     lives = Column(Integer, default=0)
+
+
+# ── Économie de jeu (crédits, thèmes débloqués, coffre, tour de roue en plus) ──
+
+class UserEconomy(Base):
+    """Une ligne par joueur, créée à la première lecture (voir routers/economy.py)."""
+    __tablename__ = 'user_economy'
+    user_id = Column(String(36), primary_key=True)
+    credits = Column(Integer, default=5)
+    regen_at = Column(DateTime(timezone=True), default=utc_now)   # départ de la recharge en cours
+    ad_day = Column(String(10), nullable=True)                    # jour (UTC) du compteur ci-dessous
+    ads_today = Column(Integer, default=0)                        # pubs « crédits » vues ce jour-là
+    refundable_until = Column(DateTime(timezone=True), nullable=True)  # dernier crédit encore remboursable
+    theme_bonus = Column(Integer, default=0)                      # places de thèmes gagnées par pub
+    chest_day = Column(String(10), nullable=True)
+    chests_opened = Column(Integer, default=0)                    # 0, 1 (gratuit) ou 2 (+ pub)
+    spin_ad_day = Column(String(10), nullable=True)               # jour du tour de roue en plus
 
 
 # ── Tournament ────────────────────────────────────────────────────────────────
