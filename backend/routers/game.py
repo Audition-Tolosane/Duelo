@@ -27,6 +27,7 @@ from services.xp import (
     get_daily_streak_bonus, update_login_streak, difficulty_mix,
 )
 from services.notifications import create_notification
+from services import question_order
 from auth_middleware import get_current_user_id, get_optional_user_id
 from rate_limit import rate_limit
 
@@ -49,7 +50,8 @@ async def _resolve_theme_category(theme: str, db: AsyncSession) -> str:
 
 
 @router.get("/questions")
-async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db: AsyncSession = Depends(get_db)):
+async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db: AsyncSession = Depends(get_db),
+                             tutorial: bool = False):
     """Get 7 questions from different angles, with an adaptive difficulty mix based on the
     player's level in this theme (sliding window). Anonymous -> balanced 2/3/2.
     For any translated language, return that language when the theme has it, else 'fr'."""
@@ -87,6 +89,7 @@ async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db:
     # Niveau du joueur dans ce thème -> difficulté adaptative (fenêtre glissante).
     # Best-effort : si non authentifié ou pas d'XP sur le thème, on reste sur l'équilibré.
     level = None
+    user_id = None
     try:
         user_id = await get_optional_user_id(request)
         if user_id:
@@ -101,10 +104,14 @@ async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db:
     except Exception as e:
         logger.warning(f"[questions] niveau indisponible, mix par défaut: {e}")
     mix = difficulty_mix(level)
+    if tutorial:
+        mix = [("Facile", 7)]   # premier match guidé : que des questions faciles
     logger.info(f"[questions] category='{category}' level={level} mix={mix}")
 
     selected = []
     used_angles = set()
+    # Questions jamais vues d'abord : ordre propre au joueur + curseur (services/question_order.py)
+    cursors = await question_order.load(db, user_id, theme) if user_id else {}
 
     for difficulty, count in mix:
         result = await db.execute(
@@ -112,6 +119,8 @@ async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db:
             .order_by(func.random())
         )
         candidates = result.scalars().all()
+        if user_id:
+            candidates = question_order.order(user_id, cursors, difficulty, candidates)
 
         added = 0
         for q in candidates:
@@ -143,6 +152,8 @@ async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db:
                 selected.append(q)
 
     logger.info(f"[questions] Found {len(selected)} questions for category='{category}' (lang={effective_lang})")
+    if user_id and selected:
+        await question_order.save(db, user_id, theme, question_order.advance(user_id, cursors, selected))
     random.shuffle(selected)
 
     result_list = []
@@ -157,8 +168,9 @@ async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db:
 
 # Deprecated alias — use /questions directly
 @router.get("/questions-v2", deprecated=True)
-async def get_game_questions_v2(theme: str, request: Request, lang: str = 'fr', db: AsyncSession = Depends(get_db)):
-    return await get_game_questions(theme, request, lang, db)
+async def get_game_questions_v2(theme: str, request: Request, lang: str = 'fr', db: AsyncSession = Depends(get_db),
+                                tutorial: bool = False):
+    return await get_game_questions(theme, request, lang, db, tutorial)
 
 
 @router.post("/matchmaking")

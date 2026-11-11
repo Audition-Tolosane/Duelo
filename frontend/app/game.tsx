@@ -54,6 +54,9 @@ const OPPONENT_REVEAL_MS = 1600;
 const PENDING_PICK_DELAY_MS = 400;
 // Dernière question : points ×1,5 (annoncé pendant la pause qui la précède ; même règle côté serveur)
 const LAST_Q_MULT = 1.5;
+// Premier match guidé : un conseil par question
+const TUTORIAL_TIPS = ['tuto.tip_speed', 'tuto.tip_opponent', 'tuto.tip_last'];
+const ICON_SIZE_TIP = 18;
 
 type Question = {
   id: string;
@@ -160,12 +163,14 @@ export default function GameScreen() {
   const params = useLocalSearchParams<{
     category: string; opponentPseudo: string; opponentSeed: string; opponentAvatarUrl: string; isBot: string; roomId: string; opponentLevel: string; opponentId: string;
     challenge_id: string; asyncChallenge: string; asyncMode: string;
-    botSkill: string; botSpeed: string;
+    botSkill: string; botSpeed: string; tutorial: string;
   }>();
   const { send: wsSend, on: wsOn } = useWS();
   const { width: screenW, height: screenH } = useWindowDimensions();
 
   const themeId = params.category;
+  // Premier match guidé : un conseil par question (1 à 3), sans bloquer le jeu
+  const isTutorial = params.tutorial === 'true';
   // Marqueur posé sur la réponse du rival : sa photo, sinon son initiale dans son cercle (comme au VS).
   const opponentAvatar = useMemo(() => ({
     seed: params.opponentSeed, url: params.opponentAvatarUrl || null, pseudo: params.opponentPseudo,
@@ -609,7 +614,7 @@ export default function GameScreen() {
       const voFlag = await AsyncStorage.getItem(`duelo_vo_${params.category}`);
       const lang = voFlag === 'true' ? 'en' : getLanguage();
       const langParam = lang && lang !== 'fr' ? `&lang=${lang}` : '';
-      const url = `${API_URL}/api/game/questions-v2?theme=${params.category}${langParam}`;
+      const url = `${API_URL}/api/game/questions-v2?theme=${params.category}${langParam}${isTutorial ? '&tutorial=true' : ''}`;
       const res = await authFetch(url);
       if (!res.ok) {
         throw new Error(`${t('game.server_error')} (${res.status})`);
@@ -1173,6 +1178,13 @@ export default function GameScreen() {
         </ScrollView>
       </View>
 
+      {isTutorial && currentIndex < TUTORIAL_TIPS.length && !showResult ? (
+        <View style={styles.tutoTip} pointerEvents="none">
+          <Icon name="idea" size={ICON_SIZE_TIP} color={COLOR.reward.gold} />
+          <Txt variant="bodySmall" color={COLOR.text.primary} style={styles.tutoTipText}>{t(TUTORIAL_TIPS[currentIndex])}</Txt>
+        </View>
+      ) : null}
+
       {/* Réponses dans la zone du pouce : grille 2×2, ou liste 1×4 si une réponse est longue */}
       {listLayout ? (
         <View style={[styles.answersZone, { flexGrow: ANSWERS_GROW, paddingBottom: answersPadBottom }]}>
@@ -1322,6 +1334,14 @@ const styles = StyleSheet.create({
 
   // Toast de série : corail plein, texte nuit
   ptsFloat: { position: 'absolute', bottom: -18, left: SPACE.md },
+  tutoTip: {
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.sm,
+    marginHorizontal: SPACE.screenX, marginBottom: SPACE.sm,
+    paddingHorizontal: SPACE.md, paddingVertical: SPACE.sm,
+    borderRadius: RADII.md, backgroundColor: COLOR.tint.gold,
+    borderWidth: BORDER.hair, borderColor: COLOR.reward.gold,
+  },
+  tutoTipText: { flex: 1 },
   lastPill: {
     flexDirection: 'row', alignItems: 'center', gap: SPACE.xs, alignSelf: 'center',
     paddingHorizontal: SPACE.md, paddingVertical: SPACE.xxs, marginBottom: SPACE.sm,

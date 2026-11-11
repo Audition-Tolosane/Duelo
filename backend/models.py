@@ -530,3 +530,11 @@ class ContentReport(Base):
     __table_args__ = (
         UniqueConstraint('reporter_id', 'target_type', 'target_id', name='uq_content_report'),
     )
+
+
+class QuestionCursor(Base):
+    """Où en est un joueur dans SON ordre des questions d'un thème (voir services/question_order.py)."""
+    __tablename__ = 'question_cursors'
+    user_id = Column(String(36), primary_key=True)
+    theme_id = Column(String(100), primary_key=True)
+    cursors = Column(Text, nullable=True)   # {"Facile": 0.42, "Moyen": 0.17, ...}

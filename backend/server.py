@@ -365,6 +365,13 @@ async def _ensure_columns():
             "ALTER TABLE matches ADD COLUMN IF NOT EXISTS xp_doubled BOOLEAN DEFAULT FALSE",
             # Réactions débloquées au coffre du jour
             "ALTER TABLE user_economy ADD COLUMN IF NOT EXISTS reactions_unlocked TEXT",
+            # Questions jamais vues d'abord : un curseur par joueur et par thème
+            """CREATE TABLE IF NOT EXISTS question_cursors (
+                user_id VARCHAR(36) NOT NULL,
+                theme_id VARCHAR(100) NOT NULL,
+                cursors TEXT,
+                PRIMARY KEY (user_id, theme_id)
+            )""",
         ]:
             try:
                 await conn.execute(text(stmt))

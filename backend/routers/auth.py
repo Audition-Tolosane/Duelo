@@ -166,7 +166,7 @@ async def delete_account(
         ChatMessage, Notification, NotificationSettings, UserThemeXP,
         Challenge, TournamentEntry, DailyMissions, DailyQuestionAnswer, UserAchievement,
         StreakShield, UserLives, XPMultiplierActivation, BoostActivation, BoostOfferRefresh,
-        ThemeFollow, QuestionReport, SpinThemeUnlock, UserBlock, ContentReport, UserEconomy,
+        ThemeFollow, QuestionReport, SpinThemeUnlock, UserBlock, ContentReport, UserEconomy, QuestionCursor,
     )
     from config import ROOT_DIR
 
@@ -211,7 +211,7 @@ async def delete_account(
         (BoostOfferRefresh, BoostOfferRefresh.user_id), (ThemeFollow, ThemeFollow.user_id),
         (QuestionReport, QuestionReport.user_id), (SpinThemeUnlock, SpinThemeUnlock.user_id),
         (UserBlock, UserBlock.blocker_id), (UserBlock, UserBlock.blocked_id),
-        (ContentReport, ContentReport.reporter_id), (UserEconomy, UserEconomy.user_id),
+        (ContentReport, ContentReport.reporter_id), (UserEconomy, UserEconomy.user_id), (QuestionCursor, QuestionCursor.user_id),
     ]:
         await db.execute(sql_delete(model).where(col == current_user_id))
 

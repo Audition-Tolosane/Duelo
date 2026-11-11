@@ -243,7 +243,9 @@ function OpponentPin({ x, y, name }: { x: number; y: number; name: string }) {
 export default function MatchmakingScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { category: rawCategory, themeName, rematch, room_id: challengeRoomId, challenge, opponentPseudo: challengeOpponentPseudo, botPseudo: rematchBotPseudo, botSeed: rematchBotSeed } = useLocalSearchParams<{ category: string; themeName: string; rematch: string; room_id: string; challenge: string; opponentPseudo: string; botPseudo: string; botSeed: string }>();
+  const { category: rawCategory, themeName, rematch, room_id: challengeRoomId, challenge, opponentPseudo: challengeOpponentPseudo, botPseudo: rematchBotPseudo, botSeed: rematchBotSeed, tutorial } = useLocalSearchParams<{ category: string; themeName: string; rematch: string; room_id: string; challenge: string; opponentPseudo: string; botPseudo: string; botSeed: string; tutorial: string }>();
+  // Premier match guidé (fin de l'onboarding) : gratuit, bot facile, sans attente
+  const isTutorial = tutorial === 'true';
   const category = rawCategory || '';
   const isRematch = rematch === 'true';
   const isChallengeMode = challenge === 'true' && !!challengeRoomId;
@@ -311,7 +313,7 @@ export default function MatchmakingScreen() {
   const matchFoundRef = useRef(false);
   const hardTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Crédits et thèmes (utils/economy) : défis et revanches sont gratuits et ne passent pas par là.
-  const exempt = isRematch || isChallengeMode;
+  const exempt = isRematch || isChallengeMode || isTutorial;
   const [gate, setGate] = useState<'checking' | 'open' | 'no_credits' | 'theme_limit'>(exempt ? 'open' : 'checking');
   const chargedRef = useRef(false);
   const searchStartedRef = useRef(false);
@@ -323,7 +325,7 @@ export default function MatchmakingScreen() {
     setGate('open');
     // Revanche contre un joueur réel : salle privée (isChallengeMode + room_id).
     // Revanche contre un bot (rematch=true sans salle) : même bot, même pseudo.
-    if (isRematch && !isChallengeMode) {
+    if ((isRematch || isTutorial) && !isChallengeMode) {
       fetchBotOpponent();
     } else if (isChallengeMode) {
       // Challenge mode: join the private room instead of the matchmaking queue
@@ -606,10 +608,11 @@ export default function MatchmakingScreen() {
     }, vsDelay);
 
     setTimeout(() => {
-      const skillParam = opp.skill_level != null ? `&botSkill=${opp.skill_level}` : '';
-      const speedParam = opp.avg_speed   != null ? `&botSpeed=${opp.avg_speed}`   : '';
+      // Premier match guidé : bot volontairement faible et lent
+      const skillParam = isTutorial ? '&botSkill=0.35' : opp.skill_level != null ? `&botSkill=${opp.skill_level}` : '';
+      const speedParam = isTutorial ? '&botSpeed=7' : opp.avg_speed   != null ? `&botSpeed=${opp.avg_speed}`   : '';
       router.replace(
-        `/game?category=${category}&opponentPseudo=${opp.pseudo}&opponentSeed=${opp.avatar_seed}${opp.avatar_url ? `&opponentAvatarUrl=${encodeURIComponent(opp.avatar_url)}` : ''}&isBot=${isBotMatch}&opponentLevel=${opp.level}&opponentStreak=${opp.streak}&opponentId=${opp.id || ''}${matchRoomId ? `&roomId=${matchRoomId}` : ''}${skillParam}${speedParam}`
+        `/game?category=${category}&opponentPseudo=${opp.pseudo}&opponentSeed=${opp.avatar_seed}${opp.avatar_url ? `&opponentAvatarUrl=${encodeURIComponent(opp.avatar_url)}` : ''}&isBot=${isBotMatch}&opponentLevel=${opp.level}&opponentStreak=${opp.streak}&opponentId=${opp.id || ''}${matchRoomId ? `&roomId=${matchRoomId}` : ''}${skillParam}${speedParam}${isTutorial ? '&tutorial=true' : ''}`
       );
     }, navDelay);
   };

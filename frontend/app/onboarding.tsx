@@ -15,6 +15,8 @@ import { COLOR, PALETTE, SPACE, SIZE, RADII } from '../theme/tokens';
 import { authFetch } from '../utils/api';
 import { t, getLanguage } from '../utils/i18n';
 
+// Thème du premier match guidé (culture générale de base), s'il existe dans la langue du joueur
+const TUTORIAL_THEME = 'GLO_CULTGEN';
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 type TrendingTheme = {
@@ -98,6 +100,20 @@ export default function OnboardingScreen() {
     setLoadingTrending(false);
   };
 
+  const pickTutorialTheme = async (fallback?: string): Promise<string | null> => {
+    try {
+      const lang = getLanguage();
+      const res = await authFetch(`${API_URL}/api/themes/everyone${lang && lang !== 'fr' ? `?lang=${lang}` : ''}`);
+      if (res.ok) {
+        const themes: { id: string }[] = (await res.json())?.themes || [];
+        const cultureG = themes.find((th) => th.id === TUTORIAL_THEME);
+        if (cultureG) return cultureG.id;
+        if (themes[0]) return themes[0].id;
+      }
+    } catch {}
+    return fallback || null;
+  };
+
   const isMounted = useRef(true);
   useEffect(() => { return () => { isMounted.current = false; }; }, []);
 
@@ -119,7 +135,12 @@ export default function OnboardingScreen() {
       }
       await AsyncStorage.setItem('duelo_onboarding_done', 'true');
     } catch (e) { console.error(e); }
-    if (isMounted.current) router.replace('/(tabs)/play');
+    // Premier match guidé, contre un bot facile, sur de la culture générale très simple
+    // (un thème « Pour tout le monde » dans la langue du joueur), pas sur un thème pointu.
+    const tutoTheme = await pickTutorialTheme(selectedThemes[0]);
+    if (!isMounted.current) return;
+    if (tutoTheme) router.replace(`/matchmaking?category=${tutoTheme}&tutorial=true` as any);
+    else router.replace('/(tabs)/play');
   };
 
   const toggleTheme = (id: string) => {

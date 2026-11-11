@@ -19,7 +19,7 @@ from services.xp import (
     get_daily_streak_bonus, update_login_streak, difficulty_mix,
 )
 from services.notifications import push_message
-from services import reactions
+from services import reactions, question_order
 from config import JWT_SECRET, JWT_ALGORITHM
 
 logger = logging.getLogger(__name__)
@@ -328,8 +328,12 @@ async def load_and_start_game(room_id: str, theme_id: str):
 
         # Difficulté adaptative : moyenne des niveaux des 2 joueurs sur le thème (duel équitable).
         avg_level = None
+        # Ordre des questions : celui du joueur qui a le moins d'XP sur le thème (il a vu le
+        # moins de questions) — ses questions jamais vues passent en premier.
+        order_pid = room.player1_id
         try:
             levels = []
+            least_xp = None
             for pid in (room.player1_id, room.player2_id):
                 if not pid:
                     continue
@@ -340,6 +344,8 @@ async def load_and_start_game(room_id: str, theme_id: str):
                 )
                 x = r.scalar_one_or_none()
                 levels.append(get_level(x) if x is not None else 0)
+                if least_xp is None or (x or 0) < least_xp:
+                    least_xp, order_pid = (x or 0), pid
             if levels:
                 avg_level = sum(levels) // len(levels)
         except Exception as e:
@@ -361,13 +367,18 @@ async def load_and_start_game(room_id: str, theme_id: str):
         filtre_langue = filtre_langue_questions(Question.language,
                                                 langue_unique or LANGUE_REFERENCE)
 
+        cursors = await question_order.load(db, order_pid, theme_id) if order_pid else {}
         for difficulty, count in mix:
+            if count <= 0:
+                continue
             result = await db.execute(
                 select(Question).where(Question.category == category,
                                        Question.difficulty == difficulty, filtre_langue)
-                .order_by(func.random()).limit(count)
             )
-            selected.extend(result.scalars().all())
+            candidates = result.scalars().all()
+            if order_pid:
+                candidates = question_order.order(order_pid, cursors, difficulty, candidates)
+            selected.extend(candidates[:count])
 
         if len(selected) < 7:
             result = await db.execute(
@@ -378,6 +389,9 @@ async def load_and_start_game(room_id: str, theme_id: str):
             for q in fallback:
                 if q not in selected and len(selected) < 7:
                     selected.append(q)
+
+        if order_pid and selected:
+            await question_order.save(db, order_pid, theme_id, question_order.advance(order_pid, cursors, selected))
 
         import random
         random.shuffle(selected)
