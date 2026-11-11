@@ -7,7 +7,7 @@ on n'envoie qu'une clé, chaque joueur la lit dans sa langue).
 import time
 
 DUEL = ["laugh", "fire", "shock", "clap"]
-FREE = DUEL + ["handshake", "gg", "well_played", "rematch", "got_me", "lucky", "oops", "next_time"]
+FREE = DUEL + ["handshake", "gg", "well_played", "got_me", "lucky", "oops", "next_time"]
 LOCKED = ["crown", "skull", "angry", "mindblown", "too_easy", "no_fear", "lessons", "unstoppable"]
 ALL = set(FREE) | set(LOCKED)
 

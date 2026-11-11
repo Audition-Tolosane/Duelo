@@ -14,7 +14,7 @@ export const DUEL_REACTIONS = ['laugh', 'fire', 'shock', 'clap'];
 
 /** Après un match : gratuites pour tous. */
 export const FREE_EMOJIS = ['laugh', 'fire', 'shock', 'clap', 'handshake'];
-export const FREE_PHRASES = ['gg', 'well_played', 'rematch', 'got_me', 'lucky', 'oops', 'next_time'];
+export const FREE_PHRASES = ['gg', 'well_played', 'got_me', 'lucky', 'oops', 'next_time'];
 /** À débloquer dans le coffre du jour. */
 export const LOCKED_EMOJIS = ['crown', 'skull', 'angry', 'mindblown'];
 export const LOCKED_PHRASES = ['too_easy', 'no_fear', 'lessons', 'unstoppable'];
@@ -56,7 +56,6 @@ export function botReactionFor(botCorrect: boolean, playerCorrect: boolean): str
 /** Réponse d'un bot à une réaction reçue (après le match ou en duel). */
 export function botReplyTo(key: string, botWon: boolean): string | null {
   if (Math.random() > 0.55) return null;
-  if (key === 'rematch') return 'next_time';
   if (key === 'gg' || key === 'well_played' || key === 'handshake' || key === 'clap') return Math.random() < 0.5 ? 'gg' : 'handshake';
   if (key === 'laugh' || key === 'lucky' || key === 'oops') return 'laugh';
   return botWon ? 'next_time' : 'well_played';

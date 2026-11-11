@@ -203,6 +203,7 @@ export default function GameScreen() {
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeLeftRef = useRef(TIMER_DURATION);
+  const answeredRef = useRef(false);   // réponse donnée à la question en cours
   const questionsRef = useRef<Question[]>([]);
   const currentIndexRef = useRef(0);
   const questionFade = useRef(new Animated.Value(0)).current;
@@ -454,6 +455,7 @@ export default function GameScreen() {
       wsOn('question_reveal', (msg) => {
         const { question_index, opponent_answer } = msg.data || {};
         if (question_index !== currentIndexRef.current) return;
+        if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
         if (typeof opponent_answer === 'number' && opponent_answer >= 0) setBotAnswer(opponent_answer);
         revealedAtRef.current = Math.max(revealedAtRef.current, Date.now() - REVEAL_MS + OPPONENT_REVEAL_MS);
       }),
@@ -612,6 +614,7 @@ export default function GameScreen() {
     timeLeftRef.current = duration;
     setTimeLeft(duration);
 
+    answeredRef.current = false;
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       timeLeftRef.current -= 1;
@@ -621,7 +624,8 @@ export default function GameScreen() {
       if (remaining <= 0) {
         if (timerRef.current) clearInterval(timerRef.current);
         timerRef.current = null;
-        handleTimeout();
+        // Déjà répondu (duel en direct) : le chrono a seulement fini de défiler pour l'adversaire.
+        if (!answeredRef.current) handleTimeout();
       }
     }, 1000);
   };
@@ -763,7 +767,10 @@ export default function GameScreen() {
     if (selectedOption !== null || showResult) return;
     if (isSubmittingRef.current) return; // #18 double-tap guard
     isSubmittingRef.current = true;
-    if (timerRef.current) clearInterval(timerRef.current);
+    answeredRef.current = true;
+    // En direct, le chrono continue de défiler tant que l'adversaire n'a pas répondu
+    // (on voit le temps qu'il lui reste) ; il s'arrête à la révélation des deux réponses.
+    if (!isLive && timerRef.current) clearInterval(timerRef.current);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     setSelectedOption(optionIndex);
