@@ -132,10 +132,12 @@ async def answer_today(
     if question_id is None or answer_index is None or not theme_id:
         raise HTTPException(status_code=400, detail="Paramètres manquants.")
 
-    q_res = await db.execute(select(Question).where(Question.id == question_id))
-    question = q_res.scalar_one_or_none()
-    if not question:
-        raise HTTPException(status_code=404, detail="Question introuvable.")
+    # Seule la question du jour de CE joueur est acceptée (sinon : n'importe quelle question
+    # envoyée renvoyait sa bonne réponse)
+    theme = await _get_today_theme(current_user, db)
+    question = await _get_today_question(theme.id, db) if theme else None
+    if not question or str(question.id) != str(question_id):
+        raise HTTPException(status_code=400, detail="Question invalide.")
 
     # /today a envoyé les options mélangées : on recalcule la même permutation pour
     # retrouver l'option d'origine derrière l'index cliqué par le joueur.

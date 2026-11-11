@@ -10,7 +10,19 @@ class RateLimiter:
 
     def _cleanup(self, key: str, window: int):
         now = time.time()
-        self.requests[key] = [t for t in self.requests[key] if now - t < window]
+        recent = [t for t in self.requests.get(key, []) if now - t < window]
+        if recent:
+            self.requests[key] = recent
+        else:
+            self.requests.pop(key, None)   # libère la mémoire des adresses inactives
+
+    def count(self, key: str, window: int) -> int:
+        """Nombre d'évènements récents, SANS en ajouter un (compteurs d'échecs)."""
+        self._cleanup(key, window)
+        n = len(self.requests[key])
+        if not n:
+            self.requests.pop(key, None)   # pas de clés vides qui s'accumulent
+        return n
 
     def check(self, key: str, limit: int, window: int):
         self._cleanup(key, window)

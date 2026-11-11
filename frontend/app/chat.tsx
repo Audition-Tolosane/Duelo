@@ -213,7 +213,7 @@ export default function ChatScreen() {
   const handleRevanche = (gameData: any) => {
     if (gameData?.category && partnerId) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-      router.push(`/player-profile?id=${partnerId}&challenge=1&themeId=${gameData.category}&themeName=${encodeURIComponent(gameData.category_name || gameData.theme_name || '')}` as any);
+      router.push(`/player-profile?id=${encodeURIComponent(String(partnerId))}&challenge=1&themeId=${encodeURIComponent(String(gameData.category || ""))}&themeName=${encodeURIComponent(gameData.category_name || gameData.theme_name || '')}` as any);
     }
   };
 

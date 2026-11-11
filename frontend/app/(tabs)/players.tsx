@@ -8,6 +8,7 @@ import Animated, { useAnimatedStyle, FadeInDown, SlideInRight, interpolate } fro
 import { useTabBar } from '../../contexts/TabBarContext';
 import UserAvatar from '../../components/UserAvatar';
 import { t, getLanguage, universeName } from '../../utils/i18n';
+import { authFetch } from '../../utils/api';
 import {
   Txt, Icon, IconName, Button, Card, Chip, ThemeIcon, Loader, EmptyState,
 } from '../../components/ui';
@@ -264,7 +265,7 @@ export default function PlayersScreen() {
     setLoadingFeed(true);
     setPulseError(false);
     try {
-      const res = await fetch(`${API_URL}/api/social/pulse/${uid}`);
+      const res = await authFetch(`${API_URL}/api/social/pulse/${uid}`);
       const data = await res.json();
       setFeed(data.feed || []);
     } catch {
@@ -289,7 +290,7 @@ export default function PlayersScreen() {
   const loadCoach = async (uid: string) => {
     setCoachError(false);
     try {
-      const res = await fetch(`${API_URL}/api/social/coach/${uid}?lang=${getLanguage()}`);
+      const res = await authFetch(`${API_URL}/api/social/coach/${uid}?lang=${getLanguage()}`);
       const data = await res.json();
       setCoachSuggestions(data.suggestions || []);
     } catch {

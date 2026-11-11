@@ -96,8 +96,11 @@ async def get_active_boost(user_id: str, theme_id: str, db: AsyncSession) -> boo
         .where(BoostActivation.user_id == user_id)
         .where(BoostActivation.theme_id.in_([theme_id, "__spin__"]))
         .where(BoostActivation.expires_at > now)
+        .limit(1)
     )
-    return res.scalar_one_or_none() is not None
+    # Plusieurs boosts actifs (roue + coffre…) : .first(), sinon MultipleResultsFound faisait
+    # échouer l'enregistrement du match (des deux joueurs en direct)
+    return res.scalars().first() is not None
 
 
 async def get_any_active_boost(user_id: str, db: AsyncSession):

@@ -51,7 +51,10 @@ async def _resolve_theme_category(theme: str, db: AsyncSession) -> str:
 
 @router.get("/questions")
 async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db: AsyncSession = Depends(get_db),
-                             tutorial: bool = False):
+                             tutorial: bool = False,
+                             # Les réponses partent avec les questions (mode solo) : on borne la
+                             # vitesse à laquelle on peut aspirer le catalogue (antisèche du direct)
+                             _rl=Depends(rate_limit(limit=40, window=3600))):
     """Get 7 questions from different angles, with an adaptive difficulty mix based on the
     player's level in this theme (sliding window). Anonymous -> balanced 2/3/2.
     For any translated language, return that language when the theme has it, else 'fr'."""
@@ -421,11 +424,16 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
         base_xp = player_score * 2
         victory_bonus = 50 if won else 0
         perfection_bonus = 50 if perfect else 0
-        giant_slayer_bonus = 100 if (won and opponent_level - level_before >= 15) else 0
+        # « Tueur de géant » : seulement contre un bot (le niveau d'un vrai adversaire est déclaré
+        # par l'app ici ; les vrais duels sont enregistrés par le serveur, voir ws.py)
+        giant_slayer_bonus = 100 if (won and opponent_is_bot and opponent_level - level_before >= 15) else 0
 
         # Bonus journalier (login streak)
+        # Bonus de série de connexion : au 1er match du jour seulement (avant : à chaque match)
+        _last = user.last_played_at
+        first_today = not (_last is not None and _last.date() == now.date())
         new_login_streak = update_login_streak(user, now)
-        daily_bonus = get_daily_streak_bonus(new_login_streak)
+        daily_bonus = get_daily_streak_bonus(new_login_streak) if first_today else 0
 
         # Boost x2 XP (rewarded ad, 6 min)
         from services.boosts import get_active_boost
@@ -887,12 +895,22 @@ async def generate_vo_questions(
     saved = 0
     for q_data in questions_data:
         try:
+            # Sortie d'IA = donnée non fiable : 4 options texte, bonne réponse 0-3, longueurs bornées
+            opts = q_data.get("options")
+            text_q = str(q_data.get("question_text", "")).strip()
+            correct = int(q_data.get("correct_option"))
+            diff = q_data.get("difficulty", "Moyen")
+            if (not isinstance(opts, list) or len(opts) != 4 or not all(isinstance(o, str) and 0 < len(o.strip()) <= 120 for o in opts)
+                    or not 0 <= correct <= 3 or not 5 <= len(text_q) <= 300):
+                continue
+            if diff not in ("Facile", "Moyen", "Difficile"):
+                diff = "Moyen"
             q = Question(
                 category=category,
-                question_text=q_data["question_text"].strip(),
-                options=q_data["options"],
-                correct_option=int(q_data["correct_option"]),
-                difficulty=q_data.get("difficulty", "Moyen"),
+                question_text=text_q,
+                options=[o.strip() for o in opts],
+                correct_option=correct,
+                difficulty=diff,
                 language='en',
             )
             db.add(q)

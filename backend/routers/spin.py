@@ -80,7 +80,7 @@ async def spin_claim(
     current_user: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ):
-    user_res = await db.execute(select(User).where(User.id == current_user))
+    user_res = await db.execute(select(User).where(User.id == current_user).with_for_update())  # verrou : un tour à la fois
     user = user_res.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")

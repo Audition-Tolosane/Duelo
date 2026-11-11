@@ -130,6 +130,13 @@ async def block_user(user_id: str, current_user: str = Depends(get_current_user_
         await db.commit()
     except IntegrityError:
         await db.rollback()
+    # Plus d'abonnement dans aucun sens : le joueur bloqué ne suit plus, n'est plus suivi
+    from models import PlayerFollow
+    await db.execute(delete(PlayerFollow).where(or_(
+        and_(PlayerFollow.follower_id == current_user, PlayerFollow.followed_id == user_id),
+        and_(PlayerFollow.follower_id == user_id, PlayerFollow.followed_id == current_user),
+    )))
+    await db.commit()
     return {"blocked": True}
 
 

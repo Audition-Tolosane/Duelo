@@ -68,7 +68,8 @@ def _aware(dt):
 
 async def get_economy(db: AsyncSession, user_id: str) -> UserEconomy:
     """Ligne du joueur, créée pleine au premier accès, recharge et compteurs du jour à jour."""
-    res = await db.execute(select(UserEconomy).where(UserEconomy.user_id == user_id))
+    # FOR UPDATE : deux requêtes simultanées (coffre, pub, crédit) ne lisent plus le même état
+    res = await db.execute(select(UserEconomy).where(UserEconomy.user_id == user_id).with_for_update())
     econ = res.scalar_one_or_none()
     now = _now()
     if not econ:

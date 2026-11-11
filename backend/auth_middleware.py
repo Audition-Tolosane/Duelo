@@ -35,6 +35,20 @@ async def get_optional_user_id(request: Request) -> str | None:
         return None
 
 
+# Routes « personnelles » prises par identifiant dans l'URL (fil d'accueil, coach, activité) :
+# jeton d'un AUTRE joueur → 403. Sans jeton : refusé seulement si STRICT_OWNER_ROUTES=1 (à mettre
+# sur Railway quand toutes les apps installées envoient leur jeton — build du 11/11/2026 et +).
+import os as _os
+
+
+async def owner_only(user_id: str, request: Request) -> None:
+    viewer = await get_optional_user_id(request)
+    if viewer and viewer != user_id:
+        raise HTTPException(status_code=403, detail="Non autorisé")
+    if not viewer and _os.environ.get("STRICT_OWNER_ROUTES", "").strip() == "1":
+        raise HTTPException(status_code=401, detail="Connexion requise")
+
+
 async def get_current_user_id(request: Request, db: AsyncSession = Depends(get_db)) -> str:
     """Extract and validate JWT from Authorization Bearer header.
 

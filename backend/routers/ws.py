@@ -93,9 +93,22 @@ async def websocket_endpoint(
 
     await manager.connect(user_id, websocket)
 
+    # Anti-inondation : plus de 40 messages en 2 s sur une même connexion = coupure
+    # (avant : seul le chat était limité ; une boucle de matchmaking_join occupait la base)
+    flood: list[float] = []
+    mm_last = 0.0
+
     try:
         while True:
             raw = await websocket.receive_text()
+            now_t = time.monotonic()
+            flood = [t for t in flood if now_t - t < 2.0]
+            flood.append(now_t)
+            if len(flood) > 40:
+                logger.warning(f"[ws] inondation, connexion coupée: {user_id}")
+                await websocket.close(code=1008, reason="Too many messages")
+                manager.disconnect(user_id)
+                return
             try:
                 data = json.loads(raw)
             except json.JSONDecodeError:
@@ -119,6 +132,9 @@ async def websocket_endpoint(
                     await handle_chat_typing(user_id, data)
 
                 elif action == "matchmaking_join":
+                    if now_t - mm_last < 1.0:   # au plus 1 recherche par seconde
+                        continue
+                    mm_last = now_t
                     await handle_matchmaking_join(user_id, data)
 
                 elif action == "matchmaking_leave":
@@ -252,6 +268,20 @@ async def handle_match_reaction(sender_id: str, data: dict):
     async with AsyncSessionLocal() as db:
         res = await db.execute(select(UserEconomy.reactions_unlocked).where(UserEconomy.user_id == sender_id))
         if not reactions.can_use(key, res.scalar_one_or_none()):
+            return
+    # Seulement vers un adversaire des 30 dernières minutes (duel enregistré ou défi joué)
+    async with AsyncSessionLocal() as db:
+        from models import Challenge
+        since = datetime.now(timezone.utc) - timedelta(minutes=30)
+        played = (await db.execute(select(Match.id).where(
+            Match.player1_id == sender_id, Match.player2_id == receiver_id,
+            Match.created_at >= since).limit(1))).scalars().first()
+        if not played:
+            played = (await db.execute(select(Challenge.id).where(
+                or_(and_(Challenge.challenger_id == sender_id, Challenge.challenged_id == receiver_id),
+                    and_(Challenge.challenger_id == receiver_id, Challenge.challenged_id == sender_id)),
+                Challenge.created_at >= datetime.utcnow() - timedelta(days=2)).limit(1))).scalars().first()
+        if not played:
             return
     if not reactions.match_allowed(sender_id, receiver_id):
         await manager.send_to_user(sender_id, {"type": "reaction_limited", "data": {}})
@@ -536,6 +566,21 @@ async def _post_match_progress(db, player_id: str, user, theme_id: str, won: boo
 
 async def save_game_results(room):
     """Save match results to database for both players."""
+    # Crédits : la partie a eu lieu, plus de remboursement possible (avant : /economy/refund
+    # après un duel en direct rendait le crédit)
+    try:
+        from routers.economy import close_refund
+        async with AsyncSessionLocal() as _db:
+            for _pid in (room.player1_id, room.player2_id):
+                await close_refund(_db, _pid)
+            await _db.commit()
+    except Exception as e:
+        logger.warning(f"[save_game_results] close_refund: {e}")
+    # Une seule fois par salle (fin normale ou abandon). Avant : un garde « même thème, même
+    # adversaire < 60 s » qui supprimait aussi les revanches rapides.
+    if getattr(room, "saved", False):
+        return
+    room.saved = True
     results = room.get_final_results()
 
     async with AsyncSessionLocal() as db:
@@ -546,19 +591,6 @@ async def save_game_results(room):
         for player_id in (room.player1_id, room.player2_id):
             opponent_id = room.get_opponent_id(player_id)
 
-            # ── Duplicate submission guard ── (le match de CE joueur seulement : chacun a sa
-            # ligne ; l'ancienne version voyait la ligne de l'adversaire et sautait le 2e joueur)
-            recent_cutoff = datetime.now(timezone.utc) - timedelta(seconds=60)
-            dup_check = await db.execute(
-                select(Match.id).where(
-                    Match.created_at >= recent_cutoff,
-                    Match.category == room.theme_id,
-                    Match.player1_id == player_id, Match.player2_id == opponent_id,
-                ).limit(1)
-            )
-            if dup_check.scalars().first():
-                logger.info(f"[save_game_results] Duplicate blocked for player={player_id}, theme={room.theme_id}")
-                continue
 
             player_score = room.get_score(player_id)
             opponent_score = room.get_score(opponent_id)
@@ -603,8 +635,11 @@ async def save_game_results(room):
             new_streak = (user.current_streak + 1) if won else 0
             streak_bonus = get_streak_bonus(new_streak) if won else 0
             now_utc = datetime.now(timezone.utc)
+            # Bonus de série de connexion : au 1er match du jour seulement (avant : à chaque match)
+            _last = user.last_played_at
+            first_today = not (_last is not None and _last.date() == now_utc.date())
             new_login_streak = update_login_streak(user, now_utc)
-            daily_bonus = get_daily_streak_bonus(new_login_streak)
+            daily_bonus = get_daily_streak_bonus(new_login_streak) if first_today else 0
 
             from services.boosts import get_active_boost
             game_xp = base_xp + victory_bonus + perfection_bonus + giant_slayer_bonus + streak_bonus
@@ -615,6 +650,19 @@ async def save_game_results(room):
             xp_mult = await get_active_multiplier(player_id, db)
             mult_bonus = round(game_xp * (xp_mult - 1.0)) if xp_mult > 1.0 else 0
             total_xp = game_xp + x2_bonus + mult_bonus + daily_bonus
+            # Anti-farm (comme en solo) : plafond de matchs par heure, et pas plus de 10 matchs
+            # récompensés par jour contre le MÊME adversaire (deux comptes qui jouent l'un contre
+            # l'autre en boucle).
+            from routers.game import SOLO_XP_HOURLY_CAP
+            _hour = await db.execute(select(func.count(Match.id)).where(
+                Match.player1_id == player_id,
+                Match.created_at >= now_utc - timedelta(hours=1)))
+            _pair = await db.execute(select(func.count(Match.id)).where(
+                Match.player1_id == player_id, Match.player2_id == opponent_id,
+                Match.created_at >= now_utc - timedelta(days=1)))
+            if (_hour.scalar() or 0) >= SOLO_XP_HOURLY_CAP or (_pair.scalar() or 0) >= 10:
+                base_xp = victory_bonus = perfection_bonus = giant_slayer_bonus = streak_bonus = 0
+                x2_bonus = mult_bonus = daily_bonus = total_xp = 0
 
             xp_breakdown = {
                 "base": base_xp, "victory": victory_bonus, "perfection": perfection_bonus,

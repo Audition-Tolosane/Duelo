@@ -135,15 +135,20 @@ async def tournament_leaderboard(
     limit: int = 50,
     db: AsyncSession = Depends(get_db),
 ):
+    limit = min(max(1, limit), 100)
     entries_res = await db.execute(
         select(TournamentEntry).where(TournamentEntry.tournament_id == tournament_id)
         .order_by(TournamentEntry.score.desc()).limit(limit)
     )
     entries = entries_res.scalars().all()
+    # Joueurs chargés en une requête (avant : une requête par ligne)
+    users_by_id = {}
+    if entries:
+        u_rows = await db.execute(select(User).where(User.id.in_([e.user_id for e in entries])))
+        users_by_id = {u.id: u for u in u_rows.scalars().all()}
     result = []
     for rank, e in enumerate(entries, 1):
-        u_res = await db.execute(select(User).where(User.id == e.user_id))
-        u = u_res.scalar_one_or_none()
+        u = users_by_id.get(e.user_id)
         result.append({
             "rank": rank,
             "user_id": e.user_id,

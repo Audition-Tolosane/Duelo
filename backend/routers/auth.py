@@ -20,6 +20,9 @@ import jwt as pyjwt
 
 logger = logging.getLogger(__name__)
 
+# Empreinte factice : vérifiée quand le compte n'existe pas (temps de réponse identique)
+_DUMMY_HASH = hash_password("skilki-dummy-password")
+
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 RESERVED_NAMES = {"admin", "root", "system", "duelo", "bot", "moderator", "mod", "support"}
@@ -129,14 +132,15 @@ async def login(data: LoginRequest, request: Request, db: AsyncSession = Depends
     # Per-email lockout: 5 failed attempts per 15 min
     normalized_email = normalize_email(data.email)
     email_key = f"login_fail:{normalized_email}"
-    try:
-        _limiter.check(email_key, 5, 900)
-    except HTTPException:
+    if _limiter.count(email_key, 900) >= 5:
         raise HTTPException(status_code=429, detail="Trop de tentatives, réessayez dans 15 minutes")
 
     # Normalise email (strips +alias, dots for gmail)
     result = await db.execute(select(User).where(User.email == normalized_email))
     user = result.scalar_one_or_none()
+    if not user or not user.password_hash:
+        # Même durée qu'un vrai essai : la réponse ne trahit pas l'existence du compte
+        verify_password(data.password, _DUMMY_HASH)
     if not user or not user.password_hash or not verify_password(data.password, user.password_hash):
         # Record failed attempt against both buckets
         import time as _time
@@ -323,8 +327,12 @@ async def _verify_google_token(id_token: str) -> dict:
     if resp.status_code != 200:
         raise HTTPException(status_code=401, detail="Token Google invalide")
     data = resp.json()
-    if GOOGLE_CLIENT_IDS and data.get("aud") not in GOOGLE_CLIENT_IDS:
+    if not GOOGLE_CLIENT_IDS:
+        raise HTTPException(status_code=501, detail="Connexion Google non configurée")
+    if data.get("aud") not in GOOGLE_CLIENT_IDS:
         raise HTTPException(status_code=401, detail="Token Google: audience incorrecte")
+    if data.get("iss") not in ("accounts.google.com", "https://accounts.google.com"):
+        raise HTTPException(status_code=401, detail="Token Google: émetteur incorrect")
     # #24 — Reject tokens with unverified email
     if data.get("email_verified") not in (True, "true"):
         raise HTTPException(status_code=401, detail="Email Google non vérifié")
@@ -364,7 +372,8 @@ async def _verify_apple_token(identity_token: str) -> dict:
     except pyjwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Jeton Apple expiré")
     except pyjwt.InvalidTokenError as e:
-        raise HTTPException(status_code=401, detail=f"Jeton Apple invalide : {e}")
+        logger.warning(f"[apple] jeton invalide : {e}")
+        raise HTTPException(status_code=401, detail="Jeton Apple invalide")
 
     return payload  # contains: sub (stable apple user ID), email (may be nil after first login)
 
@@ -433,6 +442,12 @@ async def social_login(
         if user:
             setattr(user, id_field, provider_id)
             user.is_guest = False
+            # Compte créé par email + mot de passe SANS vérification de l'email : quelqu'un a pu
+            # l'ouvrir avec l'adresse de la victime avant elle. Apple/Google viennent de prouver
+            # l'adresse : on retire ce mot de passe et on coupe les sessions existantes.
+            if user.password_hash:
+                user.password_hash = None
+                user.token_version = (user.token_version or 0) + 1
             await db.commit()
             await db.refresh(user)
             return _user_response(user)

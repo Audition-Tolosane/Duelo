@@ -31,6 +31,12 @@ app = FastAPI(
 
 @app.middleware("http")
 async def security_headers(request: Request, call_next):
+    # Corps de requête > 8 Mo refusé d'emblée (avant : aucune limite, quelques envois géants
+    # suffisaient à saturer la mémoire du serveur)
+    cl = request.headers.get("content-length")
+    if cl and cl.isdigit() and int(cl) > 8 * 1024 * 1024:
+        from fastapi.responses import JSONResponse
+        return JSONResponse({"detail": "Requête trop volumineuse"}, status_code=413)
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"

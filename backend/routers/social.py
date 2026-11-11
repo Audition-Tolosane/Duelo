@@ -1,3 +1,4 @@
+import re
 import secrets
 import random
 from datetime import datetime, timezone
@@ -12,9 +13,10 @@ from constants import COUNTRY_FLAGS, SUPER_CATEGORY_META, TOTAL_QUESTIONS
 from services.xp import get_level, get_theme_title, get_streak_badge
 from i18n import theme_localise, nom_cluster, nom_theme
 from services.notifications import create_notification
-from auth_middleware import get_current_user_id, get_optional_user_id
+from auth_middleware import get_current_user_id, get_optional_user_id, owner_only
 from routers.moderation import blocked_user_ids, is_blocked_between
 from rate_limit import rate_limit
+from helpers import validate_image_base64
 
 router = APIRouter(tags=["social"])
 
@@ -97,6 +99,15 @@ async def create_wall_post(category_id: str, data: WallPostCreate, request: Requ
         raise HTTPException(status_code=400, detail="Le contenu ne peut pas dépasser 1000 caractères")
     if data.image_base64 and len(data.image_base64) > 700000:
         raise HTTPException(status_code=400, detail="Image trop volumineuse (max 500KB)")
+    # Une vraie image intégrée seulement : une URL externe aurait été chargée par chaque lecteur
+    # (son adresse IP envoyée à un serveur tiers)
+    if data.image_base64:
+        if not re.match(r"^data:image/(png|jpe?g|webp|gif);base64,", data.image_base64):
+            raise HTTPException(status_code=400, detail="Image invalide")
+        try:
+            validate_image_base64(data.image_base64)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Image invalide")
 
     post = WallPost(user_id=data.user_id, category_id=category_id, content=data.content.strip(), image_base64=data.image_base64)
     db.add(post)
@@ -124,6 +135,11 @@ async def create_wall_post(category_id: str, data: WallPostCreate, request: Requ
 async def toggle_like(post_id: str, data: FollowToggle, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     if data.user_id != current_user:
         raise HTTPException(status_code=403, detail="Non autorisé")
+    author = (await db.execute(select(WallPost.user_id).where(WallPost.id == post_id))).scalar_one_or_none()
+    if author is None:
+        raise HTTPException(status_code=404, detail="Publication introuvable")
+    if await is_blocked_between(db, current_user, author):
+        raise HTTPException(status_code=403, detail="Action impossible")
     existing = await db.execute(
         select(PostLike).where(PostLike.post_id == post_id, PostLike.user_id == data.user_id)
     )
@@ -225,7 +241,7 @@ async def get_comments(post_id: str, viewer_id: Optional[str] = Depends(get_opti
     hidden = await blocked_user_ids(db, viewer_id)
     if hidden:
         q = q.where(PostComment.user_id.notin_(hidden))
-    result = await db.execute(q.order_by(PostComment.created_at.asc()))
+    result = await db.execute(q.order_by(PostComment.created_at.asc()).limit(200))
     comments = result.scalars().all()
     if not comments:
         return []
@@ -280,8 +296,13 @@ async def _get_user_best_theme(db: AsyncSession, user_id: str):
 # ── Player Profile & Follow ──
 
 @router.get("/player/{user_id}/profile")
-async def get_player_profile(user_id: str, viewer_id: Optional[str] = None, posts_limit: int = 20, posts_offset: int = 0,
+async def get_player_profile(user_id: str, request: Request, viewer_id: Optional[str] = None, posts_limit: int = 20, posts_offset: int = 0,
                              lang: str = 'fr', db: AsyncSession = Depends(get_db)):
+    posts_limit = min(max(1, posts_limit), 50)
+    # Joueur bloqué (dans un sens ou dans l'autre) : profil introuvable pour lui
+    jwt_viewer = await get_optional_user_id(request)
+    if jwt_viewer and jwt_viewer != user_id and await is_blocked_between(db, jwt_viewer, user_id):
+        raise HTTPException(status_code=404, detail="Joueur non trouvé")
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
     if not user:
@@ -439,6 +460,8 @@ async def toggle_player_follow(user_id: str, data: PlayerFollowToggle, current_u
         raise HTTPException(status_code=403, detail="Non autorisé")
     if data.follower_id == user_id:
         raise HTTPException(status_code=400, detail="Vous ne pouvez pas vous suivre vous-même")
+    if await is_blocked_between(db, current_user, user_id):
+        raise HTTPException(status_code=403, detail="Action impossible")
 
     existing = await db.execute(
         select(PlayerFollow).where(
@@ -484,16 +507,19 @@ async def toggle_player_follow(user_id: str, data: PlayerFollowToggle, current_u
 
 
 @router.get("/player/{user_id}/followers")
-async def get_followers(user_id: str, type: str = "followers", db: AsyncSession = Depends(get_db)):
+async def get_followers(user_id: str, type: str = "followers", limit: int = 100, offset: int = 0,
+                        db: AsyncSession = Depends(get_db)):
+    limit = min(max(1, limit), 100)
+    offset = max(0, offset)
     if type == "following":
         res = await db.execute(
             select(User).join(PlayerFollow, PlayerFollow.followed_id == User.id)
-            .where(PlayerFollow.follower_id == user_id)
+            .where(PlayerFollow.follower_id == user_id).offset(offset).limit(limit)
         )
     else:
         res = await db.execute(
             select(User).join(PlayerFollow, PlayerFollow.follower_id == User.id)
-            .where(PlayerFollow.followed_id == user_id)
+            .where(PlayerFollow.followed_id == user_id).offset(offset).limit(limit)
         )
     users = res.scalars().all()
     avatar_ids = [u.avatar_id for u in users if u.avatar_id]
@@ -576,7 +602,7 @@ async def search_players(
 
 # ── Social Pulse, Tribes, Coach ──
 
-@router.get("/social/pulse/{user_id}")
+@router.get("/social/pulse/{user_id}", dependencies=[Depends(owner_only)])
 async def social_pulse(user_id: str, db: AsyncSession = Depends(get_db)):
     u_res = await db.execute(select(User).where(User.id == user_id))
     user = u_res.scalar_one_or_none()
@@ -744,7 +770,7 @@ async def social_tribes(user_id: Optional[str] = None, db: AsyncSession = Depend
     return {"tribes": trimmed}
 
 
-@router.get("/social/coach/{user_id}")
+@router.get("/social/coach/{user_id}", dependencies=[Depends(owner_only)])
 async def social_coach(user_id: str, lang: str = 'fr', db: AsyncSession = Depends(get_db)):
     # `message` reste en français pour les anciennes versions de l'app ; l'app actuelle compose
     # son texte dans la langue du joueur à partir de `type`, `rival_pseudo`, `category_name`, `my_xp`.
@@ -803,7 +829,7 @@ async def social_coach(user_id: str, lang: str = 'fr', db: AsyncSession = Depend
 
 # ── Home Feed ──
 
-@router.get("/feed/home/{user_id}")
+@router.get("/feed/home/{user_id}", dependencies=[Depends(owner_only)])
 async def get_home_feed(user_id: str, limit: int = 20, offset: int = 0, db: AsyncSession = Depends(get_db)):
     limit = min(limit, 100)
     u_res = await db.execute(select(User).where(User.id == user_id))

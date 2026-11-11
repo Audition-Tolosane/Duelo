@@ -1,3 +1,4 @@
+import json
 import random
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException
@@ -28,6 +29,10 @@ async def send_message(data: ChatSend, current_user: str = Depends(get_current_u
         raise HTTPException(status_code=400, detail="Vous ne pouvez pas vous envoyer un message")
     if data.message_type not in ("text", "image", "game_card"):
         raise HTTPException(status_code=400, detail="Type de message invalide")
+    if data.content and len(data.content) > 500:
+        raise HTTPException(status_code=400, detail="Message trop long (max 500 caractères)")
+    if data.extra_data is not None and len(json.dumps(data.extra_data)) > 200_000:
+        raise HTTPException(status_code=400, detail="Pièce jointe trop lourde")
     if await is_blocked_between(db, data.sender_id, data.receiver_id):
         raise HTTPException(status_code=403, detail="Impossible d'envoyer un message à ce joueur")
 
@@ -158,6 +163,7 @@ async def get_conversations(user_id: str, current_user: str = Depends(get_curren
 
 @router.get("/{user_id}/messages")
 async def get_chat_messages(user_id: str, with_user: str, limit: int = 50, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
+    limit = min(max(1, limit), 200)
     if current_user != user_id:
         raise HTTPException(status_code=403, detail="Non autorisé")
     if await is_blocked_between(db, user_id, with_user):

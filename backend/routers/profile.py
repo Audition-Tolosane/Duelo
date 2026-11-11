@@ -225,6 +225,7 @@ async def update_location(
     request: Request,
     current_user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
+    _rl=Depends(rate_limit(limit=10, window=3600)),   # appelle Nominatim (OSM) : pas de spam
 ):
     body = await request.json()
 

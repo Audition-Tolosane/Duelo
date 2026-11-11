@@ -51,6 +51,7 @@ async def get_leaderboard(
     current_user: Optional[User] = Depends(get_optional_user),
     db: AsyncSession = Depends(get_db),
 ):
+    limit = min(max(1, limit), 100)
     # ── World ──────────────────────────────────────────────────────────────────
     if scope == "world":
         result = await db.execute(select(User).where(User.is_bot == False).order_by(User.total_xp.desc()).limit(limit))

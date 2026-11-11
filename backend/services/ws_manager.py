@@ -108,6 +108,9 @@ class ConnectionManager:
 
         # Add compensation: average * remaining questions (points only, not is_correct)
         compensation = round(avg_pts * remaining)
+        # Abandon = victoire de celui qui reste, même s'il était mené au moment du départ
+        leaver_score = room.get_score(disconnected_id)
+        compensation = max(compensation, leaver_score - opponent_score + 1)
         room.scores[opponent_id] += compensation
         # Do NOT increment correct_counts — compensation is not real correct answers
 
@@ -148,7 +151,14 @@ class ConnectionManager:
             },
         })
 
-        # Finish the game properly (save results)
+        # Enregistrer le match (défaite pour celui qui part) AVANT d'annoncer la fin : avant, quitter
+        # en perdant effaçait la défaite (pas de match, série et classement intacts).
+        if self.on_game_finished:
+            try:
+                await self.on_game_finished(room)
+            except Exception as e:
+                logger.error(f"[game] enregistrement du match {room.room_id} (abandon) impossible: {e}")
+        # Finish the game properly
         await self._finish_game(room)
 
     def is_online(self, user_id: str) -> bool:

@@ -1108,7 +1108,7 @@ export default function AccueilScreen() {
       if (!uid) { setLoading(false); return; }
       setUserId(uid);
 
-      const res = await fetch(`${API_URL}/api/feed/home/${uid}`);
+      const res = await authFetch(`${API_URL}/api/feed/home/${uid}`);
       if (res.ok) {
         const data = await res.json();
         setUserData(data.user);
