@@ -448,6 +448,7 @@ class UserEconomy(Base):
     chest_day = Column(String(10), nullable=True)
     chests_opened = Column(Integer, default=0)                    # 0, 1 (gratuit) ou 2 (+ pub)
     spin_ad_day = Column(String(10), nullable=True)               # jour du tour de roue en plus
+    reactions_unlocked = Column(Text, nullable=True)              # réactions gagnées au coffre (clés séparées par des virgules)
 
 
 # ── Tournament ────────────────────────────────────────────────────────────────

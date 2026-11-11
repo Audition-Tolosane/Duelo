@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import Txt from './Txt';
 import Icon from './Icon';
+import UserAvatar from '../UserAvatar';
 import { COLOR, RADII, SPACE, BORDER, GLOW } from '../../theme/tokens';
 
 // États d'une réponse — UNE couleur, UN sens :
@@ -24,6 +25,8 @@ type Props = {
   state: AnswerState;
   /** Le rival a choisi cette réponse (révélation). */
   opponentPick?: boolean;
+  /** Avatar du rival posé sur sa réponse (photo, sinon initiale dans son cercle). Sans : pastille corail. */
+  opponentAvatar?: { seed?: string; url?: string | null; pseudo?: string };
   onPress?: () => void;
   disabled?: boolean;
   testID?: string;
@@ -38,7 +41,7 @@ const rowAnswerSize = (len: number) => (len > 90 ? 14 : len > 50 ? 15 : 16);
 /** Hauteur minimale d'une réponse en ligne (cible tactile confortable). */
 export const ANSWER_ROW_MIN_HEIGHT = 56;
 
-export default function AnswerButton({ letter, text, state, opponentPick, onPress, disabled, testID, layout = 'tile', style }: Props) {
+export default function AnswerButton({ letter, text, state, opponentPick, opponentAvatar, onPress, disabled, testID, layout = 'tile', style }: Props) {
   const isRow = layout === 'row';
   const fs = isRow ? rowAnswerSize(text.length) : answerSize(text.length);
   const fg = state === 'correct' ? COLOR.text.onAction : state === 'dimmed' ? COLOR.text.dimmed : COLOR.text.primary;
@@ -64,7 +67,20 @@ export default function AnswerButton({ letter, text, state, opponentPick, onPres
       </View>
       <Txt variant="cardTitle" color={fg} numberOfLines={isRow ? 4 : 5} style={[styles.text, { fontSize: fs, lineHeight: fs + 5 }]}>{text}</Txt>
       <View style={[styles.markers, isRow && styles.markersRow]}>
-        {opponentPick ? <View style={styles.opponentDot} accessibilityLabel="opponent" /> : null}
+        {opponentPick ? (
+          opponentAvatar ? (
+            <View accessibilityLabel="opponent">
+              <UserAvatar
+                avatarSeed={opponentAvatar.seed || opponentAvatar.pseudo || ''}
+                avatarUrl={opponentAvatar.url || undefined}
+                pseudo={opponentAvatar.pseudo || '?'}
+                size={26}
+                borderColor={COLOR.player.opponent}
+                borderWidth={2}
+              />
+            </View>
+          ) : <View style={styles.opponentDot} accessibilityLabel="opponent" />
+        ) : null}
         {state === 'correct' ? <Icon name="success" size={20} color={COLOR.text.onAction} /> : null}
         {state === 'wrong' ? <Icon name="error" size={20} color={COLOR.status.error} /> : null}
       </View>
@@ -93,7 +109,7 @@ const styles = StyleSheet.create({
   letterSelected: { backgroundColor: COLOR.action.primary },
   letterCorrect: { backgroundColor: COLOR.onAccentTint },
   text: { flex: 1 },
-  markers: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: SPACE.sm, minHeight: 20 },
+  markers: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: SPACE.sm, minHeight: 26 },
   // En ligne : colonne réservée à droite (20 px = icône ✓/✕) pour limiter le reflux du texte à la révélation.
   markersRow: { minWidth: 20, minHeight: 0 },
   opponentDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: COLOR.player.opponent },

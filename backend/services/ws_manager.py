@@ -35,6 +35,12 @@ class ConnectionManager:
         self._rematch_by_proposer: dict[str, str] = {}
         # Pending challenge rooms: room_id → {acceptor_id, challenger_id, theme_id, players_data, timer}
         self.pending_challenge_rooms: dict[str, dict] = {}
+        # Joignable par l'app (sinon : push). Une app iOS en arrière-plan garde souvent sa socket
+        # ouverte côté serveur pendant des minutes : sans ça, le serveur la croyait « dans l'app »
+        # et n'envoyait aucun push. L'app signale son passage en arrière-plan (`app_state`), et
+        # une socket muette depuis plus de STALE_S (ping toutes les 25 s) ne compte plus.
+        self.background: set[str] = set()
+        self.last_seen: dict[str, float] = {}
 
     async def connect(self, user_id: str, ws: WebSocket):
         await ws.accept()
@@ -46,10 +52,14 @@ class ConnectionManager:
             except Exception:
                 pass
         self.active_connections[user_id] = ws
+        self.background.discard(user_id)
+        self.last_seen[user_id] = time.monotonic()
         logger.info(f"WS connected: {user_id} (total: {len(self.active_connections)})")
 
     def disconnect(self, user_id: str):
         self.active_connections.pop(user_id, None)
+        self.background.discard(user_id)
+        self.last_seen.pop(user_id, None)
         # Cancel matchmaking timer
         timer = self._matchmaking_timers.pop(user_id, None)
         if timer:
@@ -139,6 +149,23 @@ class ConnectionManager:
 
     def is_online(self, user_id: str) -> bool:
         return user_id in self.active_connections
+
+    STALE_S = 60
+
+    def touch(self, user_id: str):
+        self.last_seen[user_id] = time.monotonic()
+
+    def set_app_state(self, user_id: str, state: str):
+        if state == "active":
+            self.background.discard(user_id)
+        else:
+            self.background.add(user_id)
+
+    def is_in_app(self, user_id: str) -> bool:
+        """App ouverte au premier plan et socket vivante : le WebSocket suffit, pas de push."""
+        if user_id not in self.active_connections or user_id in self.background:
+            return False
+        return time.monotonic() - self.last_seen.get(user_id, 0) < self.STALE_S
 
     async def send_to_user(self, user_id: str, data: dict):
         ws = self.active_connections.get(user_id)
@@ -577,22 +604,52 @@ class ConnectionManager:
             },
         })
 
-        # Check if both players answered this question
-        if room.both_answered(question_index):
-            if question_index < room.total_questions - 1:
-                # Move to next question
-                room.advance_to(question_index + 1)
-                await self._broadcast_room(room, {
-                    "type": "next_question",
+        # Les deux ont répondu : chacun voit la case choisie par l'autre (avatar posé dessus),
+        # puis une courte pause commune avant la question suivante (ou la fin du match).
+        if room.both_answered(question_index) and question_index not in room.revealed:
+            room.revealed.add(question_index)
+            for pid in (room.player1_id, room.player2_id):
+                opp = room.get_opponent_id(pid)
+                opp_answer = room.answers.get(opp, {}).get(question_index, {}).get("answer")
+                await self.send_to_user(pid, {
+                    "type": "question_reveal",
                     "data": {
-                        "question_index": question_index + 1,
-                        "question": room.get_question(question_index + 1),
-                        "scores": room.get_scores(),
+                        "question_index": question_index,
+                        "opponent_answer": opp_answer if isinstance(opp_answer, int) else -1,
                     },
                 })
-            else:
-                # Game over
-                await self._finish_game(room)
+            asyncio.create_task(self._advance_after_reveal(room, question_index))
+
+    REVEAL_PAUSE_S = 2.0
+
+    async def send_game_reaction(self, user_id: str, room_id, key):
+        """Émoji pendant un duel en direct : 4 au choix, une seule par joueur et par question."""
+        from services.reactions import DUEL
+        room = self.game_rooms.get(room_id) if isinstance(room_id, str) else None
+        if not room or user_id not in (room.player1_id, room.player2_id) or key not in DUEL:
+            return
+        sent = room.reactions_sent.setdefault(user_id, set())
+        if room.current_index in sent:
+            return
+        sent.add(room.current_index)
+        await self.send_to_user(room.get_opponent_id(user_id), {"type": "game_reaction", "data": {"key": key}})
+
+    async def _advance_after_reveal(self, room: "GameRoom", question_index: int):
+        await asyncio.sleep(self.REVEAL_PAUSE_S)
+        if self.game_rooms.get(room.room_id) is not room:
+            return  # match déjà terminé (départ d'un joueur)
+        if question_index < room.total_questions - 1:
+            room.advance_to(question_index + 1)
+            await self._broadcast_room(room, {
+                "type": "next_question",
+                "data": {
+                    "question_index": question_index + 1,
+                    "question": room.get_question(question_index + 1),
+                    "scores": room.get_scores(),
+                },
+            })
+        else:
+            await self._finish_game(room)
 
     async def _broadcast_room(self, room: "GameRoom", data: dict):
         await self.send_to_user(room.player1_id, data)
@@ -664,6 +721,8 @@ class GameRoom:
 
         # Scores and answers: player_id → {question_index: {answer, is_correct, points, time_ms}}
         self.answers: dict[str, dict[int, dict]] = {player1_id: {}, player2_id: {}}
+        self.revealed: set[int] = set()   # questions dont la réponse adverse a été montrée
+        self.reactions_sent: dict[str, set[int]] = {}   # émojis envoyés : joueur → questions
         self.scores: dict[str, int] = {player1_id: 0, player2_id: 0}
         self.correct_counts: dict[str, int] = {player1_id: 0, player2_id: 0}
         self.disconnected: set[str] = set()

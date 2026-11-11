@@ -6,11 +6,13 @@ import { COLOR, SPACE, ICON_SIZE } from '../theme/tokens';
 import { t } from '../utils/i18n';
 import { showRewardedAd } from '../utils/ads';
 import { ChestReward, openChest, useEconomy } from '../utils/economy';
+import { reactionLabel } from '../utils/reactions';
 
 // Coffre du jour (feuille Bonus de l'Accueil) : 1 ouverture gratuite, une 2e avec une pub.
 
 function rewardText(r: ChestReward): string {
   if (r.type === 'credits') return t('chest.reward_credits', { n: String(r.value) });
+  if (r.type === 'reaction' && r.key) return t('chest.reward_reaction', { r: reactionLabel(r.key) });
   if (r.type === 'boost') return t('chest.reward_boost', { n: String(r.value) });
   return t('chest.reward_xp', { n: String(r.value) });
 }

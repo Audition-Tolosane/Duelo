@@ -22,9 +22,10 @@ export type EconomyStatus = {
   chest_free: boolean;
   chest_ad: boolean;
   theme_allowed?: boolean;
+  reactions_unlocked?: string[];
 };
 
-export type ChestReward = { type: 'credits' | 'xp' | 'boost'; value: number; theme_id?: string | null };
+export type ChestReward = { type: 'credits' | 'xp' | 'boost' | 'reaction'; value: number; theme_id?: string | null; key?: string };
 
 let current: EconomyStatus | null = null;
 const listeners = new Set<(s: EconomyStatus | null) => void>();

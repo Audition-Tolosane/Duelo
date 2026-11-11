@@ -65,7 +65,11 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
     // Reconnect when app comes back to foreground
     const sub = AppState.addEventListener('change', async (state) => {
+      // Arrière-plan : on prévient le serveur pour qu'il passe aux notifications push
+      // (la socket reste souvent ouverte, il croyait le joueur encore dans l'app).
+      if (state === 'background') { dueloWS.send({ action: 'app_state', state: 'background' }); return; }
       if (state !== 'active') return;
+      dueloWS.send({ action: 'app_state', state: 'active' });
       // Relu à chaque retour : le joueur a pu se connecter / changer de compte depuis le lancement.
       const userId = await AsyncStorage.getItem('duelo_user_id');
       if (!userId) return;

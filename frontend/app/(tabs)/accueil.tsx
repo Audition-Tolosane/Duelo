@@ -1200,6 +1200,7 @@ export default function AccueilScreen() {
             `/game?category=${challenge.theme_id}&asyncMode=reveal` +
             `&opponentPseudo=${encodeURIComponent(challenge.challenger_pseudo)}` +
             `&opponentSeed=${encodeURIComponent(challenge.challenger_avatar_seed || '')}` +
+            `&opponentId=${challenge.challenger_id || ''}` +
             `&challenge_id=${challenge.challenge_id}` as any
           );
         } else {

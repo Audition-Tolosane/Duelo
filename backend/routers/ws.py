@@ -19,6 +19,7 @@ from services.xp import (
     get_daily_streak_bonus, update_login_streak, difficulty_mix,
 )
 from services.notifications import push_message
+from services import reactions
 from config import JWT_SECRET, JWT_ALGORITHM
 
 logger = logging.getLogger(__name__)
@@ -102,10 +103,14 @@ async def websocket_endpoint(
                 continue
 
             action = data.get("action", "")
+            manager.touch(user_id)
 
             try:
                 if action == "ping":
                     await websocket.send_json({"type": "pong"})
+
+                elif action == "app_state":
+                    manager.set_app_state(user_id, str(data.get("state", "")))
 
                 elif action == "chat_send":
                     await handle_chat_send(user_id, data)
@@ -125,6 +130,12 @@ async def websocket_endpoint(
 
                 elif action == "game_answer":
                     await handle_game_answer(user_id, data)
+
+                elif action == "game_reaction":
+                    await manager.send_game_reaction(user_id, data.get("room_id"), data.get("key"))
+
+                elif action == "match_reaction":
+                    await handle_match_reaction(user_id, data)
 
                 elif action == "rematch_propose":
                     await handle_rematch_propose(user_id, data)
@@ -157,18 +168,18 @@ async def websocket_endpoint(
 
 # ── Chat Handlers ──
 
-async def handle_chat_send(sender_id: str, data: dict):
+async def handle_chat_send(sender_id: str, data: dict, internal_type: str | None = None):
     """Save message to DB and deliver in real-time."""
     receiver_id = data.get("receiver_id", "")
     content = data.get("content", "")
     content = content.strip() if isinstance(content, str) else ""
-    message_type = data.get("message_type", "text")
-    extra_data = data.get("extra_data")
+    message_type = internal_type or data.get("message_type", "text")
+    extra_data = None if internal_type else data.get("extra_data")
 
     if not receiver_id or not isinstance(receiver_id, str):
         return
-    # Same rules as REST /chat/send.
-    if message_type not in ("text", "image", "game_card"):
+    # Same rules as REST /chat/send (le type « reaction » n'est posé que par le serveur).
+    if not internal_type and message_type not in ("text", "image", "game_card"):
         return
     if len(content) > 500:
         await manager.send_to_user(sender_id, {"type": "error", "data": {"message": "Message trop long (max 500 caractères)"}})
@@ -227,6 +238,27 @@ async def handle_chat_send(sender_id: str, data: dict):
         await push_message(db, receiver_id, sender_id, sender_pseudo)
 
 
+async def handle_match_reaction(sender_id: str, data: dict):
+    """Réaction d'après-match : clé du catalogue (gratuite ou débloquée au coffre), 3 max par
+    adversaire / 10 min. Rangée dans la conversation comme message « reaction » : l'adversaire la
+    voit en bulle s'il est sur ses résultats, sinon dans ses messages (bandeau / push)."""
+    from models import UserEconomy
+    key = data.get("key")
+    receiver_id = data.get("receiver_id")
+    if not isinstance(key, str) or key not in reactions.ALL:
+        return
+    if not isinstance(receiver_id, str) or not receiver_id or receiver_id == sender_id:
+        return
+    async with AsyncSessionLocal() as db:
+        res = await db.execute(select(UserEconomy.reactions_unlocked).where(UserEconomy.user_id == sender_id))
+        if not reactions.can_use(key, res.scalar_one_or_none()):
+            return
+    if not reactions.match_allowed(sender_id, receiver_id):
+        await manager.send_to_user(sender_id, {"type": "reaction_limited", "data": {}})
+        return
+    await handle_chat_send(sender_id, {"receiver_id": receiver_id, "content": key}, internal_type="reaction")
+
+
 async def handle_chat_typing(sender_id: str, data: dict):
     """Notify receiver that sender is typing."""
     receiver_id = data.get("receiver_id", "")
@@ -265,6 +297,7 @@ async def handle_matchmaking_join(user_id: str, data: dict):
             "id": user.id,
             "pseudo": user.pseudo,
             "avatar_seed": user.avatar_seed,
+            "avatar_url": getattr(user, "avatar_url", None),
             "level": player_level,
             "streak": user.current_streak,
             "streak_badge": get_streak_badge(user.current_streak),
@@ -401,6 +434,7 @@ async def handle_challenge_join(user_id: str, data: dict):
             "id": user.id,
             "pseudo": user.pseudo,
             "avatar_seed": user.avatar_seed,
+            "avatar_url": getattr(user, "avatar_url", None),
             "level": get_level(uxp.xp) if uxp else 0,
             "streak": user.current_streak,
             "streak_badge": get_streak_badge(user.current_streak),
@@ -674,6 +708,7 @@ async def handle_rematch_propose(user_id: str, data: dict):
             "id": user.id,
             "pseudo": user.pseudo,
             "avatar_seed": user.avatar_seed,
+            "avatar_url": getattr(user, "avatar_url", None),
             "level": player_level,
             "streak": user.current_streak,
             "streak_badge": get_streak_badge(user.current_streak),

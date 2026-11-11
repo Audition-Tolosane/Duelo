@@ -17,6 +17,9 @@ import SwipeBackPage from '../components/SwipeBackPage';
 import { RematchDialog } from '../components/RematchModal';
 import UserAvatar from '../components/UserAvatar';
 import VictoryBurst from '../components/VictoryBurst';
+import { ReactionBubble, ReactionPanel, ShownReaction } from '../components/Reactions';
+import { botReplyTo, getReactionsMuted } from '../utils/reactions';
+import { useEconomy } from '../utils/economy';
 import { useWS } from '../contexts/WebSocketContext';
 import { t, pluralKey } from '../utils/i18n';
 import {
@@ -115,6 +118,51 @@ export default function ResultsScreen() {
   const [showRewardsModal, setShowRewardsModal] = useState(false);
 
   const [playerPseudo, setPlayerPseudo] = useState(t('game.player'));
+
+  // ── Réactions d'après-match (émojis + phrases ; 3 max) ──
+  const economy = useEconomy();
+  const canReact = !isAsyncChallenge && (!!params.opponentId || isBot);
+  const [reactSent, setReactSent] = useState(0);
+  const [reactNote, setReactNote] = useState<string | null>(null);
+  const [myBubble, setMyBubble] = useState<ShownReaction | null>(null);
+  const [oppBubble, setOppBubble] = useState<ShownReaction | null>(null);
+  const bubbleSeq = useRef(0);
+  const reactionsMutedRef = useRef(false);
+  useEffect(() => { getReactionsMuted().then((m) => { reactionsMutedRef.current = m; }); }, []);
+  const showOppBubble = (key: string) => {
+    if (reactionsMutedRef.current) return;
+    setOppBubble({ key, id: ++bubbleSeq.current });
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+  };
+  useEffect(() => {
+    if (!params.opponentId) return;
+    const unsubs = [
+      // Réaction de l'adversaire : bulle près de son avatar (et lue tout de suite dans le chat)
+      on('chat_message', (msg: any) => {
+        const d = msg?.data || {};
+        if (d.message_type !== 'reaction' || String(d.sender_id) !== String(params.opponentId)) return;
+        showOppBubble(String(d.content || ''));
+        AsyncStorage.getItem('duelo_user_id').then((me) => {
+          if (me) authFetch(`${API_URL}/api/chat/${me}/read?with_user=${params.opponentId}`, { method: 'POST' }).catch(() => {});
+        });
+      }),
+      on('reaction_limited', () => setReactNote(t('reaction.limited'))),
+    ];
+    return () => unsubs.forEach((u) => u());
+  }, [params.opponentId]);
+  const sendReaction = (key: string) => {
+    if (reactSent >= 3) return;
+    setReactSent((n) => n + 1);
+    setMyBubble({ key, id: ++bubbleSeq.current });
+    setReactNote(t('reaction.sent', { name: params.opponentPseudo || t('game.opponent') }));
+    if (params.opponentId) {
+      send({ action: 'match_reaction', receiver_id: params.opponentId, key });
+    } else {
+      // Bot : il répond parfois, comme un joueur
+      const reply = botReplyTo(key, !won && !draw);
+      if (reply) setTimeout(() => showOppBubble(reply), 1200 + Math.random() * 1300);
+    }
+  };
 
   // Report question states
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
@@ -324,6 +372,11 @@ export default function ResultsScreen() {
       if (data.id) setMatchId(data.id);
       if (data.xp_breakdown) {
         setXpBreakdown(data.xp_breakdown);
+      } else if (typeof data.xp_earned === 'number') {
+        setXpBreakdown({ base: data.xp_earned, victory: 0, perfection: 0, giant_slayer: 0, streak: 0, total: data.xp_earned });
+      } else {
+        // Jamais de cartouche vide : sans détail des points, on affiche l'erreur et « Réessayer ».
+        setSubmitError({ kind: 'network', status: null });
       }
       const collected: Reward[] = [];
       if (data.streak_broken && data.streak_before > 0) {
@@ -679,8 +732,21 @@ export default function ResultsScreen() {
               <Txt variant="score" color={COLOR.player.opponentText}>{oScore}</Txt>
               {!won && !draw ? <Badge label={t('pilot.results.winner')} tone="warm" /> : <View style={s.badgeSpacer} />}
             </View>
+            <ReactionBubble reaction={myBubble} side="self" style={s.bubbleSelf} />
+            <ReactionBubble reaction={oppBubble} side="opponent" style={s.bubbleOpponent} />
           </Card>
         </Reanimated.View>
+
+        {/* Réactions : émojis et phrases toutes faites */}
+        {canReact ? (
+          <Reanimated.View style={scoreStyle}>
+            <Card style={s.reactCard}>
+              <Txt variant="overline">{t('reaction.title')}</Txt>
+              <ReactionPanel unlocked={economy?.reactions_unlocked || []} sentCount={reactSent} onSend={sendReaction} />
+              {reactNote ? <Txt variant="caption" align="center" color={COLOR.text.secondary}>{reactNote}</Txt> : null}
+            </Card>
+          </Reanimated.View>
+        ) : null}
 
         {/* XP gagnés (récompense : or) */}
         <Reanimated.View style={xpStyle}>
@@ -1067,7 +1133,10 @@ const s = StyleSheet.create({
   resultBadges: { alignItems: 'center', gap: SPACE.sm, paddingHorizontal: SPACE.lg, paddingBottom: SPACE.xl, marginTop: -SPACE.lg },
   nearMiss: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, maxWidth: '100%' },
 
-  scoreCard: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm },
+  scoreCard: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm, overflow: 'visible', zIndex: 5 },
+  bubbleSelf: { left: SPACE.md, top: -SPACE.lg },
+  bubbleOpponent: { right: SPACE.md, top: -SPACE.lg },
+  reactCard: { gap: SPACE.md },
   scoreSide: { flex: 1, minWidth: 0, alignItems: 'center', gap: SPACE.xs },
   vs: { paddingHorizontal: SPACE.xs },
   underline: { textDecorationLine: 'underline' },

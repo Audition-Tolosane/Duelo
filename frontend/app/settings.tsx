@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authFetch, clearToken } from '../utils/api';
 import { dueloWS } from '../services/websocket';
 import { setSoundEnabled, isSoundEnabled } from '../utils/sounds';
+import { getReactionsMuted, setReactionsMuted } from '../utils/reactions';
 import { t } from '../utils/i18n';
 import { privacyOptionsRequired, showPrivacyOptions } from '../utils/ads';
 import * as WebBrowser from 'expo-web-browser';
@@ -56,6 +57,9 @@ export default function SettingsScreen() {
   const isGuest = guest !== '0';
   const [referralData, setReferralData] = useState<ReferralData | null>(null);
   const [soundOn, setSoundOn] = useState(isSoundEnabled());
+  const [reactionsOn, setReactionsOn] = useState(true);
+  useEffect(() => { getReactionsMuted().then((m) => setReactionsOn(!m)); }, []);
+  const toggleReactions = (on: boolean) => { setReactionsOn(on); setReactionsMuted(!on); };
   const [deleteAsk, setDeleteAsk] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
@@ -200,6 +204,23 @@ export default function SettingsScreen() {
                 {...({ activeThumbColor: COLOR.text.primary } as object)}
                 ios_backgroundColor={COLOR.surface.elevated}
                 accessibilityLabel={t('pilot.settings.sound')}
+              />
+            }
+          />
+          <Divider />
+          <ListRow
+            leadingIcon="sparkles"
+            title={t('reaction.setting')}
+            subtitle={t('reaction.setting_sub')}
+            trailing={
+              <Switch
+                value={reactionsOn}
+                onValueChange={toggleReactions}
+                trackColor={{ false: COLOR.surface.elevated, true: COLOR.action.primary }}
+                thumbColor={COLOR.text.primary}
+                {...({ activeThumbColor: COLOR.text.primary } as object)}
+                ios_backgroundColor={COLOR.surface.elevated}
+                accessibilityLabel={t('reaction.setting')}
               />
             }
           />

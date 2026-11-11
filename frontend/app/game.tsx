@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   View, StyleSheet, Animated, ScrollView, useWindowDimensions,
-  Platform, UIManager, Easing, AppState, BackHandler,
+  Platform, UIManager, Easing, AppState, BackHandler, Pressable,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,6 +15,8 @@ import IconButton from '../components/ui/IconButton';
 import Loader from '../components/ui/Loader';
 import Dialog from '../components/ui/Dialog';
 import ScreenContainer from '../components/ui/ScreenContainer';
+import { ReactionBubble, DuelReactionButton, ShownReaction } from '../components/Reactions';
+import { botReactionFor, botReplyTo, getReactionsMuted } from '../utils/reactions';
 import AnswerButton, { AnswerState, ANSWER_ROW_MIN_HEIGHT } from '../components/ui/AnswerButton';
 import { useWS } from '../contexts/WebSocketContext';
 import { dueloWS } from '../services/websocket';
@@ -45,6 +47,8 @@ const TOTAL_QUESTIONS = 7;
 const MAX_PTS_PER_Q = 20;
 // Durée minimale d'affichage du vert/rouge avant la question suivante (bot comme duel en ligne).
 const REVEAL_MS = 2000;
+// Temps laissé, une fois les deux réponses connues, pour voir l'avatar du rival sur sa case.
+const OPPONENT_REVEAL_MS = 1600;
 // Duel en ligne : la bonne réponse vient du serveur. Le jaune « en attente » ne s'affiche
 // que si sa réponse tarde, sinon on passe directement au vert/rouge comme contre un bot.
 const PENDING_PICK_DELAY_MS = 400;
@@ -153,7 +157,7 @@ const listRowHeight = (options: string[], screenW: number, padV: number) => {
 export default function GameScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{
-    category: string; opponentPseudo: string; opponentSeed: string; isBot: string; roomId: string; opponentLevel: string; opponentId: string;
+    category: string; opponentPseudo: string; opponentSeed: string; opponentAvatarUrl: string; isBot: string; roomId: string; opponentLevel: string; opponentId: string;
     challenge_id: string; asyncChallenge: string; asyncMode: string;
     botSkill: string; botSpeed: string;
   }>();
@@ -161,6 +165,10 @@ export default function GameScreen() {
   const { width: screenW, height: screenH } = useWindowDimensions();
 
   const themeId = params.category;
+  // Marqueur posé sur la réponse du rival : sa photo, sinon son initiale dans son cercle (comme au VS).
+  const opponentAvatar = useMemo(() => ({
+    seed: params.opponentSeed, url: params.opponentAvatarUrl || null, pseudo: params.opponentPseudo,
+  }), [params.opponentSeed, params.opponentAvatarUrl, params.opponentPseudo]);
   const isLive = params.roomId && params.isBot !== 'true';
   const isAsyncSolo = params.asyncMode === 'solo';
   const isAsyncReveal = params.asyncMode === 'reveal';
@@ -311,6 +319,43 @@ export default function GameScreen() {
   // Correct streak streak toast
   const [correctStreak, setCorrectStreak] = useState(0);
   const correctStreakRef = useRef(0);
+  // ── Réactions pendant le duel (direct et bots ; pas en défi différé) ──
+  const reactionsOn = !isAsync;
+  const [myReaction, setMyReaction] = useState<ShownReaction | null>(null);
+  const [oppReaction, setOppReaction] = useState<ShownReaction | null>(null);
+  const [reactedQ, setReactedQ] = useState<number | null>(null);   // une réaction par question
+  const [oppMuted, setOppMuted] = useState(false);                  // toucher le score adverse = sourdine
+  const oppMutedRef = useRef(false);
+  const botReactionsRef = useRef(0);
+  const reactionSeq = useRef(0);
+  useEffect(() => { getReactionsMuted().then((m) => { oppMutedRef.current = m; setOppMuted(m); }); }, []);
+  const showOppReaction = (key: string) => {
+    if (oppMutedRef.current || matchEndedRef.current) return;
+    setOppReaction({ key, id: ++reactionSeq.current });
+  };
+  const toggleOppMute = () => {
+    const next = !oppMutedRef.current;
+    oppMutedRef.current = next;
+    setOppMuted(next);
+    Haptics.selectionAsync();
+    if (next) setOppReaction(null);
+  };
+  const sendDuelReaction = (key: string) => {
+    const q = currentIndexRef.current;
+    if (reactedQ === q) return;
+    setReactedQ(q);
+    setMyReaction({ key, id: ++reactionSeq.current });
+    if (isLive) {
+      wsSend({ action: 'game_reaction', room_id: params.roomId, key });
+    } else {
+      // Le bot répond parfois, comme un vrai joueur
+      const reply = botReplyTo(key, botScoreRef.current > playerScoreRef.current);
+      if (reply && ['laugh', 'fire', 'shock', 'clap'].includes(reply)) {
+        setTimeout(() => showOppReaction(reply), 900 + Math.random() * 900);
+      }
+    }
+  };
+
   const [streakToastVisible, setStreakToastVisible] = useState(false);
   const [streakToastCount, setStreakToastCount] = useState(0);
   const streakToastAnim = useRef(new Animated.Value(0)).current;
@@ -399,6 +444,18 @@ export default function GameScreen() {
           is_correct ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Error
         );
         playSound(is_correct ? 'correct' : 'wrong');
+      }),
+      // Les deux ont répondu : le serveur révèle la case choisie par l'adversaire, puis marque
+      // une pause commune avant la question suivante.
+      wsOn('game_reaction', (msg) => {
+        const key = msg.data?.key;
+        if (typeof key === 'string') showOppReaction(key);
+      }),
+      wsOn('question_reveal', (msg) => {
+        const { question_index, opponent_answer } = msg.data || {};
+        if (question_index !== currentIndexRef.current) return;
+        if (typeof opponent_answer === 'number' && opponent_answer >= 0) setBotAnswer(opponent_answer);
+        revealedAtRef.current = Math.max(revealedAtRef.current, Date.now() - REVEAL_MS + OPPONENT_REVEAL_MS);
       }),
       // Opponent answered (update their score)
       wsOn('opponent_answered', (msg) => {
@@ -644,10 +701,19 @@ export default function GameScreen() {
 
     // Reveal bot answer with a small independent delay (simulates opponent responding
     // at their own pace rather than instantly when the player answers)
+    // Puis une pause une fois les deux réponses visibles, pour voir la case choisie par le rival.
     const delay = botRevealDelay ?? 0;
     setTimeout(() => setBotAnswer(botPick), delay);
+    // Bot : une réaction de temps en temps (3 max par match), cohérente avec la question
+    if (reactionsOn && !isLive && botReactionsRef.current < 3) {
+      const r = botReactionFor(bPts > 0, pPts > 0);
+      if (r) {
+        botReactionsRef.current += 1;
+        setTimeout(() => showOppReaction(r), delay + 350 + Math.random() * 500);
+      }
+    }
 
-    setTimeout(nextQuestion, REVEAL_MS);
+    setTimeout(nextQuestion, Math.max(REVEAL_MS, delay + OPPONENT_REVEAL_MS));
   };
 
   const handleTimeout = () => {
@@ -818,7 +884,7 @@ export default function GameScreen() {
         // Both players have now played → show results immediately with both real scores
         const opponentFinalScore = isAsyncSolo ? saveData.p2_score : saveData.p1_score;
         router.replace(
-          `/results?playerScore=${ps}&opponentScore=${opponentFinalScore}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=false&correctCount=${cc}&opponentLevel=1&opponentId=`
+          `/results?playerScore=${ps}&opponentScore=${opponentFinalScore}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=false&correctCount=${cc}&opponentLevel=1&opponentId=${params.opponentId || ''}`
         );
         return;
       }
@@ -951,12 +1017,24 @@ export default function GameScreen() {
 
         <RoundTimer timeLeft={timeLeft} total={questionDuration} size={TIMER_SIZE} />
 
-        <View style={[styles.scoreBox, styles.scoreBoxOpponent]} accessibilityLabel={`${params.opponentPseudo || ''} ${isAsyncSolo ? '' : botScore}`}>
-          <Txt variant="overline" color={COLOR.player.opponentText} numberOfLines={1}>
-            {params.opponentPseudo?.slice(0, 10)}
-          </Txt>
+        <Pressable
+          style={[styles.scoreBox, styles.scoreBoxOpponent]}
+          accessibilityLabel={`${params.opponentPseudo || ''} ${isAsyncSolo ? '' : botScore}`}
+          onPress={reactionsOn ? toggleOppMute : undefined}
+          disabled={!reactionsOn}
+        >
+          <View style={styles.oppNameRow}>
+            {reactionsOn && oppMuted ? <Icon name="eyeOff" size={12} color={COLOR.player.opponentText} /> : null}
+            <Txt variant="overline" color={COLOR.player.opponentText} numberOfLines={1}>
+              {params.opponentPseudo?.slice(0, 10)}
+            </Txt>
+          </View>
           <Txt variant="score">{isAsyncSolo ? '—' : botScore}</Txt>
-        </View>
+        </Pressable>
+
+        {/* Bulles de réaction, sous chaque score */}
+        <ReactionBubble reaction={myReaction} side="self" style={styles.bubbleSelf} />
+        <ReactionBubble reaction={oppReaction} side="opponent" style={styles.bubbleOpponent} />
       </View>
 
       {/* Progression : 7 tirets sémantiques + compteur */}
@@ -969,6 +1047,10 @@ export default function GameScreen() {
         <Txt variant="overline" color={COLOR.text.secondary}>
           {t('pilot.game.question_counter', { n: String(currentIndex + 1), total: String(totalShown) })}
         </Txt>
+        {/* Réaction : seulement une fois ma réponse donnée (jamais de temps perdu), une par question */}
+        {reactionsOn && (selectedOption !== null || showResult) && reactedQ !== currentIndex ? (
+          <DuelReactionButton key={currentIndex} onSend={sendDuelReaction} />
+        ) : reactionsOn ? <View style={styles.reactionSlot} /> : null}
       </View>
 
       {/* Question, posée sur le fond (sans carte), calée en haut de sa zone */}
@@ -1001,7 +1083,8 @@ export default function GameScreen() {
               letter={LETTERS[index]}
               text={opt}
               state={answerState(index)}
-              opponentPick={showResult && botAnswer === index && selectedOption !== index}
+              opponentPick={showResult && botAnswer === index}
+              opponentAvatar={opponentAvatar}
               onPress={() => selectAnswer(index)}
               disabled={showResult}
               style={[styles.listRow, { minHeight: listRowMin, maxHeight: listRowMax, paddingVertical: rowPadV }]}
@@ -1019,7 +1102,8 @@ export default function GameScreen() {
                   letter={LETTERS[index]}
                   text={options[index]}
                   state={answerState(index)}
-                  opponentPick={showResult && botAnswer === index && selectedOption !== index}
+                  opponentPick={showResult && botAnswer === index}
+              opponentAvatar={opponentAvatar}
                   onPress={() => selectAnswer(index)}
                   disabled={showResult}
                 />
@@ -1076,7 +1160,12 @@ const styles = StyleSheet.create({
   stateActions: { alignSelf: 'stretch', gap: SPACE.md },
 
   // Rangée haute : abandon + scores + timer
+  oppNameRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.xxs, maxWidth: '100%' },
+  bubbleSelf: { left: SPACE.screenX + 48, top: '100%', marginTop: SPACE.xs },
+  bubbleOpponent: { right: SPACE.screenX, top: '100%', marginTop: SPACE.xs },
+  reactionSlot: { width: 36, height: 36 },
   topRow: {
+    zIndex: 40,
     flexDirection: 'row', alignItems: 'center',
     paddingHorizontal: SPACE.screenX, paddingTop: SPACE.xs, gap: SPACE.sm,
   },

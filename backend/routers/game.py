@@ -307,16 +307,33 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
         _submit_locks[lock_key] = asyncio.Lock()
     async with _submit_locks[lock_key]:
         recent_cutoff = datetime.now(timezone.utc) - timedelta(seconds=60)
+        # Doublon = MÊME résultat renvoyé (nouvel essai réseau, écran remonté) — pas un autre match
+        # sur le même thème : une revanche jouée vite tombait dans la fenêtre, n'était pas comptée
+        # et l'écran de résultats restait sans XP. On renvoie le match déjà enregistré, XP comprise.
         existing = await db.execute(
             select(Match).where(
                 Match.created_at >= recent_cutoff,
                 Match.player1_id == player_id,
                 Match.category == theme_id,
-            )
+                Match.player1_score == player_score,
+                Match.player2_score == opponent_score,
+                Match.player1_correct == correct_count,
+                Match.player2_pseudo == opponent_pseudo,
+            ).order_by(Match.created_at.desc()).limit(1)
         )
-        if existing.scalar_one_or_none():
-            logger.info(f"[submit] Duplicate blocked for player={player_id}, theme={theme_id}")
-            return {"status": "already_submitted", "message": "Match déjà enregistré"}
+        dup = existing.scalars().first()
+        if dup:
+            logger.info(f"[submit] Duplicate for player={player_id}, theme={theme_id} -> match {dup.id}")
+            return {
+                "status": "already_submitted",
+                "id": dup.id, "player1_id": dup.player1_id,
+                "player2_pseudo": dup.player2_pseudo, "player2_is_bot": dup.player2_is_bot,
+                "category": dup.category,
+                "player1_score": dup.player1_score, "player2_score": dup.player2_score,
+                "player1_correct": dup.player1_correct, "winner_id": dup.winner_id,
+                "xp_earned": dup.xp_earned, "xp_breakdown": dup.xp_breakdown,
+                "created_at": dup.created_at.isoformat() if dup.created_at else None,
+            }
 
         # Anti-farm: count this player's matches in the last rolling hour.
         # Past the cap, the match is recorded but earns no XP (see SOLO_XP_HOURLY_CAP).

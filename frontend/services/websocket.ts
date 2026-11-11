@@ -105,7 +105,7 @@ class DueloWebSocket {
       this.ws.send(JSON.stringify(data));
     } else {
       // Queue non-ping messages to send once connected
-      if (data.action !== 'ping') {
+      if (data.action !== 'ping' && data.action !== 'app_state') {
         this.sendQueue.push(data);
       }
     }

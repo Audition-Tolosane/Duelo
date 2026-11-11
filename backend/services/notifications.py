@@ -57,6 +57,16 @@ async def _send_expo_push(token: str, title: str, body: str, data: dict = None):
                 resp = await client.post("https://exp.host/--/api/v2/push/send",
                                          json=payload, headers=headers)
             if resp.status_code < 500:
+                # Expo répond 200 même quand Apple refuse (DeviceNotRegistered, InvalidCredentials…) :
+                # on le journalise, sinon un push perdu est invisible.
+                try:
+                    ticket = (resp.json() or {}).get("data") or {}
+                    if isinstance(ticket, list):
+                        ticket = ticket[0] if ticket else {}
+                    if resp.status_code >= 400 or ticket.get("status") == "error":
+                        logger.warning(f"[push] refusé ({resp.status_code}) {ticket.get('message')} {ticket.get('details')}")
+                except Exception:
+                    pass
                 return  # success or client error (no retry)
             logger.warning(f"[push] Expo returned {resp.status_code} (attempt {attempt+1})")
         except Exception as e:
@@ -122,7 +132,7 @@ async def create_notification(
 
     # Push via WebSocket if online, or Expo push if offline
     from services.ws_manager import manager
-    if manager.is_online(user_id):
+    if manager.is_in_app(user_id):
         await db.flush()  # Get the notif ID
         await manager.send_notification(user_id, {
             "id": notif.id,
@@ -157,7 +167,7 @@ async def push_message(db: AsyncSession, receiver_id: str, sender_id: str, sende
     WebSocket (`chat_message`) et l'app affiche son propre bandeau. Respecte le réglage
     « Messages » des notifications."""
     from services.ws_manager import manager
-    if manager.is_online(receiver_id):
+    if manager.is_in_app(receiver_id):
         return
     settings_res = await db.execute(
         select(NotificationSettings).where(NotificationSettings.user_id == receiver_id)

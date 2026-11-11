@@ -7,6 +7,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
+import { isEmojiReaction, reactionLabel } from '../utils/reactions';
 import { t, getLocale } from '../utils/i18n';
 import { authFetch } from '../utils/api';
 import SwipeBackPage from '../components/SwipeBackPage';
@@ -72,6 +73,21 @@ export default function ChatScreen() {
 
   useEffect(() => {
     init();
+  }, []);
+
+  // Clavier ouvert : la liste rétrécit mais garde son décalage, les derniers messages passaient
+  // sous la saisie. On redescend en bas à chaque ouverture (et on retire la marge du bas d'écran).
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
+  useEffect(() => {
+    const showEvt = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvt = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const toEnd = () => setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 80);
+    const subs = [
+      Keyboard.addListener(showEvt, () => { setKeyboardOpen(true); toEnd(); }),
+      Keyboard.addListener('keyboardDidShow', toEnd),
+      Keyboard.addListener(hideEvt, () => setKeyboardOpen(false)),
+    ];
+    return () => subs.forEach((x) => x.remove());
   }, []);
 
   // Listen for real-time messages and typing via WebSocket
@@ -304,7 +320,10 @@ export default function ChatScreen() {
               <View style={[st.msgBubble, isMe ? st.myBubble : st.theirBubble]}>
                 {msgType === 'image' && item.extra_data
                   ? <ImageMessage data={item.extra_data} />
-                  : <Txt variant="body" color={fg}>{item.content}</Txt>}
+                  : msgType === 'reaction'
+                    // Réaction d'après-match : clé traduite (émoji en grand)
+                    ? <Txt variant={isEmojiReaction(item.content) ? 'h1' : 'body'} color={fg}>{reactionLabel(item.content)}</Txt>
+                    : <Txt variant="body" color={fg}>{item.content}</Txt>}
                 <View style={st.msgFooter}>
                   <Txt variant="caption" color={timeColor} style={isMe ? st.myTime : null}>{formatTime(item.created_at)}</Txt>
                   {isMe && item.read && msgType !== 'image' ? <Icon name="readAll" size={ICON_SIZE.sm} color={COLOR.text.onAction} /> : null}
@@ -377,6 +396,7 @@ export default function ChatScreen() {
           renderItem={renderMessage}
           contentContainerStyle={st.messagesList}
           onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: false })}
+          onLayout={() => { if (keyboardOpen) flatListRef.current?.scrollToEnd({ animated: false }); }}
           showsVerticalScrollIndicator={false}
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
@@ -406,7 +426,7 @@ export default function ChatScreen() {
         )}
 
         {/* Saisie */}
-        <View style={[st.inputWrapper, { paddingBottom: insets.bottom + SPACE.sm }]}>
+        <View style={[st.inputWrapper, { paddingBottom: (keyboardOpen ? 0 : insets.bottom) + SPACE.sm }]}>
           <IconButton icon="camera" appearance="bare" accessibilityLabel={t('conversations.photo')} onPress={handleSendImage} />
           <View style={st.inputContainer}>
             <TextInput

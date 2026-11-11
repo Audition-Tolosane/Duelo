@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
+import { reactionLabel } from '../utils/reactions';
 import { t, getLocale } from '../utils/i18n';
 import { authFetch } from '../utils/api';
 import SwipeBackPage from '../components/SwipeBackPage';
@@ -44,6 +45,7 @@ function getMessagePreview(conv: Conversation): string {
   const prefix = conv.is_sender ? t('conversations.you_prefix') : '';
   if (conv.last_message_type === 'image') return `${prefix}${t('conversations.photo')}`;
   if (conv.last_message_type === 'game_card') return `${prefix}${t('conversations.match_result')}`;
+  if (conv.last_message_type === 'reaction') return `${prefix}${t('reaction.message_preview', { r: reactionLabel(conv.last_message) })}`;
   return `${prefix}${conv.last_message}`;
 }
 

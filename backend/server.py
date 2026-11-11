@@ -363,6 +363,8 @@ async def _ensure_columns():
             )""",
             # ×2 XP après un duel (pub) : une seule fois par match
             "ALTER TABLE matches ADD COLUMN IF NOT EXISTS xp_doubled BOOLEAN DEFAULT FALSE",
+            # Réactions débloquées au coffre du jour
+            "ALTER TABLE user_economy ADD COLUMN IF NOT EXISTS reactions_unlocked TEXT",
         ]:
             try:
                 await conn.execute(text(stmt))

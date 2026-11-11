@@ -171,6 +171,7 @@ type OpponentData = {
   id: string;
   pseudo: string;
   avatar_seed: string;
+  avatar_url?: string | null;
   is_bot: boolean;
   level: number;
   title: string;
@@ -377,6 +378,7 @@ export default function MatchmakingScreen() {
           id: opp.id || '',
           pseudo: opp.pseudo,
           avatar_seed: opp.avatar_seed,
+          avatar_url: opp.avatar_url || null,
           is_bot: false,
           level: opp.level || 1,
           title: opp.selected_title || '',
@@ -607,7 +609,7 @@ export default function MatchmakingScreen() {
       const skillParam = opp.skill_level != null ? `&botSkill=${opp.skill_level}` : '';
       const speedParam = opp.avg_speed   != null ? `&botSpeed=${opp.avg_speed}`   : '';
       router.replace(
-        `/game?category=${category}&opponentPseudo=${opp.pseudo}&opponentSeed=${opp.avatar_seed}&isBot=${isBotMatch}&opponentLevel=${opp.level}&opponentStreak=${opp.streak}&opponentId=${opp.id || ''}${matchRoomId ? `&roomId=${matchRoomId}` : ''}${skillParam}${speedParam}`
+        `/game?category=${category}&opponentPseudo=${opp.pseudo}&opponentSeed=${opp.avatar_seed}${opp.avatar_url ? `&opponentAvatarUrl=${encodeURIComponent(opp.avatar_url)}` : ''}&isBot=${isBotMatch}&opponentLevel=${opp.level}&opponentStreak=${opp.streak}&opponentId=${opp.id || ''}${matchRoomId ? `&roomId=${matchRoomId}` : ''}${skillParam}${speedParam}`
       );
     }, navDelay);
   };

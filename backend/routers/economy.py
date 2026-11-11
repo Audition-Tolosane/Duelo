@@ -15,6 +15,7 @@ joueur quitte avant qu'un adversaire soit trouvé, il récupère son crédit (PO
 """
 import logging
 import random
+from services import reactions
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -47,6 +48,7 @@ CHEST_REWARDS = [
     ("xp", 250, 10),
     ("boost", 30, 20),     # ×2 XP sur tous les thèmes, en minutes
     ("credits", 5, 10),
+    ("reaction", 1, 20),   # une réaction verrouillée (tant qu'il en reste)
 ]
 
 
@@ -128,6 +130,7 @@ async def _status(db: AsyncSession, user_id: str, econ: UserEconomy, theme_id: s
         "themes_per_ad": THEMES_PER_AD,
         "chest_free": (econ.chests_opened or 0) == 0,
         "chest_ad": (econ.chests_opened or 0) == 1,
+        "reactions_unlocked": reactions.parse_unlocked(econ.reactions_unlocked),
     }
     if theme_id:
         out["theme_allowed"] = theme_id in played or len(played) < limit
@@ -245,8 +248,15 @@ async def economy_chest_open(body: dict | None = None, current_user: str = Depen
     if opened == 1:
         verify_ad_reward(current_user, "chest")
 
-    kind, value, _ = random.choices(CHEST_REWARDS, weights=[w for *_, w in CHEST_REWARDS])[0]
+    unlocked = reactions.parse_unlocked(econ.reactions_unlocked)
+    locked_left = [k for k in reactions.LOCKED if k not in unlocked]
+    pool = [r for r in CHEST_REWARDS if r[0] != "reaction" or locked_left]
+    kind, value, _ = random.choices(pool, weights=[w for *_, w in pool])[0]
     reward: dict = {"type": kind, "value": value}
+    if kind == "reaction":
+        key = random.choice(locked_left)
+        econ.reactions_unlocked = ",".join(unlocked + [key])
+        reward["key"] = key
     if kind == "credits":
         econ.credits = min(CREDITS_HARD_CAP, econ.credits + value)
     elif kind == "xp":
