@@ -334,6 +334,17 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
             ).order_by(Match.created_at.desc()).limit(1)
         )
         dup = existing.scalars().first()
+        if not dup and not opponent_is_bot:
+            # Duel en direct : le serveur a déjà enregistré ce match (avec l'adversaire) avant
+            # d'annoncer la fin. On le renvoie tel quel au lieu d'en créer un second.
+            live = await db.execute(
+                select(Match).where(
+                    Match.created_at >= datetime.now(timezone.utc) - timedelta(seconds=120),
+                    Match.player1_id == player_id, Match.category == theme_id,
+                    Match.player2_id.isnot(None), Match.player2_is_bot == False,  # noqa: E712
+                ).order_by(Match.created_at.desc()).limit(1)
+            )
+            dup = live.scalars().first()
         if dup:
             logger.info(f"[submit] Duplicate for player={player_id}, theme={theme_id} -> match {dup.id}")
             return {

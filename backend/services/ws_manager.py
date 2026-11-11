@@ -25,6 +25,10 @@ class ConnectionManager:
         self.matchmaking_queue: list[dict] = []
         # Active game rooms: room_id → GameRoom
         self.game_rooms: dict[str, "GameRoom"] = {}
+        # Enregistrement en base d'un duel terminé normalement (routers/ws.py : save_game_results).
+        # Appelé AVANT d'envoyer game_over : quand l'app envoie ensuite le résultat (submit), le
+        # match existe déjà et le serveur le lui renvoie (XP comprise) au lieu d'en créer un second.
+        self.on_game_finished = None
         # Matchmaking timeout tasks: user_id → asyncio.Task
         self._matchmaking_timers: dict[str, asyncio.Task] = {}
         # Pending rematch proposals: rematch_id → {proposer_id, opponent_id, theme_id, proposer_data, timer}
@@ -649,6 +653,11 @@ class ConnectionManager:
                 },
             })
         else:
+            if self.on_game_finished:
+                try:
+                    await self.on_game_finished(room)
+                except Exception as e:
+                    logger.error(f"[game] enregistrement du match {room.room_id} impossible: {e}")
             await self._finish_game(room)
 
     async def _broadcast_room(self, room: "GameRoom", data: dict):

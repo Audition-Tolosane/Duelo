@@ -484,10 +484,9 @@ async def handle_game_answer(user_id: str, data: dict):
         })
         return
 
+    # La fin normale d'un duel (après la pause de révélation) enregistre le match via
+    # manager.on_game_finished = save_game_results (branché plus bas).
     await manager.submit_answer(user_id, room_id, question_index, answer, time_ms)
-
-    if room_id not in manager.game_rooms:
-        await save_game_results(room)
 
 
 async def _post_match_progress(db, player_id: str, user, theme_id: str, won: bool, correct: int, score: int):
@@ -547,19 +546,17 @@ async def save_game_results(room):
         for player_id in (room.player1_id, room.player2_id):
             opponent_id = room.get_opponent_id(player_id)
 
-            # ── Duplicate submission guard ──
+            # ── Duplicate submission guard ── (le match de CE joueur seulement : chacun a sa
+            # ligne ; l'ancienne version voyait la ligne de l'adversaire et sautait le 2e joueur)
             recent_cutoff = datetime.now(timezone.utc) - timedelta(seconds=60)
             dup_check = await db.execute(
-                select(Match).where(
+                select(Match.id).where(
                     Match.created_at >= recent_cutoff,
                     Match.category == room.theme_id,
-                    or_(
-                        and_(Match.player1_id == player_id, Match.player2_id == opponent_id),
-                        and_(Match.player1_id == opponent_id, Match.player2_id == player_id),
-                    ),
-                )
+                    Match.player1_id == player_id, Match.player2_id == opponent_id,
+                ).limit(1)
             )
-            if dup_check.scalar_one_or_none():
+            if dup_check.scalars().first():
                 logger.info(f"[save_game_results] Duplicate blocked for player={player_id}, theme={room.theme_id}")
                 continue
 
@@ -742,3 +739,7 @@ async def handle_rematch_accept(user_id: str, data: dict):
 async def handle_rematch_decline(user_id: str):
     """Opponent declines the rematch."""
     await manager.decline_rematch(user_id)
+
+
+# Duel en direct terminé normalement → enregistrement en base (voir ConnectionManager.on_game_finished)
+manager.on_game_finished = save_game_results

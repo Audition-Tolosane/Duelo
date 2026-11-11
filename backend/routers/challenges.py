@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_, func
 from database import get_db
-from models import Challenge, User, Theme, PlayerFollow
+from models import Challenge, User, Theme, PlayerFollow, Match
 from constants import TOTAL_QUESTIONS
 from services.notifications import create_notification
 from services.ws_manager import manager
@@ -226,6 +226,22 @@ async def vs_stats(user_id: str, opponent_id: str, current_user: str = Depends(g
     challenges = res.scalars().all()
     user_wins = 0
     opponent_wins = 0
+    total = len(challenges)
+    # Duels joués EN DIRECT (défis acceptés en direct, revanches, matchmaking) : enregistrés
+    # par le serveur avec l'adversaire (player2_id). Le défi, lui, reste « accepted » : sans
+    # ça, le face-à-face affichait « aucun défi » alors qu'on avait joué ensemble.
+    live = await db.execute(
+        select(Match.player1_score, Match.player2_score).where(
+            Match.player1_id == user_id, Match.player2_id == opponent_id,
+            Match.player2_is_bot == False,  # noqa: E712
+        )
+    )
+    for p1, p2 in live.all():
+        total += 1
+        if (p1 or 0) > (p2 or 0):
+            user_wins += 1
+        elif (p2 or 0) > (p1 or 0):
+            opponent_wins += 1
     for c in challenges:
         if c.p1_score is None or c.p2_score is None:
             continue
@@ -239,7 +255,7 @@ async def vs_stats(user_id: str, opponent_id: str, current_user: str = Depends(g
                 user_wins += 1
             else:
                 opponent_wins += 1
-    return {"total": len(challenges), "user_wins": user_wins, "opponent_wins": opponent_wins}
+    return {"total": total, "user_wins": user_wins, "opponent_wins": opponent_wins}
 
 
 @router.get("/history")
