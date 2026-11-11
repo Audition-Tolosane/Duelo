@@ -310,7 +310,10 @@ async def upload_user_avatar(request: Request, current_user: str = Depends(get_c
 LANGUES_APP = {"fr", "en", "es", "de", "pt", "it", "pl", "ar", "ja", "ko", "zh"}
 
 
+# L'app appelle /api/profile/user/push-token : sans ce 2e chemin, le jeton n'était JAMAIS
+# enregistré (404) et aucun push ne partait. Les deux chemins restent valides.
 @router.post("/user/push-token")
+@router.post("/profile/user/push-token")
 async def save_push_token(data: dict, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     """Save or update the user's Expo push token for remote notifications."""
     user_id = data.get("user_id", "")
