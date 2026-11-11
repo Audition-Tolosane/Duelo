@@ -52,7 +52,8 @@ const OPPONENT_REVEAL_MS = 1600;
 // Duel en ligne : la bonne réponse vient du serveur. Le jaune « en attente » ne s'affiche
 // que si sa réponse tarde, sinon on passe directement au vert/rouge comme contre un bot.
 const PENDING_PICK_DELAY_MS = 400;
-const MAX_TOTAL = MAX_PTS_PER_Q * TOTAL_QUESTIONS; // 140
+// Dernière question : points ×1,5 (annoncé pendant la pause qui la précède ; même règle côté serveur)
+const LAST_Q_MULT = 1.5;
 
 type Question = {
   id: string;
@@ -317,6 +318,50 @@ export default function GameScreen() {
     ]).start();
   };
 
+  // Index de la dernière question (en direct, les questions arrivent une à une)
+  const lastIndex = () => (isLive ? TOTAL_QUESTIONS : questionsRef.current.length) - 1;
+  const lastMult = (pts: number, index = currentIndexRef.current) =>
+    index === lastIndex() ? Math.round(pts * LAST_Q_MULT) : pts;
+
+  // « +17 » qui s'envole sous mon score : le bonus de vitesse devient visible
+  const [ptsFloat, setPtsFloat] = useState<{ n: number; id: number } | null>(null);
+  const ptsFloatAnim = useRef(new Animated.Value(0)).current;
+  const showPtsFloat = (n: number) => {
+    if (n <= 0) return;
+    setPtsFloat({ n, id: Date.now() });
+    ptsFloatAnim.setValue(0);
+    Animated.timing(ptsFloatAnim, { toValue: 1, duration: 1100, easing: Easing.out(Easing.cubic), useNativeDriver: true })
+      .start(() => setPtsFloat(null));
+  };
+
+  // L'adversaire a répondu (en direct, ou bot qui « répond » à son rythme) : coche + petite vibration
+  const [oppAnswered, setOppAnswered] = useState(false);
+  const markOppAnswered = () => {
+    setOppAnswered(true);
+    if (!answeredRef.current) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+  };
+
+  // Annonce « Dernière question · ×1,5 » pendant la pause qui la précède
+  const [lastAnnounce, setLastAnnounce] = useState(false);
+  const lastAnnounceAnim = useRef(new Animated.Value(0)).current;
+  const announceLastQuestion = () => {
+    setLastAnnounce(true);
+    lastAnnounceAnim.setValue(0);
+    Animated.sequence([
+      Animated.spring(lastAnnounceAnim, { toValue: 1, tension: 80, friction: 7, useNativeDriver: true }),
+      Animated.delay(1300),
+      Animated.timing(lastAnnounceAnim, { toValue: 0, duration: 250, useNativeDriver: true }),
+    ]).start(() => setLastAnnounce(false));
+  };
+
+  // Bot (hors défi différé) : sa réponse est tirée au début de la question et « tombe » à son
+  // temps de réponse, comme un vrai adversaire (score qui monte, coche, vibration).
+  type BotPlan = { botPick: number; botPts: number; botTimeMs: number; answered: boolean };
+  const botPlanRef = useRef<BotPlan | null>(null);
+  const botAnswerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const simulateBot = !isLive && !isAsync;
+  useEffect(() => () => { if (botAnswerTimerRef.current) clearTimeout(botAnswerTimerRef.current); }, []);
+
   // Correct streak streak toast
   const [correctStreak, setCorrectStreak] = useState(0);
   const correctStreakRef = useRef(0);
@@ -432,7 +477,7 @@ export default function GameScreen() {
         botScoreRef.current = opponent_score;
         setPlayerScore(your_score);
         setBotScore(opponent_score);
-        if (is_correct) { correctCountRef.current += 1; triggerScorePop(); }
+        if (is_correct) { correctCountRef.current += 1; triggerScorePop(); showPtsFloat(points || 0); }
 
         setShowResult(true);
         setShowPending(false);
@@ -457,11 +502,13 @@ export default function GameScreen() {
         if (question_index !== currentIndexRef.current) return;
         if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
         if (typeof opponent_answer === 'number' && opponent_answer >= 0) setBotAnswer(opponent_answer);
+        if (question_index === TOTAL_QUESTIONS - 2) announceLastQuestion();
         revealedAtRef.current = Math.max(revealedAtRef.current, Date.now() - REVEAL_MS + OPPONENT_REVEAL_MS);
       }),
       // Opponent answered (update their score)
       wsOn('opponent_answered', (msg) => {
-        const { your_score, opponent_score } = msg.data || {};
+        const { your_score, opponent_score, question_index: qi } = msg.data || {};
+        if (qi === currentIndexRef.current) markOppAnswered();
         botScoreRef.current = opponent_score;
         playerScoreRef.current = your_score;
         setBotScore(opponent_score);
@@ -615,6 +662,23 @@ export default function GameScreen() {
     setTimeLeft(duration);
 
     answeredRef.current = false;
+    setOppAnswered(false);
+    if (botAnswerTimerRef.current) { clearTimeout(botAnswerTimerRef.current); botAnswerTimerRef.current = null; }
+    botPlanRef.current = null;
+    const curQ = questionsRef.current[currentIndexRef.current];
+    if (simulateBot && curQ) {
+      const plan: BotPlan = { ...resolveBotAnswer(curQ), answered: false };
+      botPlanRef.current = plan;
+      if (plan.botPick !== -1) {
+        botAnswerTimerRef.current = setTimeout(() => {
+          if (answeredRef.current || botPlanRef.current !== plan) return;
+          plan.answered = true;
+          botScoreRef.current += plan.botPts;
+          setBotScore(botScoreRef.current);
+          markOppAnswered();
+        }, plan.botTimeMs);
+      }
+    }
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       timeLeftRef.current -= 1;
@@ -668,7 +732,7 @@ export default function GameScreen() {
 
     if (botCorrect) {
       const speedBonus = Math.max(0, Math.round(10 * (1 - botTimeMs / 10000)));
-      return { botPick: question.correct_option, botPts: Math.max(10 + speedBonus, 10), botTimeMs };
+      return { botPick: question.correct_option, botPts: lastMult(Math.max(10 + speedBonus, 10)), botTimeMs };
     }
     // Erreur humaine = leurre plausible : on pondère les mauvaises options par
     // leur proximité de longueur avec la bonne réponse (proxy de vraisemblance).
@@ -694,7 +758,8 @@ export default function GameScreen() {
     botScoreRef.current = newB;
     setPlayerScore(newP);
     setBotScore(newB);
-    if (pPts > 0) triggerScorePop();
+    if (pPts > 0) { triggerScorePop(); showPtsFloat(pPts); }
+    if (currentIndexRef.current === lastIndex() - 1) setTimeout(announceLastQuestion, 500);
 
     // Hide pending on bars (answered)
     setShowPending(false);
@@ -710,7 +775,8 @@ export default function GameScreen() {
     setTimeout(() => setBotAnswer(botPick), delay);
     // Bot : une réaction de temps en temps (3 max par match), cohérente avec la question
     if (reactionsOn && !isLive && botReactionsRef.current < 3) {
-      const r = botReactionFor(bPts > 0, pPts > 0);
+      const botCorrect = botPick >= 0 && questionsRef.current[currentIndexRef.current]?.correct_option === botPick;
+      const r = botReactionFor(botCorrect, pPts > 0);
       if (r) {
         botReactionsRef.current += 1;
         setTimeout(() => showOppReaction(r), delay + 350 + Math.random() * 500);
@@ -718,6 +784,14 @@ export default function GameScreen() {
     }
 
     setTimeout(nextQuestion, Math.max(REVEAL_MS, delay + OPPONENT_REVEAL_MS));
+  };
+
+  /** Réponse du bot pour la question en cours (tirée au début ; à défaut, maintenant). */
+  const takeBotPlan = (question: Question): BotPlan => {
+    if (botAnswerTimerRef.current) { clearTimeout(botAnswerTimerRef.current); botAnswerTimerRef.current = null; }
+    const plan = botPlanRef.current ?? { ...resolveBotAnswer(question), answered: false };
+    botPlanRef.current = null;
+    return plan;
   };
 
   const handleTimeout = () => {
@@ -754,11 +828,11 @@ export default function GameScreen() {
         const p1 = p1AnswersRef.current[currentIndexRef.current];
         handleAnswer(0, p1?.points ?? 0, p1?.answer ?? -1);
       } else {
-        const { botPick, botPts, botTimeMs } = resolveBotAnswer(question);
+        const plan = takeBotPlan(question);
         // Simulate bot answering independently: reveal after a natural-looking delay
         const playerTimeMs = questionDurationRef.current * 1000;
-        const revealDelay = botTimeMs < playerTimeMs ? 0 : Math.min(botTimeMs - playerTimeMs, 1400);
-        handleAnswer(0, botPts, botPick, revealDelay);
+        const revealDelay = plan.answered || plan.botTimeMs < playerTimeMs ? 0 : Math.min(plan.botTimeMs - playerTimeMs, 1400);
+        handleAnswer(0, plan.answered ? 0 : plan.botPts, plan.botPick, revealDelay);
       }
     }
   };
@@ -808,7 +882,7 @@ export default function GameScreen() {
       // #9 — keep guard locked until nextQuestion() so rapid double-taps are blocked
       const question = questions[currentIndex];
       const isCorrect = optionIndex === question.correct_option;
-      const pPts = isCorrect ? Math.max(MAX_PTS_PER_Q - timeTaken, 10) : 0;
+      const pPts = isCorrect ? lastMult(Math.max(MAX_PTS_PER_Q - timeTaken, 10)) : 0;
       questionResultsRef.current[currentIndexRef.current] = isCorrect;
 
       Haptics.notificationAsync(
@@ -845,10 +919,11 @@ export default function GameScreen() {
         const p1 = p1AnswersRef.current[currentIndex];
         handleAnswer(pPts, p1?.points ?? 0, p1?.answer ?? -1);
       } else {
-        const { botPick, botPts, botTimeMs } = resolveBotAnswer(question);
+        const plan = takeBotPlan(question);
         // If the bot would have answered after the player, reveal its answer with a delay
-        const revealDelay = botTimeMs > timeMs ? Math.min(botTimeMs - timeMs, 1400) : 0;
-        handleAnswer(pPts, botPts, botPick, revealDelay);
+        const revealDelay = !plan.answered && plan.botTimeMs > timeMs ? Math.min(plan.botTimeMs - timeMs, 1400) : 0;
+        // Points du bot déjà comptés s'il a « répondu » avant nous
+        handleAnswer(pPts, plan.answered ? 0 : plan.botPts, plan.botPick, revealDelay);
       }
     }
   }, [selectedOption, showResult, currentIndex, questions, isLive, isAsync, isAsyncReveal]);
@@ -1020,6 +1095,18 @@ export default function GameScreen() {
           <Animated.View style={{ transform: [{ scale: scorePopAnim }] }}>
             <Txt variant="score">{playerScore}</Txt>
           </Animated.View>
+          {ptsFloat ? (
+            <Animated.View
+              key={ptsFloat.id}
+              pointerEvents="none"
+              style={[styles.ptsFloat, {
+                opacity: ptsFloatAnim.interpolate({ inputRange: [0, 0.15, 0.7, 1], outputRange: [0, 1, 1, 0] }),
+                transform: [{ translateY: ptsFloatAnim.interpolate({ inputRange: [0, 1], outputRange: [6, -26] }) }],
+              }]}
+            >
+              <Txt variant="cardTitle" color={COLOR.player.self}>+{ptsFloat.n}</Txt>
+            </Animated.View>
+          ) : null}
         </View>
 
         <RoundTimer timeLeft={timeLeft} total={questionDuration} size={TIMER_SIZE} />
@@ -1032,6 +1119,7 @@ export default function GameScreen() {
         >
           <View style={styles.oppNameRow}>
             {reactionsOn && oppMuted ? <Icon name="eyeOff" size={12} color={COLOR.player.opponentText} /> : null}
+            {oppAnswered && !isAsyncSolo ? <Icon name="check" size={12} color={COLOR.player.opponentText} /> : null}
             <Txt variant="overline" color={COLOR.player.opponentText} numberOfLines={1}>
               {params.opponentPseudo?.slice(0, 10)}
             </Txt>
@@ -1072,6 +1160,12 @@ export default function GameScreen() {
             opacity: questionFade,
             transform: [{ translateX: questionSlide }, { scale: questionScaleAnim }],
           }}>
+            {currentIndex === totalShown - 1 && totalShown > 1 ? (
+              <View style={styles.lastPill}>
+                <Icon name="bolt" size={14} color={COLOR.text.onAction} />
+                <Txt variant="label" color={COLOR.text.onAction}>{t('game.last_question_pill')}</Txt>
+              </View>
+            ) : null}
             <Txt variant="h2" align="center" style={{ fontSize: qTier.size, lineHeight: qTier.line }}>
               {question.question_text}
             </Txt>
@@ -1117,6 +1211,22 @@ export default function GameScreen() {
               ))}
             </View>
           ))}
+        </View>
+      )}
+
+      {/* Annonce de la dernière question (pendant la pause qui la précède) */}
+      {lastAnnounce && (
+        <View style={styles.streakToastWrapper} pointerEvents="none">
+          <Animated.View style={[styles.streakToast, styles.lastToast, {
+            opacity: lastAnnounceAnim,
+            transform: [{ scale: lastAnnounceAnim.interpolate({ inputRange: [0, 1], outputRange: [0.7, 1] }) }],
+          }]}>
+            <Icon name="bolt" size={24} color={COLOR.text.onAction} />
+            <View>
+              <Txt variant="h3" color={COLOR.text.onAction}>{t('game.last_question_title')}</Txt>
+              <Txt variant="label" color={COLOR.text.onAction}>{t('game.last_question_sub')}</Txt>
+            </View>
+          </Animated.View>
         </View>
       )}
 
@@ -1211,6 +1321,13 @@ const styles = StyleSheet.create({
   listRow: { flexGrow: 1, flexShrink: 0, flexBasis: 'auto' },
 
   // Toast de série : corail plein, texte nuit
+  ptsFloat: { position: 'absolute', bottom: -18, left: SPACE.md },
+  lastPill: {
+    flexDirection: 'row', alignItems: 'center', gap: SPACE.xs, alignSelf: 'center',
+    paddingHorizontal: SPACE.md, paddingVertical: SPACE.xxs, marginBottom: SPACE.sm,
+    borderRadius: RADII.pill, backgroundColor: COLOR.reward.gold,
+  },
+  lastToast: { backgroundColor: COLOR.reward.gold },
   streakToastWrapper: {
     position: 'absolute', top: '38%', left: 0, right: 0,
     alignItems: 'center',

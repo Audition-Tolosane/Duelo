@@ -273,7 +273,7 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
     questions_data = body.get("questions_data")
 
     # #14/#15 — Validate and sanitise all client-supplied values
-    MAX_SCORE = 140       # 20 pts max × 7 questions
+    MAX_SCORE = 150       # 20 pts max × 6 questions + 30 (dernière question ×1,5)
     MAX_PTS_Q = 20        # max points per correct question
     MIN_PTS_Q = 10        # min points per correct question (time bonus floor)
     player_score = max(0, min(int(player_score), MAX_SCORE))
@@ -281,7 +281,7 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
     correct_count = max(0, min(int(correct_count), TOTAL_QUESTIONS))
     # Cross-validate: score must be consistent with correct_count
     if correct_count > 0:
-        player_score = min(player_score, correct_count * MAX_PTS_Q)
+        player_score = min(player_score, correct_count * MAX_PTS_Q + MAX_PTS_Q // 2)
     elif correct_count == 0:
         player_score = 0  # no correct answers → no score
     # questions_data: only store if it's a plain list (reject arbitrary objects)

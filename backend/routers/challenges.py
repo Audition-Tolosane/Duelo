@@ -314,7 +314,7 @@ async def get_p1_answers(challenge_id: str, current_user: str = Depends(get_curr
 async def save_async_score(challenge_id: str, data: dict, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     """Save a player's score + per-question answers. When both have played, send result notifications."""
     user_id = current_user  # always use authenticated user
-    score = max(0, min(140, int(data.get("score", 0))))    # clamp to valid range
+    score = max(0, min(150, int(data.get("score", 0))))    # clamp to valid range
     correct = max(0, min(TOTAL_QUESTIONS, int(data.get("correct", 0))))  # clamp to valid range
     answers = data.get("answers", [])
 
