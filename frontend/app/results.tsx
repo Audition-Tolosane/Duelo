@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { goToTab } from '../utils/nav';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import Reanimated, {
@@ -902,7 +903,7 @@ export default function ResultsScreen() {
             <Button testID="play-again-btn" label={t('pilot.results.rematch')} icon="duel" fullWidth size="lg" onPress={playAgain} />
           )}
           <Button testID="share-result-btn" label={t('pilot.results.share')} icon="share" variant="secondary" fullWidth onPress={shareResult} />
-          <Button testID="go-home-btn" label={t('results.back_home')} icon="home" variant="ghost" fullWidth onPress={() => router.replace('/(tabs)/accueil')} />
+          <Button testID="go-home-btn" label={t('results.back_home')} icon="home" variant="ghost" fullWidth onPress={() => goToTab('/(tabs)/accueil')} />
 
           {quizQuestions.length > 0 && (
             <Pressable

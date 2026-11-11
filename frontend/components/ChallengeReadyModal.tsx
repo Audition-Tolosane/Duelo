@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated, Alert } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
+import { goToTab } from '../utils/nav';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useWS } from '../contexts/WebSocketContext';
@@ -107,7 +108,7 @@ export default function ChallengeReadyModal() {
         } else if (themeId) {
           router.push(`/matchmaking?category=${themeId}&themeName=${encodeURIComponent(themeName)}`);
         } else {
-          router.push('/(tabs)/play');
+          goToTab('/(tabs)/play');
         }
       }
     } catch {

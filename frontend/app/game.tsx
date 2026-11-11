@@ -4,6 +4,7 @@ import {
   Platform, UIManager, Easing, AppState, BackHandler, Pressable,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { goToTab } from '../utils/nav';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import SwipeBackPage from '../components/SwipeBackPage';
@@ -997,7 +998,7 @@ export default function GameScreen() {
             <Icon name="error" size={40} color={COLOR.status.error} />
             <Txt variant="h2" align="center">{t('game.invalid_game')}</Txt>
             <View style={styles.stateActions}>
-              <Button label={t('common.ok')} onPress={() => router.replace('/(tabs)/play')} haptic={false} fullWidth />
+              <Button label={t('common.ok')} onPress={() => goToTab('/(tabs)/play')} haptic={false} fullWidth />
             </View>
           </View>
         </ScreenContainer>

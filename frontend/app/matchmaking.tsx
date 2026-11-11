@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { goToTab } from '../utils/nav';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -351,7 +352,7 @@ export default function MatchmakingScreen() {
 
   useEffect(() => {
     if (!category && !isChallengeMode) {
-      router.replace('/(tabs)/play');
+      goToTab('/(tabs)/play');
       return;
     }
     loadPlayerInfo();
@@ -920,7 +921,7 @@ export default function MatchmakingScreen() {
               variant="ghost"
               fullWidth
               haptic={false}
-              onPress={() => { setShowTimeoutModal(false); router.replace('/(tabs)/accueil'); }}
+              onPress={() => { setShowTimeoutModal(false); goToTab('/(tabs)/accueil'); }}
             />
           </>
         )}
