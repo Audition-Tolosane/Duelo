@@ -22,25 +22,37 @@ class RateLimiter:
 _limiter = RateLimiter()
 
 
+# Proxys de Railway : adresses 100.64.0.0/10 (« shared address space »), que Python ne classe
+# PAS comme privées. Sans elles, chaque requête était comptée sous l'adresse du proxy (une
+# vingtaine, partagées par tous les joueurs) : les limites ne freinaient pas un attaquant et
+# pouvaient bloquer des joueurs honnêtes passés par le même proxy.
+_RAILWAY_PROXY_NET = ipaddress.ip_network("100.64.0.0/10")
+
+
 def _is_trusted_proxy(ip: str) -> bool:
-    """Return True only for loopback/private IPs (i.e. our own reverse proxy)."""
+    """Return True only for our own reverse proxy (loopback, private, Railway edge)."""
     try:
         addr = ipaddress.ip_address(ip)
-        return addr.is_loopback or addr.is_private
+        return addr.is_loopback or addr.is_private or addr in _RAILWAY_PROXY_NET
     except ValueError:
         return False
 
 
 def _get_client_ip(request: Request) -> str:
     """Return the real client IP.
-    X-Forwarded-For is only trusted when the direct connection comes from a
-    known internal proxy, preventing header-spoofing from external clients.
+
+    Les en-têtes ne sont lus que si la connexion vient de notre proxy. On prend X-Real-IP
+    (posé par le proxy), sinon la DERNIÈRE adresse de X-Forwarded-For : c'est celle que le
+    proxy a ajoutée. La première peut être inventée par le client (contournement des limites).
     """
     client_host = request.client.host if request.client else None
     if client_host and _is_trusted_proxy(client_host):
+        real_ip = (request.headers.get("X-Real-IP") or "").strip()
+        if real_ip:
+            return real_ip
         forwarded = request.headers.get("X-Forwarded-For")
         if forwarded:
-            return forwarded.split(",")[0].strip()
+            return forwarded.split(",")[-1].strip()
     return client_host or "unknown"
 
 

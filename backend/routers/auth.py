@@ -282,7 +282,14 @@ async def logout(
 
 
 @router.post("/check-pseudo")
-async def check_pseudo(data: GuestRegister, db: AsyncSession = Depends(get_db), _rl=Depends(rate_limit(limit=30, window=60))):
+async def check_pseudo(data: GuestRegister, request: Request, db: AsyncSession = Depends(get_db), _rl=Depends(rate_limit(limit=30, window=60))):
+    # TEMPORAIRE (vérif. de l'IP client derrière Railway) — à retirer
+    if data.pseudo == "zz_ipcheck_audit":
+        import logging as _lg
+        _lg.getLogger(__name__).warning(
+            f"[ipcheck] host={request.client.host if request.client else None} "
+            f"xri={request.headers.get('X-Real-IP')} xff={request.headers.get('X-Forwarded-For')} "
+            f"-> {_get_client_ip(request)}")
     # Rate-limited to curb pseudo enumeration / availability scraping.
     result = await db.execute(select(User).where(User.pseudo == data.pseudo.strip()))
     exists = result.scalar_one_or_none() is not None
