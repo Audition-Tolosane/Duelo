@@ -29,12 +29,25 @@ ADMIN_MAX_FAILURES = 10        # wrong keys per IP...
 ADMIN_FAILURE_WINDOW = 3600    # ...per hour, then the IP is locked out
 
 
+# Administration COUPÉE par défaut : elle ne répond (404) que si ADMIN_ENABLED=1 sur Railway.
+# Un mot de passe qui fuit ne donne alors accès à rien. La rallumer le temps d'une tâche
+# (modération des signalements, import), puis la couper à nouveau.
+def _admin_enabled() -> bool:
+    return os.environ.get("ADMIN_ENABLED", "").strip() == "1"
+
+
+def _require_admin_enabled():
+    if not _admin_enabled():
+        raise HTTPException(status_code=404, detail="Not Found")
+
+
 async def verify_admin_key(request: Request, x_admin_key: str = Header(default="", alias="X-Admin-Key")):
     """Dependency: validates admin password from X-Admin-Key header.
 
     Failed attempts are counted per IP on every admin route (not only /verify),
     so the key can't be brute-forced through the other endpoints.
     """
+    _require_admin_enabled()
     fail_key = f"admin_fail:{_get_client_ip(request)}"
     _limiter._cleanup(fail_key, ADMIN_FAILURE_WINDOW)
     if len(_limiter.requests[fail_key]) >= ADMIN_MAX_FAILURES:
@@ -46,6 +59,7 @@ async def verify_admin_key(request: Request, x_admin_key: str = Header(default="
 
 @router.post("/verify")
 async def verify_admin(data: AdminVerify, request: Request, _rl=Depends(rate_limit(limit=3, window=3600))):
+    _require_admin_enabled()
     if secrets.compare_digest(data.password, ADMIN_PASSWORD):
         return {"verified": True}
     raise HTTPException(status_code=403, detail="Mot de passe incorrect")
@@ -88,6 +102,7 @@ async def import_questions(data: BulkImportRequest, request: Request, _: None = 
 
 @router.get("/dashboard", response_class=HTMLResponse)
 async def admin_dashboard():
+    _require_admin_enabled()
     html_path = ROOT_DIR / "admin_dashboard.html"
     return HTMLResponse(content=html_path.read_text(encoding="utf-8"))
 
