@@ -12,6 +12,7 @@ type WSMessage = {
 type MessageHandler = (msg: WSMessage) => void;
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getToken } from '../utils/tokenStore';
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -44,7 +45,7 @@ class DueloWebSocket {
     this.intentionalClose = false;
     this.reconnectDelay = 1000;
 
-    const token = await AsyncStorage.getItem('duelo_token') ?? '';
+    const token = (await getToken()) ?? '';
     const wsUrl = API_URL.replace(/^http/, 'ws') + `/ws/${userId}?token=${encodeURIComponent(token)}`;
     this.ws = new WebSocket(wsUrl);
 

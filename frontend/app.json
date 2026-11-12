@@ -85,7 +85,8 @@
           "iosAppId": "ca-app-pub-3913909427290988~6558754544",
           "delayAppMeasurementInit": true
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true

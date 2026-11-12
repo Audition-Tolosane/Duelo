@@ -60,6 +60,15 @@ class ConnectionManager:
         self.last_seen[user_id] = time.monotonic()
         logger.info(f"WS connected: {user_id} (total: {len(self.active_connections)})")
 
+    async def kick(self, user_id: str, reason: str = "logged_out"):
+        """Coupe la connexion temps réel d'un joueur (déconnexion, compte supprimé, jetons révoqués)."""
+        ws = self.active_connections.get(user_id)
+        if ws:
+            try:
+                await ws.close(code=4003, reason=reason)
+            except Exception:
+                pass
+
     def disconnect(self, user_id: str):
         self.active_connections.pop(user_id, None)
         self.background.discard(user_id)

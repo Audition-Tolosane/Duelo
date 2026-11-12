@@ -33,14 +33,15 @@ beforeEach(() => {
 
 afterEach(async () => {
   await AsyncStorage.clear();
+  await clearToken();
 });
 
 // Import after mocks are set up
-import { authFetch } from '../utils/api';
+import { authFetch, saveToken, getToken, clearToken } from '../utils/api';
 
 describe('authFetch', () => {
   it('adds Authorization header when token is stored', async () => {
-    await AsyncStorage.setItem('duelo_token', 'my-jwt-token');
+    await saveToken('my-jwt-token');
 
     await authFetch('https://api.example.com/test');
 
@@ -60,7 +61,7 @@ describe('authFetch', () => {
   });
 
   it('forwards method and body unchanged', async () => {
-    await AsyncStorage.setItem('duelo_token', 'tok');
+    await saveToken('tok');
 
     await authFetch('https://api.example.com/submit', {
       method: 'POST',
@@ -76,7 +77,7 @@ describe('authFetch', () => {
   });
 
   it('merges Authorization with existing headers', async () => {
-    await AsyncStorage.setItem('duelo_token', 'xyz');
+    await saveToken('xyz');
 
     await authFetch('https://api.example.com/test', {
       headers: { 'X-Custom': 'value', 'Content-Type': 'application/json' },
@@ -101,13 +102,14 @@ describe('authFetch', () => {
   });
 
   it("401 avec un token : oublie la session et revient à l'accueil", async () => {
-    await AsyncStorage.multiSet([['duelo_token', 'revoked'], ['duelo_user_id', 'u1'], ['duelo_consent', '1']]);
+    await saveToken('revoked');
+    await AsyncStorage.multiSet([['duelo_user_id', 'u1'], ['duelo_consent', '1']]);
     mockFetch.mockResolvedValueOnce({ ok: false, status: 401, json: async () => ({ detail: 'Token révoqué' }) });
 
     const res = await authFetch('https://api.example.com/api/auth/consent', { method: 'POST' });
 
     expect(res.status).toBe(401);
-    expect(await AsyncStorage.getItem('duelo_token')).toBeNull();
+    expect(await getToken()).toBeNull();
     expect(await AsyncStorage.getItem('duelo_user_id')).toBeNull();
     expect(await AsyncStorage.getItem('duelo_consent')).toBeNull();
     expect(mockDisconnect).toHaveBeenCalled();

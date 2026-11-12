@@ -23,16 +23,32 @@ def create_access_token(user_id: str, token_version: int = 0) -> str:
 
 
 async def get_optional_user_id(request: Request) -> str | None:
-    """Extract user_id from JWT if present, without raising on missing/invalid token."""
+    """Joueur du jeton s'il y en a un et qu'il est valide, sinon None (jamais d'erreur).
+    Le jeton révoqué (déconnexion, compte supprimé) compte comme absent, comme dans
+    get_current_user_id — avant, il restait accepté sur les routes à connexion facultative."""
     auth = request.headers.get("Authorization", "")
     if not auth.startswith("Bearer "):
         return None
     token = auth.split(" ", 1)[1]
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        return payload.get("sub")
     except Exception:
         return None
+    user_id = payload.get("sub")
+    if not user_id:
+        return None
+    try:
+        from database import AsyncSessionLocal
+        from models import User
+        async with AsyncSessionLocal() as db:
+            current_version = (await db.execute(
+                select(User.token_version).where(User.id == user_id)
+            )).scalar_one_or_none()
+    except Exception:
+        return None
+    if current_version is None or payload.get("tv", 0) != current_version:
+        return None
+    return user_id
 
 
 # Routes « personnelles » prises par identifiant dans l'URL (fil d'accueil, coach, activité) :

@@ -141,21 +141,31 @@ async def resolve_theme_category(theme: str, db) -> str:
 
     return theme
 
+def _code_to_country() -> dict:
+    """{'FR': 'France', ...} déduit des drapeaux de constants.COUNTRY_FLAGS (deux lettres régionales)."""
+    from constants import COUNTRY_FLAGS
+    out = {}
+    for name, flag in COUNTRY_FLAGS.items():
+        if len(flag) == 2:
+            out[''.join(chr(ord(c) - 0x1F1E6 + ord('A')) for c in flag)] = name
+    return out
+
+
 async def detect_country_from_ip(request: Request) -> Optional[str]:
-    """Detect country from IP using ip-api.com."""
+    """Pays du joueur d'après son IP, à l'inscription. En HTTPS (api.country.is, libre et
+    gratuit) : avant, l'IP partait en clair vers ip-api.com (https payant chez eux).
+    Renvoie le nom anglais utilisé partout (« France »), None si pays hors liste."""
     try:
-        # Resolve the client IP via the shared helper, which only trusts
-        # X-Forwarded-For when the request comes from a known internal proxy.
         from rate_limit import _get_client_ip
         client_ip = _get_client_ip(request)
         if not client_ip or client_ip in ("127.0.0.1", "::1", "localhost", "unknown"):
             return None
         async with httpx.AsyncClient(timeout=3) as client:
-            resp = await client.get(f"http://ip-api.com/json/{client_ip}?fields=status,country,countryCode,city,regionName")
+            resp = await client.get(f"https://api.country.is/{client_ip}")
             if resp.status_code == 200:
-                data = resp.json()
-                if data.get("status") == "success":
-                    return data.get("country")
+                code = str(resp.json().get("country") or "").upper()
+                return _code_to_country().get(code)
     except Exception:
         pass
     return None
+

@@ -228,6 +228,8 @@ async def delete_account(
 
     await db.delete(user)
     await db.commit()
+    from services.ws_manager import manager
+    await manager.kick(current_user_id, "account_deleted")
     return {"success": True, "message": "Compte supprimé définitivement"}
 
 
@@ -283,6 +285,9 @@ async def logout(
         .values(token_version=(User.token_version + 1))
     )
     await db.commit()
+    # Connexion temps réel ouverte avec l'ancien jeton : coupée tout de suite
+    from services.ws_manager import manager
+    await manager.kick(current_user_id)
     return {"success": True}
 
 
@@ -446,10 +451,14 @@ async def social_login(
             # Compte créé par email + mot de passe SANS vérification de l'email : quelqu'un a pu
             # l'ouvrir avec l'adresse de la victime avant elle. Apple/Google viennent de prouver
             # l'adresse : on retire ce mot de passe et on coupe les sessions existantes.
+            revoked = bool(user.password_hash)
             if user.password_hash:
                 user.password_hash = None
                 user.token_version = (user.token_version or 0) + 1
             await db.commit()
+            if revoked:
+                from services.ws_manager import manager
+                await manager.kick(user.id, "revoked")
             await db.refresh(user)
             return _user_response(user)
 

@@ -22,6 +22,7 @@ import { useWS } from '../contexts/WebSocketContext';
 import { dueloWS } from '../services/websocket';
 import { authFetch } from '../utils/api';
 import { checkPlay, refundPlay } from '../utils/economy';
+import { clearToken } from '../utils/tokenStore';
 import { CreditsSheet, ThemeLimitSheet } from '../components/EconomySheets';
 import { t } from '../utils/i18n';
 import { COLOR, SPACE, RADII, SIZE, BORDER, GRADIENTS, GLOW, ELEVATION, PALETTE, alpha } from '../theme/tokens';
@@ -522,7 +523,8 @@ export default function MatchmakingScreen() {
       if (!res.ok) {
         if (res.status === 401) {
           // Token expiré — forcer reconnexion
-          await AsyncStorage.multiRemove(['duelo_token', 'duelo_user_id']);
+          await clearToken();
+          await AsyncStorage.removeItem('duelo_user_id');
           router.replace('/login' as any);
           return;
         }

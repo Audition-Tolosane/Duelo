@@ -2,29 +2,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { dueloWS } from '../services/websocket';
 import { currentAdToken } from './adToken';
+import { saveToken, getToken, clearToken } from './tokenStore';
 
-const TOKEN_KEY = 'duelo_token';
+export { saveToken, getToken, clearToken };
 const REQUEST_TIMEOUT_MS = 15000;
 // AI generation (Forge, VO questions) legitimately takes up to a minute or two.
 const SLOW_ROUTES = ['/api/forge/', '/generate-vo/'];
 const SLOW_TIMEOUT_MS = 120000;
 
-export async function saveToken(token: string) {
-  await AsyncStorage.setItem(TOKEN_KEY, token);
-}
-
-export async function getToken(): Promise<string | null> {
-  return AsyncStorage.getItem(TOKEN_KEY);
-}
-
-export async function clearToken() {
-  await AsyncStorage.removeItem(TOKEN_KEY);
-}
-
 // Token refusé par le serveur (déconnexion sur un autre appareil, compte supprimé,
 // expiration) : la session locale est morte, on l'oublie et on revient à l'accueil
 // au lieu de laisser chaque écran afficher « Token révoqué ».
-const SESSION_KEYS = [TOKEN_KEY, 'duelo_user_id', 'duelo_pseudo', 'duelo_avatar_seed', 'duelo_avatar_url', 'duelo_consent', 'duelo_ads_npa'];
+const SESSION_KEYS = ['duelo_user_id', 'duelo_pseudo', 'duelo_avatar_seed', 'duelo_avatar_url', 'duelo_consent', 'duelo_ads_npa'];
 let sessionEnding = false;
 
 async function endDeadSession() {
@@ -32,6 +21,7 @@ async function endDeadSession() {
   sessionEnding = true;
   try {
     dueloWS.disconnect();
+    await clearToken();
     await AsyncStorage.multiRemove(SESSION_KEYS);
     router.replace('/');
   } finally {
@@ -46,7 +36,7 @@ export async function authFetch(url: string, options: RequestInit = {}): Promise
 }
 
 async function rawAuthFetch(url: string, options: RequestInit = {}): Promise<Response> {
-  const token = await AsyncStorage.getItem(TOKEN_KEY);
+  const token = await getToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string> || {}),
