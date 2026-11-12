@@ -548,7 +548,9 @@ async def _challenge_expiry_cron():
     while True:
         await asyncio.sleep(1800)  # every 30 min
         try:
-            now = datetime.now(timezone.utc)
+            # challenges.expires_at est stocké SANS fuseau (UTC) : comparer avec une date sans
+            # fuseau, sinon asyncpg refuse la requête (le rappel « défi qui expire » ne partait jamais)
+            now = datetime.now(timezone.utc).replace(tzinfo=None)
             window_start = now + timedelta(minutes=55)
             window_end = now + timedelta(minutes=65)
             async with AsyncSessionLocal() as db:
