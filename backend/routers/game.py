@@ -219,7 +219,7 @@ async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db:
 @router.get("/questions-v2", deprecated=True)
 async def get_game_questions_v2(theme: str, request: Request, lang: str = 'fr', db: AsyncSession = Depends(get_db),
                                 tutorial: bool = False, secure: bool = False, opponent: str = '',
-                                challenge_id: str = ''):
+                                challenge_id: str = '', rematch: bool = False):
     return await get_game_questions(theme, request, lang, db, tutorial, secure, opponent, challenge_id, rematch)
 
 
