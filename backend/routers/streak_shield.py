@@ -108,7 +108,7 @@ async def earn_life(current_user: str = Depends(get_current_user_id), db: AsyncS
     """Called after rewarded ad — grants 1 life."""
     if await get_lives(current_user, db) >= MAX_LIVES:
         raise HTTPException(status_code=400, detail="Nombre maximum de vies atteint")
-    verify_ad_reward(current_user, "lives_earn")
+    await verify_ad_reward(current_user, "lives_earn")
     new_total = await add_lives(current_user, 1, db)
     return {"lives": new_total}
 

@@ -817,7 +817,7 @@ async def restore_streak(request: Request, current_user: str = Depends(get_curre
 
     # Gated behind the rewarded-ad chokepoint (audit log + anti-spam throttle).
     from services.ad_rewards import verify_ad_reward
-    verify_ad_reward(current_user, "restore_streak")
+    await verify_ad_reward(current_user, "restore_streak")
 
     match_res = await db.execute(select(Match).where(Match.id == match_id))
     match = match_res.scalar_one_or_none()
@@ -858,7 +858,7 @@ async def double_xp(request: Request, current_user: str = Depends(get_current_us
         raise HTTPException(status_code=400, detail="match_id requis")
 
     from services.ad_rewards import verify_ad_reward
-    verify_ad_reward(current_user, "double_xp")
+    await verify_ad_reward(current_user, "double_xp")
 
     match_res = await db.execute(select(Match).where(Match.id == match_id))
     match = match_res.scalar_one_or_none()

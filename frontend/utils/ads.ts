@@ -1,6 +1,22 @@
 import { Alert, Platform } from 'react-native';
 import { t } from './i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authFetch } from './api';
+import { setAdToken } from './adToken';
+
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+
+/** Code à usage unique demandé au serveur avant la pub ; Google le lui renvoie une fois la pub vue. */
+async function startAdSession(): Promise<string | null> {
+  try {
+    const res = await authFetch(`${API_URL}/api/ads/start`, { method: 'POST' });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return typeof data?.nonce === 'string' ? data.nonce : null;
+  } catch {
+    return null;
+  }
+}
 
 // Rewarded ads (AdMob). The native module only exists in a development/store
 // build — not in Expo Go nor on web — so it's loaded lazily and every entry
@@ -97,9 +113,15 @@ export async function showRewardedAd(): Promise<boolean> {
   }
 
   const npa = (await AsyncStorage.getItem('duelo_ads_npa')) === '1';
+  const [nonce, userId] = await Promise.all([startAdSession(), AsyncStorage.getItem('duelo_user_id')]);
+  setAdToken(null);
 
   return new Promise<boolean>((resolve) => {
-    const ad = mod.RewardedAd.createForAdRequest(rewardedUnitId(mod), { requestNonPersonalizedAdsOnly: npa });
+    const ad = mod.RewardedAd.createForAdRequest(rewardedUnitId(mod), {
+      requestNonPersonalizedAdsOnly: npa,
+      // Google confirme la pub vue directement au serveur, avec ce code (récompense vérifiée)
+      ...(nonce ? { serverSideVerificationOptions: { userId: userId || '', customData: nonce } } : {}),
+    });
     let earned = false;
     let shown = false;
     let done = false;
@@ -112,6 +134,7 @@ export async function showRewardedAd(): Promise<boolean> {
       // Aucune vidéo n'a pu s'afficher : on le dit, sinon le bouton semble ne rien faire.
       // (Vidéo fermée avant la fin : pas de message, c'est le choix du joueur.)
       if (!ok && !shown) notifyUnavailable();
+      if (ok && nonce) setAdToken(nonce);
       resolve(ok);
     };
     // No fill within 15 s → give up rather than leave the user waiting.

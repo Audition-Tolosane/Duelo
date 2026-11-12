@@ -97,7 +97,7 @@ async def spin_claim(
         econ = await get_economy(db, current_user)
         if not (body or {}).get("with_ad") or econ.spin_ad_day == now.strftime("%Y-%m-%d"):
             raise HTTPException(status_code=400, detail="Déjà spinné aujourd'hui")
-        verify_ad_reward(current_user, "spin_extra")
+        await verify_ad_reward(current_user, "spin_extra")
         econ.spin_ad_day = now.strftime("%Y-%m-%d")
         ad_spin = True
 

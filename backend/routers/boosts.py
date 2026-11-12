@@ -19,7 +19,7 @@ async def activate_boost_route(
     db: AsyncSession = Depends(get_db),
 ):
     """Appelé après visionnage de pub. Active le x2 XP pendant 6 min."""
-    verify_ad_reward(current_user, "boost_activate")
+    await verify_ad_reward(current_user, "boost_activate")
     used_today = await get_used_theme_ids_today(current_user, db)
     if theme_id in used_today:
         raise HTTPException(status_code=400, detail="Ce thème a déjà été boosté aujourd'hui.")
@@ -37,7 +37,7 @@ async def refresh_offers(
     db: AsyncSession = Depends(get_db),
 ):
     """Appelé après visionnage de pub. Change les offres x2 XP immédiatement."""
-    verify_ad_reward(current_user, "boost_refresh")
+    await verify_ad_reward(current_user, "boost_refresh")
     await increment_offer_refresh(current_user, db)
     new_offers = await get_daily_offers(current_user, db, lang)
     from services.boosts import get_any_active_boost as _gab

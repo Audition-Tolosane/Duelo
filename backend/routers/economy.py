@@ -202,7 +202,7 @@ async def economy_credits_ad(current_user: str = Depends(get_current_user_id), d
     if (econ.ads_today or 0) >= CREDIT_ADS_PER_DAY:
         await db.commit()
         raise HTTPException(status_code=429, detail="ads_cap")
-    verify_ad_reward(current_user, "credits")
+    await verify_ad_reward(current_user, "credits")
     econ.credits = min(CREDITS_HARD_CAP, econ.credits + CREDITS_PER_AD)
     econ.ads_today = (econ.ads_today or 0) + 1
     status = await _status(db, current_user, econ)
@@ -213,7 +213,7 @@ async def economy_credits_ad(current_user: str = Depends(get_current_user_id), d
 @router.post("/themes/ad")
 async def economy_themes_ad(current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     """Pub regardée jusqu'au bout : 3 places de thèmes en plus, définitivement."""
-    verify_ad_reward(current_user, "themes")
+    await verify_ad_reward(current_user, "themes")
     econ = await get_economy(db, current_user)
     econ.theme_bonus = (econ.theme_bonus or 0) + THEMES_PER_AD
     status = await _status(db, current_user, econ)
@@ -256,7 +256,7 @@ async def economy_chest_open(body: dict | None = None, current_user: str = Depen
         await db.commit()
         raise HTTPException(status_code=400, detail="chest_unavailable")
     if opened == 1:
-        verify_ad_reward(current_user, "chest")
+        await verify_ad_reward(current_user, "chest")
 
     unlocked = reactions.parse_unlocked(econ.reactions_unlocked)
     locked_left = [k for k in reactions.LOCKED if k not in unlocked]

@@ -556,3 +556,15 @@ class SoloSession(Base):
     correct = Column(Integer, default=0)
     used = Column(Boolean, default=False)        # déjà comptée dans un match / un défi
     created_at = Column(DateTime(timezone=True), default=utc_now)
+
+
+class AdView(Base):
+    """Pub récompensée : code donné à l'app avant la pub, confirmé par Google (services/ad_rewards.py)."""
+    __tablename__ = 'ad_views'
+    nonce = Column(String(64), primary_key=True)
+    user_id = Column(String(36), nullable=False, index=True)
+    action = Column(String(40), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+    verified_at = Column(DateTime(timezone=True), nullable=True)
+    transaction_id = Column(String(100), nullable=True)
+    used = Column(Boolean, default=False)

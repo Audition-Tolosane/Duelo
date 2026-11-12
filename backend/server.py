@@ -10,7 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 from database import get_db
 
-from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge, challenges, boosts, missions, daily_question, achievements, streak_shield, xp_multiplier, tournaments, spin, referral, league, moderation, economy
+from routers import auth, game, leaderboard, profile, social, chat, notifications, search, themes, admin, ws, forge, challenges, boosts, missions, daily_question, achievements, streak_shield, xp_multiplier, tournaments, spin, referral, league, moderation, economy, ads
+from services.ad_rewards import current_ad_token
 from schemas import QuestionReportRequest
 from models import QuestionReport
 from sqlalchemy import select
@@ -37,6 +38,8 @@ async def security_headers(request: Request, call_next):
     if cl and cl.isdigit() and int(cl) > 8 * 1024 * 1024:
         from fastapi.responses import JSONResponse
         return JSONResponse({"detail": "Requête trop volumineuse"}, status_code=413)
+    # Code de la pub récompensée qui vient d'être vue (lu par services/ad_rewards.verify_ad_reward)
+    current_ad_token.set((request.headers.get("x-ad-token") or "")[:64])
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
@@ -141,6 +144,7 @@ api_router.include_router(referral.router)
 api_router.include_router(league.router)
 api_router.include_router(moderation.router)
 api_router.include_router(economy.router)
+api_router.include_router(ads.router)
 
 # Serve avatar static files
 avatars_dir = ROOT_DIR / "static" / "avatars"
@@ -396,6 +400,17 @@ async def _ensure_columns():
                 created_at TIMESTAMPTZ DEFAULT NOW()
             )""",
             "CREATE INDEX IF NOT EXISTS ix_solo_sessions_user_id ON solo_sessions(user_id)",
+            # Pubs récompensées confirmées par Google (SSV AdMob)
+            """CREATE TABLE IF NOT EXISTS ad_views (
+                nonce VARCHAR(64) PRIMARY KEY,
+                user_id VARCHAR(36) NOT NULL,
+                action VARCHAR(40),
+                created_at TIMESTAMPTZ DEFAULT NOW(),
+                verified_at TIMESTAMPTZ,
+                transaction_id VARCHAR(100),
+                used BOOLEAN DEFAULT FALSE
+            )""",
+            "CREATE INDEX IF NOT EXISTS ix_ad_views_user_id ON ad_views(user_id)",
         ]:
             try:
                 await conn.execute(text(stmt))

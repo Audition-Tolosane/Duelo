@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { dueloWS } from '../services/websocket';
+import { currentAdToken } from './adToken';
 
 const TOKEN_KEY = 'duelo_token';
 const REQUEST_TIMEOUT_MS = 15000;
@@ -51,6 +52,8 @@ async function rawAuthFetch(url: string, options: RequestInit = {}): Promise<Res
     ...(options.headers as Record<string, string> || {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
+  const adToken = currentAdToken();
+  if (adToken) headers['X-Ad-Token'] = adToken;
   // Without a timeout a dead network leaves spinners turning until the OS gives up.
   if (options.signal) return fetch(url, { ...options, headers });
   const controller = new AbortController();
