@@ -93,7 +93,11 @@ async def resolve_place(city: str, country: str) -> dict | None:
     from helpers import _code_to_country
     return {
         "city": name[:100],
-        "department": (addr.get("county") or addr.get("state_district") or addr.get("state") or "")[:100] or None,
+        # Département : le « county » d'OpenStreetMap. Paris (ville ET département, code FR-75C)
+        # n'en a pas : la ville elle-même, plutôt que la région Île-de-France tout entière.
+        "department": (addr.get("county") or addr.get("state_district")
+                       or (name if addr.get("ISO3166-2-lvl6") else None)
+                       or addr.get("state") or "")[:100] or None,
         "region": (addr.get("state") or "")[:100] or None,
         "country": _code_to_country().get(code) or (addr.get("country") or country)[:100],
         "continent": CONTINENT_BY_CODE.get(code),
