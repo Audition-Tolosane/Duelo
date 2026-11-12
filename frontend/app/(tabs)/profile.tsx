@@ -548,13 +548,21 @@ export default function ProfileScreen() {
       const data = await res.json();
       if (data.success) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        // Nom officiel renvoyé par le serveur (« toulouse » → « Toulouse »)
+        setLocationCity(data.city || '');
         setProfile(prev => prev ? {
           ...prev,
           user: { ...prev.user, city: data.city, country: data.country, country_flag: data.country_flag || '' }
         } : null);
         setShowLocationModal(false);
       } else {
-        Alert.alert(t('common.error'), t('profile.error_network'));
+        const code = data?.detail?.code;
+        const msg = code === 'city_not_found' ? t('profile.city_not_found')
+          : code === 'city_locked' && data.detail.next_change_at
+            ? t('profile.city_locked', { date: new Date(data.detail.next_change_at).toLocaleDateString(getLocale()) })
+          : code === 'geo_unavailable' ? t('profile.geo_unavailable')
+          : t('profile.error_network');
+        Alert.alert(t('common.error'), msg);
       }
     } catch {
       Alert.alert(t('common.error'), t('profile.error_network'));

@@ -413,6 +413,9 @@ async def _ensure_columns():
                 used BOOLEAN DEFAULT FALSE
             )""",
             "CREATE INDEX IF NOT EXISTS ix_ad_views_user_id ON ad_views(user_id)",
+            # Classement local en cascade : département + date du dernier changement de ville
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS department VARCHAR(100)",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS city_changed_at TIMESTAMPTZ",
         ]:
             try:
                 await conn.execute(text(stmt))
@@ -454,6 +457,7 @@ async def _ensure_columns():
     _asyncio.create_task(_weekly_summary_cron())
     _asyncio.create_task(_streak_danger_cron())
     _asyncio.create_task(_challenge_expiry_cron())
+    _asyncio.create_task(_backfill_places())
     _asyncio.create_task(_tournament_end_cron())
 
 
@@ -551,6 +555,45 @@ async def _streak_danger_cron():
                         logger.warning(f"[cron] streak_danger push failed for {u.id}: {e}")
         except Exception as e:
             logger.error(f"[cron] streak_danger cron error: {e}")
+
+
+async def _backfill_places():
+    """Villes déjà saisies (avant le 13/11/2026) : nom officiel, département, continent, position.
+    Une par seconde (règle d'OpenStreetMap), 500 joueurs au plus par démarrage ; une ville
+    introuvable est laissée telle quelle."""
+    import asyncio
+    from database import AsyncSessionLocal
+    from sqlalchemy import select as _sel
+    from models import User as _U
+    from services.geo import resolve_place
+    await asyncio.sleep(30)
+    try:
+        async with AsyncSessionLocal() as db:
+            rows = (await db.execute(
+                _sel(_U.id, _U.city, _U.country).where(
+                    _U.is_bot == False, _U.city.isnot(None), _U.department.is_(None),  # noqa: E712
+                ).limit(500)
+            )).all()
+        done = 0
+        for uid, city, country in rows:
+            try:
+                place = await resolve_place(city, country or "")
+            except Exception:
+                continue
+            async with AsyncSessionLocal() as db:
+                u = (await db.execute(_sel(_U).where(_U.id == uid))).scalar_one_or_none()
+                if not u:
+                    continue
+                if place:
+                    for k, v in place.items():
+                        setattr(u, k, v)
+                    done += 1
+                else:
+                    u.department = ""   # introuvable : on ne réessaie pas à chaque démarrage
+                await db.commit()
+        logger.info(f"[geo] villes mises au propre : {done}/{len(rows)}")
+    except Exception as e:
+        logger.warning(f"[geo] backfill: {e}")
 
 
 async def _challenge_expiry_cron():

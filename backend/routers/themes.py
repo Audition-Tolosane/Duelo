@@ -12,7 +12,7 @@ from constants import SUPER_CATEGORY_META, CLUSTER_ICONS, GRAND_PUBLIC_THEMES, T
 from services.xp import (
     get_level, get_xp_progress, get_theme_title, get_theme_unlocked_titles,
 )
-from services.geo import haversine, CITY_MIN_PLAYERS
+from services.geo import pick_area
 from auth_middleware import get_optional_user_id
 
 router = APIRouter(tags=["themes"])
@@ -425,78 +425,49 @@ async def theme_leaderboard(
         entries = await _fetch_entries(country_filter=current_user.country)
         return {"entries": entries, "meta": {"scope_used": "country"}}
 
-    # ── City ───────────────────────────────────────────────────────────────────
+    # ── Ville (classement local en cascade, voir services/geo.py) ─────────────
     if scope == "city":
         if not current_user or not current_user.city:
             return {"entries": [], "meta": {"scope_used": "city", "missing": True}}
+        from routers.leaderboard import _area_meta
 
-        target_city = city_override or current_user.city
-        city_entries = await _fetch_entries(
-            city_filter=target_city,
-            country_filter=current_user.country,
-        )
+        def _theme_players(*filters):
+            return (select(UserThemeXP, User).join(User, User.id == UserThemeXP.user_id)
+                    .where(UserThemeXP.theme_id == theme_id, UserThemeXP.xp > 0, *filters))
 
-        if len(city_entries) >= CITY_MIN_PLAYERS or city_override:
-            return {"entries": city_entries, "meta": {"scope_used": "city", "city_name": target_city}}
+        async def count(filters):
+            return (await db.execute(
+                select(func.count()).select_from(_theme_players(*filters).subquery())
+            )).scalar() or 0
 
-        # Not enough → find nearby cities with 10+ theme players
-        suggestions = []
-        if current_user.lat and current_user.lng:
-            cities_q = (
-                select(
-                    User.city,
-                    func.count(UserThemeXP.user_id).label("player_count"),
-                    func.avg(User.lat).label("avg_lat"),
-                    func.avg(User.lng).label("avg_lng"),
-                )
+        async def cities(filters):
+            return (await db.execute(
+                select(User.city, func.count(UserThemeXP.user_id), func.avg(User.lat), func.avg(User.lng))
                 .join(UserThemeXP, UserThemeXP.user_id == User.id)
-                .where(
-                    UserThemeXP.theme_id == theme_id,
-                    UserThemeXP.xp > 0,
-                    User.country == current_user.country,
-                    User.city.isnot(None),
-                    User.city != target_city,
-                    User.lat.isnot(None),
-                )
+                .where(UserThemeXP.theme_id == theme_id, UserThemeXP.xp > 0, User.city.isnot(None), *filters)
                 .group_by(User.city)
-                .having(func.count(UserThemeXP.user_id) >= CITY_MIN_PLAYERS)
-            )
-            cities_result = await db.execute(cities_q)
-            with_distance = [
-                {
-                    "city": row.city,
-                    "player_count": row.player_count,
-                    "distance_km": round(haversine(
-                        current_user.lat, current_user.lng,
-                        row.avg_lat, row.avg_lng,
-                    )),
-                }
-                for row in cities_result.all()
-                if row.avg_lat and row.avg_lng
-            ]
-            suggestions = sorted(with_distance, key=lambda x: x["distance_km"])[:5]
+            )).all()
 
-        if suggestions:
-            return {
-                "entries": [],
-                "meta": {
-                    "scope_used": "city", "city_name": target_city,
-                    "too_small": True, "city_player_count": len(city_entries),
-                    "suggestions": suggestions,
-                },
-            }
-
-        # Fallback to country
-        fallback_entries = await _fetch_entries(country_filter=current_user.country)
-        return {
-            "entries": fallback_entries,
-            "meta": {
-                "scope_used": "country", "city_name": target_city,
-                "country_name": current_user.country,
-                "too_small": True, "city_player_count": len(city_entries),
-                "fallback": True,
-            },
-        }
+        if city_override:
+            area = {"level": "city", "name": city_override,
+                    "filters": [User.city == city_override, User.country == current_user.country]}
+        else:
+            area = await pick_area(current_user, count, cities)
+        # Filtre AVANT la limite (avant : top 50 mondial, puis filtre ville → classements vides)
+        rows = (await db.execute(
+            _theme_players(*area["filters"]).order_by(UserThemeXP.xp.desc()).limit(limit).offset(offset)
+        )).all()
+        entries = []
+        for rank, (uxp, user) in enumerate(rows, offset + 1):
+            lvl = get_level(uxp.xp)
+            entries.append({
+                "id": user.id, "rank": rank, "pseudo": user.pseudo,
+                "avatar_seed": user.avatar_seed, "avatar_url": user.avatar_url,
+                "level": lvl, "title": get_theme_title(theme, lvl) if theme else "",
+                "xp": uxp.xp, "total_xp": uxp.xp,
+            })
+        meta = _area_meta(current_user, area) if not city_override else {"scope_used": "city", "city_name": city_override}
+        return {"entries": entries, "meta": meta}
 
     entries = await _fetch_entries()
     return {"entries": entries, "meta": {"scope_used": scope}}

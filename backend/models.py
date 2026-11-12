@@ -26,6 +26,8 @@ class User(Base):
 
     # Location
     city = Column(String(100), nullable=True)
+    department = Column(String(100), nullable=True)               # département / comté (OpenStreetMap)
+    city_changed_at = Column(DateTime(timezone=True), nullable=True)  # dernier changement de ville
     region = Column(String(100), nullable=True)
     country = Column(String(100), nullable=True)
     continent = Column(String(50), nullable=True)

@@ -6,7 +6,7 @@ from database import get_db
 from models import User, Match, PlayerFollow
 from services.xp import get_streak_badge, get_level
 from datetime import datetime, timezone, timedelta
-from services.geo import haversine, CITY_MIN_PLAYERS
+from services.geo import pick_area
 from auth_middleware import get_optional_user_id, get_current_user_id
 
 router = APIRouter(tags=["leaderboard"])
@@ -20,6 +20,18 @@ async def get_optional_user(
         return None
     res = await db.execute(select(User).where(User.id == user_id))
     return res.scalar_one_or_none()
+
+
+def _area_meta(user, area: dict) -> dict:
+    """meta du classement local. Anciennes apps : bandeau « pas assez de joueurs à X » avec le
+    nom de la zone retenue (champ country_name), nouvelles : niveau (area_level) + nom."""
+    fallback = not (area["level"] == "city")
+    return {
+        "scope_used": "city" if area["level"] in ("city", "nearby_city") else area["level"],
+        "area_level": area["level"], "area_name": area["name"],
+        "city_name": user.city, "country_name": area["name"] or "Monde",
+        "too_small": fallback, "fallback": fallback,
+    }
 
 
 def _serialize_users(users, offset=0):
@@ -87,97 +99,38 @@ async def get_leaderboard(
         )
         return {"entries": _serialize_users(result.scalars().all()), "meta": {"scope_used": "country"}}
 
-    # ── City ───────────────────────────────────────────────────────────────────
+    # ── Ville (classement local en cascade, voir services/geo.py) ─────────────
     if scope == "city":
         if not current_user or not current_user.city:
             return {"entries": [], "meta": {"scope_used": "city", "missing": True}}
-
-        # city_override allows viewing another city's leaderboard from suggestions
-        target_city = city_override or current_user.city
-
-        city_q = select(User).where(
-            User.is_bot == False,
-            User.city == target_city,
-            User.country == current_user.country,
-        ).order_by(User.total_xp.desc()).limit(limit)
-        city_result = await db.execute(city_q)
-        city_users = city_result.scalars().all()
-
-        # Case 1: enough players in target city (own or override)
-        if len(city_users) >= CITY_MIN_PLAYERS or city_override:
-            return {
-                "entries": _serialize_users(city_users),
-                "meta": {"scope_used": "city", "city_name": target_city},
-            }
-
-        # Case 2: not enough — find nearby cities with 10+ players
-        suggestions = []
-        if current_user.lat and current_user.lng:
-            # Get all cities in same country with their player count and centroid
-            cities_q = (
-                select(
-                    User.city,
-                    func.count(User.id).label("player_count"),
-                    func.avg(User.lat).label("avg_lat"),
-                    func.avg(User.lng).label("avg_lng"),
-                )
-                .where(
-                    User.is_bot == False,
-                    User.country == current_user.country,
-                    User.city.isnot(None),
-                    User.city != current_user.city,
-                    User.lat.isnot(None),
-                )
-                .group_by(User.city)
-                .having(func.count(User.id) >= CITY_MIN_PLAYERS)
+        if city_override:
+            # Classement d'une autre ville (lien depuis une ancienne suggestion)
+            res = await db.execute(
+                select(User).where(User.is_bot == False, User.city == city_override,  # noqa: E712
+                                   User.country == current_user.country)
+                .order_by(User.total_xp.desc()).limit(limit)
             )
-            cities_result = await db.execute(cities_q)
-            candidate_cities = cities_result.all()
+            return {"entries": _serialize_users(res.scalars().all()),
+                    "meta": {"scope_used": "city", "city_name": city_override}}
 
-            # Sort by distance from user
-            with_distance = [
-                {
-                    "city": row.city,
-                    "player_count": row.player_count,
-                    "distance_km": round(haversine(
-                        current_user.lat, current_user.lng,
-                        row.avg_lat, row.avg_lng,
-                    )),
-                }
-                for row in candidate_cities
-                if row.avg_lat and row.avg_lng
-            ]
-            suggestions = sorted(with_distance, key=lambda x: x["distance_km"])[:5]
+        async def count(filters):
+            return (await db.execute(
+                select(func.count(User.id)).where(User.is_bot == False, *filters)  # noqa: E712
+            )).scalar() or 0
 
-        # Case 3: suggestions found → return them (no entries)
-        if suggestions:
-            return {
-                "entries": [],
-                "meta": {
-                    "scope_used": "city",
-                    "city_name": target_city,
-                    "too_small": True,
-                    "city_player_count": len(city_users),
-                    "suggestions": suggestions,
-                },
-            }
+        async def cities(filters):
+            return (await db.execute(
+                select(User.city, func.count(User.id), func.avg(User.lat), func.avg(User.lng))
+                .where(User.is_bot == False, User.city.isnot(None), *filters)  # noqa: E712
+                .group_by(User.city)
+            )).all()
 
-        # Case 4: no suggestions → fallback to country leaderboard
-        fallback_result = await db.execute(
-            select(User).where(User.is_bot == False, User.country == current_user.country)
+        area = await pick_area(current_user, count, cities)
+        res = await db.execute(
+            select(User).where(User.is_bot == False, *area["filters"])  # noqa: E712
             .order_by(User.total_xp.desc()).limit(limit)
         )
-        return {
-            "entries": _serialize_users(fallback_result.scalars().all()),
-            "meta": {
-                "scope_used": "country",
-                "city_name": target_city,
-                "country_name": current_user.country,
-                "too_small": True,
-                "city_player_count": len(city_users),
-                "fallback": True,
-            },
-        }
+        return {"entries": _serialize_users(res.scalars().all()), "meta": _area_meta(current_user, area)}
 
     # ── Friends ────────────────────────────────────────────────────────────────
     if scope == "friends":

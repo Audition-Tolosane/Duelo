@@ -69,10 +69,23 @@ type LeaderMeta = {
   city_player_count?: number;
   fallback?: boolean;
   missing?: boolean;
+  area_level?: 'city' | 'nearby_city' | 'department' | 'country' | 'continent' | 'world';
+  area_name?: string;
   suggestions?: CitySuggestion[];
 };
 
 const getXp = (item: LeaderEntry) => item.total_xp ?? item.xp ?? 0;
+
+/** « Pas encore 20 joueurs à X — tu es classé : … » (ville proche, département, pays, continent, monde). */
+function fallbackText(meta: LeaderMeta): string {
+  const city = meta.city_name ?? '';
+  if (!meta.area_level) return t('leaderboard.city_fallback', { city, country: meta.country_name ?? '' });
+  if (meta.area_level === 'nearby_city') return t('leaderboard.area_nearby', { city, area: meta.area_name ?? '' });
+  const area = meta.area_level === 'world' ? t('leaderboard.scope_world')
+    : meta.area_level === 'continent' ? t(`continent.${meta.area_name}`)
+    : meta.area_name ?? '';
+  return t('leaderboard.area_fallback', { city, area });
+}
 
 // ── Podium (top 3) : 2e à gauche, 1er au centre (or), 3e à droite ──
 function Podium({ entries, myId, onOpen }: { entries: LeaderEntry[]; myId: string; onOpen: (id?: string) => void }) {
@@ -348,7 +361,7 @@ export default function LeaderboardScreen() {
           <View style={styles.fallbackBanner}>
             <Icon name="info" size={ICON_SIZE.sm} color={COLOR.text.secondary} />
             <Txt variant="bodySmall" style={styles.flex}>
-              {t('leaderboard.city_fallback', { city: meta.city_name ?? '', country: meta.country_name ?? '' })}
+              {fallbackText(meta)}
             </Txt>
           </View>
         ) : null}

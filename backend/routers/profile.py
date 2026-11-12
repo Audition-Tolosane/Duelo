@@ -26,23 +26,6 @@ from helpers import validate_image_base64
 router = APIRouter(tags=["profile"])
 
 
-async def geocode_city(city: str, country: str) -> tuple:
-    """Geocode a city via Nominatim (OSM). Returns (lat, lng) or (None, None)."""
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            resp = await client.get(
-                "https://nominatim.openstreetmap.org/search",
-                params={"q": f"{city}, {country}", "format": "json", "limit": 1},
-                headers={"User-Agent": "DueloApp/1.0"},
-            )
-            data = resp.json()
-            if data:
-                return float(data[0]["lat"]), float(data[0]["lon"])
-    except Exception as e:
-        logger.warning(f"[geocode] Failed to geocode '{city}, {country}': {e}")
-    return None, None
-
-
 @router.get("/profile/{user_id}")
 async def get_profile(user_id: str, pseudo: Optional[str] = None, lang: str = 'fr',
                       db: AsyncSession = Depends(get_db)):
@@ -228,36 +211,40 @@ async def update_location(
     _rl=Depends(rate_limit(limit=10, window=3600)),   # appelle Nominatim (OSM) : pas de spam
 ):
     body = await request.json()
+    from datetime import datetime, timezone, timedelta
+    from services.geo import resolve_place, CITY_CHANGE_DAYS
 
-    # #34 — Use direct UPDATE to avoid read-modify-write race condition
-    from sqlalchemy import update as _update
-    updates: dict = {}
-    if "city" in body:
-        updates["city"] = str(body["city"] or "").strip()[:100] or None
-    if "country" in body:
-        updates["country"] = str(body["country"] or "").strip()[:100] or None
-    if "continent" in body:
-        updates["continent"] = str(body["continent"] or "").strip()[:100] or None
-    if "region" in body:
-        updates["region"] = str(body["region"] or "").strip()[:100] or None
-
-    if updates:
-        await db.execute(_update(User).where(User.id == current_user_id).values(**updates))
-        await db.commit()
-
-    # Re-fetch for geocoding and response
-    result = await db.execute(select(User).where(User.id == current_user_id))
+    result = await db.execute(select(User).where(User.id == current_user_id).with_for_update())
     user = result.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
 
-    # Geocode after atomic write
-    if ("city" in body or "country" in body) and user.city and user.country:
-        lat, lng = await geocode_city(user.city, user.country)
-        await db.execute(_update(User).where(User.id == current_user_id).values(lat=lat, lng=lng))
-        await db.commit()
-        user.lat = lat
-        user.lng = lng
+    city_in = str(body.get("city") or "").strip()[:100]
+    country_in = str(body.get("country") or user.country or "").strip()[:100]
+    if "city" in body and not city_in:
+        raise HTTPException(status_code=400, detail={"code": "city_required"})
+
+    if city_in:
+        # Ville officielle (OpenStreetMap) : nom exact, département, continent, position
+        try:
+            place = await resolve_place(city_in, country_in)
+        except Exception:
+            raise HTTPException(status_code=503, detail={"code": "geo_unavailable"})
+        if not place:
+            raise HTTPException(status_code=400, detail={"code": "city_not_found"})
+        changing = bool(user.city) and (place["city"] != user.city or place["country"] != user.country)
+        if changing and user.city_changed_at:
+            last = user.city_changed_at if user.city_changed_at.tzinfo else user.city_changed_at.replace(tzinfo=timezone.utc)
+            next_at = last + timedelta(days=CITY_CHANGE_DAYS)
+            if datetime.now(timezone.utc) < next_at:
+                raise HTTPException(status_code=429, detail={"code": "city_locked", "next_change_at": next_at.isoformat()})
+        if changing or not user.city:
+            user.city_changed_at = datetime.now(timezone.utc)
+        for k, v in place.items():
+            setattr(user, k, v)
+    elif "country" in body:
+        user.country = country_in or None
+    await db.commit()
     return {
         "success": True,
         "city": user.city,
@@ -265,6 +252,7 @@ async def update_location(
         "continent": user.continent,
         "region": user.region,
         "country_flag": COUNTRY_FLAGS.get(user.country or "", ""),
+        "department": user.department,
     }
 
 
