@@ -25,3 +25,12 @@ ALLOWED_ORIGINS = [
 # Social auth (optional — leave blank to disable the provider)
 GOOGLE_CLIENT_IDS = [s.strip() for s in os.environ.get('GOOGLE_CLIENT_IDS', '').split(',') if s.strip()]
 APPLE_BUNDLE_ID = os.environ.get('APPLE_BUNDLE_ID', '')
+
+
+# Photos de profil envoyées par les joueurs : sur le VOLUME Railway quand il existe (Railway pose
+# RAILWAY_VOLUME_MOUNT_PATH), sinon dans le dossier du code — effacé à chaque déploiement.
+import os as _os
+from pathlib import Path as _Path
+_VOLUME = _os.environ.get("RAILWAY_VOLUME_MOUNT_PATH", "").strip()
+USER_AVATARS_DIR = (_Path(_VOLUME) / "avatars" / "users") if _VOLUME else (ROOT_DIR / "static" / "avatars" / "users")
+USER_AVATARS_PERSISTENT = bool(_VOLUME)

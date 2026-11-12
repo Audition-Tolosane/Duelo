@@ -293,7 +293,8 @@ async def upload_user_avatar(request: Request, current_user: str = Depends(get_c
     if len(image_data) > 5 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="Image trop volumineuse (max 5 MB)")
 
-    users_dir = ROOT_DIR / "static" / "avatars" / "users"
+    from config import USER_AVATARS_DIR
+    users_dir = USER_AVATARS_DIR   # volume Railway : la photo survit aux déploiements
     os.makedirs(users_dir, exist_ok=True)
 
     filename = f"{user_id}.webp"

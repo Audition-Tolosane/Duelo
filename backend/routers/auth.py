@@ -221,7 +221,8 @@ async def delete_account(
 
     # Uploaded profile picture is served publicly from disk
     try:
-        (ROOT_DIR / "static" / "avatars" / "users" / f"{current_user_id}.webp").unlink(missing_ok=True)
+        from config import USER_AVATARS_DIR
+        (USER_AVATARS_DIR / f"{current_user_id}.webp").unlink(missing_ok=True)   # volume compris
     except OSError as e:
         logger.warning(f"[delete-account] avatar file not removed: {e}")
 

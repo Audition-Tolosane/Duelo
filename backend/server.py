@@ -4,7 +4,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 import os
-from config import ALLOWED_ORIGINS, ROOT_DIR
+from config import ALLOWED_ORIGINS, ROOT_DIR, USER_AVATARS_DIR
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
@@ -149,7 +149,9 @@ api_router.include_router(ads.router)
 # Serve avatar static files
 avatars_dir = ROOT_DIR / "static" / "avatars"
 os.makedirs(avatars_dir, exist_ok=True)
-os.makedirs(avatars_dir / "users", exist_ok=True)
+os.makedirs(USER_AVATARS_DIR, exist_ok=True)
+# Photos des joueurs (volume Railway) — monté AVANT /static/avatars, qui sert les avatars du jeu
+app.mount("/static/avatars/users", StaticFiles(directory=str(USER_AVATARS_DIR)), name="user_avatars")
 app.mount("/static/avatars", StaticFiles(directory=str(avatars_dir)), name="avatars")
 
 # Public legal pages (store listings link here).
