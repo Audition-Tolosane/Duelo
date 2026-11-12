@@ -972,7 +972,6 @@ export default function ProfileScreen() {
                         </View>
                       )}
                     </View>
-                    <Txt variant="caption" align="center" numberOfLines={1}>{universeName(a.category, a.name)}</Txt>
                   </Pressable>
                 );
               })}
