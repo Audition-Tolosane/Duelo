@@ -333,6 +333,19 @@ async def save_async_score(challenge_id: str, data: dict, current_user: str = De
     score = max(0, min(160, int(data.get("score", 0))))    # clamp to valid range
     correct = max(0, min(TOTAL_QUESTIONS, int(data.get("correct", 0))))  # clamp to valid range
     answers = data.get("answers", [])
+    # Partie notée par le serveur : score, bonnes réponses et détail viennent de la session
+    from services import solo_session
+    from routers.game import _secure_required, UPDATE_REQUIRED
+    session_scored = False
+    if data.get("session_id"):
+        s = await solo_session.load(db, str(data["session_id"]), user_id)
+        if not s or s.challenge_id != challenge_id:
+            raise HTTPException(status_code=404, detail="Partie introuvable")
+        official = solo_session.final(s)
+        score, correct, answers = official["player_score"], official["correct_count"], official["answers"]
+        session_scored = True
+    elif _secure_required():
+        raise HTTPException(status_code=426, detail=UPDATE_REQUIRED)
 
     # #13 — Validate answers structure and cross-check score vs correct count
     MAX_PTS_PER_Q = 20
@@ -342,13 +355,13 @@ async def save_async_score(challenge_id: str, data: dict, current_user: str = De
     # Strip to only safe fields, reject fabricated data
     answers = [
         {"answer": int(a.get("answer", -1)), "is_correct": bool(a.get("is_correct")),
-         "points": max(0, min(MAX_PTS_PER_Q, int(a.get("points", 0)))),
+         "points": max(0, min(MAX_PTS_PER_Q * 2, int(a.get("points", 0)))),   # dernière question ×2
          "time_ms": max(0, int(a.get("time_ms", 0)))}
         for a in answers if isinstance(a, dict)
     ][:TOTAL_QUESTIONS]  # at most TOTAL_QUESTIONS questions
     # Sanity-check: score must be consistent with correct count
-    if correct > 0 and not (correct * MIN_PTS_PER_Q <= score <= correct * MAX_PTS_PER_Q):
-        score = min(score, correct * MAX_PTS_PER_Q)  # clamp silently rather than reject
+    if not session_scored and correct > 0 and not (correct * MIN_PTS_PER_Q <= score <= correct * MAX_PTS_PER_Q + MAX_PTS_PER_Q):
+        score = min(score, correct * MAX_PTS_PER_Q + MAX_PTS_PER_Q)  # dernière question ×2
 
     res = await db.execute(select(Challenge).where(Challenge.id == challenge_id))
     challenge = res.scalar_one_or_none()

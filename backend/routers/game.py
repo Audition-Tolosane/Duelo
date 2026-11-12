@@ -29,7 +29,19 @@ from services.xp import (
 from services.notifications import create_notification
 from services import question_order
 from auth_middleware import get_current_user_id, get_optional_user_id
-from rate_limit import rate_limit
+from rate_limit import rate_limit, _limiter, _get_client_ip
+from services import solo_session
+import os
+
+
+def _secure_required() -> bool:
+    """SECURE_SOLO_REQUIRED=1 sur Railway (quand toutes les apps installées notent par le
+    serveur) : l'ancien mode, où l'app recevait les bonnes réponses et déclarait son score,
+    est refusé."""
+    return os.environ.get("SECURE_SOLO_REQUIRED", "").strip() == "1"
+
+
+UPDATE_REQUIRED = "Mets à jour l'application pour jouer"
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/game", tags=["game"])
@@ -51,13 +63,29 @@ async def _resolve_theme_category(theme: str, db: AsyncSession) -> str:
 
 @router.get("/questions")
 async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db: AsyncSession = Depends(get_db),
-                             tutorial: bool = False,
-                             # Les réponses partent avec les questions (mode solo) : on borne la
-                             # vitesse à laquelle on peut aspirer le catalogue (antisèche du direct)
-                             _rl=Depends(rate_limit(limit=40, window=3600))):
+                             tutorial: bool = False, secure: bool = False, opponent: str = '',
+                             challenge_id: str = ''):
     """Get 7 questions from different angles, with an adaptive difficulty mix based on the
     player's level in this theme (sliding window). Anonymous -> balanced 2/3/2.
-    For any translated language, return that language when the theme has it, else 'fr'."""
+    For any translated language, return that language when the theme has it, else 'fr'.
+
+    secure=1 : partie notée par le serveur (services/solo_session.py) — questions SANS la
+    bonne réponse + session_id + plan du bot. Sinon (anciennes apps) : bonnes réponses
+    incluses, donc nombre d'appels très limité (antisèche du direct)."""
+    if secure:
+        secure_user = await get_optional_user_id(request)
+        if not secure_user:
+            raise HTTPException(status_code=401, detail="Connexion requise")
+        _limiter.check(f"questions-secure:{secure_user}", 120, 3600)
+        if challenge_id:
+            from models import Challenge
+            ch = (await db.execute(select(Challenge).where(Challenge.id == challenge_id))).scalar_one_or_none()
+            if not ch or secure_user not in (ch.challenger_id, ch.challenged_id):
+                raise HTTPException(status_code=403, detail="Non autorisé")
+    else:
+        if _secure_required():
+            raise HTTPException(status_code=426, detail=UPDATE_REQUIRED)
+        _limiter.check(f"questions:{_get_client_ip(request)}", 60, 3600)
     # Resolve theme to the correct Question.category value
     category = await _resolve_theme_category(theme, db)
     logger.info(f"[questions] theme='{theme}' -> category='{category}', lang='{lang}'")
@@ -166,14 +194,45 @@ async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db:
             "id": q.id, "category": q.category, "question_text": q.question_text,
             "options": shuffled_opts, "correct_option": new_correct, "difficulty": q.difficulty,
         })
-    return result_list
+    if not secure:
+        return result_list
+
+    session_id, bot_plan = await solo_session.create(
+        db, secure_user, theme,
+        [{**q, "correct": q["correct_option"]} for q in result_list],
+        opponent=opponent, challenge_id=challenge_id, tutorial=tutorial,
+    )
+    for q in result_list:
+        q.pop("correct_option", None)
+    return {"session_id": session_id, "questions": result_list, "bot": bot_plan}
 
 
 # Deprecated alias — use /questions directly
 @router.get("/questions-v2", deprecated=True)
 async def get_game_questions_v2(theme: str, request: Request, lang: str = 'fr', db: AsyncSession = Depends(get_db),
-                                tutorial: bool = False):
-    return await get_game_questions(theme, request, lang, db, tutorial)
+                                tutorial: bool = False, secure: bool = False, opponent: str = '',
+                                challenge_id: str = ''):
+    return await get_game_questions(theme, request, lang, db, tutorial, secure, opponent, challenge_id)
+
+
+@router.post("/answer")
+async def answer_question(request: Request, current_user: str = Depends(get_current_user_id),
+                          db: AsyncSession = Depends(get_db)):
+    """Partie notée par le serveur : une réponse (index de la case, -1 = temps écoulé)."""
+    body = await request.json()
+    try:
+        index = int(body.get("question_index"))
+        option = int(body.get("answer", -1))
+        time_ms = int(body.get("time_ms") or 0)
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=400, detail="Réponse invalide")
+    s = await solo_session.load(db, str(body.get("session_id") or ""), current_user, lock=True)
+    if not s:
+        raise HTTPException(status_code=404, detail="Partie introuvable")
+    try:
+        return await solo_session.answer(db, s, index, option, time_ms)
+    except ValueError:
+        raise HTTPException(status_code=409, detail="Réponse hors ordre")
 
 
 @router.post("/matchmaking")
@@ -286,6 +345,33 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
     opponent_is_bot = body.get("opponent_is_bot", True)
     correct_count = body.get("correct_count", 0)
     questions_data = body.get("questions_data")
+    session_id = body.get("session_id")
+    session = None
+    if session_id:
+        session = await solo_session.load(db, str(session_id), current_user, lock=True)
+        if not session:
+            raise HTTPException(status_code=404, detail="Partie introuvable")
+        official = solo_session.final(session)
+        player_score = official["player_score"]
+        correct_count = official["correct_count"]
+        if session.challenge_id:
+            # Défi différé : le score adverse est celui que le serveur a enregistré pour le défi
+            from models import Challenge
+            ch = (await db.execute(select(Challenge).where(Challenge.id == session.challenge_id))).scalar_one_or_none()
+            other = None
+            if ch:
+                other = ch.p2_score if ch.challenger_id == current_user else ch.p1_score
+            opponent_score = other or 0
+            opponent_is_bot = other is None
+        else:
+            opponent_score = official["opponent_score"]
+            opponent_pseudo = session.opponent or "Bot"
+            opponent_is_bot = True
+        body_theme = body.get("theme_id")
+        if body_theme and body_theme != session.theme_id:
+            raise HTTPException(status_code=400, detail="Thème différent de la partie")
+    elif _secure_required() and opponent_is_bot:
+        raise HTTPException(status_code=426, detail=UPDATE_REQUIRED)
 
     # #14/#15 — Validate and sanitise all client-supplied values
     MAX_SCORE = 160       # 20 pts max × 6 questions + 40 (dernière question ×2)
@@ -337,7 +423,12 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
             ).order_by(Match.created_at.desc()).limit(1)
         )
         dup = existing.scalars().first()
-        if not dup and not opponent_is_bot:
+        if session is not None:
+            # Une session = un seul match : renvoyé tel quel si l'app réessaie
+            import json as _json
+            done_id = _json.loads(session.data).get("match_id")
+            dup = (await db.execute(select(Match).where(Match.id == done_id))).scalar_one_or_none() if done_id else None
+        if not dup and not opponent_is_bot and session is None:
             # Duel en direct : le serveur a déjà enregistré ce match (avec l'adversaire) avant
             # d'annoncer la fin. On le renvoie tel quel au lieu d'en créer un second.
             live = await db.execute(
@@ -360,6 +451,11 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
                 "xp_earned": dup.xp_earned, "xp_breakdown": dup.xp_breakdown,
                 "created_at": dup.created_at.isoformat() if dup.created_at else None,
             }
+        if session is not None and session.used:
+            raise HTTPException(status_code=409, detail="Partie déjà enregistrée")
+        if session is None and not opponent_is_bot and _secure_required():
+            # Les vrais duels sont enregistrés par le serveur ; l'app ne peut plus en créer
+            raise HTTPException(status_code=404, detail="Match introuvable")
 
         # Anti-farm: count this player's matches in the last rolling hour.
         # Past the cap, the match is recorded but earns no XP (see SOLO_XP_HOURLY_CAP).
@@ -474,6 +570,13 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
             questions_data=questions_data,
         )
         db.add(match)
+        if session is not None:
+            import json as _json
+            await db.flush()
+            sdata = _json.loads(session.data)
+            sdata["match_id"] = match.id
+            session.data = _json.dumps(sdata)
+            session.used = True
         from routers.economy import close_refund
         await close_refund(db, player_id)
 

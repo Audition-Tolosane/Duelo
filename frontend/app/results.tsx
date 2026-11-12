@@ -79,7 +79,7 @@ export default function ResultsScreen() {
     playerScore: string; opponentScore: string; opponentPseudo: string;
     category: string; userId: string; isBot: string;
     correctCount: string; opponentLevel: string; opponentId: string;
-    asyncChallenge: string; challengeOpponent: string; opponentDisconnected: string;
+    asyncChallenge: string; challengeOpponent: string; opponentDisconnected: string; sessionId: string;
   }>();
   const opponentLeft = params.opponentDisconnected === 'true';
   const isAsyncChallenge = params.asyncChallenge === 'true';
@@ -355,6 +355,8 @@ export default function ResultsScreen() {
         opponent_is_bot: params.isBot === 'true',
         correct_count: correctCount,
         opponent_level: parseInt(params.opponentLevel || '1'),
+        // Partie notée par le serveur : le score officiel vient de cette session
+        session_id: params.sessionId || undefined,
       });
       // 3 tentatives avec backoff sur pannes réseau / erreurs serveur —
       // et surtout : plus JAMAIS d'échec silencieux (bandeau + Réessayer).

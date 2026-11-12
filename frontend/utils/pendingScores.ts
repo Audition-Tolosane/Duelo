@@ -10,6 +10,7 @@ type PendingScore = {
   score: number;
   correct: number;
   answers: { answer: number; is_correct: boolean; points: number; time_ms: number }[];
+  session_id?: string;   // partie notée par le serveur : le score vient de la session
 };
 
 async function sleep(ms: number) {
@@ -18,7 +19,7 @@ async function sleep(ms: number) {
 
 export async function saveScoreWithRetry(
   challengeId: string,
-  payload: { user_id: string; score: number; correct: number; answers: PendingScore['answers'] },
+  payload: { user_id: string; score: number; correct: number; answers: PendingScore['answers']; session_id?: string },
   retries = 3
 ): Promise<{ ok: boolean; data?: any }> {
   const url = `${API_URL}/api/challenges/${challengeId}/save-async-score`;
@@ -83,6 +84,7 @@ export async function flushPendingScores(): Promise<void> {
             score: entry.score,
             correct: entry.correct,
             answers: entry.answers,
+            session_id: entry.session_id,
           }),
         });
         if (!res.ok) remaining.push(entry);

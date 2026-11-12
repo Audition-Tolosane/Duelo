@@ -219,6 +219,11 @@ export default function GameScreen() {
   const lastAnswerCorrectRef = useRef(false);
   // Bonne réponse renvoyée par le serveur après notre réponse (null si serveur ancien / pas de réponse)
   const lastCorrectOptionRef = useRef<number | null>(null);
+  // Partie notée par le serveur (solo, tutoriel, défi différé) : l'app ne connaît PAS la bonne
+  // réponse ; elle l'apprend après avoir répondu (/game/answer). Le plan du bot vient aussi du serveur.
+  const sessionIdRef = useRef<string | null>(null);
+  const serverBotRef = useRef<{ time_ms: number; pts: number; answers: boolean }[] | null>(null);
+  const isSecure = () => !isLive && !!sessionIdRef.current;
 
   // Async challenge tracking
   type AnswerRecord = { answer: number; is_correct: boolean; points: number; time_ms: number };
@@ -282,7 +287,7 @@ export default function GameScreen() {
     const forfeitOpp = Math.max(botScoreRef.current, ps + 10);
     saveReviewData().then(() => AsyncStorage.getItem('duelo_user_id')).then((userId) => {
       router.replace(
-        `/results?playerScore=${ps}&opponentScore=${forfeitOpp}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId || ''}&isBot=${params.isBot}&correctCount=${correctCountRef.current}&opponentLevel=${parseInt(params.opponentLevel || '1') || 1}&opponentId=${params.opponentId || ''}`
+        `/results?playerScore=${ps}&opponentScore=${forfeitOpp}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId || ''}&isBot=${params.isBot}&correctCount=${correctCountRef.current}&opponentLevel=${parseInt(params.opponentLevel || '1') || 1}&opponentId=${params.opponentId || ''}&sessionId=${sessionIdRef.current || ''}`
       );
     });
   };
@@ -615,12 +620,18 @@ export default function GameScreen() {
       const voFlag = await AsyncStorage.getItem(`duelo_vo_${params.category}`);
       const lang = voFlag === 'true' ? 'en' : getLanguage();
       const langParam = lang && lang !== 'fr' ? `&lang=${lang}` : '';
-      const url = `${API_URL}/api/game/questions-v2?theme=${params.category}${langParam}${isTutorial ? '&tutorial=true' : ''}`;
+      const oppParam = !isAsync && params.opponentPseudo ? `&opponent=${encodeURIComponent(params.opponentPseudo)}` : '';
+      const chParam = isAsync && params.challenge_id ? `&challenge_id=${encodeURIComponent(params.challenge_id)}` : '';
+      const url = `${API_URL}/api/game/questions-v2?theme=${params.category}${langParam}${isTutorial ? '&tutorial=true' : ''}&secure=1${oppParam}${chParam}`;
       const res = await authFetch(url);
       if (!res.ok) {
         throw new Error(`${t('game.server_error')} (${res.status})`);
       }
-      const data = await res.json();
+      const raw = await res.json();
+      // Serveur récent : { session_id, questions, bot } ; ancien serveur : tableau avec les bonnes réponses
+      const data = Array.isArray(raw) ? raw : raw?.questions;
+      sessionIdRef.current = Array.isArray(raw) ? null : (raw?.session_id || null);
+      serverBotRef.current = !Array.isArray(raw) && Array.isArray(raw?.bot) && raw.bot.length ? raw.bot : null;
       if (!Array.isArray(data) || data.length === 0) {
         throw new Error(t('game.no_questions'));
       }
@@ -673,7 +684,7 @@ export default function GameScreen() {
     botPlanRef.current = null;
     const curQ = questionsRef.current[currentIndexRef.current];
     if (simulateBot && curQ) {
-      const plan: BotPlan = { ...resolveBotAnswer(curQ), answered: false };
+      const plan: BotPlan = planFor(curQ);
       botPlanRef.current = plan;
       if (plan.botPick !== -1) {
         botAnswerTimerRef.current = setTimeout(() => {
@@ -792,12 +803,95 @@ export default function GameScreen() {
     setTimeout(nextQuestion, Math.max(REVEAL_MS, delay + OPPONENT_REVEAL_MS));
   };
 
+  /** Plan du bot : tiré par le serveur (case révélée après notre réponse : -2 = encore inconnue),
+   *  sinon tiré ici (ancien serveur). */
+  const planFor = (question: Question): BotPlan => {
+    const sp = serverBotRef.current?.[currentIndexRef.current];
+    if (sp) return { botPick: sp.answers ? -2 : -1, botPts: sp.pts || 0, botTimeMs: sp.time_ms || 0, answered: false };
+    return { ...resolveBotAnswer(question), answered: false };
+  };
+
   /** Réponse du bot pour la question en cours (tirée au début ; à défaut, maintenant). */
   const takeBotPlan = (question: Question): BotPlan => {
     if (botAnswerTimerRef.current) { clearTimeout(botAnswerTimerRef.current); botAnswerTimerRef.current = null; }
-    const plan = botPlanRef.current ?? { ...resolveBotAnswer(question), answered: false };
+    const plan = botPlanRef.current ?? planFor(question);
     botPlanRef.current = null;
     return plan;
+  };
+
+  /** Partie notée par le serveur : envoie la réponse (-1 = temps écoulé), réessaie si le réseau coupe. */
+  const postAnswer = async (index: number, answer: number, timeMs: number): Promise<any | null> => {
+    for (let attempt = 0; attempt < 4; attempt++) {
+      try {
+        const res = await authFetch(`${API_URL}/api/game/answer`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: sessionIdRef.current, question_index: index, answer, time_ms: Math.round(timeMs) }),
+        });
+        if (res.ok) return await res.json();
+        if (res.status < 500 && res.status !== 429) return null;
+      } catch { /* réseau : on réessaie */ }
+      await new Promise((r) => setTimeout(r, 600 * (attempt + 1)));
+    }
+    return null;
+  };
+
+  const sendSecureAnswer = (optionIndex: number, timeMs: number) => {
+    const qi = currentIndexRef.current;
+    postAnswer(qi, optionIndex, timeMs).then((r) => {
+      if (matchEndedRef.current || currentIndexRef.current !== qi) return;
+      // Serveur injoignable : la partie ne peut pas continuer (elle compte comme abandonnée)
+      if (!r) { forfeit(); return; }
+      const q = questionsRef.current[qi];
+      if (q && typeof r.correct_option === 'number') {
+        questionsRef.current[qi] = { ...q, correct_option: r.correct_option };
+      }
+      lastCorrectOptionRef.current = typeof r.correct_option === 'number' ? r.correct_option : null;
+      finishLocalAnswer(optionIndex, !!r.is_correct, r.points || 0, timeMs,
+        typeof r.bot_pick === 'number' ? r.bot_pick : undefined);
+    });
+  };
+
+  /** Fin d'une question hors direct (bot, défi différé) : affichage, sons, série, bot. */
+  const finishLocalAnswer = (optionIndex: number, isCorrect: boolean, pPts: number, timeMs: number, serverBotPick?: number) => {
+    const qi = currentIndexRef.current;
+    const question = questionsRef.current[qi];
+    if (!question) return;
+    setShowResult(true);
+    questionResultsRef.current[qi] = isCorrect;
+    Haptics.notificationAsync(
+      isCorrect ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Error
+    );
+    playSound(isCorrect ? 'correct' : 'wrong');
+
+    // Série de bonnes réponses
+    if (isCorrect) {
+      const newStreak = correctStreakRef.current + 1;
+      correctStreakRef.current = newStreak;
+      setCorrectStreak(newStreak);
+      if (newStreak === 3 || newStreak === 5 || newStreak === 7) triggerStreakToast(newStreak);
+      correctCountRef.current += 1;
+    } else if (optionIndex !== -1) {
+      correctStreakRef.current = 0;
+      setCorrectStreak(0);
+    }
+
+    // Historique des réponses (défis différés)
+    if (isAsync) {
+      playerAnswersHistoryRef.current.push({ answer: optionIndex, is_correct: isCorrect, points: pPts, time_ms: timeMs });
+    }
+
+    if (isAsyncReveal) {
+      const p1 = p1AnswersRef.current[qi];
+      handleAnswer(pPts, p1?.points ?? 0, p1?.answer ?? -1);
+    } else {
+      const plan = takeBotPlan(question);
+      // Si le bot « répond » après nous, sa case apparaît avec un petit décalage
+      const revealDelay = !plan.answered && plan.botTimeMs > timeMs ? Math.min(plan.botTimeMs - timeMs, 1400) : 0;
+      const pick = serverBotPick ?? (plan.botPick === -2 ? -1 : plan.botPick);
+      // Points du bot déjà comptés s'il a « répondu » avant nous
+      handleAnswer(pPts, plan.answered ? 0 : plan.botPts, pick, revealDelay);
+    }
   };
 
   const handleTimeout = () => {
@@ -813,32 +907,14 @@ export default function GameScreen() {
       });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } else {
-      setShowResult(true);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      playSound('wrong');
-      const question = questionsRef.current[currentIndexRef.current];
-      if (!question) return;
-      questionResultsRef.current[currentIndexRef.current] = false;
-
-      // Record timeout to history for async modes
-      if (isAsync) {
-        playerAnswersHistoryRef.current.push({
-          answer: -1,
-          is_correct: false,
-          points: 0,
-          time_ms: questionDurationRef.current * 1000,
-        });
-      }
-
-      if (isAsyncReveal) {
-        const p1 = p1AnswersRef.current[currentIndexRef.current];
-        handleAnswer(0, p1?.points ?? 0, p1?.answer ?? -1);
+      const timeMs = questionDurationRef.current * 1000;
+      if (isSecure()) {
+        // Plus de réponse possible pendant que le serveur confirme
+        isSubmittingRef.current = true;
+        answeredRef.current = true;
+        sendSecureAnswer(-1, timeMs);
       } else {
-        const plan = takeBotPlan(question);
-        // Simulate bot answering independently: reveal after a natural-looking delay
-        const playerTimeMs = questionDurationRef.current * 1000;
-        const revealDelay = plan.answered || plan.botTimeMs < playerTimeMs ? 0 : Math.min(plan.botTimeMs - playerTimeMs, 1400);
-        handleAnswer(0, plan.answered ? 0 : plan.botPts, plan.botPick, revealDelay);
+        finishLocalAnswer(-1, false, 0, timeMs);
       }
     }
   };
@@ -882,55 +958,15 @@ export default function GameScreen() {
         setTimeout(() => nextQuestion(), REVEAL_MS);
       }, 8000);
       // Don't show result locally — wait for server response
+    } else if (isSecure()) {
+      // Le serveur dit juste/faux et donne la bonne réponse (#9 : garde levée à la question suivante)
+      sendSecureAnswer(optionIndex, timeMs);
     } else {
-      // Bot mode: resolve locally
-      setShowResult(true);
-      // #9 — keep guard locked until nextQuestion() so rapid double-taps are blocked
+      // Ancien serveur : bonne réponse connue de l'app
       const question = questions[currentIndex];
       const isCorrect = optionIndex === question.correct_option;
       const pPts = isCorrect ? lastMult(Math.max(MAX_PTS_PER_Q - timeTaken, 10)) : 0;
-      questionResultsRef.current[currentIndexRef.current] = isCorrect;
-
-      Haptics.notificationAsync(
-        isCorrect ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Error
-      );
-      playSound(isCorrect ? 'correct' : 'wrong');
-
-      // Track correct streak
-      if (isCorrect) {
-        const newStreak = correctStreakRef.current + 1;
-        correctStreakRef.current = newStreak;
-        setCorrectStreak(newStreak);
-        if (newStreak === 3 || newStreak === 5 || newStreak === 7) {
-          triggerStreakToast(newStreak);
-        }
-      } else {
-        correctStreakRef.current = 0;
-        setCorrectStreak(0);
-      }
-
-      if (isCorrect) correctCountRef.current += 1;
-
-      // Record answer history for async modes
-      if (isAsync) {
-        playerAnswersHistoryRef.current.push({
-          answer: optionIndex,
-          is_correct: isCorrect,
-          points: pPts,
-          time_ms: timeMs,
-        });
-      }
-
-      if (isAsyncReveal) {
-        const p1 = p1AnswersRef.current[currentIndex];
-        handleAnswer(pPts, p1?.points ?? 0, p1?.answer ?? -1);
-      } else {
-        const plan = takeBotPlan(question);
-        // If the bot would have answered after the player, reveal its answer with a delay
-        const revealDelay = !plan.answered && plan.botTimeMs > timeMs ? Math.min(plan.botTimeMs - timeMs, 1400) : 0;
-        // Points du bot déjà comptés s'il a « répondu » avant nous
-        handleAnswer(pPts, plan.answered ? 0 : plan.botPts, plan.botPick, revealDelay);
-      }
+      finishLocalAnswer(optionIndex, isCorrect, pPts, timeMs);
     }
   }, [selectedOption, showResult, currentIndex, questions, isLive, isAsync, isAsyncReveal]);
 
@@ -946,6 +982,7 @@ export default function GameScreen() {
     setBotAnswer(null);
     setShowResult(false);
     setShowPending(true);
+    lastCorrectOptionRef.current = null;
 
     animateQuestion();
     startTimer();
@@ -966,24 +1003,25 @@ export default function GameScreen() {
     if (params.challenge_id && isAsync) {
       const { ok, data: saveData } = await saveScoreWithRetry(
         params.challenge_id,
-        { user_id: userId || '', score: ps, correct: cc, answers: playerAnswersHistoryRef.current }
+        { user_id: userId || '', score: ps, correct: cc, answers: playerAnswersHistoryRef.current,
+          session_id: sessionIdRef.current || undefined }
       );
       if (ok && saveData?.status === 'completed') {
         // Both players have now played → show results immediately with both real scores
         const opponentFinalScore = isAsyncSolo ? saveData.p2_score : saveData.p1_score;
         router.replace(
-          `/results?playerScore=${ps}&opponentScore=${opponentFinalScore}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=false&correctCount=${cc}&opponentLevel=1&opponentId=${params.opponentId || ''}`
+          `/results?playerScore=${ps}&opponentScore=${opponentFinalScore}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=false&correctCount=${cc}&opponentLevel=1&opponentId=${params.opponentId || ''}&sessionId=${sessionIdRef.current || ''}`
         );
         return;
       }
       // First to finish or network error — show async banner
       router.replace(
-        `/results?playerScore=${ps}&opponentScore=0&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=true&correctCount=${cc}&opponentLevel=1&opponentId=&asyncChallenge=true&challengeOpponent=${encodeURIComponent(params.opponentPseudo || '')}`
+        `/results?playerScore=${ps}&opponentScore=0&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=true&correctCount=${cc}&opponentLevel=1&opponentId=&asyncChallenge=true&challengeOpponent=${encodeURIComponent(params.opponentPseudo || '')}&sessionId=${sessionIdRef.current || ''}`
       );
       return;
     }
     router.replace(
-      `/results?playerScore=${ps}&opponentScore=${bs}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=${params.isBot}&correctCount=${cc}&opponentLevel=${ol}&opponentId=${params.opponentId || ''}`
+      `/results?playerScore=${ps}&opponentScore=${bs}&opponentPseudo=${params.opponentPseudo}&category=${params.category}&userId=${userId}&isBot=${params.isBot}&correctCount=${cc}&opponentLevel=${ol}&opponentId=${params.opponentId || ''}&sessionId=${sessionIdRef.current || ''}`
     );
   };
 
@@ -1057,7 +1095,7 @@ export default function GameScreen() {
   // vert + ✓ = bonne réponse révélée · rouge + ✕ = ma mauvaise réponse.
   const correctIndex = (): number | null => {
     if (!showResult) return null;
-    if (!isLive) return question.correct_option;
+    if (!isLive && !sessionIdRef.current) return question.correct_option;
     if (lastCorrectOptionRef.current !== null) return lastCorrectOptionRef.current;
     return lastAnswerCorrectRef.current ? selectedOption : null;
   };

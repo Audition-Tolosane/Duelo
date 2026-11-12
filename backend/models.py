@@ -538,3 +538,19 @@ class QuestionCursor(Base):
     user_id = Column(String(36), primary_key=True)
     theme_id = Column(String(100), primary_key=True)
     cursors = Column(Text, nullable=True)   # {"Facile": 0.42, "Moyen": 0.17, ...}
+
+
+class SoloSession(Base):
+    """Partie solo / défi différé noté par le serveur (voir services/solo_session.py)."""
+    __tablename__ = 'solo_sessions'
+    id = Column(String(36), primary_key=True)
+    user_id = Column(String(36), nullable=False, index=True)
+    theme_id = Column(String(100), nullable=False)
+    opponent = Column(String(100), nullable=True)
+    challenge_id = Column(String(36), nullable=True)
+    data = Column(Text, nullable=False)          # bonnes réponses, plan du bot, réponses données
+    player_score = Column(Integer, default=0)
+    bot_score = Column(Integer, default=0)
+    correct = Column(Integer, default=0)
+    used = Column(Boolean, default=False)        # déjà comptée dans un match / un défi
+    created_at = Column(DateTime(timezone=True), default=utc_now)

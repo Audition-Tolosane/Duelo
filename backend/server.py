@@ -378,6 +378,21 @@ async def _ensure_columns():
                 cursors TEXT,
                 PRIMARY KEY (user_id, theme_id)
             )""",
+            # Parties solo / défis différés notés par le serveur
+            """CREATE TABLE IF NOT EXISTS solo_sessions (
+                id VARCHAR(36) PRIMARY KEY,
+                user_id VARCHAR(36) NOT NULL,
+                theme_id VARCHAR(100) NOT NULL,
+                opponent VARCHAR(100),
+                challenge_id VARCHAR(36),
+                data TEXT NOT NULL,
+                player_score INTEGER DEFAULT 0,
+                bot_score INTEGER DEFAULT 0,
+                correct INTEGER DEFAULT 0,
+                used BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            )""",
+            "CREATE INDEX IF NOT EXISTS ix_solo_sessions_user_id ON solo_sessions(user_id)",
         ]:
             try:
                 await conn.execute(text(stmt))
