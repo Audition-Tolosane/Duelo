@@ -12,6 +12,11 @@ Règles (validées avec le produit) :
 
 Le contrôle se fait au début de l'écran de recherche d'adversaire (POST /economy/play) ; si le
 joueur quitte avant qu'un adversaire soit trouvé, il récupère son crédit (POST /economy/refund).
+
+TICKET : /play laisse un ticket (thème + 5 min) côté serveur. Le serveur l'exige pour entrer
+dans la file du direct (WebSocket matchmaking_join) et pour lancer une partie contre un bot
+(/game/questions?secure=1), et le consomme quand la partie commence (plus de remboursement
+possible ensuite). Sans ticket, une app modifiée ne peut plus jouer sans payer.
 """
 import logging
 import random
@@ -40,6 +45,7 @@ FREE_DAYS = 3
 THEMES_BASE = 5
 THEMES_PER_AD = 3
 REFUND_WINDOW = timedelta(seconds=90)   # recherche d'adversaire : 30 s max + écran VS
+TICKET_WINDOW = timedelta(minutes=5)    # recherche + écran VS + chargement des questions
 
 # Coffre : (type, valeur, poids). L'XP va sur le thème le plus joué (voir grant_bonus_xp).
 CHEST_REWARDS = [
@@ -167,6 +173,8 @@ async def economy_play(body: dict, current_user: str = Depends(get_current_user_
             econ.regen_at = _now()   # la recharge démarre au premier crédit dépensé
         econ.credits -= 1
         econ.refundable_until = _now() + REFUND_WINDOW
+    econ.ticket_theme = theme_id[:100] or None
+    econ.ticket_until = _now() + TICKET_WINDOW
     status = await _status(db, current_user, econ, theme_id or None)
     await db.commit()
     return {"ok": True, "charged": not status["free_play"], **status}
@@ -181,6 +189,7 @@ async def economy_refund(current_user: str = Depends(get_current_user_id), db: A
     if refunded:
         econ.credits = min(CREDITS_HARD_CAP, econ.credits + 1)
         econ.refundable_until = None
+        econ.ticket_theme = econ.ticket_until = None   # crédit rendu : plus de partie payée
     status = await _status(db, current_user, econ)
     await db.commit()
     return {"refunded": refunded, **status}
@@ -272,6 +281,23 @@ async def economy_chest_open(body: dict | None = None, current_user: str = Depen
     await db.commit()
     logger.info(f"[chest] user={current_user} open#{opened + 1} -> {kind} {value}")
     return {"reward": reward, **status}
+
+
+async def take_ticket(db: AsyncSession, user_id: str, theme_id: str, consume: bool = True) -> bool:
+    """Partie payée pour ce thème (POST /play il y a moins de 5 min) ? Si consume : le ticket est
+    utilisé et le crédit n'est plus remboursable. L'appelant fait le commit."""
+    res = await db.execute(select(UserEconomy).where(UserEconomy.user_id == user_id).with_for_update())
+    econ = res.scalar_one_or_none()
+    if not econ or not theme_id or econ.ticket_theme != theme_id:
+        return False
+    until = _aware(econ.ticket_until)
+    if not until or _now() > until:
+        return False
+    if consume:
+        econ.ticket_theme = None
+        econ.ticket_until = None
+        econ.refundable_until = None
+    return True
 
 
 async def close_refund(db: AsyncSession, user_id: str):

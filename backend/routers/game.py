@@ -64,7 +64,7 @@ async def _resolve_theme_category(theme: str, db: AsyncSession) -> str:
 @router.get("/questions")
 async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db: AsyncSession = Depends(get_db),
                              tutorial: bool = False, secure: bool = False, opponent: str = '',
-                             challenge_id: str = ''):
+                             challenge_id: str = '', rematch: bool = False):
     """Get 7 questions from different angles, with an adaptive difficulty mix based on the
     player's level in this theme (sliding window). Anonymous -> balanced 2/3/2.
     For any translated language, return that language when the theme has it, else 'fr'.
@@ -82,6 +82,14 @@ async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db:
             ch = (await db.execute(select(Challenge).where(Challenge.id == challenge_id))).scalar_one_or_none()
             if not ch or secure_user not in (ch.challenger_id, ch.challenged_id):
                 raise HTTPException(status_code=403, detail="Non autorisé")
+        else:
+            # Partie contre un bot : gratuite pour le 1er match guidé et les revanches, sinon il
+            # faut le ticket laissé par /economy/play (crédit pris) — il est consommé ici.
+            free, tutorial = await _free_bot_game(db, secure_user, theme, tutorial, rematch, opponent)
+            if not free:
+                from routers.economy import take_ticket
+                if not await take_ticket(db, secure_user, theme):
+                    raise HTTPException(status_code=402, detail="no_credits")
     else:
         if _secure_required():
             raise HTTPException(status_code=426, detail=UPDATE_REQUIRED)
@@ -212,7 +220,38 @@ async def get_game_questions(theme: str, request: Request, lang: str = 'fr', db:
 async def get_game_questions_v2(theme: str, request: Request, lang: str = 'fr', db: AsyncSession = Depends(get_db),
                                 tutorial: bool = False, secure: bool = False, opponent: str = '',
                                 challenge_id: str = ''):
-    return await get_game_questions(theme, request, lang, db, tutorial, secure, opponent, challenge_id)
+    return await get_game_questions(theme, request, lang, db, tutorial, secure, opponent, challenge_id, rematch)
+
+
+async def _free_bot_game(db: AsyncSession, user_id: str, theme: str, tutorial: bool, rematch: bool,
+                         opponent: str) -> tuple[bool, bool]:
+    """(gratuite ?, tutoriel accepté ?). Tutoriel : seulement avant le tout premier match.
+    Revanche : contre le bot du dernier match (moins de 15 min), une seule par match joué."""
+    from models import SoloSession
+    if tutorial:
+        played = (await db.execute(select(User.matches_played).where(User.id == user_id))).scalar_one_or_none()
+        if not played:
+            return True, True
+        tutorial = False
+    # Revanche reconnue par le serveur (même bot que le dernier match) : le build 15 n'envoie pas
+    # encore « rematch=1 », le drapeau est donc indicatif.
+    if opponent:
+        last = (await db.execute(
+            select(Match).where(
+                Match.player1_id == user_id, Match.player2_is_bot == True,  # noqa: E712
+                Match.created_at >= datetime.now(timezone.utc) - timedelta(minutes=15),
+            ).order_by(Match.created_at.desc()).limit(1)
+        )).scalar_one_or_none()
+        if last and last.player2_pseudo == opponent:
+            already = (await db.execute(
+                select(func.count()).select_from(SoloSession).where(
+                    SoloSession.user_id == user_id, SoloSession.opponent == opponent,
+                    SoloSession.created_at > last.created_at,
+                )
+            )).scalar() or 0
+            if already == 0:
+                return True, tutorial
+    return False, tutorial
 
 
 @router.post("/answer")

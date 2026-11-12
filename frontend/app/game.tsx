@@ -164,7 +164,7 @@ export default function GameScreen() {
   const params = useLocalSearchParams<{
     category: string; opponentPseudo: string; opponentSeed: string; opponentAvatarUrl: string; isBot: string; roomId: string; opponentLevel: string; opponentId: string;
     challenge_id: string; asyncChallenge: string; asyncMode: string;
-    botSkill: string; botSpeed: string; tutorial: string;
+    botSkill: string; botSpeed: string; tutorial: string; rematch: string;
   }>();
   const { send: wsSend, on: wsOn } = useWS();
   const { width: screenW, height: screenH } = useWindowDimensions();
@@ -622,7 +622,7 @@ export default function GameScreen() {
       const langParam = lang && lang !== 'fr' ? `&lang=${lang}` : '';
       const oppParam = !isAsync && params.opponentPseudo ? `&opponent=${encodeURIComponent(params.opponentPseudo)}` : '';
       const chParam = isAsync && params.challenge_id ? `&challenge_id=${encodeURIComponent(params.challenge_id)}` : '';
-      const url = `${API_URL}/api/game/questions-v2?theme=${params.category}${langParam}${isTutorial ? '&tutorial=true' : ''}&secure=1${oppParam}${chParam}`;
+      const url = `${API_URL}/api/game/questions-v2?theme=${params.category}${langParam}${isTutorial ? '&tutorial=true' : ''}&secure=1${oppParam}${chParam}${params.rematch === 'true' ? '&rematch=1' : ''}`;
       const res = await authFetch(url);
       if (!res.ok) {
         throw new Error(`${t('game.server_error')} (${res.status})`);

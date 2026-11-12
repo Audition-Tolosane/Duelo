@@ -318,6 +318,7 @@ export default function MatchmakingScreen() {
   const [gate, setGate] = useState<'checking' | 'open' | 'no_credits' | 'theme_limit'>(exempt ? 'open' : 'checking');
   const chargedRef = useRef(false);
   const searchStartedRef = useRef(false);
+  const deniedRetryRef = useRef(false);
 
   // Lance la recherche, une fois le crédit pris (ou d'emblée pour un défi / une revanche).
   const beginSearch = () => {
@@ -403,14 +404,23 @@ export default function MatchmakingScreen() {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
         setShowTimeoutModal(true);
       }),
-      wsOn('challenge_room_expired', () => {
-        // Room no longer exists — fall back to regular matchmaking
+      wsOn('challenge_room_expired', async () => {
+        // Salle du défi disparue : on bascule sur une recherche normale, donc payante
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        if (category) {
-          wsSend({ action: 'matchmaking_join', theme_id: category });
-        } else {
-          router.back();
-        }
+        if (!category) { router.back(); return; }
+        const check = await checkPlay(category);
+        if (!check.ok) { setGate(check.reason); return; }
+        chargedRef.current = check.charged;
+        wsSend({ action: 'matchmaking_join', theme_id: category });
+      }),
+      // Le serveur n'a pas trouvé de crédit payé pour ce thème : on le reprend une fois
+      wsOn('matchmaking_denied', async () => {
+        if (deniedRetryRef.current || !category) return;
+        deniedRetryRef.current = true;
+        const check = await checkPlay(category);
+        if (!check.ok) { setGate(check.reason); return; }
+        chargedRef.current = check.charged;
+        wsSend({ action: 'matchmaking_join', theme_id: category });
       }),
     ];
     return () => unsubs.forEach((u) => u());
@@ -613,7 +623,7 @@ export default function MatchmakingScreen() {
       const skillParam = isTutorial ? '&botSkill=0.35' : opp.skill_level != null ? `&botSkill=${opp.skill_level}` : '';
       const speedParam = isTutorial ? '&botSpeed=7' : opp.avg_speed   != null ? `&botSpeed=${opp.avg_speed}`   : '';
       router.replace(
-        `/game?category=${category}&opponentPseudo=${opp.pseudo}&opponentSeed=${opp.avatar_seed}${opp.avatar_url ? `&opponentAvatarUrl=${encodeURIComponent(opp.avatar_url)}` : ''}&isBot=${isBotMatch}&opponentLevel=${opp.level}&opponentStreak=${opp.streak}&opponentId=${opp.id || ''}${matchRoomId ? `&roomId=${matchRoomId}` : ''}${skillParam}${speedParam}${isTutorial ? '&tutorial=true' : ''}`
+        `/game?category=${category}&opponentPseudo=${opp.pseudo}&opponentSeed=${opp.avatar_seed}${opp.avatar_url ? `&opponentAvatarUrl=${encodeURIComponent(opp.avatar_url)}` : ''}&isBot=${isBotMatch}&opponentLevel=${opp.level}&opponentStreak=${opp.streak}&opponentId=${opp.id || ''}${matchRoomId ? `&roomId=${matchRoomId}` : ''}${skillParam}${speedParam}${isTutorial ? '&tutorial=true' : ''}${isRematch ? '&rematch=true' : ''}`
       );
     }, navDelay);
   };

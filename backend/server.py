@@ -371,6 +371,9 @@ async def _ensure_columns():
             "ALTER TABLE matches ADD COLUMN IF NOT EXISTS xp_doubled BOOLEAN DEFAULT FALSE",
             # Réactions débloquées au coffre du jour
             "ALTER TABLE user_economy ADD COLUMN IF NOT EXISTS reactions_unlocked TEXT",
+            # Ticket de partie : preuve, côté serveur, que le crédit a été pris avant de jouer
+            "ALTER TABLE user_economy ADD COLUMN IF NOT EXISTS ticket_theme VARCHAR(100)",
+            "ALTER TABLE user_economy ADD COLUMN IF NOT EXISTS ticket_until TIMESTAMPTZ",
             # Questions jamais vues d'abord : un curseur par joueur et par thème
             """CREATE TABLE IF NOT EXISTS question_cursors (
                 user_id VARCHAR(36) NOT NULL,

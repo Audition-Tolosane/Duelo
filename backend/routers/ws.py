@@ -323,6 +323,14 @@ async def handle_matchmaking_join(user_id: str, data: dict):
         uxp = xp_res.scalar_one_or_none()
         player_level = get_level(uxp.xp) if uxp else 0
 
+        # Crédit payé pour ce thème (POST /economy/play) ? Sinon, pas de file d'attente.
+        from routers.economy import take_ticket
+        if not await take_ticket(db, user_id, theme_id, consume=False):
+            await manager.send_to_user(user_id, {
+                "type": "matchmaking_denied", "data": {"reason": "no_ticket"},
+            })
+            return
+
         user_data = {
             "id": user.id,
             "pseudo": user.pseudo,
@@ -336,8 +344,17 @@ async def handle_matchmaking_join(user_id: str, data: dict):
 
     await manager.join_matchmaking(user_id, theme_id, user.mmr or 1000, user_data)
 
-    for room_id, room in manager.game_rooms.items():
+    for room_id, room in list(manager.game_rooms.items()):
         if user_id in (room.player1_id, room.player2_id) and not room.questions:
+            # Adversaire trouvé : la partie est payée pour les deux (crédits plus remboursables)
+            try:
+                from routers.economy import take_ticket
+                async with AsyncSessionLocal() as db:
+                    for pid in (room.player1_id, room.player2_id):
+                        await take_ticket(db, pid, theme_id)
+                    await db.commit()
+            except Exception as e:
+                logger.warning(f"[matchmaking] ticket: {e}")
             await load_and_start_game(room_id, theme_id)
             break
 
