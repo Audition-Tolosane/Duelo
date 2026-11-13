@@ -93,6 +93,7 @@ async def create_notification(
         type_to_field = {
             "challenge": "challenges",
             "match_result": "match_results",
+            "challenge_result": "match_results",   # réglage « Résultats des défis »
             "follow": "follows",
             "message": "messages",
             "like": "likes",

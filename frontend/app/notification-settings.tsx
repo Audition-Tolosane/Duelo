@@ -31,7 +31,6 @@ const SETTINGS_CONFIG: {
   { key: 'challenges',    icon: 'duel',     color: COLOR.accent.warm,    titleKey: 'notif_settings.challenges_title',    descKey: 'notif_settings.challenges_desc' },
   { key: 'match_results', icon: 'trophy',   color: COLOR.reward.gold,    titleKey: 'notif_settings.match_results_title', descKey: 'notif_settings.match_results_desc' },
   { key: 'follows',       icon: 'userPlus', color: COLOR.text.secondary, titleKey: 'notif_settings.follows_title',       descKey: 'notif_settings.follows_desc' },
-  { key: 'messages',      icon: 'message',  color: COLOR.text.secondary, titleKey: 'notif_settings.messages_title',      descKey: 'notif_settings.messages_desc' },
   { key: 'likes',         icon: 'heart',    color: COLOR.text.secondary, titleKey: 'notif_settings.likes_title',         descKey: 'notif_settings.likes_desc' },
   { key: 'comments',      icon: 'message',  color: COLOR.text.secondary, titleKey: 'notif_settings.comments_title',      descKey: 'notif_settings.comments_desc' },
   { key: 'system',        icon: 'bell',     color: COLOR.text.secondary, titleKey: 'notif_settings.system_title',        descKey: 'notif_settings.system_desc' },

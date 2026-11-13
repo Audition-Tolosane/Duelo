@@ -419,8 +419,11 @@ async def save_async_score(challenge_id: str, data: dict, current_user: str = De
             theme_label = challenge.theme_name or ""
             suffix = f" sur {theme_label}" if theme_label else ""
 
-            # Notification + WS to challenger (p1)
-            if p1_won:
+            # Notification au seul joueur qui avait joué avant : celui qui termine voit son résultat
+            # à l'écran (pas de notification qui encombre son fil)
+            if is_p1:
+                pass
+            elif p1_won:
                 await create_notification(db, challenge.challenger_id, "challenge_result",
                     "Victoire ! 🏆",
                     f"Tu as battu {p2.pseudo}{suffix} ({p1_score} – {p2_score})",
@@ -431,8 +434,9 @@ async def save_async_score(challenge_id: str, data: dict, current_user: str = De
                     f"{p2.pseudo} t'a battu{suffix} ({p2_score} – {p1_score})",
                     challenge.challenged_id, {"screen": "home"})
 
-            # Notification + WS to challenged (p2)
-            if not p1_won:
+            if is_p2:
+                pass
+            elif not p1_won:
                 await create_notification(db, challenge.challenged_id, "challenge_result",
                     "Victoire ! 🏆",
                     f"Tu as battu {p1.pseudo}{suffix} ({p2_score} – {p1_score})",

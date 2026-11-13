@@ -738,14 +738,8 @@ async def submit_match(request: Request, current_user: str = Depends(get_current
         except Exception as _tournament_err:
             logger.warning(f"Tournament update failed (non-critical): {_tournament_err}")
 
-        if won:
-            notif_body = f"Victoire en {theme.name} ! +{total_xp} XP"
-        else:
-            notif_body = f"Défaite en {theme.name}. +{total_xp} XP"
-        await create_notification(
-            db, player_id, "match_result", "notif.match_result", notif_body,
-            data={"screen": "results", "params": {"matchId": match.id}},
-        )
+        # Plus de notification « résultat du duel » : le joueur vient de le voir à l'écran, et ça
+        # encombrait le fil. Seuls les défis asynchrones notifient (routers/challenges.py).
 
         # ── Referral qualification check (deferred reward) ──
         try:

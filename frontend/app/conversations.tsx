@@ -132,7 +132,6 @@ export default function ConversationsScreen() {
     <SwipeBackPage>
     <ScreenContainer>
       <ScreenHeader
-        overline={conversations.length ? `${conversations.length} ${t('conversations.count_label')}` : undefined}
         title={t('conversations.title')}
         right={totalUnread > 0 ? <Badge count={totalUnread} /> : undefined}
       />

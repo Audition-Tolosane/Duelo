@@ -11,6 +11,8 @@ router = APIRouter(prefix="/notifications", tags=["notifications"])
 # Les messages privés ne sont plus des notifications (seule l'icône Messages les signale).
 # Les anciennes lignes « message » restent en base mais n'apparaissent plus dans la cloche.
 MESSAGE = "message"
+# Résultats de duel (le joueur les a vus à l'écran) : plus créés, anciennes lignes masquées
+HIDDEN_TYPES = (MESSAGE, "match_result")
 
 
 @router.get("/{user_id}")
@@ -19,7 +21,7 @@ async def get_notifications(user_id: str, limit: int = 50, offset: int = 0, curr
         raise HTTPException(status_code=403, detail="Non autorisé")
     limit = min(max(1, limit), 200)
     result = await db.execute(
-        select(Notification).where(Notification.user_id == user_id, Notification.type != MESSAGE)
+        select(Notification).where(Notification.user_id == user_id, Notification.type.notin_(HIDDEN_TYPES))
         .order_by(Notification.created_at.desc()).limit(limit).offset(offset)
     )
     notifications = result.scalars().all()
@@ -40,7 +42,7 @@ async def get_notification_unread_count(user_id: str, current_user: str = Depend
     result = await db.execute(
         select(func.count(Notification.id)).where(
             Notification.user_id == user_id, Notification.read == False,
-            Notification.type != MESSAGE,
+            Notification.type.notin_(HIDDEN_TYPES),
         )
     )
     return {"unread_count": result.scalar() or 0}
