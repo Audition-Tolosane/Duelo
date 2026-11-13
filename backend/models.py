@@ -203,6 +203,8 @@ class ChatMessage(Base):
     message_type = Column(String(20), default='text')  # text, image, game_card
     extra_data = Column(JSON, nullable=True)  # For image_url, game_card data, etc.
     read = Column(Boolean, default=False)
+    # Arrivé sur l'app du destinataire (✓✓ gris) ; lu = ✓✓ jaune
+    delivered = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), default=utc_now)
 
 

@@ -816,6 +816,7 @@ const translations: Translations = {
   'chat.me': { fr: 'Moi', en: 'Me', es: 'Yo', de: 'Ich', pt: 'Eu', it: 'Io', ar: 'أنا', ja: '自分', ko: '나', zh: '我', pl: 'Ja' },
   'chat.xp_earned': { fr: 'XP gagnés', en: 'XP earned', es: 'XP ganados', de: 'XP verdient', pt: 'XP ganhos', it: 'XP guadagnati', ar: 'نقاط خبرة مكتسبة', ja: '獲得XP', ko: '획득 XP', zh: '获得经验', pl: 'Zdobyte XP' },
   'chat.status_sent': { fr: 'Envoyé', en: 'Sent', es: 'Enviado', de: 'Gesendet', pt: 'Enviado', it: 'Inviato', ar: 'تم الإرسال', ja: '送信済み', ko: '보냄', zh: '已发送', pl: 'Wysłano' },
+  'chat.status_delivered': { fr: 'Reçu', en: 'Delivered', es: 'Entregado', de: 'Zugestellt', pt: 'Entregue', it: 'Consegnato', ar: 'تم التسليم', ja: '配信済み', ko: '전달됨', zh: '已送达', pl: 'Dostarczono' },
   'chat.status_read': { fr: 'Vu', en: 'Seen', es: 'Visto', de: 'Gesehen', pt: 'Visto', it: 'Visto', ar: 'تمت المشاهدة', ja: '既読', ko: '읽음', zh: '已读', pl: 'Wyświetlono' },
   'chat.rematch': { fr: 'REVANCHE', en: 'REMATCH', es: 'REVANCHA', de: 'REVANCHE', pt: 'REVANCHE', it: 'RIVINCITA', ar: 'إعادة المباراة', ja: 'リマッチ', ko: '재대결', zh: '再来一局', pl: 'REWANŻ' },
   'chat.start_conversation': { fr: "Lance la conversation", en: 'Start the conversation!', es: '¡Comienza la conversación!', de: 'Starte die Unterhaltung!', pt: 'Comece a conversa!', it: 'Inizia la conversazione!', ar: 'ابدأ المحادثة!', ja: '会話を始めましょう！', ko: '대화를 시작하세요!', zh: '开始对话吧！', pl: 'Rozpocznij rozmowę' },

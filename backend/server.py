@@ -187,6 +187,7 @@ async def _ensure_columns():
     from database import engine
     async with engine.begin() as conn:
         for stmt in [
+            "ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS delivered BOOLEAN DEFAULT FALSE",
             "ALTER TABLE questions ADD COLUMN IF NOT EXISTS option_a TEXT",
             "ALTER TABLE questions ADD COLUMN IF NOT EXISTS option_b TEXT",
             "ALTER TABLE questions ADD COLUMN IF NOT EXISTS option_c TEXT",

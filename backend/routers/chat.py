@@ -2,7 +2,7 @@ import json
 import random
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, func, delete, update, or_, and_
+from sqlalchemy import select, func, delete, or_, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from models import User, ChatMessage
@@ -12,6 +12,7 @@ from services.ws_manager import manager
 from auth_middleware import get_current_user_id
 from rate_limit import rate_limit
 from routers.moderation import blocked_user_ids, is_blocked_between
+from services.chat_status import mark_delivered, mark_read
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -40,6 +41,8 @@ async def send_message(data: ChatSend, current_user: str = Depends(get_current_u
         sender_id=data.sender_id, receiver_id=data.receiver_id,
         content=data.content.strip() if data.content else "",
         message_type=data.message_type, extra_data=data.extra_data,
+        # Destinataire connecté en temps réel : le message arrive tout de suite sur son app
+        delivered=manager.is_online(data.receiver_id),
     )
     db.add(msg)
     await db.commit()
@@ -55,7 +58,7 @@ async def send_message(data: ChatSend, current_user: str = Depends(get_current_u
         "sender_avatar_seed": sender.avatar_seed if sender else None,
         "sender_avatar_url": getattr(sender, "avatar_url", None) if sender else None,
         "content": msg.content, "message_type": msg.message_type,
-        "extra_data": msg.extra_data, "read": msg.read,
+        "extra_data": msg.extra_data, "read": msg.read, "delivered": bool(msg.delivered),
         "created_at": msg.created_at.isoformat(),
     }
     # Même chemin que l'envoi par WebSocket : temps réel si connecté (icône Messages + bandeau),
@@ -67,7 +70,7 @@ async def send_message(data: ChatSend, current_user: str = Depends(get_current_u
         "id": msg.id, "sender_id": msg.sender_id, "receiver_id": msg.receiver_id,
         "sender_pseudo": sender.pseudo if sender else "Inconnu",
         "content": msg.content, "message_type": msg.message_type,
-        "extra_data": msg.extra_data, "read": msg.read,
+        "extra_data": msg.extra_data, "read": msg.read, "delivered": bool(msg.delivered),
         "created_at": msg.created_at.isoformat(),
     }
 
@@ -82,6 +85,9 @@ async def get_conversations(user_id: str, current_user: str = Depends(get_curren
         cutoff = datetime.now(timezone.utc) - timedelta(days=7)
         await db.execute(delete(ChatMessage).where(ChatMessage.created_at < cutoff))
         await db.commit()
+
+    # L'app a récupéré ses conversations : les messages en attente sont « reçus »
+    await mark_delivered(db, user_id)
 
     # Collect distinct partner IDs in one query using UNION
     sent_result = await db.execute(
@@ -181,27 +187,19 @@ async def get_chat_messages(user_id: str, with_user: str, limit: int = 50, curre
     messages = list(reversed(result.scalars().all()))
 
     # Ouvrir la conversation = tout lire, y compris hors de la page chargée.
-    await _mark_conversation_read(db, user_id, with_user)
+    await mark_read(db, user_id, with_user)
+    await mark_delivered(db, user_id)
     for m in messages:
         if m.receiver_id == user_id:
             m.read = True
+            m.delivered = True
 
     return [{
         "id": m.id, "sender_id": m.sender_id, "receiver_id": m.receiver_id,
         "content": m.content, "message_type": m.message_type or "text",
-        "extra_data": m.extra_data, "read": m.read,
+        "extra_data": m.extra_data, "read": m.read, "delivered": bool(m.delivered or m.read),
         "created_at": m.created_at.isoformat(),
     } for m in messages]
-
-
-async def _mark_conversation_read(db: AsyncSession, user_id: str, with_user: str):
-    await db.execute(
-        update(ChatMessage)
-        .where(ChatMessage.sender_id == with_user, ChatMessage.receiver_id == user_id,
-               ChatMessage.read == False)
-        .values(read=True)
-    )
-    await db.commit()
 
 
 @router.post("/{user_id}/read")
@@ -210,7 +208,7 @@ async def mark_conversation_read(user_id: str, with_user: str, current_user: str
     (sinon le point rouge de l'icône Messages revient au prochain recalcul)."""
     if current_user != user_id:
         raise HTTPException(status_code=403, detail="Non autorisé")
-    await _mark_conversation_read(db, user_id, with_user)
+    await mark_read(db, user_id, with_user)
     return {"success": True}
 
 
@@ -218,6 +216,8 @@ async def mark_conversation_read(user_id: str, with_user: str, current_user: str
 async def get_unread_count(user_id: str, current_user: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_db)):
     if current_user != user_id:
         raise HTTPException(status_code=403, detail="Non autorisé")
+    # Appelé dès que l'app s'ouvre : les messages en attente sont arrivés sur le téléphone
+    await mark_delivered(db, user_id)
     result = await db.execute(
         select(func.count(ChatMessage.id)).where(
             ChatMessage.receiver_id == user_id, ChatMessage.read == False,

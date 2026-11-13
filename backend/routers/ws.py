@@ -92,6 +92,13 @@ async def websocket_endpoint(
         return
 
     await manager.connect(user_id, websocket)
+    # App ouverte : les messages en attente sont arrivés (✓✓ gris chez l'expéditeur)
+    try:
+        from services.chat_status import mark_delivered
+        async with AsyncSessionLocal() as _db:
+            await mark_delivered(_db, user_id)
+    except Exception:
+        logger.exception("[ws] accusés de réception")
 
     # Anti-inondation : plus de 40 messages en 2 s sur une même connexion = coupure
     # (avant : seul le chat était limité ; une boucle de matchmaking_join occupait la base)
@@ -219,6 +226,7 @@ async def handle_chat_send(sender_id: str, data: dict, internal_type: str | None
         msg = ChatMessage(
             sender_id=sender_id, receiver_id=receiver_id,
             content=content, message_type=message_type, extra_data=extra_data,
+            delivered=manager.is_online(receiver_id),
         )
         db.add(msg)
 
@@ -240,6 +248,7 @@ async def handle_chat_send(sender_id: str, data: dict, internal_type: str | None
             "message_type": msg.message_type,
             "extra_data": msg.extra_data,
             "read": False,
+            "delivered": bool(msg.delivered),
             "created_at": msg.created_at.isoformat(),
         }
 

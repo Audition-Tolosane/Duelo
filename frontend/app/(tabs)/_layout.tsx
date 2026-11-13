@@ -8,6 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { usePathname, Slot, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { BlurView } from 'expo-blur';
 import DueloHeader from '../../components/DueloHeader';
 import { useSwipeBackProgress } from '../../components/SwipeBackContext';
 import { t } from '../../utils/i18n';
@@ -49,6 +50,7 @@ const PAGER_SWIPE_ENABLED = false;
 // Libellés d'onglet à 11 px (plancher lisibilité) : Space Grotesk Medium à la taille de l'overline.
 const TAB_LABEL_SIZE = { fontSize: TYPO.overline.fontSize, lineHeight: TYPO.overline.lineHeight };
 const PLAY_DISC = SIZE.buttonLg; // disque central Jouer : 56 px
+const TAB_BAR_TINT = 'rgba(7,31,38,0.55)' // COLOR.bg.primary (#071F26) à 55 %;
 
 // En-tête global : il FLOTTE par-dessus le contenu et glisse vers le haut au défilement,
 // en suivant le doigt (voir contexts/TabBarContext.tsx). Rien ne change de hauteur : le
@@ -109,6 +111,12 @@ function CustomTabBar({ currentIndex, onTabPress }: { currentIndex: number; onTa
 
   return (
     <Animated.View style={[styles.tabBar, { bottom: bottomOffset }, hideStyle]}>
+      {/* Verre dépoli comme Instagram : le contenu défile dessous, flouté et assombri.
+          Dans un calque à part (coins arrondis + overflow) pour ne pas couper le disque Jouer. */}
+      <View style={styles.tabBarGlass} pointerEvents="none">
+        {Platform.OS !== 'web' ? <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} /> : null}
+        <View style={[StyleSheet.absoluteFill, styles.tabBarTint]} />
+      </View>
       {TAB_CONFIG.map((tab, index) => {
         const isFocused = currentIndex === index;
         const fg = isFocused ? COLOR.action.primary : COLOR.text.tertiary;
@@ -370,7 +378,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    backgroundColor: COLOR.bg.primary,
     borderRadius: RADII.pill,
     borderWidth: BORDER.hair,
     borderColor: COLOR.border.subtle,
@@ -385,6 +392,13 @@ const styles = StyleSheet.create({
       default: {},
     }),
   },
+  tabBarGlass: {
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+    borderRadius: RADII.pill,
+    overflow: 'hidden',
+  },
+  // Teinte nuit à 55 % par-dessus le flou : les icônes restent lisibles sur n'importe quel contenu
+  tabBarTint: { backgroundColor: TAB_BAR_TINT },
   tabItem: {
     alignItems: 'center',
     justifyContent: 'center',

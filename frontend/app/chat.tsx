@@ -52,6 +52,7 @@ type Message = {
   message_type: string;
   extra_data: any;
   read: boolean;
+  delivered?: boolean;
   created_at: string;
 };
 
@@ -135,6 +136,14 @@ export default function ChatScreen() {
           });
           setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
         }
+      }),
+      // Accusés de réception : ✓✓ gris (arrivé sur son téléphone), ✓✓ jaune (lu)
+      wsOn('chat_status', (msg) => {
+        if (msg.data?.with_user !== partnerId) return;
+        const read = msg.data.status === 'read';
+        setMessages((prev) => prev.map((m) => (
+          m.receiver_id === partnerId && !m.read ? { ...m, delivered: true, read: read || m.read } : m
+        )));
       }),
       // Typing indicator
       wsOn('chat_typing', (msg) => {
@@ -342,10 +351,14 @@ export default function ChatScreen() {
                     : <Txt variant="body" color={fg}>{item.content}</Txt>}
               </View>
             )}
-            {/* Sous la bulle, petit et discret : ✓ gris = envoyé, ✓✓ jaune = lu */}
+            {/* Sous la bulle, comme WhatsApp : ✓ gris envoyé, ✓✓ gris reçu, ✓✓ jaune lu */}
             {isMe ? (
-              <View style={st.msgFooter} accessible accessibilityLabel={t(item.read ? 'chat.status_read' : 'chat.status_sent')}>
-                <Icon name={item.read ? 'readAll' : 'check'} size={12} color={item.read ? COLOR.accent.notif : COLOR.text.tertiary} />
+              <View style={st.msgFooter} accessible accessibilityLabel={t(item.read ? 'chat.status_read' : item.delivered ? 'chat.status_delivered' : 'chat.status_sent')}>
+                <Icon
+                  name={item.read || item.delivered ? 'readAll' : 'check'}
+                  size={12}
+                  color={item.read ? COLOR.accent.notif : COLOR.text.tertiary}
+                />
               </View>
             ) : null}
           </Pressable>
