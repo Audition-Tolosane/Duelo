@@ -337,6 +337,7 @@ async def theme_leaderboard(
     city_override: Optional[str] = None,
     limit: int = 50,
     offset: int = 0,
+    lang: str = "fr",
     user_id: Optional[str] = Depends(get_optional_user_id),
     db: AsyncSession = Depends(get_db),
 ):
@@ -466,7 +467,7 @@ async def theme_leaderboard(
                 "level": lvl, "title": get_theme_title(theme, lvl) if theme else "",
                 "xp": uxp.xp, "total_xp": uxp.xp,
             })
-        meta = _area_meta(current_user, area) if not city_override else {"scope_used": "city", "city_name": city_override}
+        meta = await _area_meta(db, current_user, area, lang) if not city_override else {"scope_used": "city", "city_name": city_override}
         return {"entries": entries, "meta": meta}
 
     entries = await _fetch_entries()

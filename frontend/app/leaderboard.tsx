@@ -6,7 +6,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import SwipeBackPage from '../components/SwipeBackPage';
 import UserAvatar from '../components/UserAvatar';
 import { authFetch } from '../utils/api';
-import { t, pluralKey, getLocale } from '../utils/i18n';
+import { t, pluralKey, getLocale, getLanguage } from '../utils/i18n';
 import {
   Txt, Icon, IconName, Button, Badge, Card, Chip, ScreenContainer, ScreenHeader, ThemeIcon, Loader, EmptyState,
 } from '../components/ui';
@@ -192,8 +192,8 @@ export default function LeaderboardScreen() {
     setMeta(null);
     try {
       const url = isThemeMode
-        ? `${API_URL}/api/theme/${themeId}/leaderboard?scope=${scope}&limit=50`
-        : `${API_URL}/api/leaderboard?scope=${scope}&view=${view}&limit=50`;
+        ? `${API_URL}/api/theme/${themeId}/leaderboard?scope=${scope}&limit=50&lang=${getLanguage()}`
+        : `${API_URL}/api/leaderboard?scope=${scope}&view=${view}&limit=50&lang=${getLanguage()}`;
       const res = await authFetch(url);
       const data = await res.json();
 

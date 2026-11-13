@@ -407,7 +407,7 @@ type ProfileData = {
   user: {
     id: string; pseudo: string; avatar_seed: string; avatar_url?: string | null; is_guest: boolean;
     total_xp: number; selected_title: string | null;
-    country: string | null; city: string | null; country_flag: string;
+    country: string | null; city: string | null; country_flag: string; city_display?: string | null;
     matches_played: number; matches_won: number;
     best_streak: number; current_streak: number; streak_badge: string;
     login_streak: number; best_login_streak: number;
@@ -543,7 +543,7 @@ export default function ProfileScreen() {
     try {
       const res = await authFetch(`${API_URL}/api/user/location`, {
         method: 'PATCH',
-        body: JSON.stringify({ city: locationCity, country: locationCountry }),
+        body: JSON.stringify({ city: locationCity, country: locationCountry, lang: getLanguage() }),
       });
       const data = await res.json();
       if (data.success) {
@@ -552,7 +552,7 @@ export default function ProfileScreen() {
         setLocationCity(data.city || '');
         setProfile(prev => prev ? {
           ...prev,
-          user: { ...prev.user, city: data.city, country: data.country, country_flag: data.country_flag || '' }
+          user: { ...prev.user, city: data.city, city_display: data.city_display, country: data.country, country_flag: data.country_flag || '' }
         } : null);
         setShowLocationModal(false);
       } else {
@@ -746,7 +746,7 @@ export default function ProfileScreen() {
               : <Icon name="globe" size={ICON_SIZE.sm} color={COLOR.text.secondary} />}
             <Txt variant="label" numberOfLines={1} style={s.shrink}>
               {user?.city && user?.country
-                ? `${user.city}, ${user.country}`
+                ? `${user.city_display || user.city}, ${user.country}`
                 : user?.country || t('profile.world')}
             </Txt>
             <Icon name="chevronDown" size={ICON_SIZE.sm} color={COLOR.text.tertiary} />

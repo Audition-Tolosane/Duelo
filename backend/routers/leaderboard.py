@@ -22,14 +22,21 @@ async def get_optional_user(
     return res.scalar_one_or_none()
 
 
-def _area_meta(user, area: dict) -> dict:
+async def _area_meta(db, user, area: dict, lang: str = "fr") -> dict:
     """meta du classement local. Anciennes apps : bandeau « pas assez de joueurs à X » avec le
-    nom de la zone retenue (champ country_name), nouvelles : niveau (area_level) + nom."""
+    nom de la zone retenue (champ country_name), nouvelles : niveau (area_level) + nom.
+    Noms affichés dans la langue du joueur (on regroupe avec le nom local : 東京 → « Tokyo »)."""
+    from services.geo import display_name
     fallback = not (area["level"] == "city")
+    level = {"nearby_city": "city"}.get(area["level"], area["level"])
+    shown = area["name"]
+    if level in ("city", "department", "region"):
+        shown = await display_name(db, user.country, level, area["name"], lang)
+    city_shown = await display_name(db, user.country, "city", user.city, lang)
     return {
         "scope_used": "city" if area["level"] in ("city", "nearby_city") else area["level"],
-        "area_level": area["level"], "area_name": area["name"],
-        "city_name": user.city, "country_name": area["name"] or "Monde",
+        "area_level": area["level"], "area_name": shown,
+        "city_name": city_shown, "country_name": shown or "Monde",
         "too_small": fallback, "fallback": fallback,
     }
 
@@ -60,6 +67,7 @@ async def get_leaderboard(
     category: Optional[str] = None,
     limit: int = 50,
     city_override: Optional[str] = None,
+    lang: str = "fr",
     current_user: Optional[User] = Depends(get_optional_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -130,7 +138,7 @@ async def get_leaderboard(
             select(User).where(User.is_bot == False, *area["filters"])  # noqa: E712
             .order_by(User.total_xp.desc()).limit(limit)
         )
-        return {"entries": _serialize_users(res.scalars().all()), "meta": _area_meta(current_user, area)}
+        return {"entries": _serialize_users(res.scalars().all()), "meta": await _area_meta(db, current_user, area, lang)}
 
     # ── Friends ────────────────────────────────────────────────────────────────
     if scope == "friends":

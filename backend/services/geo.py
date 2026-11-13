@@ -168,7 +168,71 @@ async def resolve_place(city: str, country: str) -> dict | None:
         "country": _code_to_country().get(code) or (addr.get("country") or country)[:100],
         "continent": CONTINENT_BY_CODE.get(code),
         "lat": float(hit["lat"]), "lng": float(hit["lon"]),
+        "names": {"city": _names_of(hit)},   # retiré avant d'écrire dans users (save_place_names)
     }
+
+
+APP_LANGS = ("fr", "en", "es", "de", "pt", "it", "pl", "ar", "ja", "ko", "zh")
+
+
+def _names_of(hit: dict) -> dict:
+    nd = hit.get("namedetails") or {}
+    out = {}
+    for lang in APP_LANGS:
+        v = nd.get(f"name:{lang}")
+        if v:
+            out[lang] = v.split("/")[0].split(";")[0].strip()   # « 东京都/東京都 » → « 东京都 »
+    return out
+
+
+def place_key(country: str, level: str, name: str) -> str:
+    return f"{country or ''}|{level}|{name or ''}"[:250]
+
+
+async def save_place_names(db, place: dict, names: dict | None) -> None:
+    """Noms traduits de la ville (déjà connus) puis du département et de la région (une
+    recherche OpenStreetMap chacun, la première fois seulement). Sans effet si rien à faire."""
+    import json
+    from models import PlaceName
+    country = place.get("country") or ""
+    from helpers import _code_to_country
+    cc = {v: k for k, v in _code_to_country().items()}.get(country, "")
+    todo = [("city", place.get("city"), (names or {}).get("city"))]
+    if place.get("department") and place.get("department") != place.get("city"):
+        todo.append(("department", place["department"], None))
+    if place.get("region"):
+        todo.append(("region", place["region"], None))
+    for level, name, known in todo:
+        if not name:
+            continue
+        key = place_key(country, level, name)
+        if await db.get(PlaceName, key):
+            continue
+        if known is None:
+            try:
+                data = await _nominatim({"q": name, "limit": 1, "namedetails": 1,
+                                         **({"countrycodes": cc.lower()} if cc else {})}, "en")
+                known = _names_of(data[0]) if data else {}
+            except Exception:
+                continue
+        db.add(PlaceName(key=key, names=json.dumps(known, ensure_ascii=False)))
+    await db.commit()
+
+
+async def display_name(db, country: str, level: str, name: str, lang: str) -> str:
+    """Nom à afficher dans la langue du joueur qui regarde (sinon anglais, sinon nom local)."""
+    import json
+    from models import PlaceName
+    if not name:
+        return name
+    row = await db.get(PlaceName, place_key(country, level, name))
+    if not row:
+        return name
+    try:
+        names = json.loads(row.names)
+    except Exception:
+        return name
+    return names.get(lang) or names.get("en") or name
 
 
 async def pick_area(user, count, cities_in_department) -> dict:

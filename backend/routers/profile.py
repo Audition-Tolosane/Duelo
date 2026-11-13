@@ -108,6 +108,7 @@ async def get_profile(user_id: str, pseudo: Optional[str] = None, lang: str = 'f
             "pro_expires_at": user.pro_expires_at.isoformat() if getattr(user, "pro_expires_at", None) else None,
             "selected_title": user.selected_title,
             "country": user.country, "city": user.city, "country_flag": country_flag,
+            "city_display": await _city_display(db, user, lang),
             "matches_played": user.matches_played, "matches_won": user.matches_won,
             "best_streak": user.best_streak, "current_streak": user.current_streak,
             "streak_badge": get_streak_badge(user.current_streak),
@@ -240,8 +241,11 @@ async def update_location(
                 raise HTTPException(status_code=429, detail={"code": "city_locked", "next_change_at": next_at.isoformat()})
         if changing or not user.city:
             user.city_changed_at = datetime.now(timezone.utc)
+        names = place.pop("names", None)
         for k, v in place.items():
             setattr(user, k, v)
+        from services.geo import save_place_names
+        await save_place_names(db, place, names)
     elif "country" in body:
         user.country = country_in or None
     await db.commit()
@@ -253,7 +257,16 @@ async def update_location(
         "region": user.region,
         "country_flag": COUNTRY_FLAGS.get(user.country or "", ""),
         "department": user.department,
+        "city_display": await _city_display(db, user, str(body.get("lang") or "fr")),
     }
+
+
+async def _city_display(db, user, lang: str):
+    """Ville dans la langue de celui qui regarde (Tokyo pour un Français, 東京 pour un Japonais)."""
+    if not user.city:
+        return None
+    from services.geo import display_name
+    return await display_name(db, user.country, "city", user.city, lang)
 
 
 @router.post("/user/upload-avatar")

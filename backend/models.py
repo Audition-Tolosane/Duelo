@@ -570,3 +570,11 @@ class AdView(Base):
     verified_at = Column(DateTime(timezone=True), nullable=True)
     transaction_id = Column(String(100), nullable=True)
     used = Column(Boolean, default=False)
+
+
+class PlaceName(Base):
+    """Noms traduits d'un lieu (ville, département, région) : on REGROUPE les joueurs avec le nom
+    local (東京), on AFFICHE le nom dans la langue de celui qui regarde (Tokyo). services/geo.py."""
+    __tablename__ = 'place_names'
+    key = Column(String(250), primary_key=True)      # « pays|niveau|nom local »
+    names = Column(Text, nullable=False)              # {"fr": "Tokyo", "en": "Tokyo", "ja": "東京", ...}

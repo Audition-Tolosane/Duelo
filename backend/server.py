@@ -416,6 +416,7 @@ async def _ensure_columns():
             # Classement local en cascade : département + date du dernier changement de ville
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS department VARCHAR(100)",
             "ALTER TABLE users ADD COLUMN IF NOT EXISTS city_changed_at TIMESTAMPTZ",
+            "CREATE TABLE IF NOT EXISTS place_names (key VARCHAR(250) PRIMARY KEY, names TEXT NOT NULL)",
         ]:
             try:
                 await conn.execute(text(stmt))
@@ -586,8 +587,11 @@ async def _backfill_places():
                 if not u:
                     continue
                 if place:
+                    names = place.pop("names", None)
                     for k, v in place.items():
                         setattr(u, k, v)
+                    from services.geo import save_place_names
+                    await save_place_names(db, place, names)
                     done += 1
                 else:
                     u.department = ""   # introuvable : on ne réessaie pas à chaque démarrage
