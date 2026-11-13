@@ -52,6 +52,10 @@ function universeHint(clusters: ClusterInfo[]): string {
   return names.join(' · ');
 }
 
+// Masqués pour l'instant : remettre à true pour les réafficher
+const SHOW_FORGE = false;
+const SHOW_COMING_SOON = false;
+
 export default function ThemesScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
@@ -272,8 +276,8 @@ export default function ThemesScreen() {
           </View>
         )}
 
-        {/* ── La Forge : ligne discrète, icône corail ── */}
-        <View style={s.inset}>
+        {/* ── La Forge : masquée pour l'instant (création de thème revue plus tard) ── */}
+        {SHOW_FORGE && <View style={s.inset}>
           <ListRow
             testID="explorer-forge"
             title={t('themes.create_theme')}
@@ -290,10 +294,10 @@ export default function ThemesScreen() {
             }}
             style={s.forgeRow}
           />
-        </View>
+        </View>}
 
-        {/* ── Bientôt : une ligne de pied de page ── */}
-        {upcomingFiltered.length > 0 && (
+        {/* ── Bientôt : masqué ── */}
+        {SHOW_COMING_SOON && upcomingFiltered.length > 0 && (
           <View style={[s.inset, s.soonRow]}>
             <Icon name="lock" size={ICON_SIZE.sm} color={COLOR.text.tertiary} />
             <Txt variant="caption" style={s.soonText}>

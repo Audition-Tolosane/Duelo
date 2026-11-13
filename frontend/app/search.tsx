@@ -417,7 +417,6 @@ export default function SearchScreen() {
 
             <View style={st.section}>
               <Txt variant="overline" style={st.inset}>{t('search.all_themes')}</Txt>
-              {renderDifficultyFilters()}
               <View style={st.inset}>
                 {themes.map((theme, idx) => renderThemeItem({ item: theme, index: idx }))}
               </View>
@@ -428,7 +427,6 @@ export default function SearchScreen() {
         {/* Résultats thèmes (avec recherche) */}
         {activeTab === 'themes' && !showTrendingSection && (
           <View style={st.flex}>
-            {renderDifficultyFilters()}
             {searchError ? (
               <EmptyState icon="offline" title={t('search.error')} />
             ) : isSearching ? (

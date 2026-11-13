@@ -338,7 +338,8 @@ export default function PlayersScreen() {
   const sections: { key: SectionTab; label: string; icon: IconName }[] = [
     { key: 'pulse', label: t('pilot.social.section_activity'), icon: 'bolt' },
     { key: 'tribus', label: t('pilot.social.section_champions'), icon: 'crown' },
-    { key: 'forge', label: t('pilot.social.section_create'), icon: 'forge' },
+    // Onglet « Créer » (création de thème) masqué pour l'instant
+    // { key: 'forge', label: t('pilot.social.section_create'), icon: 'forge' },
   ];
 
   const refresh = <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLOR.text.primary} />;
