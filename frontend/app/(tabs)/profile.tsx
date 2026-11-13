@@ -631,6 +631,16 @@ export default function ProfileScreen() {
     setSavingAvatar(false);
   };
 
+  // Avant les « return » anticipés : un hook après eux fait planter React (nombre de hooks variable)
+  const countryOptions = useMemo(() => {
+    const q = countrySearch.trim().toLowerCase();
+    const ln = getLanguage();
+    return COUNTRIES
+      .map((c) => ({ ...c, label: c.names[ln] || c.names.en }))
+      .filter((c) => !q || c.label.toLowerCase().includes(q) || c.key.toLowerCase().includes(q))
+      .sort((a, b) => a.label.localeCompare(b.label, getLocale()));
+  }, [countrySearch]);
+
   if (loading) {
     return <View style={s.container}><Loader fill /></View>;
   }
@@ -661,14 +671,6 @@ export default function ProfileScreen() {
   const countryFlag = (key: string) => flagOf(key) || undefined;
   const lang = getLanguage();
   // Pays triés et cherchés dans la langue de l'app (on cherche aussi en anglais : « Japan » trouve Japon)
-  const countryOptions = useMemo(() => {
-    const q = countrySearch.trim().toLowerCase();
-    return COUNTRIES
-      .map((c) => ({ ...c, label: c.names[lang] || c.names.en }))
-      .filter((c) => !q || c.label.toLowerCase().includes(q) || c.key.toLowerCase().includes(q))
-      .sort((a, b) => a.label.localeCompare(b.label, getLocale()));
-  }, [countrySearch, lang]);
-
   return (
     <View style={s.container}>
       <AmbientBackdrop />
