@@ -227,12 +227,19 @@ async def update_location(
 
     if city_in:
         # Ville officielle (OpenStreetMap) : nom exact, département, continent, position
+        # Nouvelles apps (choose=true) : plusieurs communes du même nom → le joueur choisit la
+        # sienne (Saint-Pierre — Bas-Rhin / Haute-Garonne…), puis renvoie choice=id
+        choice = str(body.get("choice") or "")[:40] or None
         try:
-            place = await resolve_place(city_in, country_in)
+            place = await resolve_place(city_in, country_in, choice=choice,
+                                        want_choices=bool(body.get("choose")))
         except Exception:
             raise HTTPException(status_code=503, detail={"code": "geo_unavailable"})
         if not place:
             raise HTTPException(status_code=400, detail={"code": "city_not_found"})
+        choices = place.pop("choices", None)
+        if choices:
+            raise HTTPException(status_code=409, detail={"code": "city_ambiguous", "choices": choices})
         changing = bool(user.city) and (place["city"] != user.city or place["country"] != user.country)
         if changing and user.city_changed_at:
             last = user.city_changed_at if user.city_changed_at.tzinfo else user.city_changed_at.replace(tzinfo=timezone.utc)

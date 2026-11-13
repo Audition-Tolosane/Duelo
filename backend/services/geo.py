@@ -158,9 +158,24 @@ def _matches(hit: dict, q: str) -> bool:
     return False
 
 
-async def resolve_place(city: str, country: str) -> dict | None:
+def _hid(hit: dict) -> str:
+    """Identifiant OpenStreetMap stable d'un lieu (« N12345 ») : sert au choix entre homonymes."""
+    return f"{str(hit.get('osm_type') or '?')[:1].upper()}{hit.get('osm_id')}"
+
+
+def _exact(hit: dict, q: str) -> bool:
+    """Même nom exactement (« Saint-Pierre » mais pas « Saint-Pierre-de-Chartreuse »)."""
+    names = [hit.get("name") or ""] + list((hit.get("namedetails") or {}).values())
+    return any(_norm(n) == q for n in names if n)
+
+
+async def resolve_place(city: str, country: str, choice: str | None = None,
+                        want_choices: bool = False) -> dict | None:
     """Commune officielle pour « ville, pays », ou None si introuvable. Lève une exception si le
-    service est injoignable."""
+    service est injoignable.
+    want_choices : si plusieurs communes portent exactement ce nom (Saint-Pierre), la liste est
+    renvoyée dans « choices » (id, ville, département, région) ; le joueur choisit, puis on rappelle
+    avec choice=id."""
     city, country = (city or "").strip(), (country or "").strip()
     if not city:
         return None
@@ -181,14 +196,17 @@ async def resolve_place(city: str, country: str) -> dict | None:
     # Territoire : d'abord « ville, territoire », puis la ville seule (Kralendijk, Macao…)
     attempts = [base] + ([{**base, "q": city}] if terr else [])
     hit = None
+    homonyms: list = []
     try:
         for b in attempts:
-            data = [h for h in await _nominatim({**b, "limit": 5, "featureType": "settlement", "namedetails": 1}, lang)
+            data = [h for h in await _nominatim({**b, "limit": 15, "featureType": "settlement", "namedetails": 1}, lang)
                     if _in_territory(h, cc)]
             # Une ville (pas la commune administrative « county » d'Oslo ou Paramaribo) dont un nom
             # officiel (toutes langues) correspond à ce qui a été tapé ; sinon une ville ; sinon le 1er
             towns = [h for h in data if h.get("addresstype") in _PLACE_TYPES]
-            hit = (next((h for h in towns if _matches(h, q)), None) or (towns[0] if towns else None)
+            homonyms = [h for h in towns if _exact(h, q)]
+            picked = next((h for h in data if choice and _hid(h) == choice), None)
+            hit = (picked or next((h for h in towns if _matches(h, q)), None) or (towns[0] if towns else None)
                    or next((h for h in data if _matches(h, q) and h.get("addresstype") in _CITY_STATE_TYPES), None))
             if not hit:
                 # 2e essai : villes-provinces (Tokyo, Shanghai, Mexico), absentes du filtre « settlement »,
@@ -204,6 +222,23 @@ async def resolve_place(city: str, country: str) -> dict | None:
         raise
     if not hit:
         return None
+    place = _place_from_hit(hit, cc, country)
+    if place and want_choices and not (choice and _hid(hit) == choice):
+        seen, choices = set(), []
+        for h in homonyms:
+            p = _place_from_hit(h, cc, country)
+            sig = p and (p["city"], p["department"], p["region"])
+            if p and sig not in seen:
+                seen.add(sig)
+                choices.append({"id": _hid(h), "city": p["city"], "department": p["department"],
+                                "region": p["region"]})
+        if len(choices) > 1:
+            place["choices"] = choices[:10]
+    return place
+
+
+def _place_from_hit(hit: dict, cc: str, country: str) -> dict | None:
+    from helpers import _code_to_country
     addr = hit.get("address") or {}
     # Le lieu trouvé lui-même (Bibury), pas l'ensemble qui le contient (« city »: Cotswold)
     if hit.get("addresstype") in _PLACE_TYPES | _CITY_STATE_TYPES | {"county"} and hit.get("name"):

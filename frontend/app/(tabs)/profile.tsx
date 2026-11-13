@@ -422,6 +422,8 @@ export default function ProfileScreen() {
   const [countrySearch, setCountrySearch] = useState('');
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [savingLocation, setSavingLocation] = useState(false);
+  // Communes homonymes renvoyées par le serveur (Saint-Pierre — Bas-Rhin / Haute-Garonne…)
+  const [cityChoices, setCityChoices] = useState<{ id: string; city: string; department: string | null; region: string | null }[]>([]);
   const [historyExpanded, setHistoryExpanded] = useState(false);
   const [leagueData, setLeagueData] = useState<{
     mmr: number; tier: string; tier_label: string; tier_color: string;
@@ -515,20 +517,24 @@ export default function ProfileScreen() {
     setLocationCountry(profile?.user?.country || '');
     setCountrySearch('');
     setShowCountryDropdown(false);
+    setCityChoices([]);
     setShowLocationModal(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
-  const handleSaveLocation = async () => {
+  const handleSaveLocation = async (choice?: string) => {
     if (!profile) return;
     setSavingLocation(true);
     try {
       const res = await authFetch(`${API_URL}/api/user/location`, {
         method: 'PATCH',
-        body: JSON.stringify({ city: locationCity, country: locationCountry, lang: getLanguage() }),
+        body: JSON.stringify({ city: locationCity, country: locationCountry, lang: getLanguage(), choose: true, choice }),
       });
       const data = await res.json();
-      if (data.success) {
+      if (data?.detail?.code === 'city_ambiguous' && Array.isArray(data.detail.choices)) {
+        setCityChoices(data.detail.choices);
+      } else if (data.success) {
+        setCityChoices([]);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         // Nom officiel renvoyé par le serveur (« toulouse » → « Toulouse »)
         setLocationCity(data.city || '');
@@ -988,7 +994,7 @@ export default function ProfileScreen() {
         footer={
           <Button
             label={t('profile.save_location')}
-            onPress={handleSaveLocation}
+            onPress={() => handleSaveLocation()}
             loading={savingLocation}
             fullWidth
           />
@@ -999,13 +1005,35 @@ export default function ProfileScreen() {
           placeholder={t('profile.your_city')}
           placeholderTextColor={COLOR.text.tertiary}
           value={locationCity}
-          onChangeText={setLocationCity}
+          onChangeText={v => { setLocationCity(v); setCityChoices([]); }}
           autoCapitalize="words"
         />
+        {cityChoices.length > 0 && (
+          <View style={s.dropdown}>
+            <Txt variant="bodySmall" style={s.choiceHint}>{t('profile.city_pick')}</Txt>
+            <ScrollView style={s.dropdownList} keyboardShouldPersistTaps="handled" nestedScrollEnabled>
+              {cityChoices.map(c => {
+                const where = [c.department !== c.city ? c.department : null, c.region].filter(Boolean).join(', ');
+                return (
+                  <Pressable
+                    key={c.id}
+                    style={({ pressed }) => [s.countryOption, pressed && s.pressed]}
+                    onPress={() => handleSaveLocation(c.id)}
+                    disabled={savingLocation}
+                    accessibilityRole="button"
+                  >
+                    <Txt variant="body">{where ? `${c.city} — ${where}` : c.city}</Txt>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+            <Txt variant="caption" color={COLOR.text.tertiary} style={s.choiceHint}>{t('profile.city_pick_hint')}</Txt>
+          </View>
+        )}
         {/* Sélecteur de pays */}
         <Pressable
           style={[s.input, s.inputRow]}
-          onPress={() => { setShowCountryDropdown(v => !v); setCountrySearch(''); }}
+          onPress={() => { setShowCountryDropdown(v => !v); setCountrySearch(''); setCityChoices([]); }}
           accessibilityRole="button"
         >
           <View style={s.inline}>
@@ -1190,6 +1218,7 @@ const s = StyleSheet.create({
   },
   dropdownList: { maxHeight: 200 },
   countryOption: { minHeight: SIZE.touch, justifyContent: 'center', paddingHorizontal: SPACE.lg },
+  choiceHint: { paddingHorizontal: SPACE.lg, paddingVertical: SPACE.sm },
   titleOption: { paddingHorizontal: SPACE.md, borderRadius: RADII.md, borderWidth: BORDER.hair, borderColor: 'transparent' },
   titleOptionSelected: { backgroundColor: COLOR.action.selectedFill, borderColor: COLOR.border.active },
 });
