@@ -340,13 +340,14 @@ export default function ChatScreen() {
                     // Réaction d'après-match : clé traduite (émoji en grand)
                     ? <Txt variant={isEmojiReaction(item.content) ? 'h1' : 'body'} color={fg}>{reactionLabel(item.content)}</Txt>
                     : <Txt variant="body" color={fg}>{item.content}</Txt>}
-                {isMe && item.read && msgType !== 'image' ? (
-                  <View style={st.msgFooter}>
-                    <Icon name="readAll" size={ICON_SIZE.sm} color={COLOR.text.onAction} />
-                  </View>
-                ) : null}
               </View>
             )}
+            {/* Sous la bulle, petit et discret : ✓ gris = envoyé, ✓✓ jaune = lu */}
+            {isMe ? (
+              <View style={st.msgFooter} accessible accessibilityLabel={t(item.read ? 'chat.status_read' : 'chat.status_sent')}>
+                <Icon name={item.read ? 'readAll' : 'check'} size={12} color={item.read ? COLOR.accent.notif : COLOR.text.tertiary} />
+              </View>
+            ) : null}
           </Pressable>
         </View>
         </SwipeTimeRow>
@@ -520,7 +521,7 @@ const st = StyleSheet.create({
     backgroundColor: COLOR.surface.card,
     borderWidth: BORDER.hair, borderColor: COLOR.border.subtle,
   },
-  msgFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: SPACE.xs },
+  msgFooter: { flexDirection: 'row', justifyContent: 'flex-end', paddingTop: SPACE.xxs, paddingRight: SPACE.xs },
   imageMessage: { width: 200, height: 200, borderRadius: RADII.md },
 
   // Carte de match
