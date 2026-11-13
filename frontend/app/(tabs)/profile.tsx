@@ -223,13 +223,14 @@ function AchievementMedal({ item, width }: { item: any; width: number }) {
 }
 
 // ── Anneau du taux de victoire (lecture rapide) : piste crème 12 %, arc jaune = moi ──
-const RING = 84;
-const RING_STROKE = 9;
-function WinRing({ value }: { value: number }) {
+const RING = 112;
+const RING_STROKE = 10;
+function WinRing({ value, children }: { value: number; children?: React.ReactNode }) {
   const r = (RING - RING_STROKE) / 2;
   const c = 2 * Math.PI * r;
   const v = Math.max(0, Math.min(1, value));
   return (
+    <View style={s.ringBox}>
     <Svg width={RING} height={RING} aria-hidden>
       <Circle cx={RING / 2} cy={RING / 2} r={r} stroke={COLOR.track} strokeWidth={RING_STROKE} fill="none" />
       {v > 0 ? (
@@ -241,18 +242,21 @@ function WinRing({ value }: { value: number }) {
         />
       ) : null}
     </Svg>
+      {/* Pourcentage au centre de l'anneau */}
+      <View style={s.ringCenter} pointerEvents="none">{children}</View>
+    </View>
   );
 }
 
-// ── Cellule de stat (Série, Record) : pictogramme, libellé, chiffre tabulaire qui rétrécit ──
+// ── Cellule de stat (Série, Record) : pictogramme + libellé, chiffre en dessous ──
 function StatCell({ value, label, icon, color }: { value: string; label: string; icon: IconName; color: string }) {
   return (
     <View style={s.statCell} accessible accessibilityLabel={`${label} ${value}`}>
-      <Icon name={icon} size={ICON_SIZE.lg} color={color} />
-      <View style={s.shrink}>
-        <Txt variant="overline" numberOfLines={1}>{label}</Txt>
-        <Txt variant="statMedium" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>{value}</Txt>
+      <View style={s.statHead}>
+        <Icon name={icon} size={ICON_SIZE.md} color={color} />
+        <Txt variant="overline" numberOfLines={1} style={s.shrink}>{label}</Txt>
       </View>
+      <Txt variant="statMedium" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>{value}</Txt>
     </View>
   );
 }
@@ -823,23 +827,24 @@ export default function ProfileScreen() {
             </View>
           </SatinSurface>
 
-          {/* ── Victoires : % en lecture rapide + nombre brut, anneau à droite ; Série | Record dessous ── */}
-          <SatinSurface variant="card" contentStyle={[s.cardPad, s.statsCard]}>
+          {/* ── Moitié gauche : anneau avec le % dedans ; moitié droite : Série en haut, Record en bas ── */}
+          <SatinSurface variant="card" contentStyle={s.cardPad}>
             <View style={s.winRow}>
-              <View style={s.flex}>
+              <View style={s.winHalf} accessible accessibilityLabel={`${t('pilot.profile.win_rate_title')} ${winRate}%`}>
                 <Txt variant="overline" numberOfLines={1}>{t('pilot.profile.win_rate_title')}</Txt>
-                <Txt variant="statLarge" numberOfLines={1}>{`${winRate}%`}</Txt>
-                <Txt variant="caption" numberOfLines={2} style={s.tabular}>
+                <WinRing value={winRate / 100}>
+                  <Txt variant="statLarge" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>{`${winRate}%`}</Txt>
+                </WinRing>
+                <Txt variant="caption" numberOfLines={2} align="center" style={s.tabular}>
                   {t('pilot.profile.win_summary', { wins: fmt(user?.matches_won), played: fmt(user?.matches_played) })}
                 </Txt>
               </View>
-              <WinRing value={winRate / 100} />
-            </View>
-            <Divider />
-            <View style={s.statRow}>
-              <StatCell value={fmt(user?.current_streak)} label={t('pilot.profile.stat_streak')} icon="flame" color={COLOR.accent.warm} />
               <View style={s.statSep} />
-              <StatCell value={fmt(user?.best_streak)} label={t('pilot.profile.stat_best')} icon="trophy" color={COLOR.reward.gold} />
+              <View style={s.statCol}>
+                <StatCell value={fmt(user?.current_streak)} label={t('pilot.profile.stat_streak')} icon="flame" color={COLOR.accent.warm} />
+                <Divider />
+                <StatCell value={fmt(user?.best_streak)} label={t('pilot.profile.stat_best')} icon="trophy" color={COLOR.reward.gold} />
+              </View>
             </View>
           </SatinSurface>
           </View>
@@ -1153,11 +1158,15 @@ const s = StyleSheet.create({
 
   /* Victoires + stats */
   cardsBlock: { gap: SPACE.lg },
-  statsCard: { gap: SPACE.md },
-  winRow: { flexDirection: 'row', alignItems: 'center', gap: SPACE.lg },
+  winRow: { flexDirection: 'row', alignItems: 'stretch' },
+  winHalf: { flex: 1, alignItems: 'center', gap: SPACE.sm },
+  ringBox: { width: RING, height: RING },
+  ringCenter: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', paddingHorizontal: RING_STROKE + SPACE.xs },
+  statCol: { flex: 1, justifyContent: 'space-around', gap: SPACE.md },
+  statHead: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm },
   statRow: { flexDirection: 'row', alignItems: 'center' },
-  statCell: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: SPACE.md, paddingHorizontal: SPACE.xs },
-  statSep: { width: BORDER.hair, alignSelf: 'stretch', backgroundColor: COLOR.border.subtle, marginHorizontal: SPACE.sm },
+  statCell: { gap: SPACE.xs, paddingHorizontal: SPACE.md },
+  statSep: { width: BORDER.hair, alignSelf: 'stretch', backgroundColor: COLOR.border.subtle, marginHorizontal: SPACE.md },
 
   /* Social */
   socialRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: SPACE.xs, marginTop: SPACE.xxs },
