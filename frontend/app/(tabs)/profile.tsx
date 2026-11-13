@@ -248,15 +248,15 @@ function WinRing({ value, children }: { value: number; children?: React.ReactNod
   );
 }
 
-// ── Cellule de stat (Série, Record) : pictogramme + libellé, chiffre en dessous ──
+// ── Cellule de stat (Série, Record) : pictogramme centré verticalement à gauche du libellé et du chiffre ──
 function StatCell({ value, label, icon, color }: { value: string; label: string; icon: IconName; color: string }) {
   return (
     <View style={s.statCell} accessible accessibilityLabel={`${label} ${value}`}>
-      <View style={s.statHead}>
-        <Icon name={icon} size={ICON_SIZE.md} color={color} />
-        <Txt variant="overline" numberOfLines={1} style={s.shrink}>{label}</Txt>
+      <Icon name={icon} size={ICON_SIZE.lg} color={color} />
+      <View style={s.shrink}>
+        <Txt variant="overline" numberOfLines={1}>{label}</Txt>
+        <Txt variant="statMedium" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>{value}</Txt>
       </View>
-      <Txt variant="statMedium" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>{value}</Txt>
     </View>
   );
 }
@@ -1163,9 +1163,8 @@ const s = StyleSheet.create({
   ringBox: { width: RING, height: RING },
   ringCenter: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', paddingHorizontal: RING_STROKE + SPACE.xs },
   statCol: { flex: 1, justifyContent: 'space-around', gap: SPACE.md },
-  statHead: { flexDirection: 'row', alignItems: 'center', gap: SPACE.sm },
   statRow: { flexDirection: 'row', alignItems: 'center' },
-  statCell: { gap: SPACE.xs, paddingHorizontal: SPACE.md },
+  statCell: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md, paddingHorizontal: SPACE.md },
   statSep: { width: BORDER.hair, alignSelf: 'stretch', backgroundColor: COLOR.border.subtle, marginHorizontal: SPACE.md },
 
   /* Social */
