@@ -55,7 +55,7 @@ export default function SearchField({ placeholder, onPressTrigger, value, onChan
 const styles = StyleSheet.create({
   base: {
     height: SIZE.input,
-    borderRadius: RADII.md,
+    borderRadius: RADII.pill,   // bouts entièrement arrondis
     backgroundColor: COLOR.surface.input,
     borderWidth: BORDER.hair,
     borderColor: COLOR.border.default,

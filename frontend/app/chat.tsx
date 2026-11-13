@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, SharedValue } from 'react-native-reanimated';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import {
   View, StyleSheet, TextInput, FlatList, ScrollView, KeyboardAvoidingView, Platform, Keyboard, Image, Pressable,
 } from 'react-native';
@@ -52,6 +54,22 @@ type Message = {
   read: boolean;
   created_at: string;
 };
+
+// Glisser la conversation vers la gauche fait apparaître l'heure de chaque message (comme Instagram)
+const TIME_W = 64;
+
+function SwipeTimeRow({ reveal, time, children }: { reveal: SharedValue<number>; time: string; children: React.ReactNode }) {
+  const rowStyle = useAnimatedStyle(() => ({ transform: [{ translateX: -reveal.value }] }));
+  const timeStyle = useAnimatedStyle(() => ({ opacity: reveal.value / TIME_W }));
+  return (
+    <Animated.View style={rowStyle}>
+      {children}
+      <Animated.View style={[st.swipeTime, timeStyle]} pointerEvents="none">
+        <Txt variant="caption" color={COLOR.text.tertiary}>{time}</Txt>
+      </Animated.View>
+    </Animated.View>
+  );
+}
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -217,17 +235,15 @@ export default function ChatScreen() {
     }
   };
 
-  const formatTime = (dateStr: string) => {
-    const d = new Date(dateStr);
-    const now = new Date();
-    const diffDays = Math.floor((now.getTime() - d.getTime()) / 86400000);
-    const locale = getLocale();
-    const time = d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
-    if (diffDays === 0) return time;
-    if (diffDays === 1) return `${t('chat.yesterday')} ${time}`;
-    if (diffDays < 7) return `${d.toLocaleDateString(locale, { weekday: 'short' })} ${time}`;
-    return d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit' }) + ` ${time}`;
-  };
+  const reveal = useSharedValue(0);
+  // Vers la gauche seulement (vers la droite = retour, SwipeBackPage) ; le défilement vertical l'emporte
+  const timePan = useMemo(() => Gesture.Pan()
+    .activeOffsetX(-12)
+    .failOffsetX(12)
+    .failOffsetY([-12, 12])
+    .onUpdate((e) => { reveal.value = Math.min(TIME_W, Math.max(0, -e.translationX)); })
+    .onFinalize(() => { reveal.value = withSpring(0, { damping: 20, stiffness: 220 }); }),
+  [reveal]);
 
   // ── Carte de match ──
   const GameCard = ({ data, isMe }: { data: any; isMe: boolean }) => {
@@ -290,7 +306,6 @@ export default function ChatScreen() {
     const onLongPress = isMe ? undefined : () => setModTarget({ type: 'message', id: item.id });
     const msgType = item.message_type || 'text';
     const fg = isMe ? COLOR.text.onAction : COLOR.text.primary;
-    const timeColor = isMe ? COLOR.text.onAction : COLOR.text.tertiary;
 
     const showDate = index === 0 || (
       new Date(item.created_at).toDateString() !==
@@ -308,6 +323,7 @@ export default function ChatScreen() {
             <View style={st.dateLine} />
           </View>
         ) : null}
+        <SwipeTimeRow reveal={reveal} time={new Date(item.created_at).toLocaleTimeString(getLocale(), { hour: '2-digit', minute: '2-digit' })}>
         <View style={[st.msgRow, isMe ? st.msgRowRight : st.msgRowLeft]}>
           {!isMe && (
             <UserAvatar avatarUrl={partnerAvatarUrl || undefined} avatarSeed={partnerAvatarSeed || partnerPseudo || ''} pseudo={partnerPseudo || '?'} size={30} />
@@ -324,14 +340,16 @@ export default function ChatScreen() {
                     // Réaction d'après-match : clé traduite (émoji en grand)
                     ? <Txt variant={isEmojiReaction(item.content) ? 'h1' : 'body'} color={fg}>{reactionLabel(item.content)}</Txt>
                     : <Txt variant="body" color={fg}>{item.content}</Txt>}
-                <View style={st.msgFooter}>
-                  <Txt variant="caption" color={timeColor} style={isMe ? st.myTime : null}>{formatTime(item.created_at)}</Txt>
-                  {isMe && item.read && msgType !== 'image' ? <Icon name="readAll" size={ICON_SIZE.sm} color={COLOR.text.onAction} /> : null}
-                </View>
+                {isMe && item.read && msgType !== 'image' ? (
+                  <View style={st.msgFooter}>
+                    <Icon name="readAll" size={ICON_SIZE.sm} color={COLOR.text.onAction} />
+                  </View>
+                ) : null}
               </View>
             )}
           </Pressable>
         </View>
+        </SwipeTimeRow>
       </View>
     );
   };
@@ -389,6 +407,7 @@ export default function ChatScreen() {
       </View>
 
       <KeyboardAvoidingView style={st.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <GestureDetector gesture={timePan}>
         <FlatList
           ref={flatListRef}
           data={messages}
@@ -410,6 +429,7 @@ export default function ChatScreen() {
             </View>
           }
         />
+        </GestureDetector>
 
         {/* Réponses rapides */}
         {!hasText && (
@@ -487,7 +507,8 @@ const st = StyleSheet.create({
   // Messages
   messagesList: { paddingHorizontal: SPACE.screenX, paddingVertical: SPACE.lg, gap: SPACE.sm, flexGrow: 1 },
   dateSeparator: { flexDirection: 'row', alignItems: 'center', gap: SPACE.md, marginVertical: SPACE.md },
-  dateLine: { flex: 1, height: BORDER.hair, backgroundColor: COLOR.border.subtle },
+  dateLine: { flex: 1, height: BORDER.hair, backgroundColor: COLOR.border.default },
+  swipeTime: { position: 'absolute', top: 0, bottom: 0, right: -TIME_W, width: TIME_W, alignItems: 'center', justifyContent: 'center' },
   msgRow: { flexDirection: 'row', alignItems: 'flex-end', gap: SPACE.sm },
   msgRowLeft: { justifyContent: 'flex-start' },
   msgRowRight: { justifyContent: 'flex-end' },
@@ -499,7 +520,6 @@ const st = StyleSheet.create({
     borderWidth: BORDER.hair, borderColor: COLOR.border.subtle,
   },
   msgFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: SPACE.xs },
-  myTime: { opacity: 0.7 },
   imageMessage: { width: 200, height: 200, borderRadius: RADII.md },
 
   // Carte de match
