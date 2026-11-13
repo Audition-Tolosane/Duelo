@@ -79,10 +79,15 @@ async def get_economy(db: AsyncSession, user_id: str) -> UserEconomy:
     econ = res.scalar_one_or_none()
     now = _now()
     if not econ:
-        econ = UserEconomy(user_id=user_id, credits=CREDITS_MAX, regen_at=now, ads_today=0,
-                           theme_bonus=0, chests_opened=0)
-        db.add(econ)
-        await db.flush()
+        # Premier accès : deux requêtes simultanées (accueil + boutique) créaient la ligne deux
+        # fois → erreur 500 « duplicate key ». ON CONFLICT DO NOTHING, puis on relit verrouillé.
+        from sqlalchemy.dialects.postgresql import insert as pg_insert
+        await db.execute(pg_insert(UserEconomy).values(
+            user_id=user_id, credits=CREDITS_MAX, regen_at=now, ads_today=0,
+            theme_bonus=0, chests_opened=0,
+        ).on_conflict_do_nothing(index_elements=[UserEconomy.user_id]))
+        res = await db.execute(select(UserEconomy).where(UserEconomy.user_id == user_id).with_for_update())
+        econ = res.scalar_one()
     # Recharge : +1 par tranche de 30 min écoulée, jusqu'au maximum.
     regen_at = _aware(econ.regen_at) or now
     if econ.credits < CREDITS_MAX:
