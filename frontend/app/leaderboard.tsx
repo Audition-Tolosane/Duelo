@@ -69,7 +69,7 @@ type LeaderMeta = {
   city_player_count?: number;
   fallback?: boolean;
   missing?: boolean;
-  area_level?: 'city' | 'nearby_city' | 'department' | 'country' | 'continent' | 'world';
+  area_level?: 'city' | 'nearby_city' | 'department' | 'region' | 'country' | 'continent' | 'world';
   area_name?: string;
   suggestions?: CitySuggestion[];
 };

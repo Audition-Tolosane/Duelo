@@ -10,9 +10,14 @@ classement existe. Sinon le joueur est placé, dans l'ordre :
   1. dans sa commune ;
   2. dans la commune la plus proche de SON département qui a assez de joueurs ;
   3. dans son département ;
-  4. dans son pays ;
-  5. sur son continent ;
-  6. dans le classement mondial.
+  4. dans sa région ;
+  5. dans son pays ;
+  6. sur son continent ;
+  7. dans le classement mondial.
+
+Département : le « county » d'OpenStreetMap (Haute-Garonne, Landkreis Freising…). Une ville
+sans county est une ville-département : Paris, ou une kreisfreie Stadt allemande comme Munich
+ou Augsburg — elle est alors son propre département. Région : le « state » (Occitanie, Bayern).
 """
 import asyncio
 import logging
@@ -93,11 +98,8 @@ async def resolve_place(city: str, country: str) -> dict | None:
     from helpers import _code_to_country
     return {
         "city": name[:100],
-        # Département : le « county » d'OpenStreetMap. Paris (ville ET département, code FR-75C)
-        # n'en a pas : la ville elle-même, plutôt que la région Île-de-France tout entière.
-        "department": (addr.get("county") or addr.get("state_district")
-                       or (name if addr.get("ISO3166-2-lvl6") else None)
-                       or addr.get("state") or "")[:100] or None,
+        # Pas de county : ville-département (Paris, Munich…) → la ville elle-même
+        "department": (addr.get("county") or addr.get("state_district") or name)[:100],
         "region": (addr.get("state") or "")[:100] or None,
         "country": _code_to_country().get(code) or (addr.get("country") or country)[:100],
         "continent": CONTINENT_BY_CODE.get(code),
@@ -133,6 +135,11 @@ async def pick_area(user, count, cities_in_department) -> dict:
             return {"level": "nearby_city", "name": city, "filters": dep_filters + [User.city == city]}
         if await count(dep_filters) >= MIN_AREA_PLAYERS:
             return {"level": "department", "name": user.department, "filters": dep_filters}
+
+    if user.region and user.country:
+        reg_filters = [User.country == user.country, User.region == user.region]
+        if await count(reg_filters) >= MIN_AREA_PLAYERS:
+            return {"level": "region", "name": user.region, "filters": reg_filters}
 
     if user.country and await count([User.country == user.country]) >= MIN_AREA_PLAYERS:
         return {"level": "country", "name": user.country, "filters": [User.country == user.country]}

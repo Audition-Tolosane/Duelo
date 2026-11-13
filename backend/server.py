@@ -563,7 +563,7 @@ async def _backfill_places():
     introuvable est laissée telle quelle."""
     import asyncio
     from database import AsyncSessionLocal
-    from sqlalchemy import select as _sel
+    from sqlalchemy import select as _sel, or_
     from models import User as _U
     from services.geo import resolve_place
     await asyncio.sleep(30)
@@ -571,7 +571,8 @@ async def _backfill_places():
         async with AsyncSessionLocal() as db:
             rows = (await db.execute(
                 _sel(_U.id, _U.city, _U.country).where(
-                    _U.is_bot == False, _U.city.isnot(None), _U.department.is_(None),  # noqa: E712
+                    _U.is_bot == False, _U.city.isnot(None),  # noqa: E712
+                    or_(_U.department.is_(None), _U.department == _U.region),
                 ).limit(500)
             )).all()
         done = 0
