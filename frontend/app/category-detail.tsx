@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Pressable, StyleSheet, ScrollView, TextInput, Image,
-  KeyboardAvoidingView, Platform, Keyboard, RefreshControl, Modal, Alert, useWindowDimensions,
+  KeyboardAvoidingView, Platform, Keyboard, RefreshControl, Modal, Alert, useWindowDimensions, ActivityIndicator,
   NativeSyntheticEvent, NativeScrollEvent, LayoutChangeEvent,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -93,6 +93,7 @@ export default function CategoryDetailScreen() {
   const [friendsLoading, setFriendsLoading] = useState(false);
   const [friendQuery, setFriendQuery] = useState('');
   const [friendResults, setFriendResults] = useState<FriendItem[]>([]);
+  const [sendingTo, setSendingTo] = useState<string | null>(null);
   const [detail, setDetail] = useState<CategoryDetail | null>(null);
   const [posts, setPosts] = useState<WallPostData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -287,10 +288,38 @@ export default function CategoryDetailScreen() {
     setFriendQuery('');
   };
 
-  // Le défi se confirme sur le profil de l'ami, avec ce thème présélectionné.
-  const handleChallengeFriend = (friendId: string) => {
-    closeFriendSheet();
-    router.push(`/player-profile?id=${friendId}&challenge=1&themeId=${id}&themeName=${encodeURIComponent(detail?.name || '')}` as any);
+  // Le thème est déjà choisi : toucher l'ami envoie le défi directement (plus de détour par son
+  // profil où il fallait redéfier), puis écran d'attente.
+  const handleChallengeFriend = async (f: FriendItem) => {
+    if (sendingTo) return;
+    setSendingTo(f.id);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    try {
+      const res = await authFetch(`${API_URL}/api/challenges/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ challenger_id: userId, challenged_id: f.id, theme_id: id, theme_name: detail?.name || '' }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        closeFriendSheet();
+        router.push(
+          `/challenge-waiting?challenge_id=${data.challenge_id}` +
+          `&opponent_pseudo=${encodeURIComponent(f.pseudo || '')}` +
+          `&opponent_seed=${encodeURIComponent(f.avatar_seed || '')}` +
+          `&theme_id=${encodeURIComponent(String(id || ''))}` +
+          `&theme_name=${encodeURIComponent(detail?.name || '')}` as any
+        );
+      } else if (res.status === 409) {
+        Alert.alert(t('challenge.already_pending'));
+      } else {
+        const err = await res.json().catch(() => null);
+        Alert.alert(t('common.error'), (typeof err?.detail === 'string' && err.detail) || t('common.error_loading'));
+      }
+    } catch {
+      Alert.alert(t('common.error'), t('common.error_loading'));
+    }
+    setSendingTo(null);
   };
 
   const handleLeaderboard = () => {
@@ -922,8 +951,8 @@ export default function CategoryDetailScreen() {
                 title={f.pseudo}
                 subtitle={f.selected_title || undefined}
                 leading={<UserAvatar avatarUrl={f.avatar_url || undefined} avatarSeed={f.avatar_seed || f.pseudo} pseudo={f.pseudo} size={40} />}
-                trailing={<Icon name="duel" size={20} color={COLOR.action.primary} />}
-                onPress={() => handleChallengeFriend(f.id)}
+                trailing={sendingTo === f.id ? <ActivityIndicator size="small" color={COLOR.action.primary} /> : <Icon name="duel" size={20} color={COLOR.action.primary} />}
+                onPress={() => handleChallengeFriend(f)}
               />
             ));
           })()}
