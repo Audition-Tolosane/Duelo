@@ -357,6 +357,6 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLOR.accent.warm,
+    backgroundColor: COLOR.accent.notif,
   },
 });

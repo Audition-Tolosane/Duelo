@@ -69,7 +69,8 @@ export default function UserAvatar({
           justifyContent: 'center',
           alignItems: 'center',
         },
-        !frameGrad && borderColor ? { borderWidth: borderWidth || 2, borderColor } : null,
+        // Contour #FFC928 autour de chaque avatar (photo ou initiale) ; cadre dégradé s'il y en a un
+        !frameGrad ? { borderWidth: borderWidth || 2, borderColor: borderColor || COLOR.accent.notif } : null,
       ]}
     >
       {fullUrl ? (

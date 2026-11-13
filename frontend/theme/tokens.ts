@@ -62,6 +62,7 @@ export const COLOR = {
   accent: {
     warm:      PALETTE.coral,                 // événements, série, défi reçu
     rare:      PALETTE.violet,                // flawless, premium — rien d'autre
+    notif:     '#FFC928',                     // pastilles de non-lus, bulles envoyées, contour d'avatar
   },
   status: {
     success:   PALETTE.green,

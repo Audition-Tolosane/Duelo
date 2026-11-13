@@ -514,9 +514,10 @@ const st = StyleSheet.create({
   msgRowRight: { justifyContent: 'flex-end' },
   msgContent: { maxWidth: '80%' },
   msgBubble: { borderRadius: RADII.lg, paddingHorizontal: SPACE.md, paddingVertical: SPACE.sm, gap: SPACE.xs },
-  myBubble: { backgroundColor: COLOR.player.self, borderBottomRightRadius: RADII.xs },
+  // Coins tous arrondis (plus d'angle côté expéditeur)
+  myBubble: { backgroundColor: COLOR.accent.notif },
   theirBubble: {
-    backgroundColor: COLOR.surface.card, borderBottomLeftRadius: RADII.xs,
+    backgroundColor: COLOR.surface.card,
     borderWidth: BORDER.hair, borderColor: COLOR.border.subtle,
   },
   msgFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: SPACE.xs },

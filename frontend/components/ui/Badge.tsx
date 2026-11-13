@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import Txt from './Txt';
 import { COLOR, RADII, SPACE } from '../../theme/tokens';
 
-type Tone = 'warm' | 'action' | 'reward' | 'rare' | 'neutral' | 'success';
+type Tone = 'warm' | 'action' | 'reward' | 'rare' | 'neutral' | 'success' | 'notif';
 
 type Props =
   | { count: number; label?: never; tone?: Tone }
@@ -16,11 +16,13 @@ const BG: Record<Tone, string> = {
   rare: COLOR.accent.rare,
   neutral: COLOR.surface.elevated,
   success: COLOR.status.success,
+  notif: COLOR.accent.notif,
 };
 
 // Pastille de compteur (corail par défaut : un événement attend le joueur) ou étiquette courte.
 export default function Badge(props: Props) {
-  const tone = props.tone ?? 'warm';
+  // Compteur (non-lus) : jaune #FFC928 ; étiquette : corail par défaut
+  const tone = props.tone ?? (typeof props.count === 'number' ? 'notif' : 'warm');
   const fg = tone === 'neutral' ? COLOR.text.primary : COLOR.text.onAction;
   if (typeof props.count === 'number') {
     const txt = props.count > 99 ? '99+' : String(props.count);
