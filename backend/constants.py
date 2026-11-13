@@ -20,6 +20,21 @@ COUNTRY_FLAGS = {
     "Ukraine": "🇺🇦", "Croatia": "🇭🇷", "Peru": "🇵🇪", "Venezuela": "🇻🇪", "Ecuador": "🇪🇨",
 }
 
+# Tous les pays du monde (247, noms Unicode CLDR — backend/data/countries.json) : drapeau pour
+# chacun. Les 54 noms ci-dessus restent tels quels (déjà enregistrés en base).
+def _all_country_flags():
+    import json as _json
+    from pathlib import Path as _P
+    try:
+        data = _json.loads((_P(__file__).parent / "data" / "countries.json").read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    return {v["key"]: "".join(chr(0x1F1E6 + ord(ch) - 65) for ch in code) for code, v in data.items()}
+
+
+for _name, _flag in _all_country_flags().items():
+    COUNTRY_FLAGS.setdefault(_name, _flag)
+
 NOTIFICATION_TYPE_MAP = {
     "challenge": {"icon": "⚔️", "priority": 1},
     "match_result": {"icon": "🏆", "priority": 2},

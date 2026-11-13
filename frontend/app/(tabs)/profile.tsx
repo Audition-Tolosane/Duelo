@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useId } from 'react';
+import React, { useState, useEffect, useId, useMemo } from 'react';
 import { View, StyleSheet, ScrollView, Image, Alert, TextInput, Pressable } from 'react-native';
 import { useRouter, Href } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,6 +9,7 @@ import { authFetch } from '../../utils/api';
 import { useTabBar } from '../../contexts/TabBarContext';
 import Svg, { Path, Circle, Defs, LinearGradient as SvgLinear, RadialGradient, Stop, Rect } from 'react-native-svg';
 import { t, getLocale, getLanguage, universeName } from '../../utils/i18n';
+import { COUNTRIES, countryName, countryFlag as flagOf } from '../../utils/countries';
 import {
   Txt, Icon, IconName, Button, IconButton, Section, ProgressBar, ListRow, Loader, Dialog,
   BottomSheet, ThemeIcon, EmptyState, SatinSurface, AmbientBackdrop, HeroGlow,
@@ -39,26 +40,7 @@ function getXpInLevel(xp: number, level: number) {
 // Palier ultime de la ligue : seul rang en violet (rareté). Tous les autres sont en or.
 const ULTIMATE_TIER = 'diamond';
 
-const COUNTRIES: { name: string; flag: string }[] = [
-  { name: 'France', flag: '🇫🇷' }, { name: 'Germany', flag: '🇩🇪' }, { name: 'Spain', flag: '🇪🇸' },
-  { name: 'Italy', flag: '🇮🇹' }, { name: 'United Kingdom', flag: '🇬🇧' }, { name: 'United States', flag: '🇺🇸' },
-  { name: 'Canada', flag: '🇨🇦' }, { name: 'Brazil', flag: '🇧🇷' }, { name: 'Japan', flag: '🇯🇵' },
-  { name: 'China', flag: '🇨🇳' }, { name: 'Australia', flag: '🇦🇺' }, { name: 'India', flag: '🇮🇳' },
-  { name: 'Mexico', flag: '🇲🇽' }, { name: 'Russia', flag: '🇷🇺' }, { name: 'South Korea', flag: '🇰🇷' },
-  { name: 'Netherlands', flag: '🇳🇱' }, { name: 'Belgium', flag: '🇧🇪' }, { name: 'Switzerland', flag: '🇨🇭' },
-  { name: 'Portugal', flag: '🇵🇹' }, { name: 'Sweden', flag: '🇸🇪' }, { name: 'Norway', flag: '🇳🇴' },
-  { name: 'Denmark', flag: '🇩🇰' }, { name: 'Finland', flag: '🇫🇮' }, { name: 'Poland', flag: '🇵🇱' },
-  { name: 'Austria', flag: '🇦🇹' }, { name: 'Ireland', flag: '🇮🇪' }, { name: 'Argentina', flag: '🇦🇷' },
-  { name: 'Colombia', flag: '🇨🇴' }, { name: 'Chile', flag: '🇨🇱' }, { name: 'Morocco', flag: '🇲🇦' },
-  { name: 'Algeria', flag: '🇩🇿' }, { name: 'Tunisia', flag: '🇹🇳' }, { name: 'Egypt', flag: '🇪🇬' },
-  { name: 'Turkey', flag: '🇹🇷' }, { name: 'Saudi Arabia', flag: '🇸🇦' }, { name: 'South Africa', flag: '🇿🇦' },
-  { name: 'Nigeria', flag: '🇳🇬' }, { name: 'Indonesia', flag: '🇮🇩' }, { name: 'Thailand', flag: '🇹🇭' },
-  { name: 'Vietnam', flag: '🇻🇳' }, { name: 'Philippines', flag: '🇵🇭' }, { name: 'Malaysia', flag: '🇲🇾' },
-  { name: 'Singapore', flag: '🇸🇬' }, { name: 'New Zealand', flag: '🇳🇿' }, { name: 'Israel', flag: '🇮🇱' },
-  { name: 'Greece', flag: '🇬🇷' }, { name: 'Czech Republic', flag: '🇨🇿' }, { name: 'Romania', flag: '🇷🇴' },
-  { name: 'Hungary', flag: '🇭🇺' }, { name: 'Ukraine', flag: '🇺🇦' }, { name: 'Croatia', flag: '🇭🇷' },
-  { name: 'Peru', flag: '🇵🇪' }, { name: 'Venezuela', flag: '🇻🇪' }, { name: 'Ecuador', flag: '🇪🇨' },
-];
+// Liste des pays : tous les pays du monde, nom dans la langue de l'app (utils/countries.ts)
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -670,7 +652,16 @@ export default function ProfileScreen() {
   const ultimate = leagueData?.tier === ULTIMATE_TIER;
   const leagueTone = ultimate ? COLOR.accent.rare : COLOR.reward.gold;
   const winRate = Math.max(0, Math.min(100, Math.round(user?.win_rate || 0)));
-  const countryFlag = (name: string) => COUNTRIES.find(c => c.name === name)?.flag;
+  const countryFlag = (key: string) => flagOf(key) || undefined;
+  const lang = getLanguage();
+  // Pays triés et cherchés dans la langue de l'app (on cherche aussi en anglais : « Japan » trouve Japon)
+  const countryOptions = useMemo(() => {
+    const q = countrySearch.trim().toLowerCase();
+    return COUNTRIES
+      .map((c) => ({ ...c, label: c.names[lang] || c.names.en }))
+      .filter((c) => !q || c.label.toLowerCase().includes(q) || c.key.toLowerCase().includes(q))
+      .sort((a, b) => a.label.localeCompare(b.label, getLocale()));
+  }, [countrySearch, lang]);
 
   return (
     <View style={s.container}>
@@ -746,7 +737,7 @@ export default function ProfileScreen() {
               : <Icon name="globe" size={ICON_SIZE.sm} color={COLOR.text.secondary} />}
             <Txt variant="label" numberOfLines={1} style={s.shrink}>
               {user?.city && user?.country
-                ? `${user.city_display || user.city}, ${user.country}`
+                ? `${user.city_display || user.city}, ${countryName(user.country, lang)}`
                 : user?.country || t('profile.world')}
             </Txt>
             <Icon name="chevronDown" size={ICON_SIZE.sm} color={COLOR.text.tertiary} />
@@ -1022,7 +1013,7 @@ export default function ProfileScreen() {
               ? <Txt variant="body">{countryFlag(locationCountry) ?? ''}</Txt>
               : <Icon name="globe" size={ICON_SIZE.md} color={COLOR.text.tertiary} />}
             <Txt variant="body" color={locationCountry ? COLOR.text.primary : COLOR.text.tertiary}>
-              {locationCountry || t('profile.your_country')}
+              {locationCountry ? countryName(locationCountry, lang) : t('profile.your_country')}
             </Txt>
           </View>
           <Icon name="chevronDown" size={ICON_SIZE.md} color={COLOR.text.secondary} />
@@ -1038,13 +1029,13 @@ export default function ProfileScreen() {
               autoFocus
             />
             <ScrollView style={s.dropdownList} keyboardShouldPersistTaps="handled" nestedScrollEnabled>
-              {COUNTRIES.filter(c => c.name.toLowerCase().includes(countrySearch.toLowerCase())).map(c => (
+              {countryOptions.map(c => (
                 <Pressable
-                  key={c.name}
+                  key={c.code}
                   style={({ pressed }) => [s.countryOption, pressed && s.pressed]}
-                  onPress={() => { setLocationCountry(c.name); setShowCountryDropdown(false); }}
+                  onPress={() => { setLocationCountry(c.key); setShowCountryDropdown(false); }}
                 >
-                  <Txt variant="body">{`${c.flag} ${c.name}`}</Txt>
+                  <Txt variant="body">{`${c.flag} ${c.label}`}</Txt>
                 </Pressable>
               ))}
             </ScrollView>

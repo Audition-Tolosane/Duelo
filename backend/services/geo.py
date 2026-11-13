@@ -72,8 +72,28 @@ for _lang, _codes in {
     for _c in _codes.split():
         _LANG_BY_CODE[_c] = _lang
 
+_PARENT = {}
+for _parent, _codes in {
+    "FR": "RE GP MQ GF YT PM BL MF WF PF NC TF", "NL": "AW CW SX BQ", "US": "AS GU MP PR VI UM",
+    "FI": "AX", "NO": "SJ BV", "CN": "HK MO", "AU": "NF CX CC HM", "DK": "FO GL",
+    "GB": "AI BM KY VG MS TC FK GI PN SH IO GS", "NZ": "TK NU CK", "MA": "EH",
+}.items():
+    for _c in _codes.split():
+        _PARENT[_c] = _parent
+
+# Codes de subdivision qu'OpenStreetMap donne aux territoires (Guadeloupe = FR-971, Åland = FI-01…)
+_TERRITORY_ISO = {k: set(v.split()) for k, v in {
+    "GP": "FR-971 FR-GP", "MQ": "FR-972 FR-MQ", "GF": "FR-973 FR-GF", "RE": "FR-974 FR-RE",
+    "PM": "FR-975 FR-PM", "YT": "FR-976 FR-YT", "BL": "FR-977 FR-BL", "MF": "FR-978 FR-MF",
+    "WF": "FR-986 FR-WF", "PF": "FR-987 FR-PF", "NC": "FR-988 FR-NC", "TF": "FR-984 FR-TF",
+    "AX": "FI-01", "SJ": "NO-21 NO-22", "PR": "US-PR", "GU": "US-GU", "AS": "US-AS", "VI": "US-VI",
+    "MP": "US-MP", "UM": "US-UM", "HK": "CN-HK CN-91", "MO": "CN-MO CN-92",
+    # Sahara occidental : rangé par OpenStreetMap dans les provinces marocaines du Sud
+    "EH": "MA-11 MA-12 MA-LAA MA-BOD MA-ESM MA-OUD MA-AOU",
+}.items()}
+
 # Villes-provinces (Tokyo, Shanghai, Mexico…) : OpenStreetMap les range en « province »/« state »
-_CITY_STATE_TYPES = {"province", "state", "city", "town"}
+_CITY_STATE_TYPES = {"province", "state", "city", "town", "locality"}
 
 # Nominatim : 1 requête par seconde au plus (règle d'usage d'OpenStreetMap)
 _NOMINATIM_LOCK = asyncio.Lock()
@@ -88,14 +108,36 @@ async def _nominatim(params: dict, lang: str) -> list:
             await asyncio.sleep(wait)
         try:
             async with httpx.AsyncClient(timeout=6.0) as client:
-                resp = await client.get(
-                    "https://nominatim.openstreetmap.org/search",
-                    params={"format": "jsonv2", "addressdetails": 1, **params},
-                    headers={"User-Agent": "DueloApp/1.0 (skilki)", "Accept-Language": f"{lang},en"},
-                )
-                return resp.json() if resp.status_code == 200 else []
+                for attempt in range(2):
+                    resp = await client.get(
+                        "https://nominatim.openstreetmap.org/search",
+                        params={"format": "jsonv2", "addressdetails": 1, **params},
+                        headers={"User-Agent": "DueloApp/1.0 (skilki)", "Accept-Language": f"{lang},en"},
+                    )
+                    if resp.status_code == 200:
+                        return resp.json()
+                    # Refus passager (trop de demandes, panne) : une nouvelle tentative, puis erreur
+                    # — surtout pas « ville introuvable », qui ferait refuser une vraie ville.
+                    logger.warning(f"[geo] Nominatim HTTP {resp.status_code} pour {params.get('q')!r}")
+                    await asyncio.sleep(3)
+                raise RuntimeError(f"Nominatim HTTP {resp.status_code}")
         finally:
             _last_call = time.monotonic()
+
+
+def _in_territory(hit: dict, cc: str) -> bool:
+    """Territoire cherché via son pays de rattachement (La Réunion dans la France) : le lieu doit
+    porter le code du territoire (FR-RE), sinon « Saint-Denis » donnait celui de Seine-Saint-Denis."""
+    if cc not in _PARENT:
+        return True
+    addr = hit.get("address") or {}
+    if str(addr.get("country_code") or "").upper() == cc:
+        return True
+    iso = {str(v).upper() for k, v in addr.items() if k.startswith("ISO3166-2")}
+    if iso & _TERRITORY_ISO.get(cc, set()):
+        return True
+    # Codes de subdivision du type FR-RE / US-PR / BQ-BO
+    return any(v.endswith(f"-{cc}") or v.startswith(f"{cc}-") for v in iso)
 
 
 def _norm(s: str) -> str:
@@ -125,20 +167,38 @@ async def resolve_place(city: str, country: str) -> dict | None:
     from helpers import _code_to_country
     by_name = {v.lower(): k for k, v in _code_to_country().items()}
     cc = by_name.get(country.lower()) or (country.upper() if len(country) == 2 else "")
+    # Territoires (La Réunion, Curaçao, Guam…) : rangés par OpenStreetMap dans leur pays de
+    # rattachement → on cherche dans les deux, mais on garde le territoire choisi par le joueur.
+    search_codes = ",".join(c.lower() for c in [cc, _PARENT.get(cc, "")] if c)
     lang = _LANG_BY_CODE.get(cc, "en")
     # Pays connu : filtre par code pays (une ville tapée en japonais est trouvée même si le pays
     # est écrit en anglais) ; sinon recherche « ville, pays » en texte libre.
-    base = {"q": city, "countrycodes": cc.lower()} if cc else {"q": f"{city}, {country}" if country else city}
+    # Territoire : son nom dans la recherche, sinon les nombreux homonymes de métropole passent devant
+    # (« Saint-Pierre » à La Réunion)
+    terr = _code_to_country().get(cc, "") if cc in _PARENT else ""
+    base = {"q": f"{city}, {terr}" if terr else city, "countrycodes": search_codes} if cc else {"q": f"{city}, {country}" if country else city}
     q = _norm(city)
+    # Territoire : d'abord « ville, territoire », puis la ville seule (Kralendijk, Macao…)
+    attempts = [base] + ([{**base, "q": city}] if terr else [])
+    hit = None
     try:
-        data = await _nominatim({**base, "limit": 5, "featureType": "settlement", "namedetails": 1}, lang)
-        # Le lieu dont un nom officiel (toutes langues) correspond à ce qui a été tapé, sinon le 1er
-        hit = next((h for h in data if _matches(h, q)), data[0] if data else None)
-        if not hit:
-            # 2e essai : villes-provinces (Tokyo, Shanghai, Mexico), absentes du filtre « settlement ».
-            # Nom obligatoirement correspondant : sans ça, « 京都 » (Kyoto) donnait « 東京都 » (Tokyo).
-            data = await _nominatim({**base, "limit": 5, "namedetails": 1}, lang)
-            hit = next((h for h in data if h.get("addresstype") in _CITY_STATE_TYPES and _matches(h, q)), None)
+        for b in attempts:
+            data = [h for h in await _nominatim({**b, "limit": 5, "featureType": "settlement", "namedetails": 1}, lang)
+                    if _in_territory(h, cc)]
+            # Une ville (pas la commune administrative « county » d'Oslo ou Paramaribo) dont un nom
+            # officiel (toutes langues) correspond à ce qui a été tapé ; sinon une ville ; sinon le 1er
+            towns = [h for h in data if h.get("addresstype") in _PLACE_TYPES]
+            hit = (next((h for h in towns if _matches(h, q)), None) or (towns[0] if towns else None)
+                   or next((h for h in data if _matches(h, q) and h.get("addresstype") in _CITY_STATE_TYPES), None))
+            if not hit:
+                # 2e essai : villes-provinces (Tokyo, Shanghai, Mexico), absentes du filtre « settlement »,
+                # et communes qui n'existent qu'en « county » (San Juan, Porto Rico).
+                # Nom obligatoirement correspondant : sans ça, « 京都 » (Kyoto) donnait « 東京都 » (Tokyo).
+                data = [h for h in await _nominatim({**b, "limit": 5, "namedetails": 1}, lang) if _in_territory(h, cc)]
+                hit = (next((h for h in data if h.get("addresstype") in _CITY_STATE_TYPES and _matches(h, q)), None)
+                       or next((h for h in data if h.get("addresstype") == "county" and _matches(h, q)), None))
+            if hit:
+                break
     except Exception as e:
         logger.warning(f"[geo] Nominatim indisponible pour '{city}, {country}': {e}")
         raise
@@ -146,7 +206,7 @@ async def resolve_place(city: str, country: str) -> dict | None:
         return None
     addr = hit.get("address") or {}
     # Le lieu trouvé lui-même (Bibury), pas l'ensemble qui le contient (« city »: Cotswold)
-    if hit.get("addresstype") in _PLACE_TYPES | _CITY_STATE_TYPES and hit.get("name"):
+    if hit.get("addresstype") in _PLACE_TYPES | _CITY_STATE_TYPES | {"county"} and hit.get("name"):
         name = hit["name"]
     else:
         name = (addr.get("city") or addr.get("town") or addr.get("village") or addr.get("hamlet")
@@ -165,8 +225,10 @@ async def resolve_place(city: str, country: str) -> dict | None:
         "region": None if city_state else
                   ((addr.get("state") or addr.get("province")          # province : préfecture japonaise (大阪府)
                     or (addr.get("region") if code != "FR" else None) or "")[:100] or None),
-        "country": _code_to_country().get(code) or (addr.get("country") or country)[:100],
-        "continent": CONTINENT_BY_CODE.get(code),
+        # Pays choisi par le joueur (nom de la liste officielle, territoire compris) ; à défaut celui
+        # d'OpenStreetMap
+        "country": _code_to_country().get(cc) or _code_to_country().get(code) or (addr.get("country") or country)[:100],
+        "continent": CONTINENT_BY_CODE.get(cc) or CONTINENT_BY_CODE.get(code),
         "lat": float(hit["lat"]), "lng": float(hit["lon"]),
         "names": {"city": _names_of(hit)},   # retiré avant d'écrire dans users (save_place_names)
     }

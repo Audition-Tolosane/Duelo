@@ -7,6 +7,7 @@ import SwipeBackPage from '../components/SwipeBackPage';
 import UserAvatar from '../components/UserAvatar';
 import { authFetch } from '../utils/api';
 import { t, pluralKey, getLocale, getLanguage } from '../utils/i18n';
+import { countryName } from '../utils/countries';
 import {
   Txt, Icon, IconName, Button, Badge, Card, Chip, ScreenContainer, ScreenHeader, ThemeIcon, Loader, EmptyState,
 } from '../components/ui';
@@ -83,6 +84,7 @@ function fallbackText(meta: LeaderMeta): string {
   if (meta.area_level === 'nearby_city') return t('leaderboard.area_nearby', { city, area: meta.area_name ?? '' });
   const area = meta.area_level === 'world' ? t('leaderboard.scope_world')
     : meta.area_level === 'continent' ? t(`continent.${meta.area_name}`)
+    : meta.area_level === 'country' ? countryName(meta.area_name, getLanguage())
     : meta.area_name ?? '';
   return t('leaderboard.area_fallback', { city, area });
 }
